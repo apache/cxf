@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import jakarta.activation.CommandInfo;
 import jakarta.activation.CommandMap;
@@ -81,15 +80,8 @@ public final class AttachmentUtil {
     private static final Random BOUND_RANDOM = new Random();
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
-
-    /**
-     * Yet <a href="https://datatracker.ietf.org/doc/html/rfc822#appendix-D">RFC-822 Appendix D (ALPHABETICAL LISTING OF SYNTAX RULES)</a>
-     * allows more characters in domain-literal,
-     * this regex is valid to check that the parsed domain is compliant,
-     * although it is stricter
-     */
-    private static final Pattern ALPHA_NUMERIC_DOMAIN_PATTERN = Pattern.compile("^\\w+(\\.\\w+)*$");
-
+    
+    
     static final class EnhancedMailcapCommandMap extends MailcapCommandMap {
         @Override
         public synchronized DataContentHandler createDataContentHandler(
@@ -239,49 +231,24 @@ public final class AttachmentUtil {
         }
     }
 
-    /**
-     * Creates Content ID from {@link #ATT_UUID} and given namespace
-     * <p>
-     * Example:
-     * <pre>6976d00d-740c-48ed-b63d-8c56707544f7-1@example.com</pre>
-     * <p>
-     * <a href="https://datatracker.ietf.org/doc/html/rfc2392#section-2">RFC-2392 Section 2 (The MID and CID URL Schemes)</a>
-     * specifies Content ID as:
-     * <pre>
-     *   content-id = url-addr-spec
-     *   url-addr-spec = addr-spec ; URL encoding of RFC 822 addr-spec
-     * </pre>
-     * <a href="https://datatracker.ietf.org/doc/html/rfc822#appendix-D">RFC-822 Appendix D (ALPHABETICAL LISTING OF SYNTAX RULES)</a>:
-     * <pre>
-     *   addr-spec = local-part "@" domain ; global address
-     * </pre>
-     *
-     * @param ns namespace. If null, falls back to "cxf.apache.org"
-     * @return Content ID
-     */
-    public static String createContentID(String ns) {
+    public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "cxf.apache.org";
         if (ns != null && !ns.isEmpty()) {
-            if (isAlphaNumericDomain(ns)) {
-                cid = ns;
-            }
             try {
                 URI uri = new URI(ns);
                 String host = uri.getHost();
-                if (host != null && isAlphaNumericDomain(host)) {
+                if (host != null) {
                     cid = host;
+                } else {
+                    cid = ns;
                 }
             } catch (Exception e) {
-                // Could not parse domain => use fallback value
+                cid = ns;
             }
         }
         return ATT_UUID + '-' + Integer.toString(COUNTER.incrementAndGet()) + '@'
-            + URLEncoder.encode(cid, StandardCharsets.UTF_8);
-    }
-
-    private static boolean isAlphaNumericDomain(String string) {
-        return ALPHA_NUMERIC_DOMAIN_PATTERN.matcher(string).matches();
+            + URLEncoder.encode(cid, StandardCharsets.UTF_8.name());
     }
 
     public static String getUniqueBoundaryValue() {
@@ -521,7 +488,12 @@ public final class AttachmentUtil {
         source.setContentType(mimeType);
         DataHandler handler = new DataHandler(source);
 
-        String id = AttachmentUtil.createContentID(elementNS);
+        String id;
+        try {
+            id = AttachmentUtil.createContentID(elementNS);
+        } catch (UnsupportedEncodingException e) {
+            throw new Fault(e);
+        }
         AttachmentImpl att = new AttachmentImpl(id, handler);
         att.setXOP(isXop);
         return att;
@@ -556,7 +528,12 @@ public final class AttachmentUtil {
         //      ignore, just do the normal attachment thing
         }
 
-        String id = AttachmentUtil.createContentID(elementNS);
+        String id;
+        try {
+            id = AttachmentUtil.createContentID(elementNS);
+        } catch (UnsupportedEncodingException e) {
+            throw new Fault(e);
+        }
         AttachmentImpl att = new AttachmentImpl(id, handler);
         if (!StringUtils.isEmpty(handler.getName())) {
             //set Content-Disposition attachment header if filename isn't null

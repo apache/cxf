@@ -20,13 +20,15 @@ package org.apache.cxf.attachment;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createMock;
@@ -34,16 +36,10 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class AttachmentUtilTest {
-
-    // Yet RFC822 allows more characters in domain-literal,
-    // this regex is enough to check that the fallback domain is compliant
-    public static final String CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN = ".+@\\w+(\\.\\w+)*";
-
     @Test
     public void testContendDispositionFileNameNoQuotes() {
         assertEquals("a.txt",
@@ -141,15 +137,15 @@ public class AttachmentUtilTest {
         assertNotEquals(AttachmentUtil.createContentID(null), AttachmentUtil.createContentID(null));
     }
 
-    @Test
-    public void testCreateContentIDWithNullDomainNamePassed() {
-        String actual = AttachmentUtil.createContentID(null);
 
-        assertThat(actual, matchesPattern(CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN));
+    @Test
+    public void testCreateContentIDWithNullDomainNamePassed() throws UnsupportedEncodingException {
+        String actual = AttachmentUtil.createContentID(null);
+        assertThat(actual, endsWith("@cxf.apache.org"));
     }
 
     @Test
-    public void testCreateContentIDWithDomainNamePassed() {
+    public void testCreateContentIDWithDomainNamePassed() throws UnsupportedEncodingException {
         String domain = "subdomain.example.com";
 
         String actual = AttachmentUtil.createContentID(domain);
@@ -158,7 +154,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithUrlPassed() {
+    public void testCreateContentIDWithUrlPassed() throws UnsupportedEncodingException {
         String domain = "subdomain.example.com";
         String url = "https://" + domain + "/a/b/c";
 
@@ -168,7 +164,7 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithIPv4BasedUrlPassed() {
+    public void testCreateContentIDWithIPv4BasedUrlPassed() throws UnsupportedEncodingException {
         String domain = "127.0.0.1";
         String url = "https://" + domain + "/a/b/c";
 
@@ -178,13 +174,12 @@ public class AttachmentUtilTest {
     }
 
     @Test
-    public void testCreateContentIDWithIPv6BasedUrlPassed() {
+    public void testCreateContentIDWithIPv6BasedUrlPassed() throws UnsupportedEncodingException {
         String domain = "[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]";
         String url = "http://" + domain + "/a/b/c";
 
         String actual = AttachmentUtil.createContentID(url);
-
-        assertThat(actual, matchesPattern(CONTENT_ID_WITH_ALPHA_NUMERIC_DOMAIN_PATTERN));
+        assertThat(actual, endsWith("@" + URLEncoder.encode(domain, StandardCharsets.UTF_8)));
     }
 
     private CachedOutputStream testSetStreamedAttachmentProperties(final String property, final Object value)
