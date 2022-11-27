@@ -66,7 +66,8 @@
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
             org.apache.karaf.jaas.boot.principal;resolution:=optional,
             org.apache.commons.logging;resolution:=optional,
-            !sun.misc
+            !sun.misc,
+            java.security.acl;resolution:=optional
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*,org.apache.karaf.jaas.boot.principal.*
