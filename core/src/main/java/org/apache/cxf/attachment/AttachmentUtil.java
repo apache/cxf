@@ -57,6 +57,7 @@ import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -65,6 +66,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class AttachmentUtil {
+    // The xop:include "href" attribute (https://www.w3.org/TR/xop10/#xop_href) may include 
+    // arbitrary URL which we should never follow (unless explicitly allowed).
+    public static final String ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY = "org.apache.cxf.attachment.xop.follow.urls";
     public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
 
     static final String BINARY = "binary";
@@ -572,7 +576,13 @@ public final class AttachmentUtil {
                 return loadDataSource(contentId, atts);
             } else {
                 try {
-                    return new URLDataSource(new URL(contentId));
+                    final String followUrls = SystemPropertyAction
+                        .getProperty(ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "false");
+                    if ("true".equals(followUrls)) {
+                        return new URLDataSource(new URL(contentId));
+                    } else {
+                        return loadDataSource(contentId, atts);
+                    }
                 } catch (MalformedURLException e) {
                     throw new Fault(e);
                 }

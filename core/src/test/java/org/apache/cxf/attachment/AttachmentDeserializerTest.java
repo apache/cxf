@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import javax.activation.DataSource;
+import javax.activation.URLDataSource;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -49,9 +50,11 @@ import org.apache.cxf.message.XMLMessage;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -783,4 +786,22 @@ public class AttachmentDeserializerTest {
         assertEquals("passwd", dataSource.getName());
     }
 
+    @Test
+    public void testCXF8706() {
+        final DataSource ds = AttachmentUtil
+            .getAttachmentDataSource("cid:http://image.com/1.gif", Collections.emptyList());
+        assertThat(ds, instanceOf(LazyDataSource.class));
+    }
+    
+    @Test
+    public void testCXF8706followUrl() {
+        System.setProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "true");
+        try {
+            final DataSource ds = AttachmentUtil
+                .getAttachmentDataSource("cid:http://image.com/1.gif", Collections.emptyList());
+            assertThat(ds, instanceOf(URLDataSource.class));
+        } finally {
+            System.clearProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY);
+        }
+    }
 }
