@@ -50,6 +50,9 @@ public class MessageContentsList extends ArrayList<Object> {
     }
     public MessageContentsList(List<?> values) {
         super(values);
+        if (values instanceof MessageContentsList) {
+            removed.addAll(((MessageContentsList) values).removed);
+        }
     }
 
     public static MessageContentsList getContentsList(Message msg) {
