@@ -10,7 +10,7 @@ Content-ID: <echo.xml>
     <m:Data>
       <m:someData><xop:Include 
         xmlns:xop='http://www.w3.org/2004/08/xop/include' 
-        href='http://localhost:9036/policy.xsd'/>
+        href='cid:http://localhost:9036/policy.xsd'/>
       </m:someData>
     </m:Data>
   </m:echo>
