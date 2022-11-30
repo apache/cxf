@@ -576,9 +576,9 @@ public final class AttachmentUtil {
                 return loadDataSource(contentId, atts);
             } else {
                 try {
-                    final String followUrls = SystemPropertyAction
-                        .getProperty(ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "false");
-                    if ("true".equals(followUrls)) {
+                    final boolean followUrls = Boolean.valueOf(SystemPropertyAction
+                        .getProperty(ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "false"));
+                    if (followUrls) {
                         return new URLDataSource(new URL(contentId));
                     } else {
                         return loadDataSource(contentId, atts);
