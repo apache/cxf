@@ -88,6 +88,7 @@
         <cxf.el-api.version>3.0.3</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.hoverfly.version>0.14.0</cxf.hoverfly.version>
+        <cxf.hisrc.basicjaxb.version>2.0.0</cxf.hisrc.basicjaxb.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.openapi.version>1.0.15</cxf.geronimo.openapi.version>
         <cxf.glassfish.el.version>4.0.0</cxf.glassfish.el.version>

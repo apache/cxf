@@ -31,7 +31,6 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wadlto.WADLToJava;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -65,7 +64,6 @@ public class WADLToJavaTest extends ProcessorTestBase {
     }
 
     @Test
-    @Ignore("CXF-8774")
     public void testGenerateJAXBToString() throws Exception {
         String[] args = new String[] {
             "-d",
@@ -105,6 +103,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
             "java8",
             "-compile",
             "-xjc-episode " + output.getAbsolutePath() + "/test.episode",
+            "-xjc-XtoString",
             getLocation("/wadl/bookstore.xml"),
         };
 
@@ -135,7 +134,6 @@ public class WADLToJavaTest extends ProcessorTestBase {
     }
 
     @Test
-    @Ignore("CXF-8774")
     public void testGenerateJAXBToStringAndEqualsAndHashCode() throws Exception {
         String[] args = new String[] {
             "-d",
