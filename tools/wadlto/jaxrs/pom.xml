@@ -60,6 +60,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.patrodyne.jvnet</groupId>
+            <artifactId>hisrc-basicjaxb-plugins</artifactId>
+            <version>${cxf.hisrc.basicjaxb.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <scope>test</scope>
