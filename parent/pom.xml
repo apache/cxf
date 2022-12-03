@@ -125,8 +125,8 @@
         <cxf.httpcomponents.client.version>4.5.13</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.httpcomponents.core.version>4.4.15</cxf.httpcomponents.core.version>
-        <cxf.httpcomponents.client5.version>5.1.4</cxf.httpcomponents.client5.version>
-        <cxf.httpcomponents.core5.version>5.1.5</cxf.httpcomponents.core5.version>
+        <cxf.httpcomponents.client5.version>5.2</cxf.httpcomponents.client5.version>
+        <cxf.httpcomponents.core5.version>5.2</cxf.httpcomponents.core5.version>
         <cxf.jackson.version>2.14.1</cxf.jackson.version>
         <cxf.jackson.databind.version>2.14.1</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
