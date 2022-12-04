@@ -163,7 +163,7 @@
         <cxf.netty.version>4.1.85.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
-        <cxf.openjpa.version>3.1.2</cxf.openjpa.version>
+        <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.26</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
