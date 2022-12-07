@@ -150,7 +150,7 @@
         <cxf.jboss.weld.version>3.1.7.SP1</cxf.jboss.weld.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jettison.version>1.5.2</cxf.jettison.version>
+        <cxf.jettison.version>1.5.3</cxf.jettison.version>
         <cxf.jetty.osgi.version>[9.2,10)</cxf.jetty.osgi.version>
         <cxf.jetty10.version>10.0.12</cxf.jetty10.version>
         <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
