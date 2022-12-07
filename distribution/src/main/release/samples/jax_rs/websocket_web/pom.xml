@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${cxf.jetty9.version}</version>
+                <version>${cxf.jetty10.version}</version>
                 <configuration>
                     <webAppSourceDirectory>${project.build.directory}/${project.name}</webAppSourceDirectory>
                     <scanIntervalSeconds>1</scanIntervalSeconds>

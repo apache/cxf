@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.websocket.jetty9;
+package org.apache.cxf.transport.websocket.jetty10;
 
 import java.io.IOException;
 
@@ -27,24 +27,27 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
+import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
 class JettyWebSocketHandler extends JettyHTTPHandler {
-    final Jetty9WebSocketDestination webSocketDestination;
-    WebSocketServletFactory webSocketFactory;
+    final Jetty10WebSocketDestination webSocketDestination;
+    JettyWebSocketServerContainer webSocketContainer;
 
     JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
-                          Jetty9WebSocketDestination wsd) {
+                          Jetty10WebSocketDestination wsd) {
         super(jhd, cmExact);
         this.webSocketDestination = wsd;
     }
     
     @Override
     public void doStart() throws Exception {
-        webSocketFactory = webSocketDestination.getWebSocketFactory(this.getServer());
+        webSocketContainer = webSocketDestination.getWebSocketContainer(getServletContext());
         super.doStart();
     }
 
@@ -55,12 +58,18 @@ class JettyWebSocketHandler extends JettyHTTPHandler {
                        HttpServletResponse response)
         throws IOException, ServletException {
 
-        if (webSocketFactory.isUpgradeRequest(request, response)
-            && webSocketFactory.acceptWebSocket(request, response)) {
+        if (webSocketContainer.upgrade(webSocketDestination.getCreator(), request, response)) {
             baseRequest.setHandled(true);
             return;
         }
         super.handle(target, baseRequest, request, response);
+    }
+
+    @Override
+    public ContextHandler createContextHandler() {
+        final ServletContextHandler handler = new ServletContextHandler();
+        JettyWebSocketServletContainerInitializer.configure(handler, null);
+        return handler;
     }
 
 }

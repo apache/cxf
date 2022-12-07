@@ -116,10 +116,6 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
             <optional>true</optional>
         </dependency>

@@ -490,7 +490,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         }
 
         String contextName = HttpUriMapper.getContextName(url.getPath());
-        ContextHandler context = new ContextHandler();
+        ContextHandler context = handler.createContextHandler();
         context.setContextPath(contextName);
         // bind the jetty http handler with the context handler
         if (isSessionSupport) {
@@ -625,7 +625,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
     
     private Connector createConnector(String hosto, int porto, final Bus bus) {
         // now we just use the SelectChannelConnector as the default connector
-        SslContextFactory sslcf = null;
+        SslContextFactory.Server sslcf = null;
         if (tlsServerParameters != null) {
             sslcf = new SslContextFactory.Server() {
                 protected void doStart() throws Exception {
@@ -667,7 +667,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         return result;
     }
 
-    AbstractConnector createConnectorJetty(SslContextFactory sslcf, String hosto, int porto, 
+    AbstractConnector createConnectorJetty(SslContextFactory.Server sslcf, String hosto, int porto, 
             int major, int minor, final Bus bus) {
         final AbstractConnector result;
         try {
@@ -676,6 +676,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
 
             Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
+            connectionFactories.add(httpFactory);
 
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
@@ -697,13 +698,15 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                     connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
                 }
 
+                // Has to be set before the default protocol change
+                result.setConnectionFactories(connectionFactories);
+
                 String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP/1.1";
                 result.setDefaultProtocol(proto);
             } else if (isHttp2Enabled(bus)) {
                 connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
+                result.setConnectionFactories(connectionFactories);
             }
-            connectionFactories.add(httpFactory);
-            result.setConnectionFactories(connectionFactories);
 
             if (getMaxIdleTime() > 0) {
                 result.setIdleTimeout(Long.valueOf(getMaxIdleTime()));
@@ -792,8 +795,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         }
     }
 
-    @SuppressWarnings("deprecation")
-    protected void setClientAuthentication(SslContextFactory con,
+    protected void setClientAuthentication(SslContextFactory.Server con,
                                            ClientAuthentication clientAuth) {
         con.setWantClientAuth(true);
         if (clientAuth != null) {
@@ -810,7 +812,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
      * of the JettySslConnector.
      */
     private void decorateCXFJettySslSocketConnector(
-            SslContextFactory con
+            SslContextFactory.Server con
     ) {
         setClientAuthentication(con,
                                 tlsServerParameters.getClientAuthentication());
@@ -1068,7 +1070,9 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 if (mBeanContainer != null) {
                     removeServerMBean();
                 }
-                server.destroy();
+                //After upgrade Jetty to 10.0.12, server.destroy() will clear all MBeans from container
+                //The old version doesn't behavior like this and this 
+                //server.destroy();
                 server = null;
             }
         }

@@ -527,14 +527,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
-            <version>${cxf.wiremock.version}</version>
+            <groupId>io.specto</groupId>
+            <artifactId>hoverfly-java</artifactId>
+            <version>${cxf.hoverfly.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.xmlunit</groupId>
-                    <artifactId>xmlunit-core</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -619,8 +619,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <artifactId>websocket-jetty-server</artifactId>
+                    <version>${cxf.jetty10.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>javax.servlet</groupId>
@@ -632,7 +632,7 @@
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-jaas</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty10.version}</version>
                 </dependency>
             </dependencies>
         </profile>

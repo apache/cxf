@@ -346,19 +346,19 @@
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>http2-client</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty10.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-alpn-java-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty10.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-alpn-java-client</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <version>${cxf.jetty10.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

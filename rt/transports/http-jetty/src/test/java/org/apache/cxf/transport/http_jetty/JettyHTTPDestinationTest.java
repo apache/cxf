@@ -676,7 +676,7 @@ public class JettyHTTPDestinationTest {
                 EasyMock.expect(request.getAttribute("org.eclipse.jetty.ajax.Continuation")).andReturn(null);
                 EasyMock.expect(request.getAttribute("http.service.redirection")).andReturn(null).anyTimes();
 
-                HttpFields httpFields = new HttpFields();
+                HttpFields.Mutable httpFields = HttpFields.build();
                 httpFields.add("content-type", "text/xml");
                 httpFields.add("content-type", "charset=utf8");
                 httpFields.put(JettyHTTPDestinationTest.AUTH_HEADER, JettyHTTPDestinationTest.BASIC_AUTH);

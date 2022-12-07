@@ -17,17 +17,17 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket.jetty9;
+package org.apache.cxf.transport.websocket.jetty10;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
@@ -58,30 +58,28 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
-import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
+import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
+import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
 
 /**
  *
  */
-public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
+public class Jetty10WebSocketDestination extends JettyHTTPDestination implements
     WebSocketDestinationService {
-    private static final Logger LOG = LogUtils.getL7dLogger(Jetty9WebSocketDestination.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(Jetty10WebSocketDestination.class);
 
     //REVISIT make these keys configurable
     private static final String REQUEST_ID_KEY = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
     private static final String RESPONSE_ID_KEY = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
 
     private final Executor executor;
+    private JettyWebSocketServerContainer webSocketServerContainer;
 
-    private WebSocketHandler webSockethandler;
-    private WebSocketServletFactory webSocketFactory;
-
-    public Jetty9WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+    public Jetty10WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
         super(bus, registry, ei,
               serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
@@ -99,14 +97,29 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                        final HttpServletRequest request,
                        final HttpServletResponse response) throws IOException {
 
-        WebSocketServletFactory wsf = getWebSocketFactory(config, context);
+        JettyWebSocketServerContainer wssc = getWebSocketContainer(context);
+        JettyWebSocketCreator creator = getCreator();
 
-        if (wsf.isUpgradeRequest(request, response)
-            && wsf.acceptWebSocket(request, response)) {
+        if (wssc.upgrade(creator, request, response)) {
             ((Request)request).setHandled(true);
             return;
         }
         super.invoke(config, context, request, response);
+    }
+
+    public JettyWebSocketCreator getCreator() {
+        return new Creator();
+    }
+
+    public synchronized JettyWebSocketServerContainer getWebSocketContainer(ServletContext context) {
+        if (webSocketServerContainer == null) {
+            webSocketServerContainer = JettyWebSocketServerContainer.getContainer(context);
+            if (webSocketServerContainer == null) {
+                webSocketServerContainer = JettyWebSocketServerContainer.ensureContainer(context);
+            }
+            return webSocketServerContainer;
+        }
+        return webSocketServerContainer;
     }
 
     private static String getNonWSAddress(EndpointInfo endpointInfo) {
@@ -127,33 +140,6 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         return h.getServer();
     }
 
-    private WebSocketServletFactory getWebSocketFactory(ServletConfig config, ServletContext context) {
-        if (webSocketFactory == null) {
-            Server server = getServer(config, context);
-            return getWebSocketFactory(server);
-        }
-        return webSocketFactory;
-    }
-
-    public synchronized WebSocketServletFactory getWebSocketFactory(Server server) {
-        if (webSocketFactory == null) {
-            webSockethandler = new WebSocketHandler() {
-                @Override
-                public void configure(WebSocketServletFactory factory) {
-                }
-            };
-            try {
-                webSockethandler.setServer(server);
-                webSockethandler.start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            webSocketFactory = webSockethandler.getWebSocketFactory();
-            webSocketFactory.setCreator(new Creator());
-        }
-        return webSocketFactory;
-    }
-
     @Override
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new JettyWebSocketHandler(jhd, cmExact, this);
@@ -161,11 +147,6 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     @Override
     public void shutdown() {
-        try {
-            webSockethandler.stop();
-        } catch (Exception e) {
-            //nothing needed
-        }
         super.shutdown();
     }
 
@@ -179,7 +160,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             public void run() {
                 HttpServletResponse response = null;
                 try {
-                    WebSocketServletHolder holder = new Jetty9WebSocketHolder(session);
+                    WebSocketServletHolder holder = new Jetty10WebSocketHolder(session);
                     response = createServletResponse(holder);
                     HttpServletRequest request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
@@ -233,10 +214,10 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     }
 
     // hide this jetty9 interface here to avoid CNFE on WebSocketCreator
-    private class Creator implements WebSocketCreator {
+    private class Creator implements JettyWebSocketCreator {
 
         @Override
-        public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+        public Object createWebSocket(JettyServerUpgradeRequest req, JettyServerUpgradeResponse resp) {
             return new WebSocketAdapter() {
                 Session session;
                 @Override
@@ -263,16 +244,16 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     }
 
-    class Jetty9WebSocketHolder implements WebSocketServletHolder {
+    class Jetty10WebSocketHolder implements WebSocketServletHolder {
         final Session session;
-        Jetty9WebSocketHolder(Session s) {
+        Jetty10WebSocketHolder(Session s) {
             session = s;
         }
         public String getAuthType() {
             return null;
         }
         public String getContextPath() {
-            return ((ServletUpgradeRequest)session.getUpgradeRequest()).getHttpServletRequest().getContextPath();
+            return getHttpServletRequest(session.getUpgradeRequest()).getContextPath();
         }
         public String getLocalAddr() {
             return null;
@@ -332,21 +313,24 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public int getServerPort() {
-            return session.getLocalAddress().getPort();
+            return ((InetSocketAddress)session.getLocalAddress()).getPort();
         }
         public Principal getUserPrincipal() {
             return null;
         }
         public Object getAttribute(String name) {
-            return ((ServletUpgradeRequest)session.getUpgradeRequest()).getHttpServletRequest().getAttribute(name);
+            return getHttpServletRequest(session.getUpgradeRequest()).getAttribute(name);
         }
         @Override
         public void write(byte[] data, int offset, int length) throws IOException {
-            try {
-                session.getRemote().sendBytesByFuture(ByteBuffer.wrap(data,  offset, length)).get();
-            } catch (InterruptedException | ExecutionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            session.getRemote().sendBytes(ByteBuffer.wrap(data,  offset, length));
+        }
+        
+        private HttpServletRequest getHttpServletRequest(final UpgradeRequest upgradeRequest) {
+            if (upgradeRequest instanceof JettyServerUpgradeRequest) {
+                return ((JettyServerUpgradeRequest)upgradeRequest).getHttpServletRequest();
+            } else {
+                throw new IllegalStateException("Unsupported upgrade request class: " + upgradeRequest.getClass());
             }
         }
     }

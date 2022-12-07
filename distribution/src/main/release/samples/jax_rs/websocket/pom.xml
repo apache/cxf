@@ -57,14 +57,14 @@
                 </property>
             </activation>
             <properties>
-                <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+                <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
             </properties>
             <dependencies>
                 <!-- jetty9 websocket -->
                 <dependency>
                     <groupId>org.eclipse.jetty.websocket</groupId>
                     <artifactId>websocket-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty10.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>javax.servlet</groupId>

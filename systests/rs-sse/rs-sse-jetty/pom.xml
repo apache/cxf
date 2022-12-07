@@ -30,7 +30,7 @@
     <description>Apache CXF SSE Integration System Tests for Jetty</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.jetty</cxf.module.name>
     </properties>
     <dependencies>
@@ -54,12 +54,6 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-plus</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
