@@ -1,4 +1,4 @@
-Apache CXF 3.5.4 Release Notes
+Apache CXF 3.5.5 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.4 fixes over 14 JIRA issues reported by users and the community.
+3.5.5 fixes over 9 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -73,26 +73,19 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-8730] - Fix org.apache.cxf.osgi.itests.jaxrs.JaxRsServiceTest
-
 ** Bug
-    * [CXF-8698] - Content-ID of attachments for outgoing requests are URL-decoded instead of URL-encoded
-    * [CXF-8712] - RetryStrategy tries one time too often
-    * [CXF-8732] - [regression] activation DataSource requires to run JAXRS
-    * [CXF-8733] - [regression] Content-ID of attachments for outgoing requests is not URL-decoded
-    * [CXF-8735] - AbstractStaticFailoverStrategy: UnsupportedOperationException when there are no services associated with the endpoint
-    * [CXF-8738] - NullPointerException when SwaggerUiConfig.queryConfigEnabled not set
-    * [CXF-8749] - Existing handler file fails the compile generated java source files
-    * [CXF-8750] - Swagger UI not working in Karaf 4.4.0 due to a double slash
-
-** New Feature
-    * [CXF-8752] - Configurable list of redirectable verbs
+    * [CXF-8706] - CXF MTOM handler allow content injection
+    * [CXF-8761] - DigestAuthSupplier: Must not decode URL encoded URI parts
+    * [CXF-8771] - Fix SortedArraySet remove method
+    * [CXF-8776] - Version 3.5.4 contains security vulnerable woodstox version
+    * [CXF-8777] - cxf-codegen-plugin : 3.5.4 : commons-text :1.9
+    * [CXF-8796] - IllegalArgumentException: argument type mismatch with code first RPC when parameter omitted
+    * [CXF-8798] - UDPDestination throws NPE under some conditions
+    * [CXF-8799] - Unxepected URLEncode in MTOM Content-Id
 
 ** Improvement
-    * [CXF-8710] - Set `queryConfigEnabled` to `true` if any query parameters are configured in SwaggerUiConfig
-    * [CXF-8725] - Allow RetryStrategy to optionally not retry for HTTP 404 responses
-    * [CXF-8734] - upgrade to undertow 2.2.15 or later
-    * [CXF-8744] - Get rid of httpunit
-    * [CXF-8756] - Update to Swagger UI 4.14.0
-    * [CXF-8757] - Swagger UI: update queryConfigEnabled documented behavior
+    * [CXF-8785] - Make Jsonb lazy initializable in the JsrJsonbProvider
+
+
+
+
