@@ -393,6 +393,8 @@ public class AttachmentSerializer {
             return decode(s, charset);
         } catch (IllegalArgumentException ex) {
             return s;
+        } catch (UnsupportedEncodingException ex) {
+            return s;
         }
     }
 }

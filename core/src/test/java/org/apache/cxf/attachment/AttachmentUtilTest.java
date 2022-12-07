@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -179,7 +178,7 @@ public class AttachmentUtilTest {
         String url = "http://" + domain + "/a/b/c";
 
         String actual = AttachmentUtil.createContentID(url);
-        assertThat(actual, endsWith("@" + URLEncoder.encode(domain, StandardCharsets.UTF_8)));
+        assertThat(actual, endsWith("@" + URLEncoder.encode(domain, "UTF-8")));
     }
 
     private CachedOutputStream testSetStreamedAttachmentProperties(final String property, final Object value)
