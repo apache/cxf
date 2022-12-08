@@ -117,14 +117,14 @@
         <cxf.jakarta.jwsapi.version>3.0.0</cxf.jakarta.jwsapi.version>
         <cxf.jakarta.soapapi.version>2.0.1</cxf.jakarta.soapapi.version>
         <cxf.jakarta.wsapi.version>3.0.1</cxf.jakarta.wsapi.version>
-        <cxf.jakarta.jms.version>3.0.0</cxf.jakarta.jms.version>
-        <cxf.jakarta.transaction.version>2.0.0</cxf.jakarta.transaction.version>
-        <cxf.jakarta.ejb.version>4.0.0</cxf.jakarta.ejb.version>
-        <cxf.jakarta.resource.version>2.0.0</cxf.jakarta.resource.version>
+        <cxf.jakarta.jms.version>3.1.0</cxf.jakarta.jms.version>
+        <cxf.jakarta.transaction.version>2.0.1</cxf.jakarta.transaction.version>
+        <cxf.jakarta.ejb.version>4.0.1</cxf.jakarta.ejb.version>
+        <cxf.jakarta.resource.version>2.1.0</cxf.jakarta.resource.version>
         <cxf.jakarta.management.j2ee-api.version>1.1.4</cxf.jakarta.management.j2ee-api.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.javassist.version>3.27.0-GA</cxf.javassist.version>
-        <cxf.jakarta.annotation-api.version>2.1.0-B1</cxf.jakarta.annotation-api.version>
+        <cxf.jakarta.annotation-api.version>2.1.1</cxf.jakarta.annotation-api.version>
         <cxf.jakarta.ws.rs.version>3.0.0</cxf.jakarta.ws.rs.version>
         <cxf.jaxb.runtime.version>3.0.2</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>3.0.1</cxf.jaxb.version>
@@ -198,7 +198,7 @@
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
         <cxf.validation.api.package.version>[3,4)</cxf.validation.api.package.version>
-        <cxf.validation.api.version>3.0.0</cxf.validation.api.version>
+        <cxf.validation.api.version>3.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>2.27.2</cxf.wiremock.version>
