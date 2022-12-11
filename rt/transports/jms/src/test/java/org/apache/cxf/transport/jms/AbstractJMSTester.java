@@ -94,7 +94,7 @@ public abstract class AbstractJMSTester {
         addressSettings.setAutoCreateQueues(true);
         addressSettings.setAutoDeleteQueues(false);
         addressSettings.setAutoDeleteAddresses(false);
-        config.setAddressesSettings(Collections.singletonMap("#", new AddressSettings()));
+        config.setAddressSettings(Collections.singletonMap("#", new AddressSettings()));
         broker = new EmbeddedActiveMQ();
         broker.setConfiguration(config);
         SecurityConfiguration securityConfig = new SecurityConfiguration();
@@ -302,7 +302,9 @@ public abstract class AbstractJMSTester {
             synchronized (inMessage) {
                 inMessage.wait(MAX_RECEIVE_TIME * 1000L);
             }
-            assertNotNull("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds", inMessage.get());
+            if (null == inMessage.get()) {
+                assertNotNull("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds", inMessage.get());
+            }
         }
         return inMessage.getAndSet(null);
     }
@@ -312,8 +314,10 @@ public abstract class AbstractJMSTester {
             synchronized (destMessage) {
                 destMessage.wait(MAX_RECEIVE_TIME * 1000L);
             }
-            assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME + " seconds",
+            if (null == destMessage.get()) {
+                assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME + " seconds",
                     destMessage.get());
+            }
         }
         return destMessage.getAndSet(null);
     }
