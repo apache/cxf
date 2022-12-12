@@ -300,7 +300,31 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-
+        <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>[11,16)</jdk>
+            </activation>
+            <properties>
+                <cxf.spring.boot.version>2.7.6</cxf.spring.boot.version>
+                <cxf.spring.version>5.3.24</cxf.spring.version>
+                <spring.boot.version>2.7.6</spring.boot.version>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>spring.milestone</id>
+                    <url>https://repo.spring.io/milestone/</url>
+                    <name>Spring Milestone Repo</name>
+                </repository>
+                <repository>
+                    <id>netflix.candidates</id>
+                    <url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
     </profiles>
     <!--
      we turn off the deploy in the properties above, but deploy plugin will

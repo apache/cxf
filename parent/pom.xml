@@ -2134,6 +2134,16 @@
             </build>
         </profile>
         <profile>
+            <id>jdk11</id>
+            <activation>
+                <jdk>[11,16)</jdk>
+            </activation>
+            <properties>
+                <cxf.spring.boot.version>2.7.6</cxf.spring.boot.version>
+                <cxf.spring.version>5.3.24</cxf.spring.version>
+            </properties>
+        </profile>
+        <profile>
             <id>jdk13</id>
             <activation>
                 <jdk>[13,)</jdk>

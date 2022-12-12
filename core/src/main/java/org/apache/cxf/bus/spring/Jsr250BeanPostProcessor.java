@@ -22,6 +22,7 @@ package org.apache.cxf.bus.spring;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -46,8 +47,8 @@ public class Jsr250BeanPostProcessor
     public void setApplicationContext(ApplicationContext applicationContext) {
         context = applicationContext;
         try {
-            Class<?> cls = Class
-                .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+            Class<?> cls = ClassLoaderUtils.loadClass("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor",
+                                                      applicationContext.getClass());
             isProcessing = context.getBeanNamesForType(cls, true, false).length == 0;
         } catch (ClassNotFoundException e) {
             isProcessing = true;
