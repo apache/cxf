@@ -12,22 +12,11 @@ provider. As the IssuedToken is defined as the InitiatorToken of the
 Asymmetric binding in the policy of the service provider, the client will use
 the associated secret key to sign various parts of the message.
 
-CXF 3.0.0 supports both a DOM-based (in-memory) and StAX-based (streaming)
+CXF 3.6 supports both a DOM-based (in-memory) and StAX-based (streaming)
 approach to WS-Security. This demo shows how to use both approaches.
 
 Please review the README in the samples directory before continuing.
 
-*** Requirements ***
-
-The samples in this directory use STRONG encryption. If you are using a version
-of Java prior to 1.8.0_161 then you may need to install the Java Cryptography
-Extension (JCE) Unlimited Strength Jurisdiction Policy Files [1] for the
-examples to work. Note that from the 1.8.0_161 release, Java has the unlimited
-strength policies installed by default. If you get errors about invalid key
-lengths with an older JDK version, then the Unlimited Strength files are not
-installed.
-
-[1] http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 
 Building and running the demo using Maven
