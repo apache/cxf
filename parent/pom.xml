@@ -178,7 +178,7 @@
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.1.1</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.85.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.86.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.oauth.version>20100527</cxf.oauth.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
