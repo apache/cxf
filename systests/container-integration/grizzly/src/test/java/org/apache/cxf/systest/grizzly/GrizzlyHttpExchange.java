@@ -170,7 +170,7 @@ public class GrizzlyHttpExchange extends HttpExchange {
         }
         @Override
         public List<String> put(String key, List<String> value) {
-            for(String val : value) {
+            for (String val : value) {
                 response.addHeader(key, val);
             }
             return super.put(key, value);

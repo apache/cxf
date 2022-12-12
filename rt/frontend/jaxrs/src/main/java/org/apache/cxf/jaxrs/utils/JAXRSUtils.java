@@ -233,8 +233,8 @@ public final class JAXRSUtils {
             return Optional.ofNullable(cls);
         }
 
-        boolean isAssignableFrom(Class<?> cls) {
-            return load().map(c -> c.isAssignableFrom(cls)).orElse(false);
+        boolean isAssignableFrom(Class<?> clz) {
+            return load().map(c -> c.isAssignableFrom(clz)).orElse(false);
         }
     }
 

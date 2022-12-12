@@ -135,7 +135,7 @@ public class EndpointAPITest {
         String[] addresses = new String[k];
         for (int i = 0; i < k; i++) {
             addresses[i] = "http://localhost:" + currentPort + contextPath + i + path;
-            contexts[i] = new GrizzlyHttpContext(server,contextPath + i, path);
+            contexts[i] = new GrizzlyHttpContext(server, contextPath + i, path);
             endpoints[i] = Endpoint.create(new EndpointBean());
             endpoints[i].publish(contexts[i]);
         }
