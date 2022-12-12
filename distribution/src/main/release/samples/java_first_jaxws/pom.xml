@@ -82,17 +82,6 @@
                     </deployables>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <configuration>
-                    <rules>
-                        <requireJavaVersion>
-                            <version>17</version>
-                        </requireJavaVersion>
-                    </rules>
-                </configuration>
-            </plugin>
         </plugins>
         <finalName>java_first_jaxws</finalName>
     </build>
