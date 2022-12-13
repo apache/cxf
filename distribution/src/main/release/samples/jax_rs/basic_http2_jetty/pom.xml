@@ -29,22 +29,6 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <build> 
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <configuration>
-                    <rules>
-                        <requireJavaVersion>
-                            <version>17</version>
-                        </requireJavaVersion>
-                    </rules>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>h2-server</id>
