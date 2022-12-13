@@ -53,7 +53,7 @@
         <value>http://localhost:(\d)*/SoapContext/SoapPort</value>
     </util:list>
     <bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureCryptoProperties" value="stsKeystore.properties"/>
         <property name="signatureUsername" value="mystskey"/>
         <property name="callbackHandlerClass" value="demo.wssec.sts.STSCallbackHandler"/>
         <property name="issuer" value="DoubleItSTSIssuer"/>
