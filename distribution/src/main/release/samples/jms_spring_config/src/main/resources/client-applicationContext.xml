@@ -25,7 +25,7 @@
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
 	<!-- Do not forget the destroy-method as else the JVM will hang on shutdown -->
-	<bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory" destroy-method="stop">
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory" destroy-method="close">
 		<property name="brokerURL" value="tcp://localhost:61616"/>
 	</bean>
     

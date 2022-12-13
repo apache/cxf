@@ -137,15 +137,17 @@
                 <defaultGoal>test</defaultGoal>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.activemq.tooling</groupId>
-                        <artifactId>activemq-maven-plugin</artifactId>
-                        <version>5.8.0</version>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>run</goal>
+                                    <goal>java</goal>
                                 </goals>
+                                <configuration>
+                                    <mainClass>com.example.customerservice.broker.EmbeddedBroker</mainClass>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -169,10 +171,6 @@
             <artifactId>cxf-xjc-runtime</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-jakarta-client</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
@@ -180,6 +178,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jakarta-server</artifactId>
+            <version>${cxf.activemq.artemis.version}</version>
         </dependency>
     </dependencies>
 </project>
