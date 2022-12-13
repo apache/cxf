@@ -59,25 +59,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>me.snowdrop</groupId>
-            <artifactId>narayana-spring-boot-starter</artifactId>
-            <version>${cxf.narayana.spring.boot.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.narayana</groupId>
-                    <artifactId>jbosstxbridge</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.narayana</groupId>
-                    <artifactId>jbosstxts</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.narayana.jta</groupId>
-                    <artifactId>narayana-jta</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.narayana.jta</groupId>
             <artifactId>narayana-jta-jakarta</artifactId>
         </dependency>
@@ -92,6 +73,22 @@
             <version>${cxf.jboss.narayana.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jboss.ws</groupId>
+            <artifactId>jbossws-api</artifactId>
+            <version>2.0.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.ws.cxf</groupId>
+            <artifactId>jbossws-cxf-client</artifactId>
+            <version>6.1.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>${spring.boot.version}</version>
@@ -100,6 +97,10 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${cxf.h2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

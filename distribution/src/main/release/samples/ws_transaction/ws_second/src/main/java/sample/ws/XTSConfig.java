@@ -28,6 +28,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.transaction.jta.JtaTransactionManager;
+
+import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
+
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+import jakarta.transaction.UserTransaction;
 
 @Configuration
 public class XTSConfig {
@@ -47,5 +54,29 @@ public class XTSConfig {
     @DependsOn({"xtsService"})
     public InboundBridgeRecoveryManager inboundBridgeRecoveryManager() {
         return new InboundBridgeRecoveryManager();
+    }
+
+    @Bean
+    public UserTransaction narayanaUserTransaction() {
+        return com.arjuna.ats.jta.UserTransaction.userTransaction();
+    }
+
+    @Bean
+    public TransactionManager narayanaTransactionManager() {
+        return com.arjuna.ats.jta.TransactionManager.transactionManager();
+    }
+
+    @Bean
+    public TransactionSynchronizationRegistry narayanaTransactionSynchronizationRegistry() {
+        return new TransactionSynchronizationRegistryImple();
+    }
+
+    @Bean
+    public JtaTransactionManager transactionManager(UserTransaction userTransaction,
+            TransactionManager transactionManager,
+            TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        JtaTransactionManager jtaTransactionManager = new JtaTransactionManager(userTransaction, transactionManager);
+        jtaTransactionManager.setTransactionSynchronizationRegistry(transactionSynchronizationRegistry);
+        return jtaTransactionManager;
     }
 }

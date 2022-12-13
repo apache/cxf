@@ -19,20 +19,19 @@
 
 package sample.ws.service;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.TestPropertySource;
 
 import jakarta.transaction.UserTransaction;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = SampleWsApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
+@TestPropertySource(properties = "server.port=8080")
 public class  BridgeFromJTATest {
 
     @Autowired
@@ -42,13 +41,13 @@ public class  BridgeFromJTATest {
     private SecondServiceAT secondClient;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         firstClient = FirstClient.newInstance();
         secondClient = SecondClient.newInstance();
     }
 
-    @After
+    @AfterEach
     public void teardownTest() throws Exception {
         rollbackIfActive(ut);
         try {
@@ -74,8 +73,8 @@ public class  BridgeFromJTATest {
         int counter2 = secondClient.getCounter();
         ut.commit();
 
-        Assert.assertEquals(1, counter1);
-        Assert.assertEquals(1, counter2);
+        Assertions.assertEquals(1, counter1);
+        Assertions.assertEquals(1, counter2);
     }
 
     @Test
@@ -90,8 +89,8 @@ public class  BridgeFromJTATest {
         int counter2 = secondClient.getCounter();
         ut.commit();
 
-        Assert.assertEquals(0, counter1);
-        Assert.assertEquals(0, counter2);
+        Assertions.assertEquals(0, counter1);
+        Assertions.assertEquals(0, counter2);
     }
 
 

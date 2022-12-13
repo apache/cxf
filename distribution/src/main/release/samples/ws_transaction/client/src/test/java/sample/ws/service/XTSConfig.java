@@ -27,6 +27,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
+import com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple;
+
+import jakarta.transaction.UserTransaction;
+
 @Configuration
 public class XTSConfig {
     @Bean(name = "xtsService", initMethod = "start", destroyMethod = "stop")
@@ -43,5 +47,10 @@ public class XTSConfig {
     @DependsOn({"xtsService"})
     public OutboundBridgeRecoveryManager outboundBridgeRecoveryManager() {
         return new OutboundBridgeRecoveryManager();
+    }
+    
+    @Bean
+    public UserTransaction userTransaction() {
+        return new UserTransactionImple();
     }
 }
