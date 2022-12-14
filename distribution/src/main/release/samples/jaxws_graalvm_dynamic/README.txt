@@ -8,7 +8,7 @@ techniques to deal with dynamic class generation.
 Pre-requisites
 ---------------------------------------
 
-GraalVM 20.3.0 or later distribution should be installed and pre-configured as 
+GraalVM 22.3.0/JDK11+  or later distribution should be installed and pre-configured as 
 default JVM runtime (using JAVA_HOME), see please instructions at [1].
 
 The GraalVM's native-image tool should be installed, see please 

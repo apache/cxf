@@ -1,6 +1,6 @@
 [
 {
-  "name":"char[]"
+  "name":"[C"
 },
 {
   "name":"com.ibm.wsdl.extensions.soap.SOAPAddressImpl",
@@ -35,91 +35,26 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"com.sun.xml.bind.marshaller.CharacterEscapeHandler",
-  "allPublicMethods":true
-},
-{
-  "name":"com.sun.xml.bind.marshaller.MinimumEscapeHandler",
-  "fields":[{"name":"theInstance"}]
-},
-{
-  "name":"com.sun.xml.bind.marshaller.NoEscapeHandler",
-  "fields":[{"name":"theInstance"}]
-},
-{
-  "name":"com.sun.xml.bind.v2.ContextFactory",
-  "methods":[{"name":"createContext","parameterTypes":["java.lang.Class[]", "java.util.Map"]}]
-},
-{
-  "name":"com.sun.xml.bind.v2.model.nav.ReflectionNavigator",
-  "methods":[{"name":"getInstance","parameterTypes":[] }]
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.JAXBContextImpl",
+  "name":"com.sun.xml.txw2.TypedXmlWriter",
   "methods":[
-    {"name":"getBeanInfo","parameterTypes":["java.lang.Class"] }, 
-    {"name":"hasSwaRef","parameterTypes":[] }
+    {"name":"_attribute","parameterTypes":["java.lang.String","java.lang.Object"] }, 
+    {"name":"_cast","parameterTypes":["java.lang.Class"] }, 
+    {"name":"_element","parameterTypes":["java.lang.String","java.lang.Class"] }, 
+    {"name":"_namespace","parameterTypes":["java.lang.String","java.lang.String"] }, 
+    {"name":"_pcdata","parameterTypes":["java.lang.Object"] }, 
+    {"name":"commit","parameterTypes":[] }
   ]
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.JaxBeanInfo",
-  "methods":[
-    {"name":"getTypeNames","parameterTypes":[] }, 
-    {"name":"isElement","parameterTypes":[] }
-  ]
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.LeafBeanInfoImpl"
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.output.StAXExStreamWriterOutput",
-  "methods":[{"name":"<init>","parameterTypes":["org.jvnet.staxex.XMLStreamWriterEx"] }]
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.ArrayElementLeafProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.ArrayElementNodeProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.ArrayReferenceNodeProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.SingleElementLeafProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.SingleElementNodeProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.SingleMapNodeProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.property.SingleReferenceNodeProperty",
-  "allPublicConstructors":true
-},
-{
-  "name":"com.sun.xml.bind.v2.runtime.unmarshaller.StAXExConnector",
-  "methods":[{"name":"<init>","parameterTypes":["org.jvnet.staxex.XMLStreamReaderEx","com.sun.xml.bind.v2.runtime.unmarshaller.XmlVisitor"] }]
-},
-{
-  "name":"com.sun.xml.messaging.saaj.soap.SOAPDocumentImpl",
-  "allPublicMethods":true
 },
 {
   "name":"demo.jaxws.server.AddNumbersImpl",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"addNumbers","parameterTypes":["int","int"] }]
 },
 {
   "name":"int",
-  "allDeclaredConstructors":true
+  "queryAllDeclaredConstructors":true
 },
 {
   "name":"io.netty.bootstrap.ServerBootstrap$1"
@@ -133,11 +68,11 @@
 },
 {
   "name":"io.netty.buffer.AbstractByteBufAllocator",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"io.netty.buffer.AbstractReferenceCountedByteBuf",
-  "fields":[{"name":"refCnt", "allowUnsafeAccess":true}]
+  "fields":[{"name":"refCnt"}]
 },
 {
   "name":"io.netty.channel.ChannelDuplexHandler",
@@ -255,10 +190,6 @@
   "methods":[{"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
 },
 {
-  "name":"io.netty.handler.codec.MessageToMessageEncoder",
-  "methods":[{"name":"write","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object","io.netty.channel.ChannelPromise"] }]
-},
-{
   "name":"io.netty.handler.codec.http.HttpContentCompressor"
 },
 {
@@ -271,6 +202,10 @@
 {
   "name":"io.netty.handler.codec.http.HttpObjectDecoder",
   "methods":[{"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
+},
+{
+  "name":"io.netty.handler.codec.http.HttpObjectEncoder",
+  "methods":[{"name":"write","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object","io.netty.channel.ChannelPromise"] }]
 },
 {
   "name":"io.netty.handler.codec.http.HttpRequestDecoder"
@@ -291,31 +226,66 @@
 },
 {
   "name":"io.netty.util.ReferenceCountUtil",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
-  "fields":[{"name":"producerLimit", "allowUnsafeAccess":true}]
+  "fields":[{"name":"producerLimit"}]
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
-  "fields":[{"name":"consumerIndex", "allowUnsafeAccess":true}]
+  "fields":[{"name":"consumerIndex"}]
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
-  "fields":[{"name":"producerIndex", "allowUnsafeAccess":true}]
+  "fields":[{"name":"producerIndex"}]
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueConsumerIndexField",
-  "fields":[{"name":"consumerIndex", "allowUnsafeAccess":true}]
+  "fields":[{"name":"consumerIndex"}]
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerIndexField",
-  "fields":[{"name":"producerIndex", "allowUnsafeAccess":true}]
+  "fields":[{"name":"producerIndex"}]
 },
 {
   "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerLimitField",
-  "fields":[{"name":"producerLimit", "allowUnsafeAccess":true}]
+  "fields":[{"name":"producerLimit"}]
+},
+{
+  "name":"jakarta.servlet.ServletRequest",
+  "methods":[{"name":"isAsyncSupported","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.bind.annotation.XmlAccessorType",
+  "methods":[{"name":"value","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.bind.annotation.XmlElement",
+  "methods":[{"name":"type","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.bind.annotation.XmlElementDecl",
+  "methods":[{"name":"scope","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.bind.annotation.XmlRegistry"
+},
+{
+  "name":"jakarta.xml.bind.annotation.XmlType",
+  "methods":[{"name":"factoryClass","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.ws.RequestWrapper",
+  "methods":[{"name":"partName","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.ws.ResponseWrapper",
+  "methods":[{"name":"partName","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.xml.ws.WebFault",
+  "methods":[{"name":"messageName","parameterTypes":[] }]
 },
 {
   "name":"java.io.Writer"
@@ -323,7 +293,14 @@
 {
   "name":"java.lang.Object",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.ProcessHandle",
+  "methods":[
+    {"name":"current","parameterTypes":[] }, 
+    {"name":"pid","parameterTypes":[] }
+  ]
 },
 {
   "name":"java.lang.management.ManagementFactory",
@@ -331,10 +308,7 @@
 },
 {
   "name":"java.lang.management.RuntimeMXBean",
-  "methods":[
-    {"name":"getInputArguments","parameterTypes":[] }, 
-    {"name":"getName","parameterTypes":[] }
-  ]
+  "methods":[{"name":"getInputArguments","parameterTypes":[] }]
 },
 {
   "name":"java.nio.Bits",
@@ -342,7 +316,11 @@
 },
 {
   "name":"java.nio.Buffer",
-  "fields":[{"name":"address", "allowUnsafeAccess":true}]
+  "fields":[{"name":"address"}]
+},
+{
+  "name":"java.nio.ByteBuffer",
+  "methods":[{"name":"alignedSlice","parameterTypes":["int"] }]
 },
 {
   "name":"java.nio.DirectByteBuffer",
@@ -355,41 +333,51 @@
   "name":"java.security.SecureRandomParameters"
 },
 {
+  "name":"javax.security.auth.Policy"
+},
+{
   "name":"javax.security.auth.login.Configuration"
 },
 {
-  "name":"javax.xml.bind.annotation.XmlAccessorType"
+  "name":"javax.wsdl.extensions.ExtensibilityElement",
+  "methods":[{"name":"getElementType","parameterTypes":[] }]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlElement",
-  "methods":[{"name":"type","parameterTypes":[] }]
+  "name":"javax.wsdl.extensions.soap.SOAPAddress",
+  "methods":[{"name":"setLocationURI","parameterTypes":["java.lang.String"] }]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlElementDecl",
-  "methods":[{"name":"scope","parameterTypes":[] }]
+  "name":"javax.wsdl.extensions.soap.SOAPBinding",
+  "methods":[
+    {"name":"setStyle","parameterTypes":["java.lang.String"] }, 
+    {"name":"setTransportURI","parameterTypes":["java.lang.String"] }
+  ]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlRegistry"
+  "name":"javax.wsdl.extensions.soap.SOAPBody",
+  "methods":[{"name":"setUse","parameterTypes":["java.lang.String"] }]
 },
 {
-  "name":"javax.xml.bind.annotation.XmlType",
-  "methods":[{"name":"factoryClass","parameterTypes":[] }]
+  "name":"javax.wsdl.extensions.soap.SOAPFault",
+  "methods":[
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setUse","parameterTypes":["java.lang.String"] }
+  ]
 },
 {
-  "name":"javax.xml.ws.RequestWrapper",
-  "methods":[{"name":"partName","parameterTypes":[] }]
-},
-{
-  "name":"javax.xml.ws.ResponseWrapper",
-  "methods":[{"name":"partName","parameterTypes":[] }]
-},
-{
-  "name":"javax.xml.ws.WebFault",
-  "methods":[{"name":"messageName","parameterTypes":[] }]
+  "name":"javax.wsdl.extensions.soap.SOAPOperation",
+  "methods":[
+    {"name":"getStyle","parameterTypes":[] }, 
+    {"name":"setSoapActionURI","parameterTypes":["java.lang.String"] }, 
+    {"name":"setStyle","parameterTypes":["java.lang.String"] }
+  ]
 },
 {
   "name":"jdk.internal.misc.Unsafe",
   "methods":[{"name":"getUnsafe","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.axiom.om.OMElement"
 },
 {
   "name":"org.apache.cxf.binding.AbstractBindingFactory",
@@ -415,7 +403,7 @@
 },
 {
   "name":"org.apache.cxf.bindings.xformat.ObjectFactory",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.apache.cxf.bindings.xformat.XMLBindingMessageFormat",
@@ -473,8 +461,8 @@
 {
   "name":"org.apache.cxf.common.util.ASMHelperImpl",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
@@ -503,15 +491,15 @@
 {
   "name":"org.apache.cxf.ext.logging.LoggingFactoryBeanListener",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.apache.cxf.ext.logging.OldLoggingFactoryBeanListener",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -527,8 +515,8 @@
 {
   "name":"org.apache.cxf.jaxb.WrapperHelperProxyService",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -542,8 +530,8 @@
 {
   "name":"org.apache.cxf.jaxws.spi.WrapperClassCreatorProxyService",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -565,6 +553,12 @@
 {
   "name":"org.apache.cxf.transport.http.HTTPWSDLExtensionLoader",
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.client.NettyHttpConduitFactory"
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory"
 },
 {
   "name":"org.apache.cxf.transport.http.netty.server.NettyHttpDestinationFactory",
@@ -610,7 +604,7 @@
 },
 {
   "name":"org.apache.cxf.transports.http.configuration.ObjectFactory",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.apache.cxf.ws.addressing.impl.AddressingFeatureApplier"
@@ -633,7 +627,7 @@
 },
 {
   "name":"org.apache.cxf.ws.addressing.wsdl.ObjectFactory",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.apache.cxf.ws.addressing.wsdl.UsingAddressing",
@@ -650,8 +644,8 @@
 {
   "name":"org.apache.cxf.ws.policy.PolicyAnnotationListener",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -664,8 +658,8 @@
 {
   "name":"org.apache.cxf.ws.policy.PolicyDataEngineImpl",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -713,8 +707,8 @@
 {
   "name":"org.apache.cxf.wsdl.ExtensionClassCreatorProxyService",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },
 {
@@ -726,17 +720,20 @@
 },
 {
   "name":"org.apache.cxf.wsdl.http.ObjectFactory",
-  "allDeclaredMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.apache.cxf.wsdl11.WSDLManagerImpl",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "queryAllDeclaredMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setBus","parameterTypes":["org.apache.cxf.Bus"] }
+  ]
 },
 {
   "name":"org.apache.handlers.AddNumbers",
-  "allPublicMethods":true
+  "queryAllPublicMethods":true
 },
 {
   "name":"org.apache.handlers.AddNumbersFault",
@@ -745,28 +742,116 @@
 {
   "name":"org.apache.handlers.types.AddNumbers",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getArg0","parameterTypes":[] }, 
+    {"name":"getArg1","parameterTypes":[] }
+  ]
 },
 {
   "name":"org.apache.handlers.types.AddNumbersResponse",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"getReturn","parameterTypes":[] }, 
+    {"name":"setReturn","parameterTypes":["int"] }
+  ]
 },
 {
   "name":"org.apache.handlers.types.FaultDetail",
   "allDeclaredFields":true,
-  "allDeclaredMethods":true,
+  "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.apache.handlers.types.ObjectFactory",
-  "allDeclaredMethods":true,
-  "allPublicMethods":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.glassfish.jaxb.core.marshaller.CharacterEscapeHandler",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"escape","parameterTypes":["char[]","int","int","boolean","java.io.Writer"] }]
+},
+{
+  "name":"org.glassfish.jaxb.core.marshaller.MinimumEscapeHandler",
+  "fields":[{"name":"theInstance"}]
+},
+{
+  "name":"org.glassfish.jaxb.core.marshaller.NoEscapeHandler",
+  "fields":[{"name":"theInstance"}]
+},
+{
+  "name":"org.glassfish.jaxb.core.v2.model.nav.ReflectionNavigator",
+  "methods":[{"name":"getInstance","parameterTypes":[] }]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.ContextFactory",
+  "methods":[{"name":"createContext","parameterTypes":["java.lang.Class[]","java.util.Map"] }]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl",
+  "methods":[
+    {"name":"getBeanInfo","parameterTypes":["java.lang.Class"] }, 
+    {"name":"hasSwaRef","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.JaxBeanInfo",
+  "methods":[
+    {"name":"getTypeNames","parameterTypes":[] }, 
+    {"name":"isElement","parameterTypes":[] }
+  ]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.LeafBeanInfoImpl"
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.output.StAXExStreamWriterOutput"
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.ArrayElementLeafProperty",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.ArrayElementNodeProperty",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.ArrayReferenceNodeProperty",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.SingleElementLeafProperty",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl","org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeElementPropertyInfo"] }]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.SingleElementNodeProperty",
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl","org.glassfish.jaxb.runtime.v2.model.runtime.RuntimeElementPropertyInfo"] }]
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.SingleMapNodeProperty",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.property.SingleReferenceNodeProperty",
+  "queryAllPublicConstructors":true
+},
+{
+  "name":"org.glassfish.jaxb.runtime.v2.runtime.unmarshaller.StAXExConnector"
+},
+{
+  "name":"org.jvnet.fastinfoset.stax.FastInfosetStreamReader"
+},
+{
+  "name":"org.jvnet.fastinfoset.stax.LowLevelFastInfosetStreamWriter"
 },
 {
   "name":"org.jvnet.staxex.XMLStreamReaderEx"
@@ -808,7 +893,25 @@
 },
 {
   "name":"org.objectweb.asm.MethodWriter",
-  "allPublicMethods":true
+  "queryAllPublicMethods":true,
+  "methods":[
+    {"name":"visitAnnotation","parameterTypes":["java.lang.String","boolean"] }, 
+    {"name":"visitCode","parameterTypes":[] }, 
+    {"name":"visitEnd","parameterTypes":[] }, 
+    {"name":"visitFieldInsn","parameterTypes":["int","java.lang.String","java.lang.String","java.lang.String"] }, 
+    {"name":"visitFrame","parameterTypes":["int","int","java.lang.Object[]","int","java.lang.Object[]"] }, 
+    {"name":"visitInsn","parameterTypes":["int"] }, 
+    {"name":"visitIntInsn","parameterTypes":["int","int"] }, 
+    {"name":"visitJumpInsn","parameterTypes":["int","org.objectweb.asm.Label"] }, 
+    {"name":"visitLabel","parameterTypes":["org.objectweb.asm.Label"] }, 
+    {"name":"visitLdcInsn","parameterTypes":["java.lang.Object"] }, 
+    {"name":"visitLineNumber","parameterTypes":["int","org.objectweb.asm.Label"] }, 
+    {"name":"visitLocalVariable","parameterTypes":["java.lang.String","java.lang.String","java.lang.String","org.objectweb.asm.Label","org.objectweb.asm.Label","int"] }, 
+    {"name":"visitMaxs","parameterTypes":["int","int"] }, 
+    {"name":"visitMethodInsn","parameterTypes":["int","java.lang.String","java.lang.String","java.lang.String","boolean"] }, 
+    {"name":"visitTypeInsn","parameterTypes":["int","java.lang.String"] }, 
+    {"name":"visitVarInsn","parameterTypes":["int","int"] }
+  ]
 },
 {
   "name":"org.objectweb.asm.Opcodes",
@@ -865,10 +968,6 @@
   ]
 },
 {
-  "name":"org.slf4j.LoggerFactory",
-  "methods":[{"name":"getILoggerFactory","parameterTypes":[] }]
-},
-{
   "name":"org.slf4j.impl.StaticLoggerBinder"
 },
 {
@@ -882,20 +981,27 @@
   "name":"org.w3c.dom.UserDataHandler"
 },
 {
+  "name":"sun.misc.GC"
+},
+{
   "name":"sun.misc.Unsafe",
   "fields":[{"name":"theUnsafe"}],
   "methods":[
     {"name":"copyMemory","parameterTypes":["java.lang.Object","long","java.lang.Object","long","long"] }, 
     {"name":"getAndAddLong","parameterTypes":["java.lang.Object","long","long"] }, 
     {"name":"getAndSetObject","parameterTypes":["java.lang.Object","long","java.lang.Object"] }, 
-    {"name":"invokeCleaner","parameterTypes":["java.nio.ByteBuffer"] }
+    {"name":"invokeCleaner","parameterTypes":["java.nio.ByteBuffer"] }, 
+    {"name":"storeFence","parameterTypes":[] }
   ]
+},
+{
+  "name":"sun.misc.VM"
 },
 {
   "name":"sun.nio.ch.SelectorImpl",
   "fields":[
-    {"name":"publicSelectedKeys", "allowUnsafeAccess":true}, 
-    {"name":"selectedKeys", "allowUnsafeAccess":true}
+    {"name":"publicSelectedKeys"}, 
+    {"name":"selectedKeys"}
   ]
 },
 {
