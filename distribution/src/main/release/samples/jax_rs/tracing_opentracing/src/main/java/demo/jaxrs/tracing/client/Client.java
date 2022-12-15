@@ -61,5 +61,6 @@ public final class Client {
 
         System.out.println(response.readEntity(String.class));
         response.close();
+        tracer.close();
     }
 }
