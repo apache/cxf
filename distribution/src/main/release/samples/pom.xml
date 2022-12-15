@@ -38,7 +38,7 @@
         <cxf.swagger.ui.version>4.15.5</cxf.swagger.ui.version>
         <cxf.tika.version>2.6.0</cxf.tika.version>
         <cxf.tomcat.version>9.0.70</cxf.tomcat.version>
-        <cxf.lucene.version>9.4.1</cxf.lucene.version>
+        <cxf.lucene.version>9.4.2</cxf.lucene.version>
     </properties>
     <dependencies>
         <dependency>
