@@ -20,6 +20,7 @@
 package com.example.customerservice.broker;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.ActiveMQServer;
 import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 
 public final class EmbeddedBroker {
     private EmbeddedBroker() {
@@ -38,7 +40,14 @@ public final class EmbeddedBroker {
         config.setSecurityEnabled(false);
         config.addAcceptorConfiguration("tcp", "tcp://localhost:61616");
         config.setBrokerInstance(new File("target/activemq-data"));
-       
+        
+        AddressSettings addressSettings = new AddressSettings();
+        addressSettings.setAutoCreateAddresses(true);
+        addressSettings.setAutoCreateQueues(true);
+        addressSettings.setAutoDeleteQueues(false);
+        addressSettings.setAutoDeleteAddresses(false);
+        config.setAddressSettings(Collections.singletonMap("tcp", addressSettings));
+
         final ActiveMQServer server = new ActiveMQServerImpl(config);
         server.start();
 
