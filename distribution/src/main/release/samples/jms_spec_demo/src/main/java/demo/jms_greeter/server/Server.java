@@ -29,7 +29,7 @@ public class Server {
         System.out.println("Starting Server");
         Object implementor = new GreeterJMSImpl();
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue?jndiInitialContextFactory="
-            + "org.apache.activemq.jndi.ActiveMQInitialContextFactory&jndiConnectionFactoryName="
+            + "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory&jndiConnectionFactoryName="
             + "ConnectionFactory&jndiURL=tcp://localhost:61616";
         Endpoint.publish(address, implementor, new LoggingFeature());
     }
