@@ -8,7 +8,7 @@ techniques to deal with dynamic class generation.
 Pre-requisites
 ---------------------------------------
 
-GraalVM 20.3.0 or later distribution should be installed and pre-configured as 
+GraalVM 22.3.0/JDK11+ or later distribution should be installed and pre-configured as 
 default JVM runtime (using JAVA_HOME), see please instructions at [1].
 
 The GraalVM's native-image tool should be installed, see please 
@@ -43,7 +43,7 @@ Than build the client:
 This goal will produce 'client/target/jaxws-demo-client' executable (platform-dependent) 
 which could be run right away: 
 
-  On Windows: client\target\jaxws-demo-client.exe client\	src\main\resources\addNumbers.wsdl
+  On Windows: client\target\jaxws-demo-client.exe client\src\main\resources\addNumbers.wsdl
   On Linux: ./client/target/jaxws-demo-client client/src/main/resources/addNumbers.wsdl
 
 The command should produce the following output (assuming the server is up and running):

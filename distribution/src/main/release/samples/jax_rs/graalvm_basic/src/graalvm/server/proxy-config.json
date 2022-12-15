@@ -1,3 +1,5 @@
 [
-  ["com.sun.xml.bind.marshaller.CharacterEscapeHandler"]
+  {
+    "interfaces":["com.sun.xml.bind.marshaller.CharacterEscapeHandler"]
+  }
 ]

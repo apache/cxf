@@ -1,10 +1,7 @@
 [
 {
-  "name":"java.lang.ClassLoader",
-  "methods":[{"name":"getPlatformClassLoader","parameterTypes":[] }]
-},
-{
-  "name":"java.lang.NoSuchMethodError"
+  "name":"java.lang.Boolean",
+  "methods":[{"name":"getBoolean","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"sun.management.VMManagementImpl",
