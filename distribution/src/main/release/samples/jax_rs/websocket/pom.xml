@@ -176,12 +176,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
-
-        <!-- add atmosphere -->
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-        </dependency>
     </dependencies>
     
     <build>
