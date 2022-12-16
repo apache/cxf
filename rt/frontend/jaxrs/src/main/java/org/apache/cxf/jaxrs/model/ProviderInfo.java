@@ -106,4 +106,13 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
         this.busGlobal = busGlobal;
     }
 
+    @Override
+    public String toString() {
+        return "ProviderInfo{" +
+                "provider=" + provider.getClass().getName() +
+                ", custom=" + custom +
+                ", busGlobal=" + busGlobal +
+                ", root=" + root +
+                '}';
+    }
 }
