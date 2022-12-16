@@ -45,7 +45,6 @@
         <cxf.olingo.server.version>4.9.0</cxf.olingo.server.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.brave.version>5.14.1</cxf.brave.version>
-        <cxf.camel.version>2.24.0</cxf.camel.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.activemq.artemis.version>2.26.0</cxf.activemq.artemis.version>
         <cxf.h2.version>2.1.214</cxf.h2.version>
@@ -102,7 +101,6 @@
         <module>jax_rs/sse_tomcat</module>
         <module>jax_rs/tracing_brave</module>
         <module>jax_rs/tracing_opentracing</module>
-        <module>jax_rs/tracing_opentracing_camel</module>
         <module>jax_rs/websocket</module>
         <module>jax_rs/websocket_web</module>
         <module>jax_server_aegis_client</module>
