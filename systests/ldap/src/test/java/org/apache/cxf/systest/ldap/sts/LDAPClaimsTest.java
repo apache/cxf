@@ -45,55 +45,29 @@ import org.apache.cxf.sts.claims.LdapGroupClaimsHandler;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreateIndex;
-import org.apache.directory.server.core.annotations.CreatePartition;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.zapodot.junit.ldap.EmbeddedLdapRule;
+import org.zapodot.junit.ldap.EmbeddedLdapRuleBuilder;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-
-@RunWith(FrameworkRunner.class)
-
-//Define the DirectoryService
-@CreateDS(name = "LDAPClaimsTest-class",
-    enableAccessControl = false,
-    allowAnonAccess = false,
-    enableChangeLog = true,
-    partitions = {
-        @CreatePartition(
-            name = "example",
-            suffix = "dc=example,dc=com",
-            indexes = {
-                @CreateIndex(attribute = "objectClass"),
-                @CreateIndex(attribute = "dc"),
-                @CreateIndex(attribute = "ou")
-            }
-        ) 
-    }
-)
-
-@CreateLdapServer(
-    transports = {
-        @CreateTransport(protocol = "LDAP", address = "localhost")
-    }
-)
-
-//Inject an file containing entries
-@ApplyLdifFiles("ldap.ldif")
+import org.junit.ClassRule;
 
 /**
  * Test the LdapClaimsHandler that ships with the STS
  */
-public class LDAPClaimsTest extends AbstractLdapTestUnit {
+public class LDAPClaimsTest {
+    @ClassRule
+    public static EmbeddedLdapRule embeddedLdapRule = EmbeddedLdapRuleBuilder
+        .newInstance()
+        .bindingToAddress("localhost")
+        .usingBindCredentials("ldap_su")
+        .usingBindDSN("UID=admin,DC=example,DC=com")
+        .usingDomainDsn("dc=example,dc=com")
+        .importingLdifs("ldap.ldif")
+        .build();
 
     private static Properties props;
     private static boolean portUpdated;
@@ -122,7 +96,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             // Read in ldap.xml and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/ldap.xml");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            content = content.replaceAll("portno", Integer.toString(super.getLdapServer().getPort()));
+            content = content.replaceAll("portno", Integer.toString(embeddedLdapRule.embeddedServerPort()));
 
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/ldapport.xml");
             Files.write(path2, content.getBytes());
