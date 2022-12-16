@@ -46,6 +46,7 @@
     </security:global-method-security>
     <security:http auto-config="true">
         <security:http-basic/>
+        <security:intercept-url pattern="/**" access="hasRole('ROLE_CUSTOMER')" />
     </security:http>
     <security:authentication-manager>
       <security:authentication-provider>
