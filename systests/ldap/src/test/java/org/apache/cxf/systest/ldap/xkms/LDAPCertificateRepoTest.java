@@ -34,54 +34,29 @@ import org.apache.cxf.xkms.x509.repo.CertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapSearch;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreateIndex;
-import org.apache.directory.server.core.annotations.CreatePartition;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
+import org.zapodot.junit.ldap.EmbeddedLdapRule;
+import org.zapodot.junit.ldap.EmbeddedLdapRuleBuilder;
 
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-@RunWith(FrameworkRunner.class)
-
-//Define the DirectoryService
-@CreateDS(name = "LDAPCertificateRepoTest-class",
-    enableAccessControl = false,
-    allowAnonAccess = false,
-    enableChangeLog = true,
-    partitions = {
-        @CreatePartition(
-            name = "example",
-            suffix = "dc=example,dc=com",
-            indexes = {
-                @CreateIndex(attribute = "objectClass"),
-                @CreateIndex(attribute = "dc"),
-                @CreateIndex(attribute = "ou")
-            }
-        ) 
-    }
-)
-
-@CreateLdapServer(
-    transports = {
-        @CreateTransport(protocol = "LDAP", address = "localhost")
-    }
-)
-
-//Inject an file containing entries
-@ApplyLdifFiles("ldap.ldif")
-
 /**
  * Add a test for the XKMS LDAP CertificateRepo
  */
-public class LDAPCertificateRepoTest extends AbstractLdapTestUnit {
+public class LDAPCertificateRepoTest {
+    @ClassRule
+    public static EmbeddedLdapRule embeddedLdapRule = EmbeddedLdapRuleBuilder
+        .newInstance()
+        .bindingToAddress("localhost")
+        .usingBindCredentials("ldap_su")
+        .usingBindDSN("UID=admin,DC=example,DC=com")
+        .usingDomainDsn("dc=example,dc=com")
+        .importingLdifs("ldap.ldif")
+        .build();
+
     private static final String EXPECTED_SUBJECT_DN = "cn=dave,ou=users";
     private static final String ROOT_DN = "dc=example,dc=com";
     private static final String EXPECTED_SUBJECT_DN2 = "cn=newuser,ou=users";
@@ -160,7 +135,7 @@ public class LDAPCertificateRepoTest extends AbstractLdapTestUnit {
     }
 
     private CertificateRepo createLdapCertificateRepo() throws CertificateException {
-        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:" + super.getLdapServer().getPort(),
+        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:" + embeddedLdapRule.embeddedServerPort(),
             "UID=admin,DC=example,DC=com", "ldap_su", 2);
 
         LdapSchemaConfig ldapSchemaConfig = new LdapSchemaConfig();

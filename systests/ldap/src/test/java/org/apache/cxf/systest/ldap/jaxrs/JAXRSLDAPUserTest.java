@@ -29,56 +29,33 @@ import javax.ws.rs.InternalServerErrorException;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreateIndex;
-import org.apache.directory.server.core.annotations.CreatePartition;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
+import org.zapodot.junit.ldap.EmbeddedLdapRule;
+import org.zapodot.junit.ldap.EmbeddedLdapRuleBuilder;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-@RunWith(FrameworkRunner.class)
-
-//Define the DirectoryService
-@CreateDS(name = "JAXRSLDAPUserTest-class",
-    enableAccessControl = false,
-    allowAnonAccess = false,
-    enableChangeLog = true,
-    partitions = {
-        @CreatePartition(
-            name = "example",
-            suffix = "dc=example,dc=com",
-            indexes = {
-                @CreateIndex(attribute = "objectClass"),
-                @CreateIndex(attribute = "dc"),
-                @CreateIndex(attribute = "ou")
-            }
-        ) 
-    }
-)
-
-@CreateLdapServer(
-    transports = {
-        @CreateTransport(protocol = "LDAP", address = "localhost")
-    }
-)
-
-//Inject an file containing entries
-@ApplyLdifFiles("ldap.ldif")
 
 /**
  * Add a test for JAX-RS search using the LdapQueryVisitor.
  */
-public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
+public class JAXRSLDAPUserTest {
     public static final String PORT = UserLDAPServer.PORT;
     public static final String PORT2 = UserLDAPServer.PORT2;
+
+    @ClassRule
+    public static EmbeddedLdapRule embeddedLdapRule = EmbeddedLdapRuleBuilder
+        .newInstance()
+        .bindingToAddress("localhost")
+        .usingBindCredentials("ldap_su")
+        .usingBindDSN("UID=admin,DC=example,DC=com")
+        .usingDomainDsn("dc=example,dc=com")
+        .importingLdifs("ldap.ldif")
+        .build();
+
     private static boolean portUpdated;
 
     @BeforeClass
@@ -104,7 +81,7 @@ public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
             // Read in ldap.xml and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/ldap-jaxrs.xml");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            content = content.replaceAll("portno", Integer.toString(super.getLdapServer().getPort()));
+            content = content.replaceAll("portno", Integer.toString(embeddedLdapRule.embeddedServerPort()));
 
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/ldap-jaxrsport.xml");
             Files.write(path2, content.getBytes());
@@ -114,7 +91,7 @@ public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
 
     }
 
-    @org.junit.AfterClass
+    @AfterClass
     public static void cleanup() throws Exception {
         AbstractClientServerTestBase.stopAllServers();
     }
