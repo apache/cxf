@@ -1,3 +1,8 @@
+spring:
+  application:
+    instance_id: jaxrs-hello-world-service
+    name: jaxrs-hello-world-service
+
 server:
   port: 8080
   servlet-path: /system
