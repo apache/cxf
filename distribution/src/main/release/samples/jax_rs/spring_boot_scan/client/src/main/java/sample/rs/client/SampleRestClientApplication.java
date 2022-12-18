@@ -18,6 +18,10 @@
  */
 package sample.rs.client;
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,6 +29,7 @@ import jakarta.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
+import org.apache.cxf.clustering.CircuitBreakerTargetSelector;
 import org.apache.cxf.clustering.FailoverStrategy;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
@@ -37,6 +42,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.eureka.http.DefaultEurekaClientHttpRequestFactorySupplier;
+import org.springframework.cloud.netflix.eureka.http.RestTemplateDiscoveryClientOptionalArgs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +54,15 @@ import sample.rs.service.HelloService;
 @EnableJaxRsProxyClient
 public class SampleRestClientApplication {
     public static void main(String[] args) {
+        URL.setURLStreamHandlerFactory(protocol -> "eureka".equals(protocol) ? new URLStreamHandler() {
+            protected URLConnection openConnection(URL url) throws IOException {
+                return new URLConnection(url) {
+                    public void connect() throws IOException {
+                    }
+                };
+            }
+        } : null);
+
         new SpringApplicationBuilder(SampleRestClientApplication.class)
             .web(WebApplicationType.NONE)
             .run(args);
@@ -63,6 +79,11 @@ public class SampleRestClientApplication {
         };
     }
 
+    @Bean
+    RestTemplateDiscoveryClientOptionalArgs restTemplateDiscoveryClientOptionalArgs() {
+        return new RestTemplateDiscoveryClientOptionalArgs(new DefaultEurekaClientHttpRequestFactorySupplier());
+    }
+
     /**
      * Basic Random selection of statically prepared addresses.
      * More advanced strategies will periodically pull DiscoveryClient
@@ -72,25 +93,33 @@ public class SampleRestClientApplication {
     @Provider(Type.Feature)
     static class EurekaFailoverFeature extends CircuitBreakerFailoverFeature {
         @Autowired
-        DiscoveryClient discoveryClient;
-        List<String> addresses = new LinkedList<>();
+        private DiscoveryClient discoveryClient;
+        private List<String> addresses = new LinkedList<>();
 
         EurekaFailoverFeature() {
-            super("eureka://registry");
+            super();
+            setDelegate(new EurekaFailoverFeaturePortable(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
+                CircuitBreakerTargetSelector.DEFAULT_TIMEOUT, "eureka://registry"));
         }
 
-        @Override
-        public FailoverStrategy getStrategy()  {
-            for (ServiceInstance s : discoveryClient.getInstances("jaxrs-hello-world-service")) {
-                UriBuilder ub = UriBuilder.fromUri(s.getUri());
-                if (s.getMetadata().containsKey("servletPath")) {
-                    ub.path(s.getMetadata().get("servletPath"));
-                }
-                addresses.add(ub.build().toString());
+        private class EurekaFailoverFeaturePortable extends CircuitBreakerFailoverFeature.Portable {
+            EurekaFailoverFeaturePortable(int threshold, long timeout, String clientBootstrapAddress) {
+                super(threshold, timeout, clientBootstrapAddress);
             }
-            RandomStrategy rs = new RandomStrategy();
-            rs.setAlternateAddresses(addresses);
-            return rs;
+
+            @Override
+            public FailoverStrategy getStrategy()  {
+                for (ServiceInstance s : discoveryClient.getInstances("jaxrs-hello-world-service")) {
+                    UriBuilder ub = UriBuilder.fromUri(s.getUri());
+                    if (s.getMetadata().containsKey("servletPath")) {
+                        ub.path(s.getMetadata().get("servletPath"));
+                    }
+                    addresses.add(ub.build().toString());
+                }
+                RandomStrategy rs = new RandomStrategy();
+                rs.setAlternateAddresses(addresses);
+                return rs;
+            }
         }
     }
 }
