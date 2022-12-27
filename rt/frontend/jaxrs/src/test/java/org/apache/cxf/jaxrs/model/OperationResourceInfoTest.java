@@ -19,14 +19,22 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.NameBinding;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -52,6 +60,30 @@ public class OperationResourceInfoTest {
         };
 
     }
+    
+    @Produces("text/xml")
+    @Consumes("application/xml")
+    interface TestInteface {
+        @Produces("text/plain")
+        void doIt();
+
+        @CustomNameBinding
+        @Consumes("application/atom+xml")
+        void doThat();
+    }
+
+    static class TestClass2 implements TestInteface {
+        @CustomNameBinding
+        @Override
+        public void doIt() {
+        }
+
+        @Override
+        public void doThat() {
+        }
+
+    }
+
 
     @Test
     public void testConsumeTypes() throws Exception {
@@ -137,6 +169,31 @@ public class OperationResourceInfoTest {
         assertEquals(0, result);
     }
 
+    @Test
+    public void testNameBindingsClass() throws NoSuchMethodException, SecurityException {
+        final Method method = TestClass2.class.getMethod("doIt", new Class[]{});
+
+        OperationResourceInfo ori = new OperationResourceInfo(
+                method,
+                AnnotationUtils.getAnnotatedMethod(TestClass2.class,  method),
+                new ClassResourceInfo(TestClass2.class));
+
+        final Set<String> names = ori.getNameBindings();
+        assertEquals(Collections.singleton(CustomNameBinding.class.getName()), names);
+    }
+
+    @Test
+    public void testNameBindingsInterface() throws NoSuchMethodException, SecurityException {
+        final Method method = TestClass2.class.getMethod("doThat", new Class[]{});
+
+        OperationResourceInfo ori = new OperationResourceInfo(
+                method,
+                AnnotationUtils.getAnnotatedMethod(TestClass2.class, method),
+                new ClassResourceInfo(TestClass2.class));
+
+        Set<String> names = ori.getNameBindings();
+        assertEquals(Collections.singleton(CustomNameBinding.class.getName()), names);
+    }
 
     private static Message createMessage() {
         Message m = new MessageImpl();
@@ -148,5 +205,11 @@ public class OperationResourceInfoTest {
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
+    }
+    
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @NameBinding
+    public @interface CustomNameBinding {
     }
 }

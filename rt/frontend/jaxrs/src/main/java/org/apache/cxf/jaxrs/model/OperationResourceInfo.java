@@ -81,9 +81,11 @@ public class OperationResourceInfo {
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
         methodToInvoke = mInvoke;
         annotatedMethod = mAnnotated;
+        // Combine the name bindings from annotated method and method to invoke
+        nameBindings.addAll(AnnotationUtils.getNameBindings(mInvoke.getAnnotations()));
         if (mAnnotated != null) {
             parameters = ResourceUtils.getParameters(mAnnotated);
-            nameBindings = AnnotationUtils.getNameBindings(mAnnotated.getAnnotations());
+            nameBindings.addAll(AnnotationUtils.getNameBindings(mAnnotated.getAnnotations()));
         }
         classResourceInfo = cri;
         checkMediaTypes(null, null);
