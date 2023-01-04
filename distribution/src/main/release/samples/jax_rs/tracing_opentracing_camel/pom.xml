@@ -31,7 +31,7 @@
     
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.camel.version>3.20.0</cxf.camel.version>
+        <cxf.camel.version>2.25.4</cxf.camel.version>
     </properties>
     
     <profiles>
@@ -116,7 +116,7 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.camel.springboot</groupId>
+                <groupId>org.apache.camel</groupId>
                 <artifactId>camel-spring-boot-dependencies</artifactId>
                 <version>${cxf.camel.version}</version>
                 <type>pom</type>
@@ -194,23 +194,23 @@
     
         <!-- camel -->
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-opentracing-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-jetty-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-http-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-core-starter</artifactId>
         </dependency>
         
