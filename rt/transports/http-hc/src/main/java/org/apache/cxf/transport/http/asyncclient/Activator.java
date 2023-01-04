@@ -29,7 +29,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,7 +49,8 @@ public class Activator implements BundleActivator {
         conduitConfigurer.close();
     }
 
-    public class ConduitConfigurer extends ServiceTracker<Bus, Bus> implements ManagedService {
+    public static class ConduitConfigurer extends ServiceTracker<Bus, Bus> implements ManagedService {
+
         private Map<String, Object> currentConfig;
 
         public ConduitConfigurer(BundleContext context) {
@@ -58,14 +58,14 @@ public class Activator implements BundleActivator {
         }
 
         @Override
-        public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        public void updated(Dictionary<String, ?> properties) {
             this.currentConfig = toMap(properties);
-            Bus[] buses = (Bus[])getServices();
+            Object[] buses = getServices();
             if (buses == null) {
                 return;
             }
-            for (Bus bus : buses) {
-                configureConduitFactory(bus);
+            for (Object bus : buses) {
+                configureConduitFactory((Bus) bus);
             }
         }
 
@@ -93,7 +93,6 @@ public class Activator implements BundleActivator {
             AsyncHTTPConduitFactory conduitFactory = bus.getExtension(AsyncHTTPConduitFactory.class);
             conduitFactory.update(this.currentConfig);
         }
-
 
     }
 }
