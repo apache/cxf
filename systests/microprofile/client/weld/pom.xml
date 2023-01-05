@@ -32,7 +32,7 @@
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.weld</cxf.module.name>
-        <cxf.jetty.version>9.4.49.v20220914</cxf.jetty.version>
+        <cxf.jetty.version>11.0.13</cxf.jetty.version>
     </properties>
 
     <dependencies>
