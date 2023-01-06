@@ -200,7 +200,7 @@
         <cxf.validation.api.package.version>[3,4)</cxf.validation.api.package.version>
         <cxf.validation.api.version>3.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
-        <cxf.wildfly.common.version>1.5.4.Final</cxf.wildfly.common.version>
+        <cxf.wildfly.common.version>1.6.0.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>2.27.2</cxf.wiremock.version>
         <cxf.woodstox.core.version>6.4.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
