@@ -68,7 +68,7 @@ public class ConnectionFactoryImplTest {
         assertTrue("Instance of Referenceable", cf instanceof Referenceable);
 
         assertNull("No ref set", cf.getReference());
-        Reference ref = EasyMock.createMock(Reference.class);
+        Reference ref = new Reference("some.class");
         cf.setReference(ref);
         assertEquals("Got back what was set", ref, cf.getReference());
     }
