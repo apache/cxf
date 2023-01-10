@@ -165,7 +165,7 @@
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
-        <cxf.openwebbeans.version>2.0.26</cxf.openwebbeans.version>
+        <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.4.2</cxf.plexus-utils.version>
