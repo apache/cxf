@@ -187,7 +187,7 @@
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
         <cxf.opensaml.osgi.version>3.4.6_3</cxf.opensaml.osgi.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
-        <cxf.openwebbeans.version>2.0.26</cxf.openwebbeans.version>
+        <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.persistence-api.version>2.2.3</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.3.1</cxf.plexus-utils.version>
