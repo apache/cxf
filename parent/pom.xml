@@ -167,7 +167,7 @@
         <cxf.logback.classic.version>1.2.10</cxf.logback.classic.version>
         <cxf.lucene.version>9.4.2</cxf.lucene.version>
         <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
-        <cxf.micrometer.version>1.9.6</cxf.micrometer.version>
+        <cxf.micrometer.version>1.9.7</cxf.micrometer.version>
         <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
