@@ -167,7 +167,7 @@
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
-        <cxf.plexus-archiver.version>4.2.0</cxf.plexus-archiver.version>
+        <cxf.plexus-archiver.version>4.6.1</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.4.2</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.3</cxf.reactivestreams.version>
         <cxf.reactor.version>3.5.1</cxf.reactor.version>
