@@ -84,6 +84,10 @@ public class MAPCodecTest {
     private String nonReplyRelationship;
     private boolean expectFaultTo;
 
+    // Mock JAXBContext
+    private abstract static class MockJAXBContext extends JAXBContext {
+    }
+
     @Before
     public void setUp() {
         codec = new MAPCodec();
@@ -315,7 +319,7 @@ public class MAPCodecTest {
             }
         });
         List<Header> headers = message.getHeaders();
-        JAXBContext jaxbContext = control.createMock(JAXBContext.class);
+        JAXBContext jaxbContext = control.createMock(MockJAXBContext.class);
         ContextJAXBUtils.setJAXBContext(jaxbContext);
         Names200408.setJAXBContext(jaxbContext);
         Names200403.setJAXBContext(jaxbContext);
