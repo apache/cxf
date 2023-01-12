@@ -36,12 +36,16 @@ public class HttpHandlerImplTest {
     private JAXWSHttpSpiDestination destination;
     private HttpExchange exchange;
 
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
+    private abstract static class MockHttpExchange extends HttpExchange {
+    }
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
         destination = control.createMock(JAXWSHttpSpiDestination.class);
         handler = new HttpHandlerImpl(destination);
-        exchange = control.createMock(HttpExchange.class);
+        exchange = control.createMock(MockHttpExchange.class);
     }
 
     @After

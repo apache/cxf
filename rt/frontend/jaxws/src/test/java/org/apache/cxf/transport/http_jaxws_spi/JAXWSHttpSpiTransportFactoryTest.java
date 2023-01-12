@@ -41,10 +41,14 @@ public class JAXWSHttpSpiTransportFactoryTest {
     private JAXWSHttpSpiTransportFactory factory;
     private Bus bus;
 
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
+    private abstract static class MockHttpContext extends HttpContext {
+    }
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
-        context = control.createMock(HttpContext.class);
+        context = control.createMock(MockHttpContext.class);
         bus = control.createMock(Bus.class);
         factory = new JAXWSHttpSpiTransportFactory(context);
     }

@@ -77,6 +77,18 @@ public class CorbaConduitTest {
     CorbaBindingFactory factory;
     OrbConfig orbConfig;
 
+    // EasyMock: java.lang.IllegalAccessException when mocking org.omg.CORBA.* classes
+    private abstract static class MockRequest extends Request {
+    }
+
+    // EasyMock: java.lang.IllegalAccessException when mocking org.omg.CORBA.* classes
+    private abstract static class MockNamedValue extends NamedValue {
+    }
+
+    // EasyMock: java.lang.IllegalAccessException when mocking org.omg.CORBA.* classes
+    private abstract static class MockExceptionList extends ExceptionList {
+    }
+
     @Before
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
@@ -363,10 +375,10 @@ public class CorbaConduitTest {
         EasyMock.expect(message.get(CorbaConstants.CORBA_ENDPOINT_OBJECT)).andReturn(obj);
 
         //msg.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, obj);
-        Request r = control.createMock(Request.class);
+        Request r = control.createMock(MockRequest.class);
         NVList nvList = orb.create_list(0);
-        NamedValue ret = control.createMock(NamedValue.class);
-        ExceptionList exList = control.createMock(ExceptionList.class);
+        NamedValue ret = control.createMock(MockNamedValue.class);
+        ExceptionList exList = control.createMock(MockExceptionList.class);
 
         EasyMock.expect(obj._create_request((Context)EasyMock.anyObject(),
                             EasyMock.eq("greetMe"),

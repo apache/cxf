@@ -55,6 +55,14 @@ public class JAXWSHttpSpiDestinationTest {
     private MessageObserver observer;
     private EndpointInfo endpoint;
 
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
+    private abstract static class MockHttpContext extends HttpContext {
+    }
+
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
+    private abstract static class MockHttpExchange extends HttpExchange {
+    }
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -62,7 +70,7 @@ public class JAXWSHttpSpiDestinationTest {
         bus.getExtension(org.apache.cxf.policy.PolicyDataEngine.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         observer = control.createMock(MessageObserver.class);
-        context = control.createMock(HttpContext.class);
+        context = control.createMock(MockHttpContext.class);
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }
@@ -104,7 +112,7 @@ public class JAXWSHttpSpiDestinationTest {
 
 
     private HttpExchange setUpExchange() throws Exception {
-        HttpExchange exchange = control.createMock(HttpExchange.class);
+        HttpExchange exchange = control.createMock(MockHttpExchange.class);
         expect(exchange.getHttpContext()).andReturn(context).anyTimes();
         expect(exchange.getQueryString()).andReturn(null);
         expect(exchange.getPathInfo()).andReturn(null);
