@@ -84,7 +84,7 @@ public class MAPCodecTest {
     private String nonReplyRelationship;
     private boolean expectFaultTo;
 
-    // Mock JAXBContext
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
     private abstract static class MockJAXBContext extends JAXBContext {
     }
 

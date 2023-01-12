@@ -70,6 +70,9 @@ public class CorbaServerConduitTest {
     CorbaTypeMap corbaTypeMap;
     private org.omg.CORBA.Object targetObject;
 
+    // EasyMock: java.lang.IllegalAccessException when mocking org.omg.CORBA.* classes
+    private abstract static class MockServerRequest extends ServerRequest {
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -203,7 +206,7 @@ public class CorbaServerConduitTest {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
-        ServerRequest request = control.createMock(ServerRequest.class);
+        ServerRequest request = control.createMock(MockServerRequest.class);
 
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
@@ -229,7 +232,7 @@ public class CorbaServerConduitTest {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
-        ServerRequest request = control.createMock(ServerRequest.class);
+        ServerRequest request = control.createMock(MockServerRequest.class);
 
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
@@ -276,7 +279,7 @@ public class CorbaServerConduitTest {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
-        ServerRequest request = control.createMock(ServerRequest.class);
+        ServerRequest request = control.createMock(MockServerRequest.class);
         EasyMock.expect(exchange.getBus()).andReturn(bus);
 
         EasyMock.expect(msg.getExchange()).andReturn(exchange);

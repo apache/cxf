@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.activation.CommandMap;
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.security.auth.callback.Callback;
 
 import org.apache.cxf.attachment.AttachmentImpl;
@@ -40,6 +41,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class AttachmentCallbackHandlerTest {
+    // EasyMock: java.lang.IllegalAccessException when mocking javax.* classes
+    private abstract static class MockDataHandler extends DataHandler {
+        MockDataHandler(DataSource ds) {
+            super(ds);
+        }
+    }
 
     static {
         WSSConfig.init();
@@ -61,7 +68,7 @@ public class AttachmentCallbackHandlerTest {
         Attachment attachment = new AttachmentImpl(attachmentId);
 
         // Mock up a DataHandler for the Attachment
-        DataHandler dataHandler = EasyMock.mock(DataHandler.class);
+        DataHandler dataHandler = EasyMock.mock(MockDataHandler.class);
         dataHandler.setCommandMap(anyObject(CommandMap.class));
         EasyMock.expectLastCall();
         EasyMock.expect(dataHandler.getInputStream()).andReturn(null);
