@@ -103,36 +103,6 @@
             <artifactId>johnzon-mapper</artifactId>
             <classifier>jakarta</classifier>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlets</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-proxy</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>jakarta.enterprise</groupId>
@@ -187,8 +157,7 @@
             <plugin>
                 <groupId>uk.co.automatictester</groupId>
                 <artifactId>wiremock-maven-plugin</artifactId>
-                <!-- Note, updating to 4.4.1 causes a weird Xalan error when building the distribution -->
-                <version>4.4.0</version>
+                <version>7.3.0</version>
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase>
@@ -201,6 +170,17 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!-- 
+                    The end goal is to use wiremock 3.0.0 but sadly microprofile-rest-client-tck 
+                    still depends on javax.servlet (MyEventSourceServlet.java). 
+                    -->
+                    <dependency>
+                        <groupId>com.github.tomakehurst</groupId>
+                        <artifactId>wiremock-jre8-standalone</artifactId>
+                        <version>2.35.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

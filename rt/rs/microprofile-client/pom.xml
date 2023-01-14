@@ -166,10 +166,9 @@
             <version>${cxf.commons-jcs-jcache.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--TODO: after wiremock jakarta version is ready change back to com.github.tomakehurst:wiremock -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
+            <artifactId>wiremock</artifactId>
             <version>${cxf.wiremock.version}</version>
             <scope>test</scope>
             <exclusions>
