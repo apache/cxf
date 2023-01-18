@@ -178,6 +178,9 @@
     <feature name="cxf-http-netty-client" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
         <bundle dependency="true" start-level="40">mvn:${cxf.servlet-api.group}/${cxf.servlet-api.artifact}/${cxf.servlet-api.version}</bundle>
+        <bundle start-level="40">mvn:org.bouncycastle/bcprov-jdk15on/${cxf.bcprov.version}</bundle>
+        <bundle start-level="40">mvn:org.bouncycastle/bcutil-jdk15on/${cxf.bcprov.version}</bundle>
+        <bundle start-level="40">mvn:org.bouncycastle/bctls-jdk15on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
@@ -191,6 +194,9 @@
     </feature>
     <feature name="cxf-http-netty-server" version="${project.version}">
         <feature version="${project.version}">cxf-http</feature>
+        <bundle start-level="40">mvn:org.bouncycastle/bcprov-jdk15on/${cxf.bcprov.version}</bundle>
+        <bundle start-level="40">mvn:org.bouncycastle/bcutil-jdk15on/${cxf.bcprov.version}</bundle>
+        <bundle start-level="40">mvn:org.bouncycastle/bctls-jdk15on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
