@@ -131,7 +131,7 @@
         <cxf.jaxen.version>1.1.4</cxf.jaxen.version>
         <cxf.jboss.logging.version>3.4.3.Final</cxf.jboss.logging.version>
         <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
-        <cxf.jboss.narayana.version>5.12.7.Final</cxf.jboss.narayana.version>
+        <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.3</cxf.jettison.version>
