@@ -157,7 +157,7 @@
         <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
         <cxf.mockito.version>4.11.0</cxf.mockito.version>
-        <cxf.msv.version>2013.6.1</cxf.msv.version>
+        <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.netty.version>4.1.87.Final</cxf.netty.version>
