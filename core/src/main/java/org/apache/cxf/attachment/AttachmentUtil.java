@@ -65,6 +65,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class AttachmentUtil {
+    // The default values for {@link AttachmentDataSource} content type in case when
+    // "Content-Type" header is not present.
+    public static final String ATTACHMENT_CONTENT_TYPE = "org.apache.cxf.attachment.content-type"; 
+
     // The xop:include "href" attribute (https://www.w3.org/TR/xop10/#xop_href) may include 
     // arbitrary URL which we should never follow (unless explicitly allowed).
     public static final String ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY = "org.apache.cxf.attachment.xop.follow.urls";
@@ -393,14 +397,27 @@ public final class AttachmentUtil {
     static String getHeader(Map<String, List<String>> headers, String h, String delim) {
         return getHeaderValue(headers.get(h), delim);
     }
-    public static Attachment createAttachment(InputStream stream, Map<String, List<String>> headers)
-        throws IOException {
+
+    /**
+     * @deprecated use createAttachment(InputStream stream, Map<String, List<String>> headers, Message message)
+     */
+    public static Attachment createAttachment(InputStream stream, Map<String, List<String>> headers) 
+            throws IOException {
+        return createAttachment(stream, headers, null /* no Message */);
+    }
+
+    public static Attachment createAttachment(InputStream stream, Map<String, List<String>> headers, Message message)
+            throws IOException {
 
         String id = cleanContentId(getHeader(headers, "Content-ID"));
 
         AttachmentImpl att = new AttachmentImpl(id);
 
-        final String ct = getHeader(headers, "Content-Type");
+        String ct = getHeader(headers, "Content-Type");
+        if (StringUtils.isEmpty(ct)) {
+            ct = MessageUtils.getContextualString(message, ATTACHMENT_CONTENT_TYPE, "application/octet-stream");
+        }
+
         String cd = getHeader(headers, "Content-Disposition");
         String fileName = getContentDispositionFileName(cd);
 

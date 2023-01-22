@@ -34,8 +34,11 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import jakarta.activation.DataHandler;
 import org.apache.cxf.attachment.AttachmentDataSource;
+import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.wss4j.common.ext.AttachmentRemovalCallback;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
@@ -46,16 +49,19 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
 public class AttachmentCallbackHandler implements CallbackHandler {
 
     private final Collection<org.apache.cxf.message.Attachment> attachments;
+    private final String defaultMimeType;
 
     public AttachmentCallbackHandler(Message message) {
         if (message.getAttachments() == null) {
             message.setAttachments(new ArrayList<Attachment>());
         }
         attachments = message.getAttachments();
+        defaultMimeType = MessageUtils.getContextualString(message, AttachmentUtil.ATTACHMENT_CONTENT_TYPE, "application/octet-stream");
     }
 
     public AttachmentCallbackHandler(Collection<org.apache.cxf.message.Attachment> attachments) {
         this.attachments = attachments;
+        this.defaultMimeType = null;
     }
 
     @Override
@@ -76,12 +82,17 @@ public class AttachmentCallbackHandler implements CallbackHandler {
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
 
+                String mimeType = attachmentResultCallback.getAttachment().getMimeType();
+                if (StringUtils.isEmpty(mimeType)) {
+                    mimeType = defaultMimeType;
+                }
+
                 org.apache.cxf.attachment.AttachmentImpl securedAttachment =
                     new org.apache.cxf.attachment.AttachmentImpl(
                         attachmentResultCallback.getAttachmentId(),
                         new DataHandler(
                             new AttachmentDataSource(
-                                attachmentResultCallback.getAttachment().getMimeType(),
+                                mimeType,
                                 attachmentResultCallback.getAttachment().getSourceStream())
                         )
                     );
