@@ -1930,10 +1930,6 @@
                         <groupId>net.java.dev.msv</groupId>
                         <artifactId>msv-testharness</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -2414,6 +2410,25 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.java.dev.msv</groupId>
+                        <artifactId>msv-core</artifactId>
+                        <version>${cxf.msv.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>net.java.dev.msv</groupId>
+                                <artifactId>msv-testharness</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>xml-apis</groupId>
+                                <artifactId>xml-apis</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
         <profile>
             <id>jdk13</id>
