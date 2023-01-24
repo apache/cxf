@@ -1886,10 +1886,6 @@
                         <groupId>net.java.dev.msv</groupId>
                         <artifactId>msv-testharness</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -2369,6 +2365,21 @@
                             <exclusion>
                                 <artifactId>xml-apis</artifactId>
                                 <groupId>xml-apis</groupId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.java.dev.msv</groupId>
+                        <artifactId>msv-core</artifactId>
+                        <version>${cxf.msv.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>net.java.dev.msv</groupId>
+                                <artifactId>msv-testharness</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>xml-apis</groupId>
+                                <artifactId>xml-apis</artifactId>
                             </exclusion>
                         </exclusions>
                     </dependency>
