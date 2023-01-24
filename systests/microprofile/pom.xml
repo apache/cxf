@@ -32,7 +32,7 @@
     <description>Apache CXF System Tests - MicroProfile TCKs</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
+        <cxf.geronimo.config.version>1.2.3</cxf.geronimo.config.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
     </properties>
     <dependencyManagement>
