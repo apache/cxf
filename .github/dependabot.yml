@@ -18,3 +18,1459 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /benchmark/performance/base
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /benchmark/performance/soap_http_doc_lit
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /bom
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/javadoc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/manifest
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/aegis
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/aegis_standalone
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/callback
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/configuration_interceptor
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/corba/bank
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/corba/bank_ws_addressing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/corba/hello_world
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/groovy_spring_support
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/in_jvm_transport
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/java_first_jaxws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/java_first_jaxws_factory_bean
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/java_first_jms
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/java_first_pojo
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/java_first_spring_support
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic_http2_jetty
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic_http2_netty
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic_http2_undertow
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic_https
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/basic_oidc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/big_query
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/content_negotiation
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/description_openapi_microprofile_spring
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/description_openapi_v3
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/description_openapi_v3_spring
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/description_openapi_v3_web
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/graalvm_basic
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/odata
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/search
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot_scan/application
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot_scan/application
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot_scan/client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: docker
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot_scan/eureka-registry
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/spring_boot_scan/eureka-registry
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/spring_security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/sse_cdi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/sse_client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/sse_spring
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/sse_tomcat
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/tracing_brave
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/tracing_opentracing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/websocket
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_rs/websocket_web
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jax_server_aegis_client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_async
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_dispatch_provider
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_graalvm
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_graalvm_dynamic/client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_graalvm_dynamic/server
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_handlers
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jaxws_spring_boot
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jms_pubsub
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jms_queue
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jms_spec_demo
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/jms_spring_config
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/js_browser_client_java_first
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/js_browser_client_simple
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/js_client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/js_provider
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/mtom
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/restful_dispatch
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ruby_spring_support
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/soap_header
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/sts
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/throttling
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_addressing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_discovery
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_eventing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_notification
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_policy
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_rm
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_security/sign_enc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_security/sign_enc_policy
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_security/ut
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_security/ut_policy
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_transaction/client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_transaction
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_transaction/ws_first
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/ws_transaction/ws_second
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_dynamic_client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_https
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_pure_xml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_rpclit
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_soap12
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /distribution/src/main/release/samples/wsdl_first_xml_wrapped
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/cdi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/jca
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/spring-boot/autoconfigure
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/spring-boot
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/spring-boot/starter-jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/spring-boot/starter-jaxws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/tracing/tracing-brave
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /integration/tracing/tracing-opentracing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxrs-service
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxrs-service/src/main/resources/archetype-resources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxws-javafirst
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxws-javafirst/src/main/resources/archetype-resources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxws-wsdlfirst
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes/cxf-jaxws-wsdlfirst/src/main/resources/archetype-resources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/archetypes
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/codegen-plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/codegen-plugin/src/it/jaxb-xjc-runtime-sources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/codegen-plugin/src/it/jdk-cxf-with-toolchain
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/codegen-plugin/src/it/mark-generated
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/codegen-plugin/src/it/wsdl-artifact-resolution
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/corba
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/java2wadl-plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/java2ws-plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/wadl2java-plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/wadl2java-plugin/src/it/wadl-generate-rx
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/wadl2java-plugin/src/it/wsdl-artifact-resolution
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /maven-plugins/wsdl-validator-plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/bindings/coloc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/bindings/corba
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/bindings
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/bindings/soap
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/bindings/xml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/databinding/aegis
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/databinding/jaxb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/databinding
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/features/clustering
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/features/logging
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/features/metrics
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/features
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/features/throttling
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/frontend/jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/frontend/jaxws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/frontend/js
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/frontend
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/frontend/simple
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/javascript/javascript-rt
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/javascript/javascript-tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/javascript
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/management
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/description-common-openapi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/description-microprofile-openapi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/description-openapi-v3
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/description-swagger-ui
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/description
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/json-basic
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/providers
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/reactivestreams
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/reactor
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/rx
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/rx2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/rx3
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/extensions/search
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/http-sci
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/microprofile-client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/cors
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/http-signature
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/jose-parent/jose-jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/jose-parent/jose
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/jose-parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/oauth-parent/oauth2-saml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/oauth-parent/oauth2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/oauth-parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/sso/oidc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/sso/saml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/security/xml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/rs/sse
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/security-saml
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-hc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-hc5
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-jetty
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-netty/netty-client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-netty/netty-server
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http-undertow
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/http
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/jms
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/local
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/udp
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/transports/websocket
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/addr
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/eventing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/mex
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/policy
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/rm
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/ws/transfer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /rt/wsdl
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts/sts-core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts/systests/advanced
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts/systests/basic
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts/systests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/sts/systests/sts-osgi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/ws-discovery
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/ws-discovery/ws-discovery-api
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/ws-discovery/ws-discovery-service
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/wsn
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/wsn/wsn-api
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/wsn/wsn-core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/wsn/wsn-osgi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-client
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-common
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-service
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-war
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-x509-handlers
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /services/xkms/xkms-x509-repo-ldap
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/base
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-owb/cdi-multiple-apps-owb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-owb/cdi-no-apps-owb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-owb/cdi-producers-owb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-owb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-weld/cdi-multiple-apps-weld
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-weld/cdi-no-apps-weld
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-weld/cdi-producers-weld
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi/cdi-weld
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/cdi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/container-integration/grizzly
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/container-integration
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/container-integration/webapp
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/databinding
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/forked
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/jaxws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/kerberos
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ldap
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile/client/async
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile/client/jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile/client/nocdi
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile/client/tracing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile/client/weld
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/microprofile
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-http-sci
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-sse
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-sse/rs-sse-base
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-sse/rs-sse-jetty
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-sse/rs-sse-tomcat
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/rs-sse/rs-sse-undertow
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/spring-boot
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/tracing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/transport-hc5
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/transport-jms
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/transport-netty
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/transport-undertow
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/transports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/uncategorized
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ws-rm
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ws-security-examples
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ws-security
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ws-specs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/ws-transfer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/wsdl_maven/codegen
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/wsdl_maven/codegen/src/it/cxf-4004
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/wsdl_maven/codegen/src/it/it-parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/wsdl_maven/java2ws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /systests/wsdl_maven
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /testutils
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/common
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/corba
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/javato
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/javato/ws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/validator
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wadlto/jaxrs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wadlto
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/databinding/jaxb
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/frontend/javascript
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/frontend/jaxws
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/misc
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /tools/wsdlto/test
+    schedule:
+      interval: daily
