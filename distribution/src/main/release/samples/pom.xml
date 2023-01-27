@@ -48,7 +48,7 @@
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.activemq.artemis.version>2.27.1</cxf.activemq.artemis.version>
         <cxf.h2.version>2.1.214</cxf.h2.version>
-        <cxf.jboss.narayana.version>5.12.7.Final</cxf.jboss.narayana.version>
+        <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
     </properties>
     <dependencies>
