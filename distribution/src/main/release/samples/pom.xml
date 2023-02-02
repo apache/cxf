@@ -39,6 +39,7 @@
         <cxf.tika.version>1.28.5</cxf.tika.version>
         <cxf.tomcat.version>9.0.71</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
+        <cxf.brave.version>5.15.0</cxf.brave.version>
     </properties>
     <dependencies>
         <dependency>
