@@ -1,6 +1,7 @@
 [![Build Status](https://ci-builds.apache.org/job/CXF/job/CXF-JDK8/badge/icon?subject=Build)](https://ci-builds.apache.org/job/CXF/job/CXF-JDK8/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.cxf/cxf)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/apache/cxf)](https://lgtm.com/projects/g/apache/cxf/alerts/)
+[![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/6978/badge)](https://bestpractices.coreinfrastructure.org/projects/6978)
 
 Welcome to Apache CXF!
 ======================
