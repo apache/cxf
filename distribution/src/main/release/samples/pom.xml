@@ -39,6 +39,7 @@
         <cxf.tika.version>2.6.0</cxf.tika.version>
         <cxf.tomcat.version>9.0.71</cxf.tomcat.version>
         <cxf.lucene.version>9.5.0</cxf.lucene.version>
+        <cxf.brave.version>5.15.0</cxf.brave.version>
     </properties>
     <dependencies>
         <dependency>
