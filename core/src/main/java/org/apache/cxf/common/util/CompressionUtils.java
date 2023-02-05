@@ -35,7 +35,7 @@ public final class CompressionUtils {
     }
     public static InputStream inflate(byte[] deflatedToken, boolean nowrap)
         throws DataFormatException {
-        Inflater inflater = new Inflater(true);
+        Inflater inflater = new Inflater(nowrap);
         inflater.setInput(deflatedToken);
 
         byte[] buffer = new byte[deflatedToken.length];
