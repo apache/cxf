@@ -18,31 +18,39 @@
  */
 package org.apache.cxf.rt.security.crypto;
 
-import java.lang.SecurityException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.crypto.SecretKey;
 
-import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.apache.cxf.rt.security.crypto.KeyProperties;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.fail;
 
+@RunWith(Parameterized.class)
 public class CryptoUtilsTest {
+    private final boolean compression;
+
+    public CryptoUtilsTest(boolean compression) {
+        this.compression = compression;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> compression() {
+        return Arrays.asList(new Object[][] {{true}, {false}});
+    }
 
     @Test
     public void testCompression() {
-        try {
-            byte[] bytes = "testString".getBytes("UTF-8");
-            KeyProperties keyProps = new KeyProperties("AES");
-            keyProps.setCompressionSupported(true);
-            SecretKey secretKey = CryptoUtils.getSecretKey(keyProps);
-            byte[] encryptedBytes = CryptoUtils.encryptBytes(bytes, secretKey, keyProps);
-            byte[] decryptedBytes = CryptoUtils.decryptBytes(encryptedBytes, secretKey, keyProps);
-            assertArrayEquals(bytes, decryptedBytes);
-        } catch (SecurityException ex) {
-            fail(ex.toString());
-        } catch (Exception ex) {
-        }
+        byte[] bytes = "testString".getBytes(StandardCharsets.UTF_8);
+        KeyProperties keyProps = new KeyProperties("AES");
+        keyProps.setCompressionSupported(compression);
+        SecretKey secretKey = CryptoUtils.getSecretKey(keyProps);
+        byte[] encryptedBytes = CryptoUtils.encryptBytes(bytes, secretKey, keyProps);
+        byte[] decryptedBytes = CryptoUtils.decryptBytes(encryptedBytes, secretKey, keyProps);
+        assertArrayEquals(bytes, decryptedBytes);
     }
 }
