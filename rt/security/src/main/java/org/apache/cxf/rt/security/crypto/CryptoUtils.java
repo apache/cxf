@@ -546,7 +546,7 @@ public final class CryptoUtils {
                                       int mode)  throws SecurityException {
         boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
         if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
-            bytes = CompressionUtils.deflate(bytes, false);
+            bytes = CompressionUtils.deflate(bytes, true);
         }
         try {
             Cipher c = initCipher(secretKey, keyProps, mode);
@@ -580,7 +580,7 @@ public final class CryptoUtils {
                 }
             }
             if (compressionSupported && mode == Cipher.DECRYPT_MODE) {
-                result = IOUtils.readBytesFromStream(CompressionUtils.inflate(result, false));
+                result = IOUtils.readBytesFromStream(CompressionUtils.inflate(result, true));
             }
             return result;
         } catch (Exception ex) {
