@@ -7,10 +7,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [master]
+    branches: [3.5.x-fixes]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: [3.5.x-fixes]
   #schedule:
     #- cron: '0 18 * * 5'
 
@@ -49,7 +49,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@8775e868027fa230df8586bdf502bbd9b618a477 # v2.2.3
       with:
         languages: ${{ matrix.language }}
         #config-file: ./.github/codeql/codeql-cxf-config.yml
@@ -77,4 +77,4 @@ jobs:
     #   make release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@8775e868027fa230df8586bdf502bbd9b618a477 # v2.2.3
