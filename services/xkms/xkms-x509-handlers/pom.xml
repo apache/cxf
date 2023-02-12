@@ -77,8 +77,14 @@
         <plugins>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-maven-plugin</artifactId>
+                <version>2.7.5</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-packaging-plugin</artifactId>
-                <version>0.26.0</version>
+                <version>2.7.5</version>
                 <executions>
                     <execution>
                         <id>timestamp</id>
