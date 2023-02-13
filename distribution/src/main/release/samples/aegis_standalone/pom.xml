@@ -93,7 +93,7 @@
         <dependency>
             <groupId>net.java.dev.stax-utils</groupId>
             <artifactId>stax-utils</artifactId>
-            <version>20060502</version>
+            <version>20070216</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.bea.xml</groupId>
