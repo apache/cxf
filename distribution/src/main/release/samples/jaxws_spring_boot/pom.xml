@@ -90,7 +90,7 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.9</version>
+                <version>1.2.2</version>
                 <configuration>
                     <imageName>${project.groupId}/${project.artifactId}</imageName>
                     <baseImage>frolvlad/alpine-oraclejdk8:slim</baseImage>
