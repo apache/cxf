@@ -552,7 +552,6 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         return null;
     }
 
-    @SuppressWarnings("unused")
     private Object createFactory(Class<?> cls) {
         FactoryClassCreator creator = bus.getExtension(FactoryClassCreator.class);
 

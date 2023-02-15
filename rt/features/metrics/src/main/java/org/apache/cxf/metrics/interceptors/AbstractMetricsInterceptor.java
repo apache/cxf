@@ -131,8 +131,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
             //likely a REST service, let's see if we have a resource name
             Object nameProperty = m.getExchange().get("org.apache.cxf.resource.operation.name");
             if (nameProperty != null) {
-                Map<String, Object> restMap = getRestMetricsMap(m.getExchange().getEndpoint());
-                metrics = restMap.get(nameProperty.toString());
+                metrics = getRestMetricsMap(m.getExchange().getEndpoint()).get(nameProperty.toString());
                 if (metrics == null) {
                     metrics = createMetricsContextForRestResource(m, nameProperty.toString());
                 }

@@ -25,6 +25,7 @@ import java.io.Writer;
 import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -42,7 +43,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -99,7 +99,10 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
             return new DOMSource(StaxUtils.read(greetMeInputStream));
         } else if (StaxSource.class.equals(class1)) {
             if (doneStax) {
-                XMLReader reader = XMLReaderFactory.createXMLReader();
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                spf.setNamespaceAware(true);
+                XMLReader reader = spf.newSAXParser().getXMLReader();
+                
                 return new SAXSource(reader, new InputSource(greetMeInputStream));
             }
             doneStax = true;
