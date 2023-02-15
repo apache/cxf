@@ -401,8 +401,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     return ctx.getPrefix(namespaceURI);
                 }
 
-                @SuppressWarnings("rawtypes")
-                public Iterator getPrefixes(String namespaceURI) {
+                public Iterator<String> getPrefixes(String namespaceURI) {
                     if (jaxbNamespace.equals(namespaceURI)) {
                         return ctx.getPrefixes(namespace);
                     }

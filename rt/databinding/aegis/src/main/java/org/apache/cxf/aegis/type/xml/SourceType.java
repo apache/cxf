@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.aegis.type.xml;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -29,7 +31,6 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
@@ -100,17 +101,10 @@ public class SourceType extends AegisType {
         }
     }
 
-    protected XMLReader createXMLReader() throws SAXException {
-        // In JDK 1.4, the xml reader factory does not look for META-INF
-        // services
-        // If the org.xml.sax.driver system property is not defined, and
-        // exception will be thrown.
-        // In these cases, default to xerces parser
-        try {
-            return XMLReaderFactory.createXMLReader();
-        } catch (Exception e) {
-            return XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-        }
+    protected XMLReader createXMLReader() throws SAXException, ParserConfigurationException {
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setNamespaceAware(true);
+        return spf.newSAXParser().getXMLReader();
     }
 
 }

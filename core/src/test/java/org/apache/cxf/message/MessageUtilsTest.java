@@ -36,10 +36,10 @@ import org.apache.cxf.service.model.OperationInfo;
 
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class MessageUtilsTest {
@@ -102,7 +102,7 @@ public class MessageUtilsTest {
         Message message = new MessageImpl();
         String key = "key1";
         message.put(key, "aaaa, bbb  ,  cc, d");
-        Set contextualStrings = MessageUtils.getContextualStrings(message, key, Collections.EMPTY_SET);
+        Set<String> contextualStrings = MessageUtils.getContextualStrings(message, key, Collections.emptySet());
         assertEquals(4, contextualStrings.size());
         assertTrue(contextualStrings.remove("aaaa"));
         assertTrue(contextualStrings.remove("bbb"));
@@ -114,7 +114,7 @@ public class MessageUtilsTest {
         defaults.add("aaa");
         defaults.add("zzz");
         defaults.add("eee");
-        Set contextualStringsDefault = MessageUtils.getContextualStrings(message, "unknownKey", defaults);
+        Set<String> contextualStringsDefault = MessageUtils.getContextualStrings(message, "unknownKey", defaults);
         assertEquals(defaults, contextualStringsDefault);
     }
 }

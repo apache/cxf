@@ -82,7 +82,7 @@ public class MaskSensitiveHelperTest {
     }
 
     @Parameterized.Parameters
-    public static Collection primeNumbers() {
+    public static Collection<Object[]> primeNumbers() {
         return Arrays.asList(new Object[][] {
             {SENSITIVE_LOGGING_CONTENT_XML, MASKED_LOGGING_CONTENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, MASKED_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, APPLICATION_XML},
