@@ -73,6 +73,11 @@ public final class WSDiscoveryClientTest {
                 }
             }
         }
+        for (NetworkInterface p : possibles) {
+            if (p.isPointToPoint()) {
+                return p;
+            }
+        }
         return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
     }
 
@@ -141,7 +146,6 @@ public final class WSDiscoveryClientTest {
                 }
             }
         }).start();
-
 
         Bus bus = BusFactory.newInstance().createBus();
         WSDiscoveryClient c = new WSDiscoveryClient(bus);
