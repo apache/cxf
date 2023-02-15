@@ -131,7 +131,6 @@ public class WebFaultOutInterceptorTestCase {
         return message;
     }
 
-    @SuppressWarnings("rawtypes") // old SAAJ API doesn't have generics
     private final class SOAPFaultStub implements SOAPFault {
 
         @Override
@@ -225,12 +224,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getFaultReasonLocales() throws SOAPException {
+        public Iterator<Locale> getFaultReasonLocales() throws SOAPException {
             return Collections.emptyIterator();
         }
 
         @Override
-        public Iterator getFaultReasonTexts() throws SOAPException {
+        public Iterator<String> getFaultReasonTexts() throws SOAPException {
             return null;
         }
 
@@ -330,12 +329,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getAllAttributes() {
+        public Iterator<Name> getAllAttributes() {
             return null;
         }
 
         @Override
-        public Iterator getAllAttributesAsQNames() {
+        public Iterator<QName> getAllAttributesAsQNames() {
             return null;
         }
 
@@ -345,12 +344,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getNamespacePrefixes() {
+        public Iterator<String> getNamespacePrefixes() {
             return null;
         }
 
         @Override
-        public Iterator getVisibleNamespacePrefixes() {
+        public Iterator<String> getVisibleNamespacePrefixes() {
             return null;
         }
 
@@ -390,17 +389,17 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getChildElements() {
+        public Iterator<javax.xml.soap.Node> getChildElements() {
             return null;
         }
 
         @Override
-        public Iterator getChildElements(Name name) {
+        public Iterator<javax.xml.soap.Node> getChildElements(Name name) {
             return null;
         }
 
         @Override
-        public Iterator getChildElements(QName qName) {
+        public Iterator<javax.xml.soap.Node> getChildElements(QName qName) {
             return null;
         }
 
