@@ -33,7 +33,6 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 

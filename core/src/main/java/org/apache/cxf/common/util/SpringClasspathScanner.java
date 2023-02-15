@@ -41,10 +41,7 @@ import org.springframework.util.ClassUtils;
 class SpringClasspathScanner extends ClasspathScanner {
 
     //TODO: [OSGi+Jakarta] uncoment this when osgi comes back
-    //private static final boolean IN_OSGI =  isSpringInOsgi();
-    private static final boolean IN_OSGI = false;
-
-    
+    //private static final boolean IN_OSGI =  isSpringInOsgi();    
     
     SpringClasspathScanner() throws Exception {
         Class.forName("org.springframework.core.io.support.PathMatchingResourcePatternResolver");

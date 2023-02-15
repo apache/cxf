@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.openapi;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiResolver;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 
 /**
  * SwaggerUI resolvers implementation for OpenAPI 

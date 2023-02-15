@@ -26,7 +26,6 @@ import java.util.List;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.xml.ws.Endpoint;
-
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;

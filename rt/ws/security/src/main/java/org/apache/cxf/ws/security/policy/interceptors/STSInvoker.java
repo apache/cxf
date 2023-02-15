@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -56,7 +54,8 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**

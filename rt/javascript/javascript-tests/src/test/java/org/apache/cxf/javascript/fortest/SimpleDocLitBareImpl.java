@@ -19,11 +19,10 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import java.sql.Time;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.jws.WebService;
-import java.util.concurrent.TimeUnit;
 
 /**
  *

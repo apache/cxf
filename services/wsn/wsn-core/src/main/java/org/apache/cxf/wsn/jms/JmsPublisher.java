@@ -34,7 +34,6 @@ import jakarta.jms.Session;
 import jakarta.jms.Topic;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-
 import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.AbstractPublisher;
@@ -183,12 +182,10 @@ public abstract class JmsPublisher extends AbstractPublisher {
                 Object producer = producers.get(destination);
                 if ("CONSUMER_CREATED".equalsIgnoreCase(type)) {
                     final int consumerCount = event.getIntProperty("_AMQ_ConsumerCount");
-                    if (consumerCount > 0) {
-                        if (producer == null) {
-                            // start subscription
-                            producer = startSubscription(topic);
-                            producers.put(destination, producer);
-                        }
+                    if (consumerCount > 0 && producer == null) {
+                        // start subscription
+                        producer = startSubscription(topic);
+                        producers.put(destination, producer);
                     }
                 } else if ("CONSUMER_CLOSED".equalsIgnoreCase(type)) {
                     final int consumerCount = event.getIntProperty("_AMQ_ConsumerCount");

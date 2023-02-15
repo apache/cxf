@@ -47,8 +47,9 @@ public class Jsr250BeanPostProcessor
     public void setApplicationContext(ApplicationContext applicationContext) {
         context = applicationContext;
         try {
-            Class<?> cls = ClassLoaderUtils.loadClass("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor",
-                                                      applicationContext.getClass());
+            Class<?> cls = ClassLoaderUtils
+                .loadClass("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor",
+                           applicationContext.getClass());
             isProcessing = context.getBeanNamesForType(cls, true, false).length == 0;
         } catch (ClassNotFoundException e) {
             isProcessing = true;

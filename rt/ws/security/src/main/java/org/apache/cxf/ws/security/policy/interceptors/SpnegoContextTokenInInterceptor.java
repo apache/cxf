@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -62,6 +61,7 @@ import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
