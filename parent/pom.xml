@@ -95,7 +95,7 @@
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.guava.version>30.1-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
-        <cxf.hazelcast.version>5.2.1</cxf.hazelcast.version>
+        <cxf.hazelcast.version>5.2.2</cxf.hazelcast.version>
         <cxf.hibernate.em.version>6.1.7.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>7.0.5.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.1</cxf.hsqldb.version>
