@@ -30,14 +30,12 @@ public final class Client {
 
     public static void main(String[] args) throws Exception {
         // START SNIPPET: client
-        ClassPathXmlApplicationContext context
-            = new ClassPathXmlApplicationContext(new String[] {"client-beans.xml"});
-
-        HelloWorld client = (HelloWorld)context.getBean("client");
-
-        String response = client.sayHi("Joe");
-        System.out.println("Response: " + response);
-        System.exit(0);
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext(new String[] {"client-beans.xml"})) {
+            HelloWorld client = (HelloWorld)context.getBean("client");
+            String response = client.sayHi("Joe");
+            System.out.println("Response: " + response);
+        }
         // END SNIPPET: client
     }
 }
