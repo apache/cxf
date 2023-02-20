@@ -242,7 +242,7 @@
         <cxf.servicemix.jsoup.version>1.5.2_2</cxf.servicemix.jsoup.version>
         <cxf.servicemix.specs.jaxb.version>2.3_2</cxf.servicemix.specs.jaxb.version>
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
-        <cxf.tycho.version>3.0.2</cxf.tycho.version>
+        <cxf.tycho.version>3.0.3</cxf.tycho.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xerces.bundle.version>2.12.2_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
