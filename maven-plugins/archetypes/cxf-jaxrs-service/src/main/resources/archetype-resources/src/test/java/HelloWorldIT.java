@@ -10,8 +10,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,7 +33,7 @@ public class HelloWorldIT {
     @Test
     public void testJsonRoundtrip() throws Exception {
         List<Object> providers = new ArrayList<>();
-        providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+        providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
         JsonBean inputBean = new JsonBean();
         inputBean.setVal1("Maple");
         WebClient client = WebClient.create(endpointUrl + "/hello/jsonBean", providers);
@@ -43,9 +41,7 @@ public class HelloWorldIT {
             .type("application/json")
             .post(inputBean);
         assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-        MappingJsonFactory factory = new MappingJsonFactory();
-        JsonParser parser = factory.createJsonParser((InputStream)r.getEntity());
-        JsonBean output = parser.readValueAs(JsonBean.class);
+        JsonBean output = r.readEntity(JsonBean.class);
         assertEquals("Maple", output.getVal2());
     }
 }
