@@ -33,7 +33,7 @@ public class HelloWorldIT {
     @Test
     public void testJsonRoundtrip() throws Exception {
         List<Object> providers = new ArrayList<>();
-        providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
+        providers.add(new com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider());
         JsonBean inputBean = new JsonBean();
         inputBean.setVal1("Maple");
         WebClient client = WebClient.create(endpointUrl + "/hello/jsonBean", providers);
