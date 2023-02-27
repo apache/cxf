@@ -64,7 +64,7 @@
         <cxf.arquillian.version>1.7.0.Alpha13</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>3.0.0.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
-        <cxf.assertj.version>3.23.1</cxf.assertj.version>
+        <cxf.assertj.version>3.24.2</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.2</cxf.atmosphere.version>
         <cxf.bcprov.version>1.70</cxf.bcprov.version>
