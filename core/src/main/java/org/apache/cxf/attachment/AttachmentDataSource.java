@@ -32,7 +32,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 
 public class AttachmentDataSource implements DataSource {
-
     private String ct;
     private CachedOutputStream cache;
     private InputStream ins;
@@ -78,9 +77,10 @@ public class AttachmentDataSource implements DataSource {
 
     public String getContentType() {
         if (StringUtils.isEmpty(ct)) {
-            ct = "application/octet-stream";
+            return "application/octet-stream";
+        } else {
+            return ct;
         }
-        return ct;
     }
 
     public InputStream getInputStream() {
