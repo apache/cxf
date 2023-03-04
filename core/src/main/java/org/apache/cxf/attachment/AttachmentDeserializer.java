@@ -325,7 +325,7 @@ public class AttachmentDeserializer {
                                       this);
         createCount++;
 
-        return AttachmentUtil.createAttachment(partStream, headers);
+        return AttachmentUtil.createAttachment(partStream, headers, message);
     }
 
     public boolean isLazyLoading() {
