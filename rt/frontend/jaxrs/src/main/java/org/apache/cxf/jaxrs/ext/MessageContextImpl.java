@@ -290,7 +290,8 @@ public class MessageContextImpl implements MessageContext {
 
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class),
-                                     headers),
+                                     headers,
+                                     inMessage),
                                      new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {
