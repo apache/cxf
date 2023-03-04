@@ -56,7 +56,8 @@ public class AttachmentCallbackHandler implements CallbackHandler {
             message.setAttachments(new ArrayList<Attachment>());
         }
         attachments = message.getAttachments();
-        defaultMimeType = MessageUtils.getContextualString(message, AttachmentUtil.ATTACHMENT_CONTENT_TYPE, "application/octet-stream");
+        defaultMimeType = MessageUtils.getContextualString(message, AttachmentUtil.ATTACHMENT_CONTENT_TYPE,
+            "application/octet-stream");
     }
 
     public AttachmentCallbackHandler(Collection<org.apache.cxf.message.Attachment> attachments) {
