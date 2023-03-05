@@ -61,7 +61,7 @@
         <!-- please maintain alphabetical order here -->
         <cxf.activemq.artemis.version>2.28.0</cxf.activemq.artemis.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
-        <cxf.arquillian.version>1.7.0.Alpha13</cxf.arquillian.version>
+        <cxf.arquillian.version>1.7.0.Alpha14</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>3.0.0.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
         <cxf.assertj.version>3.24.2</cxf.assertj.version>
