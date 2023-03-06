@@ -119,8 +119,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-artifact-transfer</artifactId>
+            <version>0.13.1</version>
+        </dependency>
     </dependencies>
-    
 
     <profiles>
         <profile>
