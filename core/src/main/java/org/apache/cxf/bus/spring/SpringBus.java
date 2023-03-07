@@ -32,6 +32,8 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import java.lang.ref.WeakReference;
+
 /**
  *
  */
@@ -60,12 +62,7 @@ public class SpringBus extends ExtensionManagerBus
     /** {@inheritDoc}*/
     public void setApplicationContext(ApplicationContext applicationContext) {
         ctx = (AbstractApplicationContext)applicationContext;
-        @SuppressWarnings("rawtypes")
-        ApplicationListener listener = new ApplicationListener() {
-            public void onApplicationEvent(ApplicationEvent event) {
-                SpringBus.this.onApplicationEvent(event);
-            }
-        };
+        SpringBusApplicationListener listener = new SpringBusApplicationListener(this);
         ctx.addApplicationListener(listener);
         ApplicationContext ac = applicationContext.getParent();
         while (ac != null) {
@@ -152,4 +149,22 @@ public class SpringBus extends ExtensionManagerBus
         closeContext = b;
     }
 
+    private static class SpringBusApplicationListener implements ApplicationListener<ApplicationEvent> {
+
+        // Using a WeakReference ensures that the Listener does not prevent a SpringBus from being free'd
+        // This can happen in parent-child context constellations, where the Listener is recursively added
+        private final WeakReference<SpringBus> springBusReference;
+
+        SpringBusApplicationListener(SpringBus springBus) {
+            this.springBusReference = new WeakReference<>(springBus);
+        }
+
+        @Override
+        public void onApplicationEvent(ApplicationEvent event) {
+            var springBus = springBusReference.get();
+            if (springBus != null) {
+                springBus.onApplicationEvent(event);
+            }
+        }
+    }
 }
