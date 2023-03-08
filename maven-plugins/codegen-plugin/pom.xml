@@ -188,6 +188,7 @@
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                             <postBuildHookScript>verify</postBuildHookScript>
                             <skipInvocation>${maven.test.skip.exec}</skipInvocation>
+                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
                         </configuration>
                     </execution>
                 </executions>
