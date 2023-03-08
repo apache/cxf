@@ -138,6 +138,7 @@
                             <settingsFile>src/it/settings.xml</settingsFile>
                             <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                             <skipInvocation>${maven.test.skip.exec}</skipInvocation>
+                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
                         </configuration>
                     </execution>
                 </executions>
