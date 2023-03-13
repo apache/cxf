@@ -128,56 +128,6 @@
 
     <profiles>
         <profile>
-            <id>pre-java9</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>1.7.0</version>
-                    <scope>system</scope>
-                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
-                </dependency>
-            </dependencies>
-            <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
-            </activation>
-        </profile>
-
-        <profile>
-            <id>ibmjdk</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>mac-jdk16</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>1.6.0</version>
-                    <scope>system</scope>
-                    <systemPath>${java.home}/../Classes/classes.jar</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>setup.eclipse</id>
             <build>
                 <defaultGoal>process-test-sources</defaultGoal>
@@ -205,64 +155,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        
-        <profile>
-            <id>jdk13</id>
-              <activation>
-                  <jdk>[13,)</jdk>
-              </activation>
-              <build>
-                  <pluginManagement>
-                      <plugins>
-                          <plugin>
-                              <groupId>org.apache.maven.plugins</groupId>
-                              <artifactId>maven-compiler-plugin</artifactId>
-                              <executions>
-                                  <execution>
-                                    <id>default-jdk13-compile</id>
-                                    <goals>
-                                        <goal>compile</goal>
-                                    </goals>
-                                    <configuration>
-                                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                                        <compileSourceRoots>
-                                            <compileSourceRoot>${project.basedir}/src/main/java13</compileSourceRoot>
-                                        </compileSourceRoots>
-                                        <outputDirectory>${project.build.outputDirectory}/META-INF/versions/13</outputDirectory>
-                                    </configuration>
-                              </execution>
-                          </executions>
-                          <configuration>
-                              <release>11</release>
-                          </configuration>
-                      </plugin>
-                      <plugin>
-                          <groupId>org.apache.maven.plugins</groupId>
-                          <artifactId>maven-jar-plugin</artifactId>
-                          <executions>
-                              <execution>
-                                  <id>default-jar</id>
-                                  <configuration>
-                                      <archive>
-                                          <manifestEntries>
-                                              <Multi-Release>true</Multi-Release>
-                                          </manifestEntries>
-                                      </archive>
-                                  </configuration>
-                              </execution>
-                          </executions>
-                      </plugin>
-                      <plugin>
-                          <groupId>org.apache.maven.plugins</groupId>
-                          <artifactId>maven-javadoc-plugin</artifactId>
-                          <configuration>
-                              <release>11</release>
-                          </configuration>
-                      </plugin>
-                  </plugins>
-              </pluginManagement>
-          </build>
         </profile>
     </profiles>
 </project>

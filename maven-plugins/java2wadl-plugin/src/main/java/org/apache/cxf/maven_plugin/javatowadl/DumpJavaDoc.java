@@ -22,88 +22,175 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.DocErrorReporter;
-import com.sun.javadoc.MethodDoc;
-import com.sun.javadoc.ParamTag;
-import com.sun.javadoc.Parameter;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.Tag;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic;
+
+import com.sun.source.doctree.DocCommentTree;
+import com.sun.source.doctree.DocTree;
+import com.sun.source.doctree.ParamTree;
+import com.sun.source.doctree.ReturnTree;
+import com.sun.source.util.DocTrees;
 
 
-public final class DumpJavaDoc {
 
-    private DumpJavaDoc() {
+import jdk.javadoc.doclet.Doclet;
+import jdk.javadoc.doclet.DocletEnvironment;
+import jdk.javadoc.doclet.Reporter;
+
+public final class DumpJavaDoc implements Doclet {
+    private String dumpFileName;
+    private Reporter reporter;
+    
+    private final class DumpJavaDocFileOption implements Option {
+        @Override
+        public int getArgumentCount() {
+            return 1;
+        }
+
+        @Override
+        public String getDescription() {
+            return "Specify the file to dump Javadoc for later use";
+        }
+
+        @Override
+        public Kind getKind() {
+            return Kind.STANDARD;
+        }
+
+        @Override
+        public List<String> getNames() {
+            return Collections.singletonList("-dumpJavaDocFile");
+        }
+
+        @Override
+        public String getParameters() {
+            return "theFileToDumpJavaDocForLaterUse";
+        }
+
+        @Override
+        public boolean process(String option, List<String> arguments) {
+            dumpFileName = arguments.get(0);
+            return true;
+        }
+    }
+
+    public DumpJavaDoc() {
 
     }
 
-    public static boolean start(RootDoc root) throws IOException {
-        String dumpFileName = readOptions(root.options());
-        OutputStream os = Files.newOutputStream(Paths.get(dumpFileName));
-        Properties javaDocMap = new Properties();
-        for (ClassDoc classDoc : root.classes()) {
-            javaDocMap.put(classDoc.toString(), classDoc.commentText());
-            for (MethodDoc method : classDoc.methods()) {
-                javaDocMap.put(method.qualifiedName(), method.commentText());
-                for (ParamTag paramTag : method.paramTags()) {
-                    Parameter[] parameters = method.parameters();
-                    for (int i = 0; i < parameters.length; ++i) {
-                        if (parameters[i].name().equals(paramTag.parameterName())) {
-                            javaDocMap.put(method.qualifiedName() + ".paramCommentTag." + i,
-                                   paramTag.parameterComment());
+    @Override
+    public void init(Locale locale, Reporter r) {
+        this.reporter = r;
+    }
+
+    @Override
+    public String getName() {
+        return "DumpJavaDoc";
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.RELEASE_8;
+    }
+
+    @Override
+    public boolean run(DocletEnvironment docEnv) {
+        final Elements utils = docEnv.getElementUtils();
+        final DocTrees docTrees = docEnv.getDocTrees();
+        
+        try (OutputStream os = Files.newOutputStream(Paths.get(dumpFileName))) {
+            final Properties javaDocMap = new Properties();
+            for (Element element : docEnv.getIncludedElements()) {
+                if (element.getKind() == ElementKind.CLASS) {
+                    final TypeElement classDoc = (TypeElement) element;
+                    final DocCommentTree classCommentTree = docTrees.getDocCommentTree(classDoc);
+                    
+                    if (classCommentTree != null) {
+                        javaDocMap.put(classDoc.toString(), getAllComments(classCommentTree.getFullBody()));
+                    }
+                    
+                    for (Element member: classDoc.getEnclosedElements()) {
+                        // Skip all non-public methods
+                        if (!member.getModifiers().contains(Modifier.PUBLIC)) {
+                            continue;
+                        }
+                        
+                        if (member.getKind() == ElementKind.METHOD) {
+                            final ExecutableElement method = (ExecutableElement) member;
+                            final DocCommentTree methodCommentTree = docTrees.getDocCommentTree(method);
+                            final String qualifiedName = utils.getBinaryName(classDoc) + "." + method.getSimpleName();
+                            
+                            if (methodCommentTree == null) {
+                                javaDocMap.put(qualifiedName, "");
+                            } else  {
+                                javaDocMap.put(qualifiedName, getAllComments(methodCommentTree.getFullBody()));
+                                for (DocTree tree: methodCommentTree.getBlockTags()) {
+                                    if (tree.getKind() == DocTree.Kind.RETURN) {
+                                        final ReturnTree returnTree = (ReturnTree) tree;
+                                        javaDocMap.put(qualifiedName + ".returnCommentTag", 
+                                            getAllComments(returnTree.getDescription()));
+                                    } else if (tree.getKind() == DocTree.Kind.PARAM) {
+                                        final ParamTree paramTree = (ParamTree) tree;
+                                        final int index = getParamIndex(method, paramTree);
+                                        // CHECKSTYLE:OFF
+                                        if (index >= 0) {
+                                            javaDocMap.put(qualifiedName + ".paramCommentTag." + index, 
+                                                getAllComments(paramTree.getDescription()));
+                                        }
+                                        // CHECKSTYLE:ON
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                Tag[] retTags = method.tags("return");
-                if (retTags != null && retTags.length == 1) {
-                    Tag retTag = method.tags("return")[0];
-                    javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag",
-                                   retTag.text());
-                }
             }
-
+            
+            javaDocMap.store(os, "");
+            os.flush();
+        } catch (final IOException ex) {
+            reporter.print(Diagnostic.Kind.ERROR, ex.getMessage());
         }
-        javaDocMap.store(os, "");
-        os.flush();
-        os.close();
+        
         return true;
     }
-
-    private static String readOptions(String[][] options) {
-        String tagName = null;
-        for (int i = 0; i < options.length; i++) {
-            String[] opt = options[i];
-            if ("-dumpJavaDocFile".equals(opt[0])) {
-                tagName = opt[1];
+    
+    private int getParamIndex(final ExecutableElement method, final ParamTree paramTree) {
+        final List<? extends VariableElement> parameters = method.getParameters();
+        
+        for (int i = 0; i < parameters.size(); ++i) {
+            if (paramTree.getName().getName().contentEquals(parameters.get(i).getSimpleName())) {
+                return i;
             }
-        }
-        return tagName;
+        } 
+        
+        return -1;
     }
 
-    public static int optionLength(String option) {
-        if ("-dumpJavaDocFile".equals(option)) {
-            return 2;
-        }
-        return 0;
+    private String getAllComments(final Collection<? extends DocTree> comments) {
+        return comments
+            .stream()
+            .map(DocTree::toString)
+            .collect(Collectors.joining());
     }
-
-    public static boolean validOptions(String[][] options, DocErrorReporter reporter) {
-        boolean foundTagOption = false;
-        for (int i = 0; i < options.length; i++) {
-            String[] opt = options[i];
-            if ("-dumpJavaDocFile".equals(opt[0])) {
-                if (foundTagOption) {
-                    reporter.printError("Only one -dumpJavaDocFile option allowed.");
-                    return false;
-                }
-                foundTagOption = true;
-            }
-        }
-        if (!foundTagOption) {
-            reporter.printError("Usage: -dumpJavaDocFile theFileToDumpJavaDocForLaterUse...");
-        }
-        return foundTagOption;
+    
+    @Override
+    public Set<Option> getSupportedOptions() {
+        return Collections.singleton(new DumpJavaDocFileOption());
     }
 }
