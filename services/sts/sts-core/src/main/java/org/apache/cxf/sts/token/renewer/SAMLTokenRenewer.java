@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -330,7 +328,6 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         if (verifyProofOfPossession) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             Crypto sigCrypto = stsProperties.getSignatureCrypto();
-            CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
             RequestData requestData = new RequestData();
             requestData.setSigVerCrypto(sigCrypto);
             WSSConfig wssConfig = WSSConfig.getNewInstance();

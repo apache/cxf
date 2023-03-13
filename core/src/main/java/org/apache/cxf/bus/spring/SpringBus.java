@@ -19,6 +19,8 @@
 
 package org.apache.cxf.bus.spring;
 
+import java.lang.ref.WeakReference;
+
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
@@ -32,7 +34,6 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
-import java.lang.ref.WeakReference;
 
 /**
  *
