@@ -89,11 +89,13 @@ public class OASISCatalogManager {
     private static EntityResolver getResolver() {
         try {
             CatalogManager catalogManager = new CatalogManager();
+            catalogManager.setVerbosity(0);
             if (DEBUG_LEVEL != null) {
-                catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));
+                catalogManager.setVerbosity(Integer.parseInt(DEBUG_LEVEL));
             }
-            catalogManager.setUseStaticCatalog(false);
             catalogManager.setIgnoreMissingProperties(true);
+            catalogManager.setUseStaticCatalog(false);
+            
             return new CatalogResolver(catalogManager) {
                 public String getResolvedEntity(String publicId, String systemId) {
                     String s = super.getResolvedEntity(publicId, systemId);
