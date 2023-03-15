@@ -89,7 +89,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public int getContentLength() {
-        return 0;
+        String s = getHeader("Content-Length");
+        if (s != null) {
+            return Integer.parseInt(s);
+        }
+        return -1;
     }
 
     public String getContentType() {
@@ -432,7 +436,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     @Override
     public long getContentLengthLong() {
-        throw new UnsupportedOperationException();
+        String s = getHeader("Content-Length");
+        if (s != null) {
+            return Long.parseLong(s);
+        }
+        return -1;
     }
 
     @Override

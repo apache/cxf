@@ -318,7 +318,9 @@ public abstract class AbstractHTTPDestination
                     //Please note, exchange used to always get the "current" message
                     exchange.getInMessage().put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
                 }
-                super.cacheInput();
+                if (req.getContentLengthLong() != 0) {
+                    super.cacheInput();
+                }
             }
             private boolean isWSAddressingReplyToSpecified(Exchange ex) {
                 AddressingProperties map = ContextUtils.retrieveMAPs(ex.getInMessage(), false, false, false);
