@@ -171,7 +171,7 @@
         <cxf.plexus-archiver.version>4.6.2</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.4</cxf.reactivestreams.version>
-        <cxf.reactor.version>3.5.3</cxf.reactor.version>
+        <cxf.reactor.version>3.5.4</cxf.reactor.version>
         <cxf.rhino.version>1.7.14</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.21</cxf.rxjava2.version>
