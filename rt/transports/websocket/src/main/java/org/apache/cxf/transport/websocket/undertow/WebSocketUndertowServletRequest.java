@@ -125,7 +125,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
     @Override
     public int getContentLength() {
         LOG.log(Level.FINE, "getContentLength()");
-        return 0;
+        return -1;
     }
 
     @Override
@@ -569,7 +569,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public long getContentLengthLong() {
-        throw new UnsupportedOperationException();
+        return -1;
     }
 
     @Override

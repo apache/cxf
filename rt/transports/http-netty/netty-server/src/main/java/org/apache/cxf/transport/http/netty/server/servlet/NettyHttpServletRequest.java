@@ -481,7 +481,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     @Override
     public long getContentLengthLong() {
-        throw new IllegalStateException("Method 'getContentLengthLong' not yet implemented!");
+        return getContentLength();
     }
 
     @Override
