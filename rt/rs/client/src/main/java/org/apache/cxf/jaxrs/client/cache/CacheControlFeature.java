@@ -82,7 +82,7 @@ public class CacheControlFeature implements Feature, Closeable {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        provider = Caching.getCachingProvider();
+        provider = Caching.getCachingProviders().iterator().next();
         try {
             manager = provider.getCacheManager(
                     uri == null ? provider.getDefaultURI() : new URI(uri),
