@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.testutil.recorders;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -26,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -43,13 +44,19 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         try (InputStream is = message.getContent(InputStream.class)) {
             if (is != null) {
-                byte[] b = new byte[is.available()];
-                is.read(b);
-                inbound.add(b);
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("inbound: " + new String(b));
+                int i = is.available();
+                if (i < 4096) {
+                    i = 4096;
                 }
-                message.setContent(InputStream.class, new ByteArrayInputStream(b));
+                LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream(i);
+                IOUtils.copy(is, bout);
+                is.close();
+                
+                inbound.add(bout.toByteArray());
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("inbound: " + new String(bout.toByteArray()));
+                }
+                message.setContent(InputStream.class, bout.createInputStream());
             }
         } catch (Exception ex) {
             throw new Fault(ex);
