@@ -158,7 +158,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
             fail("expected exception");
         } catch (Exception e) {
             Throwable cause = e;
-            while (cause.getCause() != null) {
+            while (!(cause instanceof ConnectException) && cause.getCause() != null) {
                 cause = cause.getCause();
             }
             if (!(cause instanceof ConnectException)) {
