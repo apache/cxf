@@ -282,7 +282,9 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             bus = BusFactory.getThreadDefaultBus(true);
         }
 
-        CachingProvider provider = Caching.getCachingProvider();
+        // grab the first provider for now.  Ideally we could look at the
+        // config file and try to match it with a provider
+        CachingProvider provider = Caching.getCachingProviders().iterator().next();
 
         URI configFileURI;
         try {
