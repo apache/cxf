@@ -20,10 +20,12 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.LogManager;
 
 import org.junit.AfterClass;
 
@@ -32,6 +34,31 @@ import static org.junit.Assert.fail;
 
 public abstract class AbstractClientServerTestBase {
     private static List<ServerLauncher> launchers = new ArrayList<>();
+    private static boolean firstLaunch = true;
+    
+    private static synchronized void checkFirstLaunch(Class<?> cls) {
+        if (firstLaunch) {
+            firstLaunch = false;
+            //make sure we use the logging.properties file for the test class
+            //mvn will pass the system property, but Eclipse or other IDE 
+            //may not so lets just grab the file and make sure we use it
+            //so that we use the same logging setup as mvn on the command
+            //line so things like the logging interceptors on the chain
+            //will match and not have additional side effects compared
+            //to the command line
+            String jdkl = System.getProperty("java.util.logging.config.file");
+            if (jdkl == null) {
+                InputStream in = cls.getResourceAsStream("/logging.properties");
+                if (in != null) {
+                    try {
+                        LogManager.getLogManager().readConfiguration(in);
+                    } catch (SecurityException | IOException e) {
+                        //ignore
+                    }
+                }
+            }
+        }
+    }
 
 
     @AfterClass
@@ -62,6 +89,7 @@ public abstract class AbstractClientServerTestBase {
     public static boolean launchServer(AbstractTestServerBase base) {
         boolean ok = false;
         try {
+            checkFirstLaunch(base.getClass());
             ServerLauncher sl = new ServerLauncher(base);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -87,6 +115,7 @@ public abstract class AbstractClientServerTestBase {
     public static boolean launchServer(Class<?> clz, boolean inProcess) {
         boolean ok = false;
         try {
+            checkFirstLaunch(clz);
             ServerLauncher sl = new ServerLauncher(clz.getName(), inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -113,6 +142,7 @@ public abstract class AbstractClientServerTestBase {
                                 boolean inProcess) {
         boolean ok = false;
         try {
+            checkFirstLaunch(clz);
             ServerLauncher sl = new ServerLauncher(clz.getName(), props, args, inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -138,9 +168,11 @@ public abstract class AbstractClientServerTestBase {
         return TestUtil.getPortNumber(s);
     }
     protected static String allocatePort(Class<?> cls) {
+        checkFirstLaunch(cls);
         return TestUtil.getPortNumber(cls);
     }
     protected static String allocatePort(Class<?> cls, int count) {
+        checkFirstLaunch(cls);
         return TestUtil.getPortNumber(cls, count);
     }
 
