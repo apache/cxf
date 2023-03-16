@@ -222,7 +222,7 @@
         <cxf.fastinfoset.bundle.version>1.2.18_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.istack.bundle.version>3.0.7</cxf.istack.bundle.version>
-        <cxf.jakarta.angus.mail.version>1.0.0</cxf.jakarta.angus.mail.version>
+        <cxf.jakarta.angus.mail.version>2.0.1</cxf.jakarta.angus.mail.version>
         <cxf.jakarta.angus.activation.version>2.0.0</cxf.jakarta.angus.activation.version>
         <cxf.jasypt.bundle.version>1.9.3_1</cxf.jasypt.bundle.version>
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
