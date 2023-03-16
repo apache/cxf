@@ -63,7 +63,7 @@
             <plugin>
               <groupId>com.spotify</groupId>
               <artifactId>dockerfile-maven-plugin</artifactId>
-              <version>1.3.4</version>
+              <version>1.4.13</version>
               <configuration>
                 <repository>${user.name}/apachecxf</repository>
                 <tag>${project.artifactId}</tag>
