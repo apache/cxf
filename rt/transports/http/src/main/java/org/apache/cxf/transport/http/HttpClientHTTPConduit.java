@@ -139,6 +139,14 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             sslURL = null;
             client = null;
         }
+        // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
+        String httpRequestMethod =
+            (String)message.get(Message.HTTP_REQUEST_METHOD);
+        if (httpRequestMethod == null) {
+            httpRequestMethod = "POST";
+            message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        }
+
         HttpClient cl = client;
         if (cl == null) {
             int ctimeout = determineConnectionTimeout(message, csPolicy);        
@@ -194,25 +202,37 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     throw new IOException(e);
                 }
             }
-            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(csPolicy.getVersion())) {
+            String verc = (String)message.getContextualProperty(FORCE_HTTP_VERSION);
+            if (verc == null) {
+                verc = csPolicy.getVersion();
+            }
+            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)) {
                 cb.version(Version.HTTP_1_1);  
-            }    
-            
-            //TODO
-            //cb.authenticator(Authenticator.getDefault())
+            }
 
             cl = cb.build();
+            if (!"https".equals(uri.getScheme()) 
+                && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
+                && cl.version() == Version.HTTP_2
+                && ("2".equals(verc) || ("auto".equals(verc) && "2".equals(HTTP_VERSION)))) {
+                try {
+                    // We specifically want HTTP2, but we're using a request
+                    // that won't trigger an upgrade to HTTP/2 so we'll
+                    // call OPTIONS on the URI which may trigger HTTP/2 upgrade.
+                    // Not needed for methods that don't have a body (GET/HEAD/etc...) 
+                    // or for https (negotiated at the TLS level)
+                    HttpRequest.Builder rb = HttpRequest.newBuilder()
+                        .uri(uri)
+                        .method("OPTIONS", BodyPublishers.noBody());
+                    cl.send(rb.build(), BodyHandlers.ofByteArray());
+                } catch (IOException | InterruptedException e) {
+                    //
+                }
+            } 
             client = cl;
         }        
         message.put(HttpClient.class, cl);
         
-        // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
-        String httpRequestMethod =
-            (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if (httpRequestMethod == null) {
-            httpRequestMethod = "POST";
-            message.put(Message.HTTP_REQUEST_METHOD, "POST");
-        }
         message.put(KEY_HTTP_CONNECTION_ADDRESS, address);        
     }
 
@@ -342,7 +362,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
             HttpRequest.Builder rb = HttpRequest.newBuilder()
                 .method(httpRequestMethod, bp);  
-            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(csPolicy.getVersion())) {
+            String verc = (String)outMessage.getContextualProperty(FORCE_HTTP_VERSION);
+            if (verc == null) {
+                verc = csPolicy.getVersion();
+            }
+            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)) {
                 rb.version(Version.HTTP_1_1);  
             }            
             try {
