@@ -31,7 +31,34 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 public interface HttpServerEngineSupport {
     String ENABLE_HTTP2 = "org.apache.cxf.transports.http2.enabled";
     
+    
+    /** 
+     * Check if Http2 is enabled on the Bus or system property
+     * Default if not configured otherwise is true
+     * @param bus
+     * @return
+     */
     default boolean isHttp2Enabled(Bus bus) {
+        Object value = null;
+        
+        if (bus != null) {
+            value = bus.getProperty(ENABLE_HTTP2);
+        }
+        
+        if (value == null) {
+            value = SystemPropertyAction.getPropertyOrNull(ENABLE_HTTP2);
+        }
+        
+        return !PropertyUtils.isFalse(value);
+    }
+    
+    /** 
+     * Check if Http2 is enabled on the Bus or system property
+     * Default if not configured otherwise is false
+     * @param bus
+     * @return
+     */
+    default boolean isHttp2Required(Bus bus) {
         Object value = null;
         
         if (bus != null) {
