@@ -67,16 +67,22 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
     static final String PORT2 = allocatePort(ClientAuthServer.class, 2);
 
     final String clientKey;
+    final Object clientVal;
 
-    public ClientAuthTest(String ck) {
+    public ClientAuthTest(String ck, Object value) {
         this.clientKey = ck;
+        this.clientVal = value;
     }
     
     @Parameters(name = "{0}")
-    public static Collection<String> data() {
-        return Arrays.asList(new String[] {"force.urlconnection.http.conduit",
-                                           "defaultConduit",
-                                           "use.async.http.conduit"});
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+            {"force.urlconnection.http.conduit", true},
+            {"use.async.http.conduit", true},
+            {"defaultConduit", true},
+            {"org.apache.cxf.transport.http.forceVersion", "1.1"},
+            {"org.apache.cxf.transport.http.forceVersion", "2"}
+        });
     }
 
     @BeforeClass
@@ -112,7 +118,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
@@ -139,7 +145,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -170,7 +176,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -208,7 +214,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
             updateAddressPort(port, PORT);
 
-            ((BindingProvider)port).getRequestContext().put(clientKey, true);
+            ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -240,7 +246,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -266,7 +272,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -297,7 +303,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -328,7 +334,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -409,7 +415,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
@@ -430,7 +436,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         client = ClientProxy.getClient(port);
         http = (HTTPConduit) client.getConduit();
@@ -452,7 +458,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");
@@ -499,7 +505,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        ((BindingProvider)port).getRequestContext().put(clientKey, true);
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");

@@ -374,10 +374,11 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
                     return null;
                 }
             }
-        };
+        };        
         
         final HttpServerCodec sourceCodec = new HttpServerCodec();
-        final HttpServerUpgradeHandler upgradeHandler = new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory);
+        final HttpServerUpgradeHandler upgradeHandler = new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory,
+                                                                                     32 * 1024 * 1024);
         final CleartextHttp2ServerUpgradeHandler cleartextUpgradeHandler = new CleartextHttp2ServerUpgradeHandler(
             sourceCodec, upgradeHandler, createHttp2ChannelInitializerPriorKnowledge());
 

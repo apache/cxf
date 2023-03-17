@@ -175,11 +175,13 @@ public class NettyHttpServerEngine implements ServerEngine, HttpServerEngineSupp
             .option(ChannelOption.SO_REUSEADDR, true);
 
         // Set up the event pipeline factory.
+        // Netty has issues with "UPGRADE" requests with payloads (POST/PUT)
+        // when not using SSL so we'll only start Http2 if the user specifically configures it
         servletPipeline =
             new NettyHttpServletPipelineFactory(
                  tlsServerParameters, sessionSupport,
                  maxChunkContentSize, handlerMap,
-                 this, applicationExecutor, isHttp2Enabled(bus));
+                 this, applicationExecutor, isHttp2Required(bus));
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.childHandler(servletPipeline);

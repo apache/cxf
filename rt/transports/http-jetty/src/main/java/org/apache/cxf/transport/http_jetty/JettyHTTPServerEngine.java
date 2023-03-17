@@ -56,9 +56,13 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.http.HttpServerEngineSupport;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.BadMessageException;
+import org.eclipse.jetty.http.HttpFields.Mutable;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
+import org.eclipse.jetty.io.Connection;
+import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -676,26 +680,33 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
 
             Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
-            connectionFactories.add(httpFactory);
 
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
             if (tlsServerParameters != null) {
+                connectionFactories.add(httpFactory);
                 httpConfig.addCustomizer(new SecureRequestCustomizer(tlsServerParameters.isSniHostCheck()));
 
-                if (!isHttp2Enabled(bus)) {
+                if (isHttp2Enabled(bus)) {
+                    try {
+                        // The ALPN processors are application specific (as per Jetty docs) and are pluggable as
+                        // additional dependency.
+                        final ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
+                        alpn.setDefaultProtocol(httpFactory.getProtocol());
+                        
+                        final SslConnectionFactory scf = new SslConnectionFactory(sslcf, alpn.getProtocol());
+                        connectionFactories.add(scf);
+                        connectionFactories.add(alpn);
+                        connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
+                    } catch (Throwable ex) {
+                        if (isHttp2Required(bus)) {
+                            throw ex;
+                        }
+                    }
+                }
+                if (connectionFactories.size() == 1) {
                     final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());
                     connectionFactories.add(scf);
-                } else {
-                    // The ALPN processors are application specific (as per Jetty docs) and are pluggable as
-                    // additional dependency.
-                    final ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
-                    alpn.setDefaultProtocol(httpFactory.getProtocol());
-                    
-                    final SslConnectionFactory scf = new SslConnectionFactory(sslcf, alpn.getProtocol());
-                    connectionFactories.add(scf);
-                    connectionFactories.add(alpn);
-                    connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
                 }
 
                 // Has to be set before the default protocol change
@@ -704,7 +715,28 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 String proto = (major > 9 || (major == 9 && minor >= 3)) ? "SSL" : "SSL-HTTP/1.1";
                 result.setDefaultProtocol(proto);
             } else if (isHttp2Enabled(bus)) {
-                connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
+                connectionFactories.add(httpFactory);
+                try {
+                    connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig) {
+
+                        @Override
+                        public Connection upgradeConnection(Connector c, EndPoint endPoint,
+                                                            org.eclipse.jetty.http.MetaData.Request request,
+                                                            Mutable response101)
+                            throws BadMessageException {
+                            if (request.getContentLength() > 0 
+                                || request.getFields().contains("Transfer-Encoding")) {
+                                // if there is a body, we cannot upgrade
+                                return null;
+                            }
+                            return super.upgradeConnection(c, endPoint, request, response101);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    if (isHttp2Required(bus)) {
+                        throw ex;
+                    }
+                }
                 result.setConnectionFactories(connectionFactories);
             }
 
