@@ -137,6 +137,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
         wc.type("application/xml").accept("application/xml");
+        WebClient.getConfig(wc).getRequestContext().put("force.urlconnection.http.conduit", true);
         if (!useReflection) {
             WebClient.getConfig(wc).getRequestContext().put("use.httpurlconnection.method.reflection", false);
         }
@@ -238,6 +239,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setAutoRedirect(true);
         WebClient.getConfig(wc).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+        //WebClient.getConfig(wc).getRequestContext().put("force.urlconnection.http.conduit", true);
         Response r = wc.get();
         Book book = r.readEntity(Book.class);
         assertEquals(123L, book.getId());
@@ -549,6 +551,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testProxyGetFormParam() throws Exception {
+        
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book book = store.getFormParamsBook(100L, 23L, 123L);
         assertEquals(123L, book.getId());

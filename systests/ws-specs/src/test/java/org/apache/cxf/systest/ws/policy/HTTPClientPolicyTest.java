@@ -22,6 +22,7 @@ package org.apache.cxf.systest.ws.policy;
 import java.io.Closeable;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.http.HttpTimeoutException;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -161,7 +162,9 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             fail("Didn't get the exception");
         } catch (Exception ex) {
             //ex.printStackTrace();
-            assertTrue(ex.getCause().getClass().getName(), ex.getCause() instanceof SocketTimeoutException);
+            assertTrue(ex.getCause().getClass().getName(), 
+                       ex.getCause() instanceof SocketTimeoutException
+                       || ex.getCause() instanceof HttpTimeoutException);
         }
 
         // pingMe - policy attached to binding operation fault should have no effect
