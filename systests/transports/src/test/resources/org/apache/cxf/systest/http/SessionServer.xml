@@ -28,7 +28,7 @@
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.SessionServer}">
             <httpj:sessionSupport>true</httpj:sessionSupport>
-            <httpj:sessionTimeout>20</httpj:sessionTimeout>
+            <httpj:sessionTimeout>10</httpj:sessionTimeout>
             <httpj:reuseAddress>false</httpj:reuseAddress>
         </httpj:engine>
     </httpj:engine-factory>

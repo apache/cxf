@@ -77,6 +77,7 @@ public class GreeterSessionImpl implements Greeter {
         if (name == null) {
             name = me;
             LOG.info("Starting the Session");
+            session.setMaxInactiveInterval(1);
         }
 
         session.setAttribute("name", me);
@@ -119,6 +120,7 @@ public class GreeterSessionImpl implements Greeter {
         if (name == null) {
             name = me;
             LOG.info("Starting the Session");
+            session.setMaxInactiveInterval(1);
         }
 
         session.setAttribute("name", me);
