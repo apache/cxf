@@ -594,6 +594,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // We actually get our answer from Bethal at the end of the
         // redirects.
         configureProxy(ClientProxy.getClient(tarpin));
+
         String answer = tarpin.sayHi();
         assertProxyRequestCount(0);
 
@@ -606,8 +607,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         http.getClient().setMaxRetransmits(1);
 
         try {
-            answer = tarpin.sayHi();
-            fail("Unexpected answer from Tarpin: " + answer);
+            String a2 = tarpin.sayHi();
+            fail("Unexpected answer from Tarpin: " + a2);
         } catch (Exception e) {
             //e.printStackTrace();
         }
@@ -623,8 +624,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         http.setTrustDecider(trustDecider);
 
         try {
-            answer = tarpin.sayHi();
-            fail("Unexpected answer from Tarpin: " + answer);
+            String a2 = tarpin.sayHi();
+            fail("Unexpected answer from Tarpin: " + a2);
         } catch (Exception e) {
             //e.printStackTrace();
             assertTrue("Trust Decider wasn't called correctly",

@@ -54,7 +54,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
-import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
+import org.apache.cxf.transport.http.HttpClientHTTPConduit;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -75,7 +75,7 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.ssl.SslHandler;
 
 
-public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLifeCycleListener {
+public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCycleListener {
     public static final String USE_ASYNC = "use.async.http.conduit";
     public static final String MAX_RESPONSE_CONTENT_LENGTH =
         "org.apache.cxf.transport.http.netty.maxResponseContentLength";

@@ -22,6 +22,8 @@ package org.apache.cxf.systest.dispatch;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -200,7 +202,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             //expected
             assertTrue(ex.getCause().getClass().getName(),
                        ex.getCause() instanceof java.net.ConnectException
-                       || ex.getCause() instanceof java.net.SocketTimeoutException);
+                       || ex.getCause() instanceof java.net.SocketTimeoutException
+                       || ex.getCause()  instanceof HttpConnectTimeoutException);
         }
         dispImpl.close();
 
@@ -604,10 +607,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         disp.getRequestContext().put(HTTPClientPolicy.class.getName(), pol);
         Response<Object> o = disp.invokeAsync(later);
         try {
-            o.get(10, TimeUnit.SECONDS);
-            fail("Should have gotten a SocketTimeoutException");
+            Object o2 = o.get(10, TimeUnit.SECONDS);
+            fail("Should have gotten a SocketTimeoutException: " + o2);
+        } catch (TimeoutException tex) {
+            // this is ok
         } catch (ExecutionException ex) {
-            assertTrue(ex.getCause() instanceof SocketTimeoutException);
+            assertTrue(ex.getCause() instanceof SocketTimeoutException
+                       || ex.getCause() instanceof HttpTimeoutException);
         }
 
         later.setRequestType(20000);

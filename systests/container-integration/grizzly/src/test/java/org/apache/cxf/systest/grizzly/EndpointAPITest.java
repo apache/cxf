@@ -52,6 +52,8 @@ public class EndpointAPITest {
 
     @Before
     public void setUp() {
+        //grizzly gets confused with the 2.0 "Connect: upgrade" header
+        System.setProperty("org.apache.cxf.transport.http.forceVersion", "1.1");
         currentPort = Integer.valueOf(TestUtil.getPortNumber(EndpointAPITest.class, counter++));
         server = new HttpServer();
         NetworkListener networkListener = new NetworkListener("jaxwslistener", "0.0.0.0", currentPort);

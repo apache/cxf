@@ -233,7 +233,8 @@ public class HTTPTransportFactory
             conduit = factory.createConduit(this, bus, endpointInfo, target);
         }
         if (conduit == null) {
-            conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
+            //conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
+            conduit = new HttpClientHTTPConduit(bus, endpointInfo, target);
         }
 
         // Spring configure the conduit.

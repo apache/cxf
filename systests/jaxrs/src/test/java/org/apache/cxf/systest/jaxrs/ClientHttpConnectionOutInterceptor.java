@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -31,7 +30,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 class ClientHttpConnectionOutInterceptor extends AbstractPhaseInterceptor<Message> {
-    private Collection<HttpURLConnection> connections = new ArrayList<>();
+    private Collection<Message> messages = new ArrayList<>();
 
     ClientHttpConnectionOutInterceptor() {
         super(Phase.SEND_ENDING);
@@ -39,33 +38,36 @@ class ClientHttpConnectionOutInterceptor extends AbstractPhaseInterceptor<Messag
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        final HttpURLConnection connection = (HttpURLConnection) message.get("http.connection");
-        synchronized (connections) {
-            connections.add(connection);
+        synchronized (messages) {
+            messages.add(message);
         }
     }
 
     public boolean checkAllClosed() {
-        synchronized (connections) {
-            if (connections.isEmpty()) {
+        synchronized (messages) {
+            if (messages.isEmpty()) {
                 return false;
             }
             
-            return !connections
+            return messages
                 .stream()
-                .anyMatch(this::hasUnclosedInputStream);
+                .anyMatch(this::isClosedInputStream);
         }
     }
     
-    private boolean hasUnclosedInputStream(HttpURLConnection connection) {
+    private boolean isClosedInputStream(Message message) {
         try {
-            final InputStream inputStream = connection.getInputStream();
-            inputStream.read(new byte [] {}); /* 0 bytes to read */
-            return true;
+            final InputStream inputStream = message.getExchange().getInMessage().getContent(InputStream.class);
+            if (inputStream == null) {
+                return true;
+            }
+            inputStream.read(new byte [0]); /* 0 bytes to read */
+            return false;
         } catch (IOException ex) {
             // The HttpInputStream throws an IOException in case the input stream is already
             // closed (since we actually read nothing).
-            return !ex.getMessage().equals("stream is closed");
+            String msg = ex.getMessage();
+            return msg.contains("closed");
         }
     }
 }

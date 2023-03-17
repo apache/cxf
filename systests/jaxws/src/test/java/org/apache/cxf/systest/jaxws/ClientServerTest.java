@@ -28,6 +28,8 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +191,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testTimeoutConfigutation() throws Exception {
+    public void testTimeoutConfiguration() throws Exception {
 
         SOAPService service = new SOAPService();
         assertNotNull(service);
@@ -206,7 +208,10 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             if (ex.getCause() != null) {
                 cause = ex.getCause();
             }
-            assertTrue("Timeout cause is expected", cause instanceof java.net.SocketTimeoutException);
+            assertTrue("Timeout cause is expected: " + cause.getClass().getName(), 
+                       cause instanceof java.net.SocketTimeoutException
+                       || cause instanceof HttpConnectTimeoutException
+                       || cause instanceof HttpTimeoutException);
         }
     }
 
