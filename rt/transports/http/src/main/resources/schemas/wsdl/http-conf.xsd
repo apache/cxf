@@ -313,6 +313,16 @@
             </xs:annotation>      
 
         </xs:attribute>
+        
+        <xs:attribute name="Version" type="xs:string" use="optional" default="auto">
+            <xs:annotation>
+                <xs:documentation>
+                HTTP Version used for the connection.  The "auto" default will use whatever the default is
+                for the HTTPConduit implementation.
+                </xs:documentation>
+            </xs:annotation>
+
+        </xs:attribute>
 
         <xs:attribute name="Cookie" type="xs:string" use="optional">
             <xs:annotation>
