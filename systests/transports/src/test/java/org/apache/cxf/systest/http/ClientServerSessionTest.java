@@ -115,7 +115,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
 
-            Thread.sleep(30 * 1000); //let session expire
+            Thread.sleep(5 * 1000); //let session expire
             greeting = greeter.greetMe("SessionExpire");
             cookie = "";
             if (greeting.indexOf(';') != -1) {
