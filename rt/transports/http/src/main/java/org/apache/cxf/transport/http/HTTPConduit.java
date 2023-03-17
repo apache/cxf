@@ -49,6 +49,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -165,6 +166,7 @@ public abstract class HTTPConduit
 
     public static final String PROCESS_FAULT_ON_HTTP_400 = "org.apache.cxf.transport.process_fault_on_http_400";
     public static final String NO_IO_EXCEPTIONS = "org.apache.cxf.transport.no_io_exceptions";
+    public static final String FORCE_HTTP_VERSION = "org.apache.cxf.transport.http.forceVersion";
 
     /** 
      * The HTTP status codes as contextual property (comma-separated integers as String) 
@@ -176,10 +178,17 @@ public abstract class HTTPConduit
     public static final String SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES = 
         "org.apache.cxf.transport.service_not_available_on_http_status_codes";
 
+    
+    
     /**
      * The Logger for this class.
      */
     protected static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
+    
+    protected static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
+        new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
+
+    protected static final String HTTP_VERSION = SystemPropertyAction.getPropertyOrNull(FORCE_HTTP_VERSION);
 
     private static final Collection<Integer> DEFAULT_SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES = 
             Arrays.asList(404, 429, 503);
@@ -199,8 +208,6 @@ public abstract class HTTPConduit
 
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_GET_METHOD = "GET";
-    private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
-        new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
 
     private static final String AUTHORIZED_REDIRECTED_HTTP_VERBS = "http.redirect.allowed.verbs";
 
@@ -1401,16 +1408,19 @@ public abstract class HTTPConduit
                 }
                 throw mapException(e.getClass().getSimpleName()
                                    + " invoking " + url + ": "
-                                   + e.getMessage(), e,
+                                   + getExceptionMessage(e), e,
                                    IOException.class);
             } catch (RuntimeException e) {
                 throw mapException(e.getClass().getSimpleName()
                                    + " invoking " + url + ": "
-                                   + e.getMessage(), e,
+                                   + getExceptionMessage(e), e,
                                    RuntimeException.class);
             }
         }
 
+        protected String getExceptionMessage(Throwable t) {
+            return t.getMessage();
+        }
         private <T extends Exception> T mapException(String msg,
                                                      T ex, Class<T> cls) {
             T ex2;
