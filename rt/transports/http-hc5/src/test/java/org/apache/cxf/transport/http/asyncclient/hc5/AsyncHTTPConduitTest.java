@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.asyncclient.hc5;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
@@ -38,6 +39,9 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
@@ -334,5 +338,41 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         doneLatch.await(30, TimeUnit.SECONDS);
 
         assertEquals("All responses should be handled eventually", 0, doneLatch.getCount());
+    }
+
+    @Test
+    public void testPathWithQueryParams() throws IOException {
+        final String address = "http://localhost:" + PORT + "/SoapContext/SoapPort?param1=value1&param2=value2";
+        final Greeter greeter = new SOAPService().getSoapPort();
+        setAddress(greeter, address);
+
+        final HTTPConduit c = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
+        final MessageImpl message = new MessageImpl();
+        message.put(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+
+        final Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        c.prepare(message);
+
+        final CXFHttpRequest e = message.get(CXFHttpRequest.class);
+        assertEquals(address, e.getUri().toString());
+    }
+
+    @Test
+    public void testEmptyPathWithQueryParams() throws IOException {
+        final String address = "http://localhost:" + PORT + "?param1=value1&param2=value2";
+        final Greeter greeter = new SOAPService().getSoapPort();
+        setAddress(greeter, address);
+
+        final HTTPConduit c = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
+        final MessageImpl message = new MessageImpl();
+        message.put(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+
+        final Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        c.prepare(message);
+
+        final CXFHttpRequest e = message.get(CXFHttpRequest.class);
+        assertEquals("http://localhost:" + PORT + "/?param1=value1&param2=value2", e.getUri().toString());
     }
 }
