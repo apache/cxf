@@ -190,10 +190,18 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
         }
+
         if (StringUtils.isEmpty(uri.getPath())) {
-            //hc needs to have the path be "/"
-            uri = uri.resolve("/");
-            addressChanged = true;
+            try {
+                //hc needs to have the path be "/"
+                uri = new URI(uri.getScheme(),
+                    uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                    uri.resolve("/").getPath(), uri.getQuery(),
+                    uri.getFragment());
+                addressChanged = true;
+            } catch (final URISyntaxException ex) {
+                throw new IOException(ex);
+            }
         }
 
         message.put(USE_ASYNC, Boolean.TRUE);
