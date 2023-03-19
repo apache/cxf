@@ -123,7 +123,7 @@
         <cxf.jakarta.resource.version>2.1.0</cxf.jakarta.resource.version>
         <cxf.jakarta.management.j2ee-api.version>1.1.4</cxf.jakarta.management.j2ee-api.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
-        <cxf.javassist.version>3.27.0-GA</cxf.javassist.version>
+        <cxf.javassist.version>3.29.2-GA</cxf.javassist.version>
         <cxf.jakarta.annotation-api.version>2.1.1</cxf.jakarta.annotation-api.version>
         <cxf.jakarta.ws.rs.version>3.0.0</cxf.jakarta.ws.rs.version>
         <cxf.jaxb.runtime.version>3.0.2</cxf.jaxb.runtime.version>
