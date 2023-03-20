@@ -66,7 +66,7 @@
         <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
         <cxf.assertj.version>3.24.2</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
-        <cxf.atmosphere.version>3.0.2</cxf.atmosphere.version>
+        <cxf.atmosphere.version>3.0.3</cxf.atmosphere.version>
         <cxf.bcprov.version>1.70</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.16.2</cxf.brave.reporter.version>
         <cxf.brave.version>5.15.0</cxf.brave.version>
