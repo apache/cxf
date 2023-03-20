@@ -140,12 +140,9 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         updateAddressPort(g, PORT);
         HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
         c.getClient().setReceiveTimeout(12000);
-        try {
-            g.greetMe(FILL_BUFFER);
-            g.greetMe("Hello");
-        } catch (Exception ex) {
-            fail();
-        }
+
+        g.greetMe(FILL_BUFFER);
+        g.greetMe("Hello");
     }
 
     @Test

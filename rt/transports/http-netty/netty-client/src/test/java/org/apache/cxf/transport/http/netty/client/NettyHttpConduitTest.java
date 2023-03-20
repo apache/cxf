@@ -258,7 +258,7 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
         }).get();
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testCallAsyncCallbackInvokedOnlyOnce() throws Exception {
         updateAddressPort(g, PORT);
         int repeat = 20;
