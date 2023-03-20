@@ -123,7 +123,7 @@
                 <dependency>
                     <groupId>org.jboss.spec.javax.rmi</groupId>
                     <artifactId>jboss-rmi-api_1.0_spec</artifactId>
-                    <version>1.0.6.Final</version>
+                    <version>${cxf.jboss.jboss.rmi.version}</version>
                     <optional>true</optional>
                 </dependency>
             </dependencies>
