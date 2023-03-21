@@ -206,7 +206,6 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>${cxf.persistence-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

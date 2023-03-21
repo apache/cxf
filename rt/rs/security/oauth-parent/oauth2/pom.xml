@@ -72,7 +72,6 @@
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
-      <version>${cxf.persistence-api.version}</version>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
@@ -270,4 +269,3 @@
     </plugins>
   </build>
 </project>
-

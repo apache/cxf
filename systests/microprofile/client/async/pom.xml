@@ -49,7 +49,6 @@
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${cxf.jakarta.ws.rs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
@@ -79,13 +78,11 @@
             <dependency>
                 <groupId>jakarta.json.bind</groupId>
                 <artifactId>jakarta.json.bind-api</artifactId>
-                <version>${cxf.json.bind-api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>jakarta.json</groupId>
                 <artifactId>jakarta.json-api</artifactId>
-                <version>${cxf.json.api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

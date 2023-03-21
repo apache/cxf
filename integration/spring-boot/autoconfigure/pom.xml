@@ -115,12 +115,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>${cxf.servlet-api.group}</groupId>
-            <artifactId>${cxf.servlet-api.artifact}</artifactId>
-            <version>${cxf.servlet-api.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <optional>true</optional>

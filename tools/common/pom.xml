@@ -41,7 +41,6 @@
         <dependency>
             <groupId>jakarta.jws</groupId>
             <artifactId>jakarta.jws-api</artifactId>
-            <version>${cxf.jakarta.jwsapi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
