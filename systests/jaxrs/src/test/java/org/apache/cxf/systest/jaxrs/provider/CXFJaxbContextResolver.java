@@ -51,7 +51,6 @@ import jakarta.xml.bind.PropertyException;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.UnmarshallerHandler;
 import jakarta.xml.bind.ValidationEventHandler;
-import jakarta.xml.bind.Validator;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
@@ -61,7 +60,7 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
     @SuppressWarnings("rawtypes")
     public static class SomeUnmarshaller implements Unmarshaller {
         @Override
-        public <A extends XmlAdapter> A getAdapter(Class<A> type) {
+        public <A extends XmlAdapter<?, ?>> A getAdapter(Class<A> type) {
             return null;
         }
 
@@ -96,16 +95,11 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
         }
 
         @Override
-        public boolean isValidating() throws JAXBException {
-            return false;
-        }
-
-        @Override
         public void setAdapter(XmlAdapter adapter) {
         }
 
         @Override
-        public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
+        public <A extends XmlAdapter<?, ?>> void setAdapter(Class<A> type, A adapter) {
         }
 
         @Override
@@ -126,10 +120,6 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
 
         @Override
         public void setSchema(Schema schema) {
-        }
-
-        @Override
-        public void setValidating(boolean validating) throws JAXBException {
         }
 
         @Override
@@ -205,7 +195,7 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
     @SuppressWarnings("rawtypes")
     public static class SomeMarshaller implements Marshaller {
         @Override
-        public <A extends XmlAdapter> A getAdapter(Class<A> arg0) {
+        public <A extends XmlAdapter<?, ?>> A getAdapter(Class<A> arg0) {
             return null;
         }
 
@@ -284,7 +274,7 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
         }
 
         @Override
-        public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
+        public <A extends XmlAdapter<?, ?>> void setAdapter(Class<A> type, A adapter) {
         }
 
         @Override
@@ -308,7 +298,6 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
         }
     }
     
-    @SuppressWarnings("deprecation")
     public static class SomeJaxbContext extends JAXBContext {
         @Override
         public Marshaller createMarshaller() throws JAXBException {
@@ -320,10 +309,6 @@ public class CXFJaxbContextResolver implements ContextResolver<JAXBContext> {
             return new SomeUnmarshaller();
         }
 
-        @Override
-        public Validator createValidator() throws JAXBException {
-            return null;
-        }
     }
     
     @Override
