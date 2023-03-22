@@ -195,6 +195,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>4.0.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
