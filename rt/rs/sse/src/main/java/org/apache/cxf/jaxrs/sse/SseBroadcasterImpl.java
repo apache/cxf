@@ -108,16 +108,25 @@ public final class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void close() {
-        if (closed.compareAndSet(false, true)) {
-            subscribers.forEach(subscriber -> {
-                subscriber.close();
-            });
-        }
+        close(true);
     }
 
     private void assertNotClosed() {
         if (closed.get()) {
             throw new IllegalStateException("The SSE broadcaster is already closed");
+        }
+    }
+
+    @Override
+    public void close(boolean cascading) {
+        if (!cascading) {
+            return;
+        }
+        
+        if (closed.compareAndSet(false, true)) {
+            subscribers.forEach(subscriber -> {
+                subscriber.close();
+            });
         }
     }
 }
