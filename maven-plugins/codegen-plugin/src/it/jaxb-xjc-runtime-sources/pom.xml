@@ -77,9 +77,9 @@
     </build>
   <profiles>
     <profile>
-      <id>java9</id>
+      <id>java11</id>
       <activation>
-        <jdk>[9,)</jdk>
+        <jdk>[11,)</jdk>
       </activation>
       <dependencies>
           <dependency>
@@ -90,7 +90,7 @@
           <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>3.0.0</version>
+            <version>4.0.0</version>
           </dependency>
           <dependency>
             <groupId>jakarta.jws</groupId>
@@ -100,7 +100,7 @@
           <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>3.0.1</version>
+            <version>4.0.0</version>
           </dependency>
       </dependencies>
     </profile>
