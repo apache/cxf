@@ -65,11 +65,6 @@ public class ContextProducerBean extends AbstractCXFBean<Object> implements Pass
     }
 
     @Override
-    public boolean isNullable() {
-        return true;
-    }
-
-    @Override
     public Set<Type> getTypes() {
         Set<Type> types = super.getTypes();
         types.add(type);

@@ -164,7 +164,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 "jakarta.servlet.http.HttpServletRequest",
                 "jakarta.servlet.ServletContext"));
         }
-        beanManager.fireEvent(this);
+        beanManager.getEvent().fire(this);
     }
 
     /**
@@ -269,7 +269,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 beanManager.createAnnotatedType(ExtensionManagerBus.class);
 
             final InjectionTarget<ExtensionManagerBus> busInjectionTarget =
-                beanManager.createInjectionTarget(busAnnotatedType);
+                beanManager.getInjectionTargetFactory(busAnnotatedType).createInjectionTarget(null);
             event.addBean(new CdiBusBean(busInjectionTarget));
         }
 
