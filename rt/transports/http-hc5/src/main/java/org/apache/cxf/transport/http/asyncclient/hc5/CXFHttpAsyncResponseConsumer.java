@@ -79,7 +79,7 @@ public class CXFHttpAsyncResponseConsumer implements AsyncResponseConsumer<Boole
         for (int i = 0; i < 5; i++) {
             // Only consume content when the work was accepted by the work queue
             if (outstream.retrySetHttpResponse(response)) {
-                buf.consumeContent(src);
+                buf.consumeContent(src, completed);
                 break;
             }
         }
