@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -26,6 +28,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -50,9 +53,7 @@ public class RetryAfterHeaderProviderTest {
     }
     
     @Parameterized.Parameters(name = "retry after {0} is duration of {1} from 2000-01-01 00:00:00.000")
-    public static Collection<Object[]> data() {
-        final int offset = TimeZone.getDefault().getRawOffset() / 1000;
-        
+    public static Collection<Object[]> data() throws ParseException {
         return Arrays.asList(
             new Object[] {"", Duration.ZERO},
             new Object[] {null, Duration.ZERO},
@@ -61,8 +62,8 @@ public class RetryAfterHeaderProviderTest {
             new Object[] {"Sun, 03 Nov 2002 08:49:37 EST", Duration.ofSeconds(89646577)},
             new Object[] {"Sat, 01 Jan 2000 01:00:00 GMT", Duration.ofSeconds(3600)},
             new Object[] {"Sunday, 03-Nov-02 08:49:37 GMT", Duration.ofSeconds(89628577)},
-            new Object[] {"Sun Nov 3 08:49:37 2002", Duration.ofSeconds(89628577 - offset)},
-            new Object[] {"Sun Nov 03 08:49:37 2002", Duration.ofSeconds(89628577 - offset)},
+            new Object[] {"Sun Nov 3 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault().getOffset(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US).parse("Sun Nov 3 08:49:37 2002").getTime()) / 1000)},
+            new Object[] {"Sun Nov 03 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault().getOffset(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US).parse("Sun Nov 03 08:49:37 2002").getTime()) / 1000)},
             new Object[] {"Sun, 06 Nov 1994 08:49:37 EST", Duration.ZERO}
         );
 
