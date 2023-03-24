@@ -69,7 +69,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         }
     }
 
-    public int consumeContent(final ByteBuffer buffer) throws IOException {
+    public int consumeContent(final ByteBuffer buffer, boolean last) throws IOException {
         if (this.shutdown) {
             return -1;
         }
@@ -88,7 +88,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
                 totalRead += bytesRead;
             }
             
-            if (bytesRead == -1) {
+            if (last) {
                 this.endOfStream = true;
             }
             
