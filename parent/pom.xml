@@ -215,8 +215,8 @@
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>4.18.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.1.6</cxf.swagger.v3.version>
-        <cxf.swagger2.version>1.6.9</cxf.swagger2.version>
-        <cxf.swagger2.guava.version>31.0.1-jre</cxf.swagger2.guava.version>
+        <cxf.swagger2.version>1.6.10</cxf.swagger2.version>
+        <cxf.swagger2.guava.version>31.1-jre</cxf.swagger2.guava.version>
         <cxf.swagger2.guava.failureaccess.version>1.0.1</cxf.swagger2.guava.failureaccess.version>
         <cxf.tika.version>1.28.5</cxf.tika.version>
         <cxf.tomcat.version>9.0.73</cxf.tomcat.version>
