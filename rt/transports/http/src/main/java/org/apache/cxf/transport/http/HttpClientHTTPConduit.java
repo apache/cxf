@@ -111,7 +111,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         if (clientParameters == null) {
             clientParameters = tlsClientParameters;
         }
-
+        if (clientParameters == null) {
+            clientParameters = new TLSClientParameters();
+        }
         Object o = message.getContextualProperty("force.urlconnection.http.conduit");
         //o = true;
         if ("https".equals(uri.getScheme()) && clientParameters != null) {
