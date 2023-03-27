@@ -28,11 +28,9 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.xml.ws.Holder;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -41,20 +39,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = CompletableFutureServer.PORT;
-
-    @BeforeClass
-    public static void startServers() throws Exception {
-        AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly",
-                   launchServer(CompletableFutureServer.class, true));
-        createStaticBus();
-    }
-
+public abstract class AbstractJAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookAsyncStage() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/books";
+        String address = getAddress() + "/completable/books";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         Book book = stage.toCompletableFuture().join();
@@ -62,7 +50,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testGetBookAsyncStageAsyncResponse() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/booksAsync";
+        String address = getAddress() + "/completable/booksAsync";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         Book book = stage.toCompletableFuture().join();
@@ -70,7 +58,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testGetBookAsyncStageThenAcceptAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/books";
+        String address = getAddress() + "/completable/books";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         Holder<Book> holder = new Holder<>();
@@ -86,7 +74,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStage404() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/books";
+        String address = getAddress() + "/completable/books";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("124").rx().get(Book.class);
         try {
@@ -99,7 +87,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsBadRequestException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/badRequest";
+        String address = getAddress() + "/completable/badRequest";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -112,7 +100,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsForbiddenException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/forbidden";
+        String address = getAddress() + "/completable/forbidden";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -125,7 +113,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsNotAuthorizedException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/unauthorized";
+        String address = getAddress() + "/completable/unauthorized";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -138,7 +126,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsBadRequestMappedException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/mapped/badRequest";
+        String address = getAddress() + "/completable/mapped/badRequest";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -151,7 +139,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsForbiddenMappedException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/mapped/forbidden";
+        String address = getAddress() + "/completable/mapped/forbidden";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -164,7 +152,7 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookAsyncStageThrowsNotAuthorizedMappedException() throws Exception {
-        String address = "http://localhost:" + PORT + "/completable/mapped/unauthorized";
+        String address = getAddress() + "/completable/mapped/unauthorized";
         WebClient wc = createWebClient(address);
         CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
         try {
@@ -175,8 +163,9 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private WebClient createWebClient(String address) {
+    protected WebClient createWebClient(String address) {
         return WebClient.create(address);
     }
 
+    protected abstract String getAddress();
 }

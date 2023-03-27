@@ -39,22 +39,20 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class CompletableFutureServer extends AbstractServerTestServerBase {
-    public static final String PORT = allocatePort(CompletableFutureServer.class);
-
+public abstract class AbstractCompletableFutureServer extends AbstractServerTestServerBase {
     @Override
     protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CompletableFutureService.class);
         sf.setResourceProvider(CompletableFutureService.class,
                                new SingletonResourceProvider(new CompletableFutureService(), true));
-        sf.setAddress("http://localhost:" + PORT + "/");
+        sf.setAddress(getProtocol() + "://localhost:" + getPort() + "/");
         sf.setProvider(new MappedExceptionMapper());
         return sf.create();
     }
 
     public static void main(String[] args) throws Exception {
-        new CompletableFutureServer().start();
+        new CompletableFutureHttpServer().start();
     }
 
     @Consumes("text/boolean")
@@ -94,8 +92,8 @@ public class CompletableFutureServer extends AbstractServerTestServerBase {
             os.write(bytes);
 
         }
-
-
     }
 
+    public  abstract String getPort();
+    public  abstract String getProtocol();
 }
