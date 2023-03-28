@@ -138,7 +138,7 @@
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
         <cxf.jetty11.version>11.0.14</cxf.jetty11.version>
         <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
-        <cxf.jexl.version>3.2.1</cxf.jexl.version>
+        <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.2.19</cxf.johnzon.version>
         <cxf.json.api.version>2.0.1</cxf.json.api.version>
