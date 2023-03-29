@@ -82,6 +82,8 @@ public class CXFHttpAsyncResponseConsumer implements AsyncResponseConsumer<Boole
                 buf.consumeContent(src, completed);
                 break;
             }
+
+            Thread.onSpinWait();
         }
     }
 
