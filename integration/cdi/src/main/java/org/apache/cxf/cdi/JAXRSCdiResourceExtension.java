@@ -473,7 +473,8 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private List< Object > loadBeans(final BeanManager beanManager, Collection<Class<?>> limitedClasses,
                                      Collection<Bean<?>> beans) {
-        final List< Object > instances = new ArrayList<>();
+        // Use set to account for singletons and application scoped beans
+        final Set< Object > instances = new LinkedHashSet<>();
 
         for (final Bean< ? > bean: beans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
@@ -487,7 +488,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             }
         }
 
-        return instances;
+        return new ArrayList<>(instances);
     }
 
     /**
@@ -496,7 +497,8 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return the references for all discovered CXF-specific features
      */
     private List< Feature > loadFeatures(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
-        final List< Feature > features = new ArrayList<>();
+        // Use set to account for singletons and application scoped beans
+        final Set< Feature > features = new LinkedHashSet<>();
 
         for (final Bean< ? extends Feature > bean: featureBeans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
@@ -510,7 +512,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             }
         }
 
-        return features;
+        return new ArrayList<>(features);
     }
 
     /**

@@ -33,9 +33,11 @@ import org.apache.cxf.systests.cdi.base.BookStoreService;
 @Path("/bookstore/")
 public class BookStoreFeed {
     private final BookStoreService service;
-    
-    public BookStoreFeed(BookStoreService service) {
+    private final ServerFactoryDebugExtension debugExtension;
+
+    public BookStoreFeed(BookStoreService service, ServerFactoryDebugExtension debugExtension) {
         this.service = service;
+        this.debugExtension = debugExtension;
     }
     
     @GET
@@ -52,5 +54,11 @@ public class BookStoreFeed {
         }
         
         return feed;
+    }
+
+    @GET
+    @Path("providers")
+    public String providers() {
+        return debugExtension.providers();
     }
 }
