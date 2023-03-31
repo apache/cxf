@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.cdi.tomcat;
 import java.util.UUID;
 
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -83,6 +84,17 @@ public class TomcatWarTest extends AbstractCdiSingleAppTest {
                         .param("name", "Book 1234"));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), r.getStatus());
+    }
+
+    @Test
+    public void testConfiguredProviders() {
+        assertEquals("CustomContextFeature,"
+                + "JacksonJsonProvider,"
+                + "JacksonJsonProvider,"
+                + "SampleFeature,"
+                + "SampleNestedFeature,"
+                + "ValidationExceptionMapper",
+            createWebClient(getBasePath() + "/providers", MediaType.TEXT_PLAIN).get(String.class).trim());
     }
 
     @Override
