@@ -89,8 +89,7 @@ public class JettyEmbeddedTest extends AbstractCdiSingleAppTest {
 
     @Test
     public void testConfiguredProviders() {
-        assertEquals("AtomFeedProvider,"
-                + "CustomContextFeature,"
+        assertEquals("CustomContextFeature,"
                 + "JacksonJsonProvider,"
                 + "JacksonJsonProvider,"
                 + "SampleFeature,"
