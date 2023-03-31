@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.cdi;
 
 import java.util.stream.Collectors;
+
 import javax.inject.Singleton;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
