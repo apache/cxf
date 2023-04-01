@@ -44,6 +44,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
 
     private final ReentrantLock lock;
     private final Condition condition;
+    private final Condition suspendInput;
 
     private volatile boolean shutdown;
     private volatile boolean endOfStream;
@@ -54,6 +55,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         super(buffersize);
         this.lock = new ReentrantLock();
         this.condition = this.lock.newCondition();
+        this.suspendInput = this.lock.newCondition();
     }
 
     public void reset() {
@@ -73,6 +75,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         if (this.shutdown) {
             return -1;
         }
+
         this.lock.lock();
         try {
             setInputMode();
@@ -83,15 +86,24 @@ public class SharedInputBuffer extends ExpandableBuffer {
                     totalRead += bytesRead;
                 }
             }
+
             //read more
-            while ((bytesRead = transfer(buffer, buffer())) > 0) {
+            while ((bytesRead = transfer(buffer)) > 0) {
                 totalRead += bytesRead;
             }
-            
+
             if (last) {
                 this.endOfStream = true;
             }
-            
+
+            if (!buffer().hasRemaining() && !this.endOfStream) {
+                try {
+                    suspendInput.await();
+                } catch (InterruptedException ex) {
+                    throw new IOException("Interrupted while waiting buffer to be drained ");
+                }
+            }
+
             this.condition.signalAll();
 
             if (totalRead > 0) {
@@ -153,6 +165,8 @@ public class SharedInputBuffer extends ExpandableBuffer {
                     if (this.shutdown) {
                         throw new InterruptedIOException("Input operation aborted");
                     }
+                    
+                    this.suspendInput.signalAll();
                     this.condition.await();
                 }
             } catch (InterruptedException ex) {
@@ -262,8 +276,13 @@ public class SharedInputBuffer extends ExpandableBuffer {
     
     private int transfer(ByteBuffer from, ByteBuffer to) {
         int transfer = Math.min(to.remaining(), from.remaining());
+
         if (from.remaining() == 0) {
             return -1;
+        }
+
+        if (transfer == 0) {
+            return transfer;
         }
 
         // use a duplicated buffer so we don't disrupt the limit of the original buffer
@@ -274,6 +293,20 @@ public class SharedInputBuffer extends ExpandableBuffer {
         // now discard the data we've copied from the original source (optional)
         from.position(from.position() + transfer);
         return transfer;
+    }
+    
+    private int transfer(ByteBuffer from) {
+        ensureCapacity(from);
+        return transfer(from, buffer());
+    }
+
+    private void ensureCapacity(ByteBuffer source) {
+        if (buffer().remaining() >= source.remaining()) {
+            return;
+        } else {
+            final int adjustment = source.remaining() - buffer().remaining();
+            ensureCapacity(buffer().capacity() + adjustment);
+        }
     }
 
 }
