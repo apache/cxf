@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -92,7 +93,7 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
                     return "Hello, finally! " + cnt;
                 }
                 public String greetMe(String me) {
-                    return "Hello " + me.repeat(500);
+                    return "Hello " + String.join("", Collections.nCopies(500, me));
                 }
             });
 
@@ -122,12 +123,12 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
     @Test
     public void testCall() throws Exception {
         updateAddressPort(g, PORT);
-        assertEquals("Hello " + request.repeat(500), g.greetMe(request));
+        assertEquals("Hello " + String.join("", Collections.nCopies(500, request)), g.greetMe(request));
         HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
         HTTPClientPolicy cp = new HTTPClientPolicy();
         cp.setAllowChunking(false);
         c.setClient(cp);
-        assertEquals("Hello " + request.repeat(500), g.greetMe(request));
+        assertEquals("Hello " + String.join("", Collections.nCopies(500, request)), g.greetMe(request));
     }
     @Test
     public void testCallAsync() throws Exception {
@@ -141,7 +142,7 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
                 }
             }
         }).get();
-        assertEquals("Hello " + request.repeat(500), resp.getResponseType());
+        assertEquals("Hello " + String.join("", Collections.nCopies(500, request)), resp.getResponseType());
 
         g.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
             public void handleResponse(Response<GreetMeLaterResponse> res) {
