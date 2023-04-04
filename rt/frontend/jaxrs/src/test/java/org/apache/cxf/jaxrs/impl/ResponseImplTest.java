@@ -49,6 +49,7 @@ import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ResponseProcessingException;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -70,7 +71,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.impl.bootstrap.ConfigurationBuilderImpl;
+import org.apache.cxf.jaxrs.bootstrap.ConfigurationBuilderImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -856,17 +857,17 @@ public class ResponseImplTest {
 
         @Override
         public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
-            throw new UnsupportedOperationException("Unimplemented method 'bootstrap'");
+            return original.bootstrap(application, configuration);
         }
 
         @Override
         public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
-            throw new UnsupportedOperationException("Unimplemented method 'bootstrap'");
+            return original.bootstrap(clazz, configuration);
         }
 
         @Override
-        public jakarta.ws.rs.core.EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
-            return new EntityPartBuilderImpl(partName);
+        public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+            return original.createEntityPartBuilder(partName);
         }
     }
 

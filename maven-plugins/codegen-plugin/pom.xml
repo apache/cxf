@@ -199,7 +199,7 @@
                     <dependency>
                         <groupId>jakarta.xml.bind</groupId>
                         <artifactId>jakarta.xml.bind-api</artifactId>
-                        <version>4.0.0</version>
+                        <version>${cxf.jaxb.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
