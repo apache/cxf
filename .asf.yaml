@@ -1,3 +1,0 @@
-jenkins:
-  github_whitelist:
-    - dependabot[bot]
