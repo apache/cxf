@@ -139,7 +139,7 @@
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
-            <version>12.2</version>
+            <version>12.3</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign.opentracing</groupId>
