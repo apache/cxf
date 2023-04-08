@@ -54,7 +54,6 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -65,7 +64,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -75,7 +73,6 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.empty;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
         webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxwsTest.TestConfig.class,

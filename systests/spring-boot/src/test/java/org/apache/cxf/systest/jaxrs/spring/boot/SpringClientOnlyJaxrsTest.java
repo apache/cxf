@@ -40,7 +40,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.function.RequestPredicates;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
@@ -52,14 +51,12 @@ import io.micrometer.core.instrument.search.RequiredSearch;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringClientOnlyJaxrsTest.TestConfig.class)
 @ActiveProfiles("client")
 public class SpringClientOnlyJaxrsTest {
