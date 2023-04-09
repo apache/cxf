@@ -218,4 +218,17 @@
             </plugins>
         </pluginManagement>
     </build>
+    
+    <!-- Apache Karaf does not support JDK-19+ yet --> 
+    <profiles>
+        <profile>
+            <id>skip-tests</id>
+            <activation>
+                <jdk>[19,)</jdk>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
