@@ -21,124 +21,90 @@ package org.apache.cxf.buslifecycle;
 
 import org.apache.cxf.bus.managers.CXFBusLifeCycleManager;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class CXFBusLifeCycleManagerTest {
 
     @Test
     public void testListenerNotRegistered() {
 
-        BusLifeCycleListener listener1 = EasyMock.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener1 = mock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
 
-        EasyMock.reset(listener1);
-        EasyMock.replay(listener1);
         mgr.initComplete();
-        EasyMock.verify(listener1);
+        verifyNoInteractions(listener1);
 
-        EasyMock.reset(listener1);
-        EasyMock.replay(listener1);
         mgr.preShutdown();
-        EasyMock.verify(listener1);
+        verifyNoInteractions(listener1);
 
-        EasyMock.reset(listener1);
-        EasyMock.replay(listener1);
         mgr.postShutdown();
-        EasyMock.verify(listener1);
+        verifyNoInteractions(listener1);
     }
 
     @Test
     public void testSingleListenerRegistration() {
 
-        BusLifeCycleListener listener1 = EasyMock.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener1 = mock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
 
         mgr.registerLifeCycleListener(listener1);
 
-        EasyMock.reset(listener1);
-        listener1.initComplete();
-        EasyMock.replay(listener1);
         mgr.initComplete();
-        EasyMock.verify(listener1);
+        verify(listener1).initComplete();
 
-        EasyMock.reset(listener1);
-        listener1.preShutdown();
-        EasyMock.replay(listener1);
         mgr.preShutdown();
-        EasyMock.verify(listener1);
+        verify(listener1).preShutdown();
 
-        EasyMock.reset(listener1);
-        listener1.postShutdown();
-        EasyMock.replay(listener1);
         mgr.postShutdown();
-        EasyMock.verify(listener1);
+        verify(listener1).postShutdown();
     }
 
     @Test
     public void testMultipleListeners() {
-
-        IMocksControl ctrl = EasyMock.createStrictControl();
-
-        BusLifeCycleListener listener1 = ctrl.createMock(BusLifeCycleListener.class);
-        BusLifeCycleListener listener2 = ctrl.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener1 = mock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener2 = mock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
 
         mgr.registerLifeCycleListener(listener1);
         mgr.registerLifeCycleListener(listener2);
 
-        ctrl.reset();
-        listener1.initComplete();
-        listener2.initComplete();
-        ctrl.replay();
         mgr.initComplete();
-        ctrl.verify();
+        verify(listener1).initComplete();
+        verify(listener2).initComplete();
 
-        ctrl.reset();
-        listener2.preShutdown();
-        listener1.preShutdown();
-        ctrl.replay();
         mgr.preShutdown();
-        ctrl.verify();
+        verify(listener1).preShutdown();
+        verify(listener2).preShutdown();
 
-        ctrl.reset();
-        listener2.postShutdown();
-        listener1.postShutdown();
-        ctrl.replay();
         mgr.postShutdown();
-        ctrl.verify();
+        verify(listener1).postShutdown();
+        verify(listener2).postShutdown();
     }
 
     @Test
     public void testDeregistration() {
-
-        IMocksControl ctrl = EasyMock.createStrictControl();
-
-        BusLifeCycleListener listener1 = ctrl.createMock(BusLifeCycleListener.class);
-        BusLifeCycleListener listener2 = ctrl.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener1 = mock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener2 = mock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
 
         mgr.registerLifeCycleListener(listener2);
         mgr.registerLifeCycleListener(listener1);
         mgr.unregisterLifeCycleListener(listener2);
 
-        ctrl.reset();
-        listener1.initComplete();
-        ctrl.replay();
         mgr.initComplete();
-        ctrl.verify();
+        verify(listener1).initComplete();
+        verifyNoInteractions(listener2);
 
-        ctrl.reset();
-        listener1.preShutdown();
-        ctrl.replay();
         mgr.preShutdown();
-        ctrl.verify();
+        verify(listener1).preShutdown();
+        verifyNoInteractions(listener2);
 
-        ctrl.reset();
-        listener1.postShutdown();
-        ctrl.replay();
         mgr.postShutdown();
-        ctrl.verify();
+        verify(listener1).postShutdown();
+        verifyNoInteractions(listener2);
     }
 }

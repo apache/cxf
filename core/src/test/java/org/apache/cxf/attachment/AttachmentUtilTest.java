@@ -31,13 +31,12 @@ import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class AttachmentUtilTest {
     @Test
@@ -269,70 +268,57 @@ public class AttachmentUtilTest {
 
     @Test
     public void bigIntAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         BigInteger bigInteger = new BigInteger(String.valueOf(Long.MAX_VALUE));
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, bigInteger, cos);
-        replay(cos);
-        cos.setMaxSize(bigInteger.longValue());
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(bigInteger.longValue());
+        verify(cos).setThreshold(102400L);
+
         // Overflow long value
         bigInteger = bigInteger.add(BigInteger.ONE);
-        cos = createMock(CachedOutputStream.class);
+        cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, bigInteger, cos);
-        replay(cos);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void longAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Long.MAX_VALUE, cos);
-        replay(cos);
-        cos.setMaxSize(Long.MAX_VALUE);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(Long.MAX_VALUE);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void integerAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Integer.MAX_VALUE, cos);
-        replay(cos);
-        cos.setMaxSize(Integer.MAX_VALUE);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(Integer.MAX_VALUE);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void shortAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Short.MAX_VALUE, cos);
-        replay(cos);
-        cos.setMaxSize(Short.MAX_VALUE);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(Short.MAX_VALUE);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void byteAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Byte.MAX_VALUE, cos);
-        replay(cos);
-        cos.setMaxSize(Byte.MAX_VALUE);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(Byte.MAX_VALUE);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void numberStringAsAttachmentMaxSize() throws IOException {
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, "12345", cos);
-        replay(cos);
-        cos.setMaxSize(12345);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setMaxSize(12345);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test(expected = IOException.class)
@@ -354,25 +340,21 @@ public class AttachmentUtilTest {
     @Test
     public void fileAsAttachmentDirectory() throws IOException {
         File attachmentDirectory = new File("/dev/null");
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDirectory,
                 cos);
-        replay(cos);
-        cos.setOutputDir(attachmentDirectory);
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setOutputDir(attachmentDirectory);
+        verify(cos).setThreshold(102400L);
     }
 
     @Test
     public void stringAsAttachmentDirectory() throws IOException {
         String attachmentDirectory = "/dev/null";
-        CachedOutputStream cos = createMock(CachedOutputStream.class);
+        CachedOutputStream cos = spy(CachedOutputStream.class);
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDirectory,
                 cos);
-        replay(cos);
-        cos.setOutputDir(new File(attachmentDirectory));
-        cos.setThreshold(102400L);
-        verify(cos);
+        verify(cos).setOutputDir(new File(attachmentDirectory));
+        verify(cos).setThreshold(102400L);
     }
 
     @Test(expected = IOException.class)

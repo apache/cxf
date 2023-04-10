@@ -36,35 +36,19 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("deprecation")
 public class LoggingOutInterceptorTest {
-
-    protected IMocksControl control;
-
-    @Before
-    public void setUp() throws Exception {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        control.verify();
-    }
-
     @Test
     public void testFormatting() throws Exception {
-        control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
 
@@ -88,7 +72,6 @@ public class LoggingOutInterceptorTest {
 
     @Test
     public void testPrettyLoggingWithoutEncoding() throws Exception {
-        control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
         
@@ -112,7 +95,6 @@ public class LoggingOutInterceptorTest {
 
     @Test
     public void testPrettyLoggingWithEncoding() throws Exception {
-        control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
         
@@ -138,7 +120,6 @@ public class LoggingOutInterceptorTest {
 
     @Test
     public void testFormattingOverride() throws Exception {
-        control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         // create a custom logging interceptor that overrides how formatting is done
@@ -171,10 +152,9 @@ public class LoggingOutInterceptorTest {
         StringWriter sw = new StringWriter();
         sw.append("<today/>");
 
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
-        control.replay();
+        Endpoint endpoint = mock(Endpoint.class);
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
 
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
@@ -207,14 +187,13 @@ public class LoggingOutInterceptorTest {
     private CachedOutputStream handleAndGetCachedOutputStream(LoggingOutInterceptor interceptor) {
         interceptor.setPrintWriter(new PrintWriter(new ByteArrayOutputStream()));
 
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
-        BindingInfo bindingInfo = control.createMock(BindingInfo.class);
-        EasyMock.expect(endpointInfo.getBinding()).andReturn(bindingInfo).anyTimes();
-        EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        EasyMock.expect(bindingInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        control.replay();
+        Endpoint endpoint = mock(Endpoint.class);
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
+        BindingInfo bindingInfo = mock(BindingInfo.class);
+        when(endpointInfo.getBinding()).thenReturn(bindingInfo);
+        when(endpointInfo.getProperties()).thenReturn(new HashMap<String, Object>());
+        when(bindingInfo.getProperties()).thenReturn(new HashMap<String, Object>());
 
         Message message = new MessageImpl();
         ExchangeImpl exchange = new ExchangeImpl();

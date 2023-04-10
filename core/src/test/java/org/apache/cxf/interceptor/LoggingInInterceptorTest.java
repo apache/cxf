@@ -28,15 +28,18 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("deprecation")
 public class LoggingInInterceptorTest {
@@ -47,7 +50,6 @@ public class LoggingInInterceptorTest {
             + "</seventeen></thousand></two></july></of></eighteenth></the></is></today>";
     static int bufferLength = bufferContent.getBytes().length;
 
-    protected IMocksControl control;
     private Message message;
     private InputStream inputStream;
     private LoggingMessage loggingMessage;
@@ -56,7 +58,6 @@ public class LoggingInInterceptorTest {
     @Before
     public void setUp() throws Exception {
         loggingMessage = new LoggingMessage("", "");
-        control = EasyMock.createNiceControl();
 
         StringWriter sw = new StringWriter();
         sw.append("<today/>");
@@ -65,22 +66,20 @@ public class LoggingInInterceptorTest {
         message.put(Message.CONTENT_TYPE, "application/xml");
         message.setContent(Writer.class, sw);
 
-        inputStream = control.createMock(InputStream.class);
-        EasyMock.expect(inputStream.read(EasyMock.anyObject(byte[].class), EasyMock.anyInt(), EasyMock.anyInt()))
-                .andAnswer(new IAnswer<Integer>() {
-                    public Integer answer() {
-                        System.arraycopy(bufferContent.getBytes(), 0,
-                                EasyMock.getCurrentArguments()[0], 0,
-                                bufferLength);
-                        return bufferLength;
-                    }
-                }).andStubReturn(-1);
-        control.replay();
+        inputStream = mock(InputStream.class);
+        when(inputStream.read(any(byte[].class), anyInt(), anyInt()))
+                .then(invocation -> {
+                    System.arraycopy(bufferContent.getBytes(), 0,
+                            invocation.getArgument(0), 0,
+                            bufferLength);
+                    return bufferLength;
+                })
+                .thenReturn(-1);
     }
 
     @After
     public void tearDown() throws Exception {
-        control.verify();
+        verify(inputStream, atLeastOnce()).read(any(byte[].class), anyInt(), anyInt());
     }
 
     @Test

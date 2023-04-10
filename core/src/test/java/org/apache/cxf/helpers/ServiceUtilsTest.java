@@ -24,23 +24,21 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServiceUtilsTest {
-    private IMocksControl control;
     private Message msg;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        msg = control.createMock(Message.class);
+        msg = mock(Message.class);
     }
 
     @Test
@@ -166,11 +164,7 @@ public class ServiceUtilsTest {
     }
 
     private void setupSchemaValidationValue(Object value, boolean isRequestor) {
-        control.reset();
-        EasyMock.expect(msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED)).andReturn(value);
-
-        EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(isRequestor);
-
-        control.replay();
+        when(msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED)).thenReturn(value);
+        when(msg.get(Message.REQUESTOR_ROLE)).thenReturn(isRequestor);
     }
 }

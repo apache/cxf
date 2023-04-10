@@ -24,10 +24,11 @@ import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.springframework.context.support.AbstractRefreshableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class BusApplicationListenerTest {
 
@@ -38,16 +39,12 @@ public class BusApplicationListenerTest {
         SpringBusFactory factory = new SpringBusFactory(parent);
         Bus bus = factory.createBus();
         CXFBusLifeCycleManager manager = bus.getExtension(CXFBusLifeCycleManager.class);
-        BusLifeCycleListener listener = EasyMock.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener listener = mock(BusLifeCycleListener.class);
         manager.registerLifeCycleListener(listener);
-        EasyMock.reset(listener);
-        listener.preShutdown();
-        EasyMock.expectLastCall().times(1);
-        listener.postShutdown();
-        EasyMock.expectLastCall().times(1);
-        EasyMock.replay(listener);
         parent.close();
-        EasyMock.verify(listener);
+
+        verify(listener).preShutdown();
+        verify(listener, times(1)).postShutdown();
     }
 
 }

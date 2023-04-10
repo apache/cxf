@@ -32,9 +32,11 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SimpleAuthorizingInterceptorTest {
 
@@ -46,15 +48,14 @@ public class SimpleAuthorizingInterceptorTest {
     public void setUp() throws Exception {
         method = TestService.class.getMethod("echo", new Class[]{});
         Exchange ex = setUpExchange();
-        Service service = EasyMock.createMock(Service.class);
+        Service service = mock(Service.class);
         ex.put(Service.class, service);
-        MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
-        EasyMock.expect(service.get(MethodDispatcher.class.getName())).andReturn(md);
+        MethodDispatcher md = mock(MethodDispatcher.class);
+        when(service.get(MethodDispatcher.class.getName())).thenReturn(md);
 
-        BindingOperationInfo boi = EasyMock.createMock(BindingOperationInfo.class);
+        BindingOperationInfo boi = mock(BindingOperationInfo.class);
         ex.put(BindingOperationInfo.class, boi);
-        EasyMock.expect(md.getMethod(boi)).andReturn(method);
-        EasyMock.replay(service, md);
+        when(md.getMethod(boi)).thenReturn(method);
     }
 
     protected Exchange setUpExchange() {

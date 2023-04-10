@@ -39,9 +39,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JAASLoginInterceptorTest {
 
@@ -115,12 +116,10 @@ public class JAASLoginInterceptorTest {
     }
 
     private X509Certificate createTestCert(String subjectDn) {
-        IMocksControl c = EasyMock.createControl();
-        X509Certificate cert = c.createMock(X509Certificate.class);
-        Principal principal = c.createMock(Principal.class);
-        EasyMock.expect(principal.getName()).andReturn(subjectDn);
-        EasyMock.expect(cert.getSubjectDN()).andReturn(principal);
-        c.replay();
+        X509Certificate cert = mock(X509Certificate.class);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(subjectDn);
+        when(cert.getSubjectDN()).thenReturn(principal);
         return cert;
     }
 

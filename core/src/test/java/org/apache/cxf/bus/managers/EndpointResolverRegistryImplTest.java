@@ -24,8 +24,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.endpoint.EndpointResolver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +33,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class EndpointResolverRegistryImplTest {
 
@@ -44,18 +44,16 @@ public class EndpointResolverRegistryImplTest {
     private EndpointReferenceType logical;
     private EndpointReferenceType physical;
     private EndpointReferenceType fresh;
-    private IMocksControl control;
     private QName serviceName;
 
     @Before
     public void setUp() {
         registry = new EndpointResolverRegistryImpl();
-        control = EasyMock.createNiceControl();
-        resolver1 = control.createMock(EndpointResolver.class);
-        resolver2 = control.createMock(EndpointResolver.class);
-        logical = control.createMock(EndpointReferenceType.class);
-        physical = control.createMock(EndpointReferenceType.class);
-        fresh = control.createMock(EndpointReferenceType.class);
+        resolver1 = mock(EndpointResolver.class);
+        resolver2 = mock(EndpointResolver.class);
+        logical = mock(EndpointReferenceType.class);
+        physical = mock(EndpointReferenceType.class);
+        fresh = mock(EndpointReferenceType.class);
         serviceName = new QName("namespace", "local");
     }
 
@@ -116,37 +114,22 @@ public class EndpointResolverRegistryImplTest {
     public void testResolve() {
         registry.register(resolver1);
         registry.register(resolver2);
-        resolver1.resolve(logical);
-        EasyMock.expectLastCall().andReturn(physical);
-        control.replay();
+        when(resolver1.resolve(logical)).thenReturn(physical);
 
         EndpointReferenceType resolved = registry.resolve(logical);
-
-        control.verify();
         assertSame("unexpected physical EPR", physical, resolved);
 
-        control.reset();
         resolver1.resolve(logical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.resolve(logical);
-        EasyMock.expectLastCall().andReturn(physical);
-        control.replay();
+        when(resolver1.resolve(logical)).thenReturn(null);
+        when(resolver2.resolve(logical)).thenReturn(physical);
 
         resolved = registry.resolve(logical);
-
-        control.verify();
         assertSame("unexpected physical EPR", physical, resolved);
 
-        control.reset();
-        resolver1.resolve(logical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.resolve(logical);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        when(resolver1.resolve(logical)).thenReturn(null);
+        when(resolver2.resolve(logical)).thenReturn(null);
 
         resolved = registry.resolve(logical);
-
-        control.verify();
         assertNull("unexpected physical EPR", resolved);
     }
 
@@ -154,37 +137,21 @@ public class EndpointResolverRegistryImplTest {
     public void testRenew() {
         registry.register(resolver1);
         registry.register(resolver2);
-        resolver1.renew(logical, physical);
-        EasyMock.expectLastCall().andReturn(fresh);
-        control.replay();
+        when(resolver1.renew(logical, physical)).thenReturn(fresh);
 
         EndpointReferenceType renewed = registry.renew(logical, physical);
-
-        control.verify();
         assertSame("unexpected physical EPR", fresh, renewed);
 
-        control.reset();
-        resolver1.renew(logical, physical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.renew(logical, physical);
-        EasyMock.expectLastCall().andReturn(physical);
-        control.replay();
+        when(resolver1.renew(logical, physical)).thenReturn(null);
+        when(resolver2.renew(logical, physical)).thenReturn(physical);
 
         renewed = registry.renew(logical, physical);
-
-        control.verify();
         assertSame("unexpected physical EPR", physical, renewed);
 
-        control.reset();
-        resolver1.renew(logical, physical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.renew(logical, physical);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        when(resolver1.renew(logical, physical)).thenReturn(null);
+        when(resolver2.renew(logical, physical)).thenReturn(null);
 
         renewed = registry.renew(logical, physical);
-
-        control.verify();
         assertNull("unexpected physical EPR", renewed);
     }
 
@@ -192,37 +159,21 @@ public class EndpointResolverRegistryImplTest {
     public void testMintFromServiceName() {
         registry.register(resolver1);
         registry.register(resolver2);
-        resolver1.mint(serviceName);
-        EasyMock.expectLastCall().andReturn(logical);
-        control.replay();
+        when(resolver1.mint(serviceName)).thenReturn(logical);
 
         EndpointReferenceType minted = registry.mint(serviceName);
-
-        control.verify();
         assertSame("unexpected minted EPR", logical, minted);
 
-        control.reset();
-        resolver1.mint(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.mint(serviceName);
-        EasyMock.expectLastCall().andReturn(logical);
-        control.replay();
+        when(resolver1.mint(serviceName)).thenReturn(null);
+        when(resolver2.mint(serviceName)).thenReturn(logical);
 
         minted = registry.mint(serviceName);
-
-        control.verify();
         assertSame("unexpected minted EPR", logical, minted);
 
-        control.reset();
-        resolver1.mint(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.mint(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        when(resolver1.mint(serviceName)).thenReturn(null);
+        when(resolver2.mint(serviceName)).thenReturn(null);
 
         minted = registry.mint(serviceName);
-
-        control.verify();
         assertNull("unexpected minted EPR", minted);
     }
 
@@ -230,37 +181,21 @@ public class EndpointResolverRegistryImplTest {
     public void testMintFromPhysical() {
         registry.register(resolver1);
         registry.register(resolver2);
-        resolver1.mint(physical);
-        EasyMock.expectLastCall().andReturn(logical);
-        control.replay();
+        when(resolver1.mint(physical)).thenReturn(logical);
 
         EndpointReferenceType minted = registry.mint(physical);
-
-        control.verify();
         assertSame("unexpected minted EPR", logical, minted);
 
-        control.reset();
-        resolver1.mint(physical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.mint(physical);
-        EasyMock.expectLastCall().andReturn(logical);
-        control.replay();
+        when(resolver1.mint(physical)).thenReturn(null);
+        when(resolver2.mint(physical)).thenReturn(logical);
 
         minted = registry.mint(physical);
-
-        control.verify();
         assertSame("unexpected minted EPR", logical, minted);
 
-        control.reset();
-        resolver1.mint(physical);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.mint(physical);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        when(resolver1.mint(physical)).thenReturn(null);
+        when(resolver2.mint(physical)).thenReturn(null);
 
         minted = registry.mint(physical);
-
-        control.verify();
         assertNull("unexpected minted EPR", minted);
     }
 }

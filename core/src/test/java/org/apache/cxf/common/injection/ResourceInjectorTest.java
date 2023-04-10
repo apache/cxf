@@ -37,12 +37,13 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ResourceInjectorTest {
     private static final String RESOURCE_ONE = "resource one";
@@ -53,18 +54,13 @@ public class ResourceInjectorTest {
 
     public void setUpResourceManager(String pfx) {
 
-        ResourceManager resMgr = EasyMock.createMock(ResourceManager.class);
+        ResourceManager resMgr = mock(ResourceManager.class);
         List<ResourceResolver> resolvers = new ArrayList<>();
 
-        resMgr.getResourceResolvers();
-        EasyMock.expectLastCall().andReturn(resolvers);
-        resMgr.resolveResource(pfx + "resource1", String.class, resolvers);
-        EasyMock.expectLastCall().andReturn(RESOURCE_ONE);
-        resMgr.resolveResource("resource2", String.class, resolvers);
-        EasyMock.expectLastCall().andReturn(RESOURCE_TWO);
-        resMgr.resolveResource("resource3", CharSequence.class, resolvers);
-        EasyMock.expectLastCall().andReturn(RESOURCE_THREE);
-        EasyMock.replay(resMgr);
+        when(resMgr.getResourceResolvers()).thenReturn(resolvers);
+        when(resMgr.resolveResource(pfx + "resource1", String.class, resolvers)).thenReturn(RESOURCE_ONE);
+        when(resMgr.resolveResource("resource2", String.class, resolvers)).thenReturn(RESOURCE_TWO);
+        when(resMgr.resolveResource("resource3", CharSequence.class, resolvers)).thenReturn(RESOURCE_THREE);
 
         injector = new ResourceInjector(resMgr);
     }

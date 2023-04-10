@@ -34,8 +34,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,6 +41,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public abstract class CachedStreamTestBase {
     // use two typical ciphers for testing
@@ -230,18 +231,14 @@ public abstract class CachedStreamTestBase {
             assertNull("expects no tmp file", tmpfile);
             close(cache);
 
-            IMocksControl control = EasyMock.createControl();
-
-            Bus b = control.createMock(Bus.class);
-            EasyMock.expect(b.getProperty(CachedConstants.THRESHOLD_BUS_PROP)).andReturn("4");
-            EasyMock.expect(b.getProperty(CachedConstants.MAX_SIZE_BUS_PROP)).andReturn(null);
-            EasyMock.expect(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).andReturn(null);
+            Bus b = mock(Bus.class);
+            when(b.getProperty(CachedConstants.THRESHOLD_BUS_PROP)).thenReturn("4");
+            when(b.getProperty(CachedConstants.MAX_SIZE_BUS_PROP)).thenReturn(null);
+            when(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).thenReturn(null);
             Path tmpDirPath = Files.createTempDirectory("temp-dir");
-            EasyMock.expect(b.getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP)).andReturn(tmpDirPath.toString());
+            when(b.getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP)).thenReturn(tmpDirPath.toString());
 
             BusFactory.setThreadDefaultBus(b);
-
-            control.replay();
 
             cache = createCache();
             tmpfile = getTmpFile("Hello World!", cache);
@@ -250,8 +247,11 @@ public abstract class CachedStreamTestBase {
             assertTrue("expects a tmp file", tmpfile.exists());
             close(cache);
             assertFalse("expects no tmp file", tmpfile.exists());
-
-            control.verify();
+            
+            verify(b).getProperty(CachedConstants.THRESHOLD_BUS_PROP);
+            verify(b).getProperty(CachedConstants.MAX_SIZE_BUS_PROP);
+            verify(b).getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP);
+            verify(b).getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP);
         } finally {
             BusFactory.setThreadDefaultBus(oldbus);
         }
