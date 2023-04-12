@@ -864,6 +864,10 @@ public class ResponseImplTest {
             throw new UnsupportedOperationException("Unimplemented method 'bootstrap'");
         }
 
+        @Override
+        public jakarta.ws.rs.core.EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+            return new EntityPartBuilderImpl(partName);
+        }
     }
 
     public static class StringBeanHeaderDelegate implements HeaderDelegate<StringBean> {

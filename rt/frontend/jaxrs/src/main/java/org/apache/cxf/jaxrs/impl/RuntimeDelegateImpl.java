@@ -143,4 +143,9 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         throw new UnsupportedOperationException("Bootstrap API not yet supported");
     }
 
+    @Override
+    public jakarta.ws.rs.core.EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+        return new EntityPartBuilderImpl(partName);
+    }
+
 }
