@@ -22,7 +22,9 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
+import jakarta.ws.rs.SeBootstrap;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Cookie;
@@ -36,6 +38,7 @@ import jakarta.ws.rs.core.Variant.VariantListBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.impl.bootstrap.ConfigurationBuilderImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 
@@ -125,5 +128,19 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         return new LinkBuilderImpl();
     }
 
+    @Override
+    public SeBootstrap.Configuration.Builder createConfigurationBuilder() {
+        return new ConfigurationBuilderImpl();
+    }
+
+    @Override
+    public CompletionStage<SeBootstrap.Instance> bootstrap(Application application, SeBootstrap.Configuration configuration) {
+        throw new UnsupportedOperationException("Bootstrap API not yet supported");
+    }
+
+    @Override
+    public CompletionStage<SeBootstrap.Instance> bootstrap(Class<? extends Application> clazz, SeBootstrap.Configuration configuration) {
+        throw new UnsupportedOperationException("Bootstrap API not yet supported");
+    }
 
 }

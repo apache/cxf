@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -43,6 +44,8 @@ import org.w3c.dom.Document;
 
 import jakarta.activation.DataSource;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.SeBootstrap.Configuration;
+import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ResponseProcessingException;
 import jakarta.ws.rs.core.Application;
@@ -67,6 +70,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.impl.bootstrap.ConfigurationBuilderImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -844,6 +848,22 @@ public class ResponseImplTest {
         public Builder createLinkBuilder() {
             return original.createLinkBuilder();
         }
+
+        @Override
+        public jakarta.ws.rs.SeBootstrap.Configuration.Builder createConfigurationBuilder() {
+            return new ConfigurationBuilderImpl();
+        }
+
+        @Override
+        public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
+            throw new UnsupportedOperationException("Unimplemented method 'bootstrap'");
+        }
+
+        @Override
+        public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
+            throw new UnsupportedOperationException("Unimplemented method 'bootstrap'");
+        }
+
     }
 
     public static class StringBeanHeaderDelegate implements HeaderDelegate<StringBean> {
