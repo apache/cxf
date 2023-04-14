@@ -28,8 +28,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import javax.net.ssl.SSLContext;
+
 import jakarta.ws.rs.SeBootstrap.Configuration;
 import jakarta.ws.rs.SeBootstrap.Configuration.Builder;
+import jakarta.ws.rs.SeBootstrap.Configuration.SSLClientAuthentication;
 import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
@@ -43,6 +46,9 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant.VariantListBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
+
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.bootstrap.ConfigurationBuilderImpl;
@@ -142,6 +148,30 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         final URI address = configuration.baseUriBuilder().path(factory.getAddress()).build();
         factory.setAddress(address.toString());
         factory.setStart(true);
+        
+        if ("https".equalsIgnoreCase(configuration.protocol())) {
+            final TLSServerParameters parameters = new TLSServerParameters();
+
+            final SSLClientAuthentication sslClientAuthentication = configuration.sslClientAuthentication();
+            if (sslClientAuthentication != null) {
+                final ClientAuthentication clientAuthentication = new ClientAuthentication();
+
+                if (sslClientAuthentication == SSLClientAuthentication.OPTIONAL) {
+                    clientAuthentication.setWant(true);
+                } else if (sslClientAuthentication == SSLClientAuthentication.MANDATORY) {
+                    clientAuthentication.setRequired(true);
+                }
+
+                parameters.setClientAuthentication(clientAuthentication);
+            }
+
+            final SSLContext sslContext = configuration.sslContext();
+            if (sslContext != null) {
+                parameters.setSecureSocketProtocol(sslContext.getProtocol());
+            }
+
+            // TODO: Support SSL context propagation down to HTTP engine
+        }
 
         return CompletableFuture
             .supplyAsync(() -> factory.create())
