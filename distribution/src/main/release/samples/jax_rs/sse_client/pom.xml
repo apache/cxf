@@ -47,7 +47,7 @@
 
         <dependency>
             <groupId>io.undertow</groupId>
-            <artifactId>undertow-servlet-jakarta</artifactId>
+            <artifactId>undertow-servlet</artifactId>
         </dependency>
     </dependencies>
     
