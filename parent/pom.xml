@@ -168,11 +168,11 @@
         <cxf.logback.classic.version>1.4.6</cxf.logback.classic.version>
         <cxf.lucene.version>9.5.0</cxf.lucene.version>
         <cxf.maven.core.version>3.9.1</cxf.maven.core.version>
-        <cxf.micrometer.version>1.9.10</cxf.micrometer.version>
-        <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
-        <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
-        <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
-        <cxf.mina.version>2.1.5</cxf.mina.version>
+        <cxf.micrometer.version>1.10.6</cxf.micrometer.version>
+        <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
+        <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
+        <cxf.mina.version>2.2.1</cxf.mina.version>
         <cxf.mockito.version>5.3.1</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
