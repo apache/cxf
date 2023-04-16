@@ -167,7 +167,7 @@
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.2.10</cxf.logback.classic.version>
         <cxf.lucene.version>9.5.0</cxf.lucene.version>
-        <cxf.maven.core.version>3.6.3</cxf.maven.core.version>
+        <cxf.maven.core.version>3.9.1</cxf.maven.core.version>
         <cxf.micrometer.version>1.9.10</cxf.micrometer.version>
         <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
@@ -865,6 +865,10 @@
                         <groupId>javax.enterprise</groupId>
                         <artifactId>cdi-api</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>javax.annotation-api</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -983,6 +987,12 @@
                 <artifactId>maven-core</artifactId>
                 <scope>provided</scope>
                 <version>${cxf.maven.core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>javax.annotation-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
