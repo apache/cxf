@@ -44,7 +44,7 @@
         <cxf.lucene.version>9.5.0</cxf.lucene.version>
         <cxf.olingo.server.version>4.9.0</cxf.olingo.server.version>
         <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
-        <cxf.brave.version>5.15.0</cxf.brave.version>
+        <cxf.brave.version>5.15.1</cxf.brave.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.activemq.artemis.version>2.27.1</cxf.activemq.artemis.version>
         <cxf.h2.version>2.1.214</cxf.h2.version>
