@@ -82,6 +82,11 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                         return;
                     }
 
+                    final Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+                    if (responseCode != null && responseCode == 204) {
+                        return;
+                    }
+
                     // wrap an unzipping stream around the original one
                     GZIPInputStream zipInput = new GZIPInputStream(is);
                     message.setContent(InputStream.class, zipInput);
