@@ -116,11 +116,9 @@ public final class JwsUtils {
         }
         if (key instanceof ECPrivateKey) {
             return new EcDsaJwsSignatureProvider((ECPrivateKey)key, algo);
-        } else if (key instanceof RSAPrivateKey) {
-            return new PrivateKeyJwsSignatureProvider(key, algo);
         }
-
-        return null;
+        
+        return new PrivateKeyJwsSignatureProvider(key, algo);
     }
     public static JwsSignatureProvider getHmacSignatureProvider(String encodedKey, SignatureAlgorithm algo) {
         return getHmacSignatureProvider(JoseUtils.decode(encodedKey), algo);
@@ -178,13 +176,11 @@ public final class JwsUtils {
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
 
-        if (key instanceof RSAPublicKey) {
-            return new PublicKeyJwsSignatureVerifier(key, algo);
-        } else if (key instanceof ECPublicKey) {
+        if (key instanceof ECPublicKey) {
             return new EcDsaJwsSignatureVerifier(key, algo);
         }
 
-        return null;
+        return new PublicKeyJwsSignatureVerifier(key, algo);
     }
     public static JwsSignatureVerifier getHmacSignatureVerifier(String encodedKey, SignatureAlgorithm algo) {
         return getHmacSignatureVerifier(JoseUtils.decode(encodedKey), algo);
