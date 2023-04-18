@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.gzip;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertThat;
 
 public class GZIPInInterceptorTest {
     private Message message;
-    
+
     @Before
     public void setUp() {
         final Map<String, List<String>> heeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -51,7 +52,7 @@ public class GZIPInInterceptorTest {
     @Test
     public void testNoContent() {
         final GZIPInInterceptor interceptor = new GZIPInInterceptor();
-        final InputStream nullInputStream = InputStream.nullInputStream();
+        final InputStream nullInputStream =  new ByteArrayInputStream(new byte[0]);
 
         message.setContent(InputStream.class, nullInputStream);
         message.put(Message.RESPONSE_CODE, 204);
