@@ -114,12 +114,12 @@ public final class JwsUtils {
             LOG.warning("No signature algorithm was defined");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
-        if (key instanceof ECPrivateKey) {
+        if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(key.getAlgorithm())) {
             return new EcDsaJwsSignatureProvider((ECPrivateKey)key, algo);
-        } else if (key instanceof RSAPrivateKey) {
+        } else if (JsonWebKey.KEY_TYPE_RSA.equals(key.getAlgorithm())) {
             return new PrivateKeyJwsSignatureProvider(key, algo);
         }
-
+        
         return null;
     }
     public static JwsSignatureProvider getHmacSignatureProvider(String encodedKey, SignatureAlgorithm algo) {
@@ -178,9 +178,9 @@ public final class JwsUtils {
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
         }
 
-        if (key instanceof RSAPublicKey) {
+        if (JsonWebKey.KEY_TYPE_RSA.equals(key.getAlgorithm())) {
             return new PublicKeyJwsSignatureVerifier(key, algo);
-        } else if (key instanceof ECPublicKey) {
+        } else if (JsonWebKey.KEY_TYPE_ELLIPTIC.equals(key.getAlgorithm())) {
             return new EcDsaJwsSignatureVerifier(key, algo);
         }
 
