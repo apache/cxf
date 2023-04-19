@@ -22,7 +22,9 @@ package org.apache.cxf.transport.http.netty.client;
 import java.net.URL;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.Endpoint;
@@ -88,6 +90,7 @@ public class NettyHttpConduitTest extends AbstractBusClientServerTestBase {
                     return "Hello, finally! " + cnt;
                 }
                 public String greetMe(String me) {
+                    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(10L));
                     if (me.equals(FILL_BUFFER)) {
                         return String.join("", Collections.nCopies(16093, " "));
                     } else {
