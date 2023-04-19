@@ -62,7 +62,7 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
         if (msg instanceof NettyHttpClientRequest) {
             NettyHttpClientRequest request = (NettyHttpClientRequest)msg;
             sendedQueue.put(request);
-            ctx.writeAndFlush(request.getRequest());
+            ctx.writeAndFlush(request.getRequest(), promise);
         } else {
             super.write(ctx, msg, promise);
         }
