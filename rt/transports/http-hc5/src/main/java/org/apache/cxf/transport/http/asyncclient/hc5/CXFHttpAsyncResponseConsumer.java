@@ -83,7 +83,7 @@ public class CXFHttpAsyncResponseConsumer implements AsyncResponseConsumer<Boole
                 break;
             }
 
-            Thread.onSpinWait();
+            Thread.yield();
         }
     }
 
