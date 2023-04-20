@@ -156,7 +156,7 @@
         <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
         <cxf.jexl.version>3.2.1</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
-        <cxf.johnzon.version>1.2.18</cxf.johnzon.version>
+        <cxf.johnzon.version>1.2.20</cxf.johnzon.version>
         <cxf.json.api.version>1.1.6</cxf.json.api.version>
         <cxf.json.bind-api.version>1.0.2</cxf.json.bind-api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
