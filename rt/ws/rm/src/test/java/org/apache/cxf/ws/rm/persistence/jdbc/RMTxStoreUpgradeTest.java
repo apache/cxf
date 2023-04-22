@@ -161,8 +161,7 @@ public class RMTxStoreUpgradeTest {
                 return;
             }
             // creating the old tables
-            Statement stmt = null;
-            stmt = getConnection().createStatement();
+            Statement stmt = getConnection().createStatement();
             try {
                 stmt.executeUpdate(CREATE_OLD_SRC_SEQ_TABLE_STMT);
             } catch (SQLException ex) {

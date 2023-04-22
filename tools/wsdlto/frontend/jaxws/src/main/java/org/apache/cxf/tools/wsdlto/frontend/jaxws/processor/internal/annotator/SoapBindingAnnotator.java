@@ -19,8 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
-import javax.jws.soap.SOAPBinding;
-
+import jakarta.jws.soap.SOAPBinding;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;

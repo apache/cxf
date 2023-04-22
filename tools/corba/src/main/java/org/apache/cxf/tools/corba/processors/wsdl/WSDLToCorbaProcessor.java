@@ -25,9 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
-import javax.xml.bind.JAXBException;
 
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -126,7 +125,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             wsdlToCorbaBinding.mapBindingToInterface(env.get("porttype").toString(), env.get("binding")
                 .toString());
         }
-        if ((!env.optionSet(ToolConstants.CFG_PORTTYPE))
+        if (!env.optionSet(ToolConstants.CFG_PORTTYPE)
             && !env.optionSet(ToolConstants.CFG_BINDING)) {
             wsdlToCorbaBinding.setAllBindings(true);
         }
@@ -155,9 +154,8 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             idlAction.setBindingName(env.get("binding").toString());
         } else {
             if (wsdlToCorbaBinding != null) {
-                String portType = null;
                 if (env.optionSet(ToolConstants.CFG_PORTTYPE)) {
-                    portType = env.get("porttype").toString();
+                    String portType = env.get("porttype").toString();
                     if (portType != null) {
                         String bindingName = wsdlToCorbaBinding.getMappedBindingName(portType);
                         if (bindingName != null) {
@@ -167,7 +165,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
                 } else {
                     //try to get the binding name from the wsdlToCorbaBinding
                     java.util.List<String> bindingNames = wsdlToCorbaBinding.getGeneratedBindingNames();
-                    if ((bindingNames != null) && (!bindingNames.isEmpty())) {
+                    if ((bindingNames != null) && !bindingNames.isEmpty()) {
                         idlAction.setBindingName(bindingNames.get(0));
                         if (bindingNames.size() > 1) {
                             System.err.println("Warning: Generating idl only for the binding "

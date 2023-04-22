@@ -354,7 +354,7 @@ public class URIDomainExpression implements DomainExpression {
             }
             for (int i = 0; i < args.length; i++) {
                 String matcherGroup = matcher.group(i + 1);
-                if ((matcherGroup == null) || (!matcherGroup.equals(args[i]))) {
+                if ((matcherGroup == null) || !matcherGroup.equals(args[i])) {
                     return false;
                 }
             }

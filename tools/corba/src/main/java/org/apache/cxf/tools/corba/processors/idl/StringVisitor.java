@@ -124,7 +124,7 @@ public class StringVisitor extends VisitorBase {
 
         setSchemaType(simpleType);
 
-        CorbaType anon = null;
+        final CorbaType anon;
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
@@ -169,7 +169,7 @@ public class StringVisitor extends VisitorBase {
 
         Scope anonstringScopedName = new Scope(getScope(), "_Anon1_" + stringScopedName.tail());
         String anonstringName = anonstringScopedName.toString();
-        CorbaType anon = null;
+        final CorbaType anon;
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();

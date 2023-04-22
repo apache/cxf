@@ -21,8 +21,8 @@ package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,6 @@ import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -42,6 +40,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -64,7 +64,6 @@ import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,19 +76,10 @@ import static org.junit.Assert.fail;
 
 public class JavaToProcessorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    String classPath = "";
+
     @Before
     public void startUp() throws Exception {
-        env = new ToolContext();
         env.put(ToolConstants.CFG_WSDL, ToolConstants.CFG_WSDL);
-
-        classPath = System.getProperty("java.class.path");
-        System.setProperty("java.class.path", getClassPath());
-    }
-    @After
-    public void tearDown() {
-        super.tearDown();
-        System.setProperty("java.class.path", classPath);
     }
 
     @Test
@@ -132,8 +122,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        URI expectedFile = getClass().getResource("expected/calculator.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "calculator.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/calculator.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "calculator.wsdl"));
 
     }
 
@@ -160,8 +150,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        URI expectedFile = getClass().getResource("expected/hello_soap12.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "hello_soap12.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/hello_soap12.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "hello_soap12.wsdl"));
     }
 
     @Test
@@ -169,11 +159,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
         classFile.mkdir();
 
+        String oldCP = System.getProperty("java.class.path");
         if (JavaUtils.isJava9Compatible()) {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
             String java9PlusFolder = output.getParent() + java.io.File.separator + "java9";
-            System.setProperty("java.class.path", System.getProperty("java.class.path")
-                               + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
+            System.setProperty("java.class.path",
+                oldCP + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
         }
 
         env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
@@ -193,7 +184,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         String serviceName = "cxfService";
         String portName = "cxfPort";
 
-        System.setProperty("java.class.path", "");
+        System.setProperty("java.class.path", oldCP);
 
         //      test flag
         String[] args = new String[] {"-o",
@@ -231,8 +222,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        URI expectedFile = getClass().getResource("expected/db.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "db.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/db.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "db.wsdl"));
     }
 
     @Test
@@ -255,8 +246,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         processor.setEnvironment(env);
         processor.process();
 
-        URI expectedFile = getClass().getResource("expected/my_hello_soap12.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "my_hello_soap12.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/my_hello_soap12.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "my_hello_soap12.wsdl"));
     }
     @Test
     public void testGenWrapperBeanClasses() throws Exception {
@@ -319,7 +310,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "hello.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-
     }
 
     @Test
@@ -332,7 +322,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "hello-no-package.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-
 
         String pkgBase = "defaultnamespace";
         File requestWrapperClass = new File(output, pkgBase + "/jaxws/SayHi.java");
@@ -350,8 +339,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "rpc-hello.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        URI expectedFile = getClass().getResource("expected/rpc-hello-expected.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "rpc-hello.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/rpc-hello-expected.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "rpc-hello.wsdl"));
 
     }
 
@@ -364,9 +353,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "xml-bare.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        URI expectedFile = getClass().getResource("expected/xml-bare-expected.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "/xml-bare.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/xml-bare-expected.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "/xml-bare.wsdl"));
     }
+
     @Test
     public void testXSDImports() throws Exception {
         //Testcase for CXF-1818
@@ -409,8 +399,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "fault.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/hello_world_fault_expected.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "/fault.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/hello_world_fault_expected.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "/fault.wsdl"));
     }
 
     @Test
@@ -441,8 +431,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File bindingFile = new File(output, "echo_date.xjb");
         assertTrue(bindingFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/echo_date.xjb").toURI();
-        assertWsdlEquals(new File(expectedFile), bindingFile);
+        InputStream expectedFile = getClass().getResourceAsStream("expected/echo_date.xjb");
+        assertWsdlEquals(expectedFile, bindingFile);
     }
 
     @Test
@@ -457,8 +447,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File bindingFile = new File(output, "echo_calendar.xjb");
         assertTrue(bindingFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/echo_calendar.xjb").toURI();
-        assertWsdlEquals(new File(expectedFile), bindingFile);
+        InputStream expectedFile = getClass().getResourceAsStream("expected/echo_calendar.xjb");
+        assertWsdlEquals(expectedFile, bindingFile);
     }
 
     @Test
@@ -468,17 +458,15 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME,
                 org.apache.cxf.tools.fortest.cxf774.ListTestImpl.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "list_test.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/list_expected.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), new File(output, "/list_test.wsdl"));
+        InputStream expectedFile = getClass().getResourceAsStream("expected/list_expected.wsdl");
+        assertWsdlEquals(expectedFile, new File(output, "/list_test.wsdl"));
 
     }
 
@@ -487,17 +475,15 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/send_image.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.ImageSender.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "send_image.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/expected_send_image.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), wsdlFile);
+        InputStream expectedFile = getClass().getResourceAsStream("expected/expected_send_image.wsdl");
+        assertWsdlEquals(expectedFile, wsdlFile);
     }
 
     @Test
@@ -505,17 +491,15 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/send_image2.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.ImageSender2.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "send_image2.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
 
-        URI expectedFile = getClass().getResource("expected/expected_send_image2.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), wsdlFile);
+        InputStream expectedFile = getClass().getResourceAsStream("expected/expected_send_image2.wsdl");
+        assertWsdlEquals(expectedFile, wsdlFile);
     }
 
     @Test
@@ -523,12 +507,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/add_numbers.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.AddNumbersImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "add_numbers.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
         // To test there is wsam:action generated for the
@@ -543,8 +525,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue("The wsaAction computed for empty FaultAction is not correct", wsdlString
             .contains("http://fortest.tools.cxf.apache.org/"
                      + "AddNumbersImpl/addNumbers4/Fault/AddNumbersException"));
-        URI expectedFile = getClass().getResource("expected/add_numbers_expected.wsdl").toURI();
-        assertWsdlEquals(new File(expectedFile), wsdlFile);
+        InputStream expectedFile = getClass().getResourceAsStream("expected/add_numbers_expected.wsdl");
+        assertWsdlEquals(expectedFile, wsdlFile);
     }
 
     // Test the Holder Parameter in the RequestWrapperBean and ResponseWrapperBean
@@ -555,12 +537,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(ToolConstants.CFG_WRAPPERBEAN, ToolConstants.CFG_WRAPPERBEAN);
         env.put(ToolConstants.CFG_CREATE_XSD_IMPORTS, ToolConstants.CFG_CREATE_XSD_IMPORTS);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         String pkgBase = "org/apache/cxf/tools/fortest/addr/jaxws";
         File requestWrapperClass = new File(output, pkgBase + "/AddNumbers.java");
@@ -583,12 +562,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(ToolConstants.CFG_WRAPPERBEAN, ToolConstants.CFG_WRAPPERBEAN);
         env.put(ToolConstants.CFG_CREATE_XSD_IMPORTS, ToolConstants.CFG_CREATE_XSD_IMPORTS);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "inherit.wsdl");
         assertTrue(wsdlFile.exists());
@@ -601,12 +577,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.refparam.AddNumbersImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(ToolConstants.CFG_WRAPPERBEAN, ToolConstants.CFG_WRAPPERBEAN);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         String pkgBase = "org/apache/cxf/tools/fortest/refparam/jaxws";
         File requestWrapperClass = new File(output, pkgBase + "/AddNumbers.java");
@@ -623,12 +596,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.action.AddNumbersImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(ToolConstants.CFG_WRAPPERBEAN, ToolConstants.CFG_WRAPPERBEAN);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "action.wsdl");
         assertTrue(wsdlFile.exists());
@@ -641,12 +611,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.epr.AddNumbersImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(ToolConstants.CFG_CREATE_XSD_IMPORTS, ToolConstants.CFG_CREATE_XSD_IMPORTS);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "epr_schema1.xsd");
         assertTrue(wsdlFile.exists());
@@ -661,12 +628,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.simple.Caculator");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "exception.wsdl");
         assertTrue(wsdlFile.exists());
@@ -709,12 +673,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/cxf1519.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.cxf1519.EndpointImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "cxf1519.wsdl");
         assertTrue(wsdlFile.exists());
@@ -733,12 +694,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/cxf4147.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.java2wsdl.processor.HelloBare");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "cxf4147.wsdl");
         assertTrue(wsdlFile.exists());
         String wsdlContent = TestFileUtils.getStringFromFile(wsdlFile);
@@ -755,12 +714,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         //env.put(ToolConstants.CFG_OUTPUTFILE, "/x1/tmp/exception_prop_order.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.EchoImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "exception_prop_order.wsdl");
         assertTrue(wsdlFile.exists());
 
@@ -800,12 +757,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         //env.put(ToolConstants.CFG_OUTPUTFILE, "/x1/tmp/exception_prop_order.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo5Impl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "exception_prop_order2.wsdl");
         assertTrue(wsdlFile.exists());
 
@@ -844,12 +799,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_order.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.OrderEchoImpl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
+
         File wsdlFile = new File(output, "exception_order.wsdl");
         assertTrue(wsdlFile.exists());
 
@@ -888,12 +841,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_list.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo2Impl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "exception_list.wsdl");
         assertTrue(wsdlFile.exists());
@@ -925,12 +875,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-ref-nillable.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo3Impl");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "exception-ref-nillable.wsdl");
         assertTrue(wsdlFile.exists());
@@ -953,12 +900,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-type-adapter.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.TypeAdapterEcho");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "exception-type-adapter.wsdl");
         assertTrue(wsdlFile.exists());
@@ -999,12 +943,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/transient_message.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo4");
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
-        try {
-            processor.setEnvironment(env);
-            processor.process();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        processor.setEnvironment(env);
+        processor.process();
 
         File wsdlFile = new File(output, "transient_message.wsdl");
         assertTrue(wsdlFile.exists());

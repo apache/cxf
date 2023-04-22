@@ -19,11 +19,13 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
+import java.util.List;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvokerProvider;
@@ -43,6 +45,7 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(ReactorServer.class, true));
         createStaticBus();
     }
+    
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
@@ -55,7 +58,28 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> "Hello".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testGetHelloWorldJsonMany() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/textJsonMany";
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .getFlux(HelloWorldBean.class))
+            .expectNextMatches(bean -> "Hello 1".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 2".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 3".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 4".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Hello 5".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
             .expectComplete()
             .verify();
     }
@@ -73,6 +97,23 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testFluxEmpty() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor/flux/empty";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .getFlux(HelloWorldBean.class))
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testFluxEmpty2() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor2/flux/empty";
         
         StepVerifier
@@ -101,7 +142,7 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class))
-            .expectNextMatches(b -> b.getGreeting().equalsIgnoreCase("Person 1"))
+            .expectNextMatches(b -> "Person 1".equalsIgnoreCase(b.getGreeting()))
             .expectComplete()
             .verify();
     }
@@ -158,6 +199,24 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
             .expectError()
             .verify();
     }
+    
+    @Test
+    public void testFluxImmediateErrorsWithExceptionMapper() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/immediate/mapper/errors";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            .expectNextMatches(r -> r.getStatus() == 409 && r.readEntity(String.class).contains("stackTrace"))
+            .expectComplete()
+            .verify();
+    }
 
     @Test
     public void testFluxImmediateErrorsResponse() throws Exception {
@@ -176,6 +235,66 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
             .expectComplete()
             .verify();
     }
+    
+    @Test
+    public void testFluxErrorWithExceptionMapperReturnsContentPayload() throws Exception {
+        GenericType<List<HelloWorldBean>> helloWorldBeanListType = new GenericType<List<HelloWorldBean>>() {  };
+        String address = "http://localhost:" + PORT + "/reactor2/flux/mixed/error";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should include the emitted elements prior the error
+            .expectNextMatches(r -> r.getStatus() == 409 && r.readEntity(helloWorldBeanListType).size() == 4)
+            .expectComplete()
+            .verify();
+    }
+    
+    @Test
+    public void testFluxErrorWithWebException() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/web/errors";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should not include the exception payload (injected by exception mapper)
+            // if some elements have been emitted before
+            .expectNextMatches(r -> r.getStatus() == 403 && !r.readEntity(String.class).contains("stackTrace"))
+            .expectComplete()
+            .verify();
+    }
+
+    @Test
+    public void testFluxErrorWithExceptionMapperReturnsNoExceptionPayload() throws Exception {
+        String address = "http://localhost:" + PORT + "/reactor2/flux/mixed/error";
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ReactorInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ReactorInvoker.class)
+                .get())
+            // The response should not include the exception payload (injected by exception mapper)
+            // if some elements have been emitted before
+            .expectNextMatches(r -> r.getStatus() == 409 && !r.readEntity(String.class).contains("stackTrace"))
+            .expectComplete()
+            .verify();
+    }
 
     private void doTestTextJsonImplicitListAsyncStream(String address) throws Exception {
         StepVerifier
@@ -187,8 +306,8 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
-            .expectNextMatches(bean -> bean.getGreeting().equals("Ciao") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> "Hello".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
+            .expectNextMatches(bean -> "Ciao".equals(bean.getGreeting()) && "World".equals(bean.getAudience()))
             .expectComplete()
             .verify();
     }

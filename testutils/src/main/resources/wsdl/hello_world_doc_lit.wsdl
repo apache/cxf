@@ -230,14 +230,14 @@
         </wsdl:port>
         <wsdl:port name="JMSPort" binding="tns:Greeter_SOAPBinding">
 	        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
     	    <soap:address location="jms:jndi:dynamicQueues/routertest.MultiTransportServiceQ.text" />
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService2">
         <wsdl:port name="SoapPort2" binding="tns:Greeter_SOAPBinding">
 	        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
     	    <soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService2Q.text?replyToQueueName=dynamicQueues/routertest.SOAPService2Q.text.reply" />
         </wsdl:port>
     </wsdl:service>
@@ -249,7 +249,7 @@
     <wsdl:service name="SOAPService4">
         <wsdl:port name="SoapPort4" binding="tns:Greeter_SOAPBinding">
         	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
 	        <soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService4Q.text" />
         </wsdl:port>
     </wsdl:service>
@@ -260,14 +260,14 @@
     </wsdl:service>
     <wsdl:service name="SOAPService6">
     	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <wsdl:port name="SoapPort6" binding="tns:Greeter_SOAPBinding">
         	<soap:address location="jms:jndi:dynamicQueues/routertest.SOAPService6Q.text?replyToQueueName=dynamicQueues/SoapService6.reply.queue" />
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="SOAPService7">
 	    <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <wsdl:port name="SoapPort7" binding="tns:Greeter_SOAPBinding">
         	<soap:address location="jms:jndi:dynamicQueues/messageidascorrelationid.SOAPService7Q.text?replyToQueueName=dynamicQueues/SoapService7.replyto.queue" />
         </wsdl:port>
@@ -286,14 +286,14 @@
     <wsdl:service name="XMLService2">
         <wsdl:port name="XMLPort2" binding="tns:Greeter_XMLBinding">
 	        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
     	    <soap:address location="jms:jndi:dynamicQueues/routertest.XMLService2Q.text" />
         </wsdl:port>
     </wsdl:service>
     <wsdl:service name="XMLService3">
         <wsdl:port name="XMLPort3" binding="tns:Greeter_XMLBinding">
 	        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-    	    <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+    	    <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
             <soap:address location="jms:jndi:dynamicQueues/routertest.XMLService3Q.text" />
         </wsdl:port>
     </wsdl:service>

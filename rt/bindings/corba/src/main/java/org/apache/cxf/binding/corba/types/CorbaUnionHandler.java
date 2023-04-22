@@ -69,7 +69,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
     }
 
     public String getDisciminatorValueData() {
-        String result = null;
+        final String result;
         // The discriminator is handled by either the enum handler or the primitive handler.
         if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
             CorbaEnumHandler enumHandler = (CorbaEnumHandler)discriminator;
@@ -168,9 +168,8 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
                 // Any value will do since we only have a default case.
                 label = enumerators.get(0).getValue();
             } else {
-                String enumLabel = null;
                 for (Iterator<Enumerator> enumIter = enumerators.iterator(); enumIter.hasNext();) {
-                    enumLabel = enumIter.next().getValue();
+                    String enumLabel = enumIter.next().getValue();
                     if (!labels.contains(enumLabel)) {
                         label = enumLabel;
                         break;

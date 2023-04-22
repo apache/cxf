@@ -31,9 +31,9 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Context;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;

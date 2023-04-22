@@ -29,10 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -40,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public final class URITemplate {
 
     public static final String TEMPLATE_PARAMETERS = "jaxrs.template.parameters";
+    public static final String URI_TEMPLATE = "jaxrs.template.uri";
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
@@ -82,7 +82,7 @@ public final class URITemplate {
                     // however do not add them if they already exist since that will cause the Matcher
                     // to create extraneous values.  Parens identify a group so multiple parens would
                     // indicate multiple groups.
-                    if (pattern.startsWith("(") && pattern.endsWith(")")) {
+                    if (pattern.startsWith("(") && pattern.endsWith(")") && !pattern.startsWith("(?")) {
                         patternBuilder.append(pattern);
                     } else {
                         patternBuilder.append('(');
@@ -178,7 +178,7 @@ public final class URITemplate {
     public boolean match(String uri, MultivaluedMap<String, String> templateVariableToValue) {
 
         if (uri == null) {
-            return (templateRegexPattern == null) ? true : false;
+            return templateRegexPattern == null;
         }
 
         if (templateRegexPattern == null) {
@@ -195,19 +195,19 @@ public final class URITemplate {
                 List<PathSegment> uList = JAXRSUtils.getPathSegments(uri, false);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < uList.size(); i++) {
-                    String segment = null;
+                    final String segment;
                     if (pList.size() > i && pList.get(i).getPath().indexOf('{') == -1) {
                         segment = uList.get(i).getPath();
                     } else {
                         segment = HttpUtils.fromPathSegment(uList.get(i));
                     }
-                    if (segment.length() > 0) {
+                    if (!segment.isEmpty()) {
                         sb.append(SLASH);
                     }
                     sb.append(segment);
                 }
                 uri = sb.toString();
-                if (uri.length() == 0) {
+                if (uri.isEmpty()) {
                     uri = SLASH;
                 }
                 m = templateRegexPattern.matcher(uri);

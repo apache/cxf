@@ -19,15 +19,17 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
 
 @Path("resource2")
 public class AsyncResource2 {
-    static AsyncResponse asyncResponse;
+    private volatile AsyncResponse asyncResponse;
 
     @GET
     @Path("/suspend")
@@ -38,7 +40,15 @@ public class AsyncResource2 {
     @GET
     @Path("/setTimeOut")
     public boolean setTimeOut() {
+        int i = 0;
+        while (asyncResponse == null && ++i < 20) {
+            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(10));
+        }
+
+        if (asyncResponse == null) {
+            throw new InternalServerErrorException("Unable to retrieve the AsyncResponse, was it suspended?");
+        } 
+
         return asyncResponse.setTimeout(2L, TimeUnit.SECONDS);
     }
-
 }

@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<bindings xmlns="http://java.sun.com/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
+<bindings xmlns="https://jakarta.ee/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
     <bindings node="wsdl:definitions/wsdl:service[@name='SOAPService']">
         <package name="cxf4452.binding.test"/>
     </bindings>

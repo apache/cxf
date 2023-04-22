@@ -19,7 +19,7 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class SpecificGenericClass implements GenericInterface<String> {

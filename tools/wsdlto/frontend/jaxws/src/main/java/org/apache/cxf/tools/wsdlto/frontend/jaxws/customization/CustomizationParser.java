@@ -20,7 +20,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -140,39 +140,31 @@ public final class CustomizationParser {
         if (uri.equals(wsdlURL) && wsdlNode != null) {
             return wsdlNode;
         }
-        Document doc = null;
-        InputStream ins = null;
 
-        try {
-            URIResolver resolver = new URIResolver(uri);
-            ins = resolver.getInputStream();
+        Document doc = null;
+        try (URIResolver resolver = new URIResolver(uri)) {
+            if (!resolver.isResolved()) {
+                return null;
+            }
+            
+            XMLStreamReader reader = null;
+            try {   //NOPMD
+                reader = StaxUtils.createXMLStreamReader(uri, resolver.getInputStream());
+                doc = StaxUtils.read(reader, true);
+            } catch (Exception e) {
+                Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
+                throw new ToolException(msg, e);
+            } finally {
+                try {
+                    StaxUtils.close(reader);
+                } catch (XMLStreamException e) {
+                    //ignore
+                }
+            }
         } catch (IOException e1) {
             return null;
         }
-
-        if (ins == null) {
-            return null;
-        }
-
-        XMLStreamReader reader = null;
-        try {   //NOPMD
-            reader = StaxUtils.createXMLStreamReader(uri, ins);
-            doc = StaxUtils.read(reader, true);
-        } catch (Exception e) {
-            Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
-            throw new ToolException(msg, e);
-        } finally {
-            try {
-                StaxUtils.close(reader);
-            } catch (XMLStreamException e) {
-                //ignore
-            }
-            try {
-                ins.close();
-            } catch (IOException ex) {
-                //ignore
-            }
-        }
+        
         try {
             doc.setDocumentURI(uri);
         } catch (Exception ex) {
@@ -252,7 +244,7 @@ public final class CustomizationParser {
         if (jaxbPrefix == null) {
             schemaElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
                                        "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
-            schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "2.0");
+            schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "3.0");
         }
     }
 
@@ -484,12 +476,10 @@ public final class CustomizationParser {
 
     private void addBinding(String bindingFile) throws XMLStreamException {
 
-        Element root = null;
+        final Element root;
         XMLStreamReader xmlReader = null;
-        try {
-            URIResolver resolver = new URIResolver(bindingFile);
-            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(),
-                                                                     resolver.getInputStream());
+        try (URIResolver resolver = new URIResolver(bindingFile)) {
+            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), resolver.getInputStream());
             root = StaxUtils.read(xmlReader, true).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
@@ -502,7 +492,7 @@ public final class CustomizationParser {
         if (isValidJaxwsBindingFile(bindingFile, reader)) {
 
             String wsdlLocation = root.getAttribute("wsdlLocation");
-            Element targetNode = null;
+            Element targetNode;
             if (!StringUtils.isEmpty(wsdlLocation)) {
                 String wsdlURI = getAbsoluteURI(wsdlLocation, bindingFile);
                 targetNode = getTargetNode(wsdlURI);
@@ -529,7 +519,7 @@ public final class CustomizationParser {
             String schemaLocation = root.getAttribute("schemaLocation");
             String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
             if (resolvedSchemaLocation != null) {
-                InputSource tmpIns = null;
+                final InputSource tmpIns;
                 try {
                     tmpIns = convertToTmpInputSource(root, resolvedSchemaLocation);
                 } catch (Exception e1) {
@@ -544,7 +534,7 @@ public final class CustomizationParser {
     }
 
     private String getAbsoluteURI(String  uri, String bindingFile) {
-        URI locURI = null;
+        URI locURI;
         try {
             locURI = new URI(uri);
         } catch (URISyntaxException e) {
@@ -589,13 +579,13 @@ public final class CustomizationParser {
     }
 
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
-        InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
-        result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
-        return result;
+        try (Writer w = Files.newBufferedWriter(tmpFile.toPath())) {
+            StaxUtils.writeTo(ele, w);
+        }
+        return new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
     }
 
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {

@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
@@ -117,27 +117,19 @@ public final class NettySpringTypesFactory {
                                            Class<?> c,
                                            JAXBContext context) throws JAXBException {
         List<V> list = new ArrayList<>();
-        Node data = null;
 
         Unmarshaller u = context.createUnmarshaller();
-        Node node = parent.getFirstChild();
-        while (node != null) {
+        for (Node node = parent.getFirstChild(); node != null; node = node.getNextSibling()) {
             if (node.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(node.getLocalName())
                 && name.getNamespaceURI().equals(node.getNamespaceURI())) {
-                data = node;
-                Object obj = unmarshal(u, data, c);
+                Object obj = unmarshal(u, node, c);
                 if (obj != null) {
                     list.add((V) obj);
                 }
             }
-            node = node.getNextSibling();
         }
         return list;
     }
-
-
-
-
 
     private static Object unmarshal(Unmarshaller u,
                                      Node data, Class<?> c) {
@@ -145,7 +137,7 @@ public final class NettySpringTypesFactory {
             return null;
         }
 
-        Object obj = null;
+        Object obj;
         try {
             if (c != null) {
                 obj = u.unmarshal(data, c);

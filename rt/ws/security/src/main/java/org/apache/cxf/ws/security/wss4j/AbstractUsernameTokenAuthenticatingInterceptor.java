@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
@@ -156,7 +156,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         if (msg == null) {
             throw new IllegalStateException("Current message is not available");
         }
-        Subject subject = null;
+        final Subject subject;
         try {
             subject = createSubject(name, password, isDigest, nonce, created);
         } catch (Exception ex) {

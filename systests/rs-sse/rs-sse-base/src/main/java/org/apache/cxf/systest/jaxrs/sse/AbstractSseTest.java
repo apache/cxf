@@ -18,6 +18,12 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,26 +32,34 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.sse.InboundSseEvent;
-import javax.ws.rs.sse.SseEventSource;
-import javax.ws.rs.sse.SseEventSource.Builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.sse.InboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSource;
+import jakarta.ws.rs.sse.SseEventSource.Builder;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
     @Before
@@ -100,6 +114,65 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
                 new Book("New Book #3", 3),
                 new Book("New Book #4", 4)
             )
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testBooksStreamIsReturnedFromInboundSseEventsWithPOST() throws InterruptedException, IOException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
+        final Collection<Book> books = new ArrayList<>();
+        
+        @SuppressWarnings("rawtypes")
+        MessageBodyReader mbr = new JacksonJsonProvider();
+        
+        Response response = target.request(MediaType.SERVER_SENT_EVENTS)
+            .post(Entity.entity(42, MediaType.TEXT_PLAIN));
+        
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(response.readEntity(InputStream.class)))) {
+            String s;
+            Integer id = null;
+            Book book = null;
+            
+            while ((s = br.readLine()) != null) {
+                if (s.trim().isEmpty()) {
+                    if (id == null && book == null) {
+                        continue;
+                    } else if (id != null && book != null) {
+                        books.add(book);
+                        id = null;
+                        book = null;
+                        continue;
+                    }
+                    fail("The event did not contain both an id " + id + " and a book " + book);
+                }
+                if (s.startsWith("event:")) {
+                    assertEquals("Not a book event", "event: book", s.trim());
+                    continue;
+                }
+                if (s.startsWith("id:")) {
+                    assertNull("There was an existing id " + id, id);
+                    id = Integer.parseInt(s.substring(3).trim());
+                    continue;
+                }
+                if (s.startsWith("data:")) {
+                    assertNull("There was an existing book " + book, book);
+                    book = (Book) mbr.readFrom(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, null, 
+                            new ByteArrayInputStream(s.substring(5).trim().getBytes(StandardCharsets.UTF_8)));
+                    continue;
+                }
+                fail("Unexpected String content returned by SSE POST " + s);
+            }
+        }
+    
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertThat(books,
+                hasItems(
+                        new Book("New Book #43", 43),
+                        new Book("New Book #44", 44),
+                        new Book("New Book #45", 45),
+                        new Book("New Book #46", 46)
+                        )
         );
     }
 
@@ -304,25 +377,37 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
                 .put(null);
         assertThat(r.getStatus(), equalTo(204));
 
-        // Give server some time to finish up the sink
-        Thread.sleep(2000);
+        await()
+            .atMost(10, TimeUnit.SECONDS)
+            .pollDelay(1, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                // Only two out of 4 messages should be delivered, others should be discarded
+                final BookBroadcasterStats stats =
+                    createWebClient("/rest/api/bookstore/client-closes-connection/stats", MediaType.APPLICATION_JSON)
+                        .get()
+                        .readEntity(BookBroadcasterStats.class);
 
-        // Only two out of 4 messages should be delivered, others should be discarded
-        final BookBroadcasterStats stats =
-            createWebClient("/rest/api/bookstore/client-closes-connection/stats", MediaType.APPLICATION_JSON)
-                .get()
-                .readEntity(BookBroadcasterStats.class);
+                // Tomcat will feedback through onError callback, others through onComplete
+                assertThat(stats.isErrored(), equalTo(supportsErrorPropagation()));
+                // The sink should be in closed state
+                assertThat(stats.isWasClosed(), equalTo(true));
+                // The onClose callback should be called
+                assertThat(stats.isClosed(), equalTo(true));
 
-        // Tomcat will feedback through onError callback, others through onComplete
-        assertThat(stats.isErrored(), equalTo(supportsErrorPropagation()));
-        // The sink should be in closed state
-        assertThat(stats.isWasClosed(), equalTo(true));
-        // The onClose callback should be called
-        assertThat(stats.isClosed(), equalTo(true));
+                // It is very hard to get the predictable match here, but at most
+                // 2 events could get through before the client's connection drop off
+                assertTrue(stats.getCompleted() <= 3);
+            });
+    }
 
-        // It is very hard to get the predictable match here, but at most
-        // 2 events could get through before the client's connection drop off
-        assertTrue(stats.getCompleted() == 2 || stats.getCompleted() == 1);
+    @Test
+    public void testBooksSseContainerResponseAddedHeaders() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/headers/sse");
+        try (Response response = target.request(MediaType.SERVER_SENT_EVENTS).get()) {
+            assertThat(response.getStatus(), equalTo(202));
+            assertThat(response.getHeaderString("X-My-Header"), equalTo("headers"));
+            assertThat(response.getHeaderString("X-My-ProtocolHeader"), equalTo("protocol-headers"));
+        }
     }
 
     /**

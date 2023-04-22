@@ -60,6 +60,7 @@ public final class StatsServer {
         staticContext.setResources(resourcesFrom(staticContext, "target/classes/web-ui"));
         staticContext.setParentClassLoader(Thread.currentThread().getContextClassLoader());
 
+        server.getConnector();
         server.start();
         server.getServer().await();
     }

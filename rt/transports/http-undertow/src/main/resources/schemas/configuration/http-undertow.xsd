@@ -32,8 +32,8 @@
   		       http://www.springframework.org/schema/beans/spring-beans.xsd"
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified"
-           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-           jaxb:version="2.0">
+           xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+           jaxb:version="3.0">
 
     <xs:import namespace="http://cxf.apache.org/configuration/security"
                schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
@@ -55,6 +55,11 @@
        <xs:attribute name="workerIOThreads" type="ptp:ParameterizedUShort">
        <xs:annotation>
              <xs:documentation>Specify the number of I/O threads to create for the worker.  If not specified, a default will be chosen. One IO thread per CPU core is a reasonable default.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="workerIOName" type="xs:string">
+       <xs:annotation>
+             <xs:documentation>Specify the name for the worker.  If not specified, the default "XNIO-1" will be chosen.</xs:documentation>
           </xs:annotation>
        </xs:attribute>
     </xs:complexType>

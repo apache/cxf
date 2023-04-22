@@ -20,8 +20,7 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;

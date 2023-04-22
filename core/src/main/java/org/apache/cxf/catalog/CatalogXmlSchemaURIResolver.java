@@ -52,7 +52,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
     }
 
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
-        String resolvedSchemaLocation = null;
+        final String resolvedSchemaLocation;
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
         try {
             resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver,

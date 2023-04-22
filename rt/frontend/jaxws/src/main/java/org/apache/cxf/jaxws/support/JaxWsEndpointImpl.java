@@ -30,19 +30,19 @@ import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Binding;
-import javax.xml.ws.RespectBindingFeature;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.MTOMFeature;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.RespectBindingFeature;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.MTOMFeature;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -297,12 +297,15 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             while (extensionElements.hasNext()) {
                 ExtensibilityElement ext = extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
-                    DOMSource domSource = new DOMSource(((UnknownExtensibilityElement)ext).getElement());
-                    W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
-                    EndpointReferenceType ref = ProviderImpl.convertToInternal(w3cEPR);
-                    endpoint.getTarget().setMetadata(ref.getMetadata());
-                    endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
-                    endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());
+                    final Element element = ((UnknownExtensibilityElement) ext).getElement();
+                    synchronized (element.getOwnerDocument()) {
+                        DOMSource domSource = new DOMSource(element);
+                        W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
+                        EndpointReferenceType ref = ProviderImpl.convertToInternal(w3cEPR);
+                        endpoint.getTarget().setMetadata(ref.getMetadata());
+                        endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
+                        endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());
+                    }
                 }
 
             }

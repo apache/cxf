@@ -19,7 +19,7 @@
 -->
 <wsdl:definitions xmlns:tns="http://bugs.cxf/services/bug1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://bugs.cxf/services/bug1" name="bug1">
     <!-- customizations with global scope below it shows the default customizations -->
-    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+    <jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws">
         <jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
         <jaxws:enableAsyncMapping>false</jaxws:enableAsyncMapping>
     </jaxws:bindings>

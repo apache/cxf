@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -123,7 +123,7 @@ public class HazelCastTokenStore implements TokenStore {
     }
 
     private int getTTL(SecurityToken token) {
-        int parsedTTL = 0;
+        int parsedTTL;
         if (token.getExpires() != null) {
             Instant expires = token.getExpires();
             Instant now = Instant.now();

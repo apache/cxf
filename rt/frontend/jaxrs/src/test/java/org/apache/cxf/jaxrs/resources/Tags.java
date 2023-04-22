@@ -21,9 +21,8 @@ package org.apache.cxf.jaxrs.resources;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.aegis.type.java5.XmlFlattenedArray;
 
 @XmlRootElement(name = "Tags")

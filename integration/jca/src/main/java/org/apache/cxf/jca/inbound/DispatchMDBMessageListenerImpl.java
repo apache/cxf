@@ -20,9 +20,10 @@ package org.apache.cxf.jca.inbound;
 
 import java.lang.reflect.Method;
 
-import javax.ejb.MessageDrivenBean;
-import javax.ejb.MessageDrivenContext;
 import javax.naming.InitialContext;
+
+import jakarta.ejb.MessageDrivenBean;
+import jakarta.ejb.MessageDrivenContext;
 
 /**
  * DispatchMDBMessageListenerImpl supports dispatching of calls to a

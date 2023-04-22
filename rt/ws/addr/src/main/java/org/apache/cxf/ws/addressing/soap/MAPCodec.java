@@ -29,10 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -40,6 +36,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -386,13 +386,12 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         if (header == null) {
                             header = getHeaderFactory().getHeader(msg.getVersion());
                         }
-                        JAXBElement<?> jaxbEl = null;
                         if (o instanceof Element) {
                             Element e = (Element)o;
                             Node importedNode = header.getOwnerDocument().importNode(e, true);
                             header.appendChild(importedNode);
                         } else {
-                            jaxbEl = (JAXBElement<?>) o;
+                            JAXBElement<?> jaxbEl = (JAXBElement<?>) o;
                             ctx.createMarshaller().marshal(jaxbEl, header);
                         }
 

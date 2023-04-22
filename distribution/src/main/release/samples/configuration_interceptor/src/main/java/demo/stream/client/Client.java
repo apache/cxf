@@ -20,6 +20,7 @@
 package demo.stream.client;
 
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.frontend.ClientProxy;

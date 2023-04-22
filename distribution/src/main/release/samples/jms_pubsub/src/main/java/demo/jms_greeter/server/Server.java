@@ -19,7 +19,7 @@
 
 package demo.jms_greeter.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
 

@@ -38,7 +38,9 @@
                     <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="false"/>
                 </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:store>
-                    <wsrm-mgr:jdbcStore url="jdbc:derby:${db.name};create=true"/>
+                    <wsrm-mgr:jdbcStore url="jdbc:hsqldb:mem:${db.name}"
+                        driverClassName="org.hsqldb.jdbcDriver"
+                        tableExistsState="42504" tableExistsCode="-5504" />
                 </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>

@@ -19,17 +19,16 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -44,7 +43,6 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SCTProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
@@ -99,9 +97,8 @@ public class IssueSCTUnitTest {
         issueOperation.setTokenStore(tokenStore);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SCTProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SCTProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -172,9 +169,8 @@ public class IssueSCTUnitTest {
         issueOperation.setEncryptIssuedToken(true);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SCTProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SCTProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -251,9 +247,8 @@ public class IssueSCTUnitTest {
         issueOperation.setReturnReferences(false);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SCTProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SCTProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();

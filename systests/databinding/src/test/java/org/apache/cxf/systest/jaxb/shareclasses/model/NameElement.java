@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.systest.jaxb.shareclasses.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 import org.apache.cxf.systest.jaxb.shareclasses.model.bar.BarName;
 import org.apache.cxf.systest.jaxb.shareclasses.model.foo.FooName;
 

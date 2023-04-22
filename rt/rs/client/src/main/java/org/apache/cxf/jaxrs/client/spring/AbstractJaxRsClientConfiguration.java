@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.client.spring;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.ext.Provider;
-
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.common.util.StringUtils;

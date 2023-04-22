@@ -22,22 +22,19 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -85,11 +82,6 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerOAuth2IntrospectionJPA.class, true));
         assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2IntrospectionJCacheJWTNonPersist.class, true));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @Parameters(name = "{0}")

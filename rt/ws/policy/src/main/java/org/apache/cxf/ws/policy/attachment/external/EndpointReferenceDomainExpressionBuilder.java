@@ -23,13 +23,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -59,7 +59,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
     }
 
     public DomainExpression build(Element e) {
-        Object obj = null;
+        Object obj;
         try {
             obj = JAXBUtils.unmarshall(createJAXBContext(), e);
         } catch (JAXBException ex) {

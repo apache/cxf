@@ -80,7 +80,7 @@ public class ArrayVisitor extends VisitorBase {
 
         AST firstSizeNode = node.getFirstChild();
         AST nextSizeNode = firstSizeNode.getNextSibling();
-        Types result = null;
+        final Types result;
 
         // process all anonarrays, skip first array as it might not be anonymous
         if (nextSizeNode != null) {
@@ -94,8 +94,8 @@ public class ArrayVisitor extends VisitorBase {
 
         // process first array
         Long size = Long.valueOf(firstSizeNode.toString());
-        XmlSchemaType stype = null;
-        CorbaType ctype = null;
+        final XmlSchemaType stype;
+        final CorbaType ctype;
         if (identifierNode != null) {
             Scope scopedName = getScope();
             if (result.getSchemaType() != null) {

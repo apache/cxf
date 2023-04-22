@@ -38,19 +38,18 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.RuntimeDelegate;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -99,6 +98,8 @@ public final class HttpUtils {
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
+    
+    private static final Pattern HTTP_SCHEME_PATTERN = Pattern.compile("^(?i)(http|https)$");
 
     private HttpUtils() {
     }
@@ -303,7 +304,7 @@ public final class HttpUtils {
         if (value == null) {
             return null;
         }
-        String language = null;
+        final String language;
         String locale = null;
         int index = value.indexOf('-');
         if (index == 0 || index == value.length() - 1) {
@@ -371,6 +372,13 @@ public final class HttpUtils {
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST));
         return URI.create(base + relativePath);
     }
+    
+    public static void setHttpRequestURI(Message message, String uriTemplate) {
+        HttpServletRequest request =
+            (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+        request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", uriTemplate);
+    }
+
 
     public static URI toAbsoluteUri(URI u, Message message) {
         HttpServletRequest request =
@@ -471,7 +479,9 @@ public final class HttpUtils {
             URI uri = new URI(endpointAddress);
             String path = uri.getRawPath();
             String scheme = uri.getScheme();
-            if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
+            // RFC-3986: the scheme and host are case-insensitive and therefore should 
+            // be normalized to lowercase. 
+            if (scheme != null && !scheme.toLowerCase().startsWith(HttpUtils.HTTP_SCHEME)
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
             }
@@ -481,8 +491,22 @@ public final class HttpUtils {
         }
     }
 
+    public static String getEndpointUri(Message m) {
+        final Object servletRequest = m.get(AbstractHTTPDestination.HTTP_REQUEST);
+        
+        if (servletRequest != null) {
+            final Object property = ((jakarta.servlet.http.HttpServletRequest)servletRequest)
+                .getAttribute("org.apache.cxf.transport.endpoint.uri");
+            if (property != null) {
+                return property.toString();
+            }
+        }
+        
+        return getEndpointAddress(m);
+    }
+
     public static String getEndpointAddress(Message m) {
-        String address = null;
+        String address;
         Destination d = m.getExchange().getDestination();
         if (d != null) {
             if (d instanceof AbstractHTTPDestination) {
@@ -700,5 +724,9 @@ public final class HttpUtils {
     
     public static boolean isMethodWithNoResponseContent(String method) {
         return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
+    }
+    
+    public static boolean isHttpScheme(final String scheme) {
+        return scheme != null && HTTP_SCHEME_PATTERN.matcher(scheme).matches();
     }
 }

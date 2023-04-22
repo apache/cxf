@@ -121,6 +121,8 @@ public final class StaxUtils {
         "org.apache.cxf.staxutils.innerElementCountThreshold";
     private static final String INNER_ELEMENT_LEVEL_SYSTEM_PROP =
         "org.apache.cxf.staxutils.innerElementLevelThreshold";
+    private static final String AUTO_CLOSE_INPUT_SOURCE_PROP =
+        "org.apache.cxf.staxutils.autoCloseInputSource";
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
 
@@ -151,6 +153,7 @@ public final class StaxUtils {
     private static final int PARSER_POOL_SIZE_VAL =
             getInteger("org.apache.cxf.staxutils.pool-size", 20);
     private static final boolean ALLOW_INSECURE_PARSER_VAL;
+    private static final boolean AUTO_CLOSE_INPUT_SOURCE;
 
     // Here we check old names first and then new names for the threshold properties
     private static final int MAX_ELEMENT_DEPTH_VAL =
@@ -173,11 +176,18 @@ public final class StaxUtils {
         NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<>(PARSER_POOL_SIZE_VAL);
         OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<>(PARSER_POOL_SIZE_VAL);
 
-        String s = SystemPropertyAction.getPropertyOrNull(ALLOW_INSECURE_PARSER);
-        if (!StringUtils.isEmpty(s)) {
-            ALLOW_INSECURE_PARSER_VAL = "1".equals(s) || Boolean.parseBoolean(s);
+        String allowInsecureParser = SystemPropertyAction.getPropertyOrNull(ALLOW_INSECURE_PARSER);
+        if (!StringUtils.isEmpty(allowInsecureParser)) {
+            ALLOW_INSECURE_PARSER_VAL = "1".equals(allowInsecureParser) || Boolean.parseBoolean(allowInsecureParser);
         } else {
             ALLOW_INSECURE_PARSER_VAL = false;
+        }
+        
+        String autoCloseInputSource = SystemPropertyAction.getPropertyOrNull(AUTO_CLOSE_INPUT_SOURCE_PROP);
+        if (!StringUtils.isEmpty(autoCloseInputSource)) {
+            AUTO_CLOSE_INPUT_SOURCE = "1".equals(autoCloseInputSource) || Boolean.parseBoolean(autoCloseInputSource);
+        } else {
+            AUTO_CLOSE_INPUT_SOURCE = false; /* set 'false' by default */
         }
 
         XMLInputFactory xif = null;
@@ -190,7 +200,6 @@ public final class StaxUtils {
             }
         } catch (Throwable t) {
             //ignore, can always drop down to the pooled factories
-            xif = null;
         }
         SAFE_INPUT_FACTORY = xif;
 
@@ -294,7 +303,6 @@ public final class StaxUtils {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "XMLInputFactory.newInstance() failed with: ", t);
             }
-            factory = null;
         }
         if (factory == null || !setRestrictionProperties(factory)) {
             try {
@@ -1138,15 +1146,12 @@ public final class StaxUtils {
         }
     }
     public static Document read(InputSource s) throws XMLStreamException {
-        XMLStreamReader reader = createXMLStreamReader(s);
+        XMLStreamReader reader = null;
         try {
+            reader = createXMLStreamReader(s);
             return read(reader);
         } finally {
-            try {
-                reader.close();
-            } catch (Exception ex) {
-                //ignore
-            }
+            StaxUtils.close(reader);
         }
     }
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
@@ -1660,22 +1665,38 @@ public final class StaxUtils {
         String sysId = src.getSystemId() == null ? null : src.getSystemId();
         String pubId = src.getPublicId() == null ? null : src.getPublicId();
         if (src.getByteStream() != null) {
+            final InputStream is = src.getByteStream();
+
             if (src.getEncoding() == null) {
-                StreamSource ss = new StreamSource(src.getByteStream(), sysId);
+                final StreamSource ss = new StreamSource(is, sysId);
                 ss.setPublicId(pubId);
-                return createXMLStreamReader(ss);
+                
+                final XMLStreamReader xmlStreamReader = createXMLStreamReader(ss);
+                if (AUTO_CLOSE_INPUT_SOURCE) {
+                    return new AutoCloseableXMLStreamReader(xmlStreamReader, is);
+                } else {
+                    return xmlStreamReader;
+                }
             }
-            return createXMLStreamReader(src.getByteStream(), src.getEncoding());
+            
+            return new AutoCloseableXMLStreamReader(createXMLStreamReader(is, src.getEncoding()), is);
         } else if (src.getCharacterStream() != null) {
-            StreamSource ss = new StreamSource(src.getCharacterStream(), sysId);
+            final Reader reader = src.getCharacterStream();
+            final StreamSource ss = new StreamSource(reader, sysId);
             ss.setPublicId(pubId);
-            return createXMLStreamReader(ss);
+            final XMLStreamReader xmlStreamReader = createXMLStreamReader(ss);
+            if (AUTO_CLOSE_INPUT_SOURCE) {
+                return new AutoCloseableXMLStreamReader(xmlStreamReader, reader);
+            } else {
+                return xmlStreamReader;
+            }
         } else {
             try {
-                URL url = new URL(sysId);
-                StreamSource ss = new StreamSource(url.openStream(), sysId);
+                final URL url = new URL(sysId);
+                final InputStream is = url.openStream();
+                final StreamSource ss = new StreamSource(is, sysId);
                 ss.setPublicId(pubId);
-                return createXMLStreamReader(ss);
+                return new AutoCloseableXMLStreamReader(createXMLStreamReader(ss), is);
             } catch (Exception ex) {
                 //ignore - not a valid URL
             }
@@ -2197,4 +2218,5 @@ public final class StaxUtils {
         WoodstoxHelper.setProperty(reader, p, v);
     }
 
+    
 }

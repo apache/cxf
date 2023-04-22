@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.transfer.Get;

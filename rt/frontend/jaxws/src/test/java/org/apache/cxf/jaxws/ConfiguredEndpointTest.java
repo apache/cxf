@@ -91,7 +91,7 @@ public class ConfiguredEndpointTest {
 
     private void doTestDefaultClientEndpoint() {
 
-        javax.xml.ws.Service service = new SOAPService();
+        jakarta.xml.ws.Service service = new SOAPService();
         Greeter greeter = service.getPort(PORT_NAME, Greeter.class);
 
         JaxWsClientProxy eih = (JaxWsClientProxy)Proxy.getInvocationHandler(greeter);
@@ -144,7 +144,7 @@ public class ConfiguredEndpointTest {
 
     private void doTestConfiguredClientEndpoint() {
 
-        javax.xml.ws.Service service = new SOAPService();
+        jakarta.xml.ws.Service service = new SOAPService();
         Greeter greeter = service.getPort(PORT_NAME, Greeter.class);
 
         JaxWsClientProxy eih = (JaxWsClientProxy)Proxy.getInvocationHandler(greeter);
@@ -194,7 +194,7 @@ public class ConfiguredEndpointTest {
     private void doTestDefaultServerEndpoint() {
 
         Object implementor = new GreeterImpl();
-        EndpointImpl ei = (EndpointImpl)(javax.xml.ws.Endpoint.create(implementor));
+        EndpointImpl ei = (EndpointImpl)(jakarta.xml.ws.Endpoint.create(implementor));
         ei.publish("http://localhost/greeter");
 
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();
@@ -252,7 +252,7 @@ public class ConfiguredEndpointTest {
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, SpringBusFactory.class.getName());
 
         Object implementor = new GreeterImpl();
-        EndpointImpl ei = (EndpointImpl)(javax.xml.ws.Endpoint.create(implementor));
+        EndpointImpl ei = (EndpointImpl)(jakarta.xml.ws.Endpoint.create(implementor));
         ei.publish("http://localhost/greeter");
 
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();

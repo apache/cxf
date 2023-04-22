@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -76,19 +75,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration atReg) {
-        ServerAccessToken at = createNewAccessToken(atReg.getClient(), atReg.getSubject());
-        at.setAudiences(atReg.getAudiences());
-        at.setGrantType(atReg.getGrantType());
-        List<String> theScopes = atReg.getApprovedScope();
-        List<OAuthPermission> thePermissions =
-            convertScopeToPermissions(atReg.getClient(), theScopes);
-        at.setScopes(thePermissions);
-        at.setSubject(atReg.getSubject());
-        at.setClientCodeVerifier(atReg.getClientCodeVerifier());
-        at.setNonce(atReg.getNonce());
-        at.setResponseType(atReg.getResponseType());
-        at.setGrantCode(atReg.getGrantCode());
-        at.getExtraProperties().putAll(atReg.getExtraProperties());
+        ServerAccessToken at = doCreateAccessToken(
+            atReg.getAudiences(), atReg.getClient(),
+            atReg.getClientCodeVerifier(), atReg.getExtraProperties(),
+            atReg.getGrantCode(), atReg.getGrantType(), atReg.getNonce(),
+            atReg.getResponseType(),
+            convertScopeToPermissions(
+                    atReg.getClient(), atReg.getApprovedScope()),
+            atReg.getSubject());
 
         if (messageContext != null) {
             String certCnf = (String)messageContext.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
@@ -99,14 +93,36 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
 
         if (isUseJwtFormatForAccessTokens()) {
-            JwtClaims claims = createJwtAccessToken(at);
-            String jose = processJwtAccessToken(claims);
-            if (isPersistJwtEncoding()) {
-                at.setTokenKey(jose);
-            } else {
-                at.setEncodedToken(jose);
-            }
+            convertToJWTAccessToken(at);
         }
+
+        return at;
+    }
+
+    //CHECKSTYLE:OFF
+    protected ServerAccessToken doCreateAccessToken(List<String> audiences, //NOPMD
+                                                    Client client,
+                                                    String clientCodeVerifier,
+                                                    Map<String, String> extraProperties,
+                                                    String grantCode,
+                                                    String grantType,
+                                                    String nonce,
+                                                    String responseType,
+                                                    List<OAuthPermission> scopes,
+                                                    UserSubject userSubject) {
+    //CHECKSTYLE:ON
+
+        ServerAccessToken at =
+            createNewAccessToken(client, userSubject);
+        at.setAudiences(audiences);
+        at.setGrantType(grantType);
+        at.setScopes(scopes);
+        at.setSubject(userSubject);
+        at.setClientCodeVerifier(clientCodeVerifier);
+        at.setNonce(nonce);
+        at.setResponseType(responseType);
+        at.setGrantCode(grantCode);
+        at.getExtraProperties().putAll(extraProperties);
 
         return at;
     }
@@ -139,9 +155,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (at.getIssuer() != null) {
             claims.setIssuer(at.getIssuer());
         }
-        if (!at.getScopes().isEmpty()) {
+        if (!at.getScopes().isEmpty()) { // rfc8693, section 4.2
             claims.setClaim(OAuthConstants.SCOPE,
-                            OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
+                OAuthUtils.convertListOfScopesToString(OAuthUtils.convertPermissionsToScopeList(at.getScopes())));
         }
         // OAuth2 resource indicators (resource server audience)
         if (!at.getAudiences().isEmpty()) {
@@ -186,10 +202,20 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         return claims;
     }
 
+    protected void convertToJWTAccessToken(ServerAccessToken at) {
+        JwtClaims claims = createJwtAccessToken(at);
+        String jose = processJwtAccessToken(claims);
+        if (isPersistJwtEncoding()) {
+            at.setTokenKey(jose);
+        } else {
+            at.setEncodedToken(jose);
+        }
+    }
+
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         BearerAccessToken token = new BearerAccessToken(client, accessTokenLifetime);
-        if (issuer != null) {
-            token.setIssuer(issuer);
+        if (getIssuer() != null) {
+            token.setIssuer(getIssuer());
         }
         return token;
     }
@@ -395,35 +421,30 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected ServerAccessToken doRefreshAccessToken(Client client,
                                                      RefreshToken oldRefreshToken,
                                                      List<String> restrictedScopes) {
-        ServerAccessToken at = createNewAccessToken(client, oldRefreshToken.getSubject());
-        at.setAudiences(oldRefreshToken.getAudiences() != null
-                ? new ArrayList<String>(oldRefreshToken.getAudiences()) : null);
-        at.setGrantType(oldRefreshToken.getGrantType());
-        at.setGrantCode(oldRefreshToken.getGrantCode());
-        at.setSubject(oldRefreshToken.getSubject());
-        at.setNonce(oldRefreshToken.getNonce());
-        at.setClientCodeVerifier(oldRefreshToken.getClientCodeVerifier());
-        at.getExtraProperties().putAll(oldRefreshToken.getExtraProperties());
+
+        List<OAuthPermission> theNewScopes = null;
+
         if (restrictedScopes.isEmpty()) {
-            at.setScopes(oldRefreshToken.getScopes() != null
-                    ? new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null);
+            theNewScopes = oldRefreshToken.getScopes() != null
+                    ? new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null;
         } else {
-            List<OAuthPermission> theNewScopes = convertScopeToPermissions(client, restrictedScopes);
-            if (oldRefreshToken.getScopes().containsAll(theNewScopes)) {
-                at.setScopes(theNewScopes);
-            } else {
+            theNewScopes = convertScopeToPermissions(client, restrictedScopes);
+            if (!oldRefreshToken.getScopes().containsAll(theNewScopes)) {
                 throw new OAuthServiceException("Invalid scopes");
             }
         }
 
+        ServerAccessToken at =
+            doCreateAccessToken(
+                oldRefreshToken.getAudiences() != null
+                    ? new ArrayList<String>(oldRefreshToken.getAudiences()) : null,
+                client, oldRefreshToken.getClientCodeVerifier(),
+                oldRefreshToken.getExtraProperties(), oldRefreshToken.getGrantCode(),
+                oldRefreshToken.getGrantType(), oldRefreshToken.getNonce(),
+                null, theNewScopes, oldRefreshToken.getSubject());
+
         if (isUseJwtFormatForAccessTokens()) {
-            JwtClaims claims = createJwtAccessToken(at);
-            String jose = processJwtAccessToken(claims);
-            if (isPersistJwtEncoding()) {
-                at.setTokenKey(jose);
-            } else {
-                at.setEncodedToken(jose);
-            }
+            convertToJWTAccessToken(at);
         }
 
         return at;

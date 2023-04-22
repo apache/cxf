@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -54,6 +54,7 @@ public class ReactorServer extends AbstractBusTestServerBase {
         JAXRSServerFactoryBean sf2 = new JAXRSServerFactoryBean();
         sf2.setProvider(new JacksonJsonProvider());
         sf2.setProvider(new IllegalArgumentExceptionMapper());
+        sf2.setProvider(new IllegalStateExceptionMapper());
         new ReactorCustomizer().customize(sf2);
         sf2.setResourceClasses(FluxService.class);
         sf2.setResourceProvider(FluxService.class,
@@ -73,7 +74,7 @@ public class ReactorServer extends AbstractBusTestServerBase {
         server2 = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ReactorServer server = new ReactorServer();
         System.out.println("Go to http://localhost:" + PORT + "/reactor/flux/textJsonImplicitListAsyncStream");
         server.start();

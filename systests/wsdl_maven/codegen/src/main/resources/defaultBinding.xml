@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="">
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="">
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
         <jxb:globalBindings>
             <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>

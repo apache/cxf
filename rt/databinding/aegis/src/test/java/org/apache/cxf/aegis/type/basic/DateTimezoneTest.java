@@ -84,7 +84,7 @@ public class DateTimezoneTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         DateBean bean = new DateBean();
-        bean.setDate(Calendar.getInstance().getTime());
+        bean.setDate(new Date());
         // Test writing
         Element element = writeObjectToElement(type, bean, getContext());
         assertTimezoneLessString(element.getTextContent());

@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.coloc;
 
-import javax.xml.ws.ProtocolException;
-
+import jakarta.xml.ws.ProtocolException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;

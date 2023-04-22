@@ -23,23 +23,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import org.springframework.stereotype.Component;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Component
 @Path("library")
-public class Library {
+public class Library implements LibraryApi {
     private Map<String, Book> books = Collections.synchronizedMap(
         new TreeMap<String, Book>(String.CASE_INSENSITIVE_ORDER));
 
@@ -48,18 +41,30 @@ public class Library {
         books.put("2", new Book("Book #2", "Tom Tommyknocker"));
     }
 
-    @Produces({ MediaType.APPLICATION_JSON })
-    @GET
-    public Response getBooks(@Parameter(required = true) @QueryParam("page") @DefaultValue("1") int page) {
+    @Override
+    public Response getBooks(@Parameter(required = true) int page) {
         return Response.ok(books.values()).build();
     }
 
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("{id}")
-    @GET
-    public Response getBook(@PathParam("id") String id) {
+    @Override
+    public Response getBook(String id) {
         return books.containsKey(id) 
             ? Response.ok().entity(books.get(id)).build() 
                 : Response.status(Status.NOT_FOUND).build();
+    }
+    
+    @Override
+    public void deleteBooks() {
+        throw new UnsupportedOperationException("Operation is not supported by the server");
+    }
+    
+    @Override
+    public Catalog catalog() {
+        return new Catalog();
+    }
+    
+    @Override
+    public Response traceBooks() {
+        return Response.status(Status.NOT_ACCEPTABLE).build();
     }
 }

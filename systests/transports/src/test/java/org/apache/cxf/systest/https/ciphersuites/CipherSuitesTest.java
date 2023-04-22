@@ -19,7 +19,10 @@
 
 package org.apache.cxf.systest.https.ciphersuites;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,16 +30,20 @@ import java.util.Collections;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import javax.xml.ws.BindingProvider;
+import javax.net.ssl.TrustManagerFactory;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.systest.https.clientauth.ClientAuthTest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.https.InsecureTrustManager;
@@ -49,10 +56,12 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 /**
  * A set of tests for TLS ciphersuites
@@ -449,6 +458,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
         }
+        
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.1 is enabled", isProtocolDisabled("TLSv1.1"), is(false));
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
@@ -488,9 +500,71 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    // Both client + server include AES, client is TLSv1.1
+    @org.junit.Test
+    public void testAESIncludedTLSv11UsingSSLContext() throws Exception {
+        // Doesn't work with IBM JDK
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.1 is enabled", isProtocolDisabled("TLSv1.1"), is(false));
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+
+        // Set up KeyManagers/TrustManagers
+        KeyStore ts = KeyStore.getInstance("JKS");
+        try (InputStream trustStore =
+                     ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", ClientAuthTest.class)) {
+            ts.load(trustStore, "password".toCharArray());
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ts);
+
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.1");
+        sslContext.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
+
+        TLSClientParameters tlsParams = new TLSClientParameters();
+        tlsParams.setDisableCNCheck(true);
+        tlsParams.setSSLSocketFactory(sslContext.getSocketFactory());
+
+        conduit.setTlsClientParameters(tlsParams);
+
+        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
     // Both client + server include AES, client is TLSv1.0
     @org.junit.Test
     public void testAESIncludedTLSv10() throws Exception {
+        // Since JDK16, TLS 1.0 and 1.1 are disabled 
+        assumeThat("TLSv1.0 is enabled", isProtocolDisabled("TLSv1"), is(false));
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-noconfig.xml");
 
@@ -564,4 +638,8 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    private static boolean isProtocolDisabled(String proto) {
+        final String disabledAlgorithms = Security.getProperty("jdk.tls.disabledAlgorithms");
+        return disabledAlgorithms != null && disabledAlgorithms.contains(proto);
+    }
 }

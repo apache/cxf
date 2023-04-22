@@ -107,7 +107,7 @@ public class JweJsonProducer {
             JweEncryptionProvider encryptor = encryptors.get(i);
             JweHeaders perRecipientUnprotected =
                 recipientUnprotected == null ? null : recipientUnprotected.get(i);
-            JweHeaders jsonHeaders = null;
+            final JweHeaders jsonHeaders;
             if (perRecipientUnprotected != null && !perRecipientUnprotected.asMap().isEmpty()) {
                 checkCriticalHeaders(perRecipientUnprotected);
                 if (!Collections.disjoint(unionHeaders.asMap().keySet(),

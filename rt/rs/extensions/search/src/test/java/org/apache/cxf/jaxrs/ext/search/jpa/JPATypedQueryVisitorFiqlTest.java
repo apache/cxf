@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Tuple;
-
+import jakarta.persistence.Tuple;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
@@ -81,7 +80,7 @@ public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTe
     @Test
     public void testQueryCollection3() throws Exception {
         List<Book> books =
-            queryBooks("reviews.book.ownerInfo.name==Barry");
+            queryBooks("reviews.book.ownerInfo.name.name==Barry");
         assertEquals(1, books.size());
     }
 
@@ -267,19 +266,6 @@ public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTe
     @Test
     public void testEqualsOwnerNameQuery() throws Exception {
         List<Book> books = queryBooks("ownerInfo.name.name==Fred");
-        assertEquals(1, books.size());
-        Book book = books.get(0);
-        assertEquals("Fred", book.getOwnerInfo().getName().getName());
-    }
-
-
-    @Test
-    // "ownerInfo.name" maps to Name class and this
-    // does not work in OpenJPA, as opposed to Hibernate
-    // "ownerInfo.name.name" will map to primitive type, see
-    // testEqualsOwnerNameQuery3(), which also works in OpenJPA
-    public void testEqualsOwnerNameQuery2() throws Exception {
-        List<Book> books = queryBooks("ownerInfo.name==Fred");
         assertEquals(1, books.size());
         Book book = books.get(0);
         assertEquals("Fred", book.getOwnerInfo().getName().getName());

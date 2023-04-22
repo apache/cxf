@@ -18,17 +18,13 @@
  */
 package org.apache.cxf.systest.sts.secure_conv;
 
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -57,107 +53,63 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxSTSServer.class, true)
-        );
+        assertTrue(launchServer(new StaxSTSServer(
+            SecurityContextTokenUnitTest.class.getResource("cxf-sts.xml"),
+            SecurityContextTokenUnitTest.class.getResource("stax-cxf-sts.xml"))));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam("", false, STSPORT),
-                                              new TestParam("", false, STAX_STSPORT),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam("", false, STSPORT),
+                                new TestParam("", false, STAX_STSPORT),
+        };
     }
 
     @org.junit.Test
     public void testSecurityContextToken() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecurityContextTokenUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSecurityContextTokenNoEntropy() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecurityContextTokenUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
         SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSecurityContextTokenEncrypted() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecurityContextTokenUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSecurityContextTokenNoEntropyEncrypted() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecurityContextTokenUnitTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
         SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-
-        bus.shutdown(true);
     }
 
-    private SecurityToken requestSecurityToken(
+    private static SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, boolean enableEntropy
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);

@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebParam;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
+import jakarta.jws.WebParam;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;

@@ -68,20 +68,20 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
 
     public static SoapFault unmarshalFault(SoapMessage message,
                                            XMLStreamReader reader) {
-        String exMessage = null;
+        String exMessage;
         QName faultCode = null;
         List<QName> subCodes = null;
-        String role = null;
-        String node = null;
+        final String role;
+        final String node;
         Element detail = null;
-        String lang = null;
+        final String lang;
 
         Map<String, String> ns = new HashMap<>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);
         try {
             Node mainNode = message.getContent(Node.class);
-            Node fault = null;
+            Node fault;
 
             if (reader instanceof W3CDOMStreamReader) {
                 W3CDOMStreamReader dr = (W3CDOMStreamReader)reader;

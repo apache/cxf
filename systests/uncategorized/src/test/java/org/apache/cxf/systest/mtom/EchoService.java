@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.mtom;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://mtom.systest.cxf.apache.org")
 public class EchoService {

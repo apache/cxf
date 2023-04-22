@@ -20,8 +20,9 @@
 package org.apache.cxf.javascript.fortest;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  *
@@ -122,7 +123,7 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
     public void waitForOneWay() {
         if (oneWayLatch != null) {
             try {
-                oneWayLatch.await();
+                oneWayLatch.await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 //
             }

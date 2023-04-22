@@ -19,8 +19,7 @@
 
 package org.apache.cxf.binding.corba.wsdl;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
@@ -33,8 +32,10 @@ import org.apache.cxf.wsdl.WSDLManager;
 @NoJSR250Annotations
 public final class WSDLExtensionRegister implements WSDLExtensionLoader {
     private static final String YOKO_NAMESPACE = "http://schemas.apache.org/yoko/bindings/corba";
+    private final Bus bus;
 
     public WSDLExtensionRegister(Bus b) {
+        this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
         registerCXFExtensors(manager);
         registerYokoCompatibleExtensors(manager);
@@ -68,7 +69,7 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType,
                                               null,
@@ -83,7 +84,7 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
                                       Class<?> parentType,
                                       Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType,
                                               YOKO_NAMESPACE);

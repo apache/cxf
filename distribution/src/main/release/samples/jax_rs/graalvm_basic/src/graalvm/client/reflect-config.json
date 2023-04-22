@@ -1,0 +1,330 @@
+[
+{
+  "name":"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.netty.channel.socket.nio.NioSocketChannel",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
+  "fields":[{"name":"producerLimit"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
+  "fields":[{"name":"consumerIndex"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
+  "fields":[{"name":"producerIndex"}]
+},
+{
+  "name":"jakarta.annotation.Priority",
+  "methods":[{"name":"value","parameterTypes":[] }]
+},
+{
+  "name":"jakarta.ws.rs.ext.MessageBodyReader",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"jakarta.ws.rs.ext.MessageBodyWriter",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter"
+},
+{
+  "name":"java.lang.Object",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.invoke.MethodHandles",
+  "methods":[{"name":"lookup","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.invoke.MethodHandles$Lookup",
+  "methods":[{"name":"findClass","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.lang.management.ManagementFactory",
+  "methods":[{"name":"getRuntimeMXBean","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.management.RuntimeMXBean",
+  "methods":[{"name":"getInputArguments","parameterTypes":[] }]
+},
+{
+  "name":"java.net.Authenticator",
+  "methods":[{"name":"getDefault","parameterTypes":[] }]
+},
+{
+  "name":"java.nio.Bits",
+  "fields":[{"name":"UNALIGNED"}]
+},
+{
+  "name":"java.nio.Buffer",
+  "fields":[{"name":"address"}]
+},
+{
+  "name":"java.nio.ByteBuffer",
+  "methods":[{"name":"alignedSlice","parameterTypes":["int"] }]
+},
+{
+  "name":"java.nio.DirectByteBuffer",
+  "methods":[{"name":"<init>","parameterTypes":["long","int"] }]
+},
+{
+  "name":"java.security.MessageDigestSpi"
+},
+{
+  "name":"java.security.SecureRandomParameters"
+},
+{
+  "name":"javax.activation.DataSource"
+},
+{
+  "name":"javax.security.auth.Policy"
+},
+{
+  "name":"javax.security.auth.login.Configuration"
+},
+{
+  "name":"jdk.internal.misc.Unsafe",
+  "methods":[{"name":"getUnsafe","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.binding.AbstractBindingFactory",
+  "fields":[{"name":"bus"}]
+},
+{
+  "name":"org.apache.cxf.bus.CXFBusFactory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.bus.managers.CXFBusLifeCycleManager",
+  "fields":[{"name":"bus"}],
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.bus.managers.ClientLifeCycleManagerImpl",
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.bus.managers.EndpointResolverRegistryImpl"
+},
+{
+  "name":"org.apache.cxf.bus.managers.HeaderManagerImpl"
+},
+{
+  "name":"org.apache.cxf.bus.managers.PhaseManagerImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.bus.managers.ServerLifeCycleManagerImpl"
+},
+{
+  "name":"org.apache.cxf.bus.managers.ServerRegistryImpl",
+  "fields":[{"name":"bus"}],
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.bus.managers.WorkQueueManagerImpl"
+},
+{
+  "name":"org.apache.cxf.bus.resource.ResourceManagerImpl"
+},
+{
+  "name":"org.apache.cxf.bus.spring.SpringBusFactory"
+},
+{
+  "name":"org.apache.cxf.buslifecycle.BusLifeCycleManager"
+},
+{
+  "name":"org.apache.cxf.catalog.OASISCatalogManager"
+},
+{
+  "name":"org.apache.cxf.common.spi.ClassLoaderProxyService"
+},
+{
+  "name":"org.apache.cxf.common.util.ASMHelperImpl"
+},
+{
+  "name":"org.apache.cxf.endpoint.ClientLifeCycleManager"
+},
+{
+  "name":"org.apache.cxf.endpoint.ServerRegistry"
+},
+{
+  "name":"org.apache.cxf.ext.logging.LoggingBusLifecycleListener",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.ext.logging.LoggingFactoryBeanListener"
+},
+{
+  "name":"org.apache.cxf.ext.logging.OldLoggingFactoryBeanListener"
+},
+{
+  "name":"org.apache.cxf.jaxrs.JAXRSBindingFactory",
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"setBus","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.AbstractJAXBProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.BinaryDataProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.DataSourceProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.FormEncodingProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.JAXBElementProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setMessageContext","parameterTypes":["org.apache.cxf.jaxrs.ext.MessageContext"] }
+  ]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.MultipartProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.PrimitiveTextProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.SourceProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.StringTextProvider",
+  "allDeclaredFields":true,
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.apache.cxf.jaxrs.provider.json.JSONProvider"
+},
+{
+  "name":"org.apache.cxf.phase.PhaseManager"
+},
+{
+  "name":"org.apache.cxf.service.factory.FactoryBeanListenerManager"
+},
+{
+  "name":"org.apache.cxf.transport.AbstractTransportFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.apache.cxf.transport.http.HTTPTransportFactory",
+  "fields":[{"name":"DEFAULT_NAMESPACES"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.transport.http.ReferencingAuthenticator",
+  "methods":[{"name":"<init>","parameterTypes":["java.net.Authenticator","java.net.Authenticator"] }]
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.client.NettyHttpConduitFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory"
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.server.NettyHttpDestinationFactory"
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.server.NettyHttpServerEngineFactory",
+  "fields":[{"name":"bus"}],
+  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
+},
+{
+  "name":"org.apache.cxf.transport.http.netty.server.NettyHttpTransportFactory",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.slf4j.impl.StaticLoggerBinder"
+},
+{
+  "name":"sun.misc.GC"
+},
+{
+  "name":"sun.misc.Unsafe",
+  "fields":[{"name":"theUnsafe"}],
+  "methods":[
+    {"name":"copyMemory","parameterTypes":["java.lang.Object","long","java.lang.Object","long","long"] }, 
+    {"name":"getAndAddLong","parameterTypes":["java.lang.Object","long","long"] }, 
+    {"name":"getAndSetObject","parameterTypes":["java.lang.Object","long","java.lang.Object"] }, 
+    {"name":"invokeCleaner","parameterTypes":["java.nio.ByteBuffer"] }, 
+    {"name":"storeFence","parameterTypes":[] }
+  ]
+},
+{
+  "name":"sun.misc.VM"
+},
+{
+  "name":"sun.nio.ch.SelectorImpl",
+  "fields":[
+    {"name":"publicSelectedKeys"}, 
+    {"name":"selectedKeys"}
+  ]
+},
+{
+  "name":"sun.security.provider.DRBG",
+  "methods":[{"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+},
+{
+  "name":"sun.security.provider.SHA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.provider.SHA2$SHA256",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+}
+]

@@ -25,12 +25,12 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -94,7 +94,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
     protected String encodeAuthnRequest(Element authnRequest) throws IOException {
         String requestMessage = DOM2Writer.nodeToString(authnRequest);
 
-        byte[] deflatedBytes = null;
+        final byte[] deflatedBytes;
         // Not correct according to the spec but required by some IDPs.
         if (useDeflateEncoding) {
             DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();

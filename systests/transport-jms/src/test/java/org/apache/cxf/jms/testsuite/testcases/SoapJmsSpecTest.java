@@ -21,12 +21,12 @@ package org.apache.cxf.jms.testsuite.testcases;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.jms.DeliveryMode;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jms.testsuite.services.GreeterSpecImpl;

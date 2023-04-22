@@ -86,6 +86,11 @@ public class JwsUtilsTest {
         assertNotNull(jws);
     }
     @Test
+    public void testLoadSignatureVerifierFromProperties() throws Exception {
+        JwsSignatureVerifier jws = JwsUtils.loadSignatureVerifier("classpath:/jws/signature.properties", null);
+        assertEquals(SignatureAlgorithm.NONE, jws.getAlgorithm());
+    }
+    @Test
     public void testLoadVerificationKey() throws Exception {
         Properties p = new Properties();
         p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
@@ -127,7 +132,7 @@ public class JwsUtilsTest {
         assertEquals(2, chain.size());
     }
 
-    private Message createMessage() {
+    private static Message createMessage() {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         e.put(Bus.class, BusFactory.getThreadDefaultBus());

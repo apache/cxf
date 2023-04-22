@@ -62,11 +62,9 @@ public class XMLFormatValidator extends ServiceValidator {
 
     private boolean checkXMLFormat(BindingInfo binding) {
         Collection<BindingOperationInfo> bos = binding.getOperations();
-        boolean result = true;
-        boolean needRootNode = false;
         for (BindingOperationInfo bo : bos) {
             OperationInfo op = binding.getInterface().getOperation(bo.getName());
-            needRootNode = false;
+            boolean needRootNode = false;
             final int inputPartsNum = op.getInput().getMessagePartsNumber();
             if (inputPartsNum == 0 || inputPartsNum > 1) {
                 needRootNode = true;
@@ -97,8 +95,7 @@ public class XMLFormatValidator extends ServiceValidator {
                         if (outExtensors != null) {
                             itOut = outExtensors.iterator();
                         }
-                        result = result
-                            && findXMLFormatRootNode(itOut, bo, path + "-Output");
+                        boolean result = findXMLFormatRootNode(itOut, bo, path + "-Output");
                         if (!result) {
                             return false;
                         }

@@ -21,14 +21,14 @@ package org.apache.cxf.systest.jaxrs.metrics;
 
 import java.util.Arrays;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -40,12 +40,11 @@ import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -59,7 +58,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
+public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JAXRSServerMetricsTest.class);
 
     private static MetricsProvider provider;
@@ -79,29 +78,21 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookLibrary.class);
             sf.setResourceProvider(BookLibrary.class, new SingletonResourceProvider(new BookLibrary()));
             sf.setFeatures(Arrays.asList(new MetricsFeature(provider)));
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.setProvider(new JacksonJsonProvider());
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -130,7 +121,6 @@ public class JAXRSServerMetricsTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Before

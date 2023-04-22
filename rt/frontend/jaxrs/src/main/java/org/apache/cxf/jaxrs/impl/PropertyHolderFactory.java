@@ -20,9 +20,13 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 
@@ -40,6 +44,60 @@ public final class PropertyHolderFactory {
         void removeProperty(String name);
         void setProperty(String name, Object value);
         Collection<String> getPropertyNames();
+    }
+    
+    private static class ServletRequestPropertyHolder extends MessagePropertyHolder {
+        private static final String ENDPOINT_ADDRESS_PROPERTY = "org.apache.cxf.transport.endpoint.address";
+        private final HttpServletRequest request;
+        
+        ServletRequestPropertyHolder(Message m) {
+            super(m);
+            request = (HttpServletRequest)m.get("HTTP.REQUEST");
+        }
+
+        @Override
+        public Object getProperty(String name) {
+            final Object value = request.getAttribute(name);
+
+            if (value != null) {
+                return value;
+            }
+            
+            return super.getProperty(name);
+        }
+
+        @Override
+        public void removeProperty(String name) {
+            super.removeProperty(name);
+            request.removeAttribute(name);
+        }
+
+        @Override
+        public void setProperty(String name, Object value) {
+            if (value == null) {
+                removeProperty(name);
+            } else {
+                super.setProperty(name, value);
+                request.setAttribute(name, value);
+            }
+        }
+
+        @Override
+        public Collection<String> getPropertyNames() {
+            final Set<String> list = new LinkedHashSet<>();
+            
+            Enumeration<String> attrNames = request.getAttributeNames();
+            while (attrNames.hasMoreElements()) {
+                String name = attrNames.nextElement();
+                if (!ENDPOINT_ADDRESS_PROPERTY.equals(name)) {
+                    list.add(name);
+                }
+            }
+            
+            list.addAll(super.getPropertyNames());
+            return list;
+        }
+
     }
 
     private static class MessagePropertyHolder implements PropertyHolder {

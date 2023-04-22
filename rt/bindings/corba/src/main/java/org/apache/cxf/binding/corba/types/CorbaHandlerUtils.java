@@ -174,8 +174,8 @@ public final class CorbaHandlerUtils {
                                               CorbaTypeMap typeMap,
                                               ServiceInfo serviceInfo,
                                               Map<QName, CorbaObjectHandler> seenTypes) {
-        QName arrayElementType = null;
-        long arrayBound = 0;
+        final QName arrayElementType;
+        final long arrayBound;
         CorbaType baseType = obj.getType();
         QName elementName;
         if (baseType instanceof Array) {
@@ -189,7 +189,7 @@ public final class CorbaHandlerUtils {
             arrayBound = anonArrayType.getBound();
             elementName = anonArrayType.getElemname();
         }
-        for (int i = 0; i < arrayBound; ++i) {
+        for (long i = 0; i < arrayBound; ++i) {
             CorbaObjectHandler elementObj =
                 initializeObjectHandler(orb, elementName, arrayElementType, typeMap, serviceInfo,
                                         seenTypes);
@@ -229,8 +229,8 @@ public final class CorbaHandlerUtils {
                                                  CorbaTypeMap typeMap,
                                                  ServiceInfo serviceInfo,
                                                  Map<QName, CorbaObjectHandler> seenTypes) {
-        QName seqElementType = null;
-        long seqBound = 0;
+        final QName seqElementType;
+        final long seqBound;
         CorbaType baseType = obj.getType();
         QName elementName;
         if (baseType instanceof Sequence) {
@@ -247,7 +247,7 @@ public final class CorbaHandlerUtils {
         if (seqBound == 0) {
             // This is an unbounded sequence.  Store a 'template' object that we can use to create
             // new objects as needed
-            CorbaObjectHandler elementObj = null;
+            final CorbaObjectHandler elementObj;
 
             // Check for a recursive type
             if (seenTypes.get(seqElementType) != null) {
@@ -261,8 +261,8 @@ public final class CorbaHandlerUtils {
             }
             ((CorbaSequenceHandler)obj).setTemplateElement(elementObj);
         }
-        for (int i = 0; i < seqBound; ++i) {
-            CorbaObjectHandler elementObj = null;
+        for (long i = 0; i < seqBound; ++i) {
+            final CorbaObjectHandler elementObj;
 
             // Check for a recursive type
             if (seenTypes.get(seqElementType) != null) {
@@ -367,7 +367,7 @@ public final class CorbaHandlerUtils {
     public static XmlSchemaElement getXmlSchemaSequenceElement(XmlSchemaObject schemaType,
                                                                ServiceInfo serviceInfo) {
         XmlSchemaObject stype = schemaType;
-        XmlSchemaElement el = null;
+        final XmlSchemaElement el;
         if (schemaType instanceof XmlSchemaElement) {
             stype = ((XmlSchemaElement) schemaType).getSchemaType();
             if (stype == null) {
@@ -396,7 +396,7 @@ public final class CorbaHandlerUtils {
                                                     CorbaTypeMap typeMap,
                                                     ORB orb, ServiceInfo serviceInfo)
         throws CorbaBindingException {
-        CorbaObjectHandler handler = null;
+        final CorbaObjectHandler handler;
         TypeCode tc = CorbaUtils.getTypeCode(orb, idlType, typeMap);
         try {
             while (tc.kind().value() == TCKind._tk_alias) {

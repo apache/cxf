@@ -189,7 +189,8 @@ class Stax2ValidationUtils {
                 try {
                     // I don't think that we need the baseURI.
                     Method method = multiSchemaFactory.getMethod("createSchema", String.class, Map.class);
-                    ret = (XMLValidationSchema) method.invoke(multiSchemaFactory.newInstance(), null, sources);
+                    ret = (XMLValidationSchema) method.invoke(multiSchemaFactory.getDeclaredConstructor().newInstance(),
+                                                              null, sources);
                     endpoint.put(KEY, ret);
                 } catch (Throwable t) {
                     LOG.log(Level.INFO, "Problem loading schemas. Falling back to slower method.", ret);

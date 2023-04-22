@@ -82,7 +82,7 @@ public class Base64OutputStream extends FilterOutputStream {
         return buf;
     }
     private byte[] newArray(byte[] src, int srcPos, int srcLen, byte[] src2, int srcPos2, int srcLen2) {
-        byte[] buf = new byte[srcLen + srcLen2];
+        byte[] buf = new byte[Math.addExact(srcLen, srcLen2)];
         System.arraycopy(src, srcPos, buf, 0, srcLen);
         System.arraycopy(src2, srcPos2, buf, srcLen, srcLen2);
         return buf;

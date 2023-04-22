@@ -139,7 +139,7 @@ public class ImportRepairTest {
 
     Method findMethod(Object o, String name) {
         for (Method m: o.getClass().getMethods()) {
-            if (m.getName() == name) {
+            if (m.getName().equals(name)) {
                 return m;
             }
         }
@@ -175,11 +175,11 @@ public class ImportRepairTest {
                 //bug in the JDK doesn't set this, but accesses it
                 config.setParameter("http://www.oracle.com/xml/jaxp/properties/xmlSecurityPropertyManager",
                                     Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityPropertyManager")
-                                        .newInstance());
+                                    .getDeclaredConstructor().newInstance());
 
                 config.setParameter("http://apache.org/xml/properties/security-manager",
                                     Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityManager")
-                                        .newInstance());
+                                    .getDeclaredConstructor().newInstance());
             } catch (Throwable t) {
                 //ignore
             }

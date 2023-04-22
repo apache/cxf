@@ -26,22 +26,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -59,14 +59,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
-    protected static boolean serversStarted;
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        if (serversStarted) {
-            return;
-        }
         AbstractResourceInfo.clearAllMaps();
         Map<String, String> props = new HashMap<>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
@@ -80,7 +76,6 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, false));
         assertTrue("server did not launch correctly",
                    launchServer(JMSServer.class, true));
-        serversStarted = true;
     }
 
     @Test
@@ -88,7 +83,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT;
 
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
@@ -106,7 +101,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&messageType=text";
 
@@ -125,7 +120,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
              + "?replyToName=dynamicQueues/test.jmstransport.response"
-             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "&jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&jndiURL=tcp://localhost:" + JMS_PORT;
 
         WebClient client = WebClient.create(endpointAddressUrlEncoded);
@@ -158,7 +153,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromWebClientWithPath() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -175,7 +170,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromWebClientWithPathWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -194,7 +189,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -209,7 +204,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -225,7 +220,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromSubresourceProxyClient() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -241,7 +236,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromSubresourceProxyClientWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -258,7 +253,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithQuery() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory";
@@ -274,7 +269,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     public void testGetBookFromProxyClientWithQueryWithTextJMSMessage() throws Exception {
         // setup the the client
         String endpointAddressUrlEncoded = "jms:jndi:dynamicQueues/test.jmstransport.text"
-             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+             + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
              + "&replyToName=dynamicQueues/test.jmstransport.response"
              + "&jndiURL=tcp://localhost:" + JMS_PORT
              + "&jndiConnectionFactoryName=ConnectionFactory"
@@ -373,7 +368,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
     private Context getContext() throws Exception {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                          "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+                          "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + JMS_PORT);
         return new InitialContext(props);
 
@@ -384,9 +379,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         MessageProducer producer = session.createProducer(destination);
         Message message = session.createBytesMessage();
         message.setJMSReplyTo(replyTo);
-        message.setStringProperty("Accept", "application/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "GET");
+        setStringProperty(message, "Accept", "application/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "GET");
         producer.send(message);
         producer.close();
     }
@@ -398,9 +393,9 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         byte[] payload = writeBook(new Book("JMS OneWay", 125L));
         BytesMessage message = session.createBytesMessage();
         message.writeBytes(payload);
-        message.setStringProperty("Content-Type", "application/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
+        setStringProperty(message, "Content-Type", "application/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
 
         producer.send(message);
         producer.close();
@@ -427,11 +422,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         // POST
         // Message.REQUEST_URI : "/"
 
-        message.setStringProperty("Content-Type", "application/xml");
-        message.setStringProperty("Accept", "text/xml");
-        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books");
-        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "POST");
-        message.setStringProperty("custom.protocol.header", "custom.value");
+        setStringProperty(message, "Content-Type", "application/xml");
+        setStringProperty(message, "Accept", "text/xml");
+        setStringProperty(message, org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books");
+        setStringProperty(message, org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "POST");
+        setStringProperty(message, "custom.protocol.header", "custom.value");
 
         producer.send(message);
         producer.close();
@@ -462,4 +457,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    private static void setStringProperty(Message message, String name, String value) throws JMSException {
+        message.setStringProperty(name.replace(".", "__").replace("-", "_$_"), value);
+    }
 }

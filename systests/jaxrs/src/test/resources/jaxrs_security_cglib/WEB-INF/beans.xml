@@ -58,6 +58,7 @@
     <security:http auto-config="true">
         <security:http-basic/>
         <security:csrf disabled="true"/>
+        <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
     </security:http>
     <security:authentication-manager>
 	    <security:authentication-provider>

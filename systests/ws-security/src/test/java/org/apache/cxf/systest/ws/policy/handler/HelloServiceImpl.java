@@ -18,23 +18,22 @@
  */
 package org.apache.cxf.systest.ws.policy.handler;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.rt.security.SecurityConstants;
 
 @WebService(name = "HelloPolicyService", serviceName = "HelloPolicyService")
 @EndpointProperties(value = {
-        @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
-        value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
-        @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
-        @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "alice.properties"),
-        @EndpointProperty(key = SecurityConstants.SIGNATURE_USERNAME, value = "alice")
-        })
+    @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
+                      value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
+    @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
+    @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "alice.properties"),
+    @EndpointProperty(key = SecurityConstants.SIGNATURE_USERNAME, value = "alice")
+})
 @HandlerChain(file = "handlers.xml")
 public class HelloServiceImpl implements HelloService {
     @Override

@@ -89,7 +89,6 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         if (theConsumer == null
             && authPolicy != null && authPolicy.getUserName() != null && authPolicy.getPassword() != null) {
             theConsumer = new Consumer(authPolicy.getUserName(), authPolicy.getPassword());
-            return false;
         }
         if (theConsumer == null) {
             return false;

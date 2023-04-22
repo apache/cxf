@@ -21,7 +21,6 @@ package org.apache.cxf.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -63,7 +62,7 @@ import java.nio.charset.CodingErrorAction;
  * in the design of the code. This class is typically used in situations where an existing
  * API only accepts an {@link InputStream}, but where the most natural way to produce the data
  * is as a character stream, i.e. by providing a {@link Reader} instance. An example of a situation
- * where this problem may appear is when implementing the {@link javax.activation.DataSource}
+ * where this problem may appear is when implementing the {@link jakarta.activation.DataSource}
  * interface from the Java Activation Framework.
  * <p>
  * Given the fact that the {@link Reader} class doesn't provide any way to predict whether the next
@@ -120,9 +119,9 @@ public class ReaderInputStream extends InputStream {
         this.reader = reader;
         this.encoder = encoder;
         this.encoderIn = CharBuffer.allocate(bufferSize);
-        ((Buffer)this.encoderIn).flip();
+        encoderIn.flip();
         this.encoderOut = ByteBuffer.allocate(128);
-        ((Buffer)this.encoderOut).flip();
+        encoderOut.flip();
     }
 
     /**
@@ -192,7 +191,7 @@ public class ReaderInputStream extends InputStream {
     private void fillBuffer() throws IOException {
         if (!endOfInput && (lastCoderResult == null || lastCoderResult.isUnderflow())) {
             encoderIn.compact();
-            int position = ((Buffer)encoderIn).position();
+            int position = encoderIn.position();
             // We don't use Reader#read(CharBuffer) here because it is more efficient
             // to write directly to the underlying char array (the default implementation
             // copies data to a temporary char array).
@@ -200,13 +199,13 @@ public class ReaderInputStream extends InputStream {
             if (c == -1) {
                 endOfInput = true;
             } else {
-                ((Buffer)encoderIn).position(position + c);
+                encoderIn.position(position + c);
             }
-            ((Buffer)encoderIn).flip();
+            encoderIn.flip();
         }
         encoderOut.compact();
         lastCoderResult = encoder.encode(encoderIn, encoderOut, endOfInput);
-        ((Buffer)encoderOut).flip();
+        encoderOut.flip();
     }
 
     /**
@@ -224,7 +223,7 @@ public class ReaderInputStream extends InputStream {
         if (b == null) {
             throw new NullPointerException("Byte array must not be null");
         }
-        if (len < 0 || off < 0 || (off + len) > b.length) {
+        if (len < 0 || off < 0 || Math.addExact(off, len) > b.length) {
             throw new IndexOutOfBoundsException("Array Size=" + b.length
                     + ", offset=" + off + ", length=" + len);
         }

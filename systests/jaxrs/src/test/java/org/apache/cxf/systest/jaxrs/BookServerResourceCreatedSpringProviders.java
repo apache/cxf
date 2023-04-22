@@ -26,16 +26,8 @@ public class BookServerResourceCreatedSpringProviders extends AbstractSpringServ
         super("/jaxrs_spring_providers", "/webapp", Integer.parseInt(PORT));
     }
 
-    public static void main(String[] args) {
-        try {
-            BookServerResourceCreatedSpringProviders s = new BookServerResourceCreatedSpringProviders();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServerResourceCreatedSpringProviders().start();
     }
 
 }

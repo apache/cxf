@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.https;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -101,10 +102,8 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
             serverCertificates = conn.getServerCertificates();
             peerPrincipal = conn.getPeerPrincipal();
         } else {
-            Exception ex = null;
             try {
-                Method method = null;
-                method = connection.getClass().getMethod("getCipherSuite", (Class[]) null);
+                Method method = connection.getClass().getMethod("getCipherSuite", (Class[]) null);
                 enabledCipherSuite = (String) method.invoke(connection, (Object[]) null);
                 method = connection.getClass().getMethod("getLocalCertificates", (Class[]) null);
                 localCertificates = (Certificate[]) method.invoke(connection, (Object[]) null);
@@ -113,19 +112,16 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
 
                 //TODO Obtain localPrincipal and peerPrincipal using the com.sun.net.ssl api
             } catch (Exception e) {
-                ex = e;
-            } finally {
-                if (ex != null) {
-                    if (ex instanceof IOException) {
-                        throw (IOException) ex;
-                    }
-                    IOException ioe = new IOException("Error constructing HttpsURLConnectionInfo "
-                                                      + "for connection class "
-                                                      + connection.getClass().getName());
-                    ioe.initCause(ex);
-                    throw ioe;
-
+                Throwable ex = e;
+                if (e instanceof InvocationTargetException) {
+                    ex = ((InvocationTargetException) e).getTargetException();
                 }
+                if (ex instanceof IOException) {
+                    throw (IOException) ex;
+                }
+                throw new IOException("Error constructing HttpsURLConnectionInfo "
+                                                  + "for connection class "
+                                                  + connection.getClass().getName(), ex);
             }
         }
     }

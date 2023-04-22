@@ -22,16 +22,16 @@ package org.apache.cxf.binding.soap.saaj;
 import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.common.util.StringUtils;
 
@@ -99,8 +99,8 @@ public final class SAAJUtils {
                 e.setPrefix(prefix);
                 if (e instanceof SOAPElement) {
                     ((SOAPElement)e).removeNamespaceDeclaration(s);
-                } else if (e.getClass().getName().equals(
-                       "com.sun.org.apache.xerces.internal.dom.ElementNSImpl")) {
+                } else if ("com.sun.org.apache.xerces.internal.dom.ElementNSImpl".equals(
+                       e.getClass().getName())) {
                     //since java9 159 SOAPPart1_1Impl.getDocumentElement not return SOAPElement
                     try {
                         Method method = e.getClass().getMethod("removeAttribute", String.class);

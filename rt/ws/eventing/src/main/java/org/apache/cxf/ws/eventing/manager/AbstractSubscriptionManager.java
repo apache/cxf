@@ -22,9 +22,8 @@ package org.apache.cxf.ws.eventing.manager;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.eventing.ExpirationType;

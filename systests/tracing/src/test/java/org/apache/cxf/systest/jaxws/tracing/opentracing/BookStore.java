@@ -22,12 +22,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 

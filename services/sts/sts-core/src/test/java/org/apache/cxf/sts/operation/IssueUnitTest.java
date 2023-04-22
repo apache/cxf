@@ -20,15 +20,13 @@ package org.apache.cxf.sts.operation;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -38,7 +36,6 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
@@ -66,9 +63,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -108,9 +104,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -158,9 +153,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -222,9 +216,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -275,9 +268,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -318,9 +310,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -363,9 +354,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -409,9 +399,8 @@ public class IssueUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new DummyTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new DummyTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();

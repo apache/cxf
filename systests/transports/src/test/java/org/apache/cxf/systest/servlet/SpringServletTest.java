@@ -18,126 +18,140 @@
  */
 package org.apache.cxf.systest.servlet;
 
-import javax.xml.ws.Endpoint;
+import java.nio.charset.StandardCharsets;
 
 import org.w3c.dom.Document;
 
-import com.meterware.httpunit.HttpNotFoundException;
-import com.meterware.httpunit.PostMethodWebRequest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.servletunit.ServletUnitClient;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
+import jakarta.xml.ws.Endpoint;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class SpringServletTest extends AbstractServletTest {
-    @Override
-    protected String getConfiguration() {
-        return "/org/apache/cxf/systest/servlet/web-spring.xml";
+    @Ignore
+    public static class EmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+
+        public EmbeddedJettyServer() {
+            super("/org/apache/cxf/systest/servlet/web-spring.xml", "/", CONTEXT, PORT);
+        }
     }
 
-    @Override
-    protected Bus createBus() throws BusException {
-        // don't set up the bus, let the servlet do it
-        return null;
+    @BeforeClass
+    public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        stopAllServers();
     }
 
     @Test
     public void testInvokingSpringBeans() throws Exception {
+        final HttpPost method = new HttpPost(uri("/services/Greeter"));
 
-        WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter",
-            getClass().getResourceAsStream("GreeterMessage.xml"),
-            "text/xml; charset=utf-8");
+        method.setEntity(new InputStreamEntity(getClass().getResourceAsStream("GreeterMessage.xml"),
+            ContentType.create("text/xml", StandardCharsets.UTF_8)));
 
-        invokingEndpoint(req);
+        invokingEndpoint(method);
 
-        req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter1",
-            getClass().getResourceAsStream("GreeterMessage.xml"), "text/xml; charset=utf-8");
+        final HttpPost method2 = new HttpPost(uri("/services/Greeter1"));
 
-        invokingEndpoint(req);
+        method2.setEntity(new InputStreamEntity(getClass().getResourceAsStream("GreeterMessage.xml"),
+            ContentType.create("text/xml", StandardCharsets.UTF_8)));
+
+        invokingEndpoint(method2);
     }
 
-    public void invokingEndpoint(WebRequest req) throws Exception {
-
-        WebResponse response = newClient().getResponse(req);
-        assertEquals("text/xml", response.getContentType());
-        assertTrue("utf-8".equalsIgnoreCase(response.getCharacterSet()));
-
-        Document doc = StaxUtils.read(response.getInputStream());
-        assertNotNull(doc);
-
-        addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        assertValid("/s:Envelope/s:Body", doc);
-        assertValid("//h:sayHiResponse", doc);
+    public void invokingEndpoint(HttpUriRequest method) throws Exception {
+        try (CloseableHttpClient client = newClient()) {
+            try (CloseableHttpResponse response = client.execute(method)) {
+                assertEquals("text/xml", getContentType(response));
+                assertTrue("utf-8".equalsIgnoreCase(getCharset(response)));
+        
+                Document doc = StaxUtils.read(response.getEntity().getContent());
+                assertNotNull(doc);
+        
+                addNamespace("h", "http://apache.org/hello_world_soap_http/types");
+                assertValid("/s:Envelope/s:Body", doc);
+                assertValid("//h:sayHiResponse", doc);
+            }
+        }
     }
-
 
     @Test
     public void testGetWSDL() throws Exception {
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(true);
-
-        WebRequest req =
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter?wsdl");
-
-        WebResponse res = client.getResponse(req);
-        assertEquals(200, res.getResponseCode());
-        assertEquals("text/xml", res.getContentType());
-
-        Document doc = StaxUtils.read(res.getInputStream());
-        assertNotNull(doc);
-
-        assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/Greeter']", doc);
-
-        req =
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter2?wsdl");
-        res = client.getResponse(req);
-        assertEquals(200, res.getResponseCode());
-        assertEquals("text/xml", res.getContentType());
-
-        doc = StaxUtils.read(res.getInputStream());
-        assertNotNull(doc);
-
-        assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='http://cxf.apache.org/Greeter']", doc);
-
-        Endpoint.publish("/services/Greeter3", new org.apache.hello_world_soap_http.GreeterImpl());
-        req =
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter3?wsdl");
-        res = client.getResponse(req);
-        assertEquals(200, res.getResponseCode());
-        assertEquals("text/xml", res.getContentType());
-
-        doc = StaxUtils.read(res.getInputStream());
-        assertNotNull(doc);
-
-        assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/Greeter3']", doc);
-
+        try (CloseableHttpClient client = newClient()) {
+            final HttpGet greeter = new HttpGet(uri("/services/Greeter?wsdl"));
+            try (CloseableHttpResponse res = client.execute(greeter)) {
+                assertEquals(200, res.getStatusLine().getStatusCode());
+                assertEquals("text/xml", getContentType(res));
+        
+                Document doc = StaxUtils.read(res.getEntity().getContent());
+                assertNotNull(doc);
+        
+                assertValid("//wsdl:operation[@name='greetMe']", doc);
+                assertValid("//wsdlsoap:address[@location='" + uri("/services/Greeter") + "']", doc);
+            }
+            
+            final HttpGet greeter2 = new HttpGet(uri("/services/Greeter2?wsdl"));
+            try (CloseableHttpResponse res = client.execute(greeter2)) {
+                assertEquals(200, res.getStatusLine().getStatusCode());
+                assertEquals("text/xml", getContentType(res));
+        
+                Document doc = StaxUtils.read(res.getEntity().getContent());
+                assertNotNull(doc);
+        
+                assertValid("//wsdl:operation[@name='greetMe']", doc);
+                assertValid("//wsdlsoap:address[@location='http://cxf.apache.org/Greeter']", doc);
+        
+                Endpoint.publish("/services/Greeter3", new org.apache.hello_world_soap_http.GreeterImpl());
+            }
+            
+            final HttpGet greeter3 = new HttpGet(uri("/services/Greeter3?wsdl"));
+            try (CloseableHttpResponse res = client.execute(greeter3)) {
+                assertEquals(200, res.getStatusLine().getStatusCode());
+                assertEquals("text/xml", getContentType(res));
+        
+                Document doc = StaxUtils.read(res.getEntity().getContent());
+                assertNotNull(doc);
+        
+                assertValid("//wsdl:operation[@name='greetMe']", doc);
+                assertValid("//wsdlsoap:address[@location='" + uri("/services/Greeter3") + "']", doc);
+            }
+        }
     }
 
     @Test
     public void testIgnoreServiceList() throws Exception {
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(true);
-
-        WebRequest req =
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/");
-        try {
-            client.getResponse(req);
-            fail();
-        } catch (HttpNotFoundException ex) {
-            // expected
+        try (CloseableHttpClient client = newClient()) {
+            final HttpGet greeter = new HttpGet(uri("/services"));
+            
+            try (CloseableHttpResponse res = client.execute(greeter)) {
+                assertEquals(404, res.getStatusLine().getStatusCode());
+            }
         }
+    }
+    
+    @Override
+    protected int getPort() {
+        return EmbeddedJettyServer.PORT;
     }
 }

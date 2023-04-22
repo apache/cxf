@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.cdi;
 
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.ProcessBean;
-import javax.ws.rs.Path;
-
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.Annotated;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.ProcessBean;
+import jakarta.ws.rs.Path;
 import org.apache.cxf.Bus;
 
 import org.junit.Test;
@@ -67,7 +66,7 @@ public class JAXRSCdiResourceExtensionTest {
         Class cls = Bus.class;
         when(busBean.getBeanClass()).thenReturn(cls);
         when(busBean.getName()).thenReturn(CdiBusBean.CXF);
-        extension.collect(processBean);
+        extension.collect(processBean, beanManager);
 
         extension.injectBus(event, beanManager);
 
@@ -79,7 +78,7 @@ public class JAXRSCdiResourceExtensionTest {
         when(processBean.getBean()).thenReturn(busBean);
         when(processBean.getAnnotated()).thenReturn(annotated);
         when(annotated.isAnnotationPresent(Path.class)).thenReturn(true);
-        extension.collect(processBean);
+        extension.collect(processBean, beanManager);
 
         extension.injectBus(event, beanManager);
 

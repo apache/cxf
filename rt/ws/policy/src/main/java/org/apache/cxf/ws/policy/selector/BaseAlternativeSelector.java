@@ -62,7 +62,7 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
                 }
                 // Workaround until Neethi assertions implementations do not override equals():
                 // objects in lists can be different instances
-                if ((a instanceof PrimitiveAssertion) && (ra instanceof PrimitiveAssertion)
+                if (a instanceof PrimitiveAssertion && ra instanceof PrimitiveAssertion
                     && ((PrimitiveAssertion) a).equal(ra)) {
                     rNames.remove(ra.getName());
                     break;

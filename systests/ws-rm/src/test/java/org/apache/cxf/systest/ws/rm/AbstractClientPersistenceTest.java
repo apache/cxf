@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -116,7 +115,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             ep = null;
         }
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws Exception {
             new Server(args).start();
         }
 

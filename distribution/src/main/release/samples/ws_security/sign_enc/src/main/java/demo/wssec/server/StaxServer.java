@@ -23,8 +23,8 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

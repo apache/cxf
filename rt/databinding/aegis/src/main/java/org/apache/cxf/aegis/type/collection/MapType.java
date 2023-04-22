@@ -123,7 +123,7 @@ public class MapType extends AegisType {
      */
     @SuppressWarnings("unchecked")
     protected Map<Object, Object> instantiateMap() {
-        Map<Object, Object> map = null;
+        final Map<Object, Object> map;
 
         Class<?> cls = getTypeClass();
         if (cls.equals(Map.class)) {
@@ -140,7 +140,7 @@ public class MapType extends AegisType {
             map = new HashMap<>();
         } else {
             try {
-                map = (Map<Object, Object>)cls.newInstance();
+                map = (Map<Object, Object>)cls.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new DatabindingException("Could not create map implementation: "
                                                + getTypeClass().getName(), e);

@@ -21,6 +21,7 @@ package org.apache.cxf.clustering;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,12 +73,14 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * Select one of the alternate addresses for a retried invocation.
      *
      * @param alternates a List of alternate addresses if available
-     * @return the selected address
+     * @return the selected address or {@code null} if no alternate address is available
      */
     public String selectAlternateAddress(List<String> alternates) {
         String selected = null;
         if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
+        }
+        if (selected != null) {
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
                 LOG.log(level,
@@ -104,18 +107,20 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * Select one of the alternate endpoints for a retried invocation.
      *
      * @param alternates a List of alternate endpoints if available
-     * @return the selected endpoint
+     * @return the selected endpoint or {@code null} if no alternate endpoint is available
      */
     public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
         Endpoint selected = null;
         if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
+        } 
+        if (selected != null) {
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
                 LOG.log(level,
                         "FAILING_OVER_TO_ALTERNATE_ENDPOINT",
-                         new Object[] {selected.getEndpointInfo().getName(),
-                                       selected.getEndpointInfo().getAddress()});
+                        new Object[] {selected.getEndpointInfo().getName(),
+                                selected.getEndpointInfo().getAddress()});
             }
         } else {
             LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
@@ -133,6 +138,13 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     protected List<Endpoint> getEndpoints(Exchange exchange, boolean acceptCandidatesWithSameAddress) {
         Endpoint endpoint = exchange.getEndpoint();
         Collection<ServiceInfo> services = endpoint.getService().getServiceInfos();
+        
+        // If there are no services associated with this endpoint (often in case of JAX-RS), 
+        // returning the endpoint itself if allowed.
+        if (services.isEmpty() && acceptCandidatesWithSameAddress) {
+            return new ArrayList<>(Collections.singleton(endpoint));
+        }
+        
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();
         List<Endpoint> alternates = new ArrayList<>();
         for (ServiceInfo service : services) {

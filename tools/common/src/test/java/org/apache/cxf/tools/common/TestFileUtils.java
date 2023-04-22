@@ -32,17 +32,16 @@ public final class TestFileUtils {
     }
 
     public static String getStringFromFile(File location) throws IOException {
-        try (InputStream is = Files.newInputStream(location.toPath())) {
-            return getStringFromStream(is);
+        try (BufferedReader in = Files.newBufferedReader(location.toPath())) {
+            return normalizeCRLF(in);
         }
     }
 
     public static String getStringFromStream(InputStream is) throws IOException {
-        return normalizeCRLF(is);
+        return normalizeCRLF(new BufferedReader(new InputStreamReader(is)));
     }
 
-    private static String normalizeCRLF(InputStream instream) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(instream));
+    private static String normalizeCRLF(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder();
         String line = in.readLine();
         while (line != null) {

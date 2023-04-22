@@ -48,5 +48,10 @@ public class UndertowEmbeddedTest extends AbstractSseTest {
     protected int getPort() {
         return EmbeddedTomcatServer.PORT;
     }
+    
+    @Override
+    protected boolean supportsErrorPropagation() {
+        return true;
+    }
 
 }

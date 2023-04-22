@@ -20,9 +20,8 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.HttpRequestProperties;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;

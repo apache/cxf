@@ -19,13 +19,13 @@
 
 package org.apache.cxf.common.jaxb;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import com.ibm.xml.mock.marshaller.MockMarshaller;
-import com.sun.xml.bind.marshaller.MinimumEscapeHandler;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import com.sun.xml.bind.v2.runtime.MarshallerImpl;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import org.glassfish.jaxb.core.marshaller.MinimumEscapeHandler;
+import org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl;
+import org.glassfish.jaxb.runtime.v2.runtime.MarshallerImpl;
 
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class JAXBUtilsTest {
         Marshaller m = new MarshallerImpl((JAXBContextImpl) JAXBContext.newInstance(this.getClass()), null);
         final Object mockHandler = MinimumEscapeHandler.theInstance;
         JAXBUtils.setEscapeHandler(m, mockHandler);
-        assertEquals(mockHandler, m.getProperty("com.sun.xml.bind.characterEscapeHandler"));
+        assertEquals(mockHandler, m.getProperty("org.glassfish.jaxb.characterEscapeHandler"));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class JAXBUtilsTest {
         Marshaller m = new MockMarshaller();
         final Object mockHandler = new Object();
         JAXBUtils.setEscapeHandler(m, mockHandler);
-        assertEquals(mockHandler, m.getProperty("com.sun.xml.bind.characterEscapeHandler"));
+        assertEquals(mockHandler, m.getProperty("org.glassfish.jaxb.characterEscapeHandler"));
     }
 
     @Test

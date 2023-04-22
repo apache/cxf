@@ -19,9 +19,11 @@
 
 package org.apache.cxf.attachment;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,8 +35,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.activation.DataSource;
-
+import jakarta.activation.DataSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
@@ -47,10 +48,21 @@ import org.apache.cxf.message.MessageUtils;
 
 public class AttachmentDeserializer {
     public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
+
+    /**
+     * Allowed value is any instance of {@link File} or {@link String}.
+     */
     public static final String ATTACHMENT_DIRECTORY = "attachment-directory";
 
+    /**
+     * The memory threshold of attachments. Allowed value is any instance of {@link Number} or {@link String}.
+     * The default is {@link AttachmentDeserializer#THRESHOLD}.
+     */
     public static final String ATTACHMENT_MEMORY_THRESHOLD = "attachment-memory-threshold";
 
+    /**
+     * The maximum size of the attachment. Allowed value is any of {@link Number} or {@link String}.
+     */
     public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
 
     /**
@@ -84,8 +96,6 @@ public class AttachmentDeserializer {
     private boolean closed;
 
     private byte[] boundary;
-
-    private String contentType;
 
     private LazyAttachmentCollection attachments;
 
@@ -129,7 +139,7 @@ public class AttachmentDeserializer {
     }
 
     protected void initializeRootMessage() throws IOException {
-        contentType = (String) message.get(Message.CONTENT_TYPE);
+        String contentType = (String) message.get(Message.CONTENT_TYPE);
 
         if (contentType == null) {
             throw new IllegalStateException("Content-Type can not be empty!");
@@ -148,7 +158,7 @@ public class AttachmentDeserializer {
             if (null == boundaryString) {
                 throw new IOException("Couldn't determine the boundary from the message!");
             }
-            boundary = boundaryString.getBytes("utf-8");
+            boundary = boundaryString.getBytes(StandardCharsets.UTF_8);
 
             stream = new PushbackInputStream(message.getContent(InputStream.class), PUSHBACK_AMOUNT);
             if (!readTillFirstBoundary(stream, boundary)) {
@@ -177,7 +187,7 @@ public class AttachmentDeserializer {
         }
     }
 
-    private String findBoundaryFromContentType(String ct) throws IOException {
+    private String findBoundaryFromContentType(String ct) {
         // Use regex to get the boundary and return null if it's not found
         Matcher m = CONTENT_TYPE_BOUNDARY_PATTERN.matcher(ct);
         return m.find() ? "--" + m.group(1) : null;
@@ -281,7 +291,9 @@ public class AttachmentDeserializer {
             value = pushbackInStream.read();
             if ((byte) value == boundary[0]) {
                 int boundaryIndex = 0;
-                while (value != -1 && (boundaryIndex < boundary.length) && ((byte) value == boundary[boundaryIndex])) {
+                while (value != -1 
+                    && boundaryIndex < boundary.length 
+                    && (byte)value == boundary[boundaryIndex]) {
 
                     value = pushbackInStream.read();
                     if (value == -1) {
@@ -313,7 +325,7 @@ public class AttachmentDeserializer {
                                       this);
         createCount++;
 
-        return AttachmentUtil.createAttachment(partStream, headers);
+        return AttachmentUtil.createAttachment(partStream, headers, message);
     }
 
     public boolean isLazyLoading() {
@@ -444,11 +456,7 @@ public class AttachmentDeserializer {
             }
             value = line.substring(separator);
         }
-        List<String> v = heads.get(name);
-        if (v == null) {
-            v = new ArrayList<>(1);
-            heads.put(name, v);
-        }
+        List<String> v = heads.computeIfAbsent(name, k -> new ArrayList<>(1));
         v.add(value);
     }
 

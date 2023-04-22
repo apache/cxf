@@ -67,7 +67,7 @@ public class ChainInitiationObserver implements MessageObserver {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            InterceptorChain phaseChain = null;
+            InterceptorChain phaseChain;
 
             if (m.getInterceptorChain() != null) {
                 phaseChain = m.getInterceptorChain();

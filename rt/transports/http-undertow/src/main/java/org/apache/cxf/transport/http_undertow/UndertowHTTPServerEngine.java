@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509KeyManager;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -43,6 +43,7 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+import org.apache.cxf.transport.http.HttpServerEngineSupport;
 import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.xnio.Options;
 import org.xnio.Sequence;
@@ -64,11 +65,18 @@ import io.undertow.servlet.handlers.ServletPathMatches;
 import io.undertow.util.CopyOnWriteMap;
 
 
-public class UndertowHTTPServerEngine implements ServerEngine {
+public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineSupport {
 
     public static final String DO_NOT_CHECK_URL_PROP = "org.apache.cxf.transports.http_undertow.DontCheckUrl";
     
+    /**
+     * Please use {@link HttpServerEngineSupport#ENABLE_HTTP2} instead.
+     */
+    @Deprecated
     public static final String ENABLE_HTTP2_PROP = "org.apache.cxf.transports.http_undertow.EnableHttp2";
+    
+    public static final String ENABLE_RECORD_REQUEST_START_TIME_PROP = 
+        "org.apache.cxf.transports.http_undertow.EnableRecordRequestStartTime";
 
     private static final Logger LOG = LogUtils.getL7dLogger(UndertowHTTPServerEngine.class);
 
@@ -180,6 +188,17 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         servantCount = servantCount + 1;
     }
 
+    @Override
+    public boolean isHttp2Enabled(Bus bus) {
+        Object prop = null;
+        if (bus != null) {
+            prop = bus.getProperty(ENABLE_HTTP2_PROP);
+        }
+        if (prop == null) {
+            prop = SystemPropertyAction.getPropertyOrNull(ENABLE_HTTP2_PROP);
+        }
+        return PropertyUtils.isTrue(prop) || HttpServerEngineSupport.super.isHttp2Enabled(bus);
+    }
 
     private ServletContext buildServletContext(String contextName)
         throws ServletException {
@@ -200,8 +219,11 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     private Undertow createServer(URL url, UndertowHTTPHandler undertowHTTPHandler) throws Exception {
         Undertow.Builder result = Undertow.builder();
         result.setServerOption(UndertowOptions.IDLE_TIMEOUT, getMaxIdleTime());
-        if (this.shouldEnableHttp2(undertowHTTPHandler.getBus())) {
+        if (this.isHttp2Enabled(undertowHTTPHandler.getBus())) {
             result.setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE);
+        }
+        if (this.shouldEnableRecordRequestStartTime(undertowHTTPHandler.getBus())) {
+            result.setServerOption(UndertowOptions.RECORD_REQUEST_START_TIME, Boolean.TRUE);
         }
         if (tlsServerParameters != null) {
             if (this.sslContext == null) {
@@ -245,7 +267,12 @@ public class UndertowHTTPServerEngine implements ServerEngine {
                 builder = builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS,
                               this.threadingParameters.getMaxThreads());
             }
+            if (this.threadingParameters.isWorkerIONameSet()) {
+                builder = builder.setWorkerOption(Options.WORKER_NAME,
+                              this.threadingParameters.getWorkerIOName());
+            }
         }
+        
         return builder;
     }
 
@@ -302,14 +329,14 @@ public class UndertowHTTPServerEngine implements ServerEngine {
         return !PropertyUtils.isTrue(prop);
     }
     
-    private boolean shouldEnableHttp2(Bus bus) {
+    private boolean shouldEnableRecordRequestStartTime(Bus bus) {
 
         Object prop = null;
         if (bus != null) {
-            prop = bus.getProperty(ENABLE_HTTP2_PROP);
+            prop = bus.getProperty(ENABLE_RECORD_REQUEST_START_TIME_PROP);
         }
         if (prop == null) {
-            prop = SystemPropertyAction.getPropertyOrNull(ENABLE_HTTP2_PROP);
+            prop = SystemPropertyAction.getPropertyOrNull(ENABLE_RECORD_REQUEST_START_TIME_PROP);
         }
         return PropertyUtils.isTrue(prop);
     }
@@ -438,10 +465,10 @@ public class UndertowHTTPServerEngine implements ServerEngine {
      * remove it from the factory's cache.
      */
     public void shutdown() {
-        registedPaths.clear();
         if (shouldDestroyPort()) {
             if (servantCount == 0) {
                 UndertowHTTPServerEngineFactory.destroyForPort(port);
+                registedPaths.clear();
             } else {
                 LOG.log(Level.WARNING, "FAILED_TO_SHUTDOWN_ENGINE_MSG", port);
             }

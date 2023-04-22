@@ -27,39 +27,17 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.ws.policy</cxf.module.name>
-        <cxf.bundle.activator>org.apache.cxf.ws.policy.blueprint.Activator</cxf.bundle.activator>
-        <cxf.osgi.import>
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
-        </cxf.osgi.import>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/policy",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://www.w3.org/ns/ws-policy",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://www.w3.org/2006/07/ws-policy",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://schemas.xmlsoap.org/ws/2004/09/policy",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://www.w3.org/2000/09/xmldsig#",
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-        </cxf.export.service>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>

@@ -206,7 +206,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
         if (iterator == null) {
             iterator = new PhaseInterceptorIterator(heads);
             outputChainToLog(false);
-            //System.out.println(toString());
         }
     }
 
@@ -637,8 +636,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
                 if (lastAfter == null && beforeList.contains("*")) {
                     firstBefore = heads[phase];
                 }
-                //System.out.print("Didn't skip: " + phase.toString());
-                //System.out.println("             " + interc.getId());
+                
             } else if (!force) {
                 // skip interceptor if already in chain
                 InterceptorHolder ih2 = heads[phase];
@@ -649,8 +647,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     ih2 = ih2.next;
                 }
 
-                //System.out.print("Skipped: " + phase.toString());
-                //System.out.println("         " + interc.getId());
             }
             hasAfters[phase] |= !afterList.isEmpty();
 

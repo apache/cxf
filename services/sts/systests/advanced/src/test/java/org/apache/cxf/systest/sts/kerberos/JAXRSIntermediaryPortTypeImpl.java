@@ -21,11 +21,11 @@ package org.apache.cxf.systest.sts.kerberos;
 import java.net.URL;
 import java.util.Map;
 
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.jaxrs.security.KerberosAuthenticationFilter.KerberosSecurityContext;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -39,7 +39,7 @@ import org.ietf.jgss.GSSException;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class JAXRSIntermediaryPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";

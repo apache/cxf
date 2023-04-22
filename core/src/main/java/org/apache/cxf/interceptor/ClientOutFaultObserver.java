@@ -44,6 +44,7 @@ public class ClientOutFaultObserver extends AbstractFaultChainInitiatorObserver 
     /**
      * override the super class method
      */
+    @Override
     public void onMessage(Message m) {
         if (m.get(Message.INBOUND_MESSAGE).equals(Boolean.TRUE)) {
             //it's outbound fault observer so only take care of outbound fault

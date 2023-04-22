@@ -25,10 +25,10 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -115,7 +115,7 @@ public class EmptySOAPBodyTest extends AbstractBusClientServerTestBase {
         XMLService service = new XMLService(wsdl, providerServiceName, new LoggingFeature());
         assertNotNull(service);
         Dispatch<Source> dispatch = service.createDispatch(providerPortName, Source.class,
-                                                           javax.xml.ws.Service.Mode.PAYLOAD);
+                                                           jakarta.xml.ws.Service.Mode.PAYLOAD);
 
         String str = new String("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>"
                               + "<ns2:in xmlns=\"http://apache.org/hello_world_xml_http/bare/types\""

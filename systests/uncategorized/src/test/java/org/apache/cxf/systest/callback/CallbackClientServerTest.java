@@ -22,10 +22,10 @@ package org.apache.cxf.systest.callback;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.callback.SOAPService;
 import org.apache.callback.ServerPortType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;

@@ -20,9 +20,9 @@ package org.apache.cxf.tools.fortest.exception;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "item")
 public class OrderItem {
@@ -68,6 +68,6 @@ public class OrderItem {
     }
 
     public BigDecimal getTotalPrice() {
-        return new BigDecimal(pricePerUnit).multiply(new BigDecimal(count));
+        return BigDecimal.valueOf(pricePerUnit).multiply(BigDecimal.valueOf(count));
     }
 }

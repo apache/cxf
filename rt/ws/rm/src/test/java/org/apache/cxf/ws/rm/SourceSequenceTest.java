@@ -97,9 +97,7 @@ public class SourceSequenceTest {
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
 
-        SourceSequence seq = null;
-
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         assertEquals(id, seq.getIdentifier());
         assertFalse(seq.isLastMessage());
         assertFalse(seq.isExpired());
@@ -176,8 +174,7 @@ public class SourceSequenceTest {
         setUpSource();
         seq.setSource(source);
 
-        SequenceAcknowledgement ack = seq.getAcknowledgement();
-        ack = factory.createSequenceAcknowledgement();
+        SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
         r.setLower(Long.valueOf(1));
@@ -233,7 +230,6 @@ public class SourceSequenceTest {
 
     @Test
     public void testNextMessageNumber() throws RMException {
-        SourceSequence seq = null;
         setUpSource();
         rq.purgeAcknowledged(EasyMock.isA(SourceSequence.class));
         EasyMock.expectLastCall().anyTimes();
@@ -241,7 +237,7 @@ public class SourceSequenceTest {
 
         // default termination policy
 
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         assertFalse(nextMessages(seq, 10));
         control.verify();
@@ -301,8 +297,6 @@ public class SourceSequenceTest {
 
     @Test
     public void testCheckOfferingSequenceClosed() {
-        SourceSequence seq = null;
-
         setUpSource();
 
         RMEndpoint rme = control.createMock(RMEndpoint.class);
@@ -317,7 +311,7 @@ public class SourceSequenceTest {
 
         control.replay();
 
-        seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);
+        SourceSequence seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         seq.nextMessageNumber(did, 1, false);
         assertTrue(seq.isLastMessage());

@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.transform.feature;
 
 
-@javax.jws.WebService(portName = "EchoPort", serviceName = "EchoService",
+@jakarta.jws.WebService(portName = "EchoPort", serviceName = "EchoService",
                       targetNamespace = "http://apache.org/echo",
                       endpointInterface = "org.apache.cxf.systest.transform.feature.Echo")
 public class EchoImpl implements Echo {

@@ -27,13 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-
+import jakarta.annotation.PostConstruct;
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
+import org.apache.cxf.transport.http.HttpServerEngineSupport;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -44,7 +45,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 
-public class NettyHttpServerEngine implements ServerEngine {
+public class NettyHttpServerEngine implements ServerEngine, HttpServerEngineSupport {
 
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpServerEngine.class);
@@ -95,21 +96,36 @@ public class NettyHttpServerEngine implements ServerEngine {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private EventExecutorGroup applicationExecutor;
+    
+    private Bus bus;
 
+    
     public NettyHttpServerEngine() {
 
     }
 
-    public NettyHttpServerEngine(
-            String host,
-            int port) {
+    @Deprecated
+    public NettyHttpServerEngine(String host, int port) {
+        this(host, port, null);
+    }
+
+    public NettyHttpServerEngine(String host, int port, Bus bus) {
         this.host = host;
         this.port = port;
+        this.bus = bus;
     }
 
     @PostConstruct
     public void finalizeConfig() {
         // need to check if we need to any other thing other than Setting the TLSServerParameter
+    }
+    
+    public void setBus(Bus bus) {
+        this.bus = bus;
+    }
+    
+    public Bus getBus() {
+        return bus;
     }
 
     /**
@@ -159,11 +175,13 @@ public class NettyHttpServerEngine implements ServerEngine {
             .option(ChannelOption.SO_REUSEADDR, true);
 
         // Set up the event pipeline factory.
+        // Netty has issues with "UPGRADE" requests with payloads (POST/PUT)
+        // when not using SSL so we'll only start Http2 if the user specifically configures it
         servletPipeline =
             new NettyHttpServletPipelineFactory(
                  tlsServerParameters, sessionSupport,
                  maxChunkContentSize, handlerMap,
-                 this, applicationExecutor);
+                 this, applicationExecutor, isHttp2Required(bus));
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.childHandler(servletPipeline);

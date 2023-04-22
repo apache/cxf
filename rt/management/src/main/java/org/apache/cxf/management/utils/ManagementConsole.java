@@ -102,10 +102,10 @@ public final class ManagementConsole {
 
     ObjectName getEndpointObjectName()
         throws MalformedObjectNameException, NullPointerException {
-        StringBuilder buffer = new StringBuilder(128);
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(":type=Bus.Service.Endpoint,");
-        buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=\"" + serviceName + "\",");
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=\"" + portName + "\",*");
+        StringBuilder buffer = new StringBuilder(128)
+            .append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(":type=Bus.Service.Endpoint,")
+            .append(ManagementConstants.SERVICE_NAME_PROP).append("=\"").append(serviceName).append("\",")
+            .append(ManagementConstants.PORT_NAME_PROP).append("=\"").append(portName).append("\",*");
         return new ObjectName(buffer.toString());
     }
 

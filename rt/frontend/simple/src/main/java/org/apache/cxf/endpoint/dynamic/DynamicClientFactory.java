@@ -45,8 +45,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -70,9 +68,9 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import com.sun.tools.xjc.reader.internalizer.AbstractReferenceFinderImpl;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
 import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
-//import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
@@ -392,7 +390,7 @@ public class DynamicClientFactory {
             LOG.log(Level.SEVERE, new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
         FileUtils.removeDir(src);
-        URL[] urls = null;
+        final URL[] urls;
         try {
             urls = new URL[] {classes.toURI().toURL()};
         } catch (MalformedURLException mue) {
@@ -431,7 +429,7 @@ public class DynamicClientFactory {
         // Setup the new classloader!
         ClassLoaderUtils.setThreadContextClassloader(cl);
 
-        TypeClassInitializer visitor = new TypeClassInitializer(svcfo,
+        TypeClassInitializer visitor = new TypeClassInitializer(bus, svcfo,
                                                                 intermediateModel,
                                                                 allowWrapperOps());
         visitor.walk();
@@ -728,16 +726,15 @@ public class DynamicClientFactory {
     }
 
     private URL composeUrl(String s) {
-        try {
-            URIResolver resolver = new URIResolver(null, s, getClass());
-
+        try (URIResolver resolver = new URIResolver(null, s, getClass())) {
             if (resolver.isResolved()) {
                 return resolver.getURI().toURL();
             }
-            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
+        
+        throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
     }
 
     static class InnerErrorListener {
@@ -765,11 +762,11 @@ public class DynamicClientFactory {
                 errors.append('\n');
             }
             if (arg0.getLineNumber() > 0) {
-                errors.append(arg0.getLocalizedMessage() + "\n"
-                    + " at line " + arg0.getLineNumber()
-                    + " column " + arg0.getColumnNumber()
-                    + " of schema " + arg0.getSystemId()
-                    + "\n");
+                errors.append(arg0.getLocalizedMessage()).append('\n')
+                    .append(" at line ").append(arg0.getLineNumber())
+                    .append(" column ").append(arg0.getColumnNumber())
+                    .append(" of schema ").append(arg0.getSystemId())
+                    .append('\n');
             } else {
                 errors.append(arg0.getMessage());
                 errors.append('\n');
@@ -923,8 +920,7 @@ public class DynamicClientFactory {
         }
 
 
-        try {
-            URIResolver resolver = new URIResolver(base, target);
+        try (URIResolver resolver = new URIResolver(base, target)) {
             if (resolver.isResolved()) {
                 target = resolver.getURI().toString();
             }

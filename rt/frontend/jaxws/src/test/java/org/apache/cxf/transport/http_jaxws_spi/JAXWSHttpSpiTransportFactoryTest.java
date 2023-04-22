@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.transport.http_jaxws_spi;
 
-import javax.xml.ws.spi.http.HttpContext;
-import javax.xml.ws.spi.http.HttpHandler;
-
+import jakarta.xml.ws.spi.http.HttpContext;
+import jakarta.xml.ws.spi.http.HttpHandler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;

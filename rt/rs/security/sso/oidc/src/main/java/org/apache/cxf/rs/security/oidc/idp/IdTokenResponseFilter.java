@@ -80,7 +80,7 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
                 // if this token was refreshed then the cloned IDToken might need to have its
                 // issuedAt and expiry time properties adjusted
                 if (OAuthConstants.REFRESH_TOKEN_GRANT.equals(st.getGrantType())) {
-                    final Long iat = st.getIssuedAt();
+                    final long iat = st.getIssuedAt();
                     idToken.setExpiryTime(iat + (idToken.getExpiryTime() - idToken.getIssuedAt()));
                     idToken.setIssuedAt(iat);
                 }

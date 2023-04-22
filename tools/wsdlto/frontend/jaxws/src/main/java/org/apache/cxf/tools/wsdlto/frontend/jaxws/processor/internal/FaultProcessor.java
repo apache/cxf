@@ -108,8 +108,8 @@ public class FaultProcessor extends AbstractProcessor {
         expClass.setPackageName(packageName);
 
         for (MessagePartInfo part : faultParts) {
-            String fName = null;
-            String fNamespace = null;
+            final String fName;
+            String fNamespace;
 
             if (part.getElementQName() != null) {
                 fNamespace = part.getElementQName().getNamespaceURI();

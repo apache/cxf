@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,40 +32,42 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.annotation.Priority;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.ReaderInterceptorContext;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseContext;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.ReaderInterceptorContext;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.Holder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -239,6 +242,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals(124L, book.getId());
 
     }
+    
+    @Test
+    public void testGetBookWebTargetInjectableProvider() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders";
+        Client client = ClientBuilder.newClient();
+        client.register(new BookInfoInjectableReader());
+        BookInfo book = client.target(address).path("simple")
+            .request("application/xml").get(BookInfo.class);
+        assertEquals(124L, book.getId());
+
+    }
 
     @Test
     public void testGetBookSyncWithAsync() {
@@ -339,6 +353,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetBookWrongPathAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/wrongpath";
+        doTestGetBookAsync(address, false);
+    }
+    
+    @Test
+    public void testGetBookAbsolutePathAsync() throws Exception {
+        String address = "http://localhost:" + PORT + "/absolutepath";
         doTestGetBookAsync(address, false);
     }
 
@@ -458,7 +478,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections";
         WebClient wc = WebClient.create(endpointAddress,
-                                        Collections.singletonList(new JacksonJaxbJsonProvider()));
+                                        Collections.singletonList(new JacksonXmlBindJsonProvider()));
         doTestPostGetCollectionGenericEntityAndType(wc, MediaType.APPLICATION_JSON_TYPE);
     }
 
@@ -926,12 +946,46 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
     }
 
+    @Test
+    @SuppressWarnings({"checkstyle:linelength"})
+    public void testQueryParamSpecialCharactersEncoded() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/queryParamSpecialCharacters";
+
+        try (Response response = ClientBuilder.newClient()
+                .register(AddHeaderClientResponseFilter.class)
+                .target(address)
+                .queryParam(URLEncoder.encode("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@"), 
+                    "apiKeyQueryParam1Value")
+                .request(MediaType.TEXT_PLAIN)
+                .get()) {
+            assertEquals(200, response.getStatus());
+            
+            final String actual = response.readEntity(String.class);
+            final String expected = "apiKeyQueryParam1Value";
+            
+            assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void testGetBookDateAnnotated() throws Exception {
+        final String response = ClientBuilder
+            .newClient()
+            .target("http://localhost:" + PORT + "/bookstore/annotated/123")
+            .request(MediaType.TEXT_PLAIN)
+            .get()
+            .readEntity(String.class);
+            
+        assertThat(response, equalTo("2020-01-01{jakarta.ws.rs.GET,jakarta.ws.rs.Path,jakarta.ws.rs.Produces,"
+            + "jakarta.ws.rs.ext.Provider,jakarta.ws.rs.Consumes}"));
+    }
+    
     private static class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext rc) throws IOException {
             String method = rc.getMethod();
-            String expectedMethod = null;
+            final String expectedMethod;
             if (rc.getAcceptableMediaTypes().contains(MediaType.valueOf("text/mistypedxml"))
                 && rc.getHeaders().getFirst("THEMETHOD") != null) {
                 expectedMethod = MediaType.TEXT_XML_TYPE.equals(rc.getMediaType()) ? "DELETE" : "GET";
@@ -1038,8 +1092,30 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
 
-    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
+    private static class BookInfoInjectableReader implements MessageBodyReader<BookInfo> {
+        @Context private ResourceContext resourceContext;
 
+        @Override
+        public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public BookInfo readFrom(Class<BookInfo> arg0, Type arg1, Annotation[] anns, MediaType mt,
+                                 MultivaluedMap<String, String> headers, InputStream is) throws IOException,
+            WebApplicationException {
+            
+            if (resourceContext == null) {
+                throw new WebApplicationException("The resourceContext should not be null");
+            }
+            
+            Book book = new JAXBElementProvider<Book>().readFrom(Book.class, Book.class, anns, mt, headers, is);
+            return new BookInfo(book);
+        }
+
+    }
+    
+    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
         @Override
         public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
             return true;
@@ -1054,6 +1130,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
 
     }
+
     private static class ClientTestFeature implements Feature {
 
         @Override

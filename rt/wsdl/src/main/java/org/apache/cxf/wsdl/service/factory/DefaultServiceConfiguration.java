@@ -121,7 +121,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
     public static String createName(final Method method, final int paramNumber, final int currentSize,
                               boolean addMethodName, final String flow) {
-        String paramName = "";
+        final String paramName;
 
         if (paramNumber != -1) {
             String[] names = ParamReader.getParameterNamesFromDebugInfo(method);
@@ -137,9 +137,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
             paramName = flow;
         }
 
-        paramName = addMethodName ? method.getName() + paramName : paramName;
-
-        return paramName;
+        return addMethodName ? method.getName() + paramName : paramName;
     }
 
     @Override
@@ -262,8 +260,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         if (isHolder(cls, type)) {
             if (type instanceof ParameterizedType) {
                 //JAX-WS style using generics
-                ParameterizedType paramType = (ParameterizedType)type;
-                cls = getHolderClass(paramType);
+                //cls = getHolderClass((ParameterizedType)type);
             } else {
                 //JAXRPC style of code generated holder
                 return cls.getDeclaredFields()[0].getType();

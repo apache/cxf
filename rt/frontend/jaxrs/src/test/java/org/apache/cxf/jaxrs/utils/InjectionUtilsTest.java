@@ -33,17 +33,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -159,6 +157,14 @@ public class InjectionUtilsTest {
                                                          CarType.class, null,
                                                          ParameterType.QUERY, null);
         assertEquals("Type is wrong", CarType.AUDI, carType);
+    }
+
+    @Test
+    public void testInstantiateClass() {
+        HelmId helmId = InjectionUtils.handleParameter("a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", false, HelmId.class,
+                                                         HelmId.class, null,
+                                                         ParameterType.QUERY, null);
+        assertEquals("Type is wrong", "a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", helmId.getId());
     }
 
     @Test
@@ -380,6 +386,28 @@ public class InjectionUtilsTest {
 
         public void setBirthDate(LocalDate birthDate) {
             this.birthDate = birthDate;
+        }
+    }
+
+    private abstract static class AbstractHelmId {
+        public static HelmId fromString(String id) {
+            return HelmId.of(UUID.fromString(id));
+        }
+    }
+
+    private static final class HelmId extends AbstractHelmId {
+        private final UUID uuid;
+
+        private HelmId(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getId() {
+            return uuid.toString();
+        }
+
+        public static HelmId of(UUID uuid) {
+            return new HelmId(uuid);
         }
     }
 }

@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -27,6 +28,8 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +44,20 @@ import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
+import com.google.common.io.Files;
+
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,6 +66,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -184,14 +191,14 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testTimeoutConfigutation() throws Exception {
+    public void testTimeoutConfiguration() throws Exception {
 
         SOAPService service = new SOAPService();
         assertNotNull(service);
 
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
-        ((javax.xml.ws.BindingProvider)greeter).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)greeter).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
                                                                         "1");
         try {
             greeter.greetMe("test");
@@ -201,7 +208,10 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             if (ex.getCause() != null) {
                 cause = ex.getCause();
             }
-            assertTrue("Timeout cause is expected", cause instanceof java.net.SocketTimeoutException);
+            assertTrue("Timeout cause is expected: " + cause.getClass().getName(), 
+                       cause instanceof java.net.SocketTimeoutException
+                       || cause instanceof HttpConnectTimeoutException
+                       || cause instanceof HttpTimeoutException);
         }
     }
 
@@ -227,7 +237,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddPortWithSpecifiedSoap12Binding() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
@@ -247,7 +257,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddPortWithSpecifiedSoap11Binding() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
             "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
@@ -979,7 +989,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testServerAsync() throws Exception {
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
             "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
         String resp = greeter.greetMe("World");
@@ -990,7 +1000,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testEchoProviderAsync() throws Exception {
         String requestString = "<echo/>";
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,
@@ -1001,12 +1011,76 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         assertEquals(requestString, StaxUtils.toString(response));
     }
+    
+    @Test
+    public void testEchoProviderThresholdAsync() throws Exception {
+        final File f = Files.createTempDir();
+        LOG.info("Using temp folder: " + f.getAbsolutePath());
+        
+        System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
+        CachedOutputStream.setDefaultThreshold(5);
+        
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+        dispatcher.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", "5000");
+        
+        StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+        StreamSource response = dispatcher.invoke(request);
+
+        assertEquals(requestString, StaxUtils.toString(response));
+        
+        //give the server side a little time to process it's part and close the files
+        if (f.list().length > 0) {
+            Thread.sleep(500);
+        }
+        
+        assertEquals("Expected no files but there is at list one", 0, f.list().length);
+        FileUtils.removeDir(f);
+    }
+    
+    @Test
+    public void testEchoProviderThresholdAsyncThrows() throws Exception {
+        final File f = Files.createTempDir();
+        LOG.info("Using temp folder: " + f.getAbsolutePath());
+        
+        System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
+        CachedOutputStream.setDefaultThreshold(5);
+        
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+        dispatcher.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", "500");
+        
+        try {
+            StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+            StreamSource response = dispatcher.invoke(request);
+            assertEquals(requestString, StaxUtils.toString(response));
+        } catch (final WebServiceException ex) {
+            ((DispatchImpl<StreamSource>)dispatcher).getClient().close();
+        }
+        //give the server side a little time to process it's part and close the files
+        if (f.list().length > 0) {
+            Thread.sleep(500);
+        }
+        
+        assertEquals("Expected no files but there is at list one", 0, f.list().length);
+        FileUtils.removeDir(f);
+    }
 
     @Test
     public void testEchoProviderAsyncDecoupledEndpoints() throws Exception {
         String requestString = "<echo/>";
         Service service = Service.create(serviceName);
-        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
                         "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
         Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
                                                                    StreamSource.class,

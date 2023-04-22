@@ -20,8 +20,7 @@ package org.apache.cxf.jaxrs.ext;
 
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.service.invoker.Invoker;

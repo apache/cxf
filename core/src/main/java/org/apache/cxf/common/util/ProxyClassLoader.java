@@ -50,6 +50,7 @@ public class ProxyClassLoader extends ClassLoader {
         }
     }
 
+    @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
         if (classes != null) {
             for (Class<?> c : classes) {
@@ -75,6 +76,7 @@ public class ProxyClassLoader extends ClassLoader {
         throw new ClassNotFoundException(name);
     }
 
+    @Override
     public URL findResource(String name) {
         for (ClassLoader loader : loaders) {
             URL url = loader.getResource(name);

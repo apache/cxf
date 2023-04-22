@@ -19,41 +19,25 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase {
+public class BookServerResourceCreatedOutside extends AbstractServerTestServerBase {
 
     public static final String PORT = allocatePort(BookServerResourceCreatedOutside.class);
 
-    Server server;
-    protected void run() {
-        setBus(BusFactory.getDefaultBus());
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setBus(getBus());
         BookStore bs = new BookStore();
         sf.setServiceBean(bs);
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
-    }
-    @Override
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
+        return sf.create();
     }
 
-    public static void main(String[] args) {
-        try {
-            BookServerResourceCreatedOutside s = new BookServerResourceCreatedOutside();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookServerResourceCreatedOutside().start();
     }
 }

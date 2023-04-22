@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 
 

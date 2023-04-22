@@ -18,21 +18,15 @@
  */
 package org.apache.cxf.systest.sts.basic_auth;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItPortType;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class DoubleItPortTypeImpl implements DoubleItPortType {
-
-    @Resource
-    WebServiceContext wsContext;
 
     public int doubleIt(int numberToDouble) {
         return numberToDouble * 2;

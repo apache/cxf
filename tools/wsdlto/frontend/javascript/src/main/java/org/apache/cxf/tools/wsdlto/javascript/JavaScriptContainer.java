@@ -174,7 +174,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     public void setNamespaceJavascriptPrefixes(ToolContext env) {
         Map<String, String> nsPrefixMap = new HashMap<>();
         if (env.get(ToolConstants.CFG_JSPACKAGEPREFIX) != null) {
-            String[] pns = null;
+            final String[] pns;
             try {
                 pns = (String[])env.get(ToolConstants.CFG_JSPACKAGEPREFIX);
             } catch (ClassCastException e) {
@@ -286,7 +286,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     public List<ServiceValidator> getServiceValidators() {
         List<ServiceValidator> validators = new ArrayList<>();
 
-        Properties initialExtensions = null;
+        final Properties initialExtensions;
         try {
             initialExtensions = PropertiesLoaderUtils.loadAllProperties(SERVICE_VALIDATOR, Thread
                 .currentThread().getContextClassLoader());
@@ -305,7 +305,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
                                                                              true,
                                                                              Thread.currentThread()
                                                                                  .getContextClassLoader())
-                    .newInstance();
+                    .getDeclaredConstructor().newInstance();
                 validators.add(validator);
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "EXTENSION_ADD_FAILED_MSG", ex);

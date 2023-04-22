@@ -116,7 +116,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     return;
                 }
                 if (isRequestor(message)) {
-                    SecurityToken tok = null;
+                    final SecurityToken tok;
                     try {
                         KerberosClient client = KerberosUtils.getClient(message, "kerberos");
                         synchronized (client) {

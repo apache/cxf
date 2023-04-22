@@ -21,8 +21,9 @@ package org.apache.cxf.systest.jaxrs.description.openapi;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
@@ -41,7 +42,7 @@ public class OpenApiNonAnnotatedServiceDescriptionTest extends AbstractOpenApiSe
         }
 
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceClasses(BookStoreStylesheetsOpenApi.class);
@@ -53,11 +54,11 @@ public class OpenApiNonAnnotatedServiceDescriptionTest extends AbstractOpenApiSe
             feature.setReadAllResources(true);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            start(new OpenApiRegularNonAnnotated());
+        public static void main(String[] args) throws Exception {
+            new OpenApiRegularNonAnnotated().start();
         }
     }
 

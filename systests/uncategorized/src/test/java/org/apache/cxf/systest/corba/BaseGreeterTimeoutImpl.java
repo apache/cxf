@@ -40,7 +40,7 @@ import org.apache.cxf.hello_world_corba.PingMeFault;
  * under the License.
  */
 
-@javax.jws.WebService(portName = "GreeterTimeoutCORBAPort",
+@jakarta.jws.WebService(portName = "GreeterTimeoutCORBAPort",
         serviceName = "GreeterTimeoutCORBAService",
         targetNamespace = "http://cxf.apache.org/hello_world_corba",
         wsdlLocation = "classpath:/wsdl_systest/hello_world_corba_timeout.wsdl",

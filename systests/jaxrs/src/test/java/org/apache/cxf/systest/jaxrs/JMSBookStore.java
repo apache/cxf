@@ -25,28 +25,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
+import jakarta.jms.BytesMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
@@ -54,7 +54,7 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 @Path("/bookstore")
 public class JMSBookStore {
 
-    @javax.ws.rs.core.Context
+    @jakarta.ws.rs.core.Context
     private ProtocolHeaders headers;
 
     private Map<Long, Book> books = new HashMap<>();
@@ -152,7 +152,7 @@ public class JMSBookStore {
     private Context getContext() throws Exception {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                          "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+                          "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
         props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + EmbeddedJMSBrokerLauncher.PORT);
         return new InitialContext(props);
 

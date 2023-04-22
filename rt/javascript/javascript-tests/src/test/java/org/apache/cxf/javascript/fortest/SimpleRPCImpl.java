@@ -19,7 +19,7 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "uri:cxf.apache.org.javascript.rpc",
             endpointInterface = "org.apache.cxf.javascript.fortest.SimpleRPC")

@@ -21,9 +21,15 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ASMHelperTest {
     @Test
@@ -32,10 +38,37 @@ public class ASMHelperTest {
             EnumObject.class
         });
         Type[] types = method.getGenericParameterTypes();
-        String classCode = ASMHelper.getClassCode(types[0]);
+        ASMHelper helper = new ASMHelperImpl();
+        String classCode = helper.getClassCode(types[0]);
         assertEquals("Lorg/apache/cxf/common/util/ASMHelperTest$EnumObject<Ljava/lang/Enum;>;", classCode);
     }
 
+    @Test
+    public void testLoader() throws Exception {
+        CustomLoader cl = new CustomLoader(new ExtensionManagerBus());
+        Class<?> clz = cl.createCustom();
+        assertNotNull(clz);
+        assertTrue(cl.isFound());
+    }
+    public class CustomLoader extends ClassGeneratorClassLoader {
+        public CustomLoader(Bus bus) {
+            super(bus);
+        }
+        public Class<?> createCustom() {
+            ASMHelper helper = new ASMHelperImpl();
+            ASMHelper.ClassWriter cw = helper.createClassWriter();
+            OpcodesProxy opCodes = helper.getOpCodes();
+            cw.visit(opCodes.V1_5, opCodes.ACC_PUBLIC + opCodes.ACC_SUPER, "test/testClass", null,
+                    "java/lang/Object", null);
+            cw.visitEnd();
+
+            return loadClass("test.testClass", ASMHelperTest.class, cw.toByteArray());
+        }
+        public boolean isFound() {
+            Class<?> cls = findClass("test.testClass", ASMHelperTest.class);
+            return cls != null;
+        }
+    }
     public class EnumObject<E extends Enum<E>> {
         private String name;
 

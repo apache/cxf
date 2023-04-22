@@ -23,10 +23,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
@@ -152,7 +151,7 @@ public class LocalClientState implements ClientState {
     
     public ClientState newState(URI currentURI, MultivaluedMap<String, String> headers,
             MultivaluedMap<String, String> templatesMap, Map<String, Object> props) {
-        ClientState state = null;
+        final ClientState state;
         if (isSupportedScheme(currentURI)) {
             state = new LocalClientState(currentURI, props);
         } else {

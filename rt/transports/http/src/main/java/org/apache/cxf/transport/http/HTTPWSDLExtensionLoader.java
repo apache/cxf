@@ -19,8 +19,7 @@
 
 package org.apache.cxf.transport.http;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
@@ -37,18 +36,18 @@ public final class HTTPWSDLExtensionLoader implements WSDLExtensionLoader {
     public HTTPWSDLExtensionLoader(Bus b) {
         WSDLManager manager = b.getExtension(WSDLManager.class);
 
-        createExtensor(manager, javax.wsdl.Port.class,
+        createExtensor(b, manager, javax.wsdl.Port.class,
                        org.apache.cxf.transports.http.configuration.HTTPClientPolicy.class);
-        createExtensor(manager, javax.wsdl.Port.class,
+        createExtensor(b, manager, javax.wsdl.Port.class,
                        org.apache.cxf.transports.http.configuration.HTTPServerPolicy.class);
-        createExtensor(manager, javax.wsdl.Port.class,
+        createExtensor(b, manager, javax.wsdl.Port.class,
                        AddressType.class);
     }
-    public void createExtensor(WSDLManager manager,
+    public void createExtensor(Bus b, WSDLManager manager,
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(b, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType, null,
                                               this.getClass().getClassLoader());

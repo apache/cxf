@@ -22,8 +22,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.ws.rs.ext.Provider;
-
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.client.Client;

@@ -244,7 +244,7 @@ public class SourceSequence extends AbstractSequence {
     public long nextMessageNumber(Identifier inSeqId, long inMsgNumber, boolean last) {
         assert !lastMessage;
 
-        long result = 0;
+        final long result;
         synchronized (this) {
             currentMessageNumber++;
             if (last) {

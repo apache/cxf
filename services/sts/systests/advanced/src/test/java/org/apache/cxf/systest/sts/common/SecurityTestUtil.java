@@ -18,13 +18,9 @@
  */
 package org.apache.cxf.systest.sts.common;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.ws.BindingProvider;
-
-import org.apache.commons.io.FileUtils;
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 
 /**
@@ -36,24 +32,6 @@ public final class SecurityTestUtil {
         // complete
     }
 
-    public static void cleanup() throws IOException {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir != null) {
-            File[] tmpFiles = new File(tmpDir).listFiles();
-            if (tmpFiles != null) {
-                for (File tmpFile : tmpFiles) {
-                    if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache.instance")
-                            || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance")
-                            || tmpFile.getName().startsWith("ws-security.saml.cache.instance")
-                            || tmpFile.getName().startsWith("wss4j-nonce-cache")
-                            || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
-                        FileUtils.forceDeleteOnExit(tmpFile);
-                    }
-                }
-            }
-        }
-    }
-
     public static void enableStreaming(DoubleItPortType port) {
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -61,6 +39,27 @@ public final class SecurityTestUtil {
         ((BindingProvider)port).getResponseContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
+    }
+
+    public static void updateSTSPort(BindingProvider p, String port) {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location != null && location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location != null && location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
+        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
     }
 
 }

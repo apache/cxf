@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.provider.datasource;
 
-import javax.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceContext;
 
 public interface WebProvider {
     WebServiceContext getWebServiceContext();

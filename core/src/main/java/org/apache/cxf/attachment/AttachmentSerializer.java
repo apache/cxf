@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,21 +34,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-
+import jakarta.activation.DataHandler;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
-
-
-
 public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
 
-    private String contentTransferEncoding = "binary";
+    private String contentTransferEncoding = AttachmentUtil.BINARY;
 
     private Message message;
     private String bodyBoundary;
@@ -215,7 +213,42 @@ public class AttachmentSerializer {
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
             writer.write("Content-ID: <");
-            writer.write(URLDecoder.decode(attachmentId, StandardCharsets.UTF_8.name()));
+            
+            // 
+            // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
+            // A "cid" URL is converted to the corresponding Content-ID message
+            // header [MIME] by removing the "cid:" prefix, converting the % encoded
+            // character to their equivalent US-ASCII characters, and enclosing the
+            // remaining parts with an angle bracket pair, "<" and ">".  
+            //
+            if (attachmentId.startsWith("cid:")) {
+                writer.write(decode(attachmentId.substring(4),
+                    StandardCharsets.UTF_8));
+            } else { 
+                //
+                // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
+                // 
+                //   content-id = url-addr-spec
+                //   url-addr-spec = addr-spec ; URL encoding of RFC 822 addr-spec
+                // 
+                // RFC-822 addr-spec (https://datatracker.ietf.org/doc/html/rfc822#appendix-D) says:
+                //  
+                //   addr-spec = local-part "@" domain ; global address
+                //
+                String[] address = attachmentId.split("@", 2);
+                if (address.length == 2) {
+                    // See please AttachmentUtil::createContentID, the domain part is URL encoded
+                    final String decoded = tryDecode(address[1], StandardCharsets.UTF_8);
+                    // If the domain part is encoded, decode it 
+                    if (!decoded.equalsIgnoreCase(address[1])) {
+                        writer.write(address[0] + "@" + decoded);
+                    } else {
+                        writer.write(attachmentId);
+                    }
+                } else {
+                    writer.write(URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
+                }
+            }
             writer.write(">\r\n");
         }
         // headers like Content-Disposition need to be serialized
@@ -258,7 +291,7 @@ public class AttachmentSerializer {
                 writer.write("\r\n--");
                 writer.write(bodyBoundary);
 
-                Map<String, List<String>> headers = null;
+                final Map<String, List<String>> headers;
                 Iterator<String> it = a.getHeaderNames();
                 if (it.hasNext()) {
                     headers = new LinkedHashMap<>();
@@ -342,4 +375,19 @@ public class AttachmentSerializer {
         this.xop = xop;
     }
 
+    // URL decoder would also decode '+' but according to  RFC-2392 we need to convert
+    // only the % encoded character to their equivalent US-ASCII characters. 
+    private static String decode(String s, Charset charset) {
+        return URLDecoder.decode(s.replaceAll("([^%])[+]", "$1%2B"), charset);
+    }
+
+    // Try to decode the string assuming the decoding may fail, the original string is going to
+    // be returned in this case.
+    private static String tryDecode(String s, Charset charset) {
+        try { 
+            return decode(s, charset);
+        } catch (IllegalArgumentException ex) {
+            return s;
+        }
+    }
 }

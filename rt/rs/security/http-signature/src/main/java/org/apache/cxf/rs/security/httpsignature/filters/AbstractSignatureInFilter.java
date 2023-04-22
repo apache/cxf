@@ -27,9 +27,8 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
@@ -99,7 +98,7 @@ abstract class AbstractSignatureInFilter {
     }
 
     protected void verifySignature(MultivaluedMap<String, String> headers, String uriPath,
-                                   String httpMethod) {
+                                   String httpMethod, byte[] messageBody) {
         if (!enabled) {
             LOG.fine("Verify signature filter is disabled");
             return;
@@ -111,7 +110,9 @@ abstract class AbstractSignatureInFilter {
 
         LOG.fine("Starting filter message verification process");
         try {
-            messageVerifier.verifyMessage(headers, httpMethod, uriPath, PhaseInterceptorChain.getCurrentMessage());
+            messageVerifier.verifyMessage(headers, httpMethod, uriPath,
+                    PhaseInterceptorChain.getCurrentMessage(),
+                    messageBody);
         } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {

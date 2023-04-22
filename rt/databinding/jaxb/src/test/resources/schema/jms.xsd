@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://cxf.apache.org/transports/jms" elementFormDefault="qualified" jaxb:version="2.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jms="http://cxf.apache.org/transports/jms" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://cxf.apache.org/transports/jms" elementFormDefault="qualified" jaxb:version="3.0">
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="../schemas/wsdl/wsdl.xsd"/>
     <xs:simpleType name="DestinationStyleType">
         <xs:restriction base="xs:string">

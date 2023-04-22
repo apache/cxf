@@ -54,7 +54,7 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
  * <li>If the classpath doesn't exist, try to create URL from the URI.</li>
  * </ul>
  */
-public class URIResolver {
+public class URIResolver implements AutoCloseable {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
 
     private Map<String, LoadingByteArrayOutputStream> cache = new HashMap<>();
@@ -449,5 +449,13 @@ public class URIResolver {
 
     public boolean isResolved() {
         return is != null;
+    }
+    
+    @Override
+    public void close() throws IOException {
+        if (isResolved()) {
+            is.close();
+            unresolve();
+        }
     }
 }

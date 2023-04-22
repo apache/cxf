@@ -168,7 +168,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 LdapName ln = new LdapName(principal.getName());
 
                 for (Rdn rdn : ln.getRdns()) {
-                    if ("CN".equalsIgnoreCase(rdn.getType()) && (rdn.getValue() instanceof String)) {
+                    if ("CN".equalsIgnoreCase(rdn.getType()) && rdn.getValue() instanceof String) {
                         subjectName = (String)rdn.getValue();
                         break;
                     }
@@ -244,7 +244,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 throw new STSException("No Encryption Name is configured", STSException.REQUEST_FAILED);
             }
 
-            CryptoType cryptoType = null;
+            final CryptoType cryptoType;
 
             // Check for using of service endpoint (AppliesTo) as certificate identifier
             if (STSConstants.USE_ENDPOINT_AS_CERT_ALIAS.equals(encryptionName)) {
@@ -337,7 +337,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         encrKey.setUseThisCert(certificate);
         encrKey.setKeyEncAlgo(encryptionProperties.getKeyWrapAlgorithm());
 
-        SecretKey symmetricKey = null;
+        final SecretKey symmetricKey;
         if (secret != null) {
             symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
         } else {

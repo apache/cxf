@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType(namespace = "urn:xfire:foo", name = "bar")
 public enum JaxbTestEnum {

@@ -43,7 +43,7 @@ public class SoapFaultFactory  {
     }
 
     public Fault createFault(JMSFault jmsFault) {
-        Fault f = null;
+        final Fault f;
         if (version == Soap11.getInstance()) {
             f = createSoap11Fault(jmsFault);
             // so we can encode the SequenceFault as header

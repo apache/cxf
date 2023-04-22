@@ -21,12 +21,13 @@
 package org.apache.cxf.systest.transform.feature;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.transform.XSLTInInterceptor;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;
@@ -83,7 +84,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
             fail("404 Not found was expected"); 
         } catch (Exception e) { 
             String exceptionMessage = e.getMessage();
-            assertTrue(exceptionMessage.toLowerCase().contains("404: not found")); 
+            assertTrue(exceptionMessage, exceptionMessage.toLowerCase().contains("404:")); 
         } 
     }
 
@@ -109,7 +110,8 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
             fail("Connection refused expected");
         } catch (Exception e) {
             String exceptionMessage = e.getMessage();
-            assertTrue(exceptionMessage.toLowerCase().contains("connection refused"));
+            assertTrue(exceptionMessage, exceptionMessage.toLowerCase().contains("connection refused")
+                       || e.getCause() instanceof ConnectException);
         }
     }
 

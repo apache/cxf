@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.PreDestroy;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -35,13 +34,15 @@ import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.integration.CacheLoader;
 import javax.cache.integration.CacheWriter;
 import javax.cache.spi.CachingProvider;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
+
+import jakarta.annotation.PreDestroy;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 
 
 @Provider
-public class CacheControlFeature implements Feature {
+public class CacheControlFeature implements Feature, Closeable {
     private CachingProvider provider;
     private CacheManager manager;
     private Cache<Key, Entry> cache;
@@ -81,7 +82,7 @@ public class CacheControlFeature implements Feature {
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        provider = Caching.getCachingProvider();
+        provider = Caching.getCachingProviders().iterator().next();
         try {
             manager = provider.getCacheManager(
                     uri == null ? provider.getDefaultURI() : new URI(uri),
@@ -126,7 +127,7 @@ public class CacheControlFeature implements Feature {
     @SuppressWarnings("unchecked")
     private static <T> T newInstance(final ClassLoader contextClassLoader, final String clazz, final Class<T> cast) {
         try {
-            return (T) contextClassLoader.loadClass(clazz).newInstance();
+            return (T) contextClassLoader.loadClass(clazz).getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
             throw new IllegalArgumentException(e);
         }

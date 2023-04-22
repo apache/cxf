@@ -20,11 +20,10 @@ package org.apache.cxf.systest.jaxrs.cdi.unwrapper;
 
 import java.util.Set;
 
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ClassUnwrapper;
 import org.apache.cxf.systests.cdi.base.BookStorePreMatchingRequestFilter;

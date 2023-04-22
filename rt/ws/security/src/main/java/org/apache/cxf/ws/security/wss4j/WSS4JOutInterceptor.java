@@ -28,10 +28,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.SOAPMessage;
-
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -157,13 +156,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 return;
             }
             SoapVersion version = mc.getVersion();
-            RequestData reqData = new RequestData();
 
             /*
              * The overall try, just to have a finally at the end to perform some
              * housekeeping.
              */
             try {
+                RequestData reqData = new RequestData();
+
                 WSSConfig config = WSSConfig.getNewInstance();
                 reqData.setWssConfig(config);
                 reqData.setEncryptionSerializer(new StaxSerializer());
@@ -272,8 +272,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             } catch (InvalidCanonicalizerException | WSSecurityException e) {
                 throw new SoapFault(new Message("SECURITY_FAILED", LOG), e, version
                         .getSender());
-            } finally {
-                reqData = null;
             }
         }
 
@@ -308,7 +306,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 (Map<?, ?>)getProperty(mc, WSS4J_ACTION_MAP));
             if (actionMap != null && !actionMap.isEmpty()) {
                 for (Map.Entry<Integer, Object> entry : actionMap.entrySet()) {
-                    Class<?> removedAction = null;
+                    final Class<?> removedAction;
 
                     // Be defensive here since the cast above is slightly risky
                     // with the handler config options not being strongly typed.

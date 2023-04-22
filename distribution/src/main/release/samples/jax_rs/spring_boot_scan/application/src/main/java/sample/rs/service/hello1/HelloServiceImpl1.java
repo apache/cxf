@@ -19,10 +19,8 @@
 package sample.rs.service.hello1;
 import org.springframework.stereotype.Service;
 
-import io.swagger.annotations.Api;
 import sample.rs.service.HelloService;
 
-@Api("/sayHello")
 @Service
 public class HelloServiceImpl1 implements HelloService {
 

@@ -22,12 +22,11 @@ package org.apache.cxf.ws.security.sts.provider;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.soap.SOAPFaultException;
-
+import jakarta.annotation.Resource;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;

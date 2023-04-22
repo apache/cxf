@@ -24,7 +24,8 @@ import java.io.File;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
+
+import jakarta.xml.ws.Holder;
 import org.apache.headers.HeaderService;
 import org.apache.headers.HeaderTester;
 import org.apache.headers.InHeader;

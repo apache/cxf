@@ -97,7 +97,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
     }
 
     public InputSource getImportInputSource(String parent, String importLocation) {
-        String resolvedImportLocation = null;
+        final String resolvedImportLocation;
         try {
             resolvedImportLocation = new OASISCatalogManagerHelper().resolve(manager,
                                          importLocation, parent);
@@ -106,7 +106,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
         }
 
 
-        InputSource in = null;
+        InputSource in;
         if (resolvedImportLocation == null) {
             in = this.resolver.resolve(importLocation, parent);
         } else {

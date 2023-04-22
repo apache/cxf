@@ -124,7 +124,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                                     NameManager nameManager) {
         super(serviceInfo);
         this.endpointAddress = endpointAddress;
-        code = new StringBuilder();
+        code = new StringBuilder(512);
         utils = new JavascriptUtils(code);
         this.nameManager = nameManager;
         xmlSchemaCollection = serviceInfo.getXmlSchemaCollection();
@@ -141,7 +141,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
     @Override
     public void begin(InterfaceInfo intf) {
-        code.append("\n// Javascript for " + intf.getName() + "\n\n");
+        code.append("\n// Javascript for ").append(intf.getName()).append("\n\n");
 
         currentInterfaceClassName = nameManager.getJavascriptName(intf.getName());
         operationsWithNameConflicts = new HashSet<>();
@@ -151,7 +151,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         localInputMessagesNameMap = new HashMap<>();
         localOutputMessagesNameMap = new HashMap<>();
 
-        code.append("function " + currentInterfaceClassName + " () {\n");
+        code.append("function ").append(currentInterfaceClassName).append(" () {\n");
         utils.appendLine("this.jsutils = new CxfApacheOrgUtil();");
         utils.appendLine("this.jsutils.interfaceObject = this;");
         utils.appendLine("this.synchronous = false;");
@@ -184,10 +184,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 if (elementType != null && elementType.getQName() != null) {
                     name = elementType.getQName();
                 }
-                utils.appendLine("this.globalElementSerializers['" + name.toString() + "'] = "
+                utils.appendLine("this.globalElementSerializers['" + name + "'] = "
                                  + nameManager.getJavascriptName(name)
                                  + "_serialize;");
-                utils.appendLine("this.globalElementDeserializers['" + name.toString() + "'] = "
+                utils.appendLine("this.globalElementDeserializers['" + name + "'] = "
                                  + nameManager.getJavascriptName(name)
                                  + "_deserialize;");
             }
@@ -200,10 +200,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                     continue;
                 }
                 // the names are misleading, but that's OK.
-                utils.appendLine("this.globalElementSerializers['" + name.toString() + "'] = "
+                utils.appendLine("this.globalElementSerializers['" + name + "'] = "
                                  + nameManager.getJavascriptName(name)
                                  + "_serialize;");
-                utils.appendLine("this.globalElementDeserializers['" + name.toString() + "'] = "
+                utils.appendLine("this.globalElementDeserializers['" + name + "'] = "
                                  + nameManager.getJavascriptName(name)
                                  + "_deserialize;");
             }
@@ -211,7 +211,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     }
 
     private String getFunctionGlobalName(QName itemName, String itemType) {
-        return nameManager.getJavascriptName(itemName) + "_" + itemType;
+        return nameManager.getJavascriptName(itemName) + '_' + itemType;
     }
 
 
@@ -292,11 +292,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         MessageInfo inputMessage = currentOperation.getInput();
 
         code.append("//\n");
-        code.append("// Operation " + currentOperation.getName() + "\n");
+        code.append("// Operation ").append(currentOperation.getName()).append('\n');
         if (!isWrapped) {
             code.append("// - bare operation. Parameters:\n");
             for (ParticleInfo ei : unwrappedElementsAndNames) {
-                code.append("// - " + getElementObjectName(ei) + "\n");
+                code.append("// - ").append(getElementObjectName(ei)).append('\n');
             }
         } else {
             code.append("// Wrapped operation.\n");
@@ -309,7 +309,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 xmlSchemaCollection.getSchemaByTargetNamespace(contextQName.getNamespaceURI());
 
             for (int i = 0; i < sequence.getItems().size(); i++) {
-                code.append("// parameter " + inputParameterNames.get(i) + "\n");
+                code.append("// parameter ").append(inputParameterNames.get(i)).append('\n');
                 XmlSchemaSequenceMember sequenceItem = sequence.getItems().get(i);
                 ParticleInfo itemInfo = ParticleInfo.forLocalItem((XmlSchemaObject)sequenceItem,
                                                                   wrapperSchema,
@@ -329,7 +329,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                         baseName = ((XmlSchemaElement)sequenceItem).getQName();
                     }
                     code.append("// - Object constructor is "
-                                    + nameManager.getJavascriptName(baseName) + "\n");
+                                    ).append(nameManager.getJavascriptName(baseName)).append('\n');
                 } else if (type != null) {
                     code.append("// - simple type ").append(type.getQName());
                 }
@@ -396,18 +396,18 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                          + syncAsyncFlag + ", requestHeaders);");
 
         code.append("}\n\n");
-        code.append(currentInterfaceClassName + ".prototype."
-                    + opFunctionPropertyName
-                    + " = "
-                    + opFunctionGlobalName
-                    + ";\n\n");
+        code.append(currentInterfaceClassName).append(".prototype."
+                    ).append(opFunctionPropertyName
+                    ).append(" = "
+                    ).append(opFunctionGlobalName
+                    ).append(";\n\n");
     }
 
     private void buildErrorFunction() {
         String errorFunctionPropertyName = opFunctionPropertyName + "_onerror";
         String errorFunctionGlobalName = opFunctionGlobalName + "_onerror";
 
-        code.append("function " + errorFunctionGlobalName + "(client) {\n");
+        code.append("function ").append(errorFunctionGlobalName).append("(client) {\n");
         utils.startIf("client.user_onerror");
         // Is this a good set of parameters for the error function?
         // Not if we want to process faults, it isn't. To be revisited.
@@ -427,11 +427,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         utils.endBlock();
         utils.endBlock();
         code.append("}\n\n");
-        code.append(currentInterfaceClassName + ".prototype."
-                    + errorFunctionPropertyName
-                    + " = "
-                    + errorFunctionGlobalName
-                    + ";\n\n");
+        code.append(currentInterfaceClassName).append(".prototype."
+                    ).append(errorFunctionPropertyName
+                    ).append(" = "
+                    ).append(errorFunctionGlobalName
+                    ).append(";\n\n");
     }
 
     // Note: the response XML that we get from the XMLHttpRequest is the document element,
@@ -447,7 +447,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             arglist = "(client, responseXml)";
         }
 
-        code.append("function " + successFunctionGlobalName + arglist + " {\n");
+        code.append("function ").append(successFunctionGlobalName).append(arglist).append(" {\n");
         utils.startIf("client.user_onsuccess");
         utils.appendLine("var responseObject = null;");
         if (nonVoidOutput) {
@@ -483,10 +483,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         utils.appendLine("client.user_onsuccess(responseObject);");
         utils.endBlock();
         code.append("}\n\n");
-        code.append(currentInterfaceClassName + ".prototype."
-                    + successFunctionPropertyName
-                    + " = "
-                    + successFunctionGlobalName + ";\n\n");
+        code.append(currentInterfaceClassName).append(".prototype."
+                    ).append(successFunctionPropertyName
+                    ).append(" = "
+                    ).append(successFunctionGlobalName).append(";\n\n");
     }
 
     private void buildParameterList(StringBuilder parameterList) {
@@ -513,10 +513,9 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         }
         List<ParticleInfo> elements = new ArrayList<>();
         String functionName = outputDeserializerFunctionName(outputMessage);
-        code.append("function " + functionName + "(cxfjsutils, partElement) {\n");
+        code.append("function ").append(functionName).append("(cxfjsutils, partElement) {\n");
         getElementsForParts(outputMessage, elements);
         ParticleInfo element = elements.get(0);
-        XmlSchemaType type = null;
 
         if (isRPC) {
             utils.appendLine("cxfjsutils.trace('rpc element: ' + cxfjsutils.traceElementName(partElement));");
@@ -524,7 +523,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             utils.appendLine("cxfjsutils.trace('rpc element: ' + cxfjsutils.traceElementName(partElement));");
         }
 
-        type = element.getType();
+        XmlSchemaType type = element.getType();
 
         if (!element.isEmpty()) {
             if (type instanceof XmlSchemaComplexType) {
@@ -572,7 +571,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             getFunctionPropertyName(inputMessagesWithNameConflicts, message, message.getName())
             + "_serializeInput";
 
-        code.append("function " + serializerFunctionGlobalName + "(cxfjsutils, args) {\n");
+        code.append("function ").append(serializerFunctionGlobalName).append("(cxfjsutils, args) {\n");
 
         String wrapperXmlElementName = null;
         // for the wrapped case, we can name the object for Javascript after whatever we like.
@@ -653,10 +652,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         utils.appendLine("xml = xml + cxfjsutils.endSoap11Message();");
         utils.appendLine("return xml;");
         code.append("}\n\n");
-        code.append(currentInterfaceClassName + ".prototype."
-                    + serializerFunctionPropertyName
-                    + " = "
-                    + serializerFunctionGlobalName + ";\n\n");
+        code.append(currentInterfaceClassName).append(".prototype."
+                    ).append(serializerFunctionPropertyName
+                    ).append(" = "
+                    ).append(serializerFunctionGlobalName).append(";\n\n");
     }
 
     private XmlSchemaSequence getTypeSequence(XmlSchemaComplexType type,
@@ -692,7 +691,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     private void getElementsForParts(MessageInfo message, List<ParticleInfo> elements) {
         for (MessagePartInfo mpi : message.getMessageParts()) {
             XmlSchemaElement element = null;
-            XmlSchemaType type = null;
+            XmlSchemaType type;
             QName diagnosticName = mpi.getName();
             if (mpi.isElement()) {
                 element = (XmlSchemaElement)mpi.getXmlSchema();
@@ -816,7 +815,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     public void begin(ServiceInfo service) {
 
         code.append("//\n");
-        code.append("// Definitions for service: " + service.getName().toString() + "\n");
+        code.append("// Definitions for service: ").append(service.getName().toString()).append('\n');
         code.append("//\n");
 
         BindingInfo xml = null;
@@ -929,10 +928,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         String address = endpointInfo.getAddress();
         String portClassName = currentInterfaceClassName + "_"
             + nameManager.getJavascriptName(endpointInfo.getName());
-        code.append("function " + portClassName + " () {\n");
-        code.append("  this.url = '" + address + "';\n");
+        code.append("function ").append(portClassName).append(" () {\n");
+        code.append("  this.url = '").append(address).append("';\n");
         code.append("}\n");
-        code.append(portClassName + ".prototype = new " + currentInterfaceClassName + ";\n");
+        code.append(portClassName).append(".prototype = new ").append(currentInterfaceClassName).append(";\n");
     }
 
 
@@ -959,13 +958,13 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         // The referencing URI only helps if there is a schema that points to
         // it.
         // It might be the URI for the wsdl TNS, which might have no schema.
-        if (xmlSchemaCollection.getSchemaByTargetNamespace(referencingURI) == null) {
-            referencingURI = null;
-        }
-
-        if (referencingURI == null && containingType != null) {
-            referencingURI = containingType.getQName().getNamespaceURI();
-        }
+        //if (xmlSchemaCollection.getSchemaByTargetNamespace(referencingURI) == null) {
+        //    referencingURI = null;
+        //}
+        //
+        //if (referencingURI == null && containingType != null) {
+        //    referencingURI = containingType.getQName().getNamespaceURI();
+        //}
 
         XmlSchemaElement originalElement = element;
         while (element.getSchemaType() == null && element.isRef()) {

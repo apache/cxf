@@ -27,15 +27,15 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.activation.DataSource;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import jakarta.activation.DataSource;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Fault;
@@ -61,7 +61,7 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
         bindingName = bName;
         type = c;
         try {
-            soapMsgClass = Class.forName("javax.xml.soap.SOAPMessage");
+            soapMsgClass = Class.forName("jakarta.xml.soap.SOAPMessage");
         } catch (Throwable t) {
             soapMsgClass = null;
         }

@@ -19,10 +19,9 @@
 
 package org.apache.cxf.systest.jaxb.service;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
 import org.apache.cxf.systest.jaxb.model.Widget;
 
 @WebService(targetNamespace = "http://cxf.org.apache/service")

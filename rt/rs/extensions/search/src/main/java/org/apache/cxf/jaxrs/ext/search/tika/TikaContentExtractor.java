@@ -100,7 +100,7 @@ public class TikaContentExtractor {
      * @return the extracted content and metadata or null if extraction is not possible or was unsuccessful
      */
     public TikaContent extract(final InputStream in) {
-        return extract(in, (javax.ws.rs.core.MediaType)null);
+        return extract(in, (jakarta.ws.rs.core.MediaType)null);
     }
 
     /**
@@ -109,7 +109,7 @@ public class TikaContentExtractor {
      * @param mt JAX-RS MediaType of the stream content
      * @return the extracted content and metadata or null if extraction is not possible or was unsuccessful
      */
-    public TikaContent extract(final InputStream in, javax.ws.rs.core.MediaType mt) {
+    public TikaContent extract(final InputStream in, jakarta.ws.rs.core.MediaType mt) {
         return extract(in, new ToTextContentHandler(), mt);
     }
 
@@ -123,7 +123,7 @@ public class TikaContentExtractor {
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, final ContentHandler handler) {
-        return extract(in, handler, (javax.ws.rs.core.MediaType)null);
+        return extract(in, handler, (jakarta.ws.rs.core.MediaType)null);
     }
 
     /**
@@ -135,7 +135,7 @@ public class TikaContentExtractor {
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, final ContentHandler handler,
-                               javax.ws.rs.core.MediaType mt) {
+                               jakarta.ws.rs.core.MediaType mt) {
         return extract(in, handler, mt, (ParseContext)null);
     }
 
@@ -150,7 +150,7 @@ public class TikaContentExtractor {
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, final ContentHandler handler, ParseContext context) {
-        return extract(in, handler, (javax.ws.rs.core.MediaType)null, context);
+        return extract(in, handler, (jakarta.ws.rs.core.MediaType)null, context);
     }
 
     /**
@@ -164,7 +164,7 @@ public class TikaContentExtractor {
      *         or was unsuccessful
      */
     public TikaContent extract(final InputStream in, ContentHandler handler,
-                               javax.ws.rs.core.MediaType mtHint, ParseContext context) {
+                               jakarta.ws.rs.core.MediaType mtHint, ParseContext context) {
         if (in == null) {
             return null;
         }

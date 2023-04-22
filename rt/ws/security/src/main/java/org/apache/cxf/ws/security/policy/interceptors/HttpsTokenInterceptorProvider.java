@@ -223,7 +223,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
                         if (tlsInfo != null && tlsInfo.getPeerCertificates() != null
                                 && tlsInfo.getPeerCertificates().length > 0
-                                && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+                                && tlsInfo.getPeerCertificates()[0] instanceof X509Certificate
                         ) {
                             X509Certificate cert = (X509Certificate)tlsInfo.getPeerCertificates()[0];
                             message.put(

@@ -30,6 +30,8 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
@@ -173,35 +175,41 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             return null;
         }
 
-        if (di.getProperty("registeredPolicy") == null) {
-            List<UnknownExtensibilityElement> diext =
-                di.getExtensors(UnknownExtensibilityElement.class);
-            if (diext != null) {
-                for (UnknownExtensibilityElement e : diext) {
-                    String uri = e.getElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                                  PolicyConstants.WSU_ID_ATTR_NAME);
+        synchronized (di) {
+            if (di.getProperty("registeredPolicy") == null) {
+                List<UnknownExtensibilityElement> diext = di.getExtensors(UnknownExtensibilityElement.class);
+                if (diext != null) {
+                    for (UnknownExtensibilityElement e : diext) {
+                        final Element element = e.getElement();
+                        synchronized (element.getOwnerDocument()) {
+                            String uri = element.getAttributeNS(
+                                PolicyConstants.WSU_NAMESPACE_URI,
+                                PolicyConstants.WSU_ID_ATTR_NAME);
 
-                    if (Constants.isPolicyElement(e.getElementType())
-                        && !StringUtils.isEmpty(uri)) {
-
-                        String id = (di.getBaseURI() == null ? Integer.toString(di.hashCode()) : di.getBaseURI())
-                                + "#" + uri;
-                        Policy policy = registry.lookup(id);
-                        if (policy == null) {
-                            try {
-                                policy = builder.getPolicy(e.getElement());
-                                String fragement = "#" + uri;
-                                registry.register(fragement, policy);
-                                registry.register(id, policy);
-                            } catch (Exception policyEx) {
-                                //ignore the policy can not be built
-                                LOG.warning("Failed to build the policy '" + uri + "':" + policyEx.getMessage());
+                            if (Constants.isPolicyElement(e.getElementType()) && !StringUtils.isEmpty(uri)) {
+                                String id = (di.getBaseURI() == null
+                                    ? Integer.toString(di.hashCode())
+                                    : di.getBaseURI())
+                                   + "#" + uri;
+                                Policy policy = registry.lookup(id);
+                                if (policy == null) {
+                                    try {
+                                        policy = builder.getPolicy(element);
+                                        String fragement = "#" + uri;
+                                        registry.register(fragement, policy);
+                                        registry.register(id, policy);
+                                    } catch (Exception policyEx) {
+                                        //ignore the policy can not be built
+                                        LOG.warning("Failed to build the policy '"
+                                            + uri + "':" + policyEx.getMessage());
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                di.setProperty("registeredPolicy", true);
             }
-            di.setProperty("registeredPolicy", true);
         }
 
         Policy elementPolicy = null;
@@ -211,13 +219,15 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         if (null != extensions) {
             for (UnknownExtensibilityElement e : extensions) {
                 Policy p = null;
-                if (Constants.isPolicyElement(e.getElementType())) {
-                    p = builder.getPolicy(e.getElement());
-
-                } else if (Constants.isPolicyRef(e.getElementType())) {
-                    PolicyReference ref = builder.getPolicyReference(e.getElement());
-                    if (null != ref) {
-                        p = resolveReference(ref, di);
+                final Element element = e.getElement();
+                synchronized (element.getOwnerDocument()) {
+                    if (Constants.isPolicyElement(e.getElementType())) {
+                        p = builder.getPolicy(element);
+                    } else if (Constants.isPolicyRef(e.getElementType())) {
+                        PolicyReference ref = builder.getPolicyReference(element);
+                        if (null != ref) {
+                            p = resolveReference(ref, di);
+                        }
                     }
                 }
                 if (null != p) {
@@ -261,7 +271,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     }
 
     Policy resolveReference(PolicyReference ref, DescriptionInfo di) {
-        Policy p = null;
+        final Policy p;
         if (isExternal(ref)) {
             String uri = di.getBaseURI();
             if (uri == null) {

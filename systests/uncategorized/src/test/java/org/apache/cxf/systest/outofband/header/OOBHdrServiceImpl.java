@@ -23,17 +23,17 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Node;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -45,7 +45,7 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 
 
 
-@javax.jws.WebService(serviceName = "SOAPService",
+@jakarta.jws.WebService(serviceName = "SOAPService",
                       portName = "SoapPort",
                       endpointInterface = "org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType",
                       targetNamespace = "http://apache.org/hello_world_doc_lit_bare",

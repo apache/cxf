@@ -58,7 +58,7 @@ public class CollectionType extends ArrayType {
     @Override
     @SuppressWarnings("unchecked")
     protected Collection<Object> createCollection() {
-        Collection<Object> values = null;
+        final Collection<Object> values;
 
         /*
          * getTypeClass returns the type of the object. These 'if's asked if the proposed
@@ -83,7 +83,7 @@ public class CollectionType extends ArrayType {
             values = new ArrayList<>();
         } else {
             try {
-                values = (Collection<Object>)userTypeClass.newInstance();
+                values = (Collection<Object>)userTypeClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new DatabindingException("Could not create map implementation: "
                                                + userTypeClass.getName(), e);
@@ -111,7 +111,7 @@ public class CollectionType extends ArrayType {
             }
 
             for (Iterator<?> itr = list.iterator(); itr.hasNext();) {
-                String ns = null;
+                final String ns;
                 if (type.isAbstract()) {
                     ns = getSchemaType().getNamespaceURI();
                 } else {

@@ -21,11 +21,11 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.ByteArrayInputStream;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Exchange;
@@ -63,7 +63,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         doc = saajMsg.getSOAPPart();
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -112,7 +112,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -161,7 +161,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -197,7 +197,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         doc = saajMsg.getSOAPPart();
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 

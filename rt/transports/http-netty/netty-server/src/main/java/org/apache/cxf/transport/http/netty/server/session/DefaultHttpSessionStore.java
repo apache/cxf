@@ -55,9 +55,6 @@ public class DefaultHttpSessionStore implements HttpSessionStore {
 
     @Override
     public NettyHttpSession findSession(String sessionId) {
-        if (SESSIONS == null) {
-            return null;
-        }
         return SESSIONS.get(sessionId);
     }
 

@@ -19,8 +19,7 @@
 
 package org.apache.cxf.binding.xml.wsdl11;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
@@ -33,15 +32,18 @@ import org.apache.cxf.wsdl.WSDLManager;
 @NoJSR250Annotations
 public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
 
+    private Bus bus;
+
     public XMLWSDLExtensionLoader(Bus b) {
         setupBus(b);
     }
     public void setupBus(Bus b) {
+        this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
         registerExtensors(manager);
     }
 
-    public static void registerExtensors(WSDLManager manager) {
+    public void registerExtensors(WSDLManager manager) {
         createExtensor(manager, javax.wsdl.BindingInput.class,
                        org.apache.cxf.bindings.xformat.XMLBindingMessageFormat.class);
         createExtensor(manager, javax.wsdl.BindingOutput.class,
@@ -50,11 +52,11 @@ public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
                        org.apache.cxf.bindings.xformat.XMLFormatBinding.class);
     }
 
-    public static void createExtensor(WSDLManager manager,
+    public void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType,
                                               null,

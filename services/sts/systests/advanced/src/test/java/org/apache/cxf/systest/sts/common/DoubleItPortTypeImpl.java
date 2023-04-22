@@ -20,10 +20,9 @@ package org.apache.cxf.systest.sts.common;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -32,19 +31,44 @@ import org.junit.Assert;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class DoubleItPortTypeImpl implements DoubleItPortType {
 
     @Resource
     WebServiceContext wsContext;
 
-    public int doubleIt(int numberToDouble) {
-        Principal pr = wsContext.getUserPrincipal();
+    private boolean enforcePrincipal = true;
+    private String requiredPrincipalName;
 
-        Assert.assertNotNull("Principal must not be null", pr);
-        Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+    public int doubleIt(int numberToDouble) {
+        if (enforcePrincipal) {
+            Principal pr = wsContext.getUserPrincipal();
+
+            Assert.assertNotNull("Principal must not be null", pr);
+            Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+
+            if (requiredPrincipalName != null) {
+                Assert.assertTrue(pr.getName().contains(requiredPrincipalName));
+            }
+        }
 
         return numberToDouble * 2;
+    }
+
+    public boolean isEnforcePrincipal() {
+        return enforcePrincipal;
+    }
+
+    public void setEnforcePrincipal(boolean enforcePrincipal) {
+        this.enforcePrincipal = enforcePrincipal;
+    }
+
+    public String getRequiredPrincipalName() {
+        return requiredPrincipalName;
+    }
+
+    public void setRequiredPrincipalName(String requiredPrincipalName) {
+        this.requiredPrincipalName = requiredPrincipalName;
     }
 
 }

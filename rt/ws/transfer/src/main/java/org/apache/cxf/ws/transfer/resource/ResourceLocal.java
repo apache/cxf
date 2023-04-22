@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
@@ -51,7 +50,7 @@ import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelp
  */
 public class ResourceLocal implements Resource {
 
-    @javax.annotation.Resource
+    @jakarta.annotation.Resource
     protected WebServiceContext context;
 
     protected ResourceManager manager;

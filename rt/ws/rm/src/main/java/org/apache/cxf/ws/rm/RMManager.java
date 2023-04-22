@@ -30,12 +30,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.management.JMException;
 import javax.xml.namespace.QName;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
@@ -437,9 +437,9 @@ public class RMManager {
         RMConfiguration config = getEffectiveConfiguration(message);
         if (null == seq || seq.isExpired()) {
             // TODO: better error handling
-            EndpointReferenceType to = null;
+            final EndpointReferenceType to;
             boolean isServer = RMContextUtils.isServerSide(message);
-            EndpointReferenceType acksTo = null;
+            EndpointReferenceType acksTo;
             RelatesToType relatesTo = null;
             if (isServer) {
                 AddressingProperties inMaps = RMContextUtils.retrieveMAPs(message, false, false);

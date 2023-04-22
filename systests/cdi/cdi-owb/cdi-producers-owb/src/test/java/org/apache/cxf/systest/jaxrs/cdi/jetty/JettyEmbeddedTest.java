@@ -20,9 +20,9 @@ package org.apache.cxf.systest.jaxrs.cdi.jetty;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systests.cdi.base.AbstractCdiSingleAppTest;
 import org.apache.cxf.systests.cdi.base.jetty.AbstractJettyServer;
@@ -84,6 +84,18 @@ public class JettyEmbeddedTest extends AbstractCdiSingleAppTest {
                         .param("name", "Book 1234"));
 
         assertEquals(Response.Status.CREATED.getStatusCode(), r.getStatus());
+    }
+
+    @Test
+    public void testConfiguredProviders() {
+        assertEquals("AtomFeedProvider,"
+                + "CustomContextFeature,"
+                + "JacksonJsonProvider,"
+                + "JacksonJsonProvider,"
+                + "SampleFeature,"
+                + "SampleNestedFeature,"
+                + "ValidationExceptionMapper",
+            createWebClient(getBasePath() + "/providers", MediaType.TEXT_PLAIN).get(String.class).trim());
     }
 
     @Override

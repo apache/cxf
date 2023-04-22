@@ -21,9 +21,8 @@ package org.apache.cxf.spring.boot.autoconfigure;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -43,6 +42,10 @@ public class CxfProperties {
 
     private final Servlet servlet = new Servlet();
 
+    private final Metrics metrics = new Metrics();
+    
+    private final JaxrsScan jaxrs = new JaxrsScan();
+
     @NotNull
     @Pattern(regexp = "/[^?#]*", message = "Path must start with /")
     public String getPath() {
@@ -57,6 +60,14 @@ public class CxfProperties {
         return this.servlet;
     }
 
+    public Metrics getMetrics() {
+        return this.metrics;
+    }
+    
+    public JaxrsScan getJaxrs() {
+        return this.jaxrs;
+    }
+
     public static class Servlet {
 
         /**
@@ -68,6 +79,11 @@ public class CxfProperties {
          * Load on startup priority of the Apache CXF servlet.
          */
         private int loadOnStartup = -1;
+        
+        /**
+         * Enables or disables the servlet registration
+         */
+        private boolean enabled = true;
 
         public Map<String, String> getInit() {
             return this.init;
@@ -85,6 +101,202 @@ public class CxfProperties {
             this.loadOnStartup = loadOnStartup;
         }
 
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
+
+    public static class Metrics {
+        private final Server server = new Server();
+        private final Client client = new Client();
+        
+        /**
+         * Enables or disables metrics instrumentation
+         */
+        private boolean enabled = true;
+
+        public Server getServer() {
+            return this.server;
+        }
+        
+        public Client getClient() {
+            return this.client;
+        }
+
+        public static class Server {
+
+            /**
+             * Whether requests handled by Cxf should be automatically timed. If the number of time series
+             * emitted grows too large on account of request mapping timings, disable this and use 'Timed'
+             * on a per request mapping basis as needed.
+             */
+            private boolean autoTimeRequests = true;
+
+            /**
+             * Name of the metric for received requests.
+             */
+            private String requestsMetricName = "cxf.server.requests";
+
+            /**
+             * Maximum number of unique URI tag values allowed. After the max number of tag values is
+             * reached, metrics with additional tag values are denied by filter.
+             */
+            private int maxUriTags = 100;
+
+            public boolean isAutoTimeRequests() {
+                return this.autoTimeRequests;
+            }
+
+            public void setAutoTimeRequests(boolean autoTimeRequests) {
+                this.autoTimeRequests = autoTimeRequests;
+            }
+
+            public String getRequestsMetricName() {
+                return this.requestsMetricName;
+            }
+
+            public void setRequestsMetricName(String requestsMetricName) {
+                this.requestsMetricName = requestsMetricName;
+            }
+
+            public int getMaxUriTags() {
+                return this.maxUriTags;
+            }
+
+            public void setMaxUriTags(int maxUriTags) {
+                this.maxUriTags = maxUriTags;
+            }
+        }
+        
+        public static class Client {
+            /**
+             * Name of the metric for sent requests.
+             */
+            private String requestsMetricName = "cxf.client.requests";
+            
+            /**
+             * Maximum number of unique URI tag values allowed. After the max number of tag values is
+             * reached, metrics with additional tag values are denied by filter.
+             */
+            private int maxUriTags = 100;
+
+            public String getRequestsMetricName() {
+                return this.requestsMetricName;
+            }
+
+            public void setRequestsMetricName(String requestsMetricName) {
+                this.requestsMetricName = requestsMetricName;
+            }
+            
+            public int getMaxUriTags() {
+                return this.maxUriTags;
+            }
+
+            public void setMaxUriTags(int maxUriTags) {
+                this.maxUriTags = maxUriTags;
+            }
+        }
+        
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+    }
+    
+    public static class JaxrsScan {
+
+        
+        
+        /**
+         * property to create a JAX-RS endpoint from the auto-discovered JAX-RS 
+         * root resources and provider classes. Such classes do not have to be 
+         * annotated with Spring @Component. This property needs to be accompanied 
+         * by a "cxf.jaxrs.classes-scan-packages" property which sets a comma-separated 
+         * list of the packages to scan.
+         */
+        private boolean classesScan;
+        
+        /**
+         * property to create a JAX-RS endpoint from the auto-discovered 
+         * JAX-RS root resources and providers which are marked as Spring 
+         * Components (annotated with Spring @Component or created and 
+         * returned from @Bean methods).
+         */
+        private boolean componentScan;
+        
+        /**
+         * property to restrict which of the auto-discovered Spring components
+         * are accepted as JAX-RS resource or provider classes. It sets a 
+         * comma-separated list of the packages that a given bean instance's 
+         * class must be in. Note, this property, if set, is only effective
+         * if a given bean is a singleton. It can be used alongside or as
+         * an alternative to the "cxf.jaxrs.component-scan-beans" property. 
+         */
+        private String componentScanPackages;
+        
+        /**
+         * property to restrict which of the auto-discovered Spring components 
+         * are accepted as JAX-RS resource or provider classes. It sets a 
+         * comma-separated list of the accepted bean names - the auto-discovered 
+         * component will only be accepted if its bean name is in this list. 
+         * It can be used alongside or as an alternative to the 
+         * "cxf.jaxrs.component-scan-packages" property.  
+         */
+        private String componentScanBeans;
+        
+        private String classesScanPackages;
+        
+
+        public boolean isComponentScan() {
+            return componentScan;
+        }
+
+        public void setComponentScan(boolean componentScan) {
+            this.componentScan = componentScan;
+        }
+
+        public String getComponentScanPackages() {
+            return componentScanPackages;
+        }
+
+        public void setComponentScanPackages(String componentScanPackages) {
+            this.componentScanPackages = componentScanPackages;
+        }
+
+        public String getComponentScanBeans() {
+            return componentScanBeans;
+        }
+
+        public void setComponentScanBeans(String componentScanBeans) {
+            this.componentScanBeans = componentScanBeans;
+        }
+
+        public boolean isClassesScan() {
+            return classesScan;
+        }
+
+        public void setClassesScan(boolean classesScan) {
+            this.classesScan = classesScan;
+        }
+
+        public String getClassesScanPackages() {
+            return classesScanPackages;
+        }
+
+        public void setClassesScanPackages(String classesScanPackages) {
+            this.classesScanPackages = classesScanPackages;
+        }
+
+        
+        
     }
 
 }

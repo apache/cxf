@@ -20,8 +20,8 @@ package org.apache.cxf.jca.outbound;
 
 import java.io.Serializable;
 
-import javax.resource.Referenceable;
-import javax.resource.ResourceException;
+import jakarta.resource.Referenceable;
+import jakarta.resource.ResourceException;
 
 
 /**

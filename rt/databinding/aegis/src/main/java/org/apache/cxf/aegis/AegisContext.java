@@ -234,14 +234,11 @@ public class AegisContext {
         rootTypeQNames = new HashSet<>();
         if (this.rootClassNames != null) {
             for (String typeName : rootClassNames) {
-                Class<?> c = null;
                 try {
-                    c = ClassLoaderUtils.loadClass(typeName, TypeUtil.class);
+                    rootClasses.add(ClassLoaderUtils.loadClass(typeName, TypeUtil.class));
                 } catch (ClassNotFoundException e) {
                     throw new DatabindingException("Could not find override type class: " + typeName, e);
                 }
-
-                rootClasses.add(c);
             }
         }
 

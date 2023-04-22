@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.systest.jms;
 
-import javax.jws.WebService;
-import javax.xml.ws.soap.Addressing;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 
 

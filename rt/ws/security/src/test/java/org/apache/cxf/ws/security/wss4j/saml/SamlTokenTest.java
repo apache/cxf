@@ -19,7 +19,7 @@
 package org.apache.cxf.ws.security.wss4j.saml;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -28,11 +28,11 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -102,9 +102,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml1:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml1:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         if (allowUnsignedPrincipal) {
@@ -149,9 +149,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml1:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml1:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
@@ -185,9 +185,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml2:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml2:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
@@ -227,9 +227,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml2:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml2:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
@@ -276,9 +276,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml1:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml1:Assertion");
 
         try {
             makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
@@ -332,9 +332,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml2:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml2:Assertion");
 
         try {
             makeInvocation(outProperties, xpaths, inProperties, Collections.emptyMap());
@@ -401,9 +401,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml2:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml2:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
@@ -459,9 +459,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml2:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml2:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
@@ -516,9 +516,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         customMap.put(WSConstants.SAML2_TOKEN, validator);
         inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
 
-        List<String> xpaths = new ArrayList<>();
-        xpaths.add("//wsse:Security");
-        xpaths.add("//wsse:Security/saml1:Assertion");
+        List<String> xpaths = Arrays.asList(
+            "//wsse:Security",
+            "//wsse:Security/saml1:Assertion");
 
         Map<String, String> inMessageProperties = new HashMap<>();
         inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
@@ -578,7 +578,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
 
         DocumentBuilder db = dbf.newDocumentBuilder();
         db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        StaxUtils.read(db, reader, false);
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor(inProperties);
 

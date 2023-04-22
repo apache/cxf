@@ -18,19 +18,19 @@
  */
 package org.apache.cxf.microprofile.client;
 
-import javax.ws.rs.RuntimeType;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
-
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
+import org.apache.cxf.microprofile.client.cdi.CDIFacade;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
@@ -41,6 +41,8 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         ClientResponseFilter.class, ReaderInterceptor.class, WriterInterceptor.class,
         MessageBodyWriter.class, MessageBodyReader.class, ResponseExceptionMapper.class};
     private static final String CONFIG_KEY_DISABLE_MAPPER = "microprofile.rest.client.disable.default.mapper";
+
+    private final Instantiator instantiator = CDIFacade.getInstantiator().orElse(super.getInstantiator());
 
     public MicroProfileClientConfigurableImpl(C configurable) {
         this(configurable, null);
@@ -58,5 +60,10 @@ public class MicroProfileClientConfigurableImpl<C extends Configurable<C>>
         }
         return ConfigFacade.getOptionalValue(CONFIG_KEY_DISABLE_MAPPER,
                                              Boolean.class).orElse(false);
+    }
+
+    @Override
+    protected Instantiator getInstantiator() {
+        return instantiator;
     }
 }

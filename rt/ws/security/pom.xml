@@ -27,20 +27,11 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.ws.security</cxf.module.name>
-        <cxf.osgi.import>
-            javax.xml.soap;version="${cxf.osgi.saaj.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
-            org.ehcache*;resolution:=optional;version="[3.0.0, 4.0.0)",
-            org.opensaml*;version="${cxf.opensaml.osgi.version.range}",
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
-        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -93,6 +84,7 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${cxf.ehcache3.version}</version>
+            <classifier>jakarta</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -108,10 +100,20 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-policy</artifactId>
+            <exclusions>
+                 <exclusion>
+                     <groupId>org.codehaus.woodstox</groupId>
+                     <artifactId>woodstox-core-asl</artifactId>
+                 </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-stax</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>

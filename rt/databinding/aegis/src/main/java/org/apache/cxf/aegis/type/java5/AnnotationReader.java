@@ -23,23 +23,22 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.xml.bind.annotation.XmlEnumValue;
-
+import jakarta.xml.bind.annotation.XmlEnumValue;
 import org.apache.cxf.aegis.type.AegisType;
 
 public class AnnotationReader {
-    private static final Class<? extends Annotation> WEB_PARAM = javax.jws.WebParam.class;
-    private static final Class<? extends Annotation> WEB_RESULT = javax.jws.WebResult.class;
+    private static final Class<? extends Annotation> WEB_PARAM = jakarta.jws.WebParam.class;
+    private static final Class<? extends Annotation> WEB_RESULT = jakarta.jws.WebResult.class;
     private static final Class<? extends Annotation> XML_ATTRIBUTE =
-            javax.xml.bind.annotation.XmlAttribute.class;
+            jakarta.xml.bind.annotation.XmlAttribute.class;
     private static final Class<? extends Annotation> XML_ELEMENT =
-            javax.xml.bind.annotation.XmlElement.class;
+            jakarta.xml.bind.annotation.XmlElement.class;
     private static final Class<? extends Annotation> XML_SCHEMA =
-            javax.xml.bind.annotation.XmlSchema.class;
+            jakarta.xml.bind.annotation.XmlSchema.class;
     private static final Class<? extends Annotation> XML_TYPE =
-            javax.xml.bind.annotation.XmlType.class;
+            jakarta.xml.bind.annotation.XmlType.class;
     private static final Class<? extends Annotation> XML_TRANSIENT =
-            javax.xml.bind.annotation.XmlTransient.class;
+            jakarta.xml.bind.annotation.XmlTransient.class;
 
     public boolean isIgnored(AnnotatedElement element) {
         return isAnnotationPresent(element,
@@ -86,7 +85,7 @@ public class AnnotationReader {
         if (value == null) {
             value = (Class<?>) getAnnotationValue("type",
                     element,
-                    javax.xml.bind.annotation.XmlElement.DEFAULT.class,
+                    jakarta.xml.bind.annotation.XmlElement.DEFAULT.class,
                     XML_ELEMENT);
         }
 

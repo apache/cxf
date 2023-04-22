@@ -128,9 +128,9 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         //
         STSClient client = STSUtils.getClient(message, "spnego");
         AddressingProperties maps =
-            (AddressingProperties)message.get("javax.xml.ws.addressing.context.outbound");
+            (AddressingProperties)message.get("jakarta.xml.ws.addressing.context.outbound");
         if (maps == null) {
-            maps = (AddressingProperties)message.get("javax.xml.ws.addressing.context");
+            maps = (AddressingProperties)message.get("jakarta.xml.ws.addressing.context");
         }
         synchronized (client) {
             try {

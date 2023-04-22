@@ -28,7 +28,7 @@ public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T>
     implements InvocationHandler {
 
     public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
-        Object target = null;
+        final Object target;
         if (m.getDeclaringClass() == ThreadLocalProxy.class) {
             target = this;
         } else {

@@ -78,7 +78,7 @@ public class SchemaJavascriptBuilder {
     }
 
     public String generateCodeForSchemaCollection(XmlSchemaCollection collection) {
-        StringBuilder accumulatedCode = new StringBuilder();
+        StringBuilder accumulatedCode = new StringBuilder(128);
         for (XmlSchema schema : collection.getXmlSchemas()) {
             if (!Constants.URI_2001_SCHEMA_XSD.equals(schema.getTargetNamespace())) {
                 accumulatedCode.append(generateCodeForSchema(schema));
@@ -89,7 +89,7 @@ public class SchemaJavascriptBuilder {
 
     public String generateCodeForSchema(XmlSchema schema) {
         xmlSchema = schema;
-        code = new StringBuilder();
+        code = new StringBuilder(512);
         code.append("//\n");
         code.append("// Definitions for schema: ").append(schema.getTargetNamespace());
         if (schema.getSourceURI() != null) {
@@ -118,10 +118,10 @@ public class SchemaJavascriptBuilder {
                 if (XmlSchemaUtils.isEumeration(simpleType)) {
                     List<String> values = XmlSchemaUtils.enumeratorValues(simpleType);
                     code.append("//\n");
-                    code.append("// Simple type (enumeration) " + simpleType.getQName() + "\n");
+                    code.append("// Simple type (enumeration) ").append(simpleType.getQName()).append('\n');
                     code.append("//\n");
                     for (String value : values) {
-                        code.append("// - " + value + "\n");
+                        code.append("// - ").append(value).append('\n');
                     }
                 }
             }
@@ -173,7 +173,7 @@ public class SchemaJavascriptBuilder {
     // of parameters, it's the least of the evils.
 
     public void complexTypeConstructorAndAccessors(QName name, XmlSchemaComplexType type) {
-        accessors = new StringBuilder();
+        accessors = new StringBuilder(512);
         utils = new JavascriptUtils(code);
         List<XmlSchemaObject> items = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         List<XmlSchemaAnnotated> attrs = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
@@ -182,9 +182,9 @@ public class SchemaJavascriptBuilder {
 
         String typeObjectName = nameManager.getJavascriptName(name);
         code.append("//\n");
-        code.append("// Constructor for XML Schema item " + name.toString() + "\n");
+        code.append("// Constructor for XML Schema item ").append(name.toString()).append('\n');
         code.append("//\n");
-        code.append("function " + typeObjectName + " () {\n");
+        code.append("function ").append(typeObjectName).append(" () {\n");
         // to assist in debugging we put a type property into every object.
         utils.appendLine("this.typeMarker = '" + typeObjectName + "';");
         for (XmlSchemaObject thing : items) {
@@ -224,13 +224,13 @@ public class SchemaJavascriptBuilder {
         String getFunctionProperty = typeObjectName + ".prototype.get" + accessorSuffix;
         String setFunctionProperty = typeObjectName + ".prototype.set" + accessorSuffix;
         accessors.append("//\n");
-        accessors.append("// accessor is " + getFunctionProperty + "\n");
-        accessors.append("// element get for " + itemInfo.getJavascriptName() + "\n");
+        accessors.append("// accessor is ").append(getFunctionProperty).append('\n');
+        accessors.append("// element get for ").append(itemInfo.getJavascriptName()).append('\n');
         if (itemInfo.isAny()) {
             accessors.append("// - xs:any\n");
         } else {
             if (itemInfo.getType() != null) {
-                accessors.append("// - element type is " + itemInfo.getType().getQName() + "\n");
+                accessors.append("// - element type is ").append(itemInfo.getType().getQName()).append('\n');
             }
         }
 
@@ -251,16 +251,16 @@ public class SchemaJavascriptBuilder {
         }
 
         accessors.append("//\n");
-        accessors.append("// element set for " + itemInfo.getJavascriptName() + "\n");
-        accessors.append("// setter function is is " + setFunctionProperty + "\n");
+        accessors.append("// element set for ").append(itemInfo.getJavascriptName()).append('\n');
+        accessors.append("// setter function is is ").append(setFunctionProperty).append('\n');
         accessors.append("//\n");
-        accessors.append("function " + accessorName + "() { return this._" + itemInfo.getJavascriptName()
-                         + ";}\n\n");
-        accessors.append(getFunctionProperty + " = " + accessorName + ";\n\n");
+        accessors.append("function ").append(accessorName).append("() { return this._")
+                        .append(itemInfo.getJavascriptName()).append(";}\n\n");
+        accessors.append(getFunctionProperty).append(" = ").append(accessorName).append(";\n\n");
         accessorName = typeObjectName + "_set" + accessorSuffix;
-        accessors.append("function " + accessorName + "(value) { this._" + itemInfo.getJavascriptName()
-                         + " = value;}\n\n");
-        accessors.append(setFunctionProperty + " = " + accessorName + ";\n");
+        accessors.append("function ").append(accessorName).append("(value) { this._")
+                        .append(itemInfo.getJavascriptName()).append(" = value;}\n\n");
+        accessors.append(setFunctionProperty).append(" = ").append(accessorName).append(";\n");
 
         if (itemInfo.isOptional() || (itemInfo.isNillable() && !itemInfo.isArray())) {
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = null;");
@@ -291,7 +291,7 @@ public class SchemaJavascriptBuilder {
      */
     public void complexTypeSerializerFunction(QName name, XmlSchemaComplexType type) {
 
-        StringBuilder bodyCode = new StringBuilder();
+        StringBuilder bodyCode = new StringBuilder(128);
         JavascriptUtils bodyUtils = new JavascriptUtils(bodyCode);
         bodyUtils.setXmlStringAccumulator("xml");
 
@@ -300,9 +300,9 @@ public class SchemaJavascriptBuilder {
         utils = new JavascriptUtils(code);
         String functionName = nameManager.getJavascriptName(name) + "_" + "serialize";
         code.append("//\n");
-        code.append("// Serialize " + name + "\n");
+        code.append("// Serialize ").append(name).append('\n');
         code.append("//\n");
-        code.append("function " + functionName + "(cxfjsutils, elementName, extraNamespaces) {\n");
+        code.append("function ").append(functionName).append("(cxfjsutils, elementName, extraNamespaces) {\n");
         utils.startXmlStringAccumulator("xml");
         utils.startIf("elementName !== null");
         utils.appendString("<");
@@ -328,7 +328,8 @@ public class SchemaJavascriptBuilder {
         utils.endBlock();
         utils.appendLine("return xml;");
         code.append("}\n\n");
-        code.append(nameManager.getJavascriptName(name) + ".prototype.serialize = " + functionName + ";\n\n");
+        code.append(nameManager.getJavascriptName(name)).append(".prototype.serialize = ")
+            .append(functionName).append(";\n\n");
     }
 
     private void complexTypeSerializeAttributes(XmlSchemaComplexType type, String string) {
@@ -381,7 +382,7 @@ public class SchemaJavascriptBuilder {
 
         List<XmlSchemaObject> contentElements = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
         String typeObjectName = nameManager.getJavascriptName(name);
-        code.append("function " + typeObjectName + "_deserialize (cxfjsutils, element) {\n");
+        code.append("function ").append(typeObjectName).append("_deserialize (cxfjsutils, element) {\n");
         // create the object we are deserializing into.
         utils.appendLine("var newobject = new " + typeObjectName + "();");
         utils.appendLine("cxfjsutils.trace('element: ' + cxfjsutils.traceElementName(element));");

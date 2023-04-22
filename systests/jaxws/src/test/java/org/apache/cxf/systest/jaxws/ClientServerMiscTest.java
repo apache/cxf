@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxws;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -36,17 +36,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexType;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeService;
 import org.apache.cxf.anonymous_complex_type.RefSplitName;
@@ -99,6 +99,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(ServerMisc.class, true));
     }
 
@@ -419,9 +420,11 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     private void setASM(boolean b) throws Exception {
-        Field f = ASMHelper.class.getDeclaredField("badASM");
-        ReflectionUtil.setAccessible(f);
-        f.set(null, !b);
+
+        ASMHelper helper = getBus().getExtension(ASMHelper.class);
+        Method m = helper.getClass().getMethod("setBadASM", Boolean.TYPE);
+        ReflectionUtil.setAccessible(m);
+        m.invoke(helper, !b);
     }
 
     @Test
@@ -608,7 +611,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
 
-        if (new ASMHelper().createClassWriter() != null) {
+        if (getBus().getExtension(ASMHelper.class).createClassWriter() != null) {
             //doing the type adapter things and such really
             //requires the ASM generated helper classes
             assertEquals("Val", port.createBar("Val").getName());

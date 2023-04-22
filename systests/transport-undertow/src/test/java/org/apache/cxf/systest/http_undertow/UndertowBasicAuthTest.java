@@ -19,11 +19,15 @@
 
 package org.apache.cxf.systest.http_undertow;
 
+import java.io.File;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -42,6 +46,7 @@ import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests thread pool config.
@@ -49,10 +54,12 @@ import static org.junit.Assert.assertTrue;
 
 public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
     private static final String ADDRESS = UndertowBasicAuthServer.ADDRESS;
+    private static final String ADDRESS1 = UndertowBasicAuthServer.ADDRESS1;
     private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private Greeter greeter;
+    private Greeter greeter1;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -71,13 +78,52 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
                                    ADDRESS);
         bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
         bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
+        
+        greeter1 = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
+        bp = (BindingProvider)greeter1;
+        ClientProxy.getClient(greeter1).getInInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(greeter1).getOutInterceptors().add(new LoggingOutInterceptor());
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                   ADDRESS1);
+        bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
+        bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
     }
 
     @org.junit.Test
     public void testBasicAuth() throws Exception {
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
     }
+    
+    @org.junit.Test
+    public void testDisalloowMethodHandler() throws Exception {
+        try {
+            greeter1.greetMe("Alice");
+            fail("should catch '405: Method Not Allowed' exception");
+        } catch (Exception ex) {
+            assertTrue(ex.getCause().getMessage().contains("405: Method Not Allowed"));
+        }
+    }
+    
+    @org.junit.Test
+    public void testRequestLog() throws Exception {
+        assertEquals("Hello Log", greeter.greetMe("Log"));
+        File logFile = new File("target/request.log");
+        assertTrue(logFile.exists());
+    }
 
+    @org.junit.Test
+    public void testRequestLimitHandler() throws Exception {
+        CountDownLatch latch = new CountDownLatch(50); 
+
+        ExecutorService executor = Executors.newFixedThreadPool(200); 
+
+        for (int i = 0; i < 50; i++) {
+            executor.execute(new SendRequest(latch)); 
+        }
+        latch.await();
+        
+    }
+    
     @org.junit.Test
     public void testGetWSDL() throws Exception {
         BusFactory bf = BusFactory.newInstance();
@@ -100,6 +146,26 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
             authorizationPolicy.setPassword("pswd");
             authorizationPolicy.setAuthorizationType("Basic");
             c.setAuthorization(authorizationPolicy);
+        }
+    }
+    
+    class SendRequest implements Runnable {
+        private CountDownLatch latch;
+
+        SendRequest(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        public void run() {
+            try {
+                assertEquals("Hello Request Limit", greeter.greetMe("Request Limit"));
+            } catch (Throwable ex) {
+                //some requests are expected to fail and receive 503 error
+                //cause Server side limit the concurrent request
+                assertTrue(ex.getCause().getMessage().contains("503: Service Unavailable"));
+            } finally {
+                latch.countDown();
+            }
         }
     }
 }

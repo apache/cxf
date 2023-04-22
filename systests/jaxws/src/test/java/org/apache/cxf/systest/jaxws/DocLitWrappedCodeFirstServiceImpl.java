@@ -24,11 +24,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.WSDLDocumentation;

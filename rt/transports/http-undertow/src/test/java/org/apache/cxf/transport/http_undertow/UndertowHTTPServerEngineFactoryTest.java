@@ -114,16 +114,15 @@ public class UndertowHTTPServerEngineFactoryTest {
 
         // The Engine for port 1234 should be configured for TLS.
         // This will throw an error if it is not.
-        UndertowHTTPServerEngine engine = null;
-        engine = factory.createUndertowHTTPServerEngine(1234, "https");
+        UndertowHTTPServerEngine engine = factory.createUndertowHTTPServerEngine(1234, "https");
 
         assertNotNull("Engine is not available.", engine);
         assertEquals(1234, engine.getPort());
         assertEquals("Not https", "https", engine.getProtocol());
 
         try {
-            engine = factory.createUndertowHTTPServerEngine(1234, "http");
-            fail("The engine's protocol should be https");
+            factory.createUndertowHTTPServerEngine(1234, "http");
+            fail("The engine's protocol should be http");
         } catch (Exception e) {
             // expect the exception
         }

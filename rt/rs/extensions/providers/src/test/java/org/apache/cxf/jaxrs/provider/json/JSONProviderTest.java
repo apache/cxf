@@ -38,30 +38,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlMixed;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlMixed;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -833,8 +833,8 @@ public class JSONProviderTest {
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        Book b1 = null;
-        Book b2 = null;
+        final Book b1;
+        final Book b2;
         if (type.isArray()) {
             assertEquals(2, ((Book[])o).length);
             b1 = ((Book[])o)[0];
@@ -879,7 +879,7 @@ public class JSONProviderTest {
         namespaceMap.put("http://tags", "ns1");
         provider.setNamespaceMap(namespaceMap);
 
-        Method m = null;
+        final Method m;
         if (!isArray) {
             m = CollectionsResource.class.getMethod("setTags", new Class[]{List.class});
         } else {
@@ -892,8 +892,8 @@ public class JSONProviderTest {
                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
                        new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        TagVO2 t1 = null;
-        TagVO2 t2 = null;
+        final TagVO2 t1;
+        final TagVO2 t2;
         if (!isArray) {
             assertEquals(2, ((List<?>)o).size());
             t1 = (TagVO2)((List<?>)o).get(0);

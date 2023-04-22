@@ -20,8 +20,8 @@
 package org.apache.cxf.authservice;
 
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 /**
  *

@@ -18,15 +18,13 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -207,8 +205,7 @@ public class SAMLProviderActAsTest {
 
         assertFalse(tokenString.contains("CustomActAs"));
 
-        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
-        customProviderList.add(new CustomAttributeProvider());
+        List<AttributeStatementProvider> customProviderList = Collections.singletonList(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
 
         providerResponse = samlTokenProvider.createToken(providerParameters);

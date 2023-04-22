@@ -19,11 +19,11 @@
 
 package demo.client;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.wsn.client.Consumer;
 import org.apache.cxf.wsn.client.NotificationBroker;
 import org.apache.cxf.wsn.client.Subscription;

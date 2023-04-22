@@ -24,16 +24,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.MTOMFeature;
-import javax.xml.ws.spi.http.HttpContext;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.MTOMFeature;
+import jakarta.xml.ws.spi.http.HttpContext;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.jvnet.jax_ws_commons.transport.grizzly_httpspi.GrizzlyHttpContextFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,17 +48,21 @@ public class EndpointAPITest {
 
     private static int counter;
     private static int currentPort;
-    private com.sun.grizzly.http.embed.GrizzlyWebServer server;
+    private HttpServer server;
 
     @Before
     public void setUp() {
+        //grizzly gets confused with the 2.0 "Connect: upgrade" header
+        System.setProperty("org.apache.cxf.transport.http.forceVersion", "1.1");
         currentPort = Integer.valueOf(TestUtil.getPortNumber(EndpointAPITest.class, counter++));
-        server = new com.sun.grizzly.http.embed.GrizzlyWebServer(currentPort);
+        server = new HttpServer();
+        NetworkListener networkListener = new NetworkListener("jaxwslistener", "0.0.0.0", currentPort);
+        server.addListener(networkListener);
     }
 
     @After
     public void tearDown() {
-        server.stop();
+        server.shutdownNow();
         server = null;
     }
 
@@ -68,8 +73,7 @@ public class EndpointAPITest {
         String path = "/echo";
         String address = "http://localhost:" + currentPort + contextPath + path;
 
-        HttpContext context = GrizzlyHttpContextFactory.createHttpContext(server, contextPath, path);
-
+        HttpContext context = new GrizzlyHttpContext(server, contextPath, path);
         Endpoint endpoint = Endpoint.create(new EndpointBean());
         endpoint.publish(context); // Use grizzly HTTP context for publishing
 
@@ -86,7 +90,7 @@ public class EndpointAPITest {
         String contextPath = "/ctxt";
         String path = "/echo";
         //need to use the same HttpContext, otherwise Grizzly get confused
-        HttpContext ctx = GrizzlyHttpContextFactory.createHttpContext(server, contextPath, path);
+        HttpContext ctx = new GrizzlyHttpContext(server, contextPath, path);
         for (int i = 0; i < 3; i++) {
             String address = "http://localhost:" + currentPort + contextPath + path;
 
@@ -110,9 +114,7 @@ public class EndpointAPITest {
         String[] addresses = new String[k];
         for (int i = 0; i < k; i++) {
             addresses[i] = "http://localhost:" + currentPort + contextPath + path + i;
-            contexts[i] = GrizzlyHttpContextFactory.createHttpContext(server,
-                                                                      contextPath,
-                                                                      path + i);
+            contexts[i] = new GrizzlyHttpContext(server, contextPath, path + i);
             endpoints[i] = Endpoint.create(new EndpointBean());
             endpoints[i].publish(contexts[i]);
         }
@@ -135,9 +137,7 @@ public class EndpointAPITest {
         String[] addresses = new String[k];
         for (int i = 0; i < k; i++) {
             addresses[i] = "http://localhost:" + currentPort + contextPath + i + path;
-            contexts[i] = GrizzlyHttpContextFactory.createHttpContext(server,
-                                                                      contextPath + i,
-                                                                      path);
+            contexts[i] = new GrizzlyHttpContext(server, contextPath + i, path);
             endpoints[i] = Endpoint.create(new EndpointBean());
             endpoints[i].publish(contexts[i]);
         }

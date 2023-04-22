@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class JwtBearerClientCredentialsGrant extends AbstractJwtBearerGrant {

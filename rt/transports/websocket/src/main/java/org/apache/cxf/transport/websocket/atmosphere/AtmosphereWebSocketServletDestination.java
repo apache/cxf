@@ -24,12 +24,11 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
@@ -113,7 +112,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         // Very likely there is JSR-356 implementation available, let us reconfigure the Atmosphere framework
         // to use it since ServletConfig instance is already available.
         final Object container = config.getServletContext()
-            .getAttribute("javax.websocket.server.ServerContainer");
+            .getAttribute("jakarta.websocket.server.ServerContainer");
 
         if (container != null) {
             if (framework.initialized()) {

@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -47,10 +49,15 @@ public class LocalServiceModelReferenceResolver implements ReferenceResolver {
             descriptionInfo.getExtensors(UnknownExtensibilityElement.class);
         if (extensions != null) {
             for (UnknownExtensibilityElement e : extensions) {
-                if (Constants.isPolicyElement(e.getElementType())
-                    && uri.equals(e.getElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                                                PolicyConstants.WSU_ID_ATTR_NAME))) {
-                    return builder.getPolicy(e.getElement());
+                if (Constants.isPolicyElement(e.getElementType())) {
+                    final Element element = e.getElement();
+                    synchronized (element.getOwnerDocument()) {
+                        if (uri.equals(element.getAttributeNS(
+                           PolicyConstants.WSU_NAMESPACE_URI,
+                           PolicyConstants.WSU_ID_ATTR_NAME))) {
+                            return builder.getPolicy(element);
+                        }
+                    }
                 }
             }
         }

@@ -26,13 +26,12 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -64,6 +63,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
     private static final String RESOURCE_METHOD = "org.apache.cxf.resource.method";
     private static final String RESOURCE_OPERATION_NAME = "org.apache.cxf.resource.operation.name";
+
     public JAXRSInInterceptor() {
         super(Phase.UNMARSHAL);
     }
@@ -148,7 +148,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
             }
         }
-        List<MediaType> acceptContentTypes = null;
+        final List<MediaType> acceptContentTypes;
         try {
             acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
         } catch (IllegalArgumentException ex) {
@@ -175,7 +175,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         MultivaluedMap<String, String> matchedValues = new MetadataMap<>();
 
-        OperationResourceInfo ori = null;
+        final OperationResourceInfo ori;
 
         try {
             ori = JAXRSUtils.findTargetMethod(matchedResources, message,
@@ -238,6 +238,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         exchange.put(JAXRSUtils.ROOT_RESOURCE_CLASS, cri);
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
+        
+        
+        String uriTemplate = JAXRSUtils.getUriTemplate(message, cri, ori);
+        message.put(URITemplate.URI_TEMPLATE, uriTemplate);
+        if (HttpUtils.isHttpRequest(message)) {
+            HttpUtils.setHttpRequestURI(message, uriTemplate);
+        }
 
         String plainOperationName = ori.getMethodToInvoke().getName();
         if (numberOfResources > 1) {

@@ -18,14 +18,11 @@
  */
 package org.apache.cxf.systest.sts.secure_conv;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -48,28 +45,13 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+        assertTrue(launchServer(new STSServer(
+            SecurityContextTokenCancelTest.class.getResource("cxf-sts.xml"))));
     }
 
     @org.junit.Test
     public void testCancelSecurityContextToken() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SecurityContextTokenCancelTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
@@ -86,8 +68,6 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         String endorsingPort = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Endorsing_Port";
         cancelled = cancelSecurityToken(bus, wsdlLocation, endorsingPort, true, token);
         assertTrue(cancelled);
-
-        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(

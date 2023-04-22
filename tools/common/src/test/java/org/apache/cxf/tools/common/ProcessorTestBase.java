@@ -22,27 +22,21 @@ package org.apache.cxf.tools.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
@@ -58,12 +52,12 @@ import static org.junit.Assert.assertTrue;
 
 public class ProcessorTestBase {
 
-    public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
-                                                                                      "elementFormDefault",
-                                                                                      "form",
-                                                                                      "version",
-                                                                                      "part@name"});
-    public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList(new String[]{"sequence"});
+    public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList("attributeFormDefault",
+                                                                         "elementFormDefault",
+                                                                         "form",
+                                                                         "version",
+                                                                         "part@name");
+    public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList("sequence");
 
     //CHECKSTYLE:OFF
     @Rule
@@ -108,55 +102,9 @@ public class ProcessorTestBase {
         }
     }
 
-    protected String getClassPath() throws URISyntaxException, IOException {
-        ClassLoader loader = getClass().getClassLoader();
-        StringBuilder classPath = new StringBuilder();
-        if (loader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader)loader).getURLs()) {
-                File file = new File(url.toURI());
-                String filename = file.getAbsolutePath();
-                if (filename.indexOf("junit") == -1) {
-                    classPath.append(filename);
-                    classPath.append(System.getProperty("path.separator"));
-                }
-                if (filename.indexOf("surefirebooter") != -1) {
-                    //surefire 2.4 uses a MANIFEST classpath that javac doesn't like
-                    try (JarFile jar = new JarFile(filename)) {
-                        Attributes attr = jar.getManifest().getMainAttributes();
-                        if (attr != null) {
-                            String cp = attr.getValue("Class-Path");
-                            while (cp != null) {
-                                String fileName = cp;
-                                int idx = fileName.indexOf(' ');
-                                if (idx != -1) {
-                                    fileName = fileName.substring(0, idx);
-                                    cp = cp.substring(idx + 1).trim();
-                                } else {
-                                    cp = null;
-                                }
-                                URI uri = new URI(fileName);
-                                File f2 = new File(uri);
-                                if (f2.exists()) {
-                                    classPath.append(f2.getAbsolutePath());
-                                    classPath.append(System.getProperty("path.separator"));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return classPath.toString();
-    }
-
     protected String getLocation(String wsdlFile) throws URISyntaxException {
         return getClass().getResource(wsdlFile).toURI().toString();
     }
-
-    protected File getResource(String wsdlFile) throws URISyntaxException {
-        return new File(getClass().getResource(wsdlFile).toURI());
-    }
-
 
     protected void assertFileEquals(String resource, File location) throws IOException {
         String str1 = TestFileUtils.getStringFromStream(getClass().getResourceAsStream(resource));
@@ -193,52 +141,6 @@ public class ProcessorTestBase {
         assertFalse(st1.hasMoreTokens());
         assertFalse(st2.hasMoreTokens());
         assertTrue("Files did not match: " + unmatched, unmatched.isEmpty());
-    }
-
-    public boolean assertXmlEquals(final File expected, final File source) throws Exception {
-        List<String> attr = Arrays.asList(new String[]{"attributeFormDefault", "elementFormDefault", "form"});
-        return assertXmlEquals(expected, source, attr);
-    }
-
-    public boolean assertXmlEquals(final File expected, final File source,
-                                   final List<String> ignoreAttr) throws Exception {
-        List<Tag> expectedTags = ToolsStaxUtils.getTags(expected);
-        List<Tag> sourceTags = ToolsStaxUtils.getTags(source);
-
-        Iterator<Tag> iterator = sourceTags.iterator();
-
-        for (Tag expectedTag : expectedTags) {
-            Tag sourceTag = iterator.next();
-            if (!expectedTag.getName().equals(sourceTag.getName())) {
-                throw new ComparisonFailure("Tags not equal: ",
-                                            expectedTag.getName().toString(),
-                                            sourceTag.getName().toString());
-            }
-            for (Map.Entry<QName, String> attr : expectedTag.getAttributes().entrySet()) {
-                if (ignoreAttr.contains(attr.getKey().getLocalPart())) {
-                    continue;
-                }
-
-                if (sourceTag.getAttributes().containsKey(attr.getKey())) {
-                    if (!sourceTag.getAttributes().get(attr.getKey()).equals(attr.getValue())) {
-                        throw new ComparisonFailure("Attributes not equal: ",
-                                                attr.getKey() + ":" + attr.getValue(),
-                                                attr.getKey() + ":"
-                                                + sourceTag.getAttributes().get(attr.getKey()));
-                    }
-                } else {
-                    throw new AssertionError("Attribute: " + attr + " is missing in the source file.");
-                }
-            }
-
-            if (!StringUtils.isEmpty(expectedTag.getText())
-                && !expectedTag.getText().equals(sourceTag.getText())) {
-                throw new ComparisonFailure("Text not equal: ",
-                                            expectedTag.getText(),
-                                            sourceTag.getText());
-            }
-        }
-        return true;
     }
 
     protected void assertTagEquals(Tag expected, Tag source) {
@@ -317,14 +219,14 @@ public class ProcessorTestBase {
         return null;
     }
 
-    public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag)
+    public void assertWsdlEquals(final InputStream expected, final File source, List<String> attr, List<String> tag)
         throws Exception {
         Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr, qnameAtts);
         Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr, qnameAtts);
         assertTagEquals(expectedTag, sourceTag, attr, tag);
     }
 
-    public void assertWsdlEquals(final File expected, final File source) throws Exception {
+    public void assertWsdlEquals(final InputStream expected, final File source) throws Exception {
         assertWsdlEquals(expected, source, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
 

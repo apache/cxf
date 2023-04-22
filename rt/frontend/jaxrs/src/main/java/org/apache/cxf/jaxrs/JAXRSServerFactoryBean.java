@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
-
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
@@ -100,11 +99,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     public void setApplicationInfo(ApplicationInfo provider) {
         appProvider = provider;
-        Set<String> appNameBindings = AnnotationUtils.getNameBindings(provider.getProvider()
-                                                                      .getClass().getAnnotations());
+        Set<String> appNameBindings = AnnotationUtils.getNameBindings(bus, provider.getProvider().getClass());
         for (ClassResourceInfo cri : getServiceFactory().getClassResourceInfo()) {
             Set<String> clsNameBindings = new LinkedHashSet<>(appNameBindings);
-            clsNameBindings.addAll(AnnotationUtils.getNameBindings(cri.getServiceClass().getAnnotations()));
+            clsNameBindings.addAll(AnnotationUtils.getNameBindings(bus, cri.getServiceClass()));
             cri.setNameBindings(clsNameBindings);
         }
     }
@@ -208,7 +206,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 try {
                     server.start();
                 } catch (RuntimeException re) {
-                    server.destroy(); // prevent resource leak
+                    if (!(re instanceof ServiceConstructionException 
+                        && re.getMessage().startsWith("There is an endpoint already running on"))) {
+                        //avoid destroying another server on the same endpoint url
+                        server.destroy(); // prevent resource leak if server really started by itself
+                        
+                    }
                     throw re;
                 }
             }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
-<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory$Server">
   <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="servicestore.jks"/></Set>
   <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="sspass"/></Set>
   <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="skpass"/></Set>

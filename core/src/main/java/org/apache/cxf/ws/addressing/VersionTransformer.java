@@ -23,16 +23,14 @@ package org.apache.cxf.ws.addressing;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-//import javax.xml.ws.EndpointReference;
-//import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.v200408.AttributedQName;

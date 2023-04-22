@@ -26,17 +26,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceClient;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceClient;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.soap_ext_header.audit.Audit;
 import org.apache.cxf.soap_ext_header.ws.SamplePortType;
 import org.apache.cxf.soap_ext_header.ws.SampleService;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,18 +44,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ExtSoapHeaderClientServerTest extends AbstractBusClientServerTestBase {
+public class ExtSoapHeaderClientServerTest extends AbstractClientServerTestBase {
     public static final String PORT0 = allocatePort(Server.class, 0);
     public static final String PORT1 = allocatePort(Server.class, 1);
 
     private static SamplePortType client;
-    private static org.apache.cxf.endpoint.Server extserver;
 
     private static final QName SERVIVE_NAME = new QName("http://cxf.apache.org/soap_ext_header/ws", "SampleService");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class Server extends AbstractServerTestServerBase {
 
-        protected void run() {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             String address0 = "http://localhost:" + PORT0 + "/SoapExtHeader/SampleService";
 
             Object implementor1 = new SamplePortTypeImpl();
@@ -70,36 +70,19 @@ public class ExtSoapHeaderClientServerTest extends AbstractBusClientServerTestBa
             sf.setWsdlLocation(webService.wsdlLocation());
             sf.setAddress(address1);
 
-            extserver = sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
 
         initClient();
-    }
-
-    @AfterClass
-    public static void tearDownExtServer() throws Exception {
-        if (extserver != null) {
-            extserver.stop();
-            extserver.destroy();
-        }
     }
 
     private static void initClient() {

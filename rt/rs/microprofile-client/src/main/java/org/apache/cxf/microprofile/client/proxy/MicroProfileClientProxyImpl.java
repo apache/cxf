@@ -30,17 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
@@ -50,6 +50,7 @@ import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JaxrsClientCallback;
 import org.apache.cxf.jaxrs.client.LocalClientState;
+import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -105,24 +106,34 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private Map<Class<ClientHeadersFactory>, ProviderInfo<ClientHeadersFactory>> clientHeaderFactories = 
         new WeakHashMap<>();
     private List<Instance<?>> cdiInstances = new LinkedList<>();
+    private final TLSConfiguration tlsConfig;
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
-                                       Configuration configuration, CDIInterceptorWrapper interceptorWrapper, 
-                                       Object... varValues) {
+                                       Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
+                                       TLSConfiguration tlsConfig, Object... varValues) {
         super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri,
             isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        this.tlsConfig = tlsConfig;
+        
+        if (executorService == null) {
+            throw new IllegalArgumentException("The executorService is required and must be provided");
+        }
+        
         init(executorService, configuration);
     }
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
-                                       Object... varValues) {
+                                       TLSConfiguration tlsConfig, Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
         this.interceptorWrapper = interceptorWrapper;
+        this.tlsConfig = tlsConfig;
         init(executorService, configuration);
     }
     //CHECKSTYLE:ON
@@ -189,16 +200,25 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         for (ResponseExceptionMapper<?> mapper : mappers) {
             if (mapper.handles(r.getStatus(), r.getHeaders())) {
                 Throwable t = mapper.toThrowable(r);
+                if (t == null) {
+                    continue;
+                }
                 if (t instanceof RuntimeException) {
                     throw t;
-                } else if (t != null && m.getExceptionTypes() != null) {
+                } else if (CompletionStage.class.isAssignableFrom(m.getReturnType())) {
+                    throw new CompletionException(t);
+                } else if (m.getExceptionTypes() != null) {
                     // its a checked exception, make sure its declared
                     for (Class<?> c : m.getExceptionTypes()) {
                         if (c.isAssignableFrom(t.getClass())) {
                             throw t;
                         }
                     }
-                    // TODO Log the unhandled declarable
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.log(Level.FINEST, "ResponseExceptionMapper, " + mapper.getClass().getName() + ", handles " 
+                            + "response, but client method does not declare it's Throwable type, " 
+                            + t.getClass().getName());
+                    }
                 }
             }
         }
@@ -350,7 +370,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                     LOG.log(Level.FINEST, "Caught exception invoking compute method", t);
                 }
                 if (t instanceof InvocationTargetException) {
-                    t = t.getCause();
+                    throw t.getCause();
                 }
                 throw t;
             }
@@ -428,7 +448,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         }
     }
 
-    private ClientHeadersFactory mapClientHeadersInstance(Instance<ClientHeadersFactory> instance) {
+    private <T> T mapInstance(Instance<T> instance) {
         cdiInstances.add(instance);
         return instance.getValue();
     }
@@ -443,16 +463,16 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
 
             if (m != null) {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls, m.getExchange().getBus())
-                                   .map(this::mapClientHeadersInstance)
-                                   .orElse(factoryCls.newInstance());
+                                   .map(this::mapInstance)
+                                   .orElse(factoryCls.getDeclaredConstructor().newInstance());
                 ProviderInfo<ClientHeadersFactory> pi = clientHeaderFactories.computeIfAbsent(factoryCls, k -> {
                     return new ProviderInfo<ClientHeadersFactory>(factory, m.getExchange().getBus(), true);
                 });
                 InjectionUtils.injectContexts(factory, pi, m);
             } else {
                 factory = CDIFacade.getInstanceFromCDI(factoryCls)
-                                   .map(this::mapClientHeadersInstance)
-                                   .orElse(factoryCls.newInstance());
+                                   .map(this::mapInstance)
+                                   .orElse(factoryCls.getDeclaredConstructor().newInstance());
             }
 
             MultivaluedMap<String, String> updatedHeaders = factory.update(getJaxrsHeaders(m), existingHeaders);
@@ -528,5 +548,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     public void close() {
         cdiInstances.forEach(Instance::release);
         super.close();
+    }
+    
+    public TLSConfiguration getTlsConfig() {
+        return tlsConfig;
     }
 }

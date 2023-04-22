@@ -19,18 +19,15 @@
 package org.apache.cxf.systest.sts.usernametoken;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxDoubleItServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -59,8 +56,8 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
-    private static final String STAX_PORT = allocatePort(StaxServer.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String STAX_PORT = allocatePort(StaxDoubleItServer.class);
 
     final TestParam test;
 
@@ -70,57 +67,25 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxSTSServer.class, true)
-        );
+        assertTrue(launchServer(new StaxDoubleItServer(
+            UsernameTokenTest.class.getResource("cxf-service.xml"),
+            UsernameTokenTest.class.getResource("stax-cxf-service.xml")
+        )));
+        assertTrue(launchServer(new StaxSTSServer()));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, ""),
-                                              new TestParam(PORT, true, ""),
-                                              new TestParam(STAX_PORT, false, ""),
-                                              new TestParam(STAX_PORT, true, ""),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam(PORT, false, ""),
+                                new TestParam(PORT, true, ""),
+                                new TestParam(STAX_PORT, false, ""),
+                                new TestParam(STAX_PORT, true, ""),
+        };
     }
 
     @org.junit.Test
     public void testUsernameToken() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -136,18 +101,11 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         doubleIt(transportUTPort, 25);
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testBadUsernameToken() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("cxf-bad-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -163,12 +121,11 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -178,12 +135,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -199,7 +151,6 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         doubleIt(transportUTPort, 25);
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -209,12 +160,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenTest.class.getResource("cxf-bad-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -230,16 +176,15 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
-        } catch (javax.xml.ws.soap.SOAPFaultException fault) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(numToDouble * 2, resp);
+        assertEquals(numToDouble * 2L, resp);
     }
 }

@@ -25,8 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
+import jakarta.xml.soap.SOAPException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -276,8 +276,8 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             }
 
-            List<SecurePart> encrParts = null;
-            List<SecurePart> sigParts = null;
+            final List<SecurePart> encrParts;
+            final List<SecurePart> sigParts;
             try {
                 encrParts = getEncryptedParts();
                 //Signed parts are determined before encryption because encrypted signed headers
@@ -437,7 +437,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         AbstractToken sigToken = wrapper.getToken();
         configureSignature(sigToken, false);
 
-        if (abinding.isProtectTokens() && (sigToken instanceof X509Token)
+        if (abinding.isProtectTokens() && sigToken instanceof X509Token
             && sigToken.getIncludeTokenType() != IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             SecurePart securePart =
                 new SecurePart(new QName(WSSConstants.NS_WSSE10, "BinarySecurityToken"), Modifier.Element);

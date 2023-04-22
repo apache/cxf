@@ -37,57 +37,59 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.Encoded;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.helpers.IOUtils;
@@ -350,6 +352,13 @@ public class BookStore {
     @Produces("application/xml")
     public Book echoXmlBook(Book book) {
         return book;
+    }
+    
+    @POST
+    @Path("/echoxmlbook-i18n")
+    @Produces("application/xml")
+    public Response echoXmlBooki18n(Book book, @HeaderParam(HttpHeaders.CONTENT_LANGUAGE) String language) {
+        return Response.ok(new Book(book.getName() + "-" + language, book.getId())).build();
     }
 
     // Only books with id consisting of 3 or 4 digits of the numbers between 5 and 9 are accepted
@@ -651,6 +660,13 @@ public class BookStore {
     @Produces("text/plain,text/boolean")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
+    }
+    
+    @GET
+    @Path("books/check/uuid/{uuid}")
+    @Produces("text/plain,text/boolean")
+    public boolean checkBookUuid(@PathParam("uuid") BookId id) {
+        return books.containsKey(id.getId());
     }
 
     @GET
@@ -1537,6 +1553,11 @@ public class BookStore {
     }
 
     @POST
+    @Path("/no-content")
+    public void noContent() {
+    }
+
+    @POST
     @Path("/books/customstatus")
     @Produces("application/xml")
     @Consumes("text/xml")
@@ -1744,7 +1765,7 @@ public class BookStore {
                 header("SomeHeader1", "\"some text, some more text\"").
                 header("SomeHeader2", "\"some text\"").
                 header("SomeHeader2", "\"quoted,text\"").
-                header("SomeHeader2", "\"even more text\"").
+                header("SomeHeader2", "\"and backslash\\\"").
                 header("SomeHeader3", "\"some text, some more text with inlined \\\"\"").
                 header("SomeHeader4", "\"\"").
                 build();
@@ -1791,7 +1812,31 @@ public class BookStore {
     public Response echoEntity(String entity) {
         return Response.ok().entity(entity).build();
     }
+    
+    @GET
+    @Path("/queryParamSpecialCharacters")
+    @Produces("text/plain")
+    @SuppressWarnings({"checkstyle:linelength"})
+    public Response queryParamSpecialCharacters(@QueryParam("/?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~%1A!$'()*+,;:@") String queryParm1) {
+        return Response
+            .ok(queryParm1)
+            .type(MediaType.TEXT_PLAIN)
+            .build();
+    }
 
+    @GET
+    @Path("/annotated/{bookId}/")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getGenericBookDate(@PathParam("bookId") String id) {
+        @Provider
+        @Consumes
+        class AnnotatedClass {
+        }
+        
+        return Response.ok().entity(new GregorianCalendar(2020, 00, 01),
+            AnnotatedClass.class.getAnnotations()).build();
+    }
+    
     public final String init() {
         books.clear();
         cds.clear();
@@ -2272,6 +2317,27 @@ public class BookStore {
         }
     }
 
+    public abstract static class AbstractBookId {
+        public static BookId fromString(String id) {
+            return BookId.of(UUID.fromString(id));
+        }
+    }
+
+    public static final class BookId extends AbstractBookId {
+        private final UUID uuid;
+
+        private BookId(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public long getId() {
+            return uuid.getMostSignificantBits();
+        }
+
+        public static BookId of(UUID uuid) {
+            return new BookId(uuid);
+        }
+    }
 }
 
 

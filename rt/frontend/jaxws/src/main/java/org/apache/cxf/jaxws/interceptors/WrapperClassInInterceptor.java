@@ -67,7 +67,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
         if (method != null && method.getName().endsWith("Async")) {
             Class<?> retType = method.getReturnType();
             if ("java.util.concurrent.Future".equals(retType.getName())
-                || "javax.xml.ws.Response".equals(retType.getName())) {
+                || "jakarta.xml.ws.Response".equals(retType.getName())) {
                 return;
             }
         }
@@ -197,7 +197,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                     partNames.set(idx, null);
                 }
             } else {
-                String elementType = null;
+                final String elementType;
                 if (p.getTypeQName() == null) {
                     // handling anonymous complex type
                     elementType = null;

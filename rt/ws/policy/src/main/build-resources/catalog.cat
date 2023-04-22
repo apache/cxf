@@ -1,5 +1,5 @@
-
---
+<?xml version="1.0"?>
+<!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
   distributed with this work for additional information
@@ -16,12 +16,22 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---
+-->
 
-SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" "../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd"
-SYSTEM "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" "../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-SYSTEM "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/ws-securitypolicy-1.2.xsd" "../../../src/main/resources/schemas/ws-securitypolicy-1.2.xsd"
-SYSTEM "http://www.w3.org/2006/03/addressing/ws-addr.xsd" "../../../../../../core/src/main/resources/schemas/wsdl/ws-addr.xsd"
-SYSTEM "http://www.w3.org/2001/xml.xsd" "../../../src/main/resources/schemas/xml.xsd"
-SYSTEM "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" "../../../src/main/resources/schemas/xmldsig-core-schema.xsd"
-PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "../../../src/main/resources/schemas/XMLSchema.dtd"
+
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+            uri="../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+    <system systemId="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+            uri="../../../src/main/resources/schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+    <system systemId="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/ws-securitypolicy-1.2.xsd"
+            uri="../../../src/main/resources/schemas/ws-securitypolicy-1.2.xsd"/>
+    <system systemId="http://www.w3.org/2006/03/addressing/ws-addr.xsd"
+            uri="../../../../../../core/src/main/resources/schemas/wsdl/ws-addr.xsd"/>
+    <system systemId="http://www.w3.org/2001/xml.xsd"
+            uri="../../../src/main/resources/schemas/xml.xsd"/>
+    <system systemId="http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
+            uri="../../../src/main/resources/schemas/xmldsig-core-schema.xsd"/>
+    <public publicId="-//W3C//DTD XMLSchema 200102//EN"
+            uri="../../../src/main/resources/schemas/XMLSchema.dtd"/>
+</catalog>

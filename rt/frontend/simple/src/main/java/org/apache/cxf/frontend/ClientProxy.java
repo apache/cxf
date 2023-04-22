@@ -117,6 +117,7 @@ public class ClientProxy implements InvocationHandler, Closeable {
         return client;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void finalize() throws Throwable {
         close();

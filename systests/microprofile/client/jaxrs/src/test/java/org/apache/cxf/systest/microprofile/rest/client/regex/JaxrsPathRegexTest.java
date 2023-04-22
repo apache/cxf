@@ -20,16 +20,16 @@ package org.apache.cxf.systest.microprofile.rest.client.regex;
 
 import java.net.URI;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,32 +39,25 @@ import static org.junit.Assert.fail;
 /**
  * Testing: @Path("/echoxmlbookregex/{id : [5-9]{3,4}}")
  */
-public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
+public class JaxrsPathRegexTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JaxrsPathRegexTest.class);
 
     WebClient client;
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                 new SingletonResourceProvider(new BookStore()));
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.setPublishedEndpointUrl("/");
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -74,7 +67,6 @@ public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
         System.out.println("Listening on port " + PORT);
     }
 
@@ -120,6 +112,43 @@ public class JaxrsPathRegexTest extends AbstractBusClientServerTestBase {
 
         // Finally try another successful call
         echoedBook = bookStoreClient.echoXmlBookregex(book, "8667");
+        assertEquals(id, echoedBook.getId());
+    }
+    
+    @Test
+    public void testPathRegularExpressionMany() throws Exception {
+
+        String endpointAddress = "http://localhost:" + PORT + "/";
+        long id = 5678;
+        Book book = new Book();
+        book.setId(id);
+
+        // Successful
+        BookStoreClientRoot bookStoreClient = RestClientBuilder.newBuilder()
+            .baseUri(URI.create(endpointAddress))
+            .build(BookStoreClientRoot.class);
+
+        Book echoedBook = bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "en", "pdf");
+        assertEquals(id, echoedBook.getId());
+
+        // Wrong language
+        try {
+            bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "ru", "pdf");
+            fail("Failure expected on a failing regex");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+
+        // Wrong format
+        try {
+            bookStoreClient.echoXmlBookregexMany(book, String.valueOf(id), "en", "doc");
+            fail("Failure expected on a failing regex");
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+
+        // Finally try another successful call
+        echoedBook = bookStoreClient.echoXmlBookregexMany(book, "8667", "fr", "epub");
         assertEquals(id, echoedBook.getId());
     }
 

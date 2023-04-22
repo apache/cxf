@@ -28,9 +28,9 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
@@ -60,6 +60,33 @@ public class OASISCatalogTest {
     private final QName portName =
         new QName("http://apache.org/hello_world/services",
                   "SoapPort");
+
+    @Test
+    public void testWSDLPublishSamePath() throws Exception {
+        Endpoint ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
+                                       new GreeterImpl());
+
+        try {
+            String result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "wsdl=http://apache.org/hello_world/types2/hello_world_messages_catalog.wsdl");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/shared.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/d/shared.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/common.xsd"));
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/d/common.xsd"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/common.xsd");
+            assertFalse(result, result.contains("schemaLocation"));
+
+            result = readUrl("http://localhost:" + PORT + "/SoapContext/SoapPort?"
+                    + "xsd=http://apache.org/hello_world/types2/d/common.xsd");
+            assertTrue(result, result.contains("xsd=http://apache.org/hello_world/types2/common.xsd"));
+        } finally {
+            ep.stop();
+        }
+    }
 
     @Test
     public void testWSDLPublishWithCatalogs() throws Exception {

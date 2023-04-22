@@ -22,21 +22,25 @@ package org.apache.cxf.systest.http_undertow;
 
 import java.net.URL;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 
 public class UndertowBasicAuthServer extends AbstractBusTestServerBase  {
     static final String PORT = allocatePort(UndertowBasicAuthServer.class);
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
+    
+    static final String PORT1 = TestUtil.getPortNumber("UndertowBasicAuthServer1");
+    static final String ADDRESS1 = "http://localhost:" + PORT1 + "/SoapContext/SoapPort";
 
     Endpoint ep;
+    Endpoint ep1;
 
     protected void run()  {
         String configurationFile = "undertowBasicAuthServer.xml";
@@ -50,12 +54,17 @@ public class UndertowBasicAuthServer extends AbstractBusTestServerBase  {
 
         GreeterImpl implementor = new GreeterImpl();
         ep = Endpoint.publish(ADDRESS, implementor);
+        ep1 = Endpoint.publish(ADDRESS1, implementor);
     }
 
     public void tearDown() throws Exception {
         if (ep != null) {
             ep.stop();
             ep = null;
+        }
+        if (ep1 != null) {
+            ep1.stop();
+            ep1 = null;
         }
     }
 

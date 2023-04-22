@@ -25,12 +25,12 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Service;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.header_test.rpc.SOAPRPCHeaderService;
@@ -65,7 +65,7 @@ public class ProviderHeaderClientServerTest extends AbstractJaxWsTest {
         assertNotNull(service);
         Dispatch<SOAPMessage> dispatch = service
             .createDispatch(new QName("http://apache.org/header_test/rpc", "SoapRPCHeaderPort"),
-                            javax.xml.soap.SOAPMessage.class, Service.Mode.MESSAGE);
+                            jakarta.xml.soap.SOAPMessage.class, Service.Mode.MESSAGE);
 
         MessageFactory factory = MessageFactory.newInstance();
         InputStream is = getClass().getClassLoader()

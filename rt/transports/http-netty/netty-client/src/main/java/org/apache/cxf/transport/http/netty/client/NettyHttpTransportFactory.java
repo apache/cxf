@@ -92,8 +92,6 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         return address;
     }
 
-
-
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, Bus bus) throws IOException {
         return getConduit(endpointInfo, endpointInfo.getTarget(), bus);
@@ -103,11 +101,10 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
 
-        HTTPConduit conduit = null;
         // need to updated the endpointInfo
         endpointInfo.setAddress(getAddress(endpointInfo));
 
-        conduit = factory.createConduit(bus, endpointInfo, target);
+        HTTPConduit conduit = factory.createConduit(bus, endpointInfo, target);
 
         // Spring configure the conduit.
         String address = conduit.getAddress();
@@ -122,6 +119,5 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         conduit.finalizeConfig();
         return conduit;
     }
-
 
 }

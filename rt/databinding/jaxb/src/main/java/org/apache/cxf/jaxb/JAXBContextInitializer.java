@@ -21,7 +21,6 @@ package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -37,24 +36,21 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.ASMHelper.ClassWriter;
-import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
-import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
@@ -73,15 +69,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private Collection<Object> typeReferences;
     private Set<Class<?>> globalAdapters = new HashSet<>();
     private Map<String, Object> unmarshallerProperties;
+    private Bus bus;
 
-    JAXBContextInitializer(ServiceInfo serviceInfo,
-                                  Set<Class<?>> classes,
-                                  Collection<Object> typeReferences,
-                                  Map<String, Object> unmarshallerProperties) {
+    JAXBContextInitializer(Bus bus, ServiceInfo serviceInfo,
+                           Set<Class<?>> classes,
+                           Collection<Object> typeReferences,
+                           Map<String, Object> unmarshallerProperties) {
         super(serviceInfo);
         this.classes = classes;
         this.typeReferences = typeReferences;
         this.unmarshallerProperties = unmarshallerProperties;
+        this.bus = bus;
     }
 
     @Override
@@ -318,7 +316,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
             addClass(String.class);
         } else if (claz.getName().startsWith("java.")
-            || claz.getName().startsWith("javax.")) {
+            || claz.getName().startsWith("jakarta.") || claz.getName().startsWith("javax.")) {
             return;
         } else {
             Class<?> cls = JAXBUtils.getValidClass(claz);
@@ -328,8 +326,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 if (LOG.isLoggable(Level.INFO)) {
                     LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
                 }
-                //there is no init(), but other constructors
-                Object factory = createFactory(claz, ReflectionUtil.getDeclaredConstructors(claz)[0]);
+                Object factory = createFactory(claz);
                 unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
                 cls = claz;
             }
@@ -378,7 +375,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             return;
         }
         if (cls.getName().startsWith("java.")
-            || cls.getName().startsWith("javax.")) {
+            || cls.getName().startsWith("jakarta.") || cls.getName().startsWith("javax.")) {
             return;
         }
         //walk the public fields/methods to try and find all the classes. JAXB will only load the
@@ -534,15 +531,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static Object createTypeReference(QName n, Class<?> cls) {
         Class<?> refClass = null;
         try {
-            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference",
+            refClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.api.TypeReference",
                                                   JAXBContextInitializer.class);
         } catch (Throwable ex) {
-            try {
-                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
-                                                      JAXBContextInitializer.class);
-            } catch (Throwable ex2) {
-                //ignore
-            }
+            //ignore
         }
         if (refClass != null) {
             try {
@@ -555,50 +547,12 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         return null;
     }
 
-    @SuppressWarnings("unused")
-    private Object createFactory(Class<?> cls, Constructor<?> contructor) {
-        String newClassName = cls.getName() + "Factory";
-        ASMHelper helper = new ASMHelper();
-        ClassWriter cw = helper.createClassWriter();
-        MethodVisitor mv;
+    private Object createFactory(Class<?> cls) {
+        FactoryClassCreator creator = bus.getExtension(FactoryClassCreator.class);
 
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
-                 ASMHelper.periodToSlashes(newClassName), null, "java/lang/Object", null);
-
-        cw.visitSource(cls.getSimpleName() + "Factory" + ".java", null);
-
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-        mv.visitCode();
-        mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-        mv.visitInsn(Opcodes.RETURN);
-        mv.visitMaxs(1, 1);
-        mv.visitEnd();
-
-        mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "create" + cls.getSimpleName(),
-                            "()L" + ASMHelper.periodToSlashes(cls.getName()) + ";", null, null);
-        mv.visitCode();
-        String name = cls.getName().replace(".", "/");
-        mv.visitTypeInsn(Opcodes.NEW, name);
-        mv.visitInsn(Opcodes.DUP);
-        StringBuilder paraString = new StringBuilder(32).append("(");
-
-        for (Class<?> paraClass : contructor.getParameterTypes()) {
-            mv.visitInsn(Opcodes.ACONST_NULL);
-            paraString.append("Ljava/lang/Object;");
-        }
-        paraString.append(")V");
-
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, name, "<init>", paraString.toString(), false);
-
-        mv.visitInsn(Opcodes.ARETURN);
-        mv.visitMaxs(1, 1);
-        mv.visitEnd();
-
-        cw.visitEnd();
-        Class<?> factoryClass = helper.loadClass(newClassName, cls, cw.toByteArray());
+        Class<?> factoryClass = creator.createFactory(cls);
         try {
-            return factoryClass.newInstance();
+            return factoryClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
            //ignore
         }

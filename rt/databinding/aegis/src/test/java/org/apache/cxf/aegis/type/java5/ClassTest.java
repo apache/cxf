@@ -77,9 +77,9 @@ public class ClassTest extends AbstractAegisTest {
 
     public static class GenericsService {
 
-        public <T extends Serializable> T createInstance(Class<T> type)
-            throws InstantiationException, IllegalAccessException {
-            return type.newInstance();
+        public <T extends Serializable> T createInstance(Class<T> type) 
+            throws Exception {
+            return type.getDeclaredConstructor().newInstance();
         }
     }
 

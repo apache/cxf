@@ -150,7 +150,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         }
 
         if (!action.startsWith("\"")) {
-            action = new StringBuilder().append("\"").append(action).append("\"").toString();
+            action = '"' + action + '"';
         }
 
         return action;

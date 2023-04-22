@@ -21,8 +21,8 @@ package demo.jaxrs.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 public class CustomerServiceImpl implements CustomerService {
     long currentId = 123;

@@ -81,7 +81,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
         }
 
         String beanName = getBuilderBeanName(s);
-        ServiceBuilder builder = null;
+        final ServiceBuilder builder;
 
         try {
             builder = applicationContext.getBean(beanName, ServiceBuilder.class);

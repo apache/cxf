@@ -94,22 +94,22 @@ public class Operation0ResponseType {
     public String toString() {
         StringBuilder buffer = new StringBuilder(128);
         if (name != null) {
-            buffer.append("name : " + name + "\n");
+            buffer.append("name : ").append(name).append('\n');
         }
         if (owner != null) {
-            buffer.append("owner : " + owner + "\n");
+            buffer.append("owner : ").append(owner).append('\n');
         }
         if (species != null) {
-            buffer.append("species : " + species + "\n");
+            buffer.append("species : ").append(species).append('\n');
         }
         if (sex != null) {
-            buffer.append("sex : " + sex + "\n");
+            buffer.append("sex : ").append(sex).append('\n');
         }
         if (birth != null) {
-            buffer.append("birth : " + birth + "\n");
+            buffer.append("birth : ").append(birth).append('\n');
         }
         if (death != null) {
-            buffer.append("death : " + death + "\n");
+            buffer.append("death : ").append(death).append('\n');
         }
         return buffer.toString();
     }

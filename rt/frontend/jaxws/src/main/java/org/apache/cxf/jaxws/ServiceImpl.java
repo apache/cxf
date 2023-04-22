@@ -33,7 +33,6 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -41,18 +40,19 @@ import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.HandlerResolver;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.spi.ServiceDelegate;
 
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.HandlerResolver;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.spi.ServiceDelegate;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
@@ -245,7 +245,7 @@ public class ServiceImpl extends ServiceDelegate {
     private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf,
                                       WebServiceFeature...features) {
         Service service = sf.getService();
-        EndpointInfo ei = null;
+        EndpointInfo ei;
         if (portName == null) {
             ei = service.getServiceInfos().get(0).getEndpoints().iterator().next();
         } else {
@@ -286,7 +286,7 @@ public class ServiceImpl extends ServiceDelegate {
     private AbstractServiceFactoryBean createDispatchService(DataBinding db) {
         AbstractServiceFactoryBean serviceFactory;
 
-        Service dispatchService = null;
+        final Service dispatchService;
 
         if (null != wsdlURL) {
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
@@ -516,7 +516,6 @@ public class ServiceImpl extends ServiceDelegate {
     private EndpointInfo createEndpointInfo(AbstractServiceFactoryBean serviceFactory,
                                             QName portName,
                                             PortInfoImpl portInfo) throws BusException {
-        EndpointInfo ei = null;
         String address = portInfo.getAddress();
         String bindingID = BindingID.getBindingID(portInfo.getBindingID());
 
@@ -530,7 +529,7 @@ public class ServiceImpl extends ServiceDelegate {
         }
         DestinationFactory df = dfm.getDestinationFactoryForUri(address);
 
-        String transportId = null;
+        final String transportId;
         if (df != null && df.getTransportIds() != null && !df.getTransportIds().isEmpty()) {
             transportId = df.getTransportIds().get(0);
         } else {
@@ -548,7 +547,7 @@ public class ServiceImpl extends ServiceDelegate {
         Service service = serviceFactory.getService();
         service.getServiceInfos().get(0).addBinding(bindingInfo);
 
-        ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
+        EndpointInfo ei = new EndpointInfo(service.getServiceInfos().get(0), transportId);
         ei.setName(portName);
         ei.setAddress(address);
         ei.setBinding(bindingInfo);
@@ -593,7 +592,7 @@ public class ServiceImpl extends ServiceDelegate {
                     Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE, epi);
                     throw new WebServiceException(msg.toString());
                 }
-                if (!seiClass.isAnnotationPresent(javax.jws.WebService.class)) {
+                if (!seiClass.isAnnotationPresent(jakarta.jws.WebService.class)) {
                     Message msg = new Message("SEI_NO_WEBSERVICE_ANNOTATION", BUNDLE,
                                               seiClass.getCanonicalName());
                     throw new WebServiceException(msg.toString());
@@ -638,7 +637,7 @@ public class ServiceImpl extends ServiceDelegate {
         //Initialize Features.
         configureObject(portName.toString() + ".jaxws-client.proxyFactory", clientFac);
 
-        AbstractServiceFactoryBean sf = null;
+        final AbstractServiceFactoryBean sf;
         try {
             DataBinding db;
             if (context != null) {

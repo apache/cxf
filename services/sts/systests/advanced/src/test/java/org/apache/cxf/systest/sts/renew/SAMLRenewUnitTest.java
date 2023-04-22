@@ -18,18 +18,14 @@
  */
 package org.apache.cxf.systest.sts.renew;
 
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
+import org.apache.cxf.systest.sts.deployment.STSServer;
+import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -63,42 +59,21 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(StaxSTSServer.class, true)
-        );
+        assertTrue(launchServer(new StaxSTSServer(
+            SAMLRenewUnitTest.class.getResource("cxf-sts.xml"),
+            SAMLRenewUnitTest.class.getResource("stax-cxf-sts.xml"))));
     }
 
     @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam("", false, STSPORT),
-                                              new TestParam("", false, STAX_STSPORT),
-        });
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+    public static TestParam[] data() {
+        return new TestParam[] {new TestParam("", false, STSPORT),
+                                new TestParam("", false, STAX_STSPORT),
+        };
     }
 
     @org.junit.Test
     public void testRenewSAML1Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -124,18 +99,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testRenewSAML2Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -161,18 +129,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testRenewSAML2TokenFail() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -191,18 +152,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testRenewValidSAML1Token() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -223,18 +177,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testRenewSAML2TokenDifferentAppliesTo() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -254,18 +201,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testRenewDisabled() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client-unit.xml").toString());
 
         String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
@@ -286,8 +226,6 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-
-        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(

@@ -41,7 +41,7 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
     public ExternalResource envRule = new ExternalResource() {
         protected void before() throws Throwable {
             File classFile = tmpDir.newFolder("classes");
-            classFile.mkdir();
+
             classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},
                                              Thread.currentThread().getContextClassLoader());
             env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);

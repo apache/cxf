@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec11.server.Server12;
 import org.apache.cxf.systest.ws.wssec11.server.Server12Restricted;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer12;
@@ -142,7 +141,6 @@ public class WSSecurity112Test extends WSSecurity11Common {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.RxInvokerProvider;
-import javax.ws.rs.core.Configuration;
-
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.client.RxInvokerProvider;
+import jakarta.ws.rs.core.Configuration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
@@ -70,13 +70,19 @@ public final class ClientProviderFactory extends ProviderFactory {
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
         List<ProviderInfo<? extends Object>> theProviders =
             prepareProviders(custom, busGlobal, providers, null);
-        super.setCommonProviders(theProviders);
+        super.setCommonProviders(theProviders, RuntimeType.CLIENT);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
             if (providerCls == Object.class) {
                 // If the provider is a lambda, ClassHelper.getRealClass returns Object.class
                 providerCls = provider.getProvider().getClass();
             }
+            
+            // Check if provider is constrained to client
+            if (!constrainedTo(providerCls, RuntimeType.CLIENT)) {
+                continue;
+            }
+            
             if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
                 addProviderToList(clientRequestFilters, provider);
             }

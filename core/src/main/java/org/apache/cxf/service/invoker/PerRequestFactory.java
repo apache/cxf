@@ -52,7 +52,7 @@ public class PerRequestFactory implements Factory {
             if (Modifier.isAbstract(svcClass.getModifiers())) {
                 throw new Fault(new Message("SVC_CLASS_IS_ABSTRACT", BUNDLE, svcClass.getName()));
             }
-            Object o = svcClass.newInstance();
+            Object o = svcClass.getDeclaredConstructor().newInstance();
             Bus b = ex.getBus();
             ResourceManager resourceManager = b.getExtension(ResourceManager.class);
             if (resourceManager != null) {

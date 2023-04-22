@@ -20,16 +20,17 @@
 package org.apache.cxf.rt.security.saml.xacml2;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import net.shibboleth.utilities.java.support.xml.DOMTypeSupport;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.saml.xacml.CXFMessageParser;
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
-import org.joda.time.DateTime;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
@@ -86,14 +87,14 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         List<AttributeType> attributes = new ArrayList<>();
 
         // Resource-id
-        String resourceId = null;
+        String resourceId;
         boolean isSoapService = messageParser.isSOAPService();
         if (isSoapService) {
             QName serviceName = messageParser.getWSDLService();
             QName operationName = messageParser.getWSDLOperation();
 
             if (serviceName != null) {
-                resourceId = serviceName.toString() + "#";
+                resourceId = serviceName.toString() + '#';
                 if (serviceName.getNamespaceURI() != null
                     && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
                     resourceId += operationName.getLocalPart();
@@ -137,7 +138,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             List<AttributeType> attributes = new ArrayList<>();
             AttributeType environmentAttribute = createAttribute(XACMLConstants.CURRENT_DATETIME,
                                                                  XACMLConstants.XS_DATETIME, null,
-                                                                 new DateTime().toString());
+                                                                 DOMTypeSupport.instantToString(Instant.now()));
             attributes.add(environmentAttribute);
             return RequestComponentBuilder.createEnvironmentType(attributes);
         }

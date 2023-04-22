@@ -20,10 +20,9 @@ package org.apache.cxf.systest.ws.fault;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.annotations.Policy.Placement;

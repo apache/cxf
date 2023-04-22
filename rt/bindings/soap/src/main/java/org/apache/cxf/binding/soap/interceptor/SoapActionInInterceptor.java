@@ -277,7 +277,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                                                                     false);
         return action.equals(soi.getAction())
                || (allowNoMatchingToDefault && StringUtils.isEmpty(soi.getAction())
-               || (message.getVersion() instanceof Soap12) && StringUtils.isEmpty(soi.getAction()));
+               || message.getVersion() instanceof Soap12 && StringUtils.isEmpty(soi.getAction()));
     }
 
 }

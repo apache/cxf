@@ -22,9 +22,8 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
-
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;

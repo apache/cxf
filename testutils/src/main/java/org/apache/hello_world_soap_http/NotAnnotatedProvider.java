@@ -21,7 +21,8 @@ package org.apache.hello_world_soap_http;
 
 
 import javax.xml.transform.Source;
-import javax.xml.ws.Provider;
+
+import jakarta.xml.ws.Provider;
 
 public class NotAnnotatedProvider implements Provider<Source> {
 

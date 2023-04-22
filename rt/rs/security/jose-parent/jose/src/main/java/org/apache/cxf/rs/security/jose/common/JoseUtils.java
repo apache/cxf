@@ -166,7 +166,7 @@ public final class JoseUtils {
         if (loc == null) {
             return null;
         }
-        URL url = null;
+        URL url;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
             url = JoseUtils.getClasspathResourceURL(path, JoseUtils.class, bus);

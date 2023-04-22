@@ -22,6 +22,7 @@ package org.apache.cxf.bus.spring;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -46,8 +47,9 @@ public class Jsr250BeanPostProcessor
     public void setApplicationContext(ApplicationContext applicationContext) {
         context = applicationContext;
         try {
-            Class<?> cls = Class
-                .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+            Class<?> cls = ClassLoaderUtils
+                .loadClass("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor",
+                           applicationContext.getClass());
             isProcessing = context.getBeanNamesForType(cls, true, false).length == 0;
         } catch (ClassNotFoundException e) {
             isProcessing = true;
@@ -102,6 +104,8 @@ public class Jsr250BeanPostProcessor
         }
         return resourceManager;
     }
+    
+    @Override
     public Object postProcessAfterInitialization(Object bean, String beanId) {
         if (!isProcessing) {
             if (resourceManager == null && bean instanceof ResourceManager) {
@@ -117,6 +121,7 @@ public class Jsr250BeanPostProcessor
         return bean;
     }
 
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanId) {
         if (!isProcessing) {
             return bean;
@@ -153,6 +158,7 @@ public class Jsr250BeanPostProcessor
         }
     }
 
+    @Override
     public boolean requiresDestruction(Object bean) {
         return isProcessing;
     }

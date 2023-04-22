@@ -23,15 +23,18 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStore;
 import org.apache.cxf.systests.cdi.base.BookStoreByIds;
+import org.apache.cxf.systests.cdi.base.CustomScopedBookStore;
+import org.apache.cxf.systests.cdi.base.RequestScopedBookStore;
+import org.apache.cxf.systests.cdi.base.bindings.LoggingFilter;
+import org.apache.cxf.systests.cdi.base.contract.BookStoreImpl;
 
 @ApplicationPath("/v2")
 public class BookStoreCustomApplication extends Application {
@@ -41,11 +44,13 @@ public class BookStoreCustomApplication extends Application {
         singletons.add(new JacksonJsonProvider());
         singletons.add(new ValidationExceptionMapper());
         singletons.add(new JAXRSBeanValidationFeature());
+        singletons.add(new LoggingFilter());
         return singletons;
     }
 
     @Override
     public Set<Class<?>> getClasses() {
-        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class));
+        return new LinkedHashSet<>(Arrays.asList(BookStore.class, BookStoreByIds.class, 
+             CustomScopedBookStore.class, RequestScopedBookStore.class, BookStoreImpl.class));
     }
 }

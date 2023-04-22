@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jws:handler-chains xmlns:jws="http://java.sun.com/xml/ns/javaee">
+<jws:handler-chains xmlns:jws="https://jakarta.ee/xml/ns/jakartaee">
     <jws:handler-chain>
         <jws:handler>
             <jws:handler-name>EventingSoapHandler</jws:handler-name>

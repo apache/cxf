@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import javax.persistence.Entity;
-
+import jakarta.persistence.Entity;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 @Entity

@@ -20,7 +20,7 @@ package org.apache.cxf.jaxrs.ext;
 
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
  * An injectable interface that provides access to protocol headers

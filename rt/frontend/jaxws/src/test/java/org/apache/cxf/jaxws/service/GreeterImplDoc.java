@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxws.service;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.types.FaultDetail;

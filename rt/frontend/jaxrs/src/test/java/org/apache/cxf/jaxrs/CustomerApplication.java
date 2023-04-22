@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.jaxrs;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 
 public class CustomerApplication extends Application {
     @Context

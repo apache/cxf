@@ -37,10 +37,10 @@ public class OpenApiCustomPropertiesTest extends AbstractOpenApiServiceDescripti
             super(PORT, false);
         }
 
-        public static void main(String[] args) {
-            start(new OpenApiRegular());
+        public static void main(String[] args) throws Exception {
+            new OpenApiRegular().start();
         }
-        
+
         @Override
         protected OpenApiFeature createOpenApiFeature() {
             final OpenApiFeature feature = new OpenApiFeature();

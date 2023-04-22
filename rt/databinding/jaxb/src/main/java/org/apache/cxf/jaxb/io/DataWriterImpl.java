@@ -21,7 +21,6 @@ package org.apache.cxf.jaxb.io;
 
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -30,15 +29,15 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.MarshalException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.MarshalException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,14 +60,16 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     boolean setEventHandler = true;
     boolean noEscape;
     private JAXBDataBinding databinding;
+    private Bus bus;
 
-    public DataWriterImpl(JAXBDataBinding binding) {
-        this(binding, false);
+    public DataWriterImpl(Bus bus, JAXBDataBinding binding) {
+        this(bus, binding, false);
     }
-    public DataWriterImpl(JAXBDataBinding binding, boolean noEsc) {
+    public DataWriterImpl(Bus bus, JAXBDataBinding binding, boolean noEsc) {
         super(binding.getContext());
         databinding = binding;
         noEscape = noEsc;
+        this.bus = bus;
     }
 
     public void write(Object obj, T output) {
@@ -114,19 +115,19 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     }
 
     public Marshaller createMarshaller(Object elValue, MessagePartInfo part) {
-        Class<?> cls = null;
-        if (part != null) {
-            cls = part.getTypeClass();
-        }
-
-        if (cls == null) {
-            cls = null != elValue ? elValue.getClass() : null;
-        }
-
-        if (cls != null && cls.isArray() && elValue instanceof Collection) {
-            Collection<?> col = (Collection<?>)elValue;
-            elValue = col.toArray((Object[])Array.newInstance(cls.getComponentType(), col.size()));
-        }
+        //Class<?> cls = null;
+        //if (part != null) {
+        //    cls = part.getTypeClass();
+        //}
+        //
+        //if (cls == null) {
+        //    cls = null != elValue ? elValue.getClass() : null;
+        //}
+        //
+        //if (cls != null && cls.isArray() && elValue instanceof Collection) {
+        //    Collection<?> col = (Collection<?>)elValue;
+        //    elValue = col.toArray((Object[])Array.newInstance(cls.getComponentType(), col.size()));
+        //}
         Marshaller marshaller;
         try {
 
@@ -154,7 +155,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             final Map<String, String> nsctxt = databinding.getContextualNamespaceMap();
             // set the prefix mapper if either of the prefix map is configured
             if (nspref != null || nsctxt != null) {
-                Object mapper = JAXBUtils.setNamespaceMapper(nspref != null ? nspref : nsctxt, marshaller);
+                Object mapper = JAXBUtils.setNamespaceMapper(bus, nspref != null ? nspref : nsctxt, marshaller);
                 if (nsctxt != null) {
                     setContextualNamespaceDecls(mapper, nsctxt);
                 }
@@ -180,7 +181,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 marshaller.setEventHandler(new MtomValidationHandler(marshaller.getEventHandler(),
                                                             (JAXBAttachmentMarshaller)atmarsh));
             }
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage());
             throw new Fault(faultMessage, ex);

@@ -7,14 +7,13 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <context:property-placeholder/>
     <context:annotation-config/>
-    <bean class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer"/>
     <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"/>
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
             <bean class="${package}.HelloWorld"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
 </beans>

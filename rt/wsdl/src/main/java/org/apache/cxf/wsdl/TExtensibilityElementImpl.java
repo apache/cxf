@@ -21,9 +21,10 @@ package org.apache.cxf.wsdl;
 
 
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
+
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 /**
  * Implements the <code>ExtensibilityElement</code> interface.

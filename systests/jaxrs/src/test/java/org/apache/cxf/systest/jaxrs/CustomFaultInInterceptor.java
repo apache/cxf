@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.ProcessingException;
-
+import jakarta.ws.rs.ProcessingException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;

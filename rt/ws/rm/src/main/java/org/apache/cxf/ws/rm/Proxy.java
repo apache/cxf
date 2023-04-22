@@ -144,7 +144,7 @@ public class Proxy {
         CreateSequenceType create = new CreateSequenceType();
 
         String address = sp.getAcksTo();
-        EndpointReferenceType acksTo = null;
+        final EndpointReferenceType acksTo;
         if (null != address) {
             acksTo = RMUtils.createReference(address);
         } else {
@@ -321,7 +321,7 @@ public class Proxy {
         Endpoint endpoint = reliableEndpoint.getEndpoint(protocol);
         BindingInfo bi = reliableEndpoint.getBindingInfo(protocol);
         Conduit c = reliableEndpoint.getConduit();
-        Client client = null;
+        final Client client;
         if (params.length > 0 && params[0] instanceof DestinationSequence) {
             EndpointReferenceType acksTo = ((DestinationSequence)params[0]).getAcksTo();
             String acksAddress = acksTo.getAddress().getValue();
@@ -375,10 +375,9 @@ public class Proxy {
         ConduitSelector cs = new DeferredConduitSelector(conduit) {
             @Override
             public synchronized Conduit selectConduit(Message message) {
-                Conduit conduit = null;
+                final Conduit conduit;
                 EndpointInfo endpointInfo = getEndpoint().getEndpointInfo();
-                EndpointReferenceType original =
-                    endpointInfo.getTarget();
+                EndpointReferenceType original = endpointInfo.getTarget();
                 try {
                     if (null != address) {
                         endpointInfo.setAddress(address);

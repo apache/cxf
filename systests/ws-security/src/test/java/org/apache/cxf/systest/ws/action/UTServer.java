@@ -22,10 +22,9 @@ package org.apache.cxf.systest.ws.action;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.systest.ws.common.DoubleItImpl;
+import org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 
@@ -37,7 +36,8 @@ public class UTServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(UTServer.class);
 
     protected void run() {
-        Object implementor = new DoubleItImpl();
+        DoubleItPortTypeImpl implementor = new DoubleItPortTypeImpl();
+        implementor.setEnforcePrincipal(false);
         String address = "http://localhost:" + PORT + "/DoubleItUsernameToken3";
         EndpointImpl jaxWsEndpoint = (EndpointImpl)Endpoint.publish(address, implementor);
 

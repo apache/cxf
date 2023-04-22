@@ -60,6 +60,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -232,8 +233,7 @@ public class JettyHTTPServerEngineTest {
         engine.addServant(new URL(urlStr), new JettyHTTPTestHandler("string1", true));
         assertEquals("Get the wrong maxIdleTime.", 30000, getMaxIdle(engine.getConnector()));
 
-        String response = null;
-        response = getResponse(urlStr);
+        String response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1");
 
         try {
@@ -308,8 +308,6 @@ public class JettyHTTPServerEngineTest {
 
         engine.removeServant(new URL(urlStr));
         engine2.removeServant(new URL(urlStr2));
-
-
         engine.shutdown();
 
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
@@ -341,13 +339,10 @@ public class JettyHTTPServerEngineTest {
         engine.finalizeConfig();
 
         engine.addServant(url, handler2);
-        String response = null;
-        try {
-            response = getResponse(url.toString());
-            assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
-        } catch (Exception ex) {
-            fail("Can't get the reponse from the server " + ex);
-        }
+
+        String response = getResponse(url.toString());
+        assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
+
         engine.stop();
         JettyHTTPServerEngineFactory.destroyForPort(PORT2);
     }
@@ -375,13 +370,9 @@ public class JettyHTTPServerEngineTest {
         contextHandler.setHandler(handler2);
         contextHandler.start();
 
-        String response = null;
-        try {
-            response = getResponse(urlStr);
-        } catch (Exception ex) {
-            fail("Can't get the reponse from the server " + ex);
-        }
+        String response = getResponse(urlStr);
         assertEquals("the jetty http handler did not take effect", response, "string2");
+
         JettyHTTPServerEngineFactory.destroyForPort(PORT1);
     }
 
@@ -399,23 +390,16 @@ public class JettyHTTPServerEngineTest {
         engine.addServant(new URL(urlStr1), handler1);
 
         contextHandler = engine.getContextHandler(new URL(urlStr1));
+        assertNotNull(contextHandler);
 
         engine.addServant(new URL(urlStr2), handler2);
         contextHandler = engine.getContextHandler(new URL(urlStr2));
+        assertNotNull(contextHandler);
 
-        String response = null;
-        try {
-            response = getResponse(urlStr1 + "/test");
-        } catch (Exception ex) {
-            fail("Can't get the reponse from the server " + ex);
-        }
+        String response = getResponse(urlStr1 + "/test");
         assertEquals("the jetty http handler did not take effect", response, "test");
 
-        try {
-            response = getResponse(urlStr2 + "/test");
-        } catch (Exception ex) {
-            fail("Can't get the reponse from the server " + ex);
-        }
+        response = getResponse(urlStr2 + "/test");
         assertEquals("the jetty http handler did not take effect", response, "test2");
 
         JettyHTTPServerEngineFactory.destroyForPort(PORT3);
@@ -445,26 +429,23 @@ public class JettyHTTPServerEngineTest {
         engine.finalizeConfig();
 
         engine.addServant(url, handler2);
-        String response = null;
-        try {
-            response = getResponse(url.toString());
-            assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
-        } catch (Exception ex) {
-            fail("Can't get the reponse from the server " + ex);
-        }
+
+        String response = getResponse(url.toString());
+        assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
+
         engine.stop();
         JettyHTTPServerEngineFactory.destroyForPort(PORT4);
     }
 
-    private String getResponse(String target) throws Exception {
+    private static String getResponse(String target) throws Exception {
         URL url = new URL(target);
 
         URLConnection connection = url.openConnection();
 
         assertTrue(connection instanceof HttpURLConnection);
         connection.connect();
-        InputStream in = connection.getInputStream();
-        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+        try (InputStream in = connection.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
             IOUtils.copy(in, buffer);
             return buffer.toString();
         }

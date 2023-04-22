@@ -17,7 +17,7 @@
  * under the License.
  */
 package org.apache.cxf.systest.jaxws;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 
 @WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort",

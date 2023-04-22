@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.provider;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.xml.bind.JAXBElement;
 
 @Path("resource")
 public class CXFResource {
@@ -29,5 +29,11 @@ public class CXFResource {
     @POST
     public JAXBElement<String> jaxb(JAXBElement<String> jaxb) {
         return jaxb;
+    }
+    
+    @Path("null")
+    @POST
+    public JAXBElement<String> jaxbnull(JAXBElement<String> jaxb) {
+        return null;
     }
 }

@@ -204,6 +204,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         impl.handleMessage(message);
     }
 
+    @Override
     public void handleFault(Message message) {
         if (impl != null) {
             impl.handleFault(message);
@@ -211,6 +212,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     }
 
 
+    @Override
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         if (impl != null) {
             return impl.getAdditionalInterceptors();

@@ -21,10 +21,10 @@ package org.apache.cxf.tools.fortest.cxf774;
 
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 
 @WebService(name = "ListTest", targetNamespace = "http://cxf.apache/")
 public interface ListTest {

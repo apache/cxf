@@ -25,13 +25,12 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
-import javax.resource.spi.ManagedConnection;
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
 
-
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
+import jakarta.resource.spi.ManagedConnection;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.CXFConnectionFactory;

@@ -20,12 +20,11 @@ package org.apache.cxf.tracing.brave.jaxrs;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
-
 import brave.Tracing;
 import brave.http.HttpTracing;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.tracing.brave.HttpServerSpanParser;
 
 @Provider

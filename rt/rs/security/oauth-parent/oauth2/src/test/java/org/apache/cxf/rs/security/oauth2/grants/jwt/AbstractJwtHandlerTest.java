@@ -20,8 +20,7 @@ package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
 import java.util.Arrays;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -44,9 +43,8 @@ public class AbstractJwtHandlerTest {
     private static final byte[] SIGNATURE = "mySignature".getBytes();
 
     @Rule
-    //CHECKSTYLE:OFF
     public EasyMockRule rule = new EasyMockRule(this);
-    //CHECKSTYLE:ON
+
     private AbstractJwtHandler handler;
     @Mock
     private JwsSignatureVerifier signatureVerifier;

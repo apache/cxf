@@ -16,7 +16,7 @@
 ##    under the License.
 package ${package};
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 import org.apache.contract.helloworld.HelloWorldPortType;
 
 @WebService(targetNamespace = "http://www.apache.org/contract/HelloWorld",

@@ -32,23 +32,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -59,7 +44,22 @@ import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
@@ -83,19 +83,20 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
 @Provider
 public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
-    private static final String XML_PI_PROPERTY_RI = "com.sun.xml.bind.xmlHeaders";
-    private static final String XML_PI_PROPERTY_RI_INT = "com.sun.xml.internal.bind.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI = "org.glassfish.jaxb.xmlHeaders";
+    private static final String XML_PI_PROPERTY_RI_INT = "org.glassfish.jaxb.internal.bind.xmlHeaders";
 
-    private static final List<String> MARSHALLER_PROPERTIES =
-        Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
-                                    Marshaller.JAXB_FORMATTED_OUTPUT,
-                                    Marshaller.JAXB_FRAGMENT,
-                                    Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
-                                    Marshaller.JAXB_SCHEMA_LOCATION,
-                                    NS_MAPPER_PROPERTY_RI,
-                                    NS_MAPPER_PROPERTY_RI_INT,
-                                    XML_PI_PROPERTY_RI,
-                                    XML_PI_PROPERTY_RI_INT});
+    private static final String[] MARSHALLER_PROPERTIES = {
+        Marshaller.JAXB_ENCODING,
+        Marshaller.JAXB_FORMATTED_OUTPUT,
+        Marshaller.JAXB_FRAGMENT,
+        Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
+        Marshaller.JAXB_SCHEMA_LOCATION,
+        NS_MAPPER_PROPERTY_RI,
+        NS_MAPPER_PROPERTY_RI_INT,
+        XML_PI_PROPERTY_RI,
+        XML_PI_PROPERTY_RI_INT
+    };
 
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
@@ -169,16 +170,25 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             if (JAXBElement.class.isAssignableFrom(type)
                 || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
-                reader = getStreamReader(is, type, mt);
-                reader = TransformUtils.createNewReaderIfNeeded(reader, is);
-                if (JAXBElement.class.isAssignableFrom(type) && type == theType) {
-                    response = unmarshaller.unmarshal(reader);
-                } else {
-                    response = unmarshaller.unmarshal(reader, theType);
+                try (InputStream in = IOUtils.nullOrNotEmptyStream(is)) {
+                    // The return value might be "null" in case of empty stream, in this
+                    // case the unmarshaller fails with jakarta.xml.bind.UnmarshalException instead
+                    // of returning empty response.
+                    if (in != null) {
+                        reader = getStreamReader(in, type, mt);
+                        reader = TransformUtils.createNewReaderIfNeeded(reader, in);
+                        
+                        if (JAXBElement.class.isAssignableFrom(type) && type == theType) {
+                            response = unmarshaller.unmarshal(reader);
+                        } else {
+                            response = unmarshaller.unmarshal(reader, theType);
+                        }
+                    }
                 }
             } else {
                 response = doUnmarshal(unmarshaller, type, is, anns, mt);
             }
+            
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                 response = ((JAXBElement<?>)response).getValue();
             }
@@ -331,7 +341,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
 
         Object firstObj = it.hasNext() ? it.next() : null;
 
-        QName qname = null;
+        final QName qname;
         if (firstObj instanceof JAXBElement) {
             JAXBElement<?> el = (JAXBElement<?>)firstObj;
             qname = el.getName();
@@ -346,20 +356,18 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                                               .entity(message).build());
         }
 
-        StringBuilder pi = new StringBuilder();
-        pi.append(XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>");
-        os.write(pi.toString().getBytes());
-        String startTag = null;
-        String endTag = null;
+        os.write((XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>").getBytes());
 
-        if (qname.getNamespaceURI().length() > 0) {
+        final String startTag;
+        final String endTag;
+        if (!qname.getNamespaceURI().isEmpty()) {
             String prefix = nsPrefixes.get(qname.getNamespaceURI());
             if (prefix == null) {
                 prefix = "ns1";
             }
-            startTag = "<" + prefix + ":" + qname.getLocalPart() + " xmlns:" + prefix + "=\""
+            startTag = "<" + prefix + ':' + qname.getLocalPart() + " xmlns:" + prefix + "=\""
                 + qname.getNamespaceURI() + "\">";
-            endTag = "</" + prefix + ":" + qname.getLocalPart() + ">";
+            endTag = "</" + prefix + ':' + qname.getLocalPart() + ">";
         } else {
             startTag = "<" + qname.getLocalPart() + ">";
             endTag = "</" + qname.getLocalPart() + ">";
@@ -489,7 +497,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         MessageContext mc = getContext();
         if (mc != null) {
             String httpBasePath = (String)mc.get("http.base.path");
-            UriBuilder builder = null;
+            final UriBuilder builder;
             if (httpBasePath != null) {
                 builder = UriBuilder.fromPath(httpBasePath);
             } else {

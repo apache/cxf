@@ -19,8 +19,8 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
 
@@ -37,18 +37,19 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
             return new EntityTag("*");
         }
 
-        String tag = null;
+        String tag;
         boolean weak = false;
-        int i = header.indexOf(WEAK_PREFIX);
-        if (i != -1) {
+        final String trimmed = header.trim();
+        // See please https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag for weak validator 
+        if (trimmed.startsWith(WEAK_PREFIX)) {
             weak = true;
-            if (i + 2 < header.length()) {
-                tag = header.substring(i + 2);
+            if (trimmed.length() > 2) {
+                tag = trimmed.substring(2);
             } else {
                 return new EntityTag("", weak);
             }
         }  else {
-            tag = header;
+            tag = trimmed;
         }
         if (tag.length() > 0 && !tag.startsWith("\"") && !tag.endsWith("\"")) {
             return new EntityTag(tag, weak);

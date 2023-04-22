@@ -24,14 +24,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.LongAdder;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseBroadcaster;
-
-import org.springframework.mock.web.MockAsyncContext;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.SseBroadcaster;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,16 +44,17 @@ import static org.mockito.Mockito.when;
 public class SseBroadcasterImplTest {
     private SseBroadcaster broadcaster;
     private MessageBodyWriter<OutboundSseEvent> writer;
-    private MockHttpServletResponse response;
-    private MockAsyncContext ctx;
+    private HttpServletResponse response;
+    private AsyncContext ctx;
 
     @SuppressWarnings("unchecked")
     @Before
     public void setUp() {
         broadcaster = new SseBroadcasterImpl();
-        response = new MockHttpServletResponse();
+        response = mock(HttpServletResponse.class);
         writer = mock(MessageBodyWriter.class);
-        ctx = new MockAsyncContext(new MockHttpServletRequest(), response);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        ctx = new TestAsyncContext(request, response);
     }
 
     @Test

@@ -23,12 +23,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.apache.cxf.Bus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -42,14 +42,13 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.openapi.parse.OpenApiParseUtils;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.hamcrest.CoreMatchers;
 
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -59,7 +58,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusClientServerTestBase {
+public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractClientServerTestBase {
     static final String SECURITY_DEFINITION_NAME = "basicAuth";
 
     private static final String CONTACT = "cxf@apache.org";
@@ -68,8 +67,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
     private static final String LICENSE = "API License";
     private static final String LICENSE_URL = "API License URL";
 
-    @Ignore
-    public abstract static class Server extends AbstractBusTestServerBase {
+    public abstract static class Server extends AbstractServerTestServerBase {
         protected final String port;
         protected final boolean runAsFilter;
 
@@ -79,7 +77,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
         }
 
         @Override
-        protected void run() {
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreOpenApi.class);
             sf.setResourceClasses(BookStoreStylesheetsOpenApi.class);
@@ -89,7 +87,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
             final OpenApiFeature feature = createOpenApiFeature();
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
-            sf.create();
+            return sf.create();
         }
 
         protected OpenApiFeature createOpenApiFeature() {
@@ -106,24 +104,12 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractBusC
 
             return feature;
         }
-
-        protected static void start(final Server s) {
-            try {
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
-        }
     }
 
     protected static void startServers(final Class< ? extends Server> serverClass) throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(serverClass, false));
-        createStaticBus();
     }
 
     protected abstract String getPort();

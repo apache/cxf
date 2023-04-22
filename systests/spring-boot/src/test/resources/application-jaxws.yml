@@ -1,0 +1,5 @@
+cxf:
+  path: /Service
+  metrics:
+    jaxrs:
+      enabled: false

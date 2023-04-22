@@ -23,12 +23,12 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.ManagedConnection;
 import javax.security.auth.Subject;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
+import jakarta.resource.spi.ConnectionRequestInfo;
+import jakarta.resource.spi.ManagedConnection;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -133,7 +133,7 @@ public class ManagedConnectionFactoryImpl
         return new ManagedConnectionImpl(this, connReqInfo, subject);
     }
 
-    public void close() throws javax.resource.spi.ResourceAdapterInternalException {
+    public void close() throws jakarta.resource.spi.ResourceAdapterInternalException {
     }
 
     protected synchronized void init(ClassLoader appserverClassLoader) throws ResourceException {

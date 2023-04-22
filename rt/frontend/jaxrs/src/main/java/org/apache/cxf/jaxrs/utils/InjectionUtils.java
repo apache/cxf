@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -52,21 +53,20 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.Providers;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -115,24 +115,24 @@ public final class InjectionUtils {
         STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getName());
         STANDARD_CONTEXT_CLASSES.add(Providers.class.getName());
         STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getName());
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletRequest");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletResponse");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.ServletContext");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.http.HttpServletRequest");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.http.HttpServletResponse");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.servlet.ServletContext");
         // JAX-RS 2.0
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceContext");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceInfo");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.core.Configuration");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.container.ResourceContext");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.container.ResourceInfo");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.core.Configuration");
         // JAX-RS 2.1
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.Sse");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.sse.SseEventSink");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.sse.Sse");
+        STANDARD_CONTEXT_CLASSES.add("jakarta.ws.rs.sse.SseEventSink");
 
         VALUE_CONTEXTS.add(Application.class.getName());
-        VALUE_CONTEXTS.add("javax.ws.rs.sse.Sse");
+        VALUE_CONTEXTS.add("jakarta.ws.rs.sse.Sse");
 
         boolean useJaxb;
         try {
             ClassLoaderUtils.loadClass(
-                    "javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
+                    "jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
                     InjectionUtils.class);
             useJaxb = true;
         } catch (final ClassNotFoundException cnfe) {
@@ -144,10 +144,10 @@ public final class InjectionUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(InjectionUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(InjectionUtils.class);
 
-    private static final String SERVLET_CONFIG_CLASS_NAME = "javax.servlet.ServletConfig";
-    private static final String SERVLET_CONTEXT_CLASS_NAME = "javax.servlet.ServletContext";
-    private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "javax.servlet.http.HttpServletRequest";
-    private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
+    private static final String SERVLET_CONFIG_CLASS_NAME = "jakarta.servlet.ServletConfig";
+    private static final String SERVLET_CONTEXT_CLASS_NAME = "jakarta.servlet.ServletContext";
+    private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "jakarta.servlet.http.HttpServletRequest";
+    private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "jakarta.servlet.http.HttpServletResponse";
     private static final String ENUM_CONVERSION_CASE_SENSITIVE = "enum.conversion.case.sensitive";
 
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
@@ -321,7 +321,7 @@ public final class InjectionUtils {
             } else if (genericType instanceof GenericArrayType) {
                 genericType = ((GenericArrayType)genericType).getGenericComponentType();
             }
-            Class<?> cls = null;
+            final Class<?> cls;
             if (!(genericType instanceof ParameterizedType)) {
                 cls = (Class<?>)genericType;
             } else {
@@ -435,20 +435,27 @@ public final class InjectionUtils {
 
         value = decodeValue(value, decoded, pType);
 
+        final Optional<ParamConverter<T>> converter = getParamConverter(pClass, genericType, paramAnns, message);
         Object result = null;
         try {
-            result = createFromParameterHandler(value, pClass, genericType, paramAnns, message);
+            if (converter.isPresent()) {
+                result = converter.get().fromString(value);
+            }
         } catch (IllegalArgumentException nfe) {
             throw createParamConversionException(pType, nfe);
         }
         if (result != null) {
-            T theResult = null;
+            final T theResult;
             if (pClass.isPrimitive()) {
                 theResult = (T)result;
             } else {
                 theResult = pClass.cast(result);
             }
             return theResult;
+        } else if (converter.isPresent() && !pClass.isPrimitive()) {
+            // The converter was applied and returned null value, acceptable
+            // outcome for non-primitive type.
+            return pClass.cast(result);
         }
 
         if (Number.class.isAssignableFrom(pClass) && "".equals(value)) {
@@ -539,21 +546,30 @@ public final class InjectionUtils {
         }
         return ExceptionUtils.toBadRequestException(ex, null);
     }
+    
+    public static <T> Optional<ParamConverter<T>> getParamConverter(Class<T> pClass,
+            Type genericType, Annotation[] anns, Message message) {
+        
+        if (message != null) {
+            ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
+            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns, message);
+            return Optional.ofNullable(pm);
+        }
+        
+        return Optional.empty();
+    }
+
     public static <T> T createFromParameterHandler(String value,
                                                     Class<T> pClass,
                                                     Type genericType,
                                                     Annotation[] anns,
                                                     Message message) {
-        T result = null;
-        if (message != null) {
-            ServerProviderFactory pf = ServerProviderFactory.getInstance(message);
-            ParamConverter<T> pm = pf.createParameterHandler(pClass, genericType, anns, message);
-            if (pm != null) {
-                result = pm.fromString(value);
-            }
-        }
-        return result;
+        return getParamConverter(pClass, genericType, anns, message)
+            .map(pm -> pm.fromString(value))
+            .orElse(null);
     }
+    
+    
 
     public static void reportServerError(String messageName, String parameter) {
         reportServerError(messageName, parameter, true);
@@ -638,7 +654,7 @@ public final class InjectionUtils {
                                                                                          paramType,
                                                                                          paramAnns);
             }
-            bean = paramType.newInstance();
+            bean = paramType.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException ex) {
             reportServerError("CLASS_ACCESS_FAILURE", paramType.getName());
         } catch (Exception ex) {
@@ -649,11 +665,11 @@ public final class InjectionUtils {
             new HashMap<>();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
             String memberKey = entry.getKey();
-            String beanKey = null;
+            final String beanKey;
 
             int idx = memberKey.indexOf('.');
             if (idx == -1) {
-                beanKey = "." + memberKey;
+                beanKey = '.' + memberKey;
             } else {
                 beanKey = memberKey.substring(0, idx);
                 memberKey = memberKey.substring(idx + 1);
@@ -702,9 +718,9 @@ public final class InjectionUtils {
                 }
 
                 if (setter != null && getter != null) {
-                    Class<?> type = null;
-                    Type genericType = null;
-                    Object paramValue = null;
+                    final Class<?> type;
+                    final Type genericType;
+                    Object paramValue;
                     if (setter instanceof Method) {
                         type = Method.class.cast(setter).getParameterTypes()[0];
                         genericType = Method.class.cast(setter).getGenericParameterTypes()[0];
@@ -766,13 +782,11 @@ public final class InjectionUtils {
         return null;
     }
 
-    // CHECKSTYLE:OFF
     private static Object injectIntoMap(Type genericType,
                                         Annotation[] paramAnns,
                                         MultivaluedMap<String, String> processedValues,
                                         boolean decoded,
                                         ParameterType pathParam, Message message) {
-    // CHECKSTYLE:ON
         ParameterizedType paramType = (ParameterizedType) genericType;
         Class<?> keyType = (Class<?>)paramType.getActualTypeArguments()[0];
         Type secondType = InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
@@ -840,10 +854,10 @@ public final class InjectionUtils {
     private static List<MultivaluedMap<String, String>> processValues(Class<?> type, Type genericType,
                                         MultivaluedMap<String, String> values,
                                         boolean isbean) {
-        List<MultivaluedMap<String, String>> valuesList =
-            new ArrayList<>();
+        final List<MultivaluedMap<String, String>> valuesList;
 
         if (isbean && InjectionUtils.isSupportedCollectionOrArray(type)) {
+            valuesList = new ArrayList<>();
             Class<?> realType = InjectionUtils.getActualType(genericType);
             for (Map.Entry<String, List<String>> entry : values.entrySet()) {
                 String memberKey = entry.getKey();
@@ -894,7 +908,7 @@ public final class InjectionUtils {
                 }
             }
         } else {
-            valuesList.add(values);
+            valuesList = Collections.singletonList(values);
         }
 
         return valuesList;
@@ -945,8 +959,8 @@ public final class InjectionUtils {
      //CHECKSTYLE:ON
         Class<?> type = getCollectionType(rawType);
 
-        Class<?> realType = null;
-        Type realGenericType = null;
+        final Class<?> realType;
+        final Type realGenericType;
         if (rawType.isArray()) {
             realType = rawType.getComponentType();
             realGenericType = realType;
@@ -963,7 +977,7 @@ public final class InjectionUtils {
         Object theValues = null;
         if (type != null) {
             try {
-                theValues = type.newInstance();
+                theValues = type.getDeclaredConstructor().newInstance();
             } catch (IllegalAccessException ex) {
                 reportServerError("CLASS_ACCESS_FAILURE", type.getName());
             } catch (Exception ex) {
@@ -1009,7 +1023,7 @@ public final class InjectionUtils {
         for (String v : values) {
             String[] segments = v.split("/");
             for (String s : segments) {
-                if (s.length() != 0) {
+                if (!s.isEmpty()) {
                     newValues.add(s);
                 }
             }
@@ -1056,7 +1070,7 @@ public final class InjectionUtils {
         } else {
             String result = null;
             if (!paramValues.isEmpty()) {
-                boolean isLast = pathParam == ParameterType.PATH ? true : false;
+                boolean isLast = pathParam == ParameterType.PATH;
                 result = isLast ? paramValues.get(paramValues.size() - 1)
                                 : paramValues.get(0);
             }
@@ -1133,7 +1147,7 @@ public final class InjectionUtils {
     }
 
     private static boolean isServletApiContext(String name) {
-        return name.startsWith("javax.servlet.");
+        return name.startsWith("jakarta.servlet.");
     }
 
     private static ThreadLocalProxy<?> createThreadLocalServletApiContext(String name) {
@@ -1150,7 +1164,7 @@ public final class InjectionUtils {
         if (proxyClassName != null) {
             try {
                 return (ThreadLocalProxy<?>)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
-                    .newInstance();
+                    .getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 throw new RuntimeException(t);
             }
@@ -1329,20 +1343,14 @@ public final class InjectionUtils {
                     continue;
                 }
 
-                String propertyName = methodName.substring(minLen);
-                if (propertyName.length() == 1) {
-                    propertyName = propertyName.toLowerCase();
-                } else {
-                    propertyName = propertyName.substring(0, 1).toLowerCase()
-                                   + propertyName.substring(1);
-                }
+                String propertyName = StringUtils.uncapitalize(methodName.substring(minLen));
                 if (baseName.contains(propertyName)
                     || "class".equals(propertyName)
                     || "declaringClass".equals(propertyName)) {
                     continue;
                 }
                 if (!"".equals(baseName)) {
-                    propertyName = baseName + "." + propertyName;
+                    propertyName = baseName + '.' + propertyName;
                 }
 
                 Object value = extractFromMethod(bean, m);
@@ -1354,7 +1362,7 @@ public final class InjectionUtils {
                 } else if (value.getClass().isEnum()) {
                     values.putSingle(propertyName, value.toString());
                 } else if (isSupportedCollectionOrArray(value.getClass())) {
-                    List<Object> theValues = null;
+                    final List<Object> theValues;
                     if (value.getClass().isArray()) {
                         theValues = Arrays.asList((Object[])value);
                     } else if (value instanceof Set) {
@@ -1367,7 +1375,7 @@ public final class InjectionUtils {
                     if (isSupportedMap(m.getGenericReturnType())) {
                         Map<Object, Object> map = CastUtils.cast((Map<?, ?>)value);
                         for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                            values.add(propertyName + "." + entry.getKey().toString(),
+                            values.add(propertyName + '.' + entry.getKey().toString(),
                                        entry.getValue().toString());
                         }
                     }
@@ -1408,7 +1416,7 @@ public final class InjectionUtils {
         for (Annotation ann : m.getAnnotations()) {
             String annType = ann.annotationType().getName();
             if ("org.apache.cxf.aegis.type.java5.IgnoreProperty".equals(annType)
-                || "javax.xml.bind.annotation.XmlTransient".equals(annType)) {
+                || "jakarta.xml.bind.annotation.XmlTransient".equals(annType)) {
                 return true;
             }
         }
@@ -1517,7 +1525,7 @@ public final class InjectionUtils {
         if (targetObject == null) {
             return null;
         }
-        Type type = null;
+        final Type type;
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             type = processGenericTypeIfNeeded(serviceCls, targetType, ((GenericEntity<?>)targetObject).getType());
         } else if (invoked == null

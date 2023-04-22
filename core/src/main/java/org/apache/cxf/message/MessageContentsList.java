@@ -21,14 +21,26 @@ package org.apache.cxf.message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class MessageContentsList extends ArrayList<Object> {
+
+    /**
+     * Indicates that the element of the underlying list is absent.
+     * This is necessary for the elements to keep their original
+     * indexes within this list when some preceding elements
+     * are not populated or deleted.
+     * 
+     * @see {@link #get(MessagePartInfo)}, {@link #remove(MessagePartInfo)}
+     */
     public static final Object REMOVED_MARKER = new Object();
     private static final long serialVersionUID = -5780720048950696258L;
+    private final Set<Integer> removed = new HashSet<>();
 
     public MessageContentsList() {
         super(6);
@@ -38,6 +50,9 @@ public class MessageContentsList extends ArrayList<Object> {
     }
     public MessageContentsList(List<?> values) {
         super(values);
+        if (values instanceof MessageContentsList) {
+            removed.addAll(((MessageContentsList) values).removed);
+        }
     }
 
     public static MessageContentsList getContentsList(Message msg) {
@@ -53,33 +68,51 @@ public class MessageContentsList extends ArrayList<Object> {
         return (MessageContentsList)o;
     }
 
+    @Override
     public Object set(int idx, Object value) {
         ensureSize(idx);
-        return super.set(idx, value);
+
+        if (value != REMOVED_MARKER) {
+            removed.remove(idx);
+            return super.set(idx, value);
+        } else {
+            removed.add(idx);
+            return super.set(idx, null);
+        }
     }
 
     private void ensureSize(int idx) {
         while (idx >= size()) {
-            add(REMOVED_MARKER);
+            removed.add(size());
+            add(null);
         }
     }
 
     public Object put(MessagePartInfo key, Object value) {
-        ensureSize(key.getIndex());
-        return super.set(key.getIndex(), value);
+        return set(key.getIndex(), value);
     }
 
     public boolean hasValue(MessagePartInfo key) {
         if (key.getIndex() >= size()) {
             return false;
         }
-        return super.get(key.getIndex()) != REMOVED_MARKER;
+        return !removed.contains(key.getIndex());
     }
 
+    /**
+     * @param key the key whose associated element is to be returned.
+     * @return the element to which the index property of the specified key
+     * is mapped, or {@code null} if mapped element is marked as removed.
+     */
     public Object get(MessagePartInfo key) {
-        Object o = super.get(key.getIndex());
-        return o == REMOVED_MARKER ? null : o;
+        return super.get(key.getIndex());
     }
+
+    /**
+     * Marks corresponding element as removed, indicating absent value,
+     * so subsequent {@code get(MessagePartInfo)} for the same key return null.
+     * @param key the key whose associated element is to be marked as removed.
+     */
     public void remove(MessagePartInfo key) {
         put(key, REMOVED_MARKER);
     }

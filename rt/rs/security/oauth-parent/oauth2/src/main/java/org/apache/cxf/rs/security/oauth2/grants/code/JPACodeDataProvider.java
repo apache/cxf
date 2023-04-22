@@ -20,10 +20,9 @@ package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.TypedQuery;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.TypedQuery;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
@@ -108,7 +107,7 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     @Override
     public List<ServerAuthorizationCodeGrant> getCodeGrants(final Client c, final UserSubject subject)
             throws OAuthServiceException {
-        return execute(em -> {
+        return executeInTransaction(em -> {
             return getCodeGrants(c, subject, em);
         });
     }

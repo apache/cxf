@@ -38,9 +38,9 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import javax.annotation.PreDestroy;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.ServletContext;
+import jakarta.ws.rs.core.Context;
 
 
 public class BookStoreWithInterface2 extends BookStoreStorage implements BookInterface {

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.core.Context;
-
+import jakarta.ws.rs.core.Context;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
 public interface ContextAware {

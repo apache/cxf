@@ -23,11 +23,13 @@ import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
@@ -137,6 +139,22 @@ public class JwsCompactReaderWriterTest {
         JwtClaims claims2 = consumer.getJwtClaims();
         assertEquals(claims, claims2);
     }
+
+    @Test
+    public void testEscapeDoubleQuotes() throws Exception {
+        final long exp = Clock.systemUTC().instant().getEpochSecond() + TimeUnit.MINUTES.toSeconds(5);
+
+        JwtClaims claims = new JwtClaims();
+        claims.setExpiryTime(exp);
+        claims.setClaim("userInput", "a\",\"exp\":9999999999,\"b\":\"x");
+
+        JwsCompactProducer jwsProducer = new JwsJwtCompactProducer(claims);
+        String jwsSequence = jwsProducer.signWith(new NoneJwsSignatureProvider());
+
+        JwsJwtCompactConsumer jwsConsumer = new JwsJwtCompactConsumer(jwsSequence);
+        assertEquals(exp, jwsConsumer.getJwtClaims().getExpiryTime().longValue());
+    }
+
     @Test
     public void testWriteReadJwsUnsigned() throws Exception {
         JwsHeaders headers = new JwsHeaders(JoseType.JWT);

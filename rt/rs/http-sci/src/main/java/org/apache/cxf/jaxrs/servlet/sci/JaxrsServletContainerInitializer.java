@@ -29,17 +29,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.annotation.HandlesTypes;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRegistration.Dynamic;
+import jakarta.servlet.annotation.HandlesTypes;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -49,8 +48,8 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
     private static final Logger LOG = LogUtils.getL7dLogger(JaxrsServletContainerInitializer.class);
     private static final String IGNORE_PACKAGE = "org.apache.cxf";
 
-    private static final String JAXRS_APPLICATION_SERVLET_NAME = "javax.ws.rs.core.Application";
-    private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
+    private static final String JAXRS_APPLICATION_SERVLET_NAME = "jakarta.ws.rs.core.Application";
+    private static final String JAXRS_APPLICATION_PARAM = "jakarta.ws.rs.Application";
     private static final String CXF_JAXRS_APPLICATION_PARAM = "jaxrs.application";
     private static final String CXF_JAXRS_CLASSES_PARAM = "jaxrs.classes";
 
@@ -68,7 +67,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 return;
             }
             try {
-                app = (Application)appClass.newInstance();
+                app = (Application)appClass.getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 throw new ServletException(t);
             }

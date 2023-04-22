@@ -24,7 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 public class AccumulatingIntersector implements MimeTypesIntersector {
     private static final String MEDIA_TYPE_DISTANCE_PARAM = "d";

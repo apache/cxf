@@ -26,8 +26,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.resource.ResourceException;
-
+import jakarta.resource.ResourceException;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 
@@ -101,15 +100,13 @@ public class ResourceBean implements Serializable {
     }
 
     public void validateURLString(String spec, String msg) throws ResourceAdapterInternalException {
-        URL url = null;
         try {
-            url = createURL(spec, msg);
+            URL url = createURL(spec, msg);
             url.openStream();
             LOG.fine("Validated url=" + url);
         } catch (IOException ioe) {
             throw new ResourceAdapterInternalException(msg, ioe);
         }
     }
-
 
 }

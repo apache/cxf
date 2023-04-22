@@ -19,10 +19,10 @@
 package org.apache.cxf.ws.transfer.integration;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;

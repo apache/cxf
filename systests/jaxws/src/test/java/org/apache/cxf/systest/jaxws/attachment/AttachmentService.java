@@ -19,11 +19,10 @@
 
 package org.apache.cxf.systest.jaxws.attachment;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlElement;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlElement;
 import org.apache.cxf.annotations.SchemaValidation;
 
 @WebService(name = "AttachmentService", targetNamespace = "http://org.apache.cxf/service/AttachmentService")

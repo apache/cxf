@@ -57,11 +57,11 @@ public class CXFRequestData extends RequestData {
                 if (o instanceof Validator) {
                     return (Validator)o;
                 } else if (o instanceof Class) {
-                    return (Validator)((Class<?>)o).newInstance();
+                    return (Validator)((Class<?>)o).getDeclaredConstructor().newInstance();
                 } else if (o instanceof String) {
                     return (Validator)ClassLoaderUtils.loadClass(o.toString(),
                                                                  CXFRequestData.class)
-                                                                 .newInstance();
+                        .getDeclaredConstructor().newInstance();
                 } else if (o != null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                   "Cannot load Validator: " + o);

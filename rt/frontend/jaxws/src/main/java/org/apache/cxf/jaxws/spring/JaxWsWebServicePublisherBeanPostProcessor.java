@@ -19,16 +19,16 @@
 
 package org.apache.cxf.jaxws.spring;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.jws.WebService;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -153,7 +153,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     }
 
     private void createAndPublishEndpoint(String url, Object implementor) {
-        ServerFactoryBean serverFactory = null;
+        final ServerFactoryBean serverFactory;
         if (prototypeServerFactoryBeanName != null) {
             if (!beanFactory.isPrototype(prototypeServerFactoryBeanName)) {
                 throw
@@ -171,7 +171,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         serverFactory.setServiceClass(ClassHelper.getRealClass(implementor));
         serverFactory.setAddress(url);
 
-        DataBinding dataBinding = null;
+        final DataBinding dataBinding;
         if (prototypeDataBindingBeanName != null) {
             if (!beanFactory.isPrototype(prototypeDataBindingBeanName)) {
                 throw
@@ -192,8 +192,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
 
     public void setServletConfig(ServletConfig servletConfig) {
         try {
-            shadowCxfServlet = (Servlet)servletClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            shadowCxfServlet = (Servlet)servletClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException 
+            | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
         try {

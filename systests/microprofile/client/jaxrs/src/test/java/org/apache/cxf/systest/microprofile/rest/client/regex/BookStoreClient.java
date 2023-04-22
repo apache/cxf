@@ -19,11 +19,11 @@
 
 package org.apache.cxf.systest.microprofile.rest.client.regex;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 
 @Path("/bookstore")
 public interface BookStoreClient {
@@ -34,5 +34,12 @@ public interface BookStoreClient {
     @Consumes("application/xml")
     @Produces("application/xml")
     Book echoXmlBookregex(Book book, @PathParam("id") String id);
+    
+    @POST
+    @Path("/echoxmlbookregex/{id : [5-9]{3,4}}/{language:en|fr}/{format:pdf|epub|mobi}/many")
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    Book echoXmlBookregexMany(Book book, @PathParam("id") String id, 
+        @PathParam("language") String language, @PathParam("format") String format);
 
 }

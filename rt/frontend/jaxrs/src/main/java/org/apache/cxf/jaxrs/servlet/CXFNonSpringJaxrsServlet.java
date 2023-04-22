@@ -31,11 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.ws.rs.core.Application;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -89,7 +88,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String DEFAULT_PARAMETER_SPLIT_CHAR = ",";
     private static final String SPACE_PARAMETER_SPLIT_CHAR = "space";
 
-    private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
+    private static final String JAXRS_APPLICATION_PARAM = "jakarta.ws.rs.Application";
 
     private ClassLoader classLoader;
     private Application application;
@@ -247,7 +246,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             if (!theValue.isEmpty()) {
                 try {
                     Class<?> intClass = loadClass(theValue, "Interceptor");
-                    Object object = intClass.newInstance();
+                    Object object = intClass.getDeclaredConstructor().newInstance();
                     injectProperties(object, props);
                     list.add((Interceptor<? extends Message>)object);
                 } catch (ServletException ex) {
@@ -280,7 +279,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (!theValue.isEmpty()) {
             try {
                 Class<?> intClass = loadClass(theValue, "Invoker");
-                Object object = intClass.newInstance();
+                Object object = intClass.getDeclaredConstructor().newInstance();
                 injectProperties(object, props);
                 bean.setInvoker((Invoker)object);
             } catch (ServletException ex) {
@@ -437,7 +436,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         boolean isApplication = Application.class.isAssignableFrom(c.getDeclaringClass());
         try {
-            ProviderInfo<? extends Object> provider = null;
+            final ProviderInfo<? extends Object> provider;
             if (c.getParameterTypes().length == 0) {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
@@ -608,8 +607,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-
-            Class<?> cls = null;
+            final Class<?> cls;
             if (classLoader == null) {
                 cls = ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
             } else {

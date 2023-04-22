@@ -22,8 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.activation.DataHandler;
-
+import jakarta.activation.DataHandler;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.ByteDataSource;

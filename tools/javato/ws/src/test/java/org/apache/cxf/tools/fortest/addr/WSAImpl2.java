@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tools.fortest.addr;
 
-import javax.jws.WebService;
-import javax.xml.ws.Action;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 @WebService(
     name = "AddressingFeatureTest2",

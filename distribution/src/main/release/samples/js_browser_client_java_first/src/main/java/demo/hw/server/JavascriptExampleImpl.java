@@ -21,7 +21,7 @@ package demo.hw.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import demo.hw.server.data.Beverage;
 import demo.hw.server.data.Category;

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.wsn.services;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.wsn.jms.JmsPullPoint;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.PullPoint",

@@ -76,6 +76,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.ListenerRegistrationException;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
@@ -178,7 +179,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
             BindingMessageInfo bInput = bop.getInput();
             if (bInput != null) {
-                MessageInfo input = null;
+                final MessageInfo input;
                 BindingMessageInfo unwrappedMsg = bInput;
                 if (bop.isUnwrappedCapable()) {
                     input = bop.getOperationInfo().getUnwrappedOperation().getInput();
@@ -191,7 +192,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
             BindingMessageInfo bOutput = bop.getOutput();
             if (bOutput != null) {
-                MessageInfo output = null;
+                final MessageInfo output;
                 BindingMessageInfo unwrappedMsg = bOutput;
                 if (bop.isUnwrappedCapable()) {
                     output = bop.getOperationInfo().getUnwrappedOperation().getOutput();
@@ -341,8 +342,8 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         boolean hasWrapped = false;
 
-        org.apache.cxf.binding.soap.SoapBinding sb = null;
-        SoapVersion version = null;
+        final org.apache.cxf.binding.soap.SoapBinding sb;
+        final SoapVersion version;
         if (binding instanceof SoapBindingInfo) {
             SoapBindingInfo sbi = (SoapBindingInfo) binding;
             version = sbi.getSoapVersion();
@@ -556,11 +557,10 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     private void addOutOfBandParts(final BindingOperationInfo bop, final javax.wsdl.Message msg,
                                    final SchemaCollection schemas, boolean isInput,
                                    final String partName) {
-        MessageInfo minfo = null;
         MessageInfo.Type type;
 
         int nextId = 0;
-        minfo = bop.getOperationInfo().getInput();
+        MessageInfo minfo = bop.getOperationInfo().getInput();
         if (minfo != null) {
             for (MessagePartInfo part : minfo.getMessageParts()) {
                 if (part.getIndex() >= nextId) {
@@ -916,7 +916,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                         .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion())
                     && Boolean.FALSE.equals(o)) {
 
-                    throw new RuntimeException("Soap "
+                    throw new ListenerRegistrationException("Soap "
                                                + ((org.apache.cxf.binding.soap.SoapBinding)b)
                                                    .getSoapVersion().getVersion()
                                                + " endpoint already registered on address "

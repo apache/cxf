@@ -48,14 +48,13 @@
        <property name="loginContextName" value="bob"/>
     </bean>
 
-    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/kerberos/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.kerberos.Intermediary}/doubleit/services/doubleit-rs">
+    <jaxrs:server modelRef="classpath:org/apache/cxf/systest/sts/kerberos/jaxrs.xml" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Intermediary}/doubleit/services/doubleit-rs">
         <jaxrs:providers>
             <ref bean="kerberosFilter" />
         </jaxrs:providers>
     </jaxrs:server>
     
     <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient" id="kerberosClient">
-        <constructor-arg ref="cxf"/>
         <property name="contextName" value="bob"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
         <property name="useDelegatedCredential" value="true"/>
@@ -88,7 +87,7 @@
     </jaxws:client>
     
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="${testutil.ports.kerberos.Intermediary}">
+        <httpj:engine port="${testutil.ports.Intermediary}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>

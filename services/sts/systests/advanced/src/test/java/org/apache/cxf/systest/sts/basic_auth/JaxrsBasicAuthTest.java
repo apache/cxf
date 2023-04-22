@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.systest.sts.basic_auth;
 
-import javax.ws.rs.WebApplicationException;
-
+import jakarta.ws.rs.InternalServerErrorException;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -38,71 +37,44 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
 
     static final String STSPORT = allocatePort(STSServer.class);
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            JaxwsBasicAuthTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new STSServer()));
     }
 
     @org.junit.Test
     public void testBasicAuth() throws Exception {
-
-        doubleIt("alice", "clarinet", false);
+        doubleIt("alice", "clarinet");
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testBadBasicAuth() throws Exception {
-
-        doubleIt("alice", "trombon", true);
+        doubleIt("alice", "trombon");
     }
 
-    @org.junit.Test(expected = RuntimeException.class)
+    @org.junit.Test(expected = InternalServerErrorException.class)
     public void testNoBasicAuth() throws Exception {
-
-        doubleIt(null, null, true);
+        doubleIt(null, null);
     }
 
-    private static void doubleIt(String username, String password, boolean authFailureExpected) {
+    private static void doubleIt(String username, String password) {
         final String configLocation = "org/apache/cxf/systest/sts/basic_auth/cxf-client.xml";
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
         final int numToDouble = 25;
 
-        WebClient client = null;
+        final WebClient client;
         if (username != null && password != null) {
             client = WebClient.create(address, username, password, configLocation);
         } else {
             client = WebClient.create(address, configLocation);
         }
         client.type("text/plain").accept("text/plain");
-        try {
-            int resp = client.post(numToDouble, Integer.class);
-            if (authFailureExpected) {
-                throw new RuntimeException("Exception expected");
-            }
-            org.junit.Assert.assertEquals(2 * numToDouble, resp);
-        } catch (WebApplicationException ex) {
-            if (!authFailureExpected) {
-                throw new RuntimeException("Unexpected exception");
-            }
-            org.junit.Assert.assertEquals(500, ex.getResponse().getStatus());
-        }
+        int resp = client.post(numToDouble, Integer.class);
+        org.junit.Assert.assertEquals(2 * numToDouble, resp);
     }
 }

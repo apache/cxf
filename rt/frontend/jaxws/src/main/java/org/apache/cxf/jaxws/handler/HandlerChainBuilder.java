@@ -30,10 +30,9 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.common.logging.LogUtils;
@@ -128,7 +127,7 @@ public class HandlerChainBuilder {
                                                                       .getValue()), true, classLoader)
                 .asSubclass(Handler.class);
 
-            Handler<?> handler = handlerClass.newInstance();
+            Handler<?> handler = handlerClass.getDeclaredConstructor().newInstance();
             if (fineLog) {
                 LOG.fine("adding handler to chain: " + handler);
             }

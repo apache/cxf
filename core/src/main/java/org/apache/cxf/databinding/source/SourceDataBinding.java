@@ -60,6 +60,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
                 continue;
             }
             new ServiceModelVisitor(serviceInfo) {
+                @Override
                 public void begin(MessagePartInfo part) {
                     if (part.getTypeQName() != null || part.getElementQName() != null) {
                         return;

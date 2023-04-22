@@ -36,14 +36,14 @@ public final class WSDLGeneratorFactory {
 
     protected String getGeneratorClassName() {
         String pkgName = PackageUtils.getPackageName(getClass());
-        return pkgName + "." + wsdlVersion.toString().toLowerCase() + "." + wsdlVersion + "Generator";
+        return pkgName + '.' + wsdlVersion.toString().toLowerCase() + '.' + wsdlVersion + "Generator";
     }
 
     public AbstractGenerator<?> newGenerator() {
-        AbstractGenerator<?> generator = null;
+        final AbstractGenerator<?> generator;
         String clzName = getGeneratorClassName();
         try {
-            generator = (AbstractGenerator<?>) Class.forName(clzName).newInstance();
+            generator = (AbstractGenerator<?>) Class.forName(clzName).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new ToolException("Can not find the Generator for: " + clzName, e);
         }

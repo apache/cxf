@@ -22,9 +22,8 @@ package org.apache.hello_world_soap_http;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 import org.apache.hello_world_soap_http.types.ErrorCode;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;

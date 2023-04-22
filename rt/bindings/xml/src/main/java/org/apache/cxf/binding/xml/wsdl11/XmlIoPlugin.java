@@ -33,7 +33,7 @@ import org.apache.cxf.wsdl.JAXBExtensibilityElement;
 public final class XmlIoPlugin extends AbstractWSDLPlugin {
 
     public ExtensibilityElement createExtension(final Map<String, Object> args) throws WSDLException {
-        XMLBindingMessageFormat xmlFormat = null;
+        final XMLBindingMessageFormat xmlFormat;
 
         Class<?> clz = getOption(args, Class.class);
         QName qname = getOption(args, QName.class);

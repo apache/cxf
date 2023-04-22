@@ -22,11 +22,10 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11.annotator;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
@@ -45,7 +44,7 @@ public class WrapperBeanAnnotator implements Annotator {
     }
 
     public void annotate(final JavaAnnotatable clz) {
-        WrapperBeanClass beanClass = null;
+        final WrapperBeanClass beanClass;
         if (clz instanceof WrapperBeanClass) {
             beanClass = (WrapperBeanClass) clz;
         } else {

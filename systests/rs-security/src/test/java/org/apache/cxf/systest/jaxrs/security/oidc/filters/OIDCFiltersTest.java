@@ -20,8 +20,7 @@ package org.apache.cxf.systest.jaxrs.security.oidc.filters;
 
 import java.net.URI;
 
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;

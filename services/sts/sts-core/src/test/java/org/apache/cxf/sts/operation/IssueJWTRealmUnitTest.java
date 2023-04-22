@@ -20,19 +20,18 @@ package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -48,7 +47,6 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -89,11 +87,9 @@ public class IssueJWTRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -162,11 +158,9 @@ public class IssueJWTRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -235,11 +229,9 @@ public class IssueJWTRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -310,11 +302,9 @@ public class IssueJWTRealmUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
-        providerList.add(provider);
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(provider));
 
         // Add Service
         ServiceMBean service = new StaticService();

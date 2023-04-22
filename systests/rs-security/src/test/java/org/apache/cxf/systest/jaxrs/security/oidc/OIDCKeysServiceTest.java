@@ -20,17 +20,14 @@ package org.apache.cxf.systest.jaxrs.security.oidc;
 
 import java.net.URL;
 
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
@@ -49,11 +46,6 @@ public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
     }
 
     @org.junit.Test

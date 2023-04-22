@@ -34,8 +34,12 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
@@ -61,7 +65,7 @@
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Signature2" address="http://localhost:${testutil.ports.SignatureServer}/DoubleItSignature2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignaturePort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/action/DoubleItAction.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>

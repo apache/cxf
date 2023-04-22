@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.Marshaller;
 
 /*
  * A XML Writer that adjusts it's behaviour based on the state of the marshaller.

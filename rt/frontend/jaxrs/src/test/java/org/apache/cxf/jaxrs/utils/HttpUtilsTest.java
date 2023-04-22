@@ -21,11 +21,10 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -219,6 +218,33 @@ public class HttpUtilsTest {
     @Test
     public void testGetBaseAddressWithoutScheme() {
         doTestGetBaseAddress("/s", "/s");
+    }
+
+    @Test
+    public void testGetBaseAddressHttpUriMixedCase() {
+        final String baseURI = "HTTP://LoCALHoST:8080/STORE";
+        
+        Message m = new MessageImpl();
+        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
+        Exchange exchange = new ExchangeImpl();
+        
+        req.getRequestURL();
+        EasyMock.expectLastCall().andReturn(new StringBuffer(baseURI));
+        req.getPathInfo();
+        EasyMock.expectLastCall().andReturn("/STORE");
+        req.getContextPath();
+        EasyMock.expectLastCall().andReturn("/");
+        req.getServletPath();
+        EasyMock.expectLastCall().andReturn("/");
+        EasyMock.replay(req);
+
+        m.setExchange(exchange);
+        Destination dest = EasyMock.createMock(Destination.class);
+        exchange.setDestination(dest);
+        m.put(Message.BASE_PATH, baseURI);
+        String address = HttpUtils.getBaseAddress(m);
+        assertEquals("/STORE", address);
     }
 
     @Test

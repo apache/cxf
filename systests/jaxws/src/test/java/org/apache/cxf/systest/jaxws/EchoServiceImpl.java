@@ -18,13 +18,14 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.jws.WebService;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFactory;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.ext.logging.Logging;
 
 @WebService(name = "MyEchoService", targetNamespace = "urn:echo")
@@ -41,6 +42,35 @@ public class EchoServiceImpl implements EchoService {
         }
         throw ex;
 
+    }
+
+    public String echoProxy(String input) throws SOAPFaultException {
+        return input;
+    }
+
+
+    @Override
+    public String proxyException(String input) throws SOAPFaultException {
+        try {
+            Integer.parseInt(input);
+        } catch (Exception e) {
+            throw new SOAPFaultException(
+                    createSOAPFault(new EchoException("exception from testException()")));
+        }
+        return "DONE";
+    }
+
+    private SOAPFault createSOAPFault(Throwable ex) {
+        try {
+            SOAPFault soapFault = SOAPFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL).createFault();
+            soapFault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE, "Server", "a"));
+            soapFault.setFaultString("SOAPFaultString");
+            soapFault.setFaultActor("ServerSide");
+            soapFault.addDetail();
+            return soapFault;
+        } catch (SOAPException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SOAPFaultException wrapToSoapFault(Exception ex) throws Exception {

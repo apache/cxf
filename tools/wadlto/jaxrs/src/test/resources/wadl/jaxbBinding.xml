@@ -17,6 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0" node="//xs:complexType[@name='theBook2']/xs:sequence/xs:element[@name='id']">
+<jaxb:bindings xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.0" node="//xs:complexType[@name='theBook2']/xs:sequence/xs:element[@name='id']">
     <jaxb:property name="book2Id"/>
 </jaxb:bindings>

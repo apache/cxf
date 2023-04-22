@@ -84,7 +84,7 @@
         <soapjms:jndiConnectionFactoryName>ConnectionFactory
         </soapjms:jndiConnectionFactoryName>
         <soapjms:jndiInitialContextFactory>
-            org.apache.activemq.jndi.ActiveMQInitialContextFactory
+            org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory
         </soapjms:jndiInitialContextFactory>
         <soapjms:jndiURL>tcp://localhost:61616</soapjms:jndiURL>
         <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
@@ -117,7 +117,7 @@
     </wsdl:binding>
     <wsdl:service name="JMSGreeterService">
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
-            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61616"/>
+            <soap:address location="jms:jndi:dynamicQueues/test.cxf.jmstransport.queue?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61616"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

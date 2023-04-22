@@ -94,7 +94,7 @@ class InterfaceInvocationHandler implements InvocationHandler {
 
     protected Object doGetter(Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        String attrName = null;
+        final String attrName;
 
         if (methodName.startsWith("get")) {
             attrName = convertMethodName(methodName, 3);
@@ -127,7 +127,7 @@ class InterfaceInvocationHandler implements InvocationHandler {
 
     protected Object doSetter(Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        String attrName = null;
+        final String attrName;
 
         if (methodName.startsWith("set")) {
             attrName = convertMethodName(methodName, 3);

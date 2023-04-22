@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import javax.ws.rs.core.Form;
-
+import jakarta.ws.rs.core.Form;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;

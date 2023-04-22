@@ -29,7 +29,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec10.server.AuthorizedServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import wssec.wssec10.IPingService;
@@ -64,7 +63,6 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

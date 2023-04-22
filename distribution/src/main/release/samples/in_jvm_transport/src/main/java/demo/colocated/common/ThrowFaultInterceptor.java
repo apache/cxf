@@ -19,7 +19,7 @@
 
 package demo.colocated.common;
 
-import javax.xml.ws.ProtocolException;
+import jakarta.xml.ws.ProtocolException;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;

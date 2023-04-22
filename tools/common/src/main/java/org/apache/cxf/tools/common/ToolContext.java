@@ -156,7 +156,7 @@ public class ToolContext {
     }
 
     public boolean optionSet(String key) {
-        return (get(key) == null) ? false : true;
+        return get(key) != null;
     }
 
     public boolean isVerbose() {

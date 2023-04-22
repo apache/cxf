@@ -19,8 +19,7 @@
 // START SNIPPET: service
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.systest.jaxrs.validation.BookWithValidation;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxrs.validation.spring.BookWorld",

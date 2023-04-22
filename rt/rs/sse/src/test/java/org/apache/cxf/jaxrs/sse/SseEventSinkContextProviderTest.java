@@ -24,18 +24,17 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.IntStream;
 
-import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseEventSink;
-
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSink;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.springframework.mock.web.MockAsyncContext;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,15 +63,16 @@ public class SseEventSinkContextProviderTest {
         final Endpoint endpoint = mock(Endpoint.class);
         final ContinuationProvider continuationProvider = mock(ContinuationProvider.class);
         
-        final MockHttpServletResponse response = new MockHttpServletResponse();
-        final MockHttpServletRequest request = new MockHttpServletRequest();
-        final MockAsyncContext ctx = new MockAsyncContext(request, response) {
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final AsyncContext ctx = new TestAsyncContext(request, response) {
             @Override
             public void start(Runnable runnable) {
                 /* do nothing */
             } 
         };
-        request.setAsyncContext(ctx);
+        
+        when(request.getAsyncContext()).thenReturn(ctx);
         
         message = new MessageImpl();
         message.setExchange(exchange);

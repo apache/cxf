@@ -22,7 +22,7 @@ package cxf.client;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 
 import cxf.common.Account;
 import cxf.common.AccountCORBAService;

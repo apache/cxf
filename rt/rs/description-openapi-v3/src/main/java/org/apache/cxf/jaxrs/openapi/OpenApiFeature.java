@@ -32,15 +32,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
-
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -496,7 +494,7 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
                                 .getUserDefinedOptions());
                 registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
                 registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
-                registerSwaggerContainerRequestFilter(factory, application);
+                registerSwaggerContainerRequestFilter(factory, application, context.getOpenApiConfiguration());
 
                 if (useContextBasedConfig) {
                     registerServletConfigProvider(factory);
@@ -512,10 +510,13 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
             }
         }
 
-        private void registerSwaggerContainerRequestFilter(ServerProviderFactory factory, Application application) {
+        private void registerSwaggerContainerRequestFilter(ServerProviderFactory factory, Application application,
+                                                           OpenAPIConfiguration config) {
             if (isRunAsFilter()) {
                 List<Object> providers = new ArrayList<>();
-                providers.add(new SwaggerContainerRequestFilter(application));
+                BaseOpenApiResource filter = createOpenApiRequestFilter(application).openApiConfiguration(config)
+                        .configLocation(configLocation);
+                providers.add(filter);
                 factory.setUserProviders(providers);
             }
             
@@ -914,6 +915,11 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
         private BaseOpenApiResource createOpenApiResource() {
             return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
         }
+
+        private BaseOpenApiResource createOpenApiRequestFilter(Application application) {
+            return (customizer == null) ? new SwaggerContainerRequestFilter(application)
+                    : new CustomizedSwaggerContainerRequestFilter(application, customizer);
+        }
     }
     
     @PreMatching
@@ -945,6 +951,48 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
             } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
                 try {
                     response = super.getOpenApi(mc.getHttpHeaders(), mc.getServletConfig(), app, ui, "yaml");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            }
+
+            if (response != null) {
+                requestContext.abortWith(response);
+            }
+        }
+    }
+
+    @PreMatching
+    protected static class CustomizedSwaggerContainerRequestFilter extends OpenApiCustomizedResource
+            implements ContainerRequestFilter {
+
+        protected static final String APIDOCS_LISTING_PATH_JSON = "openapi.json";
+        protected static final String APIDOCS_LISTING_PATH_YAML = "openapi.yaml";
+
+
+        @Context
+        protected MessageContext mc;
+
+        private Application app;
+        public CustomizedSwaggerContainerRequestFilter(Application app, OpenApiCustomizer customizer) {
+            super(customizer);
+            this.app = app;
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            UriInfo ui = mc.getUriInfo();
+
+            Response response = null;
+            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
+                try {
+                    response = super.getOpenApi(app, mc.getServletConfig(), mc.getHttpHeaders(), ui, "json");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
+                try {
+                    response = super.getOpenApi(app, mc.getServletConfig(), mc.getHttpHeaders(), ui, "yaml");
                 } catch (Exception ex) {
                     throw new IOException(ex);
                 }

@@ -24,11 +24,10 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingEvent;
+import jakarta.servlet.http.HttpSessionBindingListener;
 import org.apache.cxf.transport.http.netty.server.util.Utils;
 
 public class NettyHttpSession implements HttpSession {
@@ -85,7 +84,7 @@ public class NettyHttpSession implements HttpSession {
 
     @SuppressWarnings("deprecation")
     @Override
-    public javax.servlet.http.HttpSessionContext getSessionContext() {
+    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
         throw new IllegalStateException(
                 "As of Version 2.1, this method is deprecated and has no replacement.");
     }

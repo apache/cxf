@@ -1,7 +1,8 @@
 == Spring Boot - Samples - CXF Rest Web Services 
 
 This sample project demonstrates how to use CXF JAX-RS services
-with Spring Boot. This demo has two JAX-RS class resources being deployed in a single JAX-RS endpoint.  
+with Spring Boot and Spring Actuator. This demo has two JAX-RS class resources being deployed 
+in a single JAX-RS endpoint.  
 
 = Starting the server =
 
@@ -60,6 +61,11 @@ or access it from the CXF Services page:
   http://localhost:8080/services/helloservice/services
   and follow a Swagger link.
 
+To view the exposed metrics:
+  http://localhost:8080/actuator/metrics
+
+The Apache CXF specific metrics are available under:
+  http://localhost:8080/actuator/metrics/cxf.server.requests
 
 ---- From the command line ----
 

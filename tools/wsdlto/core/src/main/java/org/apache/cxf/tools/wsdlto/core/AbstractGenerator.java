@@ -25,8 +25,7 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.DatatypeConverter;
-
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.FrontEndGenerator;
@@ -72,17 +71,16 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
     }
 
     protected Writer parseOutputName(String packageName, String filename, String ext) throws ToolException {
-        FileWriterUtil fw = null;
-        Writer writer = null;
 
         if (wantToKeep() && isCollision(packageName, filename, ext)) {
-            Message msg = new Message("SKIP_GEN", LOG, packageName + "." + filename + ext);
+            Message msg = new Message("SKIP_GEN", LOG, packageName + '.' + filename + ext);
             LOG.log(Level.INFO, msg.toString());
             return null;
         }
 
-        fw = new FileWriterUtil(getOutputDir(),
+        FileWriterUtil fw = new FileWriterUtil(getOutputDir(),
                                 env.get(OutputStreamCreator.class));
+        final Writer writer;
         try {
             if (".java".equals(ext)) {
                 writer = fw.getWriter(packageName, filename + ext,
@@ -91,7 +89,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
                 writer = fw.getWriter(packageName, filename + ext);
             }
         } catch (IOException ioe) {
-            Message msg = new Message("FAIL_TO_WRITE_FILE", LOG, packageName + "." + filename + ext);
+            Message msg = new Message("FAIL_TO_WRITE_FILE", LOG, packageName + '.' + filename + ext);
             throw new ToolException(msg, ioe);
         }
 

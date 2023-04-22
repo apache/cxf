@@ -20,7 +20,6 @@ package org.apache.cxf.sts.token.renewer;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -138,23 +137,20 @@ public class SAMLTokenRenewerPOPTest {
             // expected
         }
 
-        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         signedResult.put(
             WSSecurityEngineResult.TAG_X509_CERTIFICATES, crypto.getX509Certificates(cryptoType)
         );
-        signedResults.add(signedResult);
+        List<WSSecurityEngineResult> signedResults = Collections.singletonList(signedResult);
 
-        List<WSHandlerResult> handlerResults = new ArrayList<>();
         WSHandlerResult handlerResult =
             new WSHandlerResult(null, signedResults,
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
-        handlerResults.add(handlerResult);
 
         Map<String, Object> messageContext = validatorParameters.getMessageContext();
-        messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
+        messageContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(handlerResult));
 
         // Now successfully renew the token
         TokenRenewerResponse renewerResponse =
@@ -215,23 +211,20 @@ public class SAMLTokenRenewerPOPTest {
             // expected
         }
 
-        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myservicekey");
         signedResult.put(
             WSSecurityEngineResult.TAG_X509_CERTIFICATES, crypto.getX509Certificates(cryptoType)
         );
-        signedResults.add(signedResult);
+        List<WSSecurityEngineResult> signedResults = Collections.singletonList(signedResult);
 
-        List<WSHandlerResult> handlerResults = new ArrayList<>();
         WSHandlerResult handlerResult =
             new WSHandlerResult(null, signedResults,
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
-        handlerResults.add(handlerResult);
 
         Map<String, Object> messageContext = validatorParameters.getMessageContext();
-        messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
+        messageContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singleton(handlerResult));
 
         try {
             samlTokenRenewer.renewToken(renewerParameters);

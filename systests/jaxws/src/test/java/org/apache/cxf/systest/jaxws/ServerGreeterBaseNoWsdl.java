@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.greeter_control.GreeterImplBaseNoWsdl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;

@@ -22,18 +22,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -47,21 +47,52 @@ public abstract class AbstractCdiMultiAppTest extends AbstractCdiSingleAppTest {
                 new Form()
                         .param("id", id));
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), nullValue());
     }
 
     @Test
     public void testGetBookStoreVersion() {
         Response r1 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        r1.bufferEntity();
         assertEquals(Response.Status.OK.getStatusCode(), r1.getStatus());
         assertThat(r1.readEntity(String.class), startsWith("1.0."));
 
         Response r2 = createWebClient("/rest/v3/bookstore/versioned/version", MediaType.TEXT_PLAIN).get();
+        r2.bufferEntity();
         assertEquals(Response.Status.OK.getStatusCode(), r2.getStatus());
         assertThat(r2.readEntity(String.class), startsWith("1.0."));
 
         assertThat(r2.readEntity(String.class), not(equalTo(r1.readEntity(String.class))));
     }
 
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringRequestScopedBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/request/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringCustomScopedBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/custom/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringContractBookstore() {
+        Response r = createWebClient("/rest/v2/bookstore/contract/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
+    @Test
+    public void testResponseHasBeenReceivedWhenQueringMethodWithNameBinding() {
+        Response r = createWebClient("/rest/v2/bookstore/books").get();
+        assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+        assertThat(r.getHeaderString("X-Logged"), equalTo("true"));
+    }
+    
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.APPLICATION_JSON);
     }

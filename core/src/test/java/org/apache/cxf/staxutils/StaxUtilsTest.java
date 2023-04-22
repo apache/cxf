@@ -349,9 +349,8 @@ public class StaxUtilsTest {
 
     @Test
     public void testDefaultPrefixInRootElementWithJDKInternalCopyTransformer() throws Exception {
-        TransformerFactory trf = null;
         try {
-            trf = TransformerFactory
+            final TransformerFactory trf = TransformerFactory
                 .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
             trf.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -26,18 +26,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
@@ -89,11 +88,11 @@ public class WadlGeneratorTest {
     }
 
     @Test
-    public void testWhiteList() throws Exception {
+    public void testAllowList() throws Exception {
         WadlGenerator wg = new WadlGenerator();
-        List<String> whiteList = new ArrayList<>();
-        whiteList.add("123.123.123.123");
-        wg.setWhiteList(whiteList);
+        List<String> allowList = new ArrayList<>();
+        allowList.add("123.123.123.123");
+        wg.setAllowList(allowList);
         wg.setExternalLinks(Collections.singletonList("http://books.xsd"));
 
         ClassResourceInfo cri =

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.ResourceException;
+import jakarta.resource.ResourceException;
 
 public interface CXFTransaction {
 

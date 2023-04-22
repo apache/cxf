@@ -22,7 +22,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:itst="http://tests.iona.com/ittests"
     xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
     xmlns:x1="http://apache.org/type_test/types1"
     xmlns:x2="http://apache.org/type_test/types2"
     xmlns:x3="http://apache.org/type_test/types3"
@@ -99,16 +99,16 @@
   <itst:it_test_group ID="1">
 
     <!-- Nillable elements -->
-    <element name="NillableString" type="string" nillable="true"/>
+    <element name="NillableString" type="xsd:string" nillable="true"/>
     <element name="NillableStruct" type="x1:SimpleStruct" nillable="true"/>
 
     <!-- Anonymous type elements -->
     <element name="AnonTypeElement">
         <complexType>
             <sequence>
-                <element name="varFloat" type="float"/>
-                <element name="varInt" type="int"/>
-                <element name="varString" type="string"/>
+                <element name="varFloat" type="xsd:float"/>
+                <element name="varInt" type="xsd:int"/>
+                <element name="varString" type="xsd:string"/>
             </sequence>
         </complexType>
     </element>
@@ -118,9 +118,9 @@
     <element itst:it_no_test="true" name="AnonTypeElementQualified">
         <complexType>
             <sequence>
-                <element name="varFloat" type="float"/>
-                <element name="varInt" type="int"/>
-                <element name="varString" type="string"/>
+                <element name="varFloat" type="xsd:float"/>
+                <element name="varInt" type="xsd:int"/>
+                <element name="varString" type="xsd:string"/>
             </sequence>
         </complexType>
     </element>
@@ -686,9 +686,9 @@
 
     <complexType name="SimpleChoice">
         <choice>
-            <element name="varFloat" type="float"/>
-            <element name="varInt" type="int"/>
-            <element name="varString" type="string"/>
+            <element name="varFloat" type="xsd:float"/>
+            <element name="varInt" type="xsd:int"/>
+            <element name="varString" type="xsd:string"/>
         </choice>
         <!--CORBA MAPPING BROKEN-->
         <!--attribute name="varAttrString" type="string"/-->

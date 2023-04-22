@@ -19,27 +19,24 @@
 package org.apache.cxf.tools.java2ws;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolTestBase;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,44 +44,18 @@ import static org.junit.Assert.assertTrue;
 
 public class AegisTest extends ToolTestBase {
 
-    private File output;
-    private String cp;
-    private File inputData;
-
-
-    @Before
-    public void startUp() throws Exception {
-        cp = System.getProperty("java.class.path");
-        URL url = getClass().getResource(".");
-        output = new File(url.toURI());
-        output = new File(output, "/generated/");
-        url = getClass().getResource("/");
-        inputData = new File(url.toURI());
-        FileUtils.mkDir(output);
-    }
-
-    @After
-    public void tearDown() {
-        super.tearDown();
-        System.setProperty("java.class.path", cp);
-        FileUtils.removeDir(output);
-        output = null;
-    }
-    private File outputFile(String name) {
-        File f = new File(output.getPath() + File.separator + name);
-        f.delete();
-        return f;
-    }
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testAegisBasic() throws Exception {
         final String sei = org.apache.cxf.tools.fortest.aegis2ws.TestAegisSEI.class.getName();
-        String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/aegis.wsdl", "-verbose", "-d",
-                                      output.getPath(), "-s", output.getPath(),
+        File wsdlFile = new File(folder.getRoot(), "aegis.wsdl");
+        String[] args = new String[] {"-wsdl", "-o", wsdlFile.toString(), "-verbose",
+                                      "-d", folder.getRoot().toString(),
+                                      "-s", folder.getRoot().toString(),
                                       "-frontend", "jaxws", "-databinding", "aegis",
                                       "-client", "-server", sei};
-        File wsdlFile = null;
-        wsdlFile = outputFile("aegis.wsdl");
         JavaToWS.main(args);
         assertTrue("wsdl is not generated", wsdlFile.exists());
 
@@ -98,15 +69,13 @@ public class AegisTest extends ToolTestBase {
     @Test
     public void testAegisReconfigureDatabinding() throws Exception {
         final String sei = org.apache.cxf.tools.fortest.aegis2ws.TestAegisSEI.class.getName();
-        String[] args = new String[] {"-wsdl", "-o", output.getPath() + "/aegis.wsdl",
+        File wsdlFile = new File(folder.getRoot(), "aegis.wsdl");
+        String[] args = new String[] {"-wsdl", "-o", wsdlFile.toString(),
                                       "-beans",
-                                      new File(inputData, "revisedAegisDefaultBeans.xml").
-                                          getAbsolutePath(),
-                                      "-verbose", "-s",
-                                      output.getPath(), "-frontend", "jaxws", "-databinding", "aegis",
+            new File(getClass().getResource("/revisedAegisDefaultBeans.xml").toURI()).toString(),
+                                      "-verbose", "-s", folder.getRoot().toString(), 
+                                      "-frontend", "jaxws", "-databinding", "aegis",
                                       "-client", "-server", sei};
-        File wsdlFile = null;
-        wsdlFile = outputFile("aegis.wsdl");
         JavaToWS.main(args);
         assertTrue("wsdl is not generated " + getStdErr(), wsdlFile.exists());
 
@@ -127,7 +96,7 @@ public class AegisTest extends ToolTestBase {
     }
 
 
-    private Map<String, String> getNSMap() {
+    private static Map<String, String> getNSMap() {
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
@@ -140,7 +109,7 @@ public class AegisTest extends ToolTestBase {
         return namespaces;
     }
 
-    private void assertValid(String xpathExpression, Document doc) throws XMLStreamException {
+    private static void assertValid(String xpathExpression, Document doc) {
         XPathUtils xpu = new XPathUtils(getNSMap());
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
             Assert.fail("Failed to select any nodes for expression:\n" + xpathExpression

@@ -24,10 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
-import javax.xml.ws.soap.MTOM;
-
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.MTOM;
 import org.apache.cxf.helpers.IOUtils;
 
 /**

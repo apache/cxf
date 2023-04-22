@@ -20,11 +20,10 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.container.AsyncResponse;
-
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.container.AsyncResponse;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;

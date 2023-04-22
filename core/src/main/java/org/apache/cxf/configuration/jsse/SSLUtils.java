@@ -432,7 +432,7 @@ public final class SSLUtils {
 
     private static String[] getSystemCiphersuites(Logger log) {
         String jvmCipherSuites = System.getProperty(HTTPS_CIPHER_SUITES);
-        if ((jvmCipherSuites != null) && (!jvmCipherSuites.isEmpty())) {
+        if ((jvmCipherSuites != null) && !jvmCipherSuites.isEmpty()) {
             LogUtils.log(log, Level.FINE, "CIPHERSUITES_SYSTEM_PROPERTY_SET", jvmCipherSuites);
             return jvmCipherSuites.split(",");
         }

@@ -32,13 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -56,6 +55,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public final class FormUtils {
     public static final String FORM_PARAMS_FROM_HTTP_PARAMS = "set.form.parameters.from.http.parameters";
     public static final String FORM_PARAM_MAP = "org.apache.cxf.form_data";
+    public static final String FORM_PARAM_MAP_DECODED = "org.apache.cxf.form_data.decoded";
 
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";
@@ -168,7 +168,7 @@ public final class FormUtils {
                                              String postBody,
                                              String enc,
                                              boolean decode,
-                                             javax.servlet.http.HttpServletRequest request) {
+                                             jakarta.servlet.http.HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             populateMapFromString(params, m, postBody, enc, decode);
         } else if (request != null
@@ -179,6 +179,8 @@ public final class FormUtils {
                 params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }
             logRequestParametersIfNeeded(params, enc);
+            // The form params extracted from the HttpServelRequest are already decoded
+            m.put(FORM_PARAM_MAP_DECODED, true);
         }
     }
 

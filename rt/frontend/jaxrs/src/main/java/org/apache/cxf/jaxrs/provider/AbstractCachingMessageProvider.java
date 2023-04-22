@@ -22,9 +22,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;

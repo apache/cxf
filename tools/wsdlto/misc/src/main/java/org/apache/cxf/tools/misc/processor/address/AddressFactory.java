@@ -55,7 +55,7 @@ public final class AddressFactory {
         sb.append(StringUtils.capitalize(name));
         sb.append("Address");
         try {
-            address = (Address) Class.forName(sb.toString()).newInstance();
+            address = (Address) Class.forName(sb.toString()).getDeclaredConstructor().newInstance();
             addresses.put(name, address);
             LOG.log(Level.FINE, "FOUND_ADDRESSER", sb);
             return address;

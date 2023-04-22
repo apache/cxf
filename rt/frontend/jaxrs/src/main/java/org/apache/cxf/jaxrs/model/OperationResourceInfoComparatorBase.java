@@ -23,9 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.DefaultMethod;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

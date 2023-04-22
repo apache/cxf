@@ -184,7 +184,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     }
 
     final void loadAndRegister(Extension e) {
-        Class<?> cls = null;
+        Class<?> cls;
         if (null != e.getInterfaceName() && !"".equals(e.getInterfaceName())) {
             cls = e.loadInterface(loader);
         }  else {

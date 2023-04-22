@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
@@ -82,7 +83,7 @@ public final class SignatureHeaderUtils {
             String foundAlgorithm = Stream.of("SHA-256", "SHA-512")
                  .filter(s -> s.equalsIgnoreCase(algorithmName))
                  .findAny()
-                 .orElseThrow(() -> new NoSuchAlgorithmException("found no match in digest algorithm whitelist"));
+                 .orElseThrow(() -> new NoSuchAlgorithmException("found no match in digest algorithm allow-list"));
             return MessageDigest.getInstance(foundAlgorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new DigestFailureException("failed to retrieve digest from digest string", e);
@@ -101,4 +102,14 @@ public final class SignatureHeaderUtils {
         });
     }
 
+    public static String createRequestTarget(URI uri) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(uri.getRawPath());
+
+        if (uri.getRawQuery() != null) {
+            stringBuilder.append('?');
+            stringBuilder.append(uri.getRawQuery());
+        }
+        return stringBuilder.toString();
+    }
 }

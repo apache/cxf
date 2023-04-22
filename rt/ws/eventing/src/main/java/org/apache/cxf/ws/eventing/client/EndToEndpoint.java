@@ -20,12 +20,11 @@
 package org.apache.cxf.ws.eventing.client;
 
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.soap.Addressing;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.ws.eventing.SubscriptionEnd;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 

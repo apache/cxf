@@ -87,10 +87,10 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
             wsdlWriter.writeWSDL(def, os);
             os.close();
 
-            if (def.getImports().size() > 0) {
+            if (!def.getImports().isEmpty()) {
                 for (Import wsdlImport : WSDLDefinitionBuilder.getImports(def)) {
                     Definition wsdlDef = wsdlImport.getDefinition();
-                    File wsdlFile = null;
+                    final File wsdlFile;
                     if (!StringUtils.isEmpty(wsdlImport.getLocationURI())) {
                         wsdlFile = new File(outputdir,  wsdlImport.getLocationURI());
                     } else {

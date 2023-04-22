@@ -23,9 +23,10 @@ import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.Map;
-import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import javax.xml.namespace.QName;
+
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

@@ -27,11 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -219,7 +218,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     private String getAbsolutePathAsString() {
-        String address = getBaseUri().toString();
+        String address = URI.create(HttpUtils.getEndpointUri(message)).toString();
         if (MessageUtils.isRequestor(message)) {
             return address;
         }

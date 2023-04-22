@@ -143,7 +143,7 @@ public final class ValidatorUtil {
             return docMap;
         }
 
-        DocumentBuilder docBuilder = null;
+        final DocumentBuilder docBuilder;
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setNamespaceAware(true);

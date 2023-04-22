@@ -22,7 +22,7 @@ $intf.packageJavaDoc
 package $intf.PackageName;
 
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
 #foreach ($import in $intf.Imports)
 import ${import};

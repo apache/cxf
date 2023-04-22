@@ -21,8 +21,8 @@ package org.apache.cxf.aegis.type.java5.map;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @WebService(targetNamespace = "http://client.webservice.crm.ecot.com/skeleton/StudentService",
     name = "StudentService")

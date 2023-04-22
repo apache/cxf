@@ -24,11 +24,10 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -45,11 +44,10 @@ public class CertConstraintsTest {
         final X509Certificate gordyCert =
             loadCertificate("Gordy.jks", "JKS", "password", "gordy");
 
-        CertConstraints tmp = null;
         //
         // bethal matches but gordy doesn't
         //
-        tmp = loadCertConstraints("subject-CN-bethal");
+        CertConstraints tmp = loadCertConstraints("subject-CN-bethal");
         assertTrue(tmp.matches(bethalCert) && !tmp.matches(gordyCert));
         //
         // gordy matches but bethal doesn't

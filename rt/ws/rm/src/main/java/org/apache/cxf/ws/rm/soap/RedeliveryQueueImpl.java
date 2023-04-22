@@ -286,7 +286,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         Identifier sid = st.getIdentifier();
         String key = sid.getValue();
 
-        RedeliverCandidate candidate = null;
+        RedeliverCandidate candidate;
 
         synchronized (this) {
             List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(key);
@@ -487,10 +487,8 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 message.removeContent(Node.class);
             }
 
-
-            InputStream is = null;
             CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-            is = cos.getInputStream();
+            InputStream is = cos.getInputStream();
             message.setContent(InputStream.class, is);
             message = message.getExchange().getEndpoint().getBinding().createMessage(message);
             restartingPhase = Phase.POST_STREAM;

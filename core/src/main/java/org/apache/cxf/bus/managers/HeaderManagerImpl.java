@@ -21,8 +21,7 @@ package org.apache.cxf.bus.managers;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Resource;
-
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.headers.HeaderManager;

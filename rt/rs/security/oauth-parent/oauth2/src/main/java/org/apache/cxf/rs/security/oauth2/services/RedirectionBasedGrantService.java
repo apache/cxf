@@ -26,15 +26,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -137,11 +136,15 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Starts the authorization process
      */
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
-        // Make sure the end user has authenticated, check if HTTPS is used
-        SecurityContext sc = getAndValidateSecurityContext(params);
+        UserSubject userSubject = null;
+        SecurityContext securityContext =
+                (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
+        if (securityContext != null && securityContext.getUserPrincipal() != null) {
+            // Create a UserSubject representing the end user, if we have already authenticated
+            userSubject = createUserSubject(securityContext, params);
+        }
+        checkTransportSecurity();
         Client client = getClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
-        // Create a UserSubject representing the end user
-        UserSubject userSubject = createUserSubject(sc, params);
 
         if (authorizationFilter != null) {
             params = authorizationFilter.process(params, userSubject, client);
@@ -209,7 +212,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                 OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPerms).containsAll(requestedScope);
         }
 
-        Response finalResponse = null;
+        Response finalResponse;
         try {
             final boolean authorizationCanBeSkipped = preAuthorizationComplete
                 || canAuthorizationBeSkipped(params, client, userSubject, requestedScope, requestedPermissions);
@@ -243,11 +246,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return finalResponse;
 
     }
-    //CHECKSTYLE:OFF
 
     public Set<String> getSupportedResponseTypes() {
         return supportedResponseTypes;
     }
+
     protected boolean canAuthorizationBeSkipped(MultivaluedMap<String, String> params,
                                                 Client client,
                                                 UserSubject userSubject,
@@ -292,6 +295,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             }
             secData.setProposedScope(builder.toString().trim());
         }
+        secData.setClientCodeChallenge(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE));
+        secData.setClientCodeChallengeMethod(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD));
         if (!authorizationCanBeSkipped) {
             secData.setPermissions(requestedPerms);
             secData.setAlreadyAuthorizedPermissions(alreadyAuthorizedPerms);
@@ -338,7 +343,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return state;
     }
     protected void personalizeData(OAuthAuthorizationData data, UserSubject userSubject) {
-        if (resourceOwnerNameProvider != null) {
+        if (resourceOwnerNameProvider != null && userSubject != null) {
             data.setEndUserName(resourceOwnerNameProvider.getName(userSubject));
         }
     }
@@ -531,7 +536,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Get the {@link Client} reference
      * @param params request parameters
      * @return Client the client reference
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found,
+     * @throws {@link jakarta.ws.rs.WebApplicationException} if no matching Client is found,
      *         the error is returned directly to the end user without
      *         following the redirect URI if any
      */

@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.jaxws.holder;
 
-import javax.xml.ws.Holder;
-
 import org.w3c.dom.Node;
 
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.bus.CXFBusFactory;

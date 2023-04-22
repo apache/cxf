@@ -19,8 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.tools.common.ToolContext;
@@ -65,7 +64,7 @@ public final class ParameterMapper {
 
         if (style == JavaType.Style.INOUT || style == JavaType.Style.OUT) {
             parameter.setHolder(true);
-            parameter.setHolderName(javax.xml.ws.Holder.class.getName());
+            parameter.setHolderName(jakarta.xml.ws.Holder.class.getName());
             String holderClass = fullJavaName;
             if (JAXBUtils.holderClass(fullJavaName) != null) {
                 holderClass = JAXBUtils.holderClass(fullJavaName).getName();

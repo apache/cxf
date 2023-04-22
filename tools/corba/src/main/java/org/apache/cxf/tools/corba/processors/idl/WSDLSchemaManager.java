@@ -35,9 +35,9 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
 import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.factory.WSDLFactory;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;

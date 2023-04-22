@@ -26,11 +26,10 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <properties>
-    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -122,6 +121,17 @@
                 <configuration>
                     <executable>java</executable>
                     <mainClass>demo.jaxrs.server.BigQueryServer</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
                 </configuration>
             </plugin>
         </plugins>

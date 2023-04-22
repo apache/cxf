@@ -44,7 +44,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private static final String TOOL_NAME = "wadl2java";
     private static final String EPR_TYPE_KEY = "org.w3._2005._08.addressing.EndpointReference";
     private static final Map<String, String> DEFAULT_JAVA_TYPE_MAP = Collections.singletonMap(EPR_TYPE_KEY,
-        "javax.xml.ws.wsaddressing.W3CEndpointReference");
+        "jakarta.xml.ws.wsaddressing.W3CEndpointReference");
 
     public JAXRSContainer(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);

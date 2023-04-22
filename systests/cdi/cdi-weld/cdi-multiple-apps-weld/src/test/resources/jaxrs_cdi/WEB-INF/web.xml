@@ -1,4 +1,4 @@
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app version="3.0" xmlns="https://jakarta.ee/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<listener>

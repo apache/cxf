@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxws.types;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 
 public class BarAdapter extends XmlAdapter<BarImpl, Bar> {

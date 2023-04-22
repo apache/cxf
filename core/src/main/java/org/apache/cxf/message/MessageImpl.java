@@ -51,6 +51,11 @@ public class MessageImpl extends StringMapImpl implements Message {
     public MessageImpl() {
         //nothing
     }
+
+    public MessageImpl(int initialSize, float factor) {
+        super(initialSize, factor);
+    }
+
     public MessageImpl(Message m) {
         super(m);
         if (m instanceof MessageImpl) {

@@ -20,8 +20,7 @@ package org.apache.cxf.transport.http.netty.server.integration;
 
 import java.net.URL;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -69,7 +68,9 @@ public class SSLNettySpringServerTest extends SSLNettyServerTest {
             ep.stop();
         }
         ep = null;
-        context.close();
+        if (context != null) {
+            context.close();
+        }
     }
 
 }

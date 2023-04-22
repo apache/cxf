@@ -21,9 +21,9 @@ package org.apache.cxf.jca.outbound;
 import java.net.URL;
 import java.util.Objects;
 
-import javax.resource.spi.ConnectionRequestInfo;
 import javax.xml.namespace.QName;
 
+import jakarta.resource.spi.ConnectionRequestInfo;
 
 /**
  *

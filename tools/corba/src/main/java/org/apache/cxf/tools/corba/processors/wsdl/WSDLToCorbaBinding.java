@@ -137,7 +137,7 @@ public class WSDLToCorbaBinding {
         xmlSchemaList = typeProcessor.getXmlSchemaTypes();
         helper.setXMLSchemaList(xmlSchemaList);
 
-        List<PortType> intfs = null;
+        final List<PortType> intfs;
         if (!interfaceNames.isEmpty()) {
             intfs = new ArrayList<>(interfaceNames.size());
 
@@ -159,7 +159,7 @@ public class WSDLToCorbaBinding {
                 if (portType == null) {
                     String msgStr = "PortType " + interfaceName
                         + " doesn't exist in WSDL.";
-                    throw new Exception(msgStr);
+                    throw new ToolException(msgStr);
                 }
                 intfs.add(portType);
             }
@@ -178,17 +178,16 @@ public class WSDLToCorbaBinding {
 
     private List<PortType> getPortTypeList() throws Exception {
         Map<QName, PortType> portTypes = CastUtils.cast(def.getAllPortTypes());
-        List<PortType> intfs = null;
 
         if (portTypes == null) {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "No PortTypes defined in wsdl", LOG);
             throw new Exception(msg.toString());
         }
-        PortType portType = null;
-        intfs = new ArrayList<>();
+
+        List<PortType> intfs = new ArrayList<>();
         if (portTypes.size() == 1) {
-            portType = portTypes.values().iterator().next();
+            PortType portType = portTypes.values().iterator().next();
             interfaceNames.add(portType.getQName().getLocalPart());
             intfs.add(portType);
         } else if (portTypes.size() > 1) {
@@ -213,13 +212,13 @@ public class WSDLToCorbaBinding {
         int cnt = 0;
         while (it2.hasNext()) {
             cnt++;
-            sb.append("  " + cnt + " --> " + it2.next().getLocalPart());
+            sb.append("  ").append(cnt).append(" --> ").append(it2.next().getLocalPart());
         }
         throw new Exception(sb.toString());
     }
 
     private Binding generateCORBABinding(Definition definition, PortType portType) throws Exception {
-        QName bqname = null;
+        QName bqname;
 
         if (extReg == null) {
             extReg = def.getExtensionRegistry();
@@ -255,7 +254,7 @@ public class WSDLToCorbaBinding {
                     + " already exists in WSDL.";
                 org.apache.cxf.common.i18n.Message msg =
                     new org.apache.cxf.common.i18n.Message(msgStr, LOG);
-                throw new Exception(msg.toString());
+                throw new ToolException(msg.toString());
             }
         }
 
@@ -266,19 +265,17 @@ public class WSDLToCorbaBinding {
             def.addNamespace(pfx, CorbaConstants.NU_WSDL_CORBA);
         }
 
-        Binding binding = null;
-        binding = def.createBinding();
+        Binding binding = def.createBinding();
         binding.setPortType(portType);
         binding.setQName(bqname);
 
         bindingNames.add(bname);
         mapBindingToInterface(portType.getQName().getLocalPart(), bname);
-        BindingType bindingType = null;
 
         addCorbaTypeMap(def);
 
         try {
-            bindingType = (BindingType)extReg
+            BindingType bindingType = (BindingType)extReg
                 .createExtension(Binding.class, CorbaConstants.NE_CORBA_BINDING);
             bindingType.setRepositoryID(WSDLToCorbaHelper.REPO_STRING
                                         + binding.getPortType().getQName().getLocalPart().replace('.', '/')
@@ -336,7 +333,7 @@ public class WSDLToCorbaBinding {
                 (AddressType) def.getExtensionRegistry().createExtension(Port.class,
                                                                          CorbaConstants.NE_CORBA_ADDRESS);
 
-            String addr = null;
+            String addr;
             if (getAddressFile() != null) {
                 File addrFile = new File(getAddressFile());
                 try {
@@ -404,7 +401,7 @@ public class WSDLToCorbaBinding {
     private void addCorbaOperationExtElement(BindingOperation bo, Operation op)
         throws Exception {
 
-        OperationType operationType = null;
+        final OperationType operationType;
         try {
             operationType = (OperationType)extReg.createExtension(BindingOperation.class,
                                                                   CorbaConstants.NE_CORBA_OPERATION);
@@ -483,22 +480,20 @@ public class WSDLToCorbaBinding {
 
     private void addCorbaTypes(XmlSchema xmlSchemaTypes) throws Exception {
         Map<QName, XmlSchemaType> objs = xmlSchemaTypes.getSchemaTypes();
-        CorbaType corbaTypeImpl = null;
         for (XmlSchemaType type : objs.values()) {
             boolean anonymous = WSDLTypes.isAnonymous(type.getName());
-            corbaTypeImpl = helper.convertSchemaToCorbaType(type, type.getQName(), null,
+            CorbaType corbaTypeImpl = helper.convertSchemaToCorbaType(type, type.getQName(), null,
                                                             null, anonymous);
             if (corbaTypeImpl != null
                 && !helper.isDuplicate(corbaTypeImpl)) {
                 typeMappingType.getStructOrExceptionOrUnion().add(corbaTypeImpl);
             }
         }
-        addCorbaElements(corbaTypeImpl, xmlSchemaTypes);
+        addCorbaElements(xmlSchemaTypes);
     }
 
 
-    private void addCorbaElements(CorbaType corbaTypeImpl,
-                                  XmlSchema xmlSchemaTypes) throws Exception {
+    private void addCorbaElements(XmlSchema xmlSchemaTypes) throws Exception {
         Map<QName, XmlSchemaElement> elements = xmlSchemaTypes.getElements();
         for (XmlSchemaElement el : elements.values()) {
             QName elName = el.getQName();
@@ -507,7 +502,7 @@ public class WSDLToCorbaBinding {
                 elName = el.getRef().getTargetQName();
                 schemaType = helper.getSchemaType(elName);
             }
-            boolean anonymous = false;
+            boolean anonymous;
             if (schemaType == null) {
                 anonymous = true;
             } else {
@@ -545,7 +540,7 @@ public class WSDLToCorbaBinding {
                         }
                     }
                 }
-                corbaTypeImpl =
+                CorbaType corbaTypeImpl =
                     helper.convertSchemaToCorbaType(schemaType,
                                                     elName, schemaType,
                                                     annotation, anonymous);
@@ -569,7 +564,6 @@ public class WSDLToCorbaBinding {
 
     private CorbaType convertFaultToCorbaType(XmlSchema xmlSchema, Fault fault) throws Exception {
         org.apache.cxf.binding.corba.wsdl.Exception corbaex = null;
-        XmlSchemaType schemaType = null;
         Iterator<Part> parts = CastUtils.cast(fault.getMessage().getParts().values().iterator());
 
         if (!parts.hasNext()) {
@@ -581,7 +575,7 @@ public class WSDLToCorbaBinding {
         }
 
         Part part = parts.next();
-        schemaType = helper.lookUpType(part);
+        XmlSchemaType schemaType = helper.lookUpType(part);
         if (schemaType != null) {
             QName name = schemaType.getQName();
             if (name == null) {
@@ -651,11 +645,10 @@ public class WSDLToCorbaBinding {
                                                                              XmlSchemaType stype)
         throws Exception {
         org.apache.cxf.binding.corba.wsdl.Exception corbaex = null;
-        XmlSchemaComplexType complex = null;
 
         if (stype instanceof XmlSchemaComplexType) {
             QName defaultName = schemaTypeName;
-            complex = (XmlSchemaComplexType)stype;
+            XmlSchemaComplexType complex = (XmlSchemaComplexType)stype;
             corbaex = new org.apache.cxf.binding.corba.wsdl.Exception();
             corbaex.setQName(schemaTypeName);
             corbaex.setType(helper.checkPrefix(schemaTypeName));
@@ -870,7 +863,7 @@ public class WSDLToCorbaBinding {
             if (verboseOn) {
                 ex.printStackTrace();
             }
-            System.exit(1);
+            System.exit(1); //NOPMD
         }
     }
 

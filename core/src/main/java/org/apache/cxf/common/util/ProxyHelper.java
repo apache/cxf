@@ -34,7 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 public class ProxyHelper {
     static final ProxyHelper HELPER;
     static {
-        ProxyHelper theHelper = null;
+        ProxyHelper theHelper;
         try {
             theHelper = new CglibProxyHelper();
         } catch (Throwable ex) {
@@ -96,7 +96,7 @@ public class ProxyHelper {
     }
     
     private String getSortedNameFromInterfaceArray(Class<?>[] interfaces) {
-        SortedArraySet<String> arraySet = new SortedArraySet<String>();
+        SortedArraySet<String> arraySet = new SortedArraySet<>();
         for (Class<?> currentInterface : interfaces) {
             arraySet.add(currentInterface.getName() + ClassLoaderUtils.getClassLoaderName(currentInterface));
         }

@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.ws.rs.ext.ParamConverterProvider;
-
+import jakarta.ws.rs.ext.ParamConverterProvider;
 import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
 
 public class LuceneDocumentMetadata {

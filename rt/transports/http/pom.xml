@@ -27,37 +27,21 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http</cxf.module.name>
-        <cxf.bundle.activator>org.apache.cxf.transport.http.osgi.HTTPTransportActivator</cxf.bundle.activator>
-        <cxf.osgi.import>
-            javax.net,
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            org.osgi.service.http,
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}",
-            com.sun.activation.registries;resolution:=optional
-        </cxf.osgi.import>
-        <cxf.osgi.export>
-            org.apache.cxf.transports.http*,
-            org.apache.cxf.transport.http.*,
-            org.apache.cxf.transport.https.*,
-            org.apache.cxf.transport.servlet.*
-        </cxf.osgi.export>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-            org.apache.aries.blueprint.NamespaceHandler;osgi.service.blueprint.namespace="http://cxf.apache.org/transports/http/configuration"
-        </cxf.export.service>
         <cxf.public.suffix.list.url>
             https://publicsuffix.org/list/effective_tld_names.dat
         </cxf.public.suffix.list.url>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -69,15 +53,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${cxf.mockito.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -114,17 +93,6 @@
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>blueprint-parser</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -181,48 +149,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>versions</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>cleanVersions</goal>
-                        </goals>
-                        <configuration>
-                            <versions>
-                                <cxf.osgi.version.clean>${project.version}</cxf.osgi.version.clean>
-                            </versions>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${cxf.osgi.symbolic.name}</Bundle-SymbolicName>
-                        <Include-Resource>
-                          {maven-resources},
-                          mozilla/public-suffix-list.txt=${basedir}/target/classes/mozilla/public-suffix-list.txt
-                        </Include-Resource>
-                        <Import-Package>
-                            ${cxf.osgi.import},
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                            ${cxf.osgi.export}
-                        </Export-Package>
-                        <Export-Service>
-                            ${cxf.export.service}
-                        </Export-Service>
-                        <Bundle-Activator>${cxf.bundle.activator}</Bundle-Activator>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
                 <artifactId>download-maven-plugin</artifactId>
-                <version>1.3.0</version><!-- 1.4.0 fails due to old cache on Jenkins nodes https://github.com/maven-download-plugin/maven-download-plugin/issues/80 -->
+                <version>1.6.8</version>
                 <executions>
                     <execution>
                         <id>download-public-suffix-list</id>

@@ -21,10 +21,9 @@ package org.apache.cxf.jaxrs.security;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -33,7 +32,15 @@ import org.apache.cxf.rt.security.claims.interceptor.ClaimsAuthorizingIntercepto
 
 public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 
-    private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
+    private ClaimsAuthorizingInterceptor interceptor;
+
+    public ClaimsAuthorizingFilter() {
+        this.interceptor = new ClaimsAuthorizingInterceptor();
+    }
+
+    public ClaimsAuthorizingFilter(ClaimsAuthorizingInterceptor interceptor) {
+        this.interceptor = interceptor;
+    }
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -45,13 +52,14 @@ public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
         }
     }
 
+    @Deprecated()
     public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
         interceptor.setClaims(claimsMap);
     }
 
+    @Deprecated()
     public void setSecuredObject(Object securedObject) {
         interceptor.setSecuredObject(securedObject);
     }
-
 
 }

@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;

@@ -68,6 +68,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
             wildCardId = orig;
             this.matcher = matcher;
         }
+        
         @Override
         public int compareTo(MatcherHolder mh) {
             int literalCharsLen1 = this.wildCardId.replace("*", "").length();
@@ -85,6 +86,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         setApplicationContext(ac);
     }
 
+    @Override
     public void setBeanFactory(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
         super.setBeanFactory(beanFactory);
@@ -269,6 +271,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         }
     }
 
+    @Override
     public void destroy() {
         super.destroy();
         appContexts.clear();

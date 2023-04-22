@@ -30,9 +30,9 @@ import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;

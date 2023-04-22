@@ -58,7 +58,7 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     public static Bus getStaticBus() {
         return staticBus;
     }
-    public static Bus createStaticBus(String config) throws Exception {
+    public static Bus createStaticBus(String config) {
         if (config != null) {
             staticBus = new SpringBusFactory().createBus(config);
         } else {
@@ -68,7 +68,7 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         return staticBus;
     }
 
-    public static Bus createStaticBus() throws Exception {
+    public static Bus createStaticBus() {
         return createStaticBus(null);
     }
 

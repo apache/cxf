@@ -27,9 +27,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -38,7 +37,6 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthAuthorizationData;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oidc.SpringBusTestServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -46,7 +44,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -82,6 +79,10 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
     private static final String JWT_NON_PERSIST_JCACHE_PORT2 =
         TestUtil.getPortNumber("grants-server-jcache-jwt-non-persist.2");
 
+    private static final SpringBusTestServer JCACHE_SERVER_SESSION =
+            new SpringBusTestServer("grants-server-jcache-session") { };
+    private static final String JCACHE_PORT3 = TestUtil.getPortNumber("grants-server-jcache-session.2");
+
     private static final String ISSUER = "OIDC IdP";
 
     final String port;
@@ -100,11 +101,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(JWT_JCACHE_SERVER));
         assertTrue("server did not launch correctly", launchServer(JPA_SERVER));
         assertTrue("server did not launch correctly", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
-    }
-
-    @AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
+        assertTrue("server did not launch correctly", launchServer(JCACHE_SERVER_SESSION));
     }
 
     @Parameters(name = "{0}")
@@ -113,7 +110,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             JCACHE_SERVER.getPort(),
             JWT_JCACHE_SERVER.getPort(),
             JPA_SERVER.getPort(),
-            JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
+            JWT_NON_PERSIST_JCACHE_SERVER.getPort(),
+            JCACHE_SERVER_SESSION.getPort()};
     }
 
     @org.junit.Test
@@ -259,6 +257,51 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        assertEquals("read_balance", accessToken.getApprovedScope());
+
+        if (isAccessTokenInJWTFormat()) {
+            validateAccessToken(accessToken.getTokenKey());
+        }
+    }
+
+    // Here we don't specify a scope in the refresh token call
+    @org.junit.Test
+    public void testAuthorizationCodeGrantRefreshWithoutScope() throws Exception {
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                "alice", "security", null);
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+                org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                "consumer-id", "this-is-a-secret", null);
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+                org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken =
+                OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+
+        // Refresh the access token
+        client.type("application/x-www-form-urlencoded").accept("application/json");
+
+        Form form = new Form();
+        form.param("grant_type", "refresh_token");
+        form.param("refresh_token", accessToken.getRefreshToken());
+        form.param("client_id", "consumer-id");
+
+        accessToken = client.post(form, ClientAccessToken.class);
+        assertNotNull(accessToken.getTokenKey());
+        assertNotNull(accessToken.getRefreshToken());
+//        assertEquals("read_balance", accessToken.getApprovedScope());
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -332,6 +375,8 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             audPort = JPA_PORT2;
         } else if (JWT_NON_PERSIST_JCACHE_SERVER.getPort().equals(port)) {
             audPort = JWT_NON_PERSIST_JCACHE_PORT2;
+        } else if (JCACHE_SERVER_SESSION.getPort().equals(port)) {
+            audPort = JCACHE_PORT3;
         }
         String audience = "https://localhost:" + audPort + "/secured/bookstore/books";
         ClientAccessToken accessToken =

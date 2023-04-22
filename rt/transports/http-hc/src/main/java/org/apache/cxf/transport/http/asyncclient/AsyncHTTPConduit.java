@@ -64,7 +64,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
-import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
+import org.apache.cxf.transport.http.HttpClientHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -96,7 +96,7 @@ import org.apache.http.nio.util.HeapByteBufferAllocator;
 /**
  *
  */
-public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
+public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
 
     final AsyncHTTPConduitFactory factory;
@@ -190,10 +190,17 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
         }
+
         if (StringUtils.isEmpty(uri.getPath())) {
-            //hc needs to have the path be "/"
-            uri = uri.resolve("/");
-            addressChanged = true;
+            try {
+                //hc needs to have the path be "/"
+                uri = new URI(uri.getScheme(),
+                    uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                    uri.resolve("/").getPath(), uri.getQuery(),
+                    uri.getFragment());
+            } catch (final URISyntaxException ex) {
+                throw new IOException(ex);
+            }
         }
 
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -562,7 +569,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                                     setSSLSession(sslsession);
                                 }
                             });
+                    // See please https://issues.apache.org/jira/browse/HTTPASYNC-168, the attribute names
+                    // are case-sensitive.
                     ctx.setAttribute("http.iosession-factory-registry", regBuilder.build());
+                    ctx.setAttribute("http.ioSession-factory-registry", regBuilder.build());
                 } catch (GeneralSecurityException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -674,7 +684,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            
         }
 
         protected void closeInputStream() throws IOException {
@@ -900,7 +910,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             return sslContext;
         }
 
-        SSLContext ctx = null;
+        final SSLContext ctx;
         if (tlsClientParameters.getSslContext() != null) {
             ctx = tlsClientParameters.getSslContext();
         } else {

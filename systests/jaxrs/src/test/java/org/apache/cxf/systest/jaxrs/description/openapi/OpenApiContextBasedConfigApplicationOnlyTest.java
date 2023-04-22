@@ -22,11 +22,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -37,8 +38,8 @@ import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.openapi.parse.OpenApiParseUtils;
 import org.apache.cxf.systest.jaxrs.description.group2.BookStore;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner;
 
@@ -51,17 +52,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractBusClientServerTestBase {
+public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractClientServerTestBase {
     private static final String PORT = allocatePort(OpenApiContextBasedConfigApplicationOnlyTest.class);
 
-    public static class OpenApiContextBased extends AbstractBusTestServerBase {
+    public static class OpenApiContextBased extends AbstractServerTestServerBase {
         @Override
-        protected void run() {
+        protected Server createServer(Bus bus) throws Exception {
             createServerFactory("/api", "This is first API (api)", BookStoreOpenApi.class);
-            createServerFactory("/api2", "This is second API (api2)", BookStore.class);
+            return createServerFactory("/api2", "This is second API (api2)", BookStore.class);
         }
 
-        protected void createServerFactory(final String context, final String description, final Class<?> resource) {
+        protected Server createServerFactory(final String context, final String description, final Class<?> resource) {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setApplication(new Application() {
                 @Override
@@ -74,7 +75,7 @@ public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractBusCli
             final OpenApiFeature feature = createOpenApiFeature(description, resource);
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + context);
-            sf.create();
+            return sf.create();
         }
 
         protected OpenApiFeature createOpenApiFeature(final String description, final Class<?> resource) {
@@ -90,15 +91,8 @@ public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractBusCli
             return feature;
         }
 
-        public static void main(String[] args) {
-            try {
-                new OpenApiContextBased().start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new OpenApiContextBased().start();
         }
     }
 
@@ -107,7 +101,6 @@ public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractBusCli
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(OpenApiContextBased.class, false));
-        createStaticBus();
     }
 
     @Test

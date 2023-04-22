@@ -186,12 +186,12 @@
                             <sp:RequireInternalReference/>
                         </wsp:Policy>
                         <!--<sp:Issuer>
-                            <wsaw:Address>https://localhost:30101/SecurityTokenService/a</wsaw:Address>
+                            <wsaw:Address>https://localhost:${testutil.ports.STSServer}/SecurityTokenService/a</wsaw:Address>
                             <wsaw:Metadata>
                                 <wsx:Metadata>
                                     <wsx:MetadataSection>
                                         <wsx:MetadataReference>
-                                            <wsaw:Address>https://localhost:30101/SecurityTokenService/a/mex</wsaw:Address>
+                                            <wsaw:Address>https://localhost:${testutil.ports.STSServer}/SecurityTokenService/a/mex</wsaw:Address>
                                         </wsx:MetadataReference>
                                     </wsx:MetadataSection>
                                 </wsx:Metadata>

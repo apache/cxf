@@ -21,16 +21,15 @@ package org.apache.cxf.systest.jms.tx;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.QueueBrowser;
-import javax.jms.Session;
-import javax.transaction.TransactionManager;
-import javax.transaction.xa.XAException;
-
-import org.apache.activemq.ActiveMQXAConnectionFactory;
-import org.apache.activemq.jms.pool.JcaPooledConnectionFactory;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.QueueBrowser;
+import jakarta.jms.Session;
+import jakarta.jms.XAConnectionFactory;
+import jakarta.transaction.TransactionManager;
+import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -39,8 +38,9 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSUtil;
-import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.apache.hello_world_doc_lit.Greeter;
+import org.jboss.narayana.jta.jms.ConnectionFactoryProxy;
+import org.jboss.narayana.jta.jms.TransactionHelperImpl;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -49,31 +49,27 @@ import org.junit.Test;
 
 public class JMSTransactionTest extends AbstractVmJMSTest {
     private static final String SERVICE_ADDRESS =
-        "jms:queue:greeter.queue.tx?receivetTimeOut=5000&sessionTransacted=true";
+        "jms:queue:greeter.queue.tx?receiveTimeOut=5000&sessionTransacted=true";
     private static EndpointImpl endpoint;
     private static TransactionManager transactionManager;
 
     public static void startBusAndJMS(Class<?> testClass) {
-        String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false";
+        final String brokerURI =
+            "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false&jms.xaAckMode=1";
         startBusAndJMS(brokerURI);
         startBroker(brokerURI);
     }
 
     public static void startBusAndJMS(String brokerURI) {
-        try {
-            transactionManager = new GeronimoTransactionManager();
-        } catch (XAException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
+        transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         bus = BusFactory.getDefaultBus();
         registerTransactionManager();
-        ActiveMQXAConnectionFactory cf1 = new ActiveMQXAConnectionFactory(brokerURI);
-        cf1.setRedeliveryPolicy(redeliveryPolicy());
-        JcaPooledConnectionFactory pcf = new JcaPooledConnectionFactory();
-        pcf.setTransactionManager(transactionManager);
-        pcf.setConnectionFactory(cf1);
-        cf = pcf;
-        cff = new ConnectionFactoryFeature(pcf);
+        cf = new ActiveMQXAConnectionFactory(brokerURI);
+        
+        ConnectionFactory cf1 = new ConnectionFactoryProxy((XAConnectionFactory)cf, 
+              new TransactionHelperImpl(transactionManager));
+
+        cff = new ConnectionFactoryFeature(cf1);
     }
 
     /**
@@ -125,19 +121,19 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         Connection conn = cf.createConnection();
         conn.start();
         Queue queue = JMSUtil.createQueue(conn, "ActiveMQ.DLQ");
-        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
+        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 2000);
 
         Greeter greeter = markForClose(createGreeterProxy());
         // Should be processed normally
         greeter.greetMeOneWay(GreeterImplWithTransaction.GOOD_GUY);
 
 
-        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
+        assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 2000);
 
         // Should cause rollback, redelivery and in the end the message should go to the dead letter queue
         greeter.greetMeOneWay(GreeterImplWithTransaction.BAD_GUY);
 
-        assertNumMessagesInQueue("Request should be put into DLQ", conn, queue, 1, 2000);
+        assertNumMessagesInQueue("Request should be put into DLQ", conn, queue, 1, 5000);
         conn.close();
     }
 

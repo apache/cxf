@@ -133,17 +133,16 @@ public class FileCertificateRepo implements CertificateRepo {
     public String getCertPath(X509Certificate cert, UseKeyWithType id)
         throws URISyntaxException {
         Applications application = null;
-        String path = null;
         if (id != null) {
             application = Applications.fromUri(id.getApplication());
         }
+        final String path;
         if (application == Applications.SERVICE_ENDPOINT) {
             path = id.getIdentifier();
         } else {
             path = cert.getSubjectDN().getName();
         }
-        path = convertIdForFileSystem(path) + ".cer";
-        return path;
+        return convertIdForFileSystem(path) + ".cer";
     }
 
     private File[] getX509Files() {

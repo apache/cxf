@@ -105,21 +105,14 @@ public final class LogUtils {
                     if (clsName.contains("NOPLogger")) {
                         //no real slf4j implementation, use j.u.l
                         cname = null;
-                    } else if (clsName.contains("Log4j")) {
-                        cname = "org.apache.cxf.common.logging.Log4jLogger";
-                    } else if (clsName.contains("JCL")) {
-                        cls = Class.forName("org.apache.commons.logging.LogFactory");
-                        fcls = cls.getMethod("getFactory").invoke(null).getClass();
-                        if (fcls.getName().contains("Log4j")) {
-                            cname = "org.apache.cxf.common.logging.Log4jLogger";
-                        }
                     } else if (clsName.contains("JDK14")
                         || clsName.contains("pax.logging")) {
                         //both of these we can use the appropriate j.u.l API's
                         //directly and have it work properly
                         cname = null;
                     } else {
-                        // Cannot really detect where it's logging so we'll
+                        // Either we cannot really detect where it's logging
+                        // or we don't want to use a custom logger, so we'll
                         // go ahead and use the Slf4jLogger directly
                         cname = "org.apache.cxf.common.logging.Slf4jLogger";
                     }
@@ -236,7 +229,6 @@ public final class LogUtils {
         }
         String bundleName = name;
         try {
-            Logger logger = null;
             ResourceBundle b = null;
             if (bundleName == null) {
                 //grab the bundle prior to the call to Logger.getLogger(...) so the
@@ -285,16 +277,14 @@ public final class LogUtils {
                 }
             }
 
+            Logger logger;
             try {
                 logger = Logger.getLogger(loggerName, bundleName); //NOPMD
-            } catch (IllegalArgumentException iae) {
+            } catch (IllegalArgumentException | MissingResourceException ex) {
                 //likely a mismatch on the bundle name, just return the default
                 logger = Logger.getLogger(loggerName); //NOPMD
-            } catch (MissingResourceException rex) {
-                logger = Logger.getLogger(loggerName); //NOPMD
-            } finally {
-                b = null;
             }
+            
             return logger;
         } finally {
             if (n != orig) {

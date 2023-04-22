@@ -24,25 +24,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.LogicalMessage;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
 
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.activation.DataSource;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.LogicalMessage;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
@@ -69,7 +69,7 @@ public class LogicalMessageImpl implements LogicalMessage {
     }
 
     public Source getPayload() {
-        Source source = null;
+        Source source;
 
         Service.Mode mode = msgContext.getWrappedMessage().getExchange().get(Service.Mode.class);
 
@@ -277,7 +277,7 @@ public class LogicalMessageImpl implements LogicalMessage {
     }
 
     private SOAPMessage initSOAPMessage(InputStream is) throws SOAPException, IOException {
-        SOAPMessage msg = null;
+        final SOAPMessage msg;
         if (is != null) {
             msg = SAAJFactoryResolver.createMessageFactory(null).createMessage(null, is);
         } else {

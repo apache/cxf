@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<handler-chains xmlns="http://java.sun.com/xml/ns/javaee" xmlns:cfg="http://cxf.apache.org/configuration/cfg" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee">
+<handler-chains xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:cfg="http://cxf.apache.org/configuration/cfg" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee">
     <handler-chain>
         <handler>
             <handler-name>ph1</handler-name>

@@ -30,7 +30,7 @@ public class ToolsStaxUtilsTest extends ProcessorTestBase {
 
     @Test
     public void testGetTags() throws Exception {
-        Tag tag1 = ToolsStaxUtils.getTagTree(getResource("resources/test2.wsdl"));
+        Tag tag1 = ToolsStaxUtils.getTagTree(getClass().getResourceAsStream("resources/test2.wsdl"));
         assertEquals(1, tag1.getTags().size());
         Tag def1 = tag1.getTags().get(0);
         assertEquals(6, def1.getTags().size());
@@ -38,7 +38,7 @@ public class ToolsStaxUtilsTest extends ProcessorTestBase {
         Tag schema1 = types1.getTags().get(0);
         assertEquals(4, schema1.getTags().size());
 
-        Tag tag2 = ToolsStaxUtils.getTagTree(getResource("resources/test3.wsdl"));
+        Tag tag2 = ToolsStaxUtils.getTagTree(getClass().getResourceAsStream("resources/test3.wsdl"));
         assertEquals(1, tag2.getTags().size());
         Tag def2 = tag2.getTags().get(0);
         assertEquals(6, def2.getTags().size());

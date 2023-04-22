@@ -20,18 +20,18 @@
 package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -90,8 +90,10 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
                 Class<?> dcc = ClassUtils.forName("org.eclipse.jetty.util.DecoratedObjectFactory", 
                                                   getClass().getClassLoader());
                 handler.getServletContext().setAttribute("org.eclipse.jetty.util.DecoratedObjectFactory",
-                                                         dcc.newInstance());
-            } catch (ClassNotFoundException | LinkageError | InstantiationException | IllegalAccessException e) {
+                                                         dcc.getDeclaredConstructor().newInstance());
+            } catch (ClassNotFoundException | LinkageError | InstantiationException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+                | SecurityException e) {
                 //ignore, old version of Jetty
             }            
         }

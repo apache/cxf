@@ -25,16 +25,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.soap.Detail;
-import javax.xml.soap.DetailEntry;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.soap.Detail;
+import jakarta.xml.soap.DetailEntry;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.TestBase;

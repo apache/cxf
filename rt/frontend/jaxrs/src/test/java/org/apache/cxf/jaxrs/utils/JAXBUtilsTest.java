@@ -24,12 +24,10 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.QueryParam;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.QueryParam;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.junit.Assert;
 import org.junit.Test;

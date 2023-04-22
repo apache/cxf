@@ -143,7 +143,7 @@ public class UDPDestination extends AbstractDestination {
 
         try {
             URI uri = new URI(this.getAddress().getAddress().getValue());
-            InetSocketAddress isa = null;
+            final InetSocketAddress isa;
             if (StringUtils.isEmpty(uri.getHost())) {
                 String s = uri.getSchemeSpecificPart();
                 if (s.startsWith("//:")) {
@@ -196,22 +196,23 @@ public class UDPDestination extends AbstractDestination {
         }
         if (ret == null) {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-            List<NetworkInterface> possibles = new ArrayList<>();
-            while (ifcs.hasMoreElements()) {
-                NetworkInterface ni = ifcs.nextElement();
-                if (ni.supportsMulticast()
-                    && ni.isUp()) {
-                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                        if (ia.getAddress() instanceof java.net.Inet4Address
-                            && !ia.getAddress().isLoopbackAddress()
-                            && !ni.getDisplayName().startsWith("vnic")) {
-                            possibles.add(ni);
+            if (ifcs != null) {
+                List<NetworkInterface> possibles = new ArrayList<>();
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ni = ifcs.nextElement();
+                    if (ni.supportsMulticast() && ni.isUp()) {
+                        for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                            // Ignore any virtual interfaces created by/for a VPN connection.
+                            if (ia != null && ia.getAddress() instanceof java.net.Inet4Address
+                                    && !ia.getAddress().isLoopbackAddress()
+                                    && !ni.getDisplayName().startsWith("vnic")) {
+                                possibles.add(ni);
+                            }
                         }
                     }
                 }
+                ret = possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
             }
-            ret = possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
-
         }
         return ret;
     }

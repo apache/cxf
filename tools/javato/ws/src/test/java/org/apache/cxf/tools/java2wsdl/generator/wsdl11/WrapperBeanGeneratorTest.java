@@ -25,8 +25,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 
-import javax.xml.bind.annotation.XmlList;
-
+import jakarta.xml.bind.annotation.XmlList;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
@@ -49,8 +48,6 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
     @Rule
     public ExternalResource envRule = new ExternalResource() {
         protected void before() throws Throwable {
-            System.setProperty("java.class.path", getClassPath() + tmpDir.getRoot().getCanonicalPath()
-                                                  + File.separatorChar);
             classLoader = new URLClassLoader(new URL[] {tmpDir.getRoot().toURI().toURL()},
                                              Thread.currentThread().getContextClassLoader());
         }

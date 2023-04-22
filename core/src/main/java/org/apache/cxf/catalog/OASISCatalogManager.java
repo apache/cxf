@@ -34,10 +34,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-
 import org.xml.sax.EntityResolver;
 
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
@@ -90,19 +89,19 @@ public class OASISCatalogManager {
     private static EntityResolver getResolver() {
         try {
             CatalogManager catalogManager = new CatalogManager();
+            catalogManager.setVerbosity(0);
             if (DEBUG_LEVEL != null) {
-                catalogManager.debug.setDebug(Integer.parseInt(DEBUG_LEVEL));
+                catalogManager.setVerbosity(Integer.parseInt(DEBUG_LEVEL));
             }
-            catalogManager.setUseStaticCatalog(false);
             catalogManager.setIgnoreMissingProperties(true);
+            catalogManager.setUseStaticCatalog(false);
+            
             return new CatalogResolver(catalogManager) {
                 public String getResolvedEntity(String publicId, String systemId) {
                     String s = super.getResolvedEntity(publicId, systemId);
                     if (s != null && s.startsWith("classpath:")) {
-                        try {
-                            URIResolver r = new URIResolver(s);
+                        try (URIResolver r = new URIResolver(s)) {
                             if (r.isResolved()) {
-                                r.getInputStream().close();
                                 return r.getURL().toExternalForm();
                             }
                         } catch (IOException e) {

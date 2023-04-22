@@ -19,11 +19,10 @@
 
 package org.apache.cxf.jaxb.io;
 
-import javax.xml.bind.MarshalException;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.util.ValidationEventCollector;
-
+import jakarta.xml.bind.MarshalException;
+import jakarta.xml.bind.UnmarshalException;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.util.ValidationEventCollector;
 import org.apache.cxf.jaxb.MarshallerEventHandler;
 import org.apache.cxf.jaxb.UnmarshallerEventHandler;
 

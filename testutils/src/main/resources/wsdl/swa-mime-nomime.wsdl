@@ -19,7 +19,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/swa-nomime" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:types="http://cxf.apache.org/swa-nomime/types" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" name="SwAService" targetNamespace="http://cxf.apache.org/swa-nomime">
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/swa-nomime" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:wsi="http://ws-i.org/profiles/basic/1.1/xsd" xmlns:types="http://cxf.apache.org/swa-nomime/types" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" name="SwAService" targetNamespace="http://cxf.apache.org/swa-nomime">
     <wsdl:types>
         <xsd:schema xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://cxf.apache.org/swa-nomime/types">
             <xsd:import namespace="http://ws-i.org/profiles/basic/1.1/xsd"/>

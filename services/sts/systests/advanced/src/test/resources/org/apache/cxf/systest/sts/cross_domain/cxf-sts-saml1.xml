@@ -53,16 +53,17 @@
         <ref bean="transportSAMLValidator"/>
     </util:list>
     <bean id="transportSAMLProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-        </bean>
-    <bean id="transportSAMLValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-        </bean>
-    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
-        <property name="endpoints" ref="transportEndpoints"/>
     </bean>
-    <util:list id="transportEndpoints">
-        <value>https://localhost:(\d)*/doubleit/services/doubleit.*</value>
-        <value>https://localhost:30102/SecurityTokenService/b</value>
-    </util:list>
+    <bean id="transportSAMLValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+    </bean>
+    <bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
+        <property name="endpoints">
+            <list>
+                <value>https://localhost:(\d)*/doubleit/services/doubleit.*</value>
+                <value>https://localhost:${testutil.ports.STSServer.2}/SecurityTokenService/b</value>
+            </list>
+        </property>
+    </bean>
     <bean id="customRealmParser" class="org.apache.cxf.systest.sts.realms.URLRealmParser"/>
     <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
         <property name="signatureCryptoProperties" value="stsKeystore.properties"/>
@@ -70,13 +71,13 @@
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         <property name="issuer" value="a-issuer"/>
     </bean>
-    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" id="DefaultSTS" implementor="#transportSTSProviderBean" address="https://localhost:30101/SecurityTokenService/a" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
+    <jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/" implementor="#transportSTSProviderBean" address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/a" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl" depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService" endpointName="ns1:Transport_Port">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-        <httpj:engine port="30101">
+        <httpj:engine port="${testutil.ports.STSServer}">
             <httpj:tlsServerParameters>
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>

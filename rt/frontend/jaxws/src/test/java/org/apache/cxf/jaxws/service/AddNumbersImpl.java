@@ -22,7 +22,7 @@ package org.apache.cxf.jaxws.service;
 import java.util.ArrayList;
 import java.util.List;
 
-@javax.jws.WebService(endpointInterface = "org.apache.cxf.jaxws.service.AddNumbers")
+@jakarta.jws.WebService(endpointInterface = "org.apache.cxf.jaxws.service.AddNumbers")
 public class AddNumbersImpl implements AddNumbers {
 
     public List<Integer> addNumbers(List<String> arg) {

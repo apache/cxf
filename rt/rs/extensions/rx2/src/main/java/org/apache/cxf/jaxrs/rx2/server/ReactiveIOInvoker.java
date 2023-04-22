@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.jaxrs.rx2.server;
 
+import java.util.Collections;
+
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractReactiveInvoker;
 import org.apache.cxf.message.Message;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -35,8 +38,19 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
             return handleSingle(inMessage, (Single<?>)result);
         } else if (result instanceof Observable) {
             return handleObservable(inMessage, (Observable<?>)result);
+        } else if (result instanceof Maybe) {
+            return handleMaybe(inMessage, (Maybe<?>)result);
         }
         return null;
+    }
+    
+    protected AsyncResponseImpl handleMaybe(Message inMessage, Maybe<?> maybe) {
+        final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
+        Disposable d = subscribe(maybe, asyncResponse);
+        if (d == null) {
+            throw new IllegalStateException("Subscribe did not return a Disposable");
+        }
+        return asyncResponse;
     }
     
     protected AsyncResponseImpl handleSingle(Message inMessage, Single<?> single) {
@@ -51,7 +65,7 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     protected AsyncResponseImpl handleFlowable(Message inMessage, Flowable<?> f) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
         if (!isStreamingSubscriberUsed(f, asyncResponse, inMessage)) {
-            Disposable d = f.subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+            Disposable d = subscribe(f, asyncResponse);
             if (d == null) {
                 throw new IllegalStateException("Subscribe did not return a Disposable");
             }
@@ -61,11 +75,28 @@ public class ReactiveIOInvoker extends AbstractReactiveInvoker {
     
     protected AsyncResponseImpl handleObservable(Message inMessage, Observable<?> obs) {
         final AsyncResponseImpl asyncResponse = new AsyncResponseImpl(inMessage);
-        Disposable d = obs.subscribe(v -> asyncResponse.resume(v), t -> handleThrowable(asyncResponse, t));
+        Disposable d = subscribe(obs, asyncResponse);
         if (d == null) {
             throw new IllegalStateException("Subscribe did not return a Disposable");
         }
         return asyncResponse;
     }
 
+    private <T> Disposable subscribe(final Flowable<T> f, final AsyncResponseImpl asyncResponse) {
+        return f
+            .switchIfEmpty(Flowable.<T>empty().doOnComplete(() -> asyncResponse.resume(Collections.emptyList())))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
+
+    private <T> Disposable subscribe(final Observable<T> obs, final AsyncResponseImpl asyncResponse) {
+        return obs
+            .switchIfEmpty(Observable.<T>empty().doOnComplete(() -> asyncResponse.resume(Collections.emptyList())))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
+    
+    private <T> Disposable subscribe(Maybe<T> maybe, final AsyncResponseImpl asyncResponse) {
+        return maybe
+            .switchIfEmpty(Maybe.<T>empty().doOnComplete(() -> asyncResponse.resume(null)))
+            .subscribe(asyncResponse::resume, t -> handleThrowable(asyncResponse, t));
+    }
 }

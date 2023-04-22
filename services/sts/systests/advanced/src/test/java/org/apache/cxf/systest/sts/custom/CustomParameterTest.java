@@ -24,23 +24,21 @@ import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
-import org.apache.cxf.systest.sts.common.TokenTestUtils;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
+import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
@@ -75,44 +73,23 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(DoubleItServer.class);
 
     private static final String SAML2_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
 
     @BeforeClass
     public static void startServers() throws Exception {
-
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(Server.class, true)
-        );
-        assertTrue(
-                "Server failed to launch",
-                // run the server in the same process
-                // set this to false to fork
-                launchServer(STSServer.class, true)
-        );
-    }
-
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+        assertTrue(launchServer(new DoubleItServer(
+            CustomParameterTest.class.getResource("cxf-service.xml"))));
+        assertTrue(launchServer(new STSServer(
+            CustomParameterTest.class.getResource("cxf-sts.xml"))));
     }
 
     // Here the custom parameter in the RST is parsed by the CustomUTValidator
     @org.junit.Test
     public void testCustomParameterInRSTValidator() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -121,7 +98,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
@@ -145,19 +122,12 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         doubleIt(transportClaimsPort, 25);
 
         ((java.io.Closeable)transportClaimsPort).close();
-        bus.shutdown(true);
     }
 
     // Here the custom parameter in the RST is parsed by the CustomUTValidator
     @org.junit.Test
     public void testCustomParameterInRST2Validator() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -166,7 +136,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
@@ -195,19 +165,12 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)transportClaimsPort).close();
-        bus.shutdown(true);
     }
 
     // Here the custom parameter in the RST is parsed by the CustomClaimsHandler
     @org.junit.Test
     public void testCustomParameterInRSTClaimsHandler() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -216,7 +179,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl");
@@ -240,19 +203,12 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         doubleIt(transportClaimsPort, 25);
 
         ((java.io.Closeable)transportClaimsPort).close();
-        bus.shutdown(true);
     }
 
     // Here the custom parameter in the RST is parsed by the CustomClaimsHandler
     @org.junit.Test
     public void testCustomParameterInRSTClaimsHandler2() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -261,7 +217,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
 
-        TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
+        SecurityTestUtil.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
 
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl");
@@ -290,21 +246,12 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         }
 
         ((java.io.Closeable)transportClaimsPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testCustomParameterToRESTInterface() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CustomParameterTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
         String address = "https://localhost:" + STSPORT + "/SecurityTokenServiceREST/token";
-        WebClient client = WebClient.create(address, busFile.toString());
+        WebClient client = WebClient.create(address, getClass().getResource("cxf-client.xml").toString());
 
         client.type("application/xml").accept("application/xml");
 
@@ -343,8 +290,6 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
 
         Element assertion = validateSAMLSecurityTokenResponse(securityResponse, true);
         assertTrue(DOM2Writer.nodeToString(assertion).contains("admin-user"));
-
-        bus.shutdown(true);
     }
 
     private Element validateSAMLSecurityTokenResponse(
@@ -400,6 +345,6 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(numToDouble * 2, resp);
+        assertEquals(numToDouble * 2L, resp);
     }
 }

@@ -26,39 +26,43 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.ws.Holder;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientResponseContext;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.netty.client.NettyHttpTransportFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.Before;
@@ -68,6 +72,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -130,7 +135,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.invoke("PATCH", new Book("Timeout", 123L), Book.class);
             fail("should throw an exception due to timeout, instead got " + book);
-        } catch (javax.ws.rs.ProcessingException e) {
+        } catch (jakarta.ws.rs.ProcessingException e) {
             //expected!!!
         }
     }
@@ -374,9 +379,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertTrue(booleanHolder.value);
     }
 
-    @SuppressWarnings({
-     "unchecked", "rawtypes"
-    })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static <T> InvocationCallback<T> createGenericInvocationCallback() {
         return new GenericInvocationCallback();
     }
@@ -479,9 +482,73 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertThat(response.getStatus(), equalTo(404));
         }
     }
+
+    @Test
+    public void testNettyClientGet() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try (Response response = webClient
+                .to(address, false)
+                .accept("text/plain")
+                .async()
+                .get()
+                .get(10, TimeUnit.SECONDS)) {
+            assertThat(response.getStatus(), equalTo(200));
+        } finally {
+            webClient.close();
+        }
+    }
     
-    private WebClient createWebClient(String address) {
-        return WebClient.create(address);
+    @Test
+    public void testNettyClientDeleteWithBody() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/deletebody";
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(NettyHttpTransportFactory.DEFAULT_NAMESPACES.get(0));
+        bean.setAddress(address);
+        
+        WebClient webClient = bean.createWebClient();
+        
+        try {
+            Book book = webClient
+                .to(address, false)
+                .accept("application/xml")
+                .async()
+                .method("DELETE", Entity.entity(new Book("Delete", 123L), "application/xml"), Book.class)
+                .get(20, TimeUnit.SECONDS);
+            assertEquals("Delete", book.getName());
+        } finally {
+            webClient.close();
+        }
+    }
+
+    @Test
+    public void testBookNoContent() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/no-content";
+        WebClient client = createWebClient(address);
+        Response r = client.type("*/*").async().post(null).get();
+        assertEquals(204, r.getStatus());
+        assertThat(r.readEntity(String.class), equalTo(""));
+    }
+    
+    @Test
+    public void testBookOneway() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/oneway";
+        WebClient client = createWebClient(address, new TestResponseFilter());
+        Response r = client.type("*/*").async().post(null).get();
+        assertEquals(202, r.getStatus());
+        assertThat(r.getEntity(), is(nullValue()));
+        assertThat(r.getHeaderString("X-Filter"), equalTo("true"));
+    }
+
+    private WebClient createWebClient(String address, Object ... providers) {
+        return WebClient.create(address, Arrays.asList(providers));
     }
 
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {
@@ -495,6 +562,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         };
     }
 
+    @Produces("application/xml")
     private static class FaultyBookWriter implements MessageBodyWriter<Book> {
 
         @Override
@@ -514,8 +582,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             throw new RuntimeException();
 
         }
-
     }
+    
     @Consumes("application/xml")
     private static class FaultyBookReader implements MessageBodyReader<Book> {
 
@@ -530,19 +598,18 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             WebApplicationException {
             throw new RuntimeException();
         }
-
-
     }
-
+    
+    @Provider
     public static class TestResponseFilter implements ClientResponseFilter {
 
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
-
+            responseContext.getHeaders().add("X-Filter", "true");
         }
-
     }
+    
     private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Object result;
 

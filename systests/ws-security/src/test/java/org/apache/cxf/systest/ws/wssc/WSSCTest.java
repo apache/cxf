@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -36,7 +36,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
@@ -90,7 +89,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         }
         public String toString() {
             return prefix + ":" 
-                + port + ((port == STAX_PORT || port == STAX_PORT2) ? "(stax)" : "") 
+                + port + ((STAX_PORT.equals(port) || STAX_PORT2.equals(port)) ? "(stax)" : "") 
                 + ":" + (streaming ? "streaming" : "dom")
                 + (clearAction ? "/no SOAPAction" : "");
         }
@@ -121,6 +120,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     @Parameters(name = "{0}")
     public static Collection<TestParam> data() {
         return Arrays.asList(new TestParam[] {
+            new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true),
             new TestParam("SecureConversation_UserNameOverTransport_IPingService", PORT2, false),
             new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, false),
             new TestParam("AC_IPingService", PORT, false),
@@ -201,7 +201,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             new TestParam("_XD-SEES_IPingService", STAX_PORT, false),
             new TestParam("_XD-ES_IPingService", STAX_PORT, false),
 
-            new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true),
             // TODO Endorsing derived keys not supported.
             // new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService",
             //               STAX_PORT, true),
@@ -239,7 +238,6 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         bus.shutdown(true);
         stopAllServers();
     }

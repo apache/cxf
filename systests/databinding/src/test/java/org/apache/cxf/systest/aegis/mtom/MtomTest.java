@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
@@ -31,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import jakarta.activation.DataHandler;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;

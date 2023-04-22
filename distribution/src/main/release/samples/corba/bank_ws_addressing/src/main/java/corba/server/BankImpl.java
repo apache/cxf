@@ -22,6 +22,7 @@ package corba.server;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.omg.CORBA.portable.UnknownException;
 import org.omg.PortableServer.POA;
 
 import corba.common.Account;
@@ -57,11 +58,15 @@ public class BankImpl extends BankPOA {
             //Ignore
         }
 
-        org.omg.CORBA.Object obj = poa_.create_reference_with_id(oid, AccountHelper.id());
-        Account account = AccountHelper.narrow(obj);
-
-        accountList.put(accountName, account);
-        return account;
+        try {
+            org.omg.CORBA.Object obj = poa_.create_reference_with_id(oid, AccountHelper.id());
+            Account account = AccountHelper.narrow(obj);
+    
+            accountList.put(accountName, account);
+            return account;
+        } catch (final Throwable ex) {
+            throw new UnknownException(ex);
+        }
     }
 
     public org.omg.CORBA.Object create_epr_account(String accountName) {
@@ -80,11 +85,15 @@ public class BankImpl extends BankPOA {
             //Ignore
         }
 
-        org.omg.CORBA.Object obj = poa_.create_reference_with_id(oid, AccountHelper.id());
-        Account account = AccountHelper.narrow(obj);
-
-        accountList.put(accountName, account);
-        return account;
+        try {
+            org.omg.CORBA.Object obj = poa_.create_reference_with_id(oid, AccountHelper.id());
+            Account account = AccountHelper.narrow(obj);
+    
+            accountList.put(accountName, account);
+            return account;
+        } catch (final Throwable ex) {
+            throw new UnknownException(ex);
+        }
     }
 
     public Account get_account(String accountName) {

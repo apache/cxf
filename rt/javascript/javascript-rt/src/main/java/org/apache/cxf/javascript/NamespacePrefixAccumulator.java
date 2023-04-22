@@ -46,7 +46,7 @@ public class NamespacePrefixAccumulator {
 
     public void collect(String prefix, String uri) {
         if (!("".equals(uri)) && !prefixes.contains(prefix)) {
-            attributes.append("xmlns:" + prefix + "='" + uri + "' ");
+            attributes.append("xmlns:").append(prefix).append("='").append(uri).append("' ");
             prefixes.add(prefix);
         }
     }

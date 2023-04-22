@@ -19,7 +19,7 @@
 
 package demo.hw.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 public class Server {
 
@@ -34,7 +34,7 @@ public class Server {
         new Server();
         System.out.println("Server ready...");
 
-        Thread.sleep(5 * 60 * 1000);
+        Thread.sleep(5 * 60 * 10000);
         System.out.println("Server exiting");
         System.exit(0);
     }

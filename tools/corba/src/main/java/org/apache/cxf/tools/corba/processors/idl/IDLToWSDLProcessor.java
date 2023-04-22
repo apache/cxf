@@ -243,10 +243,9 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 if (outputWriter == null) {
                     outputWriter = getOutputWriter(idl + ".wsdl", outputDir);
                 }
-                String separator = System.getProperty("file.separator");
-                File file = null;
+                final File file;
                 if (env.get(ToolConstants.CFG_OUTPUTDIR) != null) {
-                    file = new File(outputDir + separator + idl + ".wsdl");
+                    file = new File(outputDir, idl + ".wsdl");
                 } else {
                     file = new File(idl + ".wsdl");
                 }
@@ -357,7 +356,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 System.err.println("IDLToWsdl Error : " + ex.getMessage());
                 System.err.println();
                 ex.printStackTrace();
-                System.exit(1);
+                System.exit(1); //NOPMD
             } else {
                 URI url = file.toURI();
                 return url.toString();
@@ -371,9 +370,9 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     }
 
     private Writer createOutputWriter(String name) throws Exception {
-        String outDir = outputDir;
+//        String outDir = outputDir;
         int index = name.lastIndexOf(System.getProperty("file.separator"));
-        outDir = name.substring(0, index);
+        String outDir = name.substring(0, index);
         String filename = name.substring(index + 1, name.length());
         return getOutputWriter(filename, outDir);
     }
@@ -493,7 +492,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 (AddressType) def.getExtensionRegistry().createExtension(Port.class,
                                                                          CorbaConstants.NE_CORBA_ADDRESS);
 
-            String addr = null;
+            String addr;
             String addrFileName = (String) env.get(ToolCorbaConstants.CFG_ADDRESSFILE);
             if (addrFileName != null) {
                 File addrFile = new File(addrFileName);

@@ -33,8 +33,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -66,10 +66,23 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ClientAuthServer.class);
     static final String PORT2 = allocatePort(ClientAuthServer.class, 2);
 
-    final Boolean async;
+    final String clientKey;
+    final Object clientVal;
 
-    public ClientAuthTest(Boolean async) {
-        this.async = async;
+    public ClientAuthTest(String ck, Object value) {
+        this.clientKey = ck;
+        this.clientVal = value;
+    }
+    
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+            {"force.urlconnection.http.conduit", true},
+            {"use.async.http.conduit", true},
+            {"defaultConduit", true},
+            {"org.apache.cxf.transport.http.forceVersion", "1.1"},
+            {"org.apache.cxf.transport.http.forceVersion", "2"}
+        });
     }
 
     @BeforeClass
@@ -80,12 +93,6 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(ClientAuthServer.class, true)
         );
-    }
-
-    @Parameters(name = "{0}")
-    public static Collection<Boolean> data() {
-
-        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
     }
 
     @AfterClass
@@ -111,11 +118,9 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
+        
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
@@ -140,10 +145,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -174,10 +176,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -215,10 +214,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
             updateAddressPort(port, PORT);
 
-            // Enable Async
-            if (async) {
-                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-            }
+            ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -250,10 +246,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -279,10 +272,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -313,10 +303,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -347,10 +334,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         try {
             port.greetMe("Kitty");
@@ -431,10 +415,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
@@ -455,10 +436,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         client = ClientProxy.getClient(port);
         http = (HTTPConduit) client.getConduit();
@@ -480,10 +458,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");
@@ -530,10 +505,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        // Enable Async
-        if (async) {
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        }
+        ((BindingProvider)port).getRequestContext().put(clientKey, clientVal);
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");

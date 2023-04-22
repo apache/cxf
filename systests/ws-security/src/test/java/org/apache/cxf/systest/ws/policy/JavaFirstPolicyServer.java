@@ -33,25 +33,15 @@ public class JavaFirstPolicyServer extends AbstractBusTestServerBase {
     public static final String PORT2 = allocatePort(JavaFirstPolicyServer.class, 2);
     public static final String PORT3 = allocatePort(JavaFirstPolicyServer.class, 3);
 
-    public JavaFirstPolicyServer() {
-
-    }
-
     protected void run()  {
         URL busFile = JavaFirstPolicyServer.class.getResource("javafirstserver.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         Assert.assertNotNull(busLocal);
         setBus(busLocal);
-
-        try {
-            new JavaFirstPolicyServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         new JavaFirstPolicyServer().start();
     }
 }

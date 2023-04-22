@@ -77,9 +77,13 @@ under the License.
            </map>
        </property> 
     </bean>
-    
-    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
+
+    <bean id="claimsInterceptor" class="org.apache.cxf.rt.security.claims.interceptor.ClaimsAuthorizingInterceptor">
         <property name="securedObject" ref="serviceBean"/>
+    </bean>
+
+    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
+        <constructor-arg ref="claimsInterceptor"/>
     </bean>
     
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt-authn-authz}/signedjwtauthz">

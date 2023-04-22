@@ -24,8 +24,8 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceException;
 
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.binding.corba.utils.CorbaBindingHelper;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;

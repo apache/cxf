@@ -35,11 +35,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -261,7 +260,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (!originalValue.contains(QUOTE)
             || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
             final String[] ls; 
-            if (COOKIE_SEPARATOR_CRLF_EXPRESSION != sep) {
+            if (!COOKIE_SEPARATOR_CRLF_EXPRESSION.equals(sep)) {
                 ls = originalValue.split(sep);
             } else {
                 ls = COOKIE_SEPARATOR_CRLF_PATTERN.split(originalValue);

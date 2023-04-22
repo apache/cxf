@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.tools.fortest.exception;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "http://cxf.apache.org/test/HelloService", name = "HelloService")
 public interface Echo {

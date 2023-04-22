@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.ws.policy.handler;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @SuppressWarnings("serial")
 @WebFault

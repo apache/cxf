@@ -78,7 +78,8 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                 ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
             }
         }
-        loadOSGIContext(bus);
+        //TODO: [OSGi+Jakarta] Uncomment this when osgi comes back
+        //loadOSGIContext(bus);
     }
 
     private void loadOSGIContext(Bus b) {
@@ -151,13 +152,14 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             lst.add(type.cast(context.getBean(n, type)));
         }
         lst.addAll(orig.getBeansOfType(type));
-        if (lst.isEmpty()) {
+        //TODO: [OSGi+Jakarta] Uncomment this when osgi comes back
+        /*if (lst.isEmpty()) {
             tryOSGI(lst, type);
-        }
+        }*/
         return lst;
     }
     private <T> void tryOSGI(Collection<T> lst, Class<T> type) {
-        if (!osgi) {
+        if (!osgi || bundleContext == null) {
             return;
         }
         try {

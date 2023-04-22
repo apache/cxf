@@ -21,14 +21,16 @@ package org.apache.cxf.tools.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -79,9 +81,8 @@ public class ClassUtils {
             String dirName = fileName.substring(0, fileName.lastIndexOf(File.separator) + 1);
 
             String path = outPutDir + File.separator + dirName;
-            if (!dirSet.contains(path)) {
+            if (dirSet.add(path)) {
 
-                dirSet.add(path);
                 File file = new File(path);
                 if (file.isDirectory() && file.list() != null) {
                     for (String str : file.list()) {
@@ -89,16 +90,18 @@ public class ClassUtils {
                             fileList.add(path + str);
                         } else {
                             // copy generated xml file or others to class directory
-                            File otherFile = new File(path + File.separator + str);
-                            if (otherFile.isFile() && str.toLowerCase().endsWith("xml")
+                            Path otherFile = Paths.get(path, str);
+                            String suffix = "xml";
+                            if (Files.isReadable(otherFile)
+                                && str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length())
                                 && context.get(ToolConstants.CFG_CLASSDIR) != null) {
                                 String targetDir = (String)context.get(ToolConstants.CFG_CLASSDIR);
-
-                                File targetFile = new File(targetDir + File.separator + dirName
-                                                           + File.separator + str);
                                 try {
-                                    copyXmlFile(otherFile, targetFile);
-
+                                    Files.copy(otherFile,
+                                            Files.createDirectories(Paths.get(targetDir, dirName)).resolve(str));
+                                } catch (FileAlreadyExistsException existsException) {
+                                    LOG.log(Level.WARNING, "EXIST_RESOURCE_FILE",
+                                            Paths.get(targetDir, dirName).resolve(str));
                                 } catch (IOException e) {
                                     Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
                                     throw new ToolException(msg, e);
@@ -124,26 +127,4 @@ public class ClassUtils {
         }
     }
 
-    private void copyXmlFile(File from, File to) throws ToolException, IOException {
-
-        String dir = to.getCanonicalPath()
-                .substring(0, to.getCanonicalPath().lastIndexOf(File.separator));
-        File dirFile = new File(dir);
-        dirFile.mkdirs();
-        try (InputStream input = Files.newInputStream(from.toPath());
-            OutputStream output = Files.newOutputStream(to.toPath())) {
-            byte[] b = new byte[1024 * 3];
-            int len = 0;
-            while (len != -1) {
-                len = input.read(b);
-                if (len != -1) {
-                    output.write(b, 0, len);
-                }
-            }
-            output.flush();
-        } catch (Exception e) {
-            Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
-            throw new ToolException(msg, e);
-        }
-    }
 }

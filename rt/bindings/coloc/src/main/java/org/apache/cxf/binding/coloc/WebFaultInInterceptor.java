@@ -19,8 +19,8 @@
 package org.apache.cxf.binding.coloc;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebFault;
 
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -76,13 +76,13 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private MessagePartInfo getFaultMessagePart(QName qname, OperationInfo op) {
-        if (op.isUnwrapped() && (op instanceof UnwrappedOperationInfo)) {
+        if (op.isUnwrapped() && op instanceof UnwrappedOperationInfo) {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
 
         for (FaultInfo faultInfo : op.getFaults()) {
             for (MessagePartInfo mpi : faultInfo.getMessageParts()) {
-                String ns = null;
+                final String ns;
                 if (mpi.isElement()) {
                     ns = mpi.getElementQName().getNamespaceURI();
                 } else {

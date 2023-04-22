@@ -20,25 +20,31 @@
 package org.apache.cxf.jaxrs.swagger.ui;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.IOUtils;
 
 
 @Path("api-docs")
 public class SwaggerUiService {
     private static final String FAVICON = "favicon";
     private static final Map<String, String> DEFAULT_MEDIA_TYPES;
+    private static final Pattern URL_PATTERN = Pattern.compile("url[:]\\s*[\"]([^\"]+)[\"][,]");
 
     static {
         DEFAULT_MEDIA_TYPES = new HashMap<>();
@@ -101,22 +107,44 @@ public class SwaggerUiService {
             //    http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/openapi.json
             //
             // in case the "url" configuration parameter is provided for Swagger UI.
-            if (config != null && uriInfo.getQueryParameters().isEmpty() && path.endsWith("/index.html")) {
-                final Map<String, String> params = config.getConfigParameters();
-                
-                if (params != null && !params.isEmpty()) {
-                    final UriBuilder builder = params
-                        .entrySet()
-                        .stream()
-                        .reduce(
-                            uriInfo.getRequestUriBuilder(), 
-                            (b, e) -> b.queryParam(e.getKey(), e.getValue()),
-                            (left, right) -> left
-                        );
-                    return Response.temporaryRedirect(builder.build()).build();
+            if (config != null) {
+                if (path.endsWith("/index.html") && uriInfo.getQueryParameters().isEmpty()) {
+                    final Map<String, String> params = config.getConfigParameters();
+                    
+                    if (params != null && !params.isEmpty()) {
+                        final UriBuilder builder = params
+                            .entrySet()
+                            .stream()
+                            .reduce(
+                                uriInfo.getRequestUriBuilder(), 
+                                (b, e) -> b.queryParam(e.getKey(), e.getValue()),
+                                (left, right) -> left
+                            );
+                        return Response.temporaryRedirect(builder.build()).build();
+                    }
+                }
+
+                // Since Swagger UI 4.1.3, passing the default URL as query parameter, 
+                // e.g. `?url=swagger.json` is disabled by default due to security concerns.
+                final boolean hasUrlPlaceholder = path.endsWith("/index.html")
+                    || path.endsWith("/swagger-initializer.js");
+                if (hasUrlPlaceholder && !Boolean.TRUE.equals(config.isQueryConfigEnabled())) {
+                    final String url = config.getUrl();
+                    if (!StringUtils.isEmpty(url)) {
+                        try (InputStream in = resourceURL.openStream()) {
+                            final String index = replaceUrl(IOUtils.readStringFromStream(in), url);
+                            final ResponseBuilder rb = Response.ok(index);
+
+                            if (mediaType != null) {
+                                rb.type(mediaType);
+                            }
+
+                            return rb.build();
+                        }
+                    }
                 }
             }
-            
+
             ResponseBuilder rb = Response.ok(resourceURL.openStream());
             if (mediaType != null) {
                 rb.type(mediaType);
@@ -125,6 +153,24 @@ public class SwaggerUiService {
         } catch (IOException ex) {
             throw new NotFoundException(ex);
         }
+    }
+
+    /**
+     * Replaces the URL inside Swagger UI index.html file. The implementation does not attempt to 
+     * read the file and parse it as valid HTML but uses straightforward approach by looking for 
+     * the URL pattern of the SwaggerUIBundle initialization and replacing it.
+     * @param index index.html file content
+     * @param replacement replacement URL 
+     * @return index.html file content with replaced URL
+     */
+    protected String replaceUrl(final String index, final String replacement) {
+        final Matcher matcher = URL_PATTERN.matcher(index);
+
+        if (matcher.find()) {
+            return index.substring(0, matcher.start(1)) + replacement + index.substring(matcher.end(1)); 
+        }
+
+        return index;
     }
 }
 

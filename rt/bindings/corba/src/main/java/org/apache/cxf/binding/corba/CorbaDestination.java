@@ -213,7 +213,7 @@ public class CorbaDestination implements MultiplexDestination {
         LOG.info("Service address retrieved: " + location);
 
 
-        URI addressURI = null;
+        final URI addressURI;
         try {
             addressURI = new URI(location);
         } catch (java.net.URISyntaxException ex) {
@@ -426,11 +426,11 @@ public class CorbaDestination implements MultiplexDestination {
         }
     }
     public EndpointReferenceType getAddressWithId(String id) {
-        EndpointReferenceType ref = null;
         if (bindingPOA == null) {
             throw new CorbaBindingException(
                  "getAddressWithId failed because the poa is null");
         }
+        final EndpointReferenceType ref;
         try {
             Servant servant = bindingPOA.id_to_servant(objectId);
             org.omg.CORBA.Object objRef
@@ -453,17 +453,15 @@ public class CorbaDestination implements MultiplexDestination {
     }
 
     public String getId(Map<String, Object> contextMap) {
-        String id = null;
         try {
             Current currentPoa = (Current) orb
                 .resolve_initial_references("POACurrent");
             byte[] idBytes = currentPoa.get_object_id();
-            id = new String(idBytes); //NOPMD
+            return new String(idBytes);
         } catch (Exception e) {
             throw new CorbaBindingException("Unable to getId, current is unavailable, reason: "
                                              + e, e);
         }
-        return id;
     }
 
 }

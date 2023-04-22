@@ -26,14 +26,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.SOAPBinding;
-
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
@@ -124,9 +124,7 @@ public class JavaToJSProcessor implements Processor {
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
                 String[] list = (String[])beanFilesParameter;
-                for (String b : list) {
-                    beanDefinitions.add(b);
-                }
+                beanDefinitions.addAll(Arrays.asList(list));
             }
         }
 

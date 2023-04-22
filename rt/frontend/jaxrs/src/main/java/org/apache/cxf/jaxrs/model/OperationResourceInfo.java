@@ -26,13 +26,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.Encoded;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -81,9 +80,11 @@ public class OperationResourceInfo {
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
         methodToInvoke = mInvoke;
         annotatedMethod = mAnnotated;
+        // Combine the name bindings from annotated method and method to invoke
+        nameBindings.addAll(AnnotationUtils.getNameBindings(mInvoke.getAnnotations()));
         if (mAnnotated != null) {
             parameters = ResourceUtils.getParameters(mAnnotated);
-            nameBindings = AnnotationUtils.getNameBindings(mAnnotated.getAnnotations());
+            nameBindings.addAll(AnnotationUtils.getNameBindings(mAnnotated.getAnnotations()));
         }
         classResourceInfo = cri;
         checkMediaTypes(null, null);
@@ -212,7 +213,7 @@ public class OperationResourceInfo {
     }
 
     public boolean isSubResourceLocator() {
-        return httpMethod == null ? true : false;
+        return httpMethod == null;
     }
 
 

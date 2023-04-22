@@ -32,24 +32,24 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.Oneway;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.ParameterStyle;
-import javax.jws.soap.SOAPBinding.Style;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Action;
-import javax.xml.ws.Holder;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.Response;
-import javax.xml.ws.ResponseWrapper;
-import javax.xml.ws.WebFault;
 
+import jakarta.jws.Oneway;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebParam.Mode;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding.ParameterStyle;
+import jakarta.jws.soap.SOAPBinding.Style;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.ResponseWrapper;
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -312,7 +312,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
 
         if (tns == null || tns.length() == 0) {
-            QName wrappername = null;
+            final QName wrappername;
             if (input) {
                 wrappername = getRequestWrapperName(op, method);
             } else {
@@ -342,7 +342,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
     private String getDefaultLocalName(OperationInfo op, Method method, int paramNumber,
                                        int partIndex, String prefix) {
-        String paramName = null;
+        final String paramName;
         if (paramNumber != -1) {
             paramName = prefix + partIndex;
         } else {
@@ -622,7 +622,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         Method m = getDeclaredMethod(selected);
 
         ResponseWrapper rw = m.getAnnotation(ResponseWrapper.class);
-        String clsName = "";
+        final String clsName;
         if (rw == null) {
             clsName = getPackageName(selected) + ".jaxws." + StringUtils.capitalize(selected.getName())
                       + "Response";
@@ -630,7 +630,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             clsName = rw.className();
         }
 
-        if (clsName.length() > 0) {
+        if (!clsName.isEmpty()) {
             cachedClass = responseMethodClassCache.get(clsName);
             if (cachedClass != null) {
                 responseMethodClassCache.put(selected, cachedClass);
@@ -696,14 +696,14 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         Method m = getDeclaredMethod(selected);
 
         RequestWrapper rw = m.getAnnotation(RequestWrapper.class);
-        String clsName = "";
+        final String clsName;
         if (rw == null) {
             clsName = getPackageName(selected) + ".jaxws." + StringUtils.capitalize(selected.getName());
         } else {
             clsName = rw.className();
         }
 
-        if (clsName.length() > 0) {
+        if (!clsName.isEmpty()) {
             cachedClass = requestMethodClassCache.get(clsName);
             if (cachedClass != null) {
                 requestMethodClassCache.put(selected, cachedClass);

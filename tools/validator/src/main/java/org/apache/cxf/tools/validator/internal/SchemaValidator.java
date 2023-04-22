@@ -51,6 +51,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.common.i18n.Message;
@@ -66,7 +67,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
     protected String[] defaultSchemas;
 
-    protected String schemaLocation = "./";
+    protected final String schemaLocation;
 
     private String wsdlsrc;
 
@@ -125,9 +126,15 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
-        SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
+        
+        try {
+            // The 'http://javax.xml.XMLConstants/property/accessExternalSchema' is not supported by Xerces
+            sf.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+        } catch (final SAXNotRecognizedException ex) {
+            LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA + "' is not supported.");
+        }
 
+        SchemaResourceResolver resourceResolver = new SchemaResourceResolver();
         sf.setResourceResolver(resourceResolver);
 
         List<Source> sources = new ArrayList<>();
@@ -178,7 +185,6 @@ public class SchemaValidator extends AbstractDefinitionValidator {
     }
 
     public boolean validate(InputSource wsdlsource, String[] schemas) throws ToolException {
-        boolean isValid = false;
         Schema schema;
         try {
             SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -207,8 +213,6 @@ public class SchemaValidator extends AbstractDefinitionValidator {
                 throw new ToolException(errHandler.getErrorMessages());
             }
 
-            isValid = true;
-
         } catch (IOException ioe) {
             throw new ToolException("Cannot get the wsdl " + wsdlsource.getSystemId(), ioe);
         } catch (SAXException saxEx) {
@@ -216,7 +220,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);
         }
-        return isValid;
+        return true;
     }
 
     private String[] addSchemas(String[] defaults, String[] schemas) {
@@ -241,7 +245,8 @@ public class SchemaValidator extends AbstractDefinitionValidator {
         if (f.exists() && f.isDirectory()) {
             FilenameFilter filter = new FilenameFilter() {
                 public boolean accept(File dir, String name) {
-                    if (name.toLowerCase().endsWith(".xsd")
+                    String suffix = ".xsd";
+                    if (name.regionMatches(true, name.length() - suffix.length(), suffix, 0, suffix.length())
                             && !new File(dir.getPath() + File.separator + name).isDirectory()) {
                         return true;
                     }
@@ -375,7 +380,6 @@ class SchemaResourceResolver implements LSResourceResolver {
 
         LSInput lsin = null;
         String resURL = null;
-        String localFile = null;
         if (systemId != null) {
             String schemaLocation = "";
             if (baseURI != null) {
@@ -394,7 +398,7 @@ class SchemaResourceResolver implements LSResourceResolver {
             return null;
         }
 
-        localFile = resURL;
+        String localFile = resURL;
         if (resURL.startsWith("http://")) {
             String filename = NSFILEMAP.get(resURL);
             if (filename != null) {
@@ -402,12 +406,12 @@ class SchemaResourceResolver implements LSResourceResolver {
             }
         }
 
-        URIResolver resolver;
         try {
             msg = new Message("RESOLVE_FROM_LOCAL", LOG, localFile);
             LOG.log(Level.FINE, msg.toString());
 
-            resolver = new URIResolver(localFile);
+            @SuppressWarnings("resource")
+            final URIResolver resolver = new URIResolver(localFile);
             if (resolver.isResolved()) {
                 lsin = new LSInputImpl();
                 lsin.setSystemId(localFile);

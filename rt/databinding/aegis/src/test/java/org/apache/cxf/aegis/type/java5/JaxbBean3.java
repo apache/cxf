@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 public class JaxbBean3 {
     private String attributeProperty;

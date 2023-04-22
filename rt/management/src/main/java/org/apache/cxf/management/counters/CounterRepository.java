@@ -111,8 +111,7 @@ public class CounterRepository {
     }
 
     public Counter createCounter(ObjectName on) {
-        Counter counter = null;
-        counter = new ResponseTimeCounter(on);
+        Counter counter = new ResponseTimeCounter(on);
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         if (null != im) {
             try {
@@ -124,7 +123,5 @@ public class CounterRepository {
         }
         return counter;
     }
-
-
 
 }

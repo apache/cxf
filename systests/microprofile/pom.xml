@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -32,7 +32,7 @@
     <description>Apache CXF System Tests - MicroProfile TCKs</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
+        <cxf.geronimo.config.version>1.2.3</cxf.geronimo.config.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
     </properties>
     <dependencyManagement>
@@ -40,7 +40,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.14.2</version>
+                <version>7.7.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${cxf.javax.ws.rs.version}</version>
+                <version>${cxf.jakarta.ws.rs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
@@ -82,6 +82,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -118,6 +119,7 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
+                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -126,51 +128,6 @@
                 <version>${cxf.microprofile.rest.client.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-security</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-plus</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jsp</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-commons</artifactId>
-              </exclusion>
-            </exclusions> 
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
         </dependencies>
     </dependencyManagement>
     <modules>
@@ -178,5 +135,6 @@
         <module>client/jaxrs</module>
         <module>client/tracing</module>
         <module>client/weld</module>
+        <module>client/nocdi</module>
     </modules>
 </project>

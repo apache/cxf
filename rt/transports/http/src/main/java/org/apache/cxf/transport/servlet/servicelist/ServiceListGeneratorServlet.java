@@ -22,17 +22,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -45,17 +46,12 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     private DestinationRegistry destinationRegistry;
     private Bus bus;
     private String serviceListStyleSheet;
-    private String title;
+    private String title = "CXF - Service list";
     private boolean showForeignContexts = true;
 
     public ServiceListGeneratorServlet(DestinationRegistry destinationRegistry, Bus bus) {
         this.destinationRegistry = destinationRegistry;
-        this.bus = bus;
-        if (this.bus == null) {
-            this.bus = BusFactory.getDefaultBus(false);
-        }
-
-        this.title = "CXF - Service list";
+        this.bus = bus != null ? bus : BusFactory.getDefaultBus(false);
     }
 
     public void setServiceListStyleSheet(String serviceListStyleSheet) {
@@ -66,17 +62,11 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         this.title = title;
     }
 
-
-    @SuppressWarnings("unchecked")
     @Override
     public void service(HttpServletRequest request,
                         HttpServletResponse response) throws ServletException, IOException {
-        Object obj = request.getAttribute(ServletController.AUTH_SERVICE_LIST);
-        boolean isAuthServiceList = false;
-        if (obj != null) {
-            isAuthServiceList = Boolean.valueOf(obj.toString());
-        }
-        if (isAuthServiceList) {
+        final Object isAuthServiceList = request.getAttribute(ServletController.AUTH_SERVICE_LIST);
+        if (isAuthServiceList != null && Boolean.valueOf(isAuthServiceList.toString())) {
             String authServiceListRealm = (String)request.getAttribute(ServletController.AUTH_SERVICE_LIST_REALM);
             ServiceListJAASAuthenticator authenticator = new ServiceListJAASAuthenticator();
             authenticator.setRealm(authServiceListRealm);
@@ -86,24 +76,18 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             request.removeAttribute(ServletController.AUTH_SERVICE_LIST);
             request.removeAttribute(ServletController.AUTH_SERVICE_LIST_REALM);
         }
-        AbstractDestination[] destinations = destinationRegistry.getSortedDestinations();
         if (request.getParameter("stylesheet") != null) {
             renderStyleSheet(request, response);
             return;
         }
-        List<String> privateEndpoints;
+
+        if ("HEAD".equals(request.getMethod())) {
+            return;
+        }
         if (bus == null) {
             bus = BusFactory.getDefaultBus(false);
         }
-        if (bus != null) {
-            privateEndpoints = (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
-        } else {
-            privateEndpoints = new ArrayList<>();
-        }
-
-        AbstractDestination[] soapEndpoints = getSOAPEndpoints(destinations, privateEndpoints);
-        AbstractDestination[] restEndpoints = getRestEndpoints(destinations, privateEndpoints);
-        ServiceListWriter serviceListWriter;
+        final ServiceListWriter serviceListWriter;
         if ("false".equals(request.getParameter("formatted"))) {
             boolean renderWsdlList = "true".equals(request.getParameter("wsdlList"));
             serviceListWriter = new UnformattedServiceListWriter(renderWsdlList, bus);
@@ -136,14 +120,19 @@ public class ServiceListGeneratorServlet extends HttpServlet {
 
         }
         response.setContentType(serviceListWriter.getContentType());
-        Object basePath = request.getAttribute(Message.BASE_PATH);
+        final Object basePath = request.getAttribute(Message.BASE_PATH);
+        final AbstractDestination[] destinations = destinationRegistry.getSortedDestinations();
+        final List<String> privateEndpoints = bus != null
+            ? CastUtils.cast((List<?>) bus.getProperty("org.apache.cxf.private.endpoints"))
+            : Collections.emptyList();
         serviceListWriter.writeServiceList(response.getWriter(),
                                            basePath == null ? null : basePath.toString(),
-                                           soapEndpoints, restEndpoints);
+                                           getSOAPEndpoints(destinations, privateEndpoints),
+                                           getRestEndpoints(destinations, privateEndpoints));
     }
 
 
-    private boolean isPrivate(EndpointInfo ei, List<String> privateEndpoints) {
+    private static boolean isPrivate(EndpointInfo ei, List<String> privateEndpoints) {
         if (privateEndpoints != null) {
             for (String s : privateEndpoints) {
                 if (ei.getAddress().endsWith(s)) {
@@ -154,7 +143,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         return false;
     }
 
-    private AbstractDestination[] getSOAPEndpoints(AbstractDestination[] destinations,
+    private static AbstractDestination[] getSOAPEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
         List<AbstractDestination> soapEndpoints = new ArrayList<>();
         for (AbstractDestination sd : destinations) {
@@ -166,7 +155,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         return soapEndpoints.toArray(new AbstractDestination[0]);
     }
 
-    private AbstractDestination[] getRestEndpoints(AbstractDestination[] destinations,
+    private static AbstractDestination[] getRestEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
         List<AbstractDestination> restfulDests = new ArrayList<>();
         for (AbstractDestination sd : destinations) {

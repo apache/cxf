@@ -72,9 +72,8 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
                 xmlWriter = cache;
             }
 
-            List<MessagePartInfo> parts = null;
-
-            boolean output = false;
+            final List<MessagePartInfo> parts;
+            final boolean output;
             if (!isRequestor(message)) {
                 if (operation.getOutput() == null) {
                     return;
@@ -138,7 +137,7 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
                                       BindingOperationInfo boi)
         throws XMLStreamException {
         String ns = boi.getName().getNamespaceURI();
-        SoapBody body = null;
+        final SoapBody body;
         if (output) {
             body = boi.getOutput().getExtensor(SoapBody.class);
         } else {

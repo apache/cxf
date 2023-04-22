@@ -64,19 +64,19 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         }
         Attachment sigPart = atts.remove(atts.size() - 1);
         
-        String jwsSequence = null;
+        final String jwsSequence;
         try {
             jwsSequence = IOUtils.readStringFromStream(sigPart.getDataHandler().getInputStream());
         } catch (IOException ex) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
         
-        String base64UrlEncodedHeaders = null;
-        String base64UrlEncodedSignature = null;
+        final String base64UrlEncodedHeaders;
+        final String base64UrlEncodedSignature;
         
         if (!useJwsJsonSignatureFormat) {
             String[] parts = JoseUtils.getCompactParts(jwsSequence);
-            if (parts.length != 3 || parts[1].length() > 0) {
+            if (parts.length != 3 || !parts[1].isEmpty()) {
                 throw ExceptionUtils.toBadRequestException(null, null);
             }
             base64UrlEncodedHeaders = parts[0];
@@ -97,7 +97,7 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         if (Boolean.FALSE != headers.getPayloadEncodingStatus()) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        JwsSignatureVerifier theVerifier = null;
+        final JwsSignatureVerifier theVerifier;
         if (verifier == null) {
             Properties props = KeyManagementUtils.loadStoreProperties(message, true,
                                                    JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
@@ -115,22 +115,22 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         }
         byte[] signatureBytes = JoseUtils.decode(base64UrlEncodedSignature);
         
-        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + ".");
+        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + '.');
         sig.update(headerBytesWithDot, 0, headerBytesWithDot.length);
         
         int attSize = atts.size();
         for (int i = 0; i < attSize; i++) {
-            Attachment dataPart = atts.remove(i);
-            InputStream dataPartStream = null;
+            Attachment dataPart = atts.get(i);
+            final InputStream dataPartStream;
             try {
                 dataPartStream = dataPart.getDataHandler().getDataSource().getInputStream();
             } catch (IOException ex) {
                 throw ExceptionUtils.toBadRequestException(ex, null);
             }
-            boolean verifyOnLastRead = i == attSize - 1 ? true : false;
+            boolean verifyOnLastRead = i == attSize - 1;
             JwsInputStream jwsStream = new JwsInputStream(dataPartStream, sig, signatureBytes, verifyOnLastRead);
             
-            InputStream newStream = null;
+            final InputStream newStream;
             if (bufferPayload) {
                 CachedOutputStream cos = new CachedOutputStream();
                 try {
@@ -143,7 +143,7 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
                 newStream = jwsStream;
             }
             Attachment newDataPart = new Attachment(newStream, dataPart.getHeaders());
-            atts.add(i, newDataPart);
+            atts.set(i, newDataPart);
         }
     }
 }

@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf</artifactId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>4.0.1-SNAPSHOT</version>
     <name>Apache CXF</name>
     <description>Apache CXF is an open-source services framework that aids in 
     the development of services using front-end programming APIs, like JAX-WS 
@@ -40,12 +40,12 @@
     </issueManagement>
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>3.4.4</cxf.build-utils.version>
-        <cxf.xjc-utils.version>3.3.1</cxf.xjc-utils.version>
-        <cxf.jdk.version>1.8</cxf.jdk.version>
+        <cxf.build-utils.version>4.0.0</cxf.build-utils.version>
+        <cxf.xjc-utils.version>4.0.0</cxf.xjc-utils.version>
+        <cxf.jdk.version>11</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
-        <maven-owasp-plugin-version>5.3.2</maven-owasp-plugin-version>
+        <maven-owasp-plugin-version>8.2.1</maven-owasp-plugin-version>
     </properties>
     <distributionManagement>
         <repository>
@@ -172,7 +172,6 @@
         <module>integration</module>
         <module>maven-plugins</module>
         <module>services</module>
-        <module>osgi</module>
         <module>systests</module>
     </modules>
     <profiles>
@@ -216,10 +215,9 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
-                            <version>3.8.1</version>
+                            <version>3.11.0</version>
                             <configuration>
-                                <source>${cxf.jdk.version}</source>
-                                <target>${cxf.jdk.version}</target>
+                                <release>${cxf.jdk.version}</release>
                                 <maxmem>256M</maxmem>
                                 <fork>${cxf.compiler.fork}</fork>
                             </configuration>
@@ -319,7 +317,7 @@
                                             <entry key="org.eclipse.jdt.ui.cleanupprofiles" value="${eclipse.code.cleanup}" />
                                             <entry key="org.eclipse.jdt.ui.text.custom_code_templates" value="${eclipse.code.templates}" />
                                             <!-- Add import order -->
-                                            <entry key="org.eclipse.jdt.ui.importorder" value="java;javax;org.w3c;org.xml;junit;antlr;com;net;org;org.junit;#org.junit" />
+                                            <entry key="org.eclipse.jdt.ui.importorder" value="java;javax.org.w3c;org.xml;junit;antlr;com;net;org;org.junit;#org.junit" />
                                             <!-- Sort order -->
                                             <entry key="org.eclipse.jdt.ui.visibility.order" value="B,R,D,V," />
                                             <entry key="outlinesortoption" value="T,SF,F,SI,I,C,SM,M," />
@@ -356,7 +354,7 @@
                     <!-- We want to sign the artifact, the POM, and all attached artifacts -->
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -427,32 +425,27 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>4.2.1</version>
+                    <version>5.1.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
                         <preparationGoals>clean install</preparationGoals>
@@ -464,7 +457,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <attach>true</attach>
                         <source>${cxf.jdk.version}</source>
@@ -474,27 +467,27 @@
                         <encoding>UTF-8</encoding>
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
-                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                        <doclint>none</doclint>
+                        <javadocVersion>1.8.0</javadocVersion>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
-                        <source>${cxf.jdk.version}</source>
-                        <target>${cxf.jdk.version}</target>
+                        <release>${cxf.jdk.version}</release>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
@@ -518,17 +511,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -536,32 +529,32 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>3.4.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.8.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -578,7 +571,7 @@
                 <plugin>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.13</version>
+                    <version>0.15</version>
                     <configuration>
                         <numUnapprovedLicenses>350</numUnapprovedLicenses>
                         <excludeSubProjects>false</excludeSubProjects>
@@ -600,7 +593,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.12.1</version>
                     <configuration>
                         <chmod>true</chmod>
                         <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
@@ -608,13 +601,6 @@
                         <stagingRepositoryId>apache.cxf.site</stagingRepositoryId>
                         <stagingSiteURL>scp://people.apache.org/www/cxf.apache.org/maven-site-${project.version}</stagingSiteURL>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.wagon</groupId>
-                            <artifactId>wagon-ssh</artifactId>
-                            <version>2.1</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
@@ -650,11 +636,14 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <rules>
+                            <requireJavaVersion>
+                                <version>11</version>
+                            </requireJavaVersion>
                             <requireMavenVersion>
-                                <version>3.1</version>
+                                <version>3.5</version>
                             </requireMavenVersion>
                             <bannedDependencies>
                                 <excludes>
@@ -666,11 +655,12 @@
                                     <exclude>javax.xml.soap:javax.xml.soap-api</exclude>
                                     <exclude>javax.activation:javax.activation-api</exclude>
                                     <exclude>com.sun.activation:javax.activation</exclude>
+                                    <exclude>com.sun.activation:jakarta.activation</exclude>
                                     <exclude>javax.annotation:javax.annotation-api</exclude>
-                                    <!--<exclude>javax.validation:validation-api</exclude>-->
+                                    <exclude>javax.validation:validation-api</exclude>
                                     <exclude>javax.servlet:servlet-api</exclude>
                                     <exclude>javax.json:javax.json-api</exclude>
-                                    <!--<exclude>javax.el:javax.el-api</exclude>-->
+                                    <exclude>javax.el:javax.el-api</exclude>
                                 </excludes>
                             </bannedDependencies>
                         </rules>
@@ -693,6 +683,11 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.3.2</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -713,16 +708,18 @@
     <reporting>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.6</version>
+                <version>3.12.1</version>
                 <configuration>
                     <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.4.3</version>
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>

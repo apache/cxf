@@ -103,20 +103,19 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
     }
 
     private CorbaObjectHandler getAnyContainedType(Any a) {
-        CorbaObjectHandler result = null;
+        final CorbaObjectHandler result;
 
         TypeCode tc = a.type();
         QName containedName = new QName("AnyContainedType");
-        QName idlType = null;
         if (CorbaUtils.isPrimitiveTypeCode(tc)) {
-            idlType = CorbaAnyHelper.getPrimitiveIdlTypeFromTypeCode(tc);
+            QName idlType = CorbaAnyHelper.getPrimitiveIdlTypeFromTypeCode(tc);
             result = new CorbaPrimitiveHandler(containedName, idlType, tc, null);
         } else if (tc.kind().value() == TCKind._tk_any) {
-            idlType = CorbaConstants.NT_CORBA_ANY;
+            QName idlType = CorbaConstants.NT_CORBA_ANY;
             result = new CorbaAnyHandler(containedName, idlType, tc, null);
             ((CorbaAnyHandler)result).setTypeMap(handler.getTypeMap());
         } else {
-            idlType = handler.getTypeMap().getIdlType(tc);
+            QName idlType = handler.getTypeMap().getIdlType(tc);
             result = CorbaHandlerUtils.initializeObjectHandler(orb, containedName, idlType,
                                                                handler.getTypeMap(), serviceInfo);
         }
@@ -130,7 +129,7 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
 
     private QName convertIdlToSchemaType(CorbaObjectHandler obj) {
         QName idlType = obj.getIdlType();
-        QName result = null;
+        final QName result;
         if (CorbaAnyHelper.isPrimitiveIdlType(idlType)) {
             result = CorbaAnyHelper.convertPrimitiveIdlToSchemaType(obj.getIdlType());
         } else {

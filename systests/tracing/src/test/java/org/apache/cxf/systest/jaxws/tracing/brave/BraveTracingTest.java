@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javax.xml.ws.soap.SOAPFaultException;
-
 import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.Tracing;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;

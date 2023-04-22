@@ -22,8 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
-
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
@@ -44,7 +43,7 @@ public final class XmlSeeAlsoAnnotator implements Annotator {
             return;
         }
 
-        JavaInterface intf = null;
+        final JavaInterface intf;
         if (ja instanceof JavaInterface) {
             intf = (JavaInterface) ja;
         } else {

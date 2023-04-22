@@ -25,10 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.Endpoint;
-
 import com.codahale.metrics.MetricRegistry;
 
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;

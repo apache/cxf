@@ -27,47 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-<!--
-        <cxf.bundle.activator>org.apache.cxf.transport.websocket.osgi.WebSocketTransportActivator</cxf.bundle.activator>
-                    org.eclipse.jetty.websocket;version="${cxf.jetty.osgi.version}";resolution:=optional,
-        
--->
         <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
-        <cxf.osgi.import>
-            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
-            org.atmosphere*;version="${cxf.atmosphere.version.range}";resolution:=optional,
-            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
-        </cxf.osgi.import>
-        <cxf.osgi.dynamic.import>
-            org.eclipse.jetty.jmx
-        </cxf.osgi.dynamic.import>
-        <!-- keep in sync with services exported in activator -->
-        <cxf.export.service>
-        </cxf.export.service>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.aries.blueprint</groupId>
-            <artifactId>org.apache.aries.blueprint.core</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -84,12 +50,12 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
             </exclusions>
             <optional>true</optional>
@@ -121,12 +87,12 @@
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
-                    <artifactId>javax.servlet</artifactId>
+                    <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -166,20 +132,19 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
-            <optional>true</optional>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-jetty-server</artifactId>
+            <version>${cxf.jetty11.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${cxf.jetty9.version}</version>
+            <artifactId>websocket-jakarta-server</artifactId>
+            <version>${cxf.jetty11.version}</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

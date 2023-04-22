@@ -17,14 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
     <jaxws:bindings node="wsdl:definitions">
         <jaxws:package name="org.mypkg">
             <jaxws:javadoc>this is package javadoc</jaxws:javadoc>
         </jaxws:package>
     </jaxws:bindings>
     <jaxws:bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema" node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://cxf.apache.org/w2j/hello_world_soap_http/types']">
-        <jxb:schemaBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb">
+        <jxb:schemaBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb">
             <jxb:package name="org.mypkg"/>
         </jxb:schemaBindings>
     </jaxws:bindings>

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.security.saml;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +52,6 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.joda.time.DateTime;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -141,7 +141,7 @@ public class SamlCallbackHandler implements CallbackHandler {
 
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
-                authBean.setAuthenticationInstant(new DateTime());
+                authBean.setAuthenticationInstant(Instant.now());
                 authBean.setSessionIndex("123456");
                 // AuthnContextClassRef is not set
                 authBean.setAuthenticationMethod(

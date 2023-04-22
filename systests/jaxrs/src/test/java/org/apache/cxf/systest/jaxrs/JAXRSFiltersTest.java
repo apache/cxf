@@ -19,15 +19,16 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,40 +36,26 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSFiltersTest extends AbstractBusClientServerTestBase {
+public class JAXRSFiltersTest extends AbstractClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly",
-                   launchServer(AppServer.class, true));
-        createStaticBus();
+        assertTrue("server did not launch correctly", launchServer(AppServer.class));
     }
 
-    public static class AppServer extends AbstractBusTestServerBase {
+    public static class AppServer extends AbstractServerTestServerBase {
         public static final String PORT = allocatePort(BookServer.class);
 
-        org.apache.cxf.endpoint.Server server;
-
-        public AppServer() {
-        }
-
-        protected void run() {
+        @Override
+        protected Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(ApplicationController.class);
-            List<Object> providers = new ArrayList<>();
-            providers.add(new ApplicationInfoJaxrsFilter());
-            sf.setProviders(providers);
+            sf.setProviders(Collections.singletonList(new ApplicationInfoJaxrsFilter()));
             sf.setResourceProvider(ApplicationController.class,
                                    new SingletonResourceProvider(new ApplicationController()));
             sf.setAddress("http://localhost:" + PORT + "/info");
-            server = sf.create();
-        }
-
-        public void tearDown() throws Exception {
-            server.stop();
-            server.destroy();
-            server = null;
+            return sf.create();
         }
     }
 

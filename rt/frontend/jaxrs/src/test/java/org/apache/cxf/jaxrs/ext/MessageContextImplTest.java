@@ -19,20 +19,30 @@
 
 package org.apache.cxf.jaxrs.ext;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBContext;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.UUID;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.Providers;
+import jakarta.xml.bind.JAXBContext;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletRequestFilter;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
@@ -46,11 +56,16 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -197,6 +212,42 @@ public class MessageContextImplTest {
         MessageContext mc = new MessageContextImpl(createMessage());
         assertNull(mc.getContext(Message.class));
     }
+    
+    @Test
+    public void testAttachments() throws IOException {
+        final Message in = createMessage();
+        final MessageContext mc = new MessageContextImpl(in);
+        
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            final Message out = new MessageImpl();
+            out.put(Message.CONTENT_TYPE, "image/png");
+            out.setContent(OutputStream.class, output);
+            out.setInterceptorChain(new PhaseInterceptorChain(Collections.emptySortedSet()));
+            in.getExchange().setOutMessage(out);
+            
+            final Binding binding = in.getExchange().getEndpoint().getBinding();
+            final Capture<Message> capture = Capture.newInstance();
+            EasyMock.expect(binding.createMessage(EasyMock.capture(capture)))
+                .andAnswer(
+                    new IAnswer<Message>() {
+                        @Override
+                        public Message answer() throws Throwable {
+                            return capture.getValue();
+                        }
+                    }
+                ).anyTimes();
+    
+            final String id = UUID.randomUUID().toString();
+            final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+            // Headers should be case-insensitive
+            headers.add("Content-Id", id);
+            mc.put(MultipartBody.OUTBOUND_MESSAGE_ATTACHMENTS, 
+                Collections.singletonList(new Attachment(headers, new byte[0])));
+
+            output.flush();
+            assertThat(new String(output.toByteArray()), containsString("Content-ID: <" + id + ">"));
+        }
+    }
 
     private Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
@@ -205,12 +256,14 @@ public class MessageContextImplTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
+        Binding binding = EasyMock.mock(Binding.class);
         Endpoint endpoint = EasyMock.mock(Endpoint.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
         EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
         EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
         EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
         EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
+        EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;

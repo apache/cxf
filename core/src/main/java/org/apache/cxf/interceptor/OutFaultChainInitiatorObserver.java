@@ -37,6 +37,7 @@ public class OutFaultChainInitiatorObserver extends AbstractFaultChainInitiatorO
         super(bus);
     }
 
+    @Override
     protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
         Endpoint e = ex.getEndpoint();
         Client c = ex.get(Client.class);

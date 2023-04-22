@@ -24,12 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -40,7 +34,12 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
 
-
+import jakarta.xml.soap.Detail;
+import jakarta.xml.soap.Name;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -131,7 +130,6 @@ public class WebFaultOutInterceptorTestCase {
         return message;
     }
 
-    @SuppressWarnings("rawtypes") // old SAAJ API doesn't have generics
     private class SOAPFaultStub implements SOAPFault {
 
         @Override
@@ -225,12 +223,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getFaultReasonLocales() throws SOAPException {
+        public Iterator<Locale> getFaultReasonLocales() throws SOAPException {
             return Collections.emptyIterator();
         }
 
         @Override
-        public Iterator getFaultReasonTexts() throws SOAPException {
+        public Iterator<String> getFaultReasonTexts() throws SOAPException {
             return null;
         }
 
@@ -330,12 +328,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getAllAttributes() {
+        public Iterator<Name> getAllAttributes() {
             return null;
         }
 
         @Override
-        public Iterator getAllAttributesAsQNames() {
+        public Iterator<QName> getAllAttributesAsQNames() {
             return null;
         }
 
@@ -345,12 +343,12 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getNamespacePrefixes() {
+        public Iterator<String> getNamespacePrefixes() {
             return null;
         }
 
         @Override
-        public Iterator getVisibleNamespacePrefixes() {
+        public Iterator<String> getVisibleNamespacePrefixes() {
             return null;
         }
 
@@ -390,17 +388,17 @@ public class WebFaultOutInterceptorTestCase {
         }
 
         @Override
-        public Iterator getChildElements() {
+        public Iterator<jakarta.xml.soap.Node> getChildElements() {
             return null;
         }
 
         @Override
-        public Iterator getChildElements(Name name) {
+        public Iterator<jakarta.xml.soap.Node> getChildElements(Name name) {
             return null;
         }
 
         @Override
-        public Iterator getChildElements(QName qName) {
+        public Iterator<jakarta.xml.soap.Node> getChildElements(QName qName) {
             return null;
         }
 

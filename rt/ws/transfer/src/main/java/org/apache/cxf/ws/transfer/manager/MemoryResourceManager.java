@@ -25,15 +25,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.WebServiceContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.annotation.Resource;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -56,14 +56,10 @@ public class MemoryResourceManager implements ResourceManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(MemoryResourceManager.class);
 
-    protected Map<String, String> storage;
+    protected final Map<String, String> storage = new HashMap<>();
 
     @Resource
     private WebServiceContext context;
-
-    public MemoryResourceManager() {
-        storage = new HashMap<>();
-    }
 
     @Override
     public Representation get(ReferenceParametersType ref) {
@@ -75,7 +71,7 @@ public class MemoryResourceManager implements ResourceManager {
         if (resource.isEmpty()) {
             return new Representation();
         }
-        Document doc = null;
+        final Document doc;
         try {
             doc = StaxUtils.read(new StringReader(storage.get(uuid)));
         } catch (XMLStreamException e) {

@@ -48,7 +48,7 @@ public class Server {
         servletHolder.setInitParameter("redirects-list",
             "/ /index.html /js/fileinput.min.js /css/fileinput.min.css");
         servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
-        servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
+        servletHolder.setInitParameter("redirect-attributes", "jakarta.servlet.include.request_uri");
         servletHolder.setInitParameter("jaxrs.serviceClasses", Catalog.class.getName());
         servletHolder.setInitParameter("jaxrs.properties", StringUtils.join(
             new String[] {

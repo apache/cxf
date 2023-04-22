@@ -20,21 +20,22 @@
 package org.apache.cxf.jaxb;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.XmlAttachmentRef;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.validation.Schema;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.XmlAttachmentRef;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
+import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
@@ -162,8 +163,11 @@ public abstract class JAXBDataBase {
 
     protected ValidationEventHandler getValidationEventHandler(String cn) {
         try {
-            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass()).newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass())
+                .getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException 
+            | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+            | SecurityException e) {
             LOG.log(Level.INFO, "Could not create validation event handler", e);
         }
         return null;
@@ -171,7 +175,7 @@ public abstract class JAXBDataBase {
 
     protected ValidationEventHandler getValidationEventHandler(Message m, String property) {
         Object value = m.getContextualProperty(property);
-        ValidationEventHandler veventHandler = null;
+        ValidationEventHandler veventHandler;
         if (value instanceof String) {
             veventHandler = getValidationEventHandler((String)value);
         } else {

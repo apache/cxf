@@ -26,8 +26,8 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified"
-           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-           jaxb:version="2.0">
+           xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+           jaxb:version="3.0">
 
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" 
         schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
@@ -311,6 +311,16 @@
                 dozen or so caching related directives for requests 
                 </xs:documentation>
             </xs:annotation>      
+
+        </xs:attribute>
+        
+        <xs:attribute name="Version" type="xs:string" use="optional" default="auto">
+            <xs:annotation>
+                <xs:documentation>
+                HTTP Version used for the connection.  The "auto" default will use whatever the default is
+                for the HTTPConduit implementation.
+                </xs:documentation>
+            </xs:annotation>
 
         </xs:attribute>
 

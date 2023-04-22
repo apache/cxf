@@ -118,15 +118,14 @@ public class JettyHTTPServerEngineFactoryTest {
 
         // The Engine for port 1234 should be configured for TLS.
         // This will throw an error if it is not.
-        JettyHTTPServerEngine engine = null;
-        engine = factory.createJettyHTTPServerEngine(1234, "https");
+        JettyHTTPServerEngine engine = factory.createJettyHTTPServerEngine(1234, "https");
 
         assertNotNull("Engine is not available.", engine);
         assertEquals(1234, engine.getPort());
         assertEquals("Not https", "https", engine.getProtocol());
 
         try {
-            engine = factory.createJettyHTTPServerEngine(1234, "http");
+            factory.createJettyHTTPServerEngine(1234, "http");
             fail("The engine's protocol should be https");
         } catch (Exception e) {
             // expect the exception
@@ -146,8 +145,7 @@ public class JettyHTTPServerEngineFactoryTest {
 
         assertNotNull("EngineFactory is not configured.", factory);
 
-        JettyHTTPServerEngine engine = null;
-        engine = factory.createJettyHTTPServerEngine(1234, "http");
+        JettyHTTPServerEngine engine = factory.createJettyHTTPServerEngine(1234, "http");
 
         assertNotNull("Engine is not available.", engine);
         assertEquals(1234, engine.getPort());

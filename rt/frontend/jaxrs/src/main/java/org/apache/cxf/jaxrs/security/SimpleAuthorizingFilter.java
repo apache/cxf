@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.jaxrs.security;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Response;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.interceptor.security.AbstractAuthorizingInInterceptor;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;

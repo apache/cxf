@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -42,6 +41,7 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 
+import jakarta.activation.DataSource;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -160,7 +160,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             throw new Fault("COULD_NOT_READ_XML_STREAM", LOG, e);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                            e.getClass().getCanonicalName(), e.getMessage());
+                            e.getMessage());
         }
     }
 
@@ -256,7 +256,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     parentNode.removeChild(include);
                     String cid = DOMUtils.getAttribute(include, "href");
                     //set the fake base64Binary to validate instead of reading the attachment from message
-                    parentNode.setTextContent(javax.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
+                    parentNode.setTextContent(jakarta.xml.bind.DatatypeConverter.printBase64Binary(cid.getBytes()));
                 }
             }
             try {
@@ -298,7 +298,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             return new DOMSource(document);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
-                            e.getClass().getCanonicalName(), e.getMessage());
+                            e.getMessage());
         }
     }
 

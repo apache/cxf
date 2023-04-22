@@ -26,13 +26,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.ManagedConnection;
-import javax.resource.spi.ResourceAdapterInternalException;
 import javax.security.auth.Subject;
 
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
+import jakarta.resource.spi.ConnectionRequestInfo;
+import jakarta.resource.spi.ManagedConnection;
+import jakarta.resource.spi.ResourceAdapterInternalException;
 
 import org.junit.Test;
 
@@ -198,10 +198,10 @@ class DummyManagedConnectionFactoryImpl extends AbstractManagedConnectionFactory
         }
     }
 
-    public void setResourceAdapter(javax.resource.spi.ResourceAdapter ra) {
+    public void setResourceAdapter(jakarta.resource.spi.ResourceAdapter ra) {
     }
 
-    public javax.resource.spi.ResourceAdapter getResourceAdapter() {
+    public jakarta.resource.spi.ResourceAdapter getResourceAdapter() {
         return null;
     }
 }

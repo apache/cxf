@@ -27,13 +27,11 @@ import java.util.Map;
 
 
 public final class IdlRoot extends IdlScopeBase {
-    private Map<String, IdlType> primitiveTypes;
-    private List<String> includeList;
+    private final Map<String, IdlType> primitiveTypes = new HashMap<>();
+    private final List<String> includeList = new ArrayList<>();
 
     private IdlRoot() {
         super(null, "");
-        primitiveTypes = new HashMap<>();
-        includeList = new ArrayList<>();
 
         for (short i = IdlPrimitive.MINIMUM; i <= IdlPrimitive.MAXIMUM; ++i) {
             IdlPrimitive prim = IdlPrimitive.create(this, i);
@@ -55,7 +53,7 @@ public final class IdlRoot extends IdlScopeBase {
 
 
     public IdlDefn lookup(String nm, boolean undefined) {
-        IdlDefn result = null;
+        final IdlDefn result;
 
         if (!undefined && primitiveTypes.containsKey(nm)) {
             result = primitiveTypes.get(nm);

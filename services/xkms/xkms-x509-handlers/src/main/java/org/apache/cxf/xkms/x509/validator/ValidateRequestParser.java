@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.exception.XKMSRequestException;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;

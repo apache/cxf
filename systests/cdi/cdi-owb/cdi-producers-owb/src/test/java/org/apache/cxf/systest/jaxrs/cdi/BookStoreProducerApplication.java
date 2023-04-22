@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.systest.jaxrs.cdi;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Feature;
-
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Feature;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.systests.cdi.base.BookStoreService;
@@ -32,8 +32,8 @@ import org.apache.cxf.systests.cdi.base.BookStoreService;
 public class BookStoreProducerApplication extends Application {
     @Produces protected BookStoreValidatingFeed bookStoreValidatingFeed = new BookStoreValidatingFeed();
     @Inject private BookStoreService service;
-    
-    @Produces
+
+    @Produces @Singleton
     public ValidationExceptionMapper validationExceptionMapper() {
         return new ValidationExceptionMapper();
     }
@@ -44,8 +44,8 @@ public class BookStoreProducerApplication extends Application {
     }
 
     @Produces
-    public BookStoreFeed bookStoreFeed() {
-        return new BookStoreFeed(service);
+    public BookStoreFeed bookStoreFeed(ServerFactoryDebugExtension debugExtension) {
+        return new BookStoreFeed(service, debugExtension);
     }
 
     @Produces

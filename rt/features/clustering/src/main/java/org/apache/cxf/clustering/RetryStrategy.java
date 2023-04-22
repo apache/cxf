@@ -41,8 +41,13 @@ public class RetryStrategy extends SequentialStrategy {
         return getEndpoints(exchange, stillTheSameAddress());
     }
 
+    @Override
     protected <T> T getNextAlternate(List<T> alternates) {
-        return stillTheSameAddress() ? alternates.get(0) : alternates.remove(0);
+        // is the amount of retries for the first alternate already exceeded?
+        if (!stillTheSameAddress() && !alternates.isEmpty()) {
+            alternates.remove(0);
+        }
+        return alternates.isEmpty() ? null : alternates.get(0);
     }
 
     protected boolean stillTheSameAddress() {

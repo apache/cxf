@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.form;
 
-import javax.ws.rs.core.Form;
-
+import jakarta.ws.rs.core.Form;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 
 import org.junit.Test;

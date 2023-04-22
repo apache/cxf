@@ -30,19 +30,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.ServiceMode;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.ServiceMode;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -197,21 +197,11 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     }
 
     private void initServer(SpringBusFactory bf, String cfgResource) {
-        String derbyHome = System.getProperty("derby.system.home");
-        try {
-            System.setProperty("derby.system.home", derbyHome + "-server");
-            serverBus = bf.createBus(cfgResource);
-            BusFactory.setDefaultBus(serverBus);
-            LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
-            LOG.info("serverBus inInterceptors: " + serverBus.getInInterceptors());
-            endpoint = Endpoint.publish(GREETER_ADDRESS, new GreeterProvider());
-        } finally {
-            if (derbyHome != null) {
-                System.setProperty("derby.system.home", derbyHome);
-            } else {
-                System.clearProperty("derby.system.home");
-            }
-        }
+        serverBus = bf.createBus(cfgResource);
+        BusFactory.setDefaultBus(serverBus);
+        LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
+        LOG.info("serverBus inInterceptors: " + serverBus.getInInterceptors());
+        endpoint = Endpoint.publish(GREETER_ADDRESS, new GreeterProvider());
     }
 
     private void initGreeterBus(SpringBusFactory bf,

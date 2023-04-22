@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.corba.CorbaBindingFactory;
 

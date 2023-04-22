@@ -35,13 +35,13 @@ import java.util.regex.PatternSyntaxException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.ReaderInterceptorContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
@@ -155,8 +155,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
         throws IOException,
         UnsupportedCallbackException, WSSecurityException {
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
             propKey = SecurityConstants.SIGNATURE_PROPERTIES;
@@ -190,8 +190,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     }
 
     private Crypto getSignatureCrypto(Message message) {
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;

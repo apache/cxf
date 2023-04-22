@@ -97,8 +97,7 @@ public class AttributeVisitor extends VisitorBase {
         AST node = attributeNode.getFirstChild();
 
         AST readonlyNode = null;
-        AST typeNode = null;
-        AST nameNode = null;
+        final AST typeNode;
 
         if (node.getType() == IDLTokenTypes.LITERAL_readonly) {
             readonlyNode = node;
@@ -106,7 +105,7 @@ public class AttributeVisitor extends VisitorBase {
         } else {
             typeNode = node;
         }
-        nameNode = TypesUtils.getCorbaTypeNameNode(typeNode);
+        AST nameNode = TypesUtils.getCorbaTypeNameNode(typeNode);
         while (nameNode != null) {
             // getter is generated for readonly and readwrite attributes
             generateGetter(typeNode, nameNode);
@@ -357,7 +356,7 @@ public class AttributeVisitor extends VisitorBase {
      * @return the generated corba:operation.
      */
     private OperationType generateCorbaOperation(Operation op, ParamType param, ArgType arg) {
-        OperationType operation = null;
+        final OperationType operation;
         try {
             operation = (OperationType)extReg.createExtension(BindingOperation.class,
                                                               CorbaConstants.NE_CORBA_OPERATION);

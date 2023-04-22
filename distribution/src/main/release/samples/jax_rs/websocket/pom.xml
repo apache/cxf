@@ -25,50 +25,33 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty8.version>8.1.22.v20160922</cxf.jetty8.version>
-        <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
     </properties>
     <profiles>
         <profile>
-            <id>jetty8</id>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
-            </properties>
-            <dependencies>
-                <!-- jetty8 websocket -->
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-websocket</artifactId>
-                    <version>${cxf.jetty8.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jetty9</id>
+            <id>jetty11</id>
             <!-- activate it by default -->
             <activation>
-                <property>
-                    <name>!jetty8</name>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
+                <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
             </properties>
             <dependencies>
-                <!-- jetty9 websocket -->
+                <!-- jetty11 websocket -->
                 <dependency>
                     <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-server</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <artifactId>websocket-jakarta-server</artifactId>
+                    <version>${cxf.jetty11.version}</version>
                     <exclusions>
                         <exclusion>
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>javax.servlet-api</artifactId>
+                            <groupId>jakarta.servlet</groupId>
+                            <artifactId>jakarta.servlet-api</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -125,7 +108,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
@@ -167,17 +150,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-websocket</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
+            <version>4.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
@@ -193,12 +176,21 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
-
-        <!-- add atmosphere -->
-        <dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-        </dependency>
-                
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

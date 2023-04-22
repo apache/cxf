@@ -19,11 +19,11 @@
 
 package org.apache.cxf.ws.transfer.integration;
 
-import javax.xml.ws.BindingProvider;
-
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -74,7 +74,8 @@ public class ResourceTest extends IntegrationBaseTest {
 
     @Test
     public void getRequestTest() {
-        Element representationEl = document.createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
+        Element representationEl =
+            DOMUtils.getEmptyDocument().createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
         representationEl.setTextContent(REPRESENTATION_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
@@ -85,7 +86,7 @@ public class ResourceTest extends IntegrationBaseTest {
         EasyMock.replay(manager);
 
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
@@ -117,12 +118,13 @@ public class ResourceTest extends IntegrationBaseTest {
         EasyMock.replay(manager);
 
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
 
-        Element representationEl = document.createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
+        Element representationEl =
+            DOMUtils.getEmptyDocument().createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
         representationEl.setTextContent(REPRESENTATION_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
@@ -155,7 +157,7 @@ public class ResourceTest extends IntegrationBaseTest {
         EasyMock.replay(manager);
 
         ReferenceParametersType refParams = new ReferenceParametersType();
-        Element uuid = document.createElementNS(
+        Element uuid = DOMUtils.getEmptyDocument().createElementNS(
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);

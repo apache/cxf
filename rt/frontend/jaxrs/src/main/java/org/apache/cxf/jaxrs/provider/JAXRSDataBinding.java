@@ -24,16 +24,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
@@ -60,7 +60,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
     public void setProvider(Object provider) {
         if (!(provider instanceof MessageBodyWriter)) {
             throw new IllegalArgumentException(
-                "The provider must implement javax.ws.rs.ext.MessageBodyWriter");
+                "The provider must implement jakarta.ws.rs.ext.MessageBodyWriter");
         }
         xmlWriter = (MessageBodyWriter<Object>)provider;
 
@@ -73,7 +73,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
     public <T> DataReader<T> createReader(final Class<T> cls) {
         if (xmlReader == null) {
             throw new IllegalStateException(
-                "javax.ws.rs.ext.MessageBodyReader reference is uninitialized");
+                "jakarta.ws.rs.ext.MessageBodyReader reference is uninitialized");
         }
         return (DataReader<T>)new MessageBodyDataReader();
     }

@@ -578,7 +578,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
             MessageDigest cript = MessageDigest.getInstance("SHA-1");
             cript.reset();
             cript.update(doneFileName.getBytes("utf8"));
-            doneFileName = new javax.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
+            doneFileName = new jakarta.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
         } catch (Exception e) {
             //ignore, we'll try and fake it based on the wsdl
 
@@ -615,7 +615,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
         setJvmForkArgs(javaPath);
         cmd.createArg().setLine(additionalJvmArgs);
 
-        File file = null;
+        final File file;
         try {
             // file = new File("/tmp/test.jar");
             file = FileUtils.createTempFile("cxf-codegen", ".jar");
@@ -646,7 +646,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
             String tmpFilePath = file.getAbsolutePath();
             if (tmpFilePath.contains(" ")) {
                 //ensure the path is in double quotation marks if the path contain space
-                tmpFilePath = "\"" + tmpFilePath + "\"";
+                tmpFilePath = '"' + tmpFilePath + '"';
             }
             cmd.createArg().setValue(tmpFilePath);
 
@@ -947,10 +947,9 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
     }
 
     private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {
-        boolean artifactMatched = false;
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
-                artifactMatched = isArtifactMatched(targetArtifact, pArtifact);
+                boolean artifactMatched = isArtifactMatched(targetArtifact, pArtifact);
                 if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null
                         && targetArtifact.getClassifier().equals(pArtifact.getClassifier())
                         && artifactMatched) {

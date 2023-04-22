@@ -22,11 +22,12 @@ import java.io.Closeable;
 import java.util.AbstractSequentialList;
 import java.util.LinkedList;
 
-import javax.jms.Connection;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import javax.naming.Context;
+
+import jakarta.jms.Connection;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
 
 public class ResourceCloser implements Closeable, AutoCloseable {
     private AbstractSequentialList<Object> resources;

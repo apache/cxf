@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -29,7 +27,7 @@ import java.net.URLConnection;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBusClientServerTestBase {
+public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractClientServerTestBase {
     public static final String PORT = BookServerResourceCreatedOutside.PORT;
 
     @BeforeClass
@@ -46,7 +44,6 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(BookServerResourceCreatedOutside.class, true));
-        createStaticBus();
     }
 
     @Test
@@ -57,14 +54,15 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
-        InputStream in = connect.getInputStream();
-        assertNotNull(in);
+        try (InputStream in = connect.getInputStream()) {
+            assertNotNull(in);
 
-        InputStream expected = getClass()
-            .getResourceAsStream("resources/expected_get_book123.txt");
+            InputStream expected = getClass()
+                .getResourceAsStream("resources/expected_get_book123.txt");
 
-        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
-                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                         stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
+        }
     }
 
     @Test
@@ -85,18 +83,9 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
         httpUrlConnection.setRequestProperty("Connection",   "close");
         //httpurlconnection.setRequestProperty("Content-Length",   String.valueOf(is.available()));
 
-        OutputStream outputstream = httpUrlConnection.getOutputStream();
-        File inputFile = new File(getClass().getResource("resources/add_book.txt").toURI());
-
-        byte[] tmp = new byte[4096];
-        int i = 0;
-        try (InputStream is = new FileInputStream(inputFile)) {
-            while ((i = is.read(tmp)) >= 0) {
-                outputstream.write(tmp, 0, i);
-            }
+        try (OutputStream outputstream = httpUrlConnection.getOutputStream()) {
+            IOUtils.copy(getClass().getResourceAsStream("resources/add_book.txt"), outputstream);
         }
-
-        outputstream.flush();
 
         int responseCode = httpUrlConnection.getResponseCode();
         assertEquals(200, responseCode);

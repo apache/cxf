@@ -18,11 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -101,7 +97,8 @@ public class MessageVerifier {
         this.algorithmProvider = Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
     }
 
-    public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri, Message m) {
+    public void verifyMessage(Map<String, List<String>> messageHeaders, String method,
+                              String uri, Message m, byte[] messageBody) {
         SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
         inspectMissingSignatureHeader(messageHeaders);
 
@@ -123,7 +120,10 @@ public class MessageVerifier {
             if (!(requestor || signedHeaders.contains(HTTPSignatureConstants.REQUEST_TARGET))) {
                 signedHeaders.add(HTTPSignatureConstants.REQUEST_TARGET);
             }
-            if (!signedHeaders.contains("digest")) {
+
+            if (!signedHeaders.contains("digest") && ((messageBody != null && messageBody.length > 0)
+                    || ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
+                    || "PATCH".equalsIgnoreCase(method)))) {
                 signedHeaders.add("digest");
             }
         }

@@ -22,15 +22,15 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationClientFilter;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -90,11 +90,11 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
     }
 
     @org.junit.Test
@@ -131,7 +131,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -169,11 +169,95 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
+    }
+
+    @org.junit.Test
+    public void testAuthorizationWithTwoRolesAsList() throws Exception {
+
+        URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
+        WebClient client =
+                WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(Instant.now().getEpochSecond());
+        claims.setAudiences(toList(address));
+        // The endpoint requires a role of "boss"
+        claims.setProperty("role", Arrays.asList("otherrole", "boss"));
+
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file",
+                "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(200, response.getStatus());
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
+    }
+
+    @org.junit.Test
+    public void testAuthorizationWithTwoRolesAsString() throws Exception {
+
+        URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
+        WebClient client =
+                WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(Instant.now().getEpochSecond());
+        claims.setAudiences(toList(address));
+        // The endpoint requires a role of "boss"
+        claims.setProperty("role", "otherrole,boss");
+
+        JwtToken token = new JwtToken(claims);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.type", "jwk");
+        properties.put("rs.security.keystore.alias", "2011-04-29");
+        properties.put("rs.security.keystore.file",
+                "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+        properties.put("rs.security.signature.algorithm", "RS256");
+        properties.put(JwtConstants.JWT_TOKEN, token);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(200, response.getStatus());
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
     }
 
     @org.junit.Test
@@ -209,7 +293,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -246,7 +330,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -284,11 +368,11 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
     }
 
     @org.junit.Test
@@ -326,11 +410,11 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.get();
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
     }
 
     @org.junit.Test
@@ -368,7 +452,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.head();
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -406,7 +490,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -444,7 +528,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.get();
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -482,7 +566,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.head();
-        assertNotEquals(response.getStatus(), 200);
+        assertNotEquals(200, response.getStatus());
     }
 
     @org.junit.Test
@@ -522,11 +606,11 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
+        assertEquals(200, response.getStatus());
 
         Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
+        assertEquals("book", returnedBook.getName());
+        assertEquals(123L, returnedBook.getId());
     }
 
     @org.junit.Test
@@ -565,7 +649,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 403);
+        assertEquals(403, response.getStatus());
     }
 
     @org.junit.Test
@@ -603,7 +687,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 403);
+        assertEquals(403, response.getStatus());
     }
 
     private List<String> toList(String address) {

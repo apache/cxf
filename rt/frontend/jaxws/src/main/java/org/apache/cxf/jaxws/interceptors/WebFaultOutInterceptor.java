@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
-import javax.xml.ws.WebFault;
-import javax.xml.ws.soap.SOAPFaultException;
 
+import jakarta.xml.ws.WebFault;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -134,15 +134,15 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 }
             }
         }
+
         if (cause instanceof Exception && fault != null) {
             Exception ex = (Exception)cause;
-            Object faultInfo = null;
+            Object faultInfo;
             try {
                 Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
                 faultInfo = method.invoke(cause, new Object[0]);
             } catch (NoSuchMethodException e) {
                 faultInfo = createFaultInfoBean(fault, cause);
-
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOCATION_TARGET_EXC", BUNDLE), e);
             } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -188,6 +188,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             }
         } else if (cause instanceof SOAPFaultException && ((SOAPFaultException)cause).getFault().hasDetail()) {
             return;
+        } else if (f instanceof SoapFault && f.getCause() instanceof SOAPFaultException
+                && ((SOAPFaultException)f.getCause()).getFault().hasDetail()) {
+            return;
         } else {
             FaultMode mode = message.get(FaultMode.class);
             if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
@@ -204,7 +207,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 Class<?> cls = ClassLoaderUtils.loadClass(fault.faultBean(),
                                                           cause.getClass());
                 if (cls != null) {
-                    Object ret = cls.newInstance();
+                    Object ret = cls.getDeclaredConstructor().newInstance();
                     //copy props
                     Method[] meth = cause.getClass().getMethods();
                     for (Method m : meth) {
@@ -227,7 +230,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     }
                     return ret;
                 }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException | NoSuchMethodException 
+                | SecurityException e1) {
                 //ignore
             }
         }
@@ -241,7 +246,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     private MessagePartInfo getFaultMessagePart(QName qname, OperationInfo op) {
         for (FaultInfo faultInfo : op.getFaults()) {
             for (MessagePartInfo mpi : faultInfo.getMessageParts()) {
-                String ns = null;
+                final String ns;
                 if (mpi.isElement()) {
                     ns = mpi.getElementQName().getNamespaceURI();
                 } else {

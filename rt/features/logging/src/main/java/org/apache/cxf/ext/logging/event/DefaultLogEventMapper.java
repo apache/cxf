@@ -34,6 +34,7 @@ import javax.security.auth.Subject;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ext.logging.MaskSensitiveHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -46,19 +47,24 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class DefaultLogEventMapper {
+    public static final String MASKED_HEADER_VALUE = "XXX";
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
+
     static {
-        Set<String> mediaTypes = new HashSet<>(5);
+        Set<String> mediaTypes = new HashSet<>(6);
         mediaTypes.add("application/octet-stream");
         mediaTypes.add("application/pdf");
         mediaTypes.add("image/png");
         mediaTypes.add("image/jpeg");
         mediaTypes.add("image/gif");
+        mediaTypes.add("image/bmp");
         DEFAULT_BINARY_CONTENT_MEDIA_TYPES = Collections.unmodifiableSet(mediaTypes);
     }
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
+
+    private MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
@@ -66,7 +72,11 @@ public class DefaultLogEventMapper {
         }
     }
 
-    public LogEvent map(Message message) {
+    public LogEvent map(final Message message) {
+        return this.map(message, Collections.emptySet());
+    }
+
+    public LogEvent map(final Message message, final Set<String> sensitiveProtocolHeaders) {
         final LogEvent event = new LogEvent();
         event.setMessageId(getMessageId(message));
         event.setExchangeId((String)message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
@@ -84,6 +94,9 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
+        if (sensitiveProtocolHeaders != null && !sensitiveProtocolHeaders.isEmpty()) {
+            maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
+        }
         event.setHeaders(headerMap);
 
         event.setAddress(getAddress(message, event));
@@ -193,6 +206,10 @@ public class DefaultLogEventMapper {
         return contentType != null && binaryContentMediaTypes.contains(contentType);
     }
 
+    public boolean isBinaryContent(String contentType) {
+        return contentType != null && binaryContentMediaTypes.contains(contentType);
+    }
+    
     private boolean isMultipartContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
@@ -224,9 +241,7 @@ public class DefaultLogEventMapper {
 
     private String getOperationName(Message message) {
         String operationName = null;
-        BindingOperationInfo boi = null;
-
-        boi = message.getExchange().getBindingOperationInfo();
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
 
         if (null != boi) {
             operationName = boi.getName().toString();
@@ -309,10 +324,10 @@ public class DefaultLogEventMapper {
      */
     private boolean isRESTFault(Message message) {
         Object opName = message.getExchange().get("org.apache.cxf.resource.operation.name");
-        if (opName == null) {
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (opName == null && responseCode == null) {
             return true;
         }
-        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         return (responseCode != null) && (responseCode >= 400);
     }
 

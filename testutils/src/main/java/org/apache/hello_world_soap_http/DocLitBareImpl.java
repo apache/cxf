@@ -21,9 +21,8 @@ package org.apache.hello_world_soap_http;
 
 import java.math.BigDecimal;
 
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 

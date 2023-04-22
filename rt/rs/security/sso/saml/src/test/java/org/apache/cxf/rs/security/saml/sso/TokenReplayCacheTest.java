@@ -45,7 +45,7 @@ public class TokenReplayCacheTest {
 
     @Test
     public void testEhCacheCloseCacheTwice() throws Exception {
-        TokenReplayCache replayCache = new EHCacheTokenReplayCache();
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
         replayCache.close();
         replayCache.close();
     }
@@ -53,7 +53,7 @@ public class TokenReplayCacheTest {
     // No expiry specified so it falls back to the default
     @Test
     public void testEhCacheTokenReplayCacheNoExpirySpecified() throws Exception {
-        TokenReplayCache replayCache = new EHCacheTokenReplayCache();
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id);
@@ -65,7 +65,7 @@ public class TokenReplayCacheTest {
     // The negative expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheTokenReplayCacheNegativeExpiry() throws Exception {
-        TokenReplayCache replayCache = new EHCacheTokenReplayCache();
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id, Instant.now().minusSeconds(100L));
@@ -77,7 +77,7 @@ public class TokenReplayCacheTest {
     // The huge expiry is rejected and it falls back to the default
     @Test
     public void testEhCacheTokenReplayCacheHugeExpiry() throws Exception {
-        TokenReplayCache replayCache = new EHCacheTokenReplayCache();
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id, Instant.now().plus(14, ChronoUnit.HOURS));

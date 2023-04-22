@@ -218,8 +218,8 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
     public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = "ws-security.saml.cache.instance";
 
     /**
-     * Set this property to point to a configuration file for the underlying caching implementation.
-     * The default configuration file that is used is cxf-ehcache.xml in this module.
+     * Set this property to point to a configuration file for the underlying caching implementation for the
+     * TokenStore. The default configuration file that is used is cxf-ehcache.xml in this module.
      */
     public static final String CACHE_CONFIG_FILE =
         "ws-security.cache.config.file";
@@ -281,8 +281,8 @@ public final class SecurityConstants extends org.apache.cxf.rt.security.Security
      * decrypt passwords in the Merlin Crypto implementation (or any custom Crypto implementations).
      *
      * By default, WSS4J uses the JasyptPasswordEncryptor, which must be instantiated with a
-     * master password to use to decrypt keystore passwords in the Merlin Crypto properties file.
-     * This master password is obtained via the CallbackHandler defined via PW_CALLBACK_CLASS
+     * password to use to decrypt keystore passwords in the Merlin Crypto properties file.
+     * This password is obtained via the CallbackHandler defined via PW_CALLBACK_CLASS
      * or PW_CALLBACK_REF.
      *
      * The encrypted passwords must be stored in the format "ENC(encoded encrypted password)".

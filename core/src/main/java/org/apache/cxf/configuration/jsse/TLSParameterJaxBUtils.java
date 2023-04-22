@@ -115,7 +115,7 @@ public final class TLSParameterJaxBUtils {
         if (kst == null) {
             return null;
         }
-        String type = null;
+        final String type;
         if (trustStore) {
             type = SSLUtils.getTrustStoreType(kst.isSetType()
                                      ? kst.getType() : null, LOG, KeyStore.getDefaultType());
@@ -128,7 +128,7 @@ public final class TLSParameterJaxBUtils {
                     ? deobfuscate(kst.getPassword())
                     : null;
         if (password == null) {
-            String tmp = null;
+            final String tmp;
             if (trustStore) {
                 tmp = SSLUtils.getTruststorePassword(null, LOG);
             } else {
@@ -138,7 +138,7 @@ public final class TLSParameterJaxBUtils {
                 password = tmp.toCharArray();
             }
         }
-        String provider = null;
+        final String provider;
         if (trustStore) {
             provider = SSLUtils.getTruststoreProvider(kst.isSetProvider() ? kst.getProvider() : null, LOG);
         } else {
@@ -164,7 +164,7 @@ public final class TLSParameterJaxBUtils {
         } else if (kst.isSetUrl()) {
             keyStore.load(new URL(kst.getUrl()).openStream(), password);
         } else {
-            String loc = null;
+            final String loc;
             if (trustStore) {
                 loc = SSLUtils.getTruststore(null, LOG);
             } else {
@@ -357,10 +357,9 @@ public final class TLSParameterJaxBUtils {
         if (callbackHandlerClass == null) {
             return null;
         }
-        CallbackHandler ch = null;
         try {
-            ch = (CallbackHandler)ClassLoaderUtils.loadClass(callbackHandlerClass, TLSParameterJaxBUtils.class)
-                .newInstance();
+            final CallbackHandler ch = (CallbackHandler) ClassLoaderUtils
+                .loadClass(callbackHandlerClass, TLSParameterJaxBUtils.class).getDeclaredConstructor().newInstance();
             String prompt = kmc.getKeyStore().getFile();
             if (prompt == null) {
                 prompt = kmc.getKeyStore().getResource();

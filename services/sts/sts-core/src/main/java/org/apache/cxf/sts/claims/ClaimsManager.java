@@ -163,7 +163,7 @@ public class ClaimsManager {
         // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
         SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
-        List<ProcessedClaim> claimList = null;
+        final List<ProcessedClaim> claimList;
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             claimList = this.parseClaimsInAssertion(assertion.getSaml2());
         } else {
@@ -240,7 +240,7 @@ public class ClaimsManager {
         // do an identity mapping
         if (handlerRealmSupport.getHandlerRealm() != null
                 && !handlerRealmSupport.getHandlerRealm().equalsIgnoreCase(parameters.getRealm())) {
-            Principal targetPrincipal = null;
+            final Principal targetPrincipal;
             try {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Mapping user '" + parameters.getPrincipal().getName()

@@ -20,16 +20,16 @@ package org.apache.cxf.jaxws;
 
 import java.util.Collection;
 
-import javax.jws.WebService;
 import javax.wsdl.Definition;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebFault;
 
 import org.w3c.dom.Document;
 
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebFault;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentationCollection;
@@ -73,7 +73,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setBus(bus);
         svrFactory.setServiceFactory(bean);
-        svrFactory.setServiceBean(clazz.newInstance());
+        svrFactory.setServiceBean(clazz.getDeclaredConstructor().newInstance());
         svrFactory.setAddress(address);
         svrFactory.create();
 

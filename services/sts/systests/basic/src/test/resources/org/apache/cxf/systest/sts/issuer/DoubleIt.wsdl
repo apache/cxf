@@ -114,7 +114,7 @@
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                             <sp:Issuer>
-                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport</wsaw:Address>
+                                <wsaw:Address>https://localhost:${testutil.ports.IssuerSTSServer}/SecurityTokenService/Transport</wsaw:Address>
                                 <wsaw:Metadata xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512/">
                                     <wsam:ServiceName EndpointName="Transport_Port">wst:SecurityTokenService</wsam:ServiceName>
                                 </wsaw:Metadata>
@@ -178,12 +178,12 @@
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                             <sp:Issuer>
-                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport</wsaw:Address>
+                                <wsaw:Address>https://localhost:${testutil.ports.IssuerSTSServer}/SecurityTokenService/Transport</wsaw:Address>
                                 <wsaw:Metadata>
                                     <wsx:Metadata>
                                         <wsx:MetadataSection>
                                             <wsx:MetadataReference>
-                                                <wsaw:Address>https://localhost:30101/SecurityTokenService/Transport/mex</wsaw:Address>
+                                                <wsaw:Address>https://localhost:${testutil.ports.IssuerSTSServer}/SecurityTokenService/Transport/mex</wsaw:Address>
                                             </wsx:MetadataReference>
                                         </wsx:MetadataSection>
                                     </wsx:Metadata>
@@ -248,13 +248,13 @@
                                 <sp:RequireInternalReference/>
                             </wsp:Policy>
                             <sp:Issuer>
-                                <!--<wsaw:Address>https://localhost:30101/SecurityTokenService/TransportSoap12</wsaw:Address>-->
+                                <!--<wsaw:Address>https://localhost:${testutil.ports.IssuerSTSServer}/SecurityTokenService/TransportSoap12</wsaw:Address>-->
                                 <wsaw:Address>http://www.w3.org/2005/08/addressing/anonymous</wsaw:Address>
                                 <wsaw:Metadata>
                                     <wsx:Metadata>
                                         <wsx:MetadataSection>
                                             <wsx:MetadataReference>
-                                                <wsaw:Address>https://localhost:30101/SecurityTokenService/TransportSoap12/mex</wsaw:Address>
+                                                <wsaw:Address>https://localhost:${testutil.ports.IssuerSTSServer}/SecurityTokenService/TransportSoap12/mex</wsaw:Address>
                                             </wsx:MetadataReference>
                                         </wsx:MetadataSection>
                                     </wsx:Metadata>

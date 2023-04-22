@@ -24,8 +24,8 @@ import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
 import org.apache.cxf.jaxws.schemavalidation.ProductPostActionType;
 import org.apache.cxf.jaxws.schemavalidation.RequestHeader;
 
-@javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
-@javax.jws.WebService(endpointInterface = "org.apache.cxf.jaxws.schemavalidation.ServicePortType")
+@jakarta.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
+@jakarta.jws.WebService(endpointInterface = "org.apache.cxf.jaxws.schemavalidation.ServicePortType")
 public class ServicePortTypeImpl {
 
     public CkResponseType ckR(CkRequestType ckRIn, RequestHeader header) {

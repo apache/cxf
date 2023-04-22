@@ -78,7 +78,7 @@ public class FixedVisitor extends VisitorBase {
 
         AST digitsNode = fixedNode.getFirstChild();
         AST scaleNode = digitsNode.getNextSibling();
-        Scope scopedName = null;
+        final Scope scopedName;
         if (identifierNode == null) {
             scopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
         } else {
@@ -116,7 +116,7 @@ public class FixedVisitor extends VisitorBase {
         // add xmlschema:fixed
         setSchemaType(fixedSimpleType);
 
-        CorbaType type = null;
+        final CorbaType type;
         if (identifierNode != null) {
             // corba:fixed
             Fixed corbaFixed = new Fixed();

@@ -20,10 +20,10 @@
 package org.apache.cxf.systest.ws.transfer;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.transfer.Create;

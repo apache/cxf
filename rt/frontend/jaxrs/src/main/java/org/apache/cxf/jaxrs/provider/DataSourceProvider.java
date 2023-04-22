@@ -27,15 +27,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -57,7 +56,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
                                MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
 
-        DataSource ds = null;
+        final DataSource ds;
         if (cls == FileDataSource.class) {
             File file = new BinaryDataProvider<File>().readFrom(File.class, File.class, annotations, type, headers, is);
             ds = new FileDataSource(file);

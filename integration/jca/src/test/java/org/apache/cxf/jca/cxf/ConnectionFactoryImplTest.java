@@ -24,11 +24,12 @@ import java.io.Serializable;
 import java.net.URL;
 
 import javax.naming.Reference;
-import javax.resource.Referenceable;
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionManager;
-import javax.resource.spi.ManagedConnectionFactory;
 import javax.xml.namespace.QName;
+
+import jakarta.resource.Referenceable;
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ConnectionManager;
+import jakarta.resource.spi.ManagedConnectionFactory;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -67,7 +68,7 @@ public class ConnectionFactoryImplTest {
         assertTrue("Instance of Referenceable", cf instanceof Referenceable);
 
         assertNull("No ref set", cf.getReference());
-        Reference ref = EasyMock.createMock(Reference.class);
+        Reference ref = new Reference("some.class");
         cf.setReference(ref);
         assertEquals("Got back what was set", ref, cf.getReference());
     }

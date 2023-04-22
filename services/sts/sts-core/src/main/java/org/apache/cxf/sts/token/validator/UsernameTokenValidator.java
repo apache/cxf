@@ -27,14 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
@@ -136,7 +136,7 @@ public class UsernameTokenValidator implements TokenValidator {
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
 
         // Marshall the received JAXB object into a DOM Element
-        Element usernameTokenElement = null;
+        final Element usernameTokenElement;
         try {
             Set<Class<?>> classes = new HashSet<>();
             classes.add(ObjectFactory.class);

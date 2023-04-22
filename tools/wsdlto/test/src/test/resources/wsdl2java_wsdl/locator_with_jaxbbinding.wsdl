@@ -131,7 +131,7 @@
                 <xs:anyAttribute namespace="##other" processContents="lax"/>
             </xs:complexType>
         </xs:schema>
-        <xs:schema xmlns:tns="http://apache.org/locator2/query" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" elementFormDefault="qualified" targetNamespace="http://apache.org/locator2/query" jaxb:version="2.0">
+        <xs:schema xmlns:tns="http://apache.org/locator2/query" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" elementFormDefault="qualified" targetNamespace="http://apache.org/locator2/query" jaxb:version="3.0">
             <xs:annotation>
                 <xs:appinfo>
                     <jaxb:globalBindings mapSimpleTypeDef="true" choiceContentProperty="true">

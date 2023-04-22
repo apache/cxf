@@ -19,12 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.reactivestreams.server.AbstractSubscriber;
 import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import reactor.core.publisher.Mono;
@@ -46,7 +46,7 @@ public class MonoService {
     public void getJsonImplicitListStreamingAsync(@Suspended AsyncResponse ar) {
         Mono.just("Hello")
                 .map(HelloWorldBean::new)
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000L, 0L));
     }
 
@@ -56,7 +56,20 @@ public class MonoService {
     public void getTextAsync(@Suspended final AsyncResponse ar) {
         Mono.just("Hello, ").map(s -> s + "world!")
                 .subscribe(new StringAsyncSubscriber(ar));
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/empty")
+    public Mono<HelloWorldBean> empty() { 
+        return Mono.empty(); 
+    }
 
+    @GET
+    @Produces("application/json")
+    @Path("error")
+    public Mono<HelloWorldBean> getError() {
+        return Mono.error(new RuntimeException("Oops"));
     }
 
     private static class StringAsyncSubscriber extends AbstractSubscriber<String> {

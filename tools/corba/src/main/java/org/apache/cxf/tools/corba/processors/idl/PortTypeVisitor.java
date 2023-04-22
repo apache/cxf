@@ -121,7 +121,7 @@ public class PortTypeVisitor extends VisitorBase {
                 specNode = specNode.getNextSibling();
             }
 
-            AST exportNode = null;
+            AST exportNode;
             if (specNode.getType() == IDLTokenTypes.RCURLY) {
                 exportNode = specNode.getNextSibling();
             } else if (specNode.getType() == IDLTokenTypes.COLON) {
@@ -391,7 +391,7 @@ public class PortTypeVisitor extends VisitorBase {
             interfaceNameNode = interfaceNameNode.getNextSibling();
         }
 
-        if ((!inheritedScopes.isEmpty())
+        if (!inheritedScopes.isEmpty()
             && (wsdlVisitor.getInheritedScopeMap() != null)) {
             wsdlVisitor.getInheritedScopeMap().put(childScope, inheritedScopes);
         }

@@ -41,7 +41,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 public class DefaultSTSTokenCacher implements STSTokenCacher {
 
     public SecurityToken retrieveToken(Message message, boolean retrieveTokenFromEndpoint) throws TokenStoreException {
-        SecurityToken tok = null;
+        SecurityToken tok;
         if (retrieveTokenFromEndpoint) {
             tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
             if (tok == null) {

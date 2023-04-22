@@ -94,5 +94,10 @@
         <entry key="getThatBook" value="ROLE_BOOK_OWNER"/>
         <entry key="getBook" value="ROLE_BOOK_OWNER"/>
     </util:map>
+    <bean id="loginService" class="org.apache.cxf.systest.jaxrs.security.BookLoginService" init-method="start">
+        <property name="name" value="BookStoreRealm"/>
+        <property name="loginModuleName" value="org.apache.cxf.systest.jaxrs.security.BookLoginModule"/>
+        <property name="configuration" ref="bookLoginConfig"/>
+    </bean>
 </beans>
 <!-- END SNIPPET: beans -->

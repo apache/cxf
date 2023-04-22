@@ -26,14 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
-
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
@@ -82,9 +81,9 @@ public class AttachmentSerializerTest {
 
         // Set the SOAP content type
         msg.put(Message.CONTENT_TYPE, soapContentType);
-        String soapCtType = null;
-        String soapCtParams = null;
-        String soapCtParamsEscaped = null;
+        final String soapCtType;
+        final String soapCtParams;
+        final String soapCtParamsEscaped;
         int p = soapContentType.indexOf(';');
         if (p != -1) {
             soapCtParams = soapContentType.substring(p);
@@ -172,13 +171,38 @@ public class AttachmentSerializerTest {
         assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
 
     }
-
+    
     @Test
     public void testMessageMTOM() throws Exception {
+        doTestMessageMTOM("test.xml", "<test.xml>");
+    }
+
+    @Test
+    public void testMessageMTOMCid() throws Exception {
+        doTestMessageMTOM("cid:http%3A%2F%2Fcxf.apache.org%2F", "<http://cxf.apache.org/>");
+    }
+
+    @Test
+    public void testMessageMTOMCidEncoded() throws Exception {
+        doTestMessageMTOM("cid:cxf@[2001%3A0db8%3A11a3%3A09d7%3A1f34%3A8a2e%3A07a0%3A765d]",
+            "<cxf@[2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d]>");
+    }
+
+    @Test
+    public void testMessageMTOMUrlDecoded() throws Exception {
+        doTestMessageMTOM("test+me.xml", "<test%2Bme.xml>");
+    }
+    
+    @Test
+    public void testMessageMTOMUrlDecodedCid() throws Exception {
+        doTestMessageMTOM("cid:test+me.xml", "<test+me.xml>");
+    }
+
+    private void doTestMessageMTOM(String contentId, String expectedContentId) throws Exception {
         MessageImpl msg = new MessageImpl();
 
         Collection<Attachment> atts = new ArrayList<>();
-        AttachmentImpl a = new AttachmentImpl("test.xml");
+        AttachmentImpl a = new AttachmentImpl(contentId);
 
         InputStream is = getClass().getResourceAsStream("my.wav");
         ByteArrayDataSource ds = new ByteArrayDataSource(is, "application/octet-stream");
@@ -235,7 +259,7 @@ public class AttachmentSerializerTest {
         MimeBodyPart part2 = (MimeBodyPart) multipart.getBodyPart(1);
         assertEquals("application/octet-stream", part2.getHeader("Content-Type")[0]);
         assertEquals("binary", part2.getHeader("Content-Transfer-Encoding")[0]);
-        assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
+        assertEquals(expectedContentId, part2.getHeader("Content-ID")[0]);
 
     }
 

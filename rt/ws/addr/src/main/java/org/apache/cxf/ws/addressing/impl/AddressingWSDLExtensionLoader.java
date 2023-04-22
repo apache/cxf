@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.addressing.impl;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
@@ -33,7 +32,10 @@ import org.apache.cxf.wsdl.WSDLManager;
 @NoJSR250Annotations
 public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader {
 
+    private final Bus bus;
+
     public AddressingWSDLExtensionLoader(Bus b) {
+        this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
 
         createExtensor(manager, javax.wsdl.Binding.class,
@@ -43,7 +45,7 @@ public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader 
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(),
                                               parentType,
                                               elementType, null,
                                               this.getClass().getClassLoader());

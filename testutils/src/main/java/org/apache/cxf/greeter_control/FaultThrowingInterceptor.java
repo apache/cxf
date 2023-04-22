@@ -51,7 +51,7 @@ public class FaultThrowingInterceptor extends AbstractPhaseInterceptor<Message> 
         if (MessageUtils.isRequestor(message)) {
             return;
         }
-        String msg = null;
+        final String msg;
         synchronized (MESSAGE_FORMAT) {
             msg = MESSAGE_FORMAT.format(new Object[] {getPhase()});
         }

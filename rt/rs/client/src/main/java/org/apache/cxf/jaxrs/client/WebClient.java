@@ -31,29 +31,28 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.CompletionStageRxInvoker;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.RxInvoker;
-import javax.ws.rs.client.RxInvokerProvider;
-import javax.ws.rs.client.SyncInvoker;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
-
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.AsyncInvoker;
+import jakarta.ws.rs.client.CompletionStageRxInvoker;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.RxInvoker;
+import jakarta.ws.rs.client.RxInvokerProvider;
+import jakarta.ws.rs.client.SyncInvoker;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.GenericEntity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -302,7 +301,7 @@ public class WebClient extends AbstractClient {
      */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
 
-        WebClient webClient = null;
+        final WebClient webClient;
 
         ClientState clientState = getClientState(client);
         if (clientState == null) {
@@ -767,7 +766,7 @@ public class WebClient extends AbstractClient {
         if (path == null) {
             return back(true);
         }
-        back(path.startsWith("/") ? true : false);
+        back(path.startsWith("/"));
         return path(path);
     }
 
@@ -927,7 +926,7 @@ public class WebClient extends AbstractClient {
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
-        Response r = null;
+        final Response r;
         try {
             r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType,
                                              inAnns, responseClass, outGenericType, null, null);
@@ -1309,7 +1308,7 @@ public class WebClient extends AbstractClient {
     }
 
     @SuppressWarnings({
-     "rawtypes", "unchecked"
+        "rawtypes", "unchecked"
     })
     public <T extends RxInvoker> T rx(Class<T> rxCls, ExecutorService executorService) {
         if (CompletionStageRxInvoker.class.isAssignableFrom(rxCls)) {

@@ -24,27 +24,26 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.handler.MessageContext;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.Service.Mode;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -131,7 +130,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 
@@ -159,7 +157,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on an incorrect key");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "No certificates were found for decryption";
             if (STAX_PORT.equals(test.getPort())) {
                 error = "Referenced security token could not be retrieved";
@@ -584,9 +582,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }
-        Map<String, String> ns = new HashMap<>();
-        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
-        XPathUtils xp = new XPathUtils(ns);
+        XPathUtils xp = new XPathUtils(Collections.singletonMap("ns2", "http://www.example.org/schema/DoubleIt"));
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
         assertEquals(StaxUtils.toString(nd), "50", o);
 
@@ -616,10 +612,10 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         Document xmlDocument = DOMUtils.newDocument();
 
-        Element requestElement = xmlDocument.createElementNS("http://www.example.org/schema/DoubleIt", "tns:DoubleIt");
-        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns",
-                                      "http://www.example.org/schema/DoubleIt");
-        Element dataElement = xmlDocument.createElement("numberToDouble");
+        final String ns = "http://www.example.org/schema/DoubleIt";
+        Element requestElement = xmlDocument.createElementNS(ns, "tns:DoubleIt");
+        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns", ns);
+        Element dataElement = xmlDocument.createElementNS(null, "numberToDouble");
         dataElement.appendChild(xmlDocument.createTextNode("25"));
         requestElement.appendChild(dataElement);
         xmlDocument.appendChild(requestElement);
@@ -642,9 +638,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         SOAPMessage resp = disp.invoke(request);
         Node nd = resp.getSOAPBody().getFirstChild();
 
-        Map<String, String> ns = new HashMap<>();
-        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
-        XPathUtils xp = new XPathUtils(ns);
+        XPathUtils xp = new XPathUtils(Collections.singletonMap("ns2", ns));
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", 
                                DOMUtils.getDomElement(nd), XPathConstants.STRING);
         assertEquals(StaxUtils.toString(nd), "50", o);
@@ -1388,7 +1382,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
 
@@ -1576,7 +1570,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending an X.509 Supporting Token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -1589,7 +1583,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a PKI token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error));
         }
@@ -1638,7 +1632,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         try {
             x509Port.doubleIt(25);
             fail("Failure expected on not endorsing the token");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             String error = "These policy alternatives can not be satisfied";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("X509Token not satisfied"));

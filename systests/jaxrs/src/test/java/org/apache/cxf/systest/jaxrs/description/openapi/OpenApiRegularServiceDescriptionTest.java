@@ -29,8 +29,8 @@ public class OpenApiRegularServiceDescriptionTest extends AbstractOpenApiService
             super(PORT, false);
         }
 
-        public static void main(String[] args) {
-            start(new OpenApiRegular());
+        public static void main(String[] args) throws Exception {
+            new OpenApiRegular().start();
         }
     }
 

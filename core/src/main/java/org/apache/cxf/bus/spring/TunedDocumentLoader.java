@@ -76,8 +76,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         try {
             Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
                                                       TunedDocumentLoader.class);
-            saxParserFactory = (SAXParserFactory)cls.newInstance();
-            nsasaxParserFactory = (SAXParserFactory)cls.newInstance();
+            saxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
+            nsasaxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
         } catch (Throwable e) {
             //woodstox not found, use any other Stax parser
             saxParserFactory = SAXParserFactory.newInstance();
@@ -138,13 +138,13 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
 
     static Document loadFastinfosetDocument(URL url)
         throws IOException, ParserConfigurationException, XMLStreamException {
-        InputStream is = url.openStream();
-        InputStream in = new BufferedInputStream(is);
-        XMLStreamReader staxReader = new StAXDocumentParser(in);
-        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-        StaxUtils.copy(staxReader, writer);
-        in.close();
-        return writer.getDocument();
+        try (InputStream in = new BufferedInputStream(url.openStream())) {
+            XMLStreamReader staxReader = new StAXDocumentParser(in);
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+            StaxUtils.copy(staxReader, writer);
+            staxReader.close();
+            return writer.getDocument();
+        }
     }
 
 }

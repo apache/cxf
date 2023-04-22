@@ -25,12 +25,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 
-import javax.annotation.Priority;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -91,15 +90,11 @@ public class JweWriterInterceptor implements WriterInterceptor {
                 LOG.warning("JWE encryption error");
                 throw new JweException(JweException.Error.CONTENT_ENCRYPTION_FAILURE, ex);
             }
-            OutputStream wrappedStream = null;
             JweOutputStream jweOutputStream = new JweOutputStream(actualOs, encryption.getCipher(),
                                                          encryption.getAuthTagProducer());
-            wrappedStream = jweOutputStream;
-            if (encryption.isCompressionSupported()) {
-                wrappedStream = new DeflaterOutputStream(jweOutputStream);
-            }
 
-            ctx.setOutputStream(wrappedStream);
+            ctx.setOutputStream(
+                encryption.isCompressionSupported() ? new DeflaterOutputStream(jweOutputStream) : jweOutputStream);
             ctx.proceed();
             setJoseMediaType(ctx);
             jweOutputStream.finalFlush();

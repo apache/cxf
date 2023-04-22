@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" wsdlLocation="../hello_world.wsdl">
     <jaxws:bindings node="wsdl:definitions/wsdl:service[@name='SOAPService']">
         <jaxws:class name="MyService"/>
     </jaxws:bindings>

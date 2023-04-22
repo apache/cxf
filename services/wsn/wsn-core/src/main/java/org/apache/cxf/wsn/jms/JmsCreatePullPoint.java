@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.wsn.jms;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
 import org.apache.cxf.wsn.AbstractPullPoint;
 import org.apache.cxf.wsn.client.NotificationBroker;
@@ -58,7 +57,7 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
 
     @Override
     protected String createPullPointName(CreatePullPoint createPullPointRequest) {
-        String name = null;
+        String name;
         if (createPullPointRequest.getOtherAttributes().get(
             NotificationBroker.QNAME_PULLPOINT_QUEUE_NAME) != null) {
             //try use the sepcified pullpoint queue instead a generated one

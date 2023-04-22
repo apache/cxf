@@ -20,11 +20,11 @@ package org.apache.cxf.jca.servant;
 
 import java.rmi.RemoteException;
 
-import javax.ejb.EJBHome;
-import javax.ejb.EJBMetaData;
-import javax.ejb.Handle;
-import javax.ejb.HomeHandle;
-import javax.ejb.RemoveException;
+import jakarta.ejb.EJBHome;
+import jakarta.ejb.EJBMetaData;
+import jakarta.ejb.Handle;
+import jakarta.ejb.HomeHandle;
+import jakarta.ejb.RemoveException;
 
 import org.junit.Assert;
 

@@ -20,8 +20,8 @@
 package org.apache.cxf.cxf2006;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.RespectBindingFeature;
 
+import jakarta.xml.ws.RespectBindingFeature;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.ServerLauncher;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
@@ -68,7 +68,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (javax.xml.ws.WebServiceException ex) {
+        } catch (jakarta.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -84,7 +84,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (javax.xml.ws.WebServiceException ex) {
+        } catch (jakarta.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -100,7 +100,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (javax.xml.ws.WebServiceException ex) {
+        } catch (jakarta.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -116,7 +116,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (javax.xml.ws.WebServiceException ex) {
+        } catch (jakarta.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }

@@ -171,22 +171,26 @@ public class Base64DecoderStream extends FilterInputStream {
     // in order to function as a filter, these streams need to override the different
     // read() signature.
 
+    @Override
     public int read() throws IOException {
         return getByte();
     }
 
 
+    @Override
     public int read(byte [] buffer, int offset, int length) throws IOException {
         return getBytes(buffer, offset, length);
     }
 
-
+    
+    @Override
     public boolean markSupported() {
         return false;
     }
 
 
+    @Override
     public int available() throws IOException {
-        return ((in.available() / 4) * 3) + decodedCount;
+        return Math.addExact((in.available() / 4) * 3, decodedCount);
     }
 }

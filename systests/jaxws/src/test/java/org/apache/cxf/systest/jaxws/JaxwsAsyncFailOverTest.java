@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxws;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebService;
-import javax.xml.ws.Response;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
@@ -34,6 +33,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            javax.xml.ws.Endpoint.publish(address, implementor);
+            jakarta.xml.ws.Endpoint.publish(address, implementor);
         }
 
 
@@ -77,6 +77,11 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+    }
+
+    @AfterClass
+    public static void stopServers() throws Exception {
+        stopAllServers();
     }
 
     @Test

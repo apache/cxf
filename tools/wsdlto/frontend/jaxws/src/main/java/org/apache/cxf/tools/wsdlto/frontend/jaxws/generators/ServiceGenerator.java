@@ -25,10 +25,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.jws.HandlerChain;
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.helpers.CastUtils;
@@ -104,7 +104,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                         }
                         if (!existHandlerAnno) {
                             js.addAnnotation(annot);
-                            js.addImport("javax.jws.HandlerChain");
+                            js.addImport("jakarta.jws.HandlerChain");
                         }
                     }
 

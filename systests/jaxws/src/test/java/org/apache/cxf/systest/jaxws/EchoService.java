@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import javax.jws.WebService;
-import javax.xml.ws.soap.SOAPFaultException;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.SOAPFaultException;
 
 @WebService(name = "MyEchoService", targetNamespace = "urn:echo")
 public interface EchoService {
     String echoException(String input) throws SOAPFaultException;
+    String echoProxy(String input) throws SOAPFaultException;
+    String proxyException(String input) throws SOAPFaultException;
 }

@@ -23,14 +23,15 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPBinding;
 
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -38,6 +39,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
@@ -60,6 +62,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -82,20 +85,27 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             String address = "http://localhost:" + PORT + "/mime-test";
             String addressProvider = "http://localhost:" + PORT + "/mime-test-provider";
             try {
-                jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
+                jaxep = (EndpointImpl) jakarta.xml.ws.Endpoint.publish(address, implementor);
                 Endpoint ep = jaxep.getServer().getEndpoint();
                 ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
                 ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
-                jaxep.getInInterceptors().add(new LoggingInInterceptor());
-                jaxep.getOutInterceptors().add(new LoggingOutInterceptor());
+                LoggingInInterceptor logIn = new LoggingInInterceptor();
+                logIn.setLogBinary(false);
+                logIn.setLogMultipart(true);
+                LoggingOutInterceptor logOut = new LoggingOutInterceptor();
+                logOut.setLogBinary(false);
+                logOut.setLogMultipart(true);
+                jaxep.getInInterceptors().add(logIn);
+                jaxep.getOutInterceptors().add(logOut);
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
                 jaxep.getProperties().put("schema-validation-enabled", "true");
                 jaxWsSoapBinding.setMTOMEnabled(true);
                 EndpointImpl endpoint =
-                    (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
+                    (EndpointImpl)jakarta.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
                 endpoint.getProperties().put("schema-validation-enabled", "true");
-                endpoint.getInInterceptors().add(new LoggingInInterceptor());
-                endpoint.getOutInterceptors().add(new LoggingOutInterceptor());
+                endpoint.getInInterceptors().add(logIn);
+                endpoint.getOutInterceptors().add(logOut);
+                
 
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -202,14 +212,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
@@ -246,12 +248,12 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             ClientProxy.getClient(mtomPort).getOutInterceptors().add(new LoggingOutInterceptor());
             ((HTTPConduit)ClientProxy.getClient(mtomPort).getConduit()).getClient().setReceiveTimeout(60000);
             mtomPort.testXop(name, param);
-            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+            fail("should throw jakarta.xml.ws.soap.SOAPFaultException");
             
-        } catch (javax.xml.ws.soap.SOAPFaultException  ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException  ex) {
             assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
         } catch (Exception ex) {
-            fail("should throw javax.xml.ws.soap.SOAPFaultException");
+            fail("should throw jakarta.xml.ws.soap.SOAPFaultException");
         }
     }
 
@@ -344,19 +346,39 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
     }
 
+    @Ignore("failed on jenkins CI")
+    public void testMtomWithChineseFileName() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
+        try {
+            final Holder<DataHandler> param = new Holder<>();
+
+            URL fileURL = getClass().getResource("/\u6d4b\u8bd5.bmp");
+            assertNotNull(fileURL);
+
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
+                param.value = new DataHandler(fileURL);
+                final Holder<String> name = new Holder<>("have name");
+                mtomPort.testXop(name, param);
+
+                assertEquals("can't get file name", "return detail   测试.bmp",
+                    java.net.URLDecoder.decode(name.value, StandardCharsets.UTF_8.name()));
+                assertNotNull(param.value);
+            }
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
     @Test
     public void testMtomWithFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
@@ -379,14 +401,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("Connection reset")
-                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
-                //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being
-                //sent back to the client when using localhost (which is what we do)
-                //we'll ignore for now
-                return;
-            }
             System.out.println(System.getProperties());
             throw ex;
         }
@@ -415,6 +429,11 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                                     boolean enableMTOM, boolean installInterceptors) throws Exception {
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
         Bus bus = getStaticBus();
+        LoggingFeature lf = new LoggingFeature();
+        lf.setPrettyLogging(false);
+        lf.setLogBinary(false);
+        lf.setLogMultipart(true);
+        bus.getFeatures().add(lf);
         serviceFactory.setBus(bus);
         serviceFactory.setServiceName(serviceName);
         serviceFactory.setServiceClass(serviceEndpointInterface);

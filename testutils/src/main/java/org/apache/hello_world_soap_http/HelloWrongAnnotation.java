@@ -19,9 +19,9 @@
 
 package org.apache.hello_world_soap_http;
 
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.soap.SOAPBinding;
 
-@javax.jws.WebService(name = "HelloWrongAnnotation",
+@jakarta.jws.WebService(name = "HelloWrongAnnotation",
                       serviceName = "HelloService",
                       portName = "HelloPort",
                       targetNamespace = "http://apache.org/hello_world_soap_http"

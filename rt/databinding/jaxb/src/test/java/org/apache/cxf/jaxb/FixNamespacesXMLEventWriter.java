@@ -19,12 +19,13 @@
 
 package org.apache.cxf.jaxb;
 
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+
+import jakarta.xml.bind.Marshaller;
 
 public class FixNamespacesXMLEventWriter implements XMLEventWriter, MarshallerAwareXMLWriter {
     private final XMLEventWriter delegate;

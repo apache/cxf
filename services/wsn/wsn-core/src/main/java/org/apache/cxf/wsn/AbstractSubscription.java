@@ -20,19 +20,19 @@ package org.apache.cxf.wsn;
 
 import java.util.GregorianCalendar;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.oasis_open.docs.wsn.b_2.InvalidFilterFaultType;
 import org.oasis_open.docs.wsn.b_2.InvalidMessageContentExpressionFaultType;
 import org.oasis_open.docs.wsn.b_2.InvalidProducerPropertiesExpressionFaultType;
@@ -375,10 +375,8 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         // Check policy
         if (subscribeRequest.getSubscriptionPolicy() != null) {
             for (Object p : subscribeRequest.getSubscriptionPolicy().getAny()) {
-                JAXBElement<?> e = null;
                 if (p instanceof JAXBElement) {
-                    e = (JAXBElement<?>) p;
-                    p = e.getValue();
+                    p = ((JAXBElement<?>) p).getValue();
                 }
                 if (p instanceof UseRaw) {
                     useRaw = true;

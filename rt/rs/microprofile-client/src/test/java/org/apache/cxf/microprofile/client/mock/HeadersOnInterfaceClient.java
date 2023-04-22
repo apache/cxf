@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.microprofile.client.mock;
 
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 
 @ClientHeaderParam(name = "IntfHeader1", value = "value1")

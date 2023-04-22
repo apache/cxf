@@ -21,12 +21,12 @@ package org.apache.cxf.systest.jaxrs.validation;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import jakarta.validation.ValidationException;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -38,13 +38,12 @@ import org.apache.cxf.jaxrs.validation.JAXRSParameterNameProvider;
 import org.apache.cxf.jaxrs.validation.ValidationExceptionMapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.jaxrs.Book;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
 import org.apache.cxf.validation.BeanValidationProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -52,9 +51,10 @@ import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest {
     public static final String PORT = allocatePort(JAXRSClientServerValidationTest.class);
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
             sf.setResourceClasses(BookStoreWithValidation.class);
@@ -78,19 +78,11 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
                 new JAXRSBeanValidationOutInterceptor()));
 
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -99,7 +91,6 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Before

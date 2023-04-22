@@ -31,14 +31,13 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -239,7 +238,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 result = checkSubResultObject(result, subResourcePath);
 
-                Class<?> subResponseType = null;
+                final Class<?> subResponseType;
                 if (result.getClass() == Class.class) {
                     ResourceContext rc = new ResourceContextImpl(inMessage, ori);
                     result = rc.getResource((Class<?>)result);
@@ -268,6 +267,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          acceptContentType);
                 exchange.put(OperationResourceInfo.class, subOri);
                 inMessage.put(URITemplate.TEMPLATE_PARAMETERS, values);
+                inMessage.put(URITemplate.URI_TEMPLATE, JAXRSUtils.getUriTemplate(inMessage, subCri, ori, subOri));
 
                 if (!subOri.isSubResourceLocator()
                     && JAXRSUtils.runContainerRequestFilters(providerFactory,
@@ -324,7 +324,7 @@ public class JAXRSInvoker extends AbstractInvoker {
     protected Method getMethodToInvoke(ClassResourceInfo cri, OperationResourceInfo ori, Object resourceObject) {
         Method resourceMethod = cri.getMethodDispatcher().getMethod(ori);
 
-        Method methodToInvoke = null;
+        Method methodToInvoke;
         if (Proxy.class.isInstance(resourceObject)) {
             methodToInvoke = cri.getMethodDispatcher().getProxyMethod(resourceMethod);
             if (methodToInvoke == null) {

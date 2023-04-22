@@ -54,4 +54,15 @@
             <entry key="expand.query.value.as.collection" value="true" />
         </jaxrs:properties>
     </jaxrs:client>
+    <jaxrs:client id="client3" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo" threadSafe="true">
+        <jaxrs:properties>
+            <entry key="expand.query.value.as.collection" value="true" />
+        </jaxrs:properties>
+    </jaxrs:client>
+    <jaxrs:client id="client4" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo" threadSafe="true">
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.client.cache.CacheControlFeature"/>
+            <bean class="org.apache.cxf.jaxrs.client.spring.JAXRSClientFactoryBeanTest.SomeFeature"/>
+        </jaxrs:providers>
+    </jaxrs:client>
 </beans>

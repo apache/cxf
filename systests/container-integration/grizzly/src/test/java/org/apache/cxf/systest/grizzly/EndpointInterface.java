@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systest.grizzly;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
 
 @WebService(targetNamespace = "http://org.apache.cxf/jaxws/endpoint/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)

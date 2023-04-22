@@ -30,8 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.ws.rs.client.InvocationCallback;
-
+import jakarta.ws.rs.client.InvocationCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 

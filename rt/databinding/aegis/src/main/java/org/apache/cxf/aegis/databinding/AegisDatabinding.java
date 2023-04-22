@@ -202,16 +202,14 @@ public class AegisDatabinding extends AbstractDataBinding {
             for (String key : s.keySet()) {
                 if (key.endsWith(".implementation")) {
                     String className = key.substring(0, key.length() - ".implementation".length());
-                    Class<?> clazz = null;
                     try {
-                        clazz = ClassLoaderUtils.loadClass(className, getClass());
+                        String implClassName = (String)s.get(key);
+                        implMap.put(ClassLoaderUtils.loadClass(className, getClass()), implClassName);
                     } catch (ClassNotFoundException e) {
                         Message message = new Message("MAPPED_CLASS_NOT_FOUND", LOG, className, key);
                         LOG.warning(message.toString());
                         continue;
                     }
-                    String implClassName = (String)s.get(key);
-                    implMap.put(clazz, implClassName);
                 }
             }
 
@@ -604,7 +602,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                     param.setProperty("maxOccurs", Long.toString(info.getMaxOccurs()));
                 }
 
-                if ((type instanceof ArrayType) && !type.isWriteOuter()) {
+                if (type instanceof ArrayType && !type.isWriteOuter()) {
                     param.setProperty("org.apache.cxf.aegis.outerType", type);
                     ArrayType aType = (ArrayType) type;
                     type = aType.getComponentType();

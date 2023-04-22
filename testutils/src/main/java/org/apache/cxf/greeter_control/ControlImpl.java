@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -114,7 +113,6 @@ public class ControlImpl implements Control {
 
     public void setFaultLocation(FaultLocation fl) {
         List<Interceptor<? extends Message>> interceptors = greeterBus.getInInterceptors();
-        FaultThrowingInterceptor fi = null;
         for (Interceptor<? extends Message> i : interceptors) {
             if (i instanceof FaultThrowingInterceptor) {
                 interceptors.remove(i);
@@ -127,7 +125,7 @@ public class ControlImpl implements Control {
             return;
         }
 
-        fi = new FaultThrowingInterceptor(fl.getPhase());
+        FaultThrowingInterceptor fi = new FaultThrowingInterceptor(fl.getPhase());
         if (null != fl.getBefore() && !"".equals(fl.getBefore())) {
             fi.addBefore(fl.getBefore());
         }

@@ -19,11 +19,10 @@
 
 package org.apache.cxf.jca.cxf;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
+import jakarta.resource.spi.work.Work;
+import jakarta.resource.spi.work.WorkEvent;
+import jakarta.resource.spi.work.WorkException;
+import jakarta.resource.spi.work.WorkManager;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
 /**

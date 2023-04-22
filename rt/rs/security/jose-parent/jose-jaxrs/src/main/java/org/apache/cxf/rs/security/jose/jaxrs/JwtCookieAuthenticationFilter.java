@@ -18,9 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Cookie;
-
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Cookie;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 
 public class JwtCookieAuthenticationFilter extends AbstractJwtAuthenticationFilter {

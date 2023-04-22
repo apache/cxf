@@ -338,9 +338,8 @@ public class CorbaObjectReader {
         } catch (NO_IMPLEMENT ex) {
             //the read_fixed method is a "late addition" and not all orbs implement it.
             //Some of them have a "read_fixed(TypeCode)" method, we'll try that
-            Method m = null;
             try {
-                m = stream.getClass().getMethod("read_fixed", new Class[] {TypeCode.class});
+                Method m = stream.getClass().getMethod("read_fixed", new Class[] {TypeCode.class});
                 BigDecimal fixedValue =
                     (BigDecimal)m.invoke(stream, new Object[] {fixedHandler.getTypeCode()});
                 fixedHandler.setValue(fixedValue);
@@ -366,7 +365,7 @@ public class CorbaObjectReader {
         List<Unionbranch> branches = unionType.getUnionbranch();
         CorbaObjectHandler discriminator = unionHandler.getDiscriminator();
         if (!branches.isEmpty()) {
-            String discLabel = null;
+            final String discLabel;
             if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
                 CorbaEnumHandler disc = (CorbaEnumHandler) discriminator;
                 readEnumDiscriminator(unionHandler, disc);
@@ -574,7 +573,7 @@ public class CorbaObjectReader {
         params[2] = template.getTypeCode();
         params[3] = template.getType();
 
-        CorbaObjectHandler handler = null;
+        final CorbaObjectHandler handler;
         try {
             handler = (CorbaObjectHandler) templateConstructor.newInstance(params);
             // To construct an any, we also need to set a typemap.  This should be available through

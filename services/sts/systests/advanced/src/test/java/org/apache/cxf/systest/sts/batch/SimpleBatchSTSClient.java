@@ -106,16 +106,17 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
  * A primitive STSClient for batch tokens. Note that this contains a number of hacks and should NOT be
@@ -658,13 +659,18 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             writer.writeStartElement("wst", "Entropy", namespace);
             writer.writeStartElement("wst", "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            if (algorithmSuite == null) {
-                requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
-            } else {
-                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
-                requestorEntropy = WSSecurityUtil
-                    .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
+
+            try {
+                if (algorithmSuite == null) {
+                    requestorEntropy = XMLSecurityConstants.generateBytes(keySize / 8);
+                } else {
+                    AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                    requestorEntropy = XMLSecurityConstants.generateBytes(algType.getMaximumSymmetricKeyLength() / 8);
+                }
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
+
             writer.writeCharacters(Base64.getMimeEncoder().encodeToString(requestorEntropy));
 
             writer.writeEndElement();
@@ -989,7 +995,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         if (o instanceof String) {
             try {
                 Class<?> cls = ClassLoaderUtils.loadClass((String)o, this.getClass());
-                o = cls.newInstance();
+                o = cls.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new Fault(e);
             }

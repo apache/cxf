@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<handler-chains xmlns="http://java.sun.com/xml/ns/javaee">
+<handler-chains xmlns="https://jakarta.ee/xml/ns/jakartaee">
   <handler-chain>
     <handler>
       <handler-name>ReferenceParameterParsingHandler</handler-name>

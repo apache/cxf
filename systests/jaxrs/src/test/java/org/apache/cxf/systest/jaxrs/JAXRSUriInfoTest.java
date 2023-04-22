@@ -18,13 +18,12 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
@@ -117,11 +116,9 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
         @Path("/{path:.*}")
         @Produces("text/plain")
         public String getBasePathAndPathParam(@PathParam("path") String path) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(uriInfo.getBaseUri());
-            sb.append(",\"" + path + "\"");
-            sb.append(',').append(uriInfo.getPath());
-            return sb.toString();
+            return  new StringBuilder(uriInfo.getBaseUri().toString())
+                .append(",\"").append(path).append('"')
+                .append(',').append(uriInfo.getPath()).toString();
         }
 
     }

@@ -23,8 +23,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
-
+import jakarta.validation.ParameterNameProvider;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 

@@ -18,15 +18,15 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import java.io.ByteArrayInputStream;
+import java.io.*;
 
-import javax.annotation.Priority;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.ext.Provider;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 /**
  * RS CXF container Filter which verifies the Digest header, and then extracts signature data from the context
  * and sends it to the message verifier
@@ -34,17 +34,15 @@ import javax.ws.rs.ext.Provider;
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureFilter extends AbstractSignatureInFilter implements ContainerRequestFilter {
-
     @Override
     public void filter(ContainerRequestContext requestCtx) {
         byte[] messageBody = verifyDigest(requestCtx.getHeaders(), requestCtx.getEntityStream());
         if (messageBody != null) {
             requestCtx.setEntityStream(new ByteArrayInputStream(messageBody));
         }
-
         verifySignature(requestCtx.getHeaders(),
-                        requestCtx.getUriInfo().getAbsolutePath().getPath(),
-                        requestCtx.getMethod());
+                SignatureHeaderUtils.createRequestTarget(requestCtx.getUriInfo().getRequestUri()),
+                        requestCtx.getMethod(), messageBody);
     }
 
     @Override

@@ -26,9 +26,9 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class HttpsURLConnectionFactoryTest {
 
@@ -44,7 +44,7 @@ public class HttpsURLConnectionFactoryTest {
         TLSClientParameters tlsClientParams = new TLSClientParameters();
         tlsClientParams.setUseHttpsURLConnectionDefaultSslSocketFactory(false);
 
-        HttpsURLConnection conn = EasyMock.createMock(HttpsURLConnection.class);
+        HttpsURLConnection conn = Mockito.mock(HttpsURLConnection.class);
 
         try {
             factory.decorateWithTLS(tlsClientParams, conn);
@@ -66,7 +66,7 @@ public class HttpsURLConnectionFactoryTest {
         tlsClientParams.setUseHttpsURLConnectionDefaultSslSocketFactory(false);
         tlsClientParams.setCertAlias("someAlias");
 
-        HttpsURLConnection conn = EasyMock.createMock(HttpsURLConnection.class);
+        HttpsURLConnection conn = Mockito.mock(HttpsURLConnection.class);
 
         try {
             factory.decorateWithTLS(tlsClientParams, conn);
@@ -88,7 +88,7 @@ public class HttpsURLConnectionFactoryTest {
         TLSClientParameters tlsClientParams = new TLSClientParameters();
         tlsClientParams.setUseHttpsURLConnectionDefaultSslSocketFactory(false);
 
-        HttpsURLConnection conn = EasyMock.createMock(HttpsURLConnection.class);
+        HttpsURLConnection conn = Mockito.mock(HttpsURLConnection.class);
 
         try {
             factory.decorateWithTLS(tlsClientParams, conn);
@@ -111,7 +111,7 @@ public class HttpsURLConnectionFactoryTest {
         tlsClientParams.setUseHttpsURLConnectionDefaultSslSocketFactory(false);
         tlsClientParams.setCertAlias("someAlias");
 
-        HttpsURLConnection conn = EasyMock.createMock(HttpsURLConnection.class);
+        HttpsURLConnection conn = Mockito.mock(HttpsURLConnection.class);
 
         try {
             factory.decorateWithTLS(tlsClientParams, conn);

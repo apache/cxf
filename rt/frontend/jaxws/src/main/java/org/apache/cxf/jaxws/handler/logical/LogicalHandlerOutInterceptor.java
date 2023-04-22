@@ -19,19 +19,19 @@
 
 package org.apache.cxf.jaxws.handler.logical;
 
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.Binding;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -72,7 +72,7 @@ public class LogicalHandlerOutInterceptor
 
         Node nd = message.getContent(Node.class);
         SOAPMessage m = message.getContent(SOAPMessage.class);
-        Document document = null;
+        final Document document;
 
         if (m != null) {
             document = m.getSOAPPart();

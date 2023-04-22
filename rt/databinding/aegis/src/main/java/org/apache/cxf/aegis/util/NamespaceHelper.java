@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.aegis.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -33,7 +31,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -173,114 +170,6 @@ public final class NamespaceHelper {
         }
 
         return protocol + "://" + sb.toString();
-    }
-
-    /**
-     * Method makePackageName
-     *
-     * @param namespace
-     * @return
-     */
-    public static String makePackageName(String namespace) {
-
-        String hostname = null;
-        String path = "";
-
-        // get the target namespace of the document
-        try {
-            URL u = new URL(namespace);
-
-            hostname = u.getHost();
-            path = u.getPath();
-        } catch (MalformedURLException e) {
-            if (namespace.indexOf(':') > -1) {
-                hostname = namespace.substring(namespace.indexOf(':') + 1);
-
-                if (hostname.indexOf('/') > -1) {
-                    hostname = hostname.substring(0, hostname.indexOf('/'));
-                }
-            } else {
-                hostname = namespace;
-            }
-        }
-
-        // if we didn't file a hostname, bail
-        if (hostname == null) {
-            return null;
-        }
-
-        // convert illegal java identifier
-        hostname = hostname.replace('-', '_');
-        path = path.replace('-', '_');
-
-        // chomp off last forward slash in path, if necessary
-        if ((path.length() > 0) && (path.charAt(path.length() - 1) == '/')) {
-            path = path.substring(0, path.length() - 1);
-        }
-
-        // tokenize the hostname and reverse it
-        StringTokenizer st = new StringTokenizer(hostname, ".:");
-        String[] words = new String[st.countTokens()];
-
-        for (int i = 0; i < words.length; ++i) {
-            words[i] = st.nextToken();
-        }
-
-        StringBuilder sb = new StringBuilder(namespace.length());
-
-        for (int i = words.length - 1; i >= 0; --i) {
-            addWordToPackageBuffer(sb, words[i], i == words.length - 1);
-        }
-
-        // tokenize the path
-        StringTokenizer st2 = new StringTokenizer(path, "/");
-
-        while (st2.hasMoreTokens()) {
-            addWordToPackageBuffer(sb, st2.nextToken(), false);
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Massage <tt>word</tt> into a form suitable for use in a Java package
-     * name. Append it to the target string buffer with a <tt>.</tt> delimiter
-     * iff <tt>word</tt> is not the first word in the package name.
-     *
-     * @param sb the buffer to append to
-     * @param word the word to append
-     * @param firstWord a flag indicating whether this is the first word
-     */
-    private static void addWordToPackageBuffer(StringBuilder sb, String word, boolean firstWord) {
-
-        if (JavaUtils.isJavaKeyword(word)) {
-            word = JavaUtils.makeNonJavaKeyword(word);
-        }
-
-        // separate with dot after the first word
-        if (!firstWord) {
-            sb.append('.');
-        }
-
-        // prefix digits with underscores
-        if (Character.isDigit(word.charAt(0))) {
-            sb.append('_');
-        }
-
-        // replace periods with underscores
-        if (word.indexOf('.') != -1) {
-            char[] buf = word.toCharArray();
-
-            for (int i = 0; i < word.length(); i++) {
-                if (buf[i] == '.') {
-                    buf[i] = '_';
-                }
-            }
-
-            word = new String(buf);
-        }
-
-        sb.append(word);
     }
 
     /**

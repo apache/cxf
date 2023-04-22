@@ -51,7 +51,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
 
-    private StAXDocumentParser getParser(InputStream in) {
+    private XMLStreamReader getParser(InputStream in) {
         StAXDocumentParser parser = new StAXDocumentParser(in);
         parser.setStringInterning(true);
         parser.setForceStreamClose(true);

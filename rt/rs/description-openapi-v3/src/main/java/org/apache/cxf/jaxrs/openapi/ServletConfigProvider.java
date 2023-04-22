@@ -21,9 +21,8 @@ package org.apache.cxf.jaxrs.openapi;
 
 import java.util.Objects;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 import org.apache.cxf.jaxrs.common.openapi.DelegatingServletConfig;
 import org.apache.cxf.jaxrs.common.openapi.SyntheticServletConfig;
 import org.apache.cxf.jaxrs.ext.ContextProvider;

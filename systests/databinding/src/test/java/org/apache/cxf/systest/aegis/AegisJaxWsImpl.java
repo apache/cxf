@@ -23,8 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.systest.aegis.bean.Item;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

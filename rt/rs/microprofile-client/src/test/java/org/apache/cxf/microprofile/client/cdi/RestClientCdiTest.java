@@ -24,16 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.NormalScope;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.Produces;
-
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.NormalScope;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.Produces;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.microprofile.client.mock.HighPriorityClientReqFilter;
@@ -90,7 +89,7 @@ public class RestClientCdiTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "rawTypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsReleasedOnClientClose() throws Exception {
         IMocksControl control = EasyMock.createStrictControl();
         BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
@@ -123,7 +122,7 @@ public class RestClientCdiTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "rawTypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsNotReleasedOnClientCloseUsingNormalScope() throws Exception {
         IMocksControl control = EasyMock.createStrictControl();
         BeanManager mockedBeanMgr = control.createMock(BeanManager.class);

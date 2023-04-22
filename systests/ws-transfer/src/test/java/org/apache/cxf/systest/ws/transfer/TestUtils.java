@@ -21,8 +21,8 @@
 package org.apache.cxf.systest.ws.transfer;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;

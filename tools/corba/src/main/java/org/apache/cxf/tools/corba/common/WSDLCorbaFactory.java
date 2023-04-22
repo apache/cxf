@@ -33,7 +33,7 @@ import javax.wsdl.xml.WSDLReader;
 import javax.wsdl.xml.WSDLWriter;
 
 public abstract class WSDLCorbaFactory {
-    private static final String PROPERTY_NAME = "javax.wsdl.factory.WSDLCorbaFactory";
+    private static final String PROPERTY_NAME = "jakarta.wsdl.factory.WSDLCorbaFactory";
     private static final String PROPERTY_FILE_NAME = "wsdl.properties";
     private static final String DEFAULT_FACTORY_IMPL_NAME =
         "org.apache.cxf.tools.corba.processors.wsdl.WSDLCorbaFactoryImpl";
@@ -47,7 +47,7 @@ public abstract class WSDLCorbaFactory {
      * class which implements WSDLFactory. The steps (in order)
      * are:
      *<pre>
-     *  Check the javax.wsdl.factory.WSDLFactory system property.
+     *  Check the jakarta.wsdl.factory.WSDLFactory system property.
      *  Check the lib/wsdl.properties file in the JRE directory. The key
      * will have the same name as the above system property.
      *  Use the default value.
@@ -80,7 +80,7 @@ public abstract class WSDLCorbaFactory {
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 Class<?> cl = loader.loadClass(factoryImplName);
 
-                return (WSDLCorbaFactory)cl.newInstance();
+                return (WSDLCorbaFactory)cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 /*
                  Catches:
@@ -120,11 +120,10 @@ public abstract class WSDLCorbaFactory {
     public abstract ExtensionRegistry newPopulatedExtensionRegistry();
 
     private static String findFactoryImplName() {
-        String factoryImplName = null;
 
         // First, check the system property.
         try {
-            factoryImplName = System.getProperty(PROPERTY_NAME);
+            String factoryImplName = System.getProperty(PROPERTY_NAME);
 
             if (factoryImplName != null) {
                 return factoryImplName;
@@ -143,7 +142,7 @@ public abstract class WSDLCorbaFactory {
                     properties.load(is);
                 }
 
-                factoryImplName = properties.getProperty(PROPERTY_NAME);
+                String factoryImplName = properties.getProperty(PROPERTY_NAME);
 
                 if (factoryImplName != null) {
                     return factoryImplName;

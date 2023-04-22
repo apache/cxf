@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.refresh;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
@@ -51,7 +50,7 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         List<String> requestedScopes = OAuthUtils.getRequestedScopes(client,
                                             params.getFirst(OAuthConstants.SCOPE),
                                             useAllClientScopes,
-                                            partialMatchScopeValidation);
+                                            partialMatchScopeValidation, false);
         final ServerAccessToken st = dataProvider.refreshAccessToken(client, refreshToken, requestedScopes);
         st.setGrantType(OAuthConstants.REFRESH_TOKEN_GRANT);
         return st;

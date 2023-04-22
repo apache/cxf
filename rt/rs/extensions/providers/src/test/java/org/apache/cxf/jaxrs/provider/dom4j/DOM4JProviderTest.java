@@ -25,10 +25,9 @@ import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.impl.MetadataMap;

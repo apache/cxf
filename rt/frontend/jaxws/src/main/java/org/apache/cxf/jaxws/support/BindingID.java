@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.jaxws.support;
 
-import javax.xml.ws.soap.SOAPBinding;
-
+import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 

@@ -157,7 +157,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
 
             // get the current sequence, requesting the creation of a new one if necessary
             synchronized (source) {
-                SourceSequence seq = null;
+                final SourceSequence seq;
                 if (isLastMessage) {
                     seq = (SourceSequence)invocationContext.get(SourceSequence.class.getName());
                 } else {
@@ -208,9 +208,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             // We need to ensure that we have an output stream which won't start writing the
             // message until connection is setup
             if (!(os instanceof WriteOnCloseOutputStream)) {
-                WriteOnCloseOutputStream cached = new WriteOnCloseOutputStream(os);
-                msg.setContent(OutputStream.class, cached);
-                os = cached;
+                msg.setContent(OutputStream.class, new WriteOnCloseOutputStream(os));
             }
             getManager().initializeInterceptorChain(msg);
             //doneCaptureMessage(msg);
@@ -307,7 +305,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
             if (cw.getThrowable() != null) {
                 Throwable t = cw.getThrowable();
-                RuntimeException exception = null;
+                final RuntimeException exception;
                 if (t instanceof RuntimeException) {
                     exception = (RuntimeException)t;
                 } else {

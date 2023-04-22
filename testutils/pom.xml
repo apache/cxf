@@ -27,20 +27,31 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.testutils</cxf.module.name>
-        <cxf.osgi.import>
-            javax.xml.soap;version="${cxf.osgi.saaj.version}",
-            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
-            javax.activation;version="${cxf.osgi.javax.activation.version}"
-        </cxf.osgi.import>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.soap</groupId>
+            <artifactId>jakarta.xml.soap-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -58,13 +69,13 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
+            <artifactId>artemis-jakarta-server</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.javamail</groupId>
-            <artifactId>geronimo-javamail_1.4_mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -151,23 +162,19 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-wsdl-validator-plugin</artifactId>
                 <version>${project.version}</version>
-                <configuration>
-                    <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
-                </configuration>
                 <executions>
-                    <!-- execution>
-                        <id>validate</id>
+                    <execution>
                         <phase>validate</phase>
                         <goals>
-                          <goal>wsdlvalidator</goal>
+                            <goal>wsdlvalidator</goal>
                         </goals>
-                    </execution -->
+                    </execution>
                 </executions>
-            </plugin>
+            </plugin-->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>

@@ -65,14 +65,11 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaServiceClass> services = javaModel.getServiceClasses();
 
-            JavaServiceClass service = null;
             if (!services.values().isEmpty()) {
                 for (JavaServiceClass javaservice : services.values()) {
-                    service = javaservice;
                     for (JavaPort jport : javaservice.getPorts()) {
                         JavaInterface intf = interfaces.get(jport.getInterfaceClass());
-                        outputImpl(intf, service, jport.getPortName(), penv);
-
+                        outputImpl(intf, javaservice, jport.getPortName(), penv);
                     }
                 }
             } else {

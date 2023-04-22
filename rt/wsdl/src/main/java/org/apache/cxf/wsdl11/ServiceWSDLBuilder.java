@@ -189,7 +189,6 @@ public class ServiceWSDLBuilder {
                     wsdlImport.setLocationURI(service.getInterface().getName().getLocalPart() + ".wsdl");
                     definition.addImport(wsdlImport);
                     addNamespace(getPrefix(tns), tns, definition);
-                    definition = portTypeDef;
                 }
                 portTypes.add(buildPortType(service.getInterface(), portTypeDef));
 
@@ -253,8 +252,10 @@ public class ServiceWSDLBuilder {
             for (ExtensibilityElement element : extensibilityElements) {
                 if (element instanceof UnknownExtensibilityElement) {
                     UnknownExtensibilityElement uee = (UnknownExtensibilityElement)element;
-                    String pfx = uee.getElement().getPrefix();
-                    addNamespace(pfx, element.getElementType().getNamespaceURI(), def);
+                    synchronized (uee.getElement().getOwnerDocument()) {
+                        String pfx = uee.getElement().getPrefix();
+                        addNamespace(pfx, element.getElementType().getNamespaceURI(), def);
+                    }
                 } else {
                     QName qn = element.getElementType();
                     addNamespace(qn.getNamespaceURI(), def);
@@ -455,9 +456,8 @@ public class ServiceWSDLBuilder {
     protected void buildBinding(Definition definition,
                                 Collection<BindingInfo> bindingInfos,
                                 Collection<PortType> portTypes) {
-        Binding binding = null;
         for (BindingInfo bindingInfo : bindingInfos) {
-            binding = definition.createBinding();
+            final Binding binding = definition.createBinding();
             addDocumentation(binding, bindingInfo.getDocumentation());
             binding.setUndefined(false);
             for (PortType portType : portTypes) {
@@ -478,9 +478,8 @@ public class ServiceWSDLBuilder {
 
     protected void buildBindingOperation(Definition def, Binding binding,
                                        Collection<BindingOperationInfo> bindingOperationInfos) {
-        BindingOperation bindingOperation = null;
         for (BindingOperationInfo bindingOperationInfo : bindingOperationInfos) {
-            bindingOperation = def.createBindingOperation();
+            final BindingOperation bindingOperation = def.createBindingOperation();
             addDocumentation(bindingOperation, bindingOperationInfo.getDocumentation());
             bindingOperation.setName(bindingOperationInfo.getName().getLocalPart());
             for (Operation operation
@@ -501,10 +500,8 @@ public class ServiceWSDLBuilder {
 
     protected void buildBindingFault(Definition def, BindingOperation bindingOperation,
                                    Collection<BindingFaultInfo> bindingFaultInfos) {
-        BindingFault bindingFault = null;
-        for (BindingFaultInfo bindingFaultInfo
-            : bindingFaultInfos) {
-            bindingFault = def.createBindingFault();
+        for (BindingFaultInfo bindingFaultInfo : bindingFaultInfos) {
+            final BindingFault bindingFault = def.createBindingFault();
             addDocumentation(bindingFault, bindingFaultInfo.getDocumentation());
             bindingFault.setName(bindingFaultInfo.getFaultInfo().getFaultName().getLocalPart());
             bindingOperation.addBindingFault(bindingFault);
@@ -516,9 +513,8 @@ public class ServiceWSDLBuilder {
 
     protected void buildBindingInput(Definition def, BindingOperation bindingOperation,
                                          BindingMessageInfo bindingMessageInfo) {
-        BindingInput bindingInput = null;
         if (bindingMessageInfo != null) {
-            bindingInput = def.createBindingInput();
+            final BindingInput bindingInput = def.createBindingInput();
             addDocumentation(bindingInput, bindingMessageInfo.getDocumentation());
             bindingInput.setName(bindingMessageInfo.getMessageInfo().getName().getLocalPart());
             bindingOperation.setBindingInput(bindingInput);
@@ -529,9 +525,8 @@ public class ServiceWSDLBuilder {
 
     protected void buildBindingOutput(Definition def, BindingOperation bindingOperation,
                                    BindingMessageInfo bindingMessageInfo) {
-        BindingOutput bindingOutput = null;
         if (bindingMessageInfo != null) {
-            bindingOutput = def.createBindingOutput();
+            final BindingOutput bindingOutput = def.createBindingOutput();
             addDocumentation(bindingOutput, bindingMessageInfo.getDocumentation());
             bindingOutput.setName(bindingMessageInfo.getMessageInfo().getName().getLocalPart());
             bindingOperation.setBindingOutput(bindingOutput);
@@ -687,9 +682,8 @@ public class ServiceWSDLBuilder {
                 }
                 //loop to add fault
                 Collection<FaultInfo> faults = operationInfo.getFaults();
-                Fault fault = null;
                 for (FaultInfo faultInfo : faults) {
-                    fault = def.createFault();
+                    final Fault fault = def.createFault();
                     addDocumentation(fault, faultInfo.getDocumentation());
                     fault.setName(faultInfo.getFaultName().getLocalPart());
                     message = def.createMessage();
@@ -737,9 +731,8 @@ public class ServiceWSDLBuilder {
         def.addMessage(message);
 
         List<MessagePartInfo> messageParts = messageContainer.getMessageParts();
-        Part messagePart = null;
         for (MessagePartInfo messagePartInfo : messageParts) {
-            messagePart = def.createPart();
+            final Part messagePart = def.createPart();
             messagePart.setName(messagePartInfo.getName().getLocalPart());
             if (messagePartInfo.isElement()) {
                 messagePart.setElementName(messagePartInfo.getElementQName());

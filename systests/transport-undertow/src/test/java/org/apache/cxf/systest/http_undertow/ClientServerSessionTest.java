@@ -25,10 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.WebServiceException;
-
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.helpers.CastUtils;
@@ -69,12 +68,12 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
 
 
             Map<String, List<String>> headers
-                = CastUtils.cast((Map<?, ?>)bp.getRequestContext().get("javax.xml.ws.http.request.headers"));
+                = CastUtils.cast((Map<?, ?>)bp.getRequestContext().get("jakarta.xml.ws.http.request.headers"));
 
             if (headers == null) {
                 headers = new HashMap<>();
                 bp.getRequestContext()
-                    .put("javax.xml.ws.http.request.headers", headers);
+                    .put("jakarta.xml.ws.http.request.headers", headers);
             }
 
             List<String> cookies = Arrays.asList(new String[] {"a=a", "b=b"});

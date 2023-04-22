@@ -61,7 +61,7 @@ public class ParameterEventProducer implements CorbaTypeEventProducer {
     }
 
     public int next() {
-        int event = -1;
+        final int event;
         if (currentEventProducer != null && currentEventProducer.hasNext()) {
             event = currentEventProducer.next();
         } else if (iterator != null && iterator.hasNext()) {

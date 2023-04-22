@@ -135,7 +135,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      */
     protected Endpoint getFailoverTarget(Exchange exchange,
                                        InvocationContext invocation) {
-        List<String> alternateAddresses = null;
+        final List<String> alternateAddresses;
         if (!invocation.hasAlternates()) {
             // no previous failover attempt on this invocation
             //
@@ -179,7 +179,6 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      */
     private Endpoint getDistributionTarget(Exchange exchange,
                                            InvocationContext invocation) {
-        List<String> alternateAddresses = null;
         if ((addressList == null) || (addressList.isEmpty())) {
             try {
                 addressList = getStrategy().getAlternateAddresses(null);
@@ -188,7 +187,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
                         + " cannot handle a null argument to getAlternateAddresses: " + ex.toString());
             }
         }
-        alternateAddresses = addressList;
+        List<String> alternateAddresses = addressList;
 
         if ((alternateAddresses == null) || (alternateAddresses.isEmpty())) {
             alternateAddresses = getStrategy().getAlternateAddresses(exchange);

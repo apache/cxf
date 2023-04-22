@@ -1,4 +1,5 @@
---
+<?xml version="1.0"?>
+<!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
   distributed with this work for additional information
@@ -15,11 +16,18 @@
   KIND, either express or implied. See the License for the
   specific language governing permissions and limitations
   under the License.
---
+-->
 
 
-SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"
-SYSTEM "http://cxf.apache.org/schemas/configuration/security.xsd" "../../../../../../core/src/main/resources/schemas/configuration/security.xsd"
-SYSTEM "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd" "../../../../../../core/src/main/resources/schemas/configuration/parameterized-types.xsd"
-SYSTEM "http://cxf.apache.org/schemas/wsdl/http-conf.xsd"         "../../../../../../rt/transports/http/src/main/resources/schemas/wsdl/http-conf.xsd"
-SYSTEM "http://cxf.apache.org/schemas/configuration/http-undertow.xsd" "schemas/configuration/http-undertow.xsd"
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="http://schemas.xmlsoap.org/wsdl/"
+            uri="../../../../../../core/src/main/resources/schemas/wsdl/wsdl.xsd"/>
+    <system systemId="http://cxf.apache.org/schemas/configuration/security.xsd"
+            uri="../../../../../../core/src/main/resources/schemas/configuration/security.xsd"/>
+    <system systemId="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"
+            uri="../../../../../../core/src/main/resources/schemas/configuration/parameterized-types.xsd"/>
+    <system systemId="http://cxf.apache.org/schemas/wsdl/http-conf.xsd"
+            uri="../../../../../../rt/transports/http/src/main/resources/schemas/wsdl/http-conf.xsd"/>
+    <system systemId="http://cxf.apache.org/schemas/configuration/http-undertow.xsd"
+            uri="schemas/configuration/http-undertow.xsd"/>
+</catalog>

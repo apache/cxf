@@ -21,7 +21,7 @@ package org.apache.cxf.tools.fortest.date;
 
 import java.util.Calendar;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public class EchoCalendar {

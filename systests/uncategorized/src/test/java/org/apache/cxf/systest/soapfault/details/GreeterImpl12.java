@@ -27,7 +27,7 @@ import org.apache.hello_world_soap12_http.Greeter;
 import org.apache.hello_world_soap12_http.PingMeFault;
 import org.apache.hello_world_soap12_http.types.FaultDetail;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+@jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap12_http",
                       endpointInterface = "org.apache.hello_world_soap12_http.Greeter",
                       wsdlLocation = "wsdl/hello_world_soap12.wsdl")

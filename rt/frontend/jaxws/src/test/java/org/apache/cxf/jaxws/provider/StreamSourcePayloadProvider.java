@@ -20,14 +20,15 @@
 package org.apache.cxf.jaxws.provider;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
+
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 
 @WebServiceProvider()
 @ServiceMode(value = Service.Mode.PAYLOAD)
-@javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
+@jakarta.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 public class StreamSourcePayloadProvider implements Provider<StreamSource> {
 
     public StreamSourcePayloadProvider() {

@@ -19,8 +19,7 @@
 
 package org.apache.cxf.systest.soap;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.hello_world_soap_action.WrappedGreeter;
 
 @WebService(endpointInterface = "org.apache.hello_world_soap_action.WrappedGreeter",

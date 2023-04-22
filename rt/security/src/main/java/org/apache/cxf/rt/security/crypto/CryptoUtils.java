@@ -77,7 +77,8 @@ public final class CryptoUtils {
     public static void installBouncyCastleProvider() throws Exception {
         final String bcClassName = "org.bouncycastle.jce.provider.BouncyCastleProvider";
         if (Security.getProvider(bcClassName) == null) {
-            Security.addProvider((Provider)ClassLoaderUtils.loadClass(bcClassName, CryptoUtils.class).newInstance());
+            Security.addProvider((Provider)ClassLoaderUtils.loadClass(bcClassName, CryptoUtils.class)
+                                 .getDeclaredConstructor().newInstance());
         }
     }
     public static void removeBouncyCastleProvider() {
@@ -545,7 +546,7 @@ public final class CryptoUtils {
                                       int mode)  throws SecurityException {
         boolean compressionSupported = keyProps != null && keyProps.isCompressionSupported();
         if (compressionSupported && mode == Cipher.ENCRYPT_MODE) {
-            bytes = CompressionUtils.deflate(bytes, false);
+            bytes = CompressionUtils.deflate(bytes, true);
         }
         try {
             Cipher c = initCipher(secretKey, keyProps, mode);
@@ -557,9 +558,12 @@ public final class CryptoUtils {
                 if (blockSize == -1) {
                     if (JavaUtils.isJava8Before161()) {
                         blockSize = secretKey instanceof PublicKey ? 117 : 128;
-                    } else {
+                    } else if (JavaUtils.getJavaMajorVersion() < 19) {
                         //the default block size is 256 when use private key under java9
                         blockSize = secretKey instanceof PublicKey ? 117 : 256;
+                    } else {
+                        //the default block size is 384 when use private key after java19
+                        blockSize = secretKey instanceof PublicKey ? 117 : 384;
                     }
                 }
                 boolean updateRequired = keyProps != null && keyProps.getAdditionalData() != null;
@@ -576,7 +580,7 @@ public final class CryptoUtils {
                 }
             }
             if (compressionSupported && mode == Cipher.DECRYPT_MODE) {
-                result = IOUtils.readBytesFromStream(CompressionUtils.inflate(result, false));
+                result = IOUtils.readBytesFromStream(CompressionUtils.inflate(result, true));
             }
             return result;
         } catch (Exception ex) {

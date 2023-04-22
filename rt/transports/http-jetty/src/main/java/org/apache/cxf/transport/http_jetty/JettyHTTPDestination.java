@@ -29,10 +29,9 @@ import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -40,13 +39,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
-import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
@@ -372,18 +369,6 @@ public class JettyHTTPDestination extends ServletDestination {
     protected Message retrieveFromContinuation(HttpServletRequest req) {
         return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
     }
-    protected void setupContinuation(Message inMessage,
-                      final HttpServletRequest req,
-                      final HttpServletResponse resp) {
-        if (engine != null && engine.getContinuationsEnabled()) {
-            super.setupContinuation(inMessage, req, resp);
-            if (!inMessage.containsKey(ContinuationProvider.class.getName())) {
-                inMessage.put(ContinuationProvider.class.getName(),
-                    new JettyContinuationProvider(req, resp, inMessage));
-            }
-        }
-    }
-
     private Request getCurrentRequest() {
         try {
             HttpConnection con = HttpConnection.getCurrentConnection();

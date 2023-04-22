@@ -26,18 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.UTPasswordCallback;
 import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService;
 import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService;
@@ -76,7 +75,6 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
         stopAllServers();
     }
 

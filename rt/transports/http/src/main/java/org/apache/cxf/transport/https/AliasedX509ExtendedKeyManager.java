@@ -103,7 +103,7 @@ public class AliasedX509ExtendedKeyManager extends X509ExtendedKeyManager {
     /* ------------------------------------------------------------ */
     /**
      * @see javax.net.ssl.X509ExtendedKeyManager#chooseEngineServerAlias(java.lang.String,
-     *      java.security.Principal[], javax.net.ssl.SSLEngine)
+     *      java.security.Principal[], jakarta.net.ssl.SSLEngine)
      */
     @Override
     public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {

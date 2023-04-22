@@ -27,17 +27,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import jakarta.activation.DataHandler;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
@@ -54,17 +53,17 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class BookCatalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());
-    private final Directory directory = new RAMDirectory();
+    private final Directory directory = new ByteBuffersDirectory();
     private final Analyzer analyzer = new StandardAnalyzer();
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
-
+    
     @POST
     @Consumes("multipart/form-data")
     public Response addBook(final MultipartBody body) throws Exception {
@@ -74,8 +73,9 @@ public class BookCatalog {
             if (handler != null) {
                 final String source = handler.getName();
                 final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
-                    .withSource(source)
-                    .withField("modified", Date.class);
+                        .withSource(source)
+                        .withField("modified", Date.class)
+                        .withField("dcterms:modified", Date.class);
 
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
                 if (document != null) {
@@ -117,6 +117,7 @@ public class BookCatalog {
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
         final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
+        fieldTypes.put("dcterms:modified", Date.class);
 
         LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);

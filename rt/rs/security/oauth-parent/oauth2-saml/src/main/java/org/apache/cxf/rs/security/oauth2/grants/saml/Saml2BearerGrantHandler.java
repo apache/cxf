@@ -30,11 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -207,8 +206,7 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                     );
                 assertion.verifySignature(samlKeyInfo);
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(),
-                    data.getCallbackHandler()
+                    new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
                 );
             } else if (getTLSCertificates(message) == null) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);

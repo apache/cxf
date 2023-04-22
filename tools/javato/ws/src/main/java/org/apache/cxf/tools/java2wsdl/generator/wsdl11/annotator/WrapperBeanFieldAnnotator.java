@@ -21,12 +21,11 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11.annotator;
 
 import java.lang.annotation.Annotation;
 
-import javax.xml.bind.annotation.XmlAttachmentRef;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import jakarta.xml.bind.annotation.XmlAttachmentRef;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.bind.annotation.XmlMimeType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
@@ -37,7 +36,7 @@ import org.apache.cxf.tools.common.model.JavaField;
 public class WrapperBeanFieldAnnotator implements Annotator {
 
     public void annotate(final JavaAnnotatable field) {
-        JavaField jField = null;
+        final JavaField jField;
         if (field instanceof JavaField) {
             jField = (JavaField) field;
         } else {

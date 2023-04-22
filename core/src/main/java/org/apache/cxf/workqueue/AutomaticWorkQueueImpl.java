@@ -21,7 +21,6 @@ package org.apache.cxf.workqueue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -63,7 +62,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     int lowWaterMark;
     int highWaterMark;
     long dequeueTimeout;
-    volatile int approxThreadCount;
+    AtomicInteger approxThreadCount = new AtomicInteger();
 
     ThreadPoolExecutor executor;
     Method addWorkerMethod;
@@ -174,10 +173,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
             if (LOG.isLoggable(Level.FINE)) {
                 StringBuilder buf = new StringBuilder(128).append("Constructing automatic work queue with:\n")
-                        .append("max queue size: ").append(maxQueueSize).append("\n")
-                        .append("initialThreads: ").append(initialThreads).append("\n")
-                        .append("lowWaterMark: ").append(lowWaterMark).append("\n")
-                        .append("highWaterMark: ").append(highWaterMark).append("\n");
+                        .append("max queue size: ").append(maxQueueSize).append('\n')
+                        .append("initialThreads: ").append(initialThreads).append('\n')
+                        .append("lowWaterMark: ").append(lowWaterMark).append('\n')
+                        .append("highWaterMark: ").append(highWaterMark).append('\n');
                 LOG.fine(buf.toString());
             }
 
@@ -200,11 +199,13 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 executor.setCorePoolSize(lowWaterMark);
             }
 
-            ReentrantLock l = null;
+            ReentrantLock l;
             try {
-                Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
-                ReflectionUtil.setAccessible(f);
-                l = (ReentrantLock)f.get(executor);
+                l = ReflectionUtil.accessDeclaredField("mainLock", ThreadPoolExecutor.class,
+                                                       executor, ReentrantLock.class);
+                if (l == null) {
+                    l = new ReentrantLock();
+                }
             } catch (Throwable t) {
                 l = new ReentrantLock();
             }
@@ -340,11 +341,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
             Runnable wrapped = new Runnable() {
                 public void run() {
-                    ++approxThreadCount;
+                    approxThreadCount.incrementAndGet();
                     try {
                         r.run();
                     } finally {
-                        --approxThreadCount;
+                        approxThreadCount.decrementAndGet();
                     }
                 }
             };
@@ -426,7 +427,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         ex.execute(r);
         if (addWorkerMethod != null
             && !ex.getQueue().isEmpty()
-            && this.approxThreadCount < highWaterMark
+            && this.approxThreadCount.get() < highWaterMark
             && addThreadLock.tryLock()) {
             try {
                 mainLock.lock();
@@ -436,6 +437,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                     int sz2 = this.getActiveCount();
 
                     if ((sz + sz2) > ps) {
+                        // Needs --add-opens java.base/java.util.concurrent=ALL-UNNAMED for JDK16+
                         ReflectionUtil.setAccessible(addWorkerMethod).invoke(executor, addWorkerArgs);
                     }
                 } catch (Exception exc) {

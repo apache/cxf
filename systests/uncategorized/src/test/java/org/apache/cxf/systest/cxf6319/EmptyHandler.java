@@ -22,8 +22,9 @@ package org.apache.cxf.systest.cxf6319;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 
 /**
  * @author Tomas Hofman (thofman@redhat.com)
@@ -41,7 +42,7 @@ public class EmptyHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     @Override
-    public void close(javax.xml.ws.handler.MessageContext context) {
+    public void close(jakarta.xml.ws.handler.MessageContext context) {
     }
 
     @Override

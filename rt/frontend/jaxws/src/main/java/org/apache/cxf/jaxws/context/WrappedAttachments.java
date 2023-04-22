@@ -27,8 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.activation.DataHandler;
-
+import jakarta.activation.DataHandler;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;
 

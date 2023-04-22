@@ -19,7 +19,7 @@
 
 package org.apache.cxf.cdi.event;
 
-import javax.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.context.spi.CreationalContext;
 
 public class DisposableCreationalContext {
     private final CreationalContext<?> context;

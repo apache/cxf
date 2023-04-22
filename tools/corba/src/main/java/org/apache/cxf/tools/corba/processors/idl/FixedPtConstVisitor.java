@@ -55,22 +55,15 @@ public class FixedPtConstVisitor implements Visitor {
     public void visit(AST fixedNode) {
         //      <fixed_pt_const_type> ::= "fixed"
 
-        XmlSchemaType stype = null;
         CorbaType ctype = null;
 
-        QName corbaTypeQName = CorbaConstants.NE_CORBA_FIXED;
-
-        if (corbaTypeQName != null) {
-            QName schemaTypeQName = Constants.XSD_DECIMAL;
-            if (schemaTypeQName != null) {
-                stype = schemas.getTypeByQName(schemaTypeQName);
-                if (stype != null) {
-                    ctype = new CorbaType();
-                    ctype.setQName(corbaTypeQName);
-                    ctype.setType(stype.getQName());
-                    ctype.setName(stype.getQName().getLocalPart());
-                }
-            }
+        QName schemaTypeQName = Constants.XSD_DECIMAL;
+        XmlSchemaType stype = schemas.getTypeByQName(schemaTypeQName);
+        if (stype != null) {
+            ctype = new CorbaType();
+            ctype.setQName(CorbaConstants.NE_CORBA_FIXED);
+            ctype.setType(stype.getQName());
+            ctype.setName(stype.getQName().getLocalPart());
         }
 
         schemaType = stype;

@@ -40,24 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamWriter;
@@ -68,6 +50,24 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -1207,8 +1207,8 @@ public class JAXBElementProviderTest {
                        type, m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        Book b1 = null;
-        Book b2 = null;
+        final Book b1;
+        final Book b2;
         if (type.isArray()) {
             assertEquals(2, ((Book[])o).length);
             b1 = ((Book[])o)[0];
@@ -1251,7 +1251,7 @@ public class JAXBElementProviderTest {
                                           boolean isArray) throws Exception {
         @SuppressWarnings("rawtypes")
         JAXBElementProvider provider = new JAXBElementProvider();
-        Method m = null;
+        final Method m;
         if (!isArray) {
             m = CollectionsResource.class.getMethod("setTags", new Class[]{List.class});
         } else {
@@ -1263,8 +1263,8 @@ public class JAXBElementProviderTest {
                        m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertNotNull(o);
-        TagVO2 t1 = null;
-        TagVO2 t2 = null;
+        final TagVO2 t1;
+        final TagVO2 t2;
         if (!isArray) {
             assertEquals(2, ((List<?>)o).size());
             t1 = (TagVO2)((List<?>)o).get(0);

@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
@@ -138,7 +138,7 @@ public final class STSUtils {
         // Only parse the EPR if we really have to
         if (issuer != null
             && (preferWSMex || client.getLocation() == null && client.getWsdlLocation() == null)) {
-            EndpointReferenceType epr = null;
+            final EndpointReferenceType epr;
             try {
                 epr = VersionTransformer.parseEndpointReference(issuer);
             } catch (JAXBException e) {
@@ -308,7 +308,6 @@ public final class STSUtils {
                                              boolean sc) throws BusException, EndpointException {
         //CHECKSTYLE:ON
 
-        Service service = null;
         String ns = namespace + "/wsdl";
         ServiceInfo si = new ServiceInfo();
 
@@ -321,7 +320,7 @@ public final class STSUtils {
         OperationInfo roi = addRenewOperation(ii, namespace, ns);
 
         si.setInterface(ii);
-        service = new ServiceImpl(si);
+        Service service = new ServiceImpl(si);
 
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         BindingFactory bindingFactory = bfm.getBindingFactory(soapVersion);

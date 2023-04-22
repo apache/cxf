@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.filters;
 import java.net.URI;
 import java.util.Collections;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -136,7 +135,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = jwtConsumer.getJwtClaims();
         assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
         assertEquals("alice", claims.getStringProperty("username"));
-        assertTrue(claims.getListStringProperty(OAuthConstants.SCOPE).contains(scope));
+        assertTrue(claims.getStringProperty(OAuthConstants.SCOPE).contains(scope));
         // Now invoke on the service with the access token
         WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders())
             .authorization(new ClientAccessToken(BEARER_AUTHORIZATION_SCHEME, accessToken.getTokenKey()));

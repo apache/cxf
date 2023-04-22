@@ -55,6 +55,9 @@
     
     <bean id="kerberosCallbackHandler" 
           class="org.apache.cxf.systest.kerberos.common.KerberosServicePasswordCallback"/>
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
           
     <bean id="kerberosValidator" class="org.apache.wss4j.dom.validate.KerberosTokenValidator">
         <property name="contextName" value="bob"/>
@@ -204,7 +207,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2" implementor="org.apache.cxf.systest.kerberos.common.DoubleItImpl" endpointName="s:DoubleItTransportSAML2Port" serviceName="s:DoubleItService" depends-on="STSClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server.3}/doubleit/services/doubleittransportsaml2" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="doubleittransportsaml2" implementor="#doubleItNoSecurity" endpointName="s:DoubleItTransportSAML2Port" serviceName="s:DoubleItService" depends-on="STSClientAuthHttpsSettings" address="https://localhost:${testutil.ports.Server.3}/doubleit/services/doubleittransportsaml2" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.kerberos.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="serviceKeystore.properties"/>

@@ -19,7 +19,7 @@
 
 package com.example.customerservice.server;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import com.example.customerservice.CustomerService;
 

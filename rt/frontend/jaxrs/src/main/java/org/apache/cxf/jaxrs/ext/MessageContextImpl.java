@@ -28,20 +28,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
@@ -84,7 +83,7 @@ public class MessageContextImpl implements MessageContext {
                 throw new WebApplicationException(e, 413);
             }
         }
-        if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
+        if (keyValue.equals("WRITE-" + Message.ATTACHMENTS) && m.getExchange().getOutMessage() != null) {
             return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
         }
 
@@ -218,7 +217,7 @@ public class MessageContextImpl implements MessageContext {
         Attachment root = (Attachment)handlers.get(0);
 
         String rootContentType = root.getContentType().toString();
-        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders());
+        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders(), true, false, true);
         if (!AttachmentUtil.isMtomEnabled(outMessage)) {
             rootHeaders.putSingle(Message.CONTENT_TYPE, rootContentType);
         }
@@ -290,7 +289,8 @@ public class MessageContextImpl implements MessageContext {
 
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class),
-                                     headers),
+                                     headers,
+                                     inMessage),
                                      new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {

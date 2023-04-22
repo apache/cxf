@@ -22,6 +22,8 @@ package org.apache.cxf.systest.dispatch;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -29,30 +31,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.jws.WebService;
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.soap.SOAPFaultException;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -60,6 +44,24 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
 
+import jakarta.jws.WebService;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPFaultException;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -200,7 +202,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             //expected
             assertTrue(ex.getCause().getClass().getName(),
                        ex.getCause() instanceof java.net.ConnectException
-                       || ex.getCause() instanceof java.net.SocketTimeoutException);
+                       || ex.getCause() instanceof java.net.SocketTimeoutException
+                       || ex.getCause()  instanceof HttpConnectTimeoutException);
         }
         dispImpl.close();
 
@@ -604,10 +607,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         disp.getRequestContext().put(HTTPClientPolicy.class.getName(), pol);
         Response<Object> o = disp.invokeAsync(later);
         try {
-            o.get(10, TimeUnit.SECONDS);
-            fail("Should have gotten a SocketTimeoutException");
+            Object o2 = o.get(10, TimeUnit.SECONDS);
+            fail("Should have gotten a SocketTimeoutException: " + o2);
+        } catch (TimeoutException tex) {
+            // this is ok
         } catch (ExecutionException ex) {
-            assertTrue(ex.getCause() instanceof SocketTimeoutException);
+            assertTrue(ex.getCause() instanceof SocketTimeoutException
+                       || ex.getCause() instanceof HttpTimeoutException);
         }
 
         later.setRequestType(20000);

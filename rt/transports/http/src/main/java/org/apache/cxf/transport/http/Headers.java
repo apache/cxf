@@ -37,9 +37,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -66,6 +65,7 @@ public class Headers {
     public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     public static final String HTTP_HEADERS_LINK = "Link";
     public static final String EMPTY_REQUEST_PROPERTY = "org.apache.cxf.empty.request";
+    public static final String USER_AGENT = initUserAgent();
     private static final String SET_EMPTY_REQUEST_CT_PROPERTY = "set.content.type.for.empty.request";
     private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
@@ -73,7 +73,6 @@ public class Headers {
     private static final List<String> SENSITIVE_HEADERS = Arrays.asList("Authorization", "Proxy-Authorization");
     private static final List<Object> SENSITIVE_HEADER_MARKER = Arrays.asList("***");
     private static final String ALLOW_LOGGING_SENSITIVE_HEADERS = "allow.logging.sensitive.headers";
-    private static final String USER_AGENT = initUserAgent();
 
     private final Message message;
     private final Map<String, List<String>> headers;
@@ -278,7 +277,9 @@ public class Headers {
     }
 
     public void readFromConnection(HttpURLConnection connection) {
-        Map<String, List<String>> origHeaders = connection.getHeaderFields();
+        readFromConnection(connection.getHeaderFields());
+    }
+    public void readFromConnection(Map<String, List<String>> origHeaders) {
         headers.clear();
         for (Entry<String, List<String>> entry : origHeaders.entrySet()) {
             if (entry.getKey() != null) {
@@ -295,7 +296,6 @@ public class Headers {
             }
         }
     }
-
     private static List<String> createMutableList(String val) {
         return new ArrayList<>(Arrays.asList(val));
     }
@@ -371,7 +371,7 @@ public class Headers {
     }
 
     public String determineContentType() {
-        String ct = null;
+        String ct;
         List<Object> ctList = CastUtils.cast(headers.get(Message.CONTENT_TYPE));
         if (ctList != null && ctList.size() == 1 && ctList.get(0) != null) {
             ct = ctList.get(0).toString();

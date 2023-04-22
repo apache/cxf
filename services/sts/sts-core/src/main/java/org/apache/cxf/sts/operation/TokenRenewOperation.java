@@ -26,8 +26,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
@@ -149,7 +148,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
             realm = tokenResponse.getTokenRealm();
             for (TokenRenewer tokenRenewer : tokenRenewers) {
-                boolean canHandle = false;
+                final boolean canHandle;
                 if (realm == null) {
                     canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken());
                 } else {
@@ -233,7 +232,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         if (returnReferences) {
             // RequestedAttachedReference
             TokenReference attachedReference = tokenRenewerResponse.getAttachedReference();
-            RequestedReferenceType requestedAttachedReferenceType = null;
+            final RequestedReferenceType requestedAttachedReferenceType;
             if (attachedReference != null) {
                 requestedAttachedReferenceType = createRequestedReference(attachedReference, true);
             } else {
@@ -251,7 +250,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
             // RequestedUnattachedReference
             TokenReference unAttachedReference = tokenRenewerResponse.getUnAttachedReference();
-            RequestedReferenceType requestedUnattachedReferenceType = null;
+            final RequestedReferenceType requestedUnattachedReferenceType;
             if (unAttachedReference != null) {
                 requestedUnattachedReferenceType = createRequestedReference(unAttachedReference, false);
             } else {

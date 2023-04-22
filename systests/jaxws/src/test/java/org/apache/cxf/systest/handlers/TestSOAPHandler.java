@@ -22,28 +22,28 @@ package org.apache.cxf.systest.handlers;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.DetailEntry;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
 
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.xml.soap.Detail;
+import jakarta.xml.soap.DetailEntry;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFactory;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.soap.SOAPHandler;
+import jakarta.xml.ws.handler.soap.SOAPMessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 
@@ -80,7 +80,7 @@ public class  TestSOAPHandler extends TestHandlerBase
         }
     }
 
-    // Implementation of javax.xml.ws.handler.soap.SOAPHandler
+    // Implementation of jakarta.xml.ws.handler.soap.SOAPHandler
 
     public final Set<QName> getHeaders() {
         return null;
@@ -310,6 +310,6 @@ public class  TestSOAPHandler extends TestHandlerBase
 
     private boolean isValidWsdlDescription(Object wsdlDescription) {
         return (wsdlDescription != null)
-               && ((wsdlDescription instanceof java.net.URI) || (wsdlDescription instanceof java.net.URL));
+               && (wsdlDescription instanceof java.net.URI || wsdlDescription instanceof java.net.URL);
     }
 }

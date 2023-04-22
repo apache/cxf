@@ -20,9 +20,8 @@ package org.apache.cxf.jca.cxf;
 
 import java.util.Properties;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ResourceAdapter;
-
+import jakarta.resource.ResourceException;
+import jakarta.resource.spi.ResourceAdapter;
 import org.apache.cxf.Bus;
 
 import org.easymock.EasyMock;

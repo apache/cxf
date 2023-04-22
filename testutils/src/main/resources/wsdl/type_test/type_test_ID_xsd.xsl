@@ -19,7 +19,6 @@
 -->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext"
     xmlns:itst="http://tests.iona.com/ittests"
@@ -29,7 +28,7 @@
     xmlns="http://www.w3.org/2001/XMLSchema"
     >
 
-  <xsl:output method="xml" indent="yes" xalan:indent-amount="4"/>
+  <xsl:output method="xml" indent="yes" />
   <xsl:strip-space elements="*"/>
 
   <!-- group selection parameter -->  
@@ -48,8 +47,8 @@
   <!-- 0 - root schema node -->
   <xsl:template match="/xsd:schema">
     <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
-                xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-                jaxb:version="2.0">
+                xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+                jaxb:version="3.0">
       <xsl:attribute name="targetNamespace">
         <xsl:value-of select="concat('http://apache.org/type_test/types', $groupID)"/>
       </xsl:attribute>

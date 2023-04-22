@@ -24,13 +24,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -296,6 +295,19 @@ public class UriInfoImplTest {
 
         qps = u.getQueryParameters();
         assertEquals("Number of queiries is wrong", 4, qps.size());
+        assertEquals("Wrong query value", qps.get("N").get(0), "0");
+        assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
+        assertEquals("Wrong query value", qps.get("n").get(1), "3");
+        assertEquals("Wrong query value", qps.get("b").get(0), "2");
+        assertEquals("Wrong query value", qps.get("a.b").get(0), "ab");
+
+        Message m = mockMessage("http://localhost:8080/baz", "/bar",
+                "N=0&n=1%202&n=3&&b=2&a%2Eb=ab");
+        m.put("parse.query.value.as.collection", Boolean.TRUE);
+        u = new UriInfoImpl(m, null);
+
+        qps = u.getQueryParameters();
+        assertEquals("Number of queries is wrong", 4, qps.size());
         assertEquals("Wrong query value", qps.get("N").get(0), "0");
         assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
         assertEquals("Wrong query value", qps.get("n").get(1), "3");

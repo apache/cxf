@@ -23,8 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.jws.WebParam;
-
+import jakarta.jws.WebParam;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -250,9 +249,9 @@ public class OperationProcessor  extends AbstractProcessor {
     private void addAsyncMethod(JavaMethod method) throws ToolException {
         addPollingMethod(method);
         addCallbackMethod(method);
-        method.getInterface().addImport("javax.xml.ws.AsyncHandler");
+        method.getInterface().addImport("jakarta.xml.ws.AsyncHandler");
         method.getInterface().addImport("java.util.concurrent.Future");
-        method.getInterface().addImport("javax.xml.ws.Response");
+        method.getInterface().addImport("jakarta.xml.ws.Response");
     }
 
     private void addCallbackMethod(JavaMethod method) throws ToolException {
@@ -317,7 +316,7 @@ public class OperationProcessor  extends AbstractProcessor {
         asyncHandlerAnnotation.addElement(new JAnnotationElement("targetNamespace", ""));
         asyncHandler.addAnnotation("WebParam", asyncHandlerAnnotation);
 
-        method.getInterface().addImport("javax.jws.WebParam");
+        method.getInterface().addImport("jakarta.jws.WebParam");
         method.getInterface().addMethod(callbackMethod);
     }
 
@@ -405,7 +404,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 counter++;
             }
         }
-        return counter > 1 ? true : false;
+        return counter > 1;
     }
 
 }

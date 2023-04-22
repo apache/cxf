@@ -30,13 +30,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -104,7 +103,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private MessageContext messageContext;
 
     @Context
-    private javax.ws.rs.core.SecurityContext securityContext;
+    private jakarta.ws.rs.core.SecurityContext securityContext;
 
     private Map<String, String> claimTypeMap = DEFAULT_CLAIM_TYPE_MAP;
     private Map<String, String> tokenTypeMap = DEFAULT_TOKEN_TYPE_MAP;
@@ -386,7 +385,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
         if (tlsInfo != null && tlsInfo.getPeerCertificates() != null
                 && tlsInfo.getPeerCertificates().length > 0
-                && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
+                && tlsInfo.getPeerCertificates()[0] instanceof X509Certificate
         ) {
             return (X509Certificate)tlsInfo.getPeerCertificates()[0];
         }

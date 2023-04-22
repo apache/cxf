@@ -19,15 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs.cors;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 
 /**
@@ -49,9 +48,14 @@ public class UnannotatedCorsServer {
     }
 
     @GET
-    @CrossOriginResourceSharing(allowOrigins = {
-            "http://area51.mil:31415" },
-             exposeHeaders = {"X-custom-3", "X-custom-4" })
+    @CrossOriginResourceSharing(
+        allowOrigins = {
+            "http://area51.mil:31415" 
+        },
+        exposeHeaders = {
+            "X-custom-3", 
+            "X-custom-4" 
+        })
     @Produces("text/plain")
     @Path("/annotatedGet/{echo}")
     public String annotatedGet(@PathParam("echo") String echo) {

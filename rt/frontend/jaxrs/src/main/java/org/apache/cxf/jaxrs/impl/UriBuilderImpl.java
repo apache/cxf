@@ -33,12 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriBuilderException;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilderException;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -46,8 +45,18 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
+/**
+ * Implements the {@link UriBuilder} abstract class. A few notes with respect to CXF specifics:
+ * <ul>
+ *   <li>it uses standard {@link URI} internally, so it does not conform to 
+ *   RFC-3986 which {@link UriBuilder} mandates</li>
+ *   <li>it encodes URI components if it encounters '%XX' pattern within name (if applicable) or value (those
+ *   are treated as partially encoded)</li>
+ *  </ul
+ */
 public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private static final String EXPAND_QUERY_VALUE_AS_COLLECTION = "expand.query.value.as.collection";
+    private static final String USE_ARRAY_SYNTAX_FOR_QUERY_VALUES = "use.array.syntax.for.query.values";
 
     private String scheme;
     private String userInfo;
@@ -66,6 +75,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private Map<String, Object> resolvedEncodedTemplates;
 
     private boolean queryValueIsCollection;
+    private boolean useArraySyntaxForQueryParams;
 
     /**
      * Creates builder with empty URI.
@@ -78,6 +88,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      */
     public UriBuilderImpl(Map<String, Object> properties) {
         queryValueIsCollection = PropertyUtils.isTrue(properties, EXPAND_QUERY_VALUE_AS_COLLECTION);
+        useArraySyntaxForQueryParams = PropertyUtils.isTrue(properties, USE_ARRAY_SYNTAX_FOR_QUERY_VALUES);
     }
 
     /**
@@ -112,7 +123,13 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, false, values);
         try {
-            return buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            final URI uri = buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+            
+            if (!Rfc3986UriValidator.validate(uri)) {
+                throw new UriBuilderException("[" + uri + "] is not a valid HTTP URL");
+            }
+            
+            return uri;
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
@@ -367,7 +384,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         for (String var : uniqueVars) {
             boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
 
-            boolean isVarEncoded = isPathEncVar || alreadyResolvedTs.containsKey(var) ? false : true;
+            boolean isVarEncoded = !(isPathEncVar || alreadyResolvedTs.containsKey(var));
             Map<String, Object> resolved = isVarEncoded ? alreadyResolvedTsEnc
                 : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
             Object oval = resolved.isEmpty() ? null : resolved.remove(var);
@@ -444,6 +461,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             resolvedTemplates == null ? null : new HashMap<String, Object>(resolvedTemplates);
         builder.resolvedTemplatesPathEnc =
             resolvedTemplatesPathEnc == null ? null : new HashMap<String, Object>(resolvedTemplatesPathEnc);
+        builder.useArraySyntaxForQueryParams = useArraySyntaxForQueryParams;
         return builder;
     }
     // CHECKSTYLE:ON
@@ -513,7 +531,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         Path ann = method.getAnnotation(Path.class);
         if (ann == null) {
-            throw new IllegalArgumentException("Method '" + method.getClass().getCanonicalName() + "."
+            throw new IllegalArgumentException("Method '" + method.getDeclaringClass().getCanonicalName() + "."
                                                + method.getName() + "' is not annotated with Path");
         }
         // path(String) decomposes multi-segment path when necessary
@@ -865,7 +883,11 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
             // Expand query parameter as "name=v1,v2,v3"
             if (isQuery && queryValueIsCollection) {
-                b.append(entry.getKey()).append('=');
+                b.append(entry.getKey());
+                if (useArraySyntaxForQueryParams) {
+                    b.append("[]");
+                }
+                b.append('=');
 
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
@@ -899,6 +921,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                     String val = sit.next();
                     b.append(entry.getKey());
+                    if (useArraySyntaxForQueryParams) {
+                        b.append("[]");
+                    }
                     if (val != null) {
                         boolean templateValue = val.startsWith("{") && val.endsWith("}");
                         if (!templateValue) {

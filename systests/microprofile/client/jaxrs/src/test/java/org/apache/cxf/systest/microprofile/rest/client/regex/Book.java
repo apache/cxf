@@ -19,9 +19,9 @@
 
 package org.apache.cxf.systest.microprofile.rest.client.regex;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Book")
 public class Book {

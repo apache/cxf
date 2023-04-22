@@ -61,6 +61,11 @@ public class SwaggerUiConfig {
     private Boolean showCommonExtensions;
     // Set a different validator URL, for example for locally deployed validators
     private String validatorUrl;
+    // Controls whether the "Try it out" section should be enabled by default.
+    private Boolean tryItOutEnabled;
+    // Enables overriding configuration parameters via URL search params. If not explicitly set, it
+    // will be automatically set to true when setter for any other field is called.
+    private Boolean queryConfigEnabled;
     
     public String getConfigUrl() {
         return configUrl;
@@ -68,6 +73,7 @@ public class SwaggerUiConfig {
     
     public void setConfigUrl(final String configUrl) {
         this.configUrl = configUrl;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public String getUrl() {
@@ -76,6 +82,7 @@ public class SwaggerUiConfig {
     
     public void setUrl(final String url) {
         this.url = url;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public String getFilter() {
@@ -84,6 +91,7 @@ public class SwaggerUiConfig {
     
     public void setFilter(final String filter) {
         this.filter = filter;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Boolean getShowCommonExtensions() {
@@ -92,6 +100,7 @@ public class SwaggerUiConfig {
 
     public void setShowCommonExtensions(Boolean showCommonExtensions) {
         this.showCommonExtensions = showCommonExtensions;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Boolean getShowExtensions() {
@@ -104,6 +113,7 @@ public class SwaggerUiConfig {
 
     public void setMaxDisplayedTags(Integer maxDisplayedTags) {
         this.maxDisplayedTags = maxDisplayedTags;
+        setQueryConfigEnabledIfNeeded();
     }
 
     public SwaggerUiConfig maxDisplayedTags(Integer value) {
@@ -113,6 +123,7 @@ public class SwaggerUiConfig {
 
     public void setShowExtensions(Boolean showExtensions) {
         this.showExtensions = showExtensions;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public String getDocExpansion() {
@@ -121,6 +132,7 @@ public class SwaggerUiConfig {
 
     public void setDocExpansion(String docExpansion) {
         this.docExpansion = docExpansion;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Boolean getDisplayRequestDuration() {
@@ -129,6 +141,7 @@ public class SwaggerUiConfig {
 
     public void setDisplayRequestDuration(Boolean displayRequestDuration) {
         this.displayRequestDuration = displayRequestDuration;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public String getDefaultModelRendering() {
@@ -137,6 +150,7 @@ public class SwaggerUiConfig {
 
     public void setDefaultModelRendering(String defaultModelRendering) {
         this.defaultModelRendering = defaultModelRendering;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Integer getDefaultModelExpandDepth() {
@@ -145,6 +159,7 @@ public class SwaggerUiConfig {
 
     public void setDefaultModelExpandDepth(Integer defaultModelExpandDepth) {
         this.defaultModelExpandDepth = defaultModelExpandDepth;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Integer getDefaultModelsExpandDepth() {
@@ -153,6 +168,7 @@ public class SwaggerUiConfig {
 
     public void setDefaultModelsExpandDepth(Integer defaultModelsExpandDepth) {
         this.defaultModelsExpandDepth = defaultModelsExpandDepth;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Boolean getDisplayOperationId() {
@@ -161,6 +177,7 @@ public class SwaggerUiConfig {
 
     public void setDisplayOperationId(Boolean displayOperationId) {
         this.displayOperationId = displayOperationId;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public Boolean getDeepLinking() {
@@ -169,6 +186,7 @@ public class SwaggerUiConfig {
 
     public void setDeepLinking(Boolean deepLinking) {
         this.deepLinking = deepLinking;
+        setQueryConfigEnabledIfNeeded();
     }
     
 
@@ -178,6 +196,7 @@ public class SwaggerUiConfig {
 
     public void setValidatorUrl(String validatorUrl) {
         this.validatorUrl = validatorUrl;
+        setQueryConfigEnabledIfNeeded();
     }
     
     public SwaggerUiConfig validatorUrl(String value) {
@@ -240,9 +259,27 @@ public class SwaggerUiConfig {
         return this;
     }
 
+    public SwaggerUiConfig queryConfigEnabled(boolean enabled) {
+        setQueryConfigEnabled(enabled);
+        return this;
+    }
+
     public SwaggerUiConfig filter(final String f) {
         setFilter(f);
         return this;
+    }
+
+    public SwaggerUiConfig tryItOutEnabled(boolean tryItOut) {
+        setTryItOutEnabled(tryItOut);
+        return this;
+    }
+
+    public Boolean isQueryConfigEnabled() {
+        return queryConfigEnabled;
+    }
+
+    public void setQueryConfigEnabled(Boolean queryConfigEnabled) {
+        this.queryConfigEnabled = queryConfigEnabled;
     }
 
     public Map<String, String> getConfigParameters() {
@@ -262,6 +299,7 @@ public class SwaggerUiConfig {
         put("showExtensions", getShowExtensions(), params);
         put("showCommonExtensions", getShowCommonExtensions(), params);
         put("validatorUrl", getValidatorUrl(), params);
+        put("tryItOutEnabled", isTryItOutEnabled(), params);
 
         return params;
     }
@@ -282,5 +320,20 @@ public class SwaggerUiConfig {
         if (!StringUtils.isEmpty(value)) {
             params.put(name, value);
         }
+    }
+
+    private void setQueryConfigEnabledIfNeeded() {
+        if (queryConfigEnabled == null) {
+            setQueryConfigEnabled(true);
+        }
+    }
+
+    public Boolean isTryItOutEnabled() {
+        return tryItOutEnabled;
+    }
+
+    public void setTryItOutEnabled(Boolean tryItOutEnabled) {
+        this.tryItOutEnabled = tryItOutEnabled;
+        setQueryConfigEnabledIfNeeded();
     }
 }

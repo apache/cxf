@@ -30,15 +30,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
+import jakarta.validation.Valid;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -181,7 +180,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         methods.put("listRepositories", new Class<?>[] {});
         methods.put("createRepository", new Class<?>[] {java.io.IOException.class});
         methods.put("deleteRepository",
-                new Class<?>[] {javax.ws.rs.NotFoundException.class, java.io.IOException.class});
+                new Class<?>[] {jakarta.ws.rs.NotFoundException.class, java.io.IOException.class});
         methods.put("postThename", new Class<?>[] {java.io.IOException.class, java.lang.NoSuchMethodException.class});
         try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
             for (String className : cc.getServiceClassNames().values()) {
@@ -364,7 +363,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
         context.put(WadlToolConstants.CFG_SCHEMA_TYPE_MAP,
             "{http://www.w3.org/2005/08/addressing}EndpointReferenceType="
-            + "javax.xml.ws.wsaddressing.W3CEndpointReference");
+            + "jakarta.xml.ws.wsaddressing.W3CEndpointReference");
         context.put(WadlToolConstants.CFG_NO_ADDRESS_BINDING, "true");
         context.put(WadlToolConstants.CFG_NO_TYPES, "true");
 
@@ -806,6 +805,51 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
         verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 14, true);
         verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 14, true);
+    }
+
+    @Test
+    public void testCodeGenHyphen() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreHyphen.xml"));
+        context.put(WadlToolConstants.CFG_IMPL, "true");
+        context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
+        assertEquals(3, files.size());
+        assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "generated" + ".TestCompositeObject.class"));
+        assertTrue(checkContains(files, "generated" + ".ObjectFactory.class"));
+    }
+    
+    @Test
+    public void testCodeGenDigit() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstoreDigit.xml"));
+        context.put(WadlToolConstants.CFG_IMPL, "true");
+        context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+        container.setContext(context);
+        container.execute();
+
+        assertNotNull(output.list());
+
+        List<File> files = FileUtils.getFilesRecurseUsingSuffix(output, ".class");
+        assertEquals(4, files.size());
+        assertTrue(checkContains(files, "Api1" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
+        assertTrue(checkContains(files, "generated" + ".TestCompositeObject.class"));
+        assertTrue(checkContains(files, "generated" + ".ObjectFactory.class"));
     }
 
     @Test

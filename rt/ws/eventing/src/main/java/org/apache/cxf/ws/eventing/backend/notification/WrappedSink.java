@@ -18,14 +18,13 @@
  */
 package org.apache.cxf.ws.eventing.backend.notification;
 
-import javax.jws.Oneway;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.soap.Addressing;
-
+import jakarta.jws.Oneway;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.soap.Addressing;
 import org.apache.cxf.ws.eventing.EventType;
 import org.apache.cxf.ws.eventing.shared.EventingConstants;
 

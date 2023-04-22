@@ -20,10 +20,9 @@ package org.apache.cxf.systest.sts.kerberos;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -32,7 +31,7 @@ import org.junit.Assert;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class DoubleItPortTypeImpl implements DoubleItPortType {
 
     @Resource

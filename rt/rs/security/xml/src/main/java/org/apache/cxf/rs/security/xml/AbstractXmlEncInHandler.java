@@ -101,8 +101,8 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     // Subclasses can overwrite it and return the bytes, assuming they know the actual key
     protected byte[] getSymmetricKeyBytes(Message message, Element encDataElement) {
 
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
             propKey = SecurityConstants.SIGNATURE_PROPERTIES;

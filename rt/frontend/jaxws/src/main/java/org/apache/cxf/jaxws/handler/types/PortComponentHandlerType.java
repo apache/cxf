@@ -21,14 +21,14 @@ package org.apache.cxf.jaxws.handler.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlID;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Declares the handler for a port-component. Handlers can access the init-param name/value pairs using the
@@ -60,9 +60,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "port-component_handlerType", propOrder = {
-        "description", "displayName", "icon", "handlerName", "handlerClass", "initParam", "soapHeader",
-        "soapRole" })
+@XmlType(name = "port-component_handlerType", 
+    propOrder = {
+        "description", 
+        "displayName", 
+        "icon", 
+        "handlerName", 
+        "handlerClass", 
+        "initParam", 
+        "soapHeader",
+        "soapRole" 
+    })
 public class PortComponentHandlerType {
 
     protected List<DescriptionType> description;

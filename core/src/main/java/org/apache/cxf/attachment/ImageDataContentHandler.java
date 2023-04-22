@@ -23,8 +23,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,23 +31,23 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Iterator;
 
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataContentHandler;
-import javax.activation.DataSource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
+import jakarta.activation.ActivationDataFlavor;
+import jakarta.activation.DataContentHandler;
+import jakarta.activation.DataSource;
 import org.apache.cxf.helpers.IOUtils;
 
 /**
  *
  */
 public class ImageDataContentHandler implements DataContentHandler {
-    private static final DataFlavor[] FLAVORS;
+    private static final ActivationDataFlavor[] FLAVORS;
     static {
         String[] types = ImageIO.getReaderMIMETypes();
-        FLAVORS = new DataFlavor[types.length];
+        FLAVORS = new ActivationDataFlavor[types.length];
         int i = 0;
         for (String type : types) {
             FLAVORS[i++] = new ActivationDataFlavor(Image.class, type, "Image");
@@ -64,9 +62,9 @@ public class ImageDataContentHandler implements DataContentHandler {
         return ImageIO.read(ds.getInputStream());
     }
 
-    public Object getTransferData(DataFlavor df, DataSource ds) throws UnsupportedFlavorException,
-        IOException {
-        for (DataFlavor f : FLAVORS) {
+    @Override
+    public Object getTransferData(ActivationDataFlavor df, DataSource ds) throws IOException {
+        for (ActivationDataFlavor f : FLAVORS) {
             if (f.equals(df)) {
                 return getContent(ds);
             }
@@ -74,10 +72,12 @@ public class ImageDataContentHandler implements DataContentHandler {
         return null;
     }
 
-    public DataFlavor[] getTransferDataFlavors() {
+    @Override
+    public ActivationDataFlavor[] getTransferDataFlavors() {
         return FLAVORS;
     }
 
+    @Override
     public void writeTo(Object obj, String mimeType, OutputStream os) throws IOException {
         if (obj instanceof Image) {
             Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);

@@ -21,24 +21,24 @@ package org.apache.cxf.systest.jaxrs.provider;
 
 import java.util.Arrays;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -47,32 +47,40 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
+public class JsrJsonpProviderTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JsrJsonpProviderTest.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookJsonStore.class);
             sf.setResourceProvider(BookJsonStore.class,
                 new SingletonResourceProvider(new BookJsonStore()));
             sf.setProvider(new JsrJsonpProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
-            sf.create();
+            org.apache.cxf.endpoint.Server s = sf.create();
+            try {
+                sf.create();
+                fail();
+            } catch (Exception ex) {
+                assertTrue(ex.getCause() instanceof ServiceConstructionException);
+                assertTrue(ex.getCause().getMessage().startsWith("There is an endpoint already running on"));
+            }
+            try {
+                sf.create();
+                fail();
+            } catch (Exception ex) {
+                assertTrue(ex.getCause() instanceof ServiceConstructionException);
+                assertTrue(ex.getCause().getMessage().startsWith("There is an endpoint already running on"));
+            }
+            return s;
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -81,7 +89,6 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Before

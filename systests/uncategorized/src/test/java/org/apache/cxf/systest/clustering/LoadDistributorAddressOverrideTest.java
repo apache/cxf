@@ -22,8 +22,7 @@ package org.apache.cxf.systest.clustering;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceException;
-
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.clustering.LoadDistributorTargetSelector;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;

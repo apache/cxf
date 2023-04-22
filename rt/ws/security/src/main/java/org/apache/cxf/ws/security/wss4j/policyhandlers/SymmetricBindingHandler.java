@@ -29,12 +29,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -272,7 +272,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
 
                     if (!secondEncrParts.isEmpty()) {
-                        Element secondRefList = null;
+                        final Element secondRefList;
 
                         if (encryptionToken.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                             secondRefList = ((WSSecDKEncrypt)encr).encryptForExternalRef(null, secondEncrParts);
@@ -304,7 +304,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         assertTokenWrapper(sigAbstractTokenWrapper);
         AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
         String sigTokId = null;
-        Element sigTokElem = null;
 
         try {
             SecurityToken sigTok = null;
@@ -348,11 +347,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             boolean tokIncluded = true;
             if (isTokenRequired(sigToken.getIncludeTokenType())) {
                 Element el = sigTok.getToken();
-                sigTokElem = cloneElement(el);
+                Element sigTokElem = cloneElement(el);
                 this.addEncryptedKeyElement(sigTokElem);
             } else if (isRequestor() && sigToken instanceof X509Token) {
                 Element el = sigTok.getToken();
-                sigTokElem = cloneElement(el);
+                Element sigTokElem = cloneElement(el);
                 this.addEncryptedKeyElement(sigTokElem);
             } else {
                 tokIncluded = false;
@@ -384,7 +383,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             //Encryption
             AbstractTokenWrapper encrAbstractTokenWrapper = getEncryptionToken();
             AbstractToken encrToken = encrAbstractTokenWrapper.getToken();
-            SecurityToken encrTok = null;
+            final SecurityToken encrTok;
             if (sigToken.equals(encrToken)) {
                 //Use the same token
                 encrTok = sigTok;
@@ -414,12 +413,12 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             if (encrAbstractTokenWrapper.getToken() != null && !enc.isEmpty()) {
-                WSSecBase encr = null;
+                final WSSecBase encr;
                 if (encrAbstractTokenWrapper.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                     encr = doEncryptionDerived(encrAbstractTokenWrapper, encrTok, tokIncluded, enc, false);
                 } else {
                     byte[] ephemeralKey = encrTok.getSecret();
-                    SecretKey symmetricKey = null;
+                    final SecretKey symmetricKey;
                     String symEncAlgorithm = sbinding.getAlgorithmSuite().getAlgorithmSuiteType().getEncryption();
                     if (ephemeralKey != null) {
                         symmetricKey = KeyUtils.prepareSecretKey(symEncAlgorithm, ephemeralKey);
@@ -531,8 +530,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             dkEncr.setSymmetricEncAlgorithm(algType.getEncryption());
             dkEncr.setDerivedKeyLength(algType.getEncryptionDerivedKeyLength() / 8);
             dkEncr.prepare(encrTok.getSecret());
-            Element encrDKTokenElem = null;
-            encrDKTokenElem = dkEncr.getdktElement();
+            Element encrDKTokenElem = dkEncr.getdktElement();
             addDerivedKeyElement(encrDKTokenElem);
 
             Element refList = dkEncr.encryptForExternalRef(null, encrParts);
@@ -925,7 +923,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         AlgorithmSuiteType algType = sbinding.getAlgorithmSuite().getAlgorithmSuiteType();
         sig.setDigestAlgo(algType.getDigest());
         sig.setSigCanonicalization(sbinding.getAlgorithmSuite().getC14n().getValue());
-        Crypto crypto = null;
+        final Crypto crypto;
         if (sbinding.getProtectionToken() != null) {
             crypto = getEncryptionCrypto();
         } else {
@@ -1007,7 +1005,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (isTokenRequired(sigToken.getIncludeTokenType())) {
             boolean useMac = hasSignedPartsOrElements();
             byte[] salt = UsernameTokenUtil.generateSalt(useMac);
-            WSSecUsernameToken usernameToken = addDKUsernameToken(sigToken, salt, useMac);
+            WSSecUsernameToken usernameToken = addDKUsernameToken(sigToken, salt);
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey(salt);
             Arrays.fill(salt, (byte)0);

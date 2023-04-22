@@ -19,9 +19,9 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.Random;
 
 import org.w3c.dom.Element;
 
@@ -49,7 +49,6 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -201,7 +200,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
@@ -266,7 +268,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
@@ -300,7 +305,10 @@ public class SAMLProviderKeyTypeTest {
 
         Entropy entropy = new Entropy();
         BinarySecret binarySecret = new BinarySecret();
-        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecret.setBinarySecretValue(secret);
         entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
 
@@ -486,10 +494,9 @@ public class SAMLProviderKeyTypeTest {
 
         STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedC14nAlgorithms = new ArrayList<>();
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_WITH_COMMENTS);
-        sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
+        sigProperties.setAcceptedC14nAlgorithms(Arrays.asList(
+            WSS4JConstants.C14N_EXCL_OMIT_COMMENTS,
+            WSS4JConstants.C14N_EXCL_WITH_COMMENTS));
         stsProperties.setSignatureProperties(sigProperties);
 
         // This will succeed as the requested c14n algorithm is accepted

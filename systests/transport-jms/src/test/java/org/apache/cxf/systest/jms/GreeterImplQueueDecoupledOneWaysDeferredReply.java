@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 
 

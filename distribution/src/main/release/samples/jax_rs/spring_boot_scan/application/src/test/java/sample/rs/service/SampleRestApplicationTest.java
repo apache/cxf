@@ -19,18 +19,13 @@
 package sample.rs.service;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.springframework.boot.web.server.LocalServerPort;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = SampleRestApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SampleRestApplicationTest {
 
@@ -44,7 +39,7 @@ public class SampleRestApplicationTest {
         // HelloServiceImpl1
         wc.path("sayHello").path("ApacheCxfUser");
         String greeting = wc.get(String.class);
-        Assert.assertEquals("Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!", greeting); 
+        assertEquals("Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!", greeting); 
  
         // Reverse to the starting URI
         wc.back(true);
@@ -52,7 +47,7 @@ public class SampleRestApplicationTest {
         // HelloServiceImpl2
         wc.path("sayHello2").path("ApacheCxfUser");
         greeting = wc.get(String.class);
-        Assert.assertEquals("Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!", greeting); 
+        assertEquals("Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!", greeting); 
     }
 
 }

@@ -125,7 +125,7 @@
     <binding name="HelloWorldPortBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
@@ -170,7 +170,7 @@
     <binding name="HelloWorldPortSoapActionBinding" type="tns:HelloWorldSoapActionPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+        <jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
 
         <operation name="sayHi">
             <soap:operation soapAction="SAY_HI_1" style="rpc"/>
@@ -194,7 +194,7 @@
     <binding name="HelloWorldQueueBinMsgBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
     	<jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
  
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
@@ -224,7 +224,7 @@
     <binding name="HWStaticReplyQTextPortBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
 
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
@@ -254,7 +254,7 @@
     <binding name="HWStaticReplyQBinMsgBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
@@ -284,7 +284,7 @@
     <binding name="HWJMSAddressingBinding" type="tns:HelloWorldPortType">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMe">
             <soap:operation soapAction="" style="rpc"/>
             <input name="greetMe">
@@ -313,7 +313,7 @@
     <binding name="HelloWorldOneWayBinding" type="tns:HelloWorldOneWayPort">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">
@@ -324,7 +324,7 @@
     <binding name="HelloWorldPubSubBinding" type="tns:HelloWorldPubSubPort">
         <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
         <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
-  		<jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+  		<jms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
         <operation name="greetMeOneWay">
             <soap:operation style="rpc"/>
             <input name="greetMeOneWay">

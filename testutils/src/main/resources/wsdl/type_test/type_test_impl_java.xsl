@@ -22,7 +22,6 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:itst="http://tests.iona.com/ittests">
     
     <xsl:import href="inc_type_test_java_signature.xsl"/>
@@ -33,7 +32,7 @@
     <xsl:template match="/xsd:schema">
       <xsl:text>package org.apache.cxf.systest.type_test;&#10;&#10;</xsl:text>
       <xsl:text>import java.util.List;&#10;</xsl:text>
-      <xsl:text>import javax.xml.ws.Holder;&#10;&#10;</xsl:text>
+      <xsl:text>import jakarta.xml.ws.Holder;&#10;&#10;</xsl:text>
       <xsl:apply-templates select="itst:it_test_group[@ID]" mode="imports"/>
 <![CDATA[/**
  * org.apache.cxf.systest.type_test.TypeTestImpl

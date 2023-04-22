@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.systests.cdi.base;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 @Named @ApplicationScoped
 public class BookStoreAuthenticator {

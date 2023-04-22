@@ -59,6 +59,7 @@ public class FactoryInvoker extends AbstractInvoker {
         }
     }
 
+    @Override
     public void releaseServiceObject(final Exchange ex, Object obj) {
         factory.release(ex, obj);
     }

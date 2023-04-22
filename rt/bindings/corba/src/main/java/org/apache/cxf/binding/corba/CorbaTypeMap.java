@@ -67,7 +67,7 @@ public class CorbaTypeMap {
     // This is used by the Any type when trying to re-construct the type stored inside a
     // CORBA Any.
     public QName getIdlType(TypeCode tc) {
-        String repId = null;
+        final String repId;
         try {
             repId = tc.id();
         } catch (org.omg.CORBA.TypeCodePackage.BadKind ex) {

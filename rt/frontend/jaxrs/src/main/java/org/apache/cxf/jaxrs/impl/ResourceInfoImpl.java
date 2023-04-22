@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.lang.reflect.Method;
 
-import javax.ws.rs.container.ResourceInfo;
-
+import jakarta.ws.rs.container.ResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.message.Message;
 

@@ -23,11 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
@@ -44,6 +43,9 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
+import org.apache.cxf.jaxrs.resources.BookSuperClass;
+import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.jaxrs.resources.SuperBookStore;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -202,6 +204,19 @@ public class JAXRSClientFactoryBeanTest {
         assertNotNull(parts);
         IProductResource productResourceElement = parts.elementAt("1");
         assertNotNull(productResourceElement);
+    }
+    
+    @Test
+    public void testBookAndBridgeMethods() throws Exception {
+        SuperBookStore superBookResource = JAXRSClientFactory.create("http://localhost:9000",
+                SuperBookStore.class);
+        assertNotNull(superBookResource);
+        
+        Book book = ((BookSuperClass)superBookResource).getNewBook("id4", true);
+        assertNotNull(book);
+        
+        SuperBook superBook = (SuperBook)superBookResource.getNewBook("id4", true);
+        assertNotNull(superBook);
     }
 
     @Test

@@ -20,11 +20,11 @@
 package org.apache.cxf.greeter_control;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.types.FaultDetail;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
@@ -41,7 +41,7 @@ public class AbstractGreeterImpl implements Greeter {
     private long delay;
     private String lastOnewayArg;
     private boolean throwAlways;
-    private boolean useLastOnewayArg;
+    private AtomicBoolean useLastOnewayArg = new AtomicBoolean();
     private int pingMeCount;
 
     public long getDelay() {
@@ -58,10 +58,8 @@ public class AbstractGreeterImpl implements Greeter {
         }
     }
 
-    public void useLastOnewayArg(Boolean use) {
-        synchronized (this) {
-            useLastOnewayArg = use;
-        }
+    public void useLastOnewayArg(boolean use) {
+        useLastOnewayArg.set(use);
     }
 
     public void setThrowAlways(boolean t) {
@@ -77,10 +75,7 @@ public class AbstractGreeterImpl implements Greeter {
                 // ignore
             }
         }
-        String result = null;
-        synchronized (this) {
-            result = useLastOnewayArg ? lastOnewayArg : arg0.toUpperCase();
-        }
+        String result = useLastOnewayArg.get() ? lastOnewayArg : arg0.toUpperCase();
         LOG.fine("returning: " + result);
         return result;
     }

@@ -48,18 +48,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -78,6 +66,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessOrder;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorOrder;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
+import jakarta.xml.bind.attachment.AttachmentMarshaller;
+import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -196,7 +196,7 @@ public final class JAXBEncoderDecoder {
             // generate the xml declaration.
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-        } catch (javax.xml.bind.PropertyException e) {
+        } catch (jakarta.xml.bind.PropertyException e) {
             // intentionally empty.
         }
 
@@ -261,7 +261,7 @@ public final class JAXBEncoderDecoder {
             }
         } catch (Fault ex) {
             throw ex;
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage());
             throw new Fault(faultMessage, ex);
@@ -304,7 +304,7 @@ public final class JAXBEncoderDecoder {
             } else {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage());
             throw new Fault(faultMessage, ex);
@@ -335,7 +335,7 @@ public final class JAXBEncoderDecoder {
             } else {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage());
             throw new Fault(faultMessage, ex);
@@ -478,7 +478,7 @@ public final class JAXBEncoderDecoder {
     }
 
     private static String getName(Member m1) {
-        String m1Name = null;
+        final String m1Name;
         if (m1 instanceof Field) {
             m1Name = ((Field)m1).getName();
         } else {
@@ -498,7 +498,7 @@ public final class JAXBEncoderDecoder {
             return;
         }
         Object objArray;
-        Class<?> cls = null;
+        final Class<?> cls;
         if (mObj instanceof List) {
             List<?> l = (List<?>)mObj;
             objArray = l.toArray();
@@ -539,7 +539,7 @@ public final class JAXBEncoderDecoder {
             }
 
             Class<?> cls = part.getTypeClass();
-            Object obj = null;
+            Object obj;
             try {
                 Constructor<?> cons = cls.getConstructor();
                 obj = cons.newInstance();
@@ -584,7 +584,7 @@ public final class JAXBEncoderDecoder {
                         m = Utils.getMethod(cls, accessType, "is" + s);
                     }
                     Type type = m.getGenericReturnType();
-                    Object o = null;
+                    Object o;
                     if (JAXBSchemaInitializer.isArray(type)) {
                         Class<?> compType = JAXBSchemaInitializer
                             .getArrayComponentType(type);
@@ -763,7 +763,7 @@ public final class JAXBEncoderDecoder {
         }
         Collection<Object> c;
         try {
-            c = CastUtils.cast((Collection<?>)tp2.newInstance());
+            c = CastUtils.cast((Collection<?>)tp2.getDeclaredConstructor().newInstance());
         } catch (Exception e) {
             c = new HashSet<>();
         }
@@ -800,7 +800,7 @@ public final class JAXBEncoderDecoder {
                 Class<?> cls = (Class<?>)tp2;
                 if (!cls.isInterface() && List.class.isAssignableFrom(cls)) {
                     try {
-                        return CastUtils.cast((List<?>)cls.newInstance());
+                        return CastUtils.cast((List<?>)cls.getDeclaredConstructor().newInstance());
                     } catch (Exception e) {
                         // ignore, just return an ArrayList
                     }
@@ -836,7 +836,7 @@ public final class JAXBEncoderDecoder {
                                       final Class<?> clazz,
                                       final boolean unwrap) throws Exception {
 
-        Object obj = null;
+        final Object obj;
         boolean unmarshalWithClass = true;
 
         if (clazz == null
@@ -924,8 +924,8 @@ public final class JAXBEncoderDecoder {
             if (ex instanceof Fault) {
                 throw (Fault)ex;
             }
-            if (ex instanceof javax.xml.bind.UnmarshalException) {
-                javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
+            if (ex instanceof jakarta.xml.bind.UnmarshalException) {
+                jakarta.xml.bind.UnmarshalException unmarshalEx = (jakarta.xml.bind.UnmarshalException)ex;
                 if (unmarshalEx.getLinkedException() != null) {
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
                                             unmarshalEx.getLinkedException().getMessage()), ex);
@@ -1109,7 +1109,7 @@ public final class JAXBEncoderDecoder {
             return ret;
         } catch (Fault ex) {
             throw ex;
-        } catch (javax.xml.bind.MarshalException ex) {
+        } catch (jakarta.xml.bind.MarshalException ex) {
             throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getLinkedException()
                 .getMessage()), ex);
         } catch (Exception ex) {

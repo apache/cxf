@@ -18,11 +18,10 @@
  */
 package org.apache.cxf.systest.ws.policy.handler;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 

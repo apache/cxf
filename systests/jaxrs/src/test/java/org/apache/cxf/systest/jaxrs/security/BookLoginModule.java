@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,17 +34,13 @@ public class BookLoginModule implements LoginModule {
 
     public BookLoginModule() {
         try {
-            module = LOGIN_MODULE_C.newInstance();
+            module = LOGIN_MODULE_C.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
-        try {
-            fileResource = getClass()
-                .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties")
-                .toURI().getPath();
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
+        fileResource = getClass()
+            .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties")
+            .toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +78,8 @@ public class BookLoginModule implements LoginModule {
         Map<String, String> customOptions = new HashMap<>();
         customOptions.put("file", fileResource);
 
-        module.initialize(subject, handler, sharedState, customOptions);
+        // See please https://github.com/eclipse/jetty.project/issues/5486
+        BookLoginService.withInstance(() -> module.initialize(subject, handler, sharedState, customOptions));
     }
 
     public boolean login() throws LoginException {

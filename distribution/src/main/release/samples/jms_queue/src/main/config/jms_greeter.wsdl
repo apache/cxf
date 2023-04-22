@@ -123,7 +123,7 @@
         <wsdl:port binding="tns:JMSGreeterPortBinding" name="GreeterPort">
         	<soap:address location="jms:queue:test.cxf.jmstransport.queue"/>
         	<soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
-            <soapjms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
+            <soapjms:jndiInitialContextFactory>org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory</soapjms:jndiInitialContextFactory>
  			<soapjms:jndiURL>tcp://localhost:61616</soapjms:jndiURL>
         </wsdl:port>
     </wsdl:service>

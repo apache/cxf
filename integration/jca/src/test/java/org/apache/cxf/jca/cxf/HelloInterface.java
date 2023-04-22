@@ -19,8 +19,8 @@
 package org.apache.cxf.jca.cxf;
 
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService()
 //@WebService

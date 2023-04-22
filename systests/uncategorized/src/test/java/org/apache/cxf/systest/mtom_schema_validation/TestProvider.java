@@ -21,26 +21,26 @@ package org.apache.cxf.systest.mtom_schema_validation;
 
 import java.io.StringReader;
 
-import javax.jws.soap.SOAPBinding;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Provider;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
 
 import org.xml.sax.InputSource;
 
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
 
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http")
-@ServiceMode(value = javax.xml.ws.Service.Mode.PAYLOAD)
+@ServiceMode(value = jakarta.xml.ws.Service.Mode.PAYLOAD)
 @WebServiceProvider(targetNamespace = "http://cxf.apache.org/", serviceName = "HelloWS", portName = "hello")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @EndpointProperties(value = {
-                             @EndpointProperty(key = "schema-validation-enabled", value = "true"),
-                             @EndpointProperty(key = "mtom-enabled", value = "true")
-                    })
+    @EndpointProperty(key = "schema-validation-enabled", value = "true"),
+    @EndpointProperty(key = "mtom-enabled", value = "true")
+})
 public class TestProvider implements Provider<SAXSource> {
 
     private String successRsp = "<ns2:helloResponse xmlns:ns2=\"http://cxf.apache.org/\">"

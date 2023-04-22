@@ -21,21 +21,22 @@ package org.apache.cxf.systest.mtom;
 import java.io.InputStream;
 import java.util.Collections;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPBinding;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.mime.TestMtom;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
 
 import org.junit.AfterClass;
@@ -43,21 +44,24 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ClientMtomXopWithJMSTest {
+public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomJMSPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomJMSService");
 
     private static Bus bus;
     private static ConnectionFactoryFeature cff;
-
+    private static EmbeddedJMSBrokerLauncher broker;
+    
     @BeforeClass
     public static void startServers() throws Exception {
+        broker = new EmbeddedJMSBrokerLauncher("vm://localhost");
+        launchServer(broker);
+        
         Object implementor = new TestMtomJMSImpl();
         bus = BusFactory.getDefaultBus();
 
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        PooledConnectionFactory cfp = new PooledConnectionFactory(cf);
-        cff = new ConnectionFactoryFeature(cfp);
+        cff = new ConnectionFactoryFeature(cf);
 
         EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
         ep.getFeatures().add(cff);

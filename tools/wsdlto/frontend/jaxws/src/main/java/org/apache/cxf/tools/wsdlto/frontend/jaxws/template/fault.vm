@@ -18,9 +18,9 @@
 package $expClass.PackageName;
 
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 #foreach ($import in $expClass.Imports)
 import ${import};
 #end
@@ -56,7 +56,7 @@ public class $expClass.Name extends $exceptionSuperclass {
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    $field.Modifier $field.ClassName $paraName;
+    $field.Modifier $field.ClassName faultInfo;
 
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
@@ -84,7 +84,7 @@ public class $expClass.Name extends $exceptionSuperclass {
 #end
     public ${expClass.Name}(String message, $field.ClassName $paraName) {
         super(message);
-        this.$paraName = $paraName;
+        this.faultInfo = $paraName;
     }
 
 #if ($markGenerated == "true")
@@ -92,14 +92,14 @@ public class $expClass.Name extends $exceptionSuperclass {
 #end
     public ${expClass.Name}(String message, $field.ClassName $paraName, java.lang.Throwable cause) {
         super(message, cause);
-        this.$paraName = $paraName;
+        this.faultInfo = $paraName;
     }
 
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public $field.ClassName getFaultInfo() {
-        return this.$paraName;
+        return this.faultInfo;
     }
 #end
 }

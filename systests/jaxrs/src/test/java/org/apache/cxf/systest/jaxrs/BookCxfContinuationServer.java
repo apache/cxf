@@ -19,32 +19,27 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
-public class BookCxfContinuationServer extends AbstractBusTestServerBase {
+public class BookCxfContinuationServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookCxfContinuationServer.class);
 
-    protected void run() {
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookCxfContinuationStore.class);
         sf.setResourceProvider(BookCxfContinuationStore.class,
                                new SingletonResourceProvider(new BookCxfContinuationStore()));
         sf.setAddress("http://localhost:" + PORT + "/");
 
-        sf.create();
+        return sf.create();
     }
 
-    public static void main(String[] args) {
-        try {
-            BookCxfContinuationServer s = new BookCxfContinuationServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new BookCxfContinuationServer().start();
     }
 }

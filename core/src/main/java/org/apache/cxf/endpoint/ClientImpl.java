@@ -38,8 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.handler.MessageContext;
 
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
@@ -246,6 +246,7 @@ public class ClientImpl
         responseContext.remove(t);
     }
 
+    @Override
     public Contexts getContexts() {
         return new Contexts() {
             @Override
@@ -266,10 +267,7 @@ public class ClientImpl
     public Map<String, Object> getRequestContext() {
         if (isThreadLocalRequestContext()) {
             final Thread t = Thread.currentThread();
-            if (!requestContext.containsKey(t)) {
-                EchoContext freshRequestContext = new EchoContext(currentRequestContext);
-                requestContext.put(t, freshRequestContext);
-            }
+            requestContext.computeIfAbsent(t, k -> new EchoContext(currentRequestContext));
             latestContextThread = t;
             return requestContext.get(t);
         }

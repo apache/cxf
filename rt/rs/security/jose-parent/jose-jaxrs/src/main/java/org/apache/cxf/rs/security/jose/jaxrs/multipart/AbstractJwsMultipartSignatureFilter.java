@@ -46,16 +46,16 @@ public abstract class AbstractJwsMultipartSignatureFilter {
     }
     
     protected List<Object> getAttachmentParts(Object rootEntity) {
-        List<Object> parts = null;
+        final List<Object> parts;
         
         if (rootEntity instanceof MultipartBody) {
             parts = CastUtils.cast(((MultipartBody)rootEntity).getAllAttachments());
         } else {
-            parts = new ArrayList<>();
             if (rootEntity instanceof List) {
                 List<Object> entityList = CastUtils.cast((List<?>)rootEntity);
-                parts.addAll(entityList);
+                parts = new ArrayList<>(entityList);
             } else {
+                parts = new ArrayList<>(2);
                 parts.add(rootEntity);
             }
         }
@@ -67,7 +67,7 @@ public abstract class AbstractJwsMultipartSignatureFilter {
         JwsSignature jwsSignature = theSigProvider.createJwsSignature(headers);
         
         String base64UrlEncodedHeaders = Base64UrlUtility.encode(writer.toJson(headers));
-        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + ".");
+        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + '.');
         jwsSignature.update(headerBytesWithDot, 0, headerBytesWithDot.length);
         AttachmentUtils.addMultipartOutFilter(new JwsMultipartSignatureOutFilter(jwsSignature));
         

@@ -20,18 +20,19 @@ package org.apache.cxf.systest.microprofile.rest.client.tracing.brave;
 
 import java.net.URI;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import brave.ScopedSpan;
 import brave.Tracing;
 import brave.sampler.Sampler;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.microprofile.rest.client.tracing.BookRestClient;
 import org.apache.cxf.systest.microprofile.rest.client.tracing.BookStore;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
@@ -40,7 +41,6 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -48,18 +48,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertTrue;
 
-public class BraveTracingTest extends AbstractBusClientServerTestBase {
+public class BraveTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(BraveTracingTest.class);
 
     private Tracing brave;
     private BraveClientProvider braveClientProvider;
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             final Tracing brave = Tracing
                     .newBuilder()
-                    .spanReporter(new TestSpanReporter())
+                    .addSpanHandler(new TestSpanHandler())
                     .sampler(Sampler.ALWAYS_SAMPLE)
                     .build();
 
@@ -69,7 +69,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new BraveFeature(brave));
-            sf.create();
+            return sf.create();
         }
     }
 
@@ -78,16 +78,15 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Before
     public void setUp() {
-        TestSpanReporter.clear();
+        TestSpanHandler.clear();
 
         brave = Tracing
                 .newBuilder()
-                .spanReporter(new TestSpanReporter())
+                .addSpanHandler(new TestSpanHandler())
                 .sampler(Sampler.ALWAYS_SAMPLE)
                 .build();
 
@@ -99,14 +98,14 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         final BookRestClient client = createRestClient();
         assertThat(client.getBooks(), hasSize(2));
 
-        assertThat(TestSpanReporter.getAllSpans().size(), 
+        assertThat(TestSpanHandler.getAllSpans().size(), 
             equalTo(3));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(0).name(), 
             equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(), 
-            equalTo("get /bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name(), 
-            equalTo("get http://localhost:" + PORT + "/bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(1).name(), 
+            equalTo("GET /bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(2).name(), 
+            equalTo("GET http://localhost:" + PORT + "/bookstore/books"));
     }
 
     @Test
@@ -114,14 +113,14 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         final BookRestClient client = createAsyncRestClient();
         assertThat(client.getBooks(), hasSize(2));
 
-        assertThat(TestSpanReporter.getAllSpans().size(), 
+        assertThat(TestSpanHandler.getAllSpans().size(), 
             equalTo(3));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(0).name(), 
             equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(), 
-            equalTo("get /bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name(), 
-            equalTo("get http://localhost:" + PORT + "/bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(1).name(), 
+            equalTo("GET /bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(2).name(), 
+            equalTo("GET http://localhost:" + PORT + "/bookstore/books"));
     }
 
     @Test
@@ -135,15 +134,15 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             span.finish();
         }
 
-        assertThat(TestSpanReporter.getAllSpans().size(), 
+        assertThat(TestSpanHandler.getAllSpans().size(), 
             equalTo(4));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(0).name(), 
             equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(), 
-            equalTo("get /bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name(), 
-            equalTo("get http://localhost:" + PORT + "/bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(3).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(1).name(), 
+            equalTo("GET /bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(2).name(), 
+            equalTo("GET http://localhost:" + PORT + "/bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(3).name(), 
             equalTo("calling book service"));
     }
     
@@ -158,15 +157,15 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             span.finish();
         }
 
-        assertThat(TestSpanReporter.getAllSpans().size(), 
+        assertThat(TestSpanHandler.getAllSpans().size(), 
             equalTo(4));
-        assertThat(TestSpanReporter.getAllSpans().get(0).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(0).name(), 
             equalTo("get books"));
-        assertThat(TestSpanReporter.getAllSpans().get(1).name(), 
-            equalTo("get /bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(2).name(), 
-            equalTo("get http://localhost:" + PORT + "/bookstore/books"));
-        assertThat(TestSpanReporter.getAllSpans().get(3).name(), 
+        assertThat(TestSpanHandler.getAllSpans().get(1).name(), 
+            equalTo("GET /bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(2).name(), 
+            equalTo("GET http://localhost:" + PORT + "/bookstore/books"));
+        assertThat(TestSpanHandler.getAllSpans().get(3).name(), 
             equalTo("calling book service"));
     }
     

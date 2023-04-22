@@ -20,7 +20,7 @@ package org.apache.cxf.tools.fortest.xmllist;
 
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType")
 public class AddNumberImpl implements AddNumbersPortType {

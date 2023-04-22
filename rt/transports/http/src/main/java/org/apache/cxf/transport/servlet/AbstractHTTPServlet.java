@@ -28,24 +28,25 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -243,11 +244,17 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         throws ServletException, IOException {
         handleRequest(request, response);
     }
+    
+    @Override
+    protected void doTrace(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        handleRequest(request, response);
+    }
 
     /**
      * {@inheritDoc}
      *
-     * javax.http.servlet.HttpServlet does not let to override the code which deals with
+     * jakarta.http.servlet.HttpServlet does not let to override the code which deals with
      * unrecognized HTTP verbs such as PATCH (being standardized), WebDav ones, etc.
      * Thus we let CXF servlets process unrecognized HTTP verbs directly, otherwise we delegate
      * to HttpService
@@ -277,14 +284,14 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected void handleRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException {
         if ((dispatcherServletPath != null || dispatcherServletName != null)
-            && (redirectList != null && matchPath(redirectList, request)
+            && (redirectList != null && matchPath(redirectQueryCheck, redirectList, request)
                 || redirectList == null)) {
             // if no redirectList is provided then this servlet is redirecting only
             redirect(request, response, request.getPathInfo());
             return;
         }
         boolean staticResourcesMatch = staticResourcesList != null
-            && matchPath(staticResourcesList, request);
+            && matchPath(false, staticResourcesList, request);
         boolean staticWelcomeFileMatch = staticWelcomeFile != null
             && (StringUtils.isEmpty(request.getPathInfo()) || "/".equals(request.getPathInfo()));
         if (staticResourcesMatch || staticWelcomeFileMatch) {
@@ -303,7 +310,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             String originalPrefix = request.getHeader(X_FORWARDED_PREFIX_HEADER);
             String originalHost = request.getHeader(X_FORWARDED_HOST_HEADER);
             String originalPort = request.getHeader(X_FORWARDED_PORT_HEADER);
-            if (originalProtocol != null || originalRemoteAddr != null) {
+            
+            // If at least one of the X-Forwarded-Xxx headers is set, try to use them
+            if (Stream.of(originalProtocol, originalRemoteAddr, originalPrefix, 
+                    originalHost, originalPort).anyMatch(Objects::nonNull)) {
                 return new HttpServletRequestXForwardedFilter(request, 
                                                               originalProtocol, 
                                                               originalRemoteAddr,
@@ -318,12 +328,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     }
 
 
-    private boolean matchPath(List<Pattern> values, HttpServletRequest request) {
+    private static boolean matchPath(boolean checkRedirect, List<Pattern> values, HttpServletRequest request) {
         String path = request.getPathInfo();
         if (path == null) {
             path = "/";
         }
-        if (redirectQueryCheck) {
+        if (checkRedirect) {
             String queryString = request.getQueryString();
             if (queryString != null && !queryString.isEmpty()) {
                 path += "?" + queryString;

@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.databinding.DataBinding;
@@ -97,7 +97,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         if (serviceName != null) {
             return serviceName;
         }
-        if (address == null) {
+        if (address == null && !classResourceInfos.isEmpty()) {
             Class<?> primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
             return new QName(ns, primaryClass.getSimpleName());

@@ -18,10 +18,10 @@
  */
 package demo.jaxrs.sse;
 
-import javax.inject.Inject;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;

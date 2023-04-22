@@ -28,10 +28,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ws.rs.RuntimeType;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Feature;
-
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Feature;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
@@ -235,7 +234,7 @@ public class ConfigurationImpl implements Configuration {
 
     public static Object createProvider(Class<?> cls) {
         try {
-            return cls.newInstance();
+            return cls.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }

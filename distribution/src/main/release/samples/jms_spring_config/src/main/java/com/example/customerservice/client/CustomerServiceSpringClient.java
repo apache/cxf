@@ -18,6 +18,7 @@
  */
 package com.example.customerservice.client;
 
+import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -28,12 +29,13 @@ public final class CustomerServiceSpringClient {
     }
 
     public static void main(String[] args) throws Exception {
-        ClassPathXmlApplicationContext context
-            = new ClassPathXmlApplicationContext(new String[] {"classpath:client-applicationContext.xml"});
-        CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");
-
-        client.testCustomerService();
-
-        context.close();
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext(new String[] {"classpath:client-applicationContext.xml"})) {
+            CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");
+            client.testCustomerService();
+        }
+        
+        // Shutdown ActiveMQ client pools
+        ActiveMQClient.clearThreadPools();
     }
 }

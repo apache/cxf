@@ -22,9 +22,9 @@ package org.apache.cxf.binding.xml.interceptor;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
@@ -77,7 +77,8 @@ public class TestBase {
         Bus bus = BusFactory.getDefaultBus();
 
         WSDLManagerImpl manager = new WSDLManagerImpl();
-        XMLWSDLExtensionLoader.registerExtensors(manager);
+        XMLWSDLExtensionLoader loader = new XMLWSDLExtensionLoader(bus);
+        loader.registerExtensors(manager);
 
         assertNotNull(bus.getExtension(WSDLManager.class));
 

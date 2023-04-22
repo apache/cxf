@@ -28,18 +28,16 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>container-integration</module>
         <module>uncategorized</module>
         <module>transports</module>
         <module>forked</module>
-        <module>transport-jms</module>
         <module>transport-undertow</module>
         <module>jaxws</module>
         <module>databinding</module>
-        <module>jaxrs</module>
         <module>ws-specs</module>
         <module>ws-rm</module>
         <module>ws-security</module>
@@ -55,5 +53,9 @@
         <module>rs-sse</module>
         <module>microprofile</module>
         <module>spring-boot</module>
+        <module>transport-netty</module>
+        <module>transport-hc5</module>
+        <module>transport-jms</module>
+        <module>jaxrs</module>
     </modules>
 </project>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import javax.xml.bind.DatatypeConverter 
+import jakarta.xml.bind.DatatypeConverter 
 
 File generatedFile = new File( basedir, 'target/generated-sources/cxf/org/apache/cxf/w2j/hello_world_soap_http/Greeter.java' )
 String generatedDate = DatatypeConverter.printDateTime(Calendar.getInstance()).substring(1, 10)

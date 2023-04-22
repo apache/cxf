@@ -32,11 +32,11 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -235,8 +235,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
 
             if (encToken != null) {
-                WSSecBase encr = null;
                 if (encToken.getToken() != null && !enc.isEmpty()) {
+                    final WSSecBase encr;
                     if (encToken.getToken().getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
                         encr = doEncryptionDerived(encToken, enc);
                     } else {
@@ -342,7 +342,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             unassertPolicy(encryptionToken, ex);
         }
 
-        List<WSEncryptionPart> encrParts = null;
+        final List<WSEncryptionPart> encrParts;
         try {
             encrParts = getEncryptedParts();
             //Signed parts are determined before encryption because encrypted signed headers
@@ -492,7 +492,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             Crypto crypto = getEncryptionCrypto();
 
-            SecurityToken securityToken = null;
+            final SecurityToken securityToken;
             try {
                 securityToken = getSecurityToken();
                 if (!isRequestor() && securityToken != null

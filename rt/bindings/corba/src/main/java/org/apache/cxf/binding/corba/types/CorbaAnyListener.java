@@ -117,7 +117,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
 
 
     private QName convertSchemaToIdlType(QName schemaType) {
-        QName idlType = null;
+        final QName idlType;
         if (CorbaAnyHelper.isPrimitiveSchemaType(schemaType)) {
             idlType = CorbaAnyHelper.convertPrimitiveSchemaToIdlType(schemaType);
         } else {

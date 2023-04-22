@@ -28,17 +28,18 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.Service;
-import javax.xml.ws.spi.Provider;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.spi.Provider;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
 
 public class WSNHelper {
@@ -90,7 +91,7 @@ public class WSNHelper {
                 if (endpoint.getProperties() == null) {
                     endpoint.setProperties(new HashMap<String, Object>());
                 }
-                endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
+                endpoint.getProperties().put(Message.WSDL_DESCRIPTION, wsdlLocation.toExternalForm());
                 List<Source> mt = new ArrayList<>();
                 StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                 mt.add(src);

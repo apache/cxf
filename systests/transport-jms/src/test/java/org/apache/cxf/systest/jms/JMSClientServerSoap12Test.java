@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jms;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.AddressingFeature;
 
+import jakarta.xml.ws.soap.AddressingFeature;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;

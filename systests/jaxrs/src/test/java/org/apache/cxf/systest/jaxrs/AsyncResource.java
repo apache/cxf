@@ -18,19 +18,20 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
 
 @Path("resource")
 public class AsyncResource {
@@ -78,9 +79,7 @@ public class AsyncResource {
     }
 
     protected static AsyncResponse takeAsyncResponse(int stageId) {
-        AsyncResponse asyncResponse = null;
-        asyncResponse = ASYNC_RESPONSES[stageId].take();
-        return asyncResponse;
+        return ASYNC_RESPONSES[stageId].take();
     }
 
     protected static final void addResponse(AsyncResponse response, String stageId) {
@@ -97,7 +96,7 @@ public class AsyncResource {
     }
 
     private static class AsyncResponseQueue {
-        Queue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
 
         public void add(AsyncResponse asyncResponse) {
             queue.add(asyncResponse);
@@ -105,7 +104,11 @@ public class AsyncResource {
         }
 
         public AsyncResponse take() {
-            return queue.remove();
+            try {
+                return queue.poll(50, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) {
+                return null;
+            }
         }
 
     }

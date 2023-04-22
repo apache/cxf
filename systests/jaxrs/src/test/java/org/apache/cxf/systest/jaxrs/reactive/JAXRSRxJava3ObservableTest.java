@@ -22,12 +22,16 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.GenericType;
-import javax.xml.ws.Holder;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.rx3.client.ObservableRxInvoker;
@@ -36,6 +40,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.TestObserver;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -88,7 +93,71 @@ public class JAXRSRxJava3ObservableTest extends AbstractBusClientServerTestBase 
         String address = "http://localhost:" + PORT + "/rx3/observable/textJsonList";
         doTestGetHelloWorldJsonList(address);
     }
+    
+    @Test
+    public void testGetHelloWorldEmpty() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx3/observable/empty";
+        
+        final Observable<Response> obs = ClientBuilder
+            .newClient()
+            .register(new JacksonJsonProvider())
+            .register(new ObservableRxInvokerProvider())
+            .target(address)
+            .request(MediaType.APPLICATION_JSON)
+            .rx(ObservableRxInvoker.class)
+            .get();
+        
+        final TestObserver<Response> subscriber = new TestObserver<>();
+        obs.subscribe(subscriber);
 
+        subscriber.await(3, TimeUnit.SECONDS);
+        subscriber
+            .assertValue(r -> "[]".equals(r.readEntity(String.class)))
+            .assertComplete();
+    }
+    
+    @Test
+    public void testObservableImmediateErrors() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx3/observable/immediate/errors";
+        
+        final Observable<HelloWorldBean> obs = ClientBuilder
+            .newClient()
+            .register(new JacksonJsonProvider())
+            .register(new ObservableRxInvokerProvider())
+            .target(address)
+            .request(MediaType.APPLICATION_JSON)
+            .rx(ObservableRxInvoker.class)
+            .get(HelloWorldBean.class);
+        
+        final TestObserver<HelloWorldBean> subscriber = new TestObserver<>();
+        obs.subscribe(subscriber);
+
+        subscriber.await(3, TimeUnit.SECONDS);
+        subscriber.assertError(InternalServerErrorException.class);
+    }
+    
+    @Test
+    public void testObservableImmediateErrorsWithExceptionMapper() throws Exception {
+        String address = "http://localhost:" + PORT + "/rx3/observable/immediate/mapper/errors";
+        
+        final Observable<Response> obs = ClientBuilder
+                .newClient()
+                .register(new JacksonJsonProvider())
+                .register(new ObservableRxInvokerProvider())
+                .target(address)
+                .request(MediaType.APPLICATION_JSON)
+                .rx(ObservableRxInvoker.class)
+                .get();
+        
+        final TestObserver<Response> subscriber = new TestObserver<>();
+        obs.subscribe(subscriber);
+
+        subscriber.await(3, TimeUnit.SECONDS);
+        subscriber
+            .assertValue(r -> r.getStatus() == 409 && r.readEntity(String.class).contains("stackTrace"))
+            .assertComplete();
+    }
+    
     private void doTestGetHelloWorldJsonList(String address) throws Exception {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));

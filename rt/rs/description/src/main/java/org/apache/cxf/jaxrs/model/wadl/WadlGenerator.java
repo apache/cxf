@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -50,30 +51,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletRequest;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -87,11 +65,35 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.Encoded;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.MatrixParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBBeanInfo;
@@ -153,7 +155,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private static final String DEFAULT_NS_PREFIX = "prefix";
     private static final Map<ParameterType, Class<? extends Annotation>> PARAMETER_TYPE_MAP;
     static {
-        PARAMETER_TYPE_MAP = new HashMap<>();
+        PARAMETER_TYPE_MAP = new EnumMap<>(ParameterType.class);
         PARAMETER_TYPE_MAP.put(ParameterType.FORM, FormParam.class);
         PARAMETER_TYPE_MAP.put(ParameterType.QUERY, QueryParam.class);
         PARAMETER_TYPE_MAP.put(ParameterType.HEADER, HeaderParam.class);
@@ -189,7 +191,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private ElementQNameResolver resolver;
     private List<String> privateAddresses;
-    private List<String> whiteList;
+    private List<String> allowList;
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
@@ -238,7 +240,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
             if (stylesheetReference != null || !docLocationMap.isEmpty()) {
                 String path = ui.getPath(false);
-                if (path.startsWith("/") && path.length() > 0) {
+                if (path.startsWith("/") && !path.isEmpty()) {
                     path = path.substring(1);
                 }
                 if (stylesheetReference != null && path.endsWith(".xsl")
@@ -254,17 +256,17 @@ public class WadlGenerator implements ContainerRequestFilter {
             return;
         }
 
-        if (whiteList != null && !whiteList.isEmpty()) {
+        if (allowList != null && !allowList.isEmpty()) {
             ServletRequest servletRequest = (ServletRequest)m.getContextualProperty(
                 "HTTP.REQUEST");
-            String remoteAddress = null;
+            final String remoteAddress;
             if (servletRequest != null) {
                 remoteAddress = servletRequest.getRemoteAddr();
             } else {
                 remoteAddress = "";
             }
             boolean foundMatch = false;
-            for (String addr : whiteList) {
+            for (String addr : allowList) {
                 if (addr.equals(remoteAddress)) {
                     foundMatch = true;
                     break;
@@ -1606,7 +1608,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (jaxbInfo == null) {
                 return null;
             }
-            Object instance = type.newInstance();
+            Object instance = type.getDeclaredConstructor().newInstance();
             return getQNameFromParts(jaxbInfo.getElementLocalName(instance),
                                      jaxbInfo.getElementNamespaceURI(instance), type, clsMap);
         } catch (Exception ex) {
@@ -1878,8 +1880,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setSchemaLocations(List<String> locations) {
         externalQnamesMap = new HashMap<>();
         externalSchemasCache = new ArrayList<>(locations.size());
-        for (int i = 0; i < locations.size(); i++) {
-            String loc = locations.get(i);
+        for (String loc : locations) {
             try {
                 loadSchemasIntoCache(loc);
             } catch (Exception ex) {
@@ -2304,12 +2305,12 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
 
-    public List<String> getWhiteList() {
-        return whiteList;
+    public List<String> getAllowList() {
+        return allowList;
     }
 
-    public void setWhiteList(List<String> whiteList) {
-        this.whiteList = whiteList;
+    public void setAllowList(List<String> allowList) {
+        this.allowList = allowList;
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {

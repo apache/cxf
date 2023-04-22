@@ -19,20 +19,22 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -60,6 +62,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     private void doTestGetBookHTML(String endpointAddress) throws Exception {
+
         WebClient client = WebClient.create(endpointAddress)
             .accept(MediaType.TEXT_HTML);
 
@@ -76,7 +79,6 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPRequestScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore2/books/html/123";
@@ -90,7 +92,6 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPSessionScope() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore3/books/html/456";
@@ -143,6 +144,38 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         assertEquals("Welcome", welcome);
     }
 
+    @Test
+    public void testGetBookHTMLFromEnsureResponseStreamIsUnclosed() throws Exception {
+        final ClientHttpConnectionOutInterceptor interceptor = new ClientHttpConnectionOutInterceptor();
+
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore4/books/html/123";
+        WebClient client = WebClient.create(endpointAddress).accept(MediaType.TEXT_HTML);
+        WebClient.getConfig(client).getOutInterceptors().add(interceptor);
+
+        XMLSource source = client.get(XMLSource.class);
+        Map<String, String> namespaces = new HashMap<>();
+        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
+        namespaces.put("books", "http://www.w3.org/books");
+        String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
+        assertEquals("CXF Rocks", value);
+        
+        assertThat(interceptor.checkAllClosed(), is(false));
+    }
+    
+    @Test
+    public void testGetBookHTMLFromEnsureResponseStreamIsAutoClosed() throws Exception {
+        final ClientHttpConnectionOutInterceptor interceptor = new ClientHttpConnectionOutInterceptor();
+        final Map<String, Object> properties = Collections.singletonMap("response.stream.auto.close", true);
+
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore4/books/html/123";
+        WebClient client = WebClient.create(endpointAddress, properties).accept(MediaType.TEXT_HTML);
+        WebClient.getConfig(client).getOutInterceptors().add(interceptor);
+
+        final String source = client.get(String.class);
+        assertThat(source, containsString("CXF Rocks"));
+        assertThat(interceptor.checkAllClosed(), is(true));
+    }
+    
     private void doTestGetBookHTMLFromWelcomeList(String address) throws Exception {
         WebClient client = WebClient.create(address)
             .accept(MediaType.TEXT_HTML);
@@ -154,4 +187,5 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
         assertEquals("Welcome to CXF", value);
     }
+    
 }

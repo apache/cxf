@@ -20,19 +20,20 @@ package org.apache.cxf.systests.cdi.base;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
+import org.apache.cxf.systests.cdi.base.bindings.Logged;
 
 @Path("/bookstore/")
 public class BookStore {
@@ -76,6 +77,7 @@ public class BookStore {
     @Path("/books")
     @NotNull @Valid
     @Produces(MediaType.APPLICATION_JSON)
+    @Logged
     public Collection< Book > getBooks() {
         return service.all();
     }

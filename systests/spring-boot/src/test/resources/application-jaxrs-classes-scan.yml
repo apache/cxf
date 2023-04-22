@@ -1,0 +1,5 @@
+cxf:
+  path: /api
+  jaxrs:
+    classes-scan: true
+    classes-scan-packages: org.apache.cxf.systest.jaxrs.resources,com.fasterxml.jackson.jakarta.rs.json,org.apache.cxf.jaxrs.openapi,org.apache.cxf.jaxrs.validation

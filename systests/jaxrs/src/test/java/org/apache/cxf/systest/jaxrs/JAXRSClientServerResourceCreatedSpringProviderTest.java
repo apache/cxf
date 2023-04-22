@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -294,19 +292,9 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         httpUrlConnection.setRequestProperty("Content-type",   "application/x-www-form-urlencoded");
         httpUrlConnection.setRequestProperty("Connection",   "close");
 
-        OutputStream outputstream = httpUrlConnection.getOutputStream();
-
-        File inputFile = new File(getClass().getResource("resources/singleValPostBody.txt").toURI());
-
-        byte[] tmp = new byte[4096];
-        int i = 0;
-        try (InputStream is = new FileInputStream(inputFile)) {
-            while ((i = is.read(tmp)) >= 0) {
-                outputstream.write(tmp, 0, i);
-            }
+        try (OutputStream outputstream = httpUrlConnection.getOutputStream()) {
+            IOUtils.copy(getClass().getResourceAsStream("resources/singleValPostBody.txt"), outputstream);
         }
-
-        outputstream.flush();
 
         int responseCode = httpUrlConnection.getResponseCode();
         assertEquals(200, responseCode);

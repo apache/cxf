@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jms.continuations;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.jaxws.EndpointImpl;

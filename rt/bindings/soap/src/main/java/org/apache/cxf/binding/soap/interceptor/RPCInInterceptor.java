@@ -72,7 +72,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             boolean output = !isRequestor(message);
             for (BindingOperationInfo info : service.getOperations()) {
                 if (info.getName().getLocalPart().equals(opName.getLocalPart())) {
-                    SoapBody body = null;
+                    final SoapBody body;
                     if (output) {
                         body = info.getOutput().getExtensor(SoapBody.class);
                     } else {
@@ -94,7 +94,6 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
         }
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
 
-        BindingOperationInfo operation = null;
         if (!StaxUtils.toNextElement(xmlReader)) {
             message.setContent(Exception.class, new RuntimeException("There must be a method name element."));
         }
@@ -103,6 +102,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             opName = opName.substring(0, opName.length() - 8);
         }
 
+        final BindingOperationInfo operation;
         if (message.getExchange().getBindingOperationInfo() == null) {
             operation = getOperation(message, new QName(xmlReader.getNamespaceURI(), opName));
             if (operation == null) {

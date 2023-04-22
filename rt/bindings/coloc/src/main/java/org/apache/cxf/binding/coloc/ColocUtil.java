@@ -260,7 +260,7 @@ public final class ColocUtil {
             message.getExchange().getService().getDataBinding().createReader(XMLStreamReader.class);
         MessagePartInfo mpi = getMessageInfo(message).getMessagePart(0);
         XMLStreamReader streamReader = null;
-        Object wrappedObject = null;
+        Object wrappedObject;
         try {
             streamReader = StaxUtils.createXMLStreamReader(source);
             wrappedObject = reader.read(mpi, streamReader);

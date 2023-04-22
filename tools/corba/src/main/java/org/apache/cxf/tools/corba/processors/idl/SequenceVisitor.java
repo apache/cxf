@@ -89,7 +89,7 @@ public class SequenceVisitor extends VisitorBase {
             bound = Long.parseLong(boundNode.toString());
         }
 
-        Scope scopedName = null;
+        final Scope scopedName;
         if (identifierNode == null) {
             // anonymous type
             scopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
@@ -97,7 +97,7 @@ public class SequenceVisitor extends VisitorBase {
             scopedName = new Scope(getScope(), identifierNode);
         }
 
-        XmlSchemaType schemaType = null;
+        final XmlSchemaType schemaType;
 
         // According to CORBA Binding for WSDL specification,
         // idl:sequence<octet> maps to xs:base64Binary by default.
@@ -116,7 +116,7 @@ public class SequenceVisitor extends VisitorBase {
             schemaType = generateSchemaType(null, scopedName, bound, fullyQualifiedName);
         }
 
-        CorbaType corbaType = null;
+        final CorbaType corbaType;
         if (identifierNode == null) {
             corbaType = generateCorbaAnonsequence(ctype,
                                                   schemaType,

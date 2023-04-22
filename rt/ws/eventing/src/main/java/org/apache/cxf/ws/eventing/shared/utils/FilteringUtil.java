@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -33,6 +31,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.eventing.FilterType;

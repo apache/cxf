@@ -19,8 +19,7 @@
 
 package org.apache.cxf.transport.jms.wsdl11;
 
-import javax.xml.bind.JAXBException;
-
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.wsdl.DeliveryModeType;
@@ -52,8 +51,10 @@ public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
         TimeToLiveType.class,
         TopicReplyToNameType.class
     };
+    private final Bus bus;
 
     public JMSWSDLExtensionLoader(Bus b) {
+        this.bus = b;
         WSDLManager manager = b.getExtension(WSDLManager.class);
         for (Class<?> extensor : EXTENSORS) {
             addExtensions(manager, javax.wsdl.Binding.class, extensor);
@@ -64,7 +65,7 @@ public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
 
     public void addExtensions(WSDLManager manager, Class<?> parentType, Class<?> elementType) {
         try {
-            JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(), parentType, elementType, null,
+            JAXBExtensionHelper.addExtensions(bus, manager.getExtensionRegistry(), parentType, elementType, null,
                                               this.getClass().getClassLoader());
         } catch (JAXBException e) {
             // ignore, won't support XML

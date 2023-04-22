@@ -19,12 +19,12 @@
 
 package org.apache.cxf.ws.eventing.integration.notificationapi;
 
-import javax.jws.Oneway;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.Action;
-import javax.xml.ws.soap.Addressing;
+import jakarta.jws.Oneway;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.ws.Action;
+import jakarta.xml.ws.soap.Addressing;
 
 
 @WebService(targetNamespace = "http://www.events.com")

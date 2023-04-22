@@ -34,12 +34,12 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -256,7 +256,7 @@ public final class PluginLoader {
         if (StringUtils.isEmpty(fullPackage)) {
             fullPackage = frontend.getPackage();
         }
-        return fullPackage + "." + generator.getName();
+        return fullPackage + '.' + generator.getName();
     }
 
     private List<FrontEndGenerator> getFrontEndGenerators(FrontEnd frontend) {
@@ -267,7 +267,7 @@ public final class PluginLoader {
             for (Generator generator : frontend.getGenerators().getGenerator()) {
                 fullClzName = getGeneratorClass(frontend, generator);
                 Class<?> clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
-                generators.add((FrontEndGenerator)clz.newInstance());
+                generators.add((FrontEndGenerator)clz.getDeclaredConstructor().newInstance());
             }
         } catch (Exception e) {
             Message msg = new Message("FRONTEND_PROFILE_LOAD_FAIL", LOG, fullClzName);
@@ -279,10 +279,10 @@ public final class PluginLoader {
     }
 
     private FrontEndProfile loadFrontEndProfile(String fullClzName) {
-        FrontEndProfile profile = null;
+        final FrontEndProfile profile;
         try {
             Class<?> clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
-            profile = (FrontEndProfile)clz.newInstance();
+            profile = (FrontEndProfile)clz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             Message msg = new Message("FRONTEND_PROFILE_LOAD_FAIL", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());
@@ -292,9 +292,10 @@ public final class PluginLoader {
     }
 
     private Processor loadProcessor(String fullClzName) {
-        Processor processor = null;
+        final Processor processor;
         try {
-            processor = (Processor) ClassLoaderUtils.loadClass(fullClzName, getClass()).newInstance();
+            processor = (Processor) ClassLoaderUtils.loadClass(fullClzName, getClass())
+                .getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             Message msg = new Message("LOAD_PROCESSOR_FAILED", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());
@@ -304,7 +305,7 @@ public final class PluginLoader {
     }
 
     private Class<? extends ToolContainer> loadContainerClass(String fullClzName) {
-        Class<?> clz = null;
+        final Class<?> clz;
         try {
             clz = ClassLoaderUtils.loadClass(fullClzName, getClass());
         } catch (Exception e) {
@@ -326,7 +327,7 @@ public final class PluginLoader {
         if (StringUtils.isEmpty(frontend.getProfile())) {
             return "org.apache.cxf.tools.wsdlto.core.FrontEndProfile";
         }
-        return frontend.getPackage() + "." + frontend.getProfile();
+        return frontend.getPackage() + '.' + frontend.getProfile();
     }
 
     private String getProcessorClass(FrontEnd frontend) {
@@ -334,11 +335,11 @@ public final class PluginLoader {
         if (StringUtils.isEmpty(pkgName)) {
             pkgName = frontend.getPackage();
         }
-        return pkgName + "." + frontend.getProcessor().getName();
+        return pkgName + '.' + frontend.getProcessor().getName();
     }
 
     private String getContainerClass(FrontEnd frontend) {
-        return getContainerPackage(frontend) + "." + frontend.getContainer().getName();
+        return getContainerPackage(frontend) + '.' + frontend.getContainer().getName();
     }
 
     private String getContainerPackage(FrontEnd frontend) {
@@ -351,14 +352,14 @@ public final class PluginLoader {
 
     private String getToolspec(FrontEnd frontend) {
         String toolspec = frontend.getContainer().getToolspec();
-        return "/" + getContainerPackage(frontend).replace(".", "/") + "/" + toolspec;
+        return '/' + getContainerPackage(frontend).replace('.', '/') + '/' + toolspec;
     }
 
     private AbstractWSDLBuilder loadBuilder(String fullClzName) {
-        AbstractWSDLBuilder builder = null;
+        final AbstractWSDLBuilder builder;
         try {
             builder = (AbstractWSDLBuilder) ClassLoaderUtils
-                .loadClass(fullClzName, getClass()).newInstance();
+                .loadClass(fullClzName, getClass()).getDeclaredConstructor().newInstance();
 
         } catch (Exception e) {
             Message msg = new Message("LOAD_PROCESSOR_FAILED", LOG, fullClzName);
@@ -373,14 +374,13 @@ public final class PluginLoader {
         if (StringUtils.isEmpty(pkgName)) {
             pkgName = frontend.getPackage();
         }
-        return pkgName + "." + frontend.getBuilder().getName();
+        return pkgName + '.' + frontend.getBuilder().getName();
     }
 
     public FrontEndProfile getFrontEndProfile(String name) {
-        FrontEndProfile profile = null;
         FrontEnd frontend = getFrontEnd(name);
 
-        profile = loadFrontEndProfile(getFrontEndProfileClass(frontend));
+        FrontEndProfile profile = loadFrontEndProfile(getFrontEndProfileClass(frontend));
 
         for (FrontEndGenerator generator : getFrontEndGenerators(frontend)) {
             profile.registerGenerator(generator);
@@ -409,10 +409,10 @@ public final class PluginLoader {
     }
 
     private DataBindingProfile loadDataBindingProfile(String fullClzName) {
-        DataBindingProfile profile = null;
+        final DataBindingProfile profile;
         try {
             profile = (DataBindingProfile)ClassLoaderUtils.loadClass(fullClzName,
-                                                                     getClass()).newInstance();
+                                                                     getClass()).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             Message msg = new Message("DATABINDING_PROFILE_LOAD_FAIL", LOG, fullClzName);
             LOG.log(Level.SEVERE, msg.toString());
@@ -422,10 +422,8 @@ public final class PluginLoader {
     }
 
     public DataBindingProfile getDataBindingProfile(String name) {
-        DataBindingProfile profile = null;
         DataBinding databinding = getDataBinding(name);
-        profile = loadDataBindingProfile(databinding.getPackage() + "." + databinding.getProfile());
-        return profile;
+        return loadDataBindingProfile(databinding.getPackage() + '.' + databinding.getProfile());
     }
 
     public Map<String, FrontEnd> getFrontEnds() {

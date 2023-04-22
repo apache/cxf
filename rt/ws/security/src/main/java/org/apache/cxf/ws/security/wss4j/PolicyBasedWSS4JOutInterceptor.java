@@ -24,11 +24,10 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -140,7 +139,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
             if (binding != null) {
                 WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand, saaj.getSOAPPart());
-                Element el = null;
+                final Element el;
                 try {
                     el = secHeader.insertSecurityHeader();
                 } catch (WSSecurityException e) {

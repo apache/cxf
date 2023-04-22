@@ -54,7 +54,8 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.XMLUtils;
 
 /**
@@ -78,7 +79,7 @@ abstract class STSInvoker implements Invoker {
         MessageContentsList lst = (MessageContentsList)o;
         DOMSource src = (DOMSource)lst.get(0);
         Node nd = src.getNode();
-        Element requestEl = null;
+        final Element requestEl;
         if (nd instanceof Document) {
             requestEl = ((Document)nd).getDocumentElement();
         } else {
@@ -204,19 +205,25 @@ abstract class STSInvoker implements Invoker {
         byte[] clientEntropy,
         int keySize
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
-        byte[] secret = null;
+        final byte[] secret;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
+        byte[] randomBytes = null;
+        try {
+            randomBytes = XMLSecurityConstants.generateBytes(keySize / 8);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+
         if (clientEntropy == null) {
-            secret = WSSecurityUtil.generateNonce(keySize / 8);
+            secret = randomBytes;
 
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
             writer.writeCharacters(XMLUtils.encodeToString(secret));
             writer.writeEndElement();
         } else {
-            byte[] entropy = WSSecurityUtil.generateNonce(keySize / 8);
             P_SHA1 psha1 = new P_SHA1();
-            secret = psha1.createKey(clientEntropy, entropy, 0, keySize / 8);
+            secret = psha1.createKey(clientEntropy, randomBytes, 0, keySize / 8);
 
             writer.writeStartElement(prefix, "ComputedKey", namespace);
             writer.writeCharacters(namespace + "/CK/PSHA1");
@@ -226,7 +233,7 @@ abstract class STSInvoker implements Invoker {
             writer.writeStartElement(prefix, "Entropy", namespace);
             writer.writeStartElement(prefix, "BinarySecret", namespace);
             writer.writeAttribute("Type", namespace + "/Nonce");
-            writer.writeCharacters(XMLUtils.encodeToString(entropy));
+            writer.writeCharacters(XMLUtils.encodeToString(randomBytes));
             writer.writeEndElement();
 
         }

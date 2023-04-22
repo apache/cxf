@@ -25,32 +25,14 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
     <packaging>pom</packaging>
     <properties>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.test.skip>true</maven.test.skip>
-        <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
-	<cxf.version>${project.version}</cxf.version>
-        <narayana.spring.boot.version>2.1.0</narayana.spring.boot.version>
-        <narayana.version>5.9.0.Final</narayana.version>
-        <version.org.jboss.ws>1.0.2.Final</version.org.jboss.ws>
-        <jbossws-cxf.version>5.2.4.Final</jbossws-cxf.version>
     </properties>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -63,12 +45,12 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-logging</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -77,34 +59,31 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>me.snowdrop</groupId>
-            <artifactId>narayana-spring-boot-starter</artifactId>
-            <version>${narayana.spring.boot.version}</version>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.xts</groupId>
-            <artifactId>jbossxts</artifactId>
-            <version>${narayana.version}</version>
+            <artifactId>jbossxts-jakarta</artifactId>
+            <version>${cxf.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana</groupId>
-            <artifactId>jbosstxbridge</artifactId>
-            <version>${narayana.version}</version>
+            <artifactId>jbosstxbridge-jakarta</artifactId>
+            <version>${cxf.jboss.narayana.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.ws</groupId>
             <artifactId>jbossws-api</artifactId>
-            <version>${version.org.jboss.ws}</version>
-            <scope>provided</scope>
+            <version>2.0.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
             <artifactId>jbossws-cxf-client</artifactId>
-            <version>${jbossws-cxf.version}</version>
-            <scope>provided</scope>
+            <version>6.2.0.Final</version>
             <exclusions>
                 <exclusion>
-                    <groupId>*</groupId>
+                    <groupId>org.apache.cxf</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
@@ -112,19 +91,27 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <version>${cxf.h2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
+            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -141,4 +128,19 @@
             </properties>
         </profile>
     </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>17</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -45,6 +43,8 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.InputSource;
 
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPEnvelope;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -209,19 +209,27 @@ public class StaxSerializer extends AbstractSerializer {
      * @throws XMLEncryptionException
      */
     private Node deserialize(Node ctx, InputSource inputSource) throws XMLEncryptionException {
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(inputSource);
-        return deserialize(ctx, reader, true);
+        XMLStreamReader reader = null;
+        try {
+            reader = StaxUtils.createXMLStreamReader(inputSource);
+            return deserialize(ctx, reader, true);
+        } finally {
+            try {
+                StaxUtils.close(reader);
+            } catch (final XMLStreamException ex) {
+                throw new XMLEncryptionException(ex);
+            }
+        }
     }
 
     private Node deserialize(Node ctx, XMLStreamReader reader, boolean wrapped) throws XMLEncryptionException {
-        Document contextDocument = null;
+        final Document contextDocument;
         if (Node.DOCUMENT_NODE == ctx.getNodeType()) {
             contextDocument = (Document)ctx;
         } else {
             contextDocument = ctx.getOwnerDocument();
         }
 
-        XMLStreamWriter writer = null;
         try {
             if (ctx instanceof SOAPElement) {
                 SOAPElement el = (SOAPElement)ctx;
@@ -231,19 +239,19 @@ public class StaxSerializer extends AbstractSerializer {
                 //cannot load into fragment due to a ClassCastException within SAAJ addChildElement
                 //which only checks for Document as parent, not DocumentFragment
                 Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
-                writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
+                XMLStreamWriter writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
                 return appendNewChild(reader, wrapped, contextDocument, writer, element);
             }
             if (DOMUtils.isJava9SAAJ()) {
                 //cannot load into fragment due to a ClassCastException within SAAJ addChildElement
                 //which only checks for Document as parent, not DocumentFragment
                 Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
-                writer = new OverlayW3CDOMStreamWriter(ctx.getOwnerDocument(), element);
+                XMLStreamWriter writer = new OverlayW3CDOMStreamWriter(ctx.getOwnerDocument(), element);
                 return appendNewChild(reader, wrapped, contextDocument, writer, element);
             }
             // Import to a dummy fragment
             DocumentFragment dummyFragment = contextDocument.createDocumentFragment();
-            writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
             StaxUtils.copy(reader, writer);
 
             // Remove the "dummy" wrapper

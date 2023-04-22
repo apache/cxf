@@ -272,10 +272,9 @@ public class Compiler {
     }
 
     public boolean internalCompile(String[] args, int sourceFileIndex) {
-        Process p = null;
-        String[] cmdArray = null;
         File tmpFile = null;
         try {
+            final String[] cmdArray;
             if (isLongCommandLines(args) && sourceFileIndex >= 0) {
                 tmpFile = FileUtils.createTempFile("cxf-compiler", null);
                 try (PrintWriter out = new PrintWriter(new FileWriter(tmpFile))) {
@@ -316,7 +315,7 @@ public class Compiler {
                 }
             }
 
-            p = Runtime.getRuntime().exec(cmdArray);
+            final Process p = Runtime.getRuntime().exec(cmdArray);
 
             if (p.getErrorStream() != null) {
                 StreamPrinter errorStreamPrinter = new StreamPrinter(p.getErrorStream(), "", System.out);
@@ -328,7 +327,7 @@ public class Compiler {
                 infoStreamPrinter.start();
             }
 
-            return p.waitFor() == 0 ? true : false;
+            return p.waitFor() == 0;
         } catch (SecurityException e) {
             System.err.println("[ERROR] SecurityException during exec() of compiler \"" + args[0] + "\".");
         } catch (InterruptedException e) {

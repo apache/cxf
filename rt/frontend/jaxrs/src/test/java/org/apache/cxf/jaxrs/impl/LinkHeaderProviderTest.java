@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.core.Link;
+import jakarta.ws.rs.core.Link;
 
 import org.junit.Test;
 

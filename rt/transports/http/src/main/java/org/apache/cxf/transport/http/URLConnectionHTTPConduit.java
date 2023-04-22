@@ -255,7 +255,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         protected void setupWrappedStream() throws IOException {
             // If we need to cache for retransmission, store data in a
             // CacheAndWriteOutputStream. Otherwise write directly to the output stream.
-            OutputStream cout = null;
+            OutputStream cout;
             try {
                 try {
 //                    cout = connection.getOutputStream();
@@ -339,7 +339,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
 
         protected InputStream getInputStream() throws IOException {
-            InputStream in = null;
+            InputStream in;
             if (getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 in = connection.getErrorStream();
                 if (in == null) {

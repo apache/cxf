@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.ws.Endpoint;
-
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -54,7 +53,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         addVerifiers();
 
         try {
-            AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.newInstance();
+            AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.getDeclaredConstructor().newInstance();
             implementor.verificationCache = this;
             ep = Endpoint.publish(address, implementor);
         } catch (Exception ex) {

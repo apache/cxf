@@ -24,22 +24,23 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.OutboundSseEvent.Builder;
-import javax.ws.rs.sse.Sse;
-import javax.ws.rs.sse.SseBroadcaster;
-import javax.ws.rs.sse.SseEventSink;
-
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.OutboundSseEvent.Builder;
+import jakarta.ws.rs.sse.Sse;
+import jakarta.ws.rs.sse.SseBroadcaster;
+import jakarta.ws.rs.sse.SseEventSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ public class BookStore2 extends BookStoreClientCloseable {
             public void run() {
                 try {
                     final Integer id = Integer.valueOf(lastEventId);
-                    final Builder builder = sse.newEventBuilder();
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
                     sink.send(createEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
@@ -92,7 +93,35 @@ public class BookStore2 extends BookStoreClientCloseable {
             }
         }.start();
     }
+    
+    @POST
+    @Path("sse/{id}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    @Consumes(MediaType.TEXT_PLAIN)
+    public void forBookPOST(@Context SseEventSink sink, @PathParam("id") final String id,
+            final String lastEventId) {
+        new Thread() {
+            public void run() {
+                try {
+                    final Integer id = Integer.valueOf(lastEventId);
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
+                    sink.send(createEvent(builder.name("book"), id + 1));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 2));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 3));
+                    Thread.sleep(200);
+                    sink.send(createEvent(builder.name("book"), id + 4));
+                    Thread.sleep(200);
+                    sink.close();
+                } catch (final InterruptedException ex) {
+                    LOG.error("Communication error", ex);
+                }
+            }
+        }.start();
+    }
+    
     @GET
     @Path("nodelay/sse/{id}")
     @Produces(MediaType.SERVER_SENT_EVENTS)

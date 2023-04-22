@@ -24,7 +24,7 @@ package $intf.PackageName;
 
 import java.util.logging.Logger;
 #if ($markGenerated == "true")
-import javax.annotation.Generated;
+import jakarta.annotation.Generated;
 #end
 #foreach ($import in $intf.Imports)
 import ${import};
@@ -39,7 +39,7 @@ import ${import};
  *
  */
 
-@javax.jws.WebService(
+@jakarta.jws.WebService(
 #if ($service.ServiceName != "")
                       serviceName = "$service.ServiceName",
 #end

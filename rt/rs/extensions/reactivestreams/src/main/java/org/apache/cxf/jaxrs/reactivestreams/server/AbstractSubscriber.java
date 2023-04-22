@@ -21,8 +21,7 @@ package org.apache.cxf.jaxrs.reactivestreams.server;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
-import javax.ws.rs.container.AsyncResponse;
-
+import jakarta.ws.rs.container.AsyncResponse;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;

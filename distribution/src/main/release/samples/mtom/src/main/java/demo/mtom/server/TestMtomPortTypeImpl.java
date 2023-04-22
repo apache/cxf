@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.ws.Holder;
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebService;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.Holder;
 
 import org.apache.cxf.mime.TestMtomPortType;
 

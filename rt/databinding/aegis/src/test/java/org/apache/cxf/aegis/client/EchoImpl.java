@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.aegis.client;
 
-import javax.xml.ws.Holder;
+import jakarta.xml.ws.Holder;
 
 public class EchoImpl implements Echo {
     public String echo(String text, Holder<String> textAgain) {

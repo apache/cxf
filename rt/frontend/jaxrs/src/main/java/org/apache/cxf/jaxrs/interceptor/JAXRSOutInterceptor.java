@@ -33,18 +33,18 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.WriterInterceptor;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -102,7 +102,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
         Object responseObj = objs.get(0);
 
-        Response response = null;
+        final Response response;
         if (responseObj instanceof Response) {
             response = (Response)responseObj;
             if (response.getStatus() == 500
@@ -151,7 +151,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Method invoked = ori == null ? null : ori.getAnnotatedMethod() != null
             ? ori.getAnnotatedMethod() : ori.getMethodToInvoke();
 
-        Annotation[] annotations = null;
+        Annotation[] annotations;
         Annotation[] staticAnns = ori != null ? ori.getOutAnnotations() : new Annotation[]{};
         Annotation[] responseAnns = response.getEntityAnnotations();
         if (responseAnns != null) {
@@ -345,7 +345,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     private void checkCachedStream(Message m, OutputStream osOriginal, boolean enabled) throws Exception {
-        XMLStreamWriter writer = null;
+        final XMLStreamWriter writer;
         if (enabled) {
             writer = m.getContent(XMLStreamWriter.class);
         } else {
@@ -353,7 +353,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
-            if (cache.getEvents().size() != 0) {
+            if (!cache.getEvents().isEmpty()) {
                 XMLStreamWriter origWriter = null;
                 try {
                     origWriter = StaxUtils.createXMLStreamWriter(osOriginal);

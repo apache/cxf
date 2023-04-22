@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.types;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *

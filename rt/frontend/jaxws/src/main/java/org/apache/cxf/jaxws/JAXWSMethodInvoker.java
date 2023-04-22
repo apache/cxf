@@ -24,10 +24,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.Provider;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.MessageContext.Scope;
-
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.handler.MessageContext.Scope;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -42,7 +41,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
 
     public static final String COPY_SOAP_HEADERS_BY_FAULT = "org.apache.cxf.fault.copySoapHeaders";
 
-    javax.xml.ws.spi.Invoker invoker;
+    jakarta.xml.ws.spi.Invoker invoker;
 
 
     public JAXWSMethodInvoker(final Object bean) {
@@ -52,7 +51,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
     public JAXWSMethodInvoker(Factory factory) {
         super(factory);
     }
-    public JAXWSMethodInvoker(javax.xml.ws.spi.Invoker i) {
+    public JAXWSMethodInvoker(jakarta.xml.ws.spi.Invoker i) {
         super(null);
         invoker = i;
     }
@@ -84,7 +83,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             }
             res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
 
-            if ((serviceObject instanceof Provider)
+            if (serviceObject instanceof Provider
                 && MessageUtils.getContextualBoolean(exchange.getInMessage(),
                                                      "jaxws.provider.interpretNullAsOneway",
                                                      true)
@@ -119,8 +118,8 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
     private void changeToOneway(Exchange exchange) {
         exchange.setOneWay(true);
         exchange.setOutMessage(null);
-        javax.servlet.http.HttpServletResponse httpresp =
-            (javax.servlet.http.HttpServletResponse)exchange.getInMessage().
+        jakarta.servlet.http.HttpServletResponse httpresp =
+            (jakarta.servlet.http.HttpServletResponse)exchange.getInMessage().
                 get("HTTP.RESPONSE");
         if (httpresp != null) {
             httpresp.setStatus(202);

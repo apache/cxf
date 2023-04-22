@@ -40,9 +40,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPath;
@@ -57,6 +54,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPHeader;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
@@ -586,7 +586,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
         Crypto crypto = secToken.getCrypto();
-        String uname = null;
+        final String uname;
         try {
             uname = crypto.getX509Identifier(secToken.getX509Certificate());
         } catch (WSSecurityException e1) {
@@ -615,7 +615,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     ) throws WSSecurityException {
         if (endorse && isTokenRequired(token.getIncludeTokenType())) {
             byte[] salt = UsernameTokenUtil.generateSalt(true);
-            WSSecUsernameToken utBuilder = addDKUsernameToken(token, salt, true);
+            WSSecUsernameToken utBuilder = addDKUsernameToken(token, salt);
             if (utBuilder != null) {
                 utBuilder.prepare(salt);
                 addSupportingElement(utBuilder.getUsernameTokenElement());
@@ -798,7 +798,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             secRefSaml.setReference(ref);
         } else {
             Element keyId = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:KeyIdentifier");
-            String valueType = null;
+            final String valueType;
             if (saml1) {
                 valueType = WSS4JConstants.WSS_SAML_KI_VALUE_TYPE;
                 secRefSaml.addTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
@@ -866,7 +866,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return null;
     }
 
-    protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, byte[] salt, boolean useMac) {
+    protected WSSecUsernameToken addDKUsernameToken(UsernameToken token, byte[] salt) {
         assertToken(token);
         if (!isTokenRequired(token.getIncludeTokenType())) {
             return null;
@@ -887,7 +887,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             if (!StringUtils.isEmpty(password)) {
                 // If the password is available then build the token
                 utBuilder.setUserInfo(userName, password);
-                utBuilder.addDerivedKey(useMac,  1000);
+                utBuilder.addDerivedKey(1000);
                 utBuilder.prepare(salt);
             } else {
                 unassertPolicy(token, "No password available");
@@ -1020,7 +1020,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     protected String getPassword(String userName, Assertion info, int usage) {
         //Then try to get the password from the given callback handler
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
-        CallbackHandler handler = null;
+        final CallbackHandler handler;
         try {
             handler = SecurityUtils.getCallbackHandler(o);
             if (handler == null) {
@@ -1078,7 +1078,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         } else {
             //Add an id
             id = wssConfig.getIdAllocator().createId("_", element);
-            String pfx = null;
+            String pfx;
             try {
                 pfx = element.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
             } catch (Throwable t) {
@@ -1454,7 +1454,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                         if (!found.contains(el)) {
                             found.add(el);
-                            WSEncryptionPart part = null;
+                            final WSEncryptionPart part;
                             boolean saml1 = WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())
                                 && "Assertion".equals(el.getLocalName());
                             boolean saml2 = WSS4JConstants.SAML2_NS.equals(el.getNamespaceURI())

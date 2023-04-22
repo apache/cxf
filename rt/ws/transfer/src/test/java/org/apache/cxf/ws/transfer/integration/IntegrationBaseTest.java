@@ -23,14 +23,11 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Document;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
@@ -54,9 +51,7 @@ import org.apache.cxf.ws.transfer.resourcefactory.resolver.SimpleResourceResolve
 import org.apache.cxf.ws.transfer.shared.TransferConstants;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 public class IntegrationBaseTest {
 
@@ -71,27 +66,7 @@ public class IntegrationBaseTest {
 
     public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
 
-    protected static DocumentBuilderFactory documentBuilderFactory;
-
-    protected static DocumentBuilder documentBuilder;
-
-    protected static Document document;
-
     protected Bus bus;
-
-    @BeforeClass
-    public static void beforeClass() throws ParserConfigurationException {
-        documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        document = documentBuilder.newDocument();
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        documentBuilderFactory = null;
-        documentBuilder = null;
-        document = null;
-    }
 
     @Before
     public void before() {
@@ -162,8 +137,7 @@ public class IntegrationBaseTest {
     }
 
     protected Representation getRepresentation(String content) throws XMLStreamException {
-        Document doc = null;
-        doc = StaxUtils.read(new StringReader(content));
+        Document doc = StaxUtils.read(new StringReader(content));
         Representation representation = new Representation();
         representation.setAny(doc.getDocumentElement());
         return representation;

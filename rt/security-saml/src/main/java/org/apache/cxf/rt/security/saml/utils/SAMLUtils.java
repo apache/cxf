@@ -109,11 +109,6 @@ public final class SAMLUtils {
         String name,
         String nameFormat
     ) {
-        String roleAttributeName = name;
-        if (roleAttributeName == null) {
-            roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
-        }
-
         Set<Principal> roles = new HashSet<>();
 
         for (Claim claim : claims) {
@@ -167,8 +162,8 @@ public final class SAMLUtils {
                     audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
                 }
 
-                if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                    audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
+                if (msg.getContextualProperty(Message.WSDL_SERVICE) != null) {
+                    audiences.add(msg.getContextualProperty(Message.WSDL_SERVICE).toString());
                 }
             }
             return audiences;

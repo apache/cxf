@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.transport.jms.uri;
 
-import javax.jms.ConnectionFactory;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
+import jakarta.jms.ConnectionFactory;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Exchange;
@@ -37,6 +37,7 @@ import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -49,13 +50,15 @@ import static org.junit.Assert.assertNotNull;
 public class URIConfiguredConduitTest {
     private static final String SERVICE_QUEUE = "test";
     private static final String BROKER_URI 
-        = "vm://URIConfiguredConduitTest?broker.persistent=false&broker.useJmx=false";
+        = "vm://0?broker.persistent=false&broker.useJmx=false";
     private static ConnectionFactory cf;
 
     private enum SyncType {
         sync,
         async
     };
+
+    @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
 
     @BeforeClass
     public static void initConnectionFactory() {
@@ -67,7 +70,7 @@ public class URIConfiguredConduitTest {
         sendAndReceive(SyncType.sync,
                        "jms:jndi:dynamicQueues/"
                            + SERVICE_QUEUE
-                           + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                           + "?jndiInitialContextFactory=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
                            + "&useConduitIdSelector=false"
                            + "&replyToName=dynamicQueues/testreply"
                            + "&messageType=text"

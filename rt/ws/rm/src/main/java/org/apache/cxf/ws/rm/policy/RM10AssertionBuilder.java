@@ -22,9 +22,9 @@ package org.apache.cxf.ws.rm.policy;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder;
 import org.apache.cxf.ws.rm.RM10Constants;

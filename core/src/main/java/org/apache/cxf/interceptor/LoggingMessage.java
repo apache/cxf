@@ -20,6 +20,9 @@ package org.apache.cxf.interceptor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @deprecated use the logging module rt/features/logging instead
+ */
 @Deprecated
 public final class LoggingMessage {
     public static final String ID_KEY = LoggingMessage.class.getName() + ".ID";

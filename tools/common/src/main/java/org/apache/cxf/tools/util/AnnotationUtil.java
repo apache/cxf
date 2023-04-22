@@ -28,9 +28,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -78,7 +77,7 @@ public final class AnnotationUtil {
         return ClassLoaderUtils.getURLClassLoader(urls, parent);
     }
     public static synchronized Class<?> loadClass(String className, ClassLoader parent) {
-        Class<?> clazz = null;
+        final Class<?> clazz;
         URL[] urls = URIParserUtil.pathToURLs(getClassPath());
         ClassLoader classLoader = newLoader(urls, parent);
         try {

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 
 /**
  * This class represents a (static) service. It can be spring-loaded with a set of Endpoint
@@ -36,10 +37,13 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public class StaticService implements ServiceMBean {
     private static final Logger LOG = LogUtils.getL7dLogger(StaticService.class);
+    // https://tools.ietf.org/html/rfc7230#section-3.1.1
+    private static final int DEFAULT_MAX_ADDRESS_LENGTH = 8000;
 
     private String tokenType;
     private String keyType;
     private EncryptionProperties encryptionProperties;
+    private int maxAddressLength = DEFAULT_MAX_ADDRESS_LENGTH;
 
     /**
      * a collection of compiled regular expression patterns
@@ -53,6 +57,9 @@ public class StaticService implements ServiceMBean {
         String addressToMatch = address;
         if (addressToMatch == null) {
             addressToMatch = "";
+        }
+        if (addressToMatch.length() > maxAddressLength) {
+            throw new STSException("The address length exceeds the maximum allowable length");
         }
         for (Pattern endpointPattern : endpointPatterns) {
             final Matcher matcher = endpointPattern.matcher(addressToMatch);
@@ -132,4 +139,21 @@ public class StaticService implements ServiceMBean {
         LOG.fine("Setting encryption properties");
     }
 
+    /**
+     * Get the maximum allowable address length to compare against the addresses set in
+     * setEndpoints
+     * @return the maximum allowable address length
+     */
+    public int getMaxAddressLength() {
+        return maxAddressLength;
+    }
+
+    /**
+     * Set the maximum allowable address length to compare against the addresses set in
+     * setEndpoints
+     * @param maxAddressLength the maximum allowable address length
+     */
+    public void setMaxAddressLength(int maxAddressLength) {
+        this.maxAddressLength = maxAddressLength;
+    }
 }

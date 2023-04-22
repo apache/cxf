@@ -30,23 +30,23 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.Response;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext.Scope;
-import javax.xml.ws.http.HTTPBinding;
-import javax.xml.ws.http.HTTPException;
-import javax.xml.ws.soap.SOAPBinding;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.SOAPConstants;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.MessageContext.Scope;
+import jakarta.xml.ws.http.HTTPBinding;
+import jakarta.xml.ws.http.HTTPException;
+import jakarta.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
@@ -200,6 +200,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 }
                 return exception;
             } catch (SOAPException e) {
+                e.printStackTrace();
                 return new WebServiceException(ex);
             }
         }

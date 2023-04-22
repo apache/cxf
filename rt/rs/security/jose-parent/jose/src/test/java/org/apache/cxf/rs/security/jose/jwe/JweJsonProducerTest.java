@@ -247,7 +247,7 @@ public class JweJsonProducerTest {
                                          boolean canBeFlat) throws Exception {
         JweHeaders headers = new JweHeaders(KeyAlgorithm.A128KW,
                                             contentEncryptionAlgo);
-        JweEncryptionProvider jwe = null;
+        final JweEncryptionProvider jwe;
         if (wrapperKeyBytes == null) {
             headers.asMap().remove("alg");
             SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");

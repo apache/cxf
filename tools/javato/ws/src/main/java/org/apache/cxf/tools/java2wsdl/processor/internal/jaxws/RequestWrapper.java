@@ -25,8 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jws.WebParam;
-
+import jakarta.jws.WebParam;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -45,12 +44,12 @@ public class RequestWrapper extends Wrapper {
 
     @Override
     public boolean isWrapperAbsent(final Method method) {
-        javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
+        jakarta.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(jakarta.xml.ws.RequestWrapper.class);
         return getClassName() == null && (reqWrapper == null || StringUtils.isEmpty(reqWrapper.className()));
     }
 
     public String getWrapperTns(Method method) {
-        javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
+        jakarta.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(jakarta.xml.ws.RequestWrapper.class);
         if (reqWrapper != null) {
             return reqWrapper.targetNamespace();
         }
@@ -96,8 +95,8 @@ public class RequestWrapper extends Wrapper {
 
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
-        javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
-        javax.jws.WebMethod webMethod = method.getAnnotation(javax.jws.WebMethod.class);
+        jakarta.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(jakarta.xml.ws.RequestWrapper.class);
+        jakarta.jws.WebMethod webMethod = method.getAnnotation(jakarta.jws.WebMethod.class);
         String methName = webMethod == null ? null : webMethod.operationName();
         if (StringUtils.isEmpty(methName)) {
             methName = method.getName();

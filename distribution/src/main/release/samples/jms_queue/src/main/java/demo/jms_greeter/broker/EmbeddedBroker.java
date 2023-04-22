@@ -18,18 +18,26 @@
  */
 
 package demo.jms_greeter.broker;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+
+import java.io.File;
+
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.ActiveMQServer;
+import org.apache.activemq.artemis.core.server.impl.ActiveMQServerImpl;
 
 public final class EmbeddedBroker {
     private EmbeddedBroker() {
     }
 
     public static void main(String[] args) throws Exception {
-        BrokerService broker = new BrokerService();
-        broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        broker.setDataDirectory("target/activemq-data");
-        broker.addConnector("tcp://localhost:61616");
+        final Configuration config = new ConfigurationImpl();
+        config.setPersistenceEnabled(true);
+        config.setSecurityEnabled(false);
+        config.addAcceptorConfiguration("tcp", "tcp://localhost:61616");
+        config.setBrokerInstance(new File("target/activemq-data"));
+       
+        final ActiveMQServer broker = new ActiveMQServerImpl(config);
         broker.start();
         System.out.println("JMS broker ready ...");
         Thread.sleep(125 * 60 * 1000);

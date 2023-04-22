@@ -64,7 +64,6 @@ public class LdapCertificateRepo implements CertificateRepo {
      */
     public LdapCertificateRepo(LdapSearch ldapSearch, LdapSchemaConfig ldapConfig, String rootDN) {
         this.ldapSearch = ldapSearch;
-        this.ldapSearch = ldapSearch;
         this.ldapConfig = ldapConfig;
         this.rootDN = rootDN;
         try {
@@ -278,7 +277,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     @Override
     public void saveCertificate(X509Certificate cert, UseKeyWithType key) {
         Applications application = Applications.fromUri(key.getApplication());
-        String dn = null;
+        final String dn;
         Map<String, String> attrs = new HashMap<>();
         if (application == Applications.PKIX) {
             dn = key.getIdentifier() + "," + rootDN;

@@ -25,8 +25,8 @@ import java.util.Collection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.ws.BindingProvider;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -51,7 +51,7 @@ import static org.junit.Assert.fail;
 /**
  * A test for hostname verification when the Java system property "java.protocol.handler.pkgs" is set to
  * "com.sun.net.ssl.internal.www.protocol". This means that com.sun.net.ssl.HostnameVerifier is used
- * instead of the javax version.
+ * instead of the jakarta version.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerTestBase {
@@ -211,7 +211,7 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         HostnameVerifier hostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
         try {
             System.setProperty("javax.net.ssl.trustStore", "keys/subjalt.jks");
-            System.setProperty("javax.net.ssl.trustStorePassword", "security");
+            System.setProperty("jakajavaxrta.net.ssl.trustStorePassword", "security");
             System.setProperty("javax.net.ssl.trustStoreType", "JKS");
             HttpsURLConnection.setDefaultHostnameVerifier(
                 new javax.net.ssl.HostnameVerifier() {

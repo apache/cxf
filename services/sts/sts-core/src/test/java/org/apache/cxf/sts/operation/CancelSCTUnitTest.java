@@ -19,15 +19,14 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -88,11 +87,9 @@ public class CancelSCTUnitTest {
         cancelOperation.setTokenStore(tokenStore);
 
         // Add Token Canceller
-        List<TokenCanceller> cancellerList = new ArrayList<>();
         TokenCanceller sctCanceller = new SCTCanceller();
         sctCanceller.setVerifyProofOfPossession(false);
-        cancellerList.add(sctCanceller);
-        cancelOperation.setTokenCancellers(cancellerList);
+        cancelOperation.setTokenCancellers(Collections.singletonList(sctCanceller));
 
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();

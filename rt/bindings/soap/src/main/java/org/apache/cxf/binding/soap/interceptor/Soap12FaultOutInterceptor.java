@@ -161,7 +161,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
 
         //REVISIT either make SoapFault's this method public or put this method into a soap fault utility class
         private static String getCodeString(String prefix, String defaultPrefix, QName code) {
-            String codePrefix = null;
+            String codePrefix;
             if (StringUtils.isEmpty(prefix)) {
                 codePrefix = code.getPrefix();
                 if (StringUtils.isEmpty(codePrefix)) {
@@ -171,7 +171,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 codePrefix = prefix;
             }
 
-            return codePrefix + ":" + code.getLocalPart();
+            return codePrefix + ':' + code.getLocalPart();
         }
     }
 }

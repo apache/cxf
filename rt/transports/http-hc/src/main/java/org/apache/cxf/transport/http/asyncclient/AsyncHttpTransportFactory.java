@@ -51,10 +51,15 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
         URI_PREFIXES.add("hc://");
     }
 
-    private final AsyncHTTPConduitFactory factory = new AsyncHTTPConduitFactory();
+    private AsyncHTTPConduitFactory factory = new AsyncHTTPConduitFactory();
 
     public AsyncHttpTransportFactory() {
         super(DEFAULT_NAMESPACES);
+    }
+    
+    
+    public void setAsyncHTTPConduitFactory(AsyncHTTPConduitFactory f) {
+        factory = f;
     }
 
     /**
@@ -100,11 +105,14 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
 
-        HTTPConduit conduit = null;
         // need to updated the endpointInfo
         endpointInfo.setAddress(getAddress(endpointInfo));
-
-        conduit = factory.createConduit(bus, endpointInfo, target);
+        
+        AsyncHTTPConduitFactory fact = bus.getExtension(AsyncHTTPConduitFactory.class);
+        if (fact == null) {
+            fact = factory;
+        }
+        HTTPConduit conduit = fact.createConduit(bus, endpointInfo, target);
 
         // Spring configure the conduit.
         String address = conduit.getAddress();

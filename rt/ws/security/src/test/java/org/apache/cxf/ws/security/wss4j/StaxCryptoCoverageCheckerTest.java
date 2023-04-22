@@ -89,7 +89,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as SOAP Body isn't signed");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -135,7 +135,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as UsernameToken isn't encrypted");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
@@ -193,7 +193,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as UsernameToken isn't signed");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
     }
@@ -253,7 +253,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as UsernameToken isn't encrypted");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
     }
@@ -303,7 +303,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as SOAP Body isn't encrypted");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
     }
@@ -339,7 +339,7 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         try {
             echo.echo("test");
             fail("Failure expected as Timestamp isn't signed");
-        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 

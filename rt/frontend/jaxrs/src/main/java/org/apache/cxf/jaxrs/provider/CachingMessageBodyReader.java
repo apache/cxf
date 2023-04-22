@@ -26,12 +26,11 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 @Provider
@@ -69,7 +68,7 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
         if (delegatingReaders != null) {
             return getDelegatingReader(type, gType, anns, mt);
         }
-        MessageBodyReader<T> r = null;
+        final MessageBodyReader<T> r;
 
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         try {

@@ -162,7 +162,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             fail("expected exception");
         } catch (Exception e) {
             Throwable cause = e;
-            while (cause.getCause() != null) {
+            while (!(cause instanceof ConnectException) && cause.getCause() != null) {
                 cause = cause.getCause();
             }
             // failover attempt bails after retried invocations on

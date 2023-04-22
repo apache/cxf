@@ -103,18 +103,12 @@ public final class PackageUtils {
             String lastToken = tokens.get(tokens.size() - 1);
             idx = lastToken.lastIndexOf('.');
             if (idx > 0) {
-                //lastToken = lastToken.substring(0, idx);
                 lastToken = lastToken.replace('.', '_');
                 tokens.set(tokens.size() - 1, lastToken);
             }
         }
 
         String domain = tokens.remove(0);
-        // comma was removed by tokenize
-//        idx = domain.indexOf(':');
-//        if (idx >= 0) {
-//            domain = domain.substring(0, idx);
-//        }
         List<String> r = tokenize(domain, urnScheme ? ".-" : ".");
         Collections.reverse(r);
         if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
@@ -132,12 +126,14 @@ public final class PackageUtils {
             String token = tokens.get(i);
             token = removeIllegalIdentifierChars(token);
 
+            token = token.toLowerCase();
+
             // this will check for reserved keywords
             if (JavaUtils.isJavaKeyword(token)) {
                 token = '_' + token;
             }
 
-            tokens.set(i, token.toLowerCase());
+            tokens.set(i, token);
         }
 
         // concat all the pieces and return it

@@ -37,6 +37,7 @@ public class NettyHttpClientRequest {
     private CxfResponseCallBack cxfResponseCallback;
     private int connectionTimeout;
     private int receiveTimeout;
+    private int maxResponseContentLength;
 
     public NettyHttpClientRequest(URI requestUri, String method) {
         this.uri = requestUri;
@@ -95,4 +96,11 @@ public class NettyHttpClientRequest {
     }
 
 
+    public void setMaxResponseContentLength(int maxResponseContentLength) {
+        this.maxResponseContentLength = maxResponseContentLength;
+    }
+
+    public int getMaxResponseContentLength() {
+        return maxResponseContentLength;
+    }
 }

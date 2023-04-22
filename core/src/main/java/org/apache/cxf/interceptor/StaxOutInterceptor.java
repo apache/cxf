@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -183,9 +184,10 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
 
                 try {
-                    xif = (XMLOutputFactory)(cls.newInstance());
+                    xif = (XMLOutputFactory)(cls.getDeclaredConstructor().newInstance());
                     factories.put(o, xif);
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                     throw new Fault(e);
                 }
             }

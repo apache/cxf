@@ -50,10 +50,15 @@
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth" address="https://localhost:${testutil.ports.basicauth.Server}/DoubleItBasicAuth" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/basicauth/DoubleItBasicAuth.wsdl" depends-on="tls-settings">
+
+    <bean id="doubleItNoSecurity" class="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl">
+        <property name="enforcePrincipal" value="false"/>
+    </bean>
+
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth" address="https://localhost:${testutil.ports.basicauth.Server}/DoubleItBasicAuth" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/basicauth/DoubleItBasicAuth.wsdl" depends-on="tls-settings">
         <jaxws:properties />
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth2" address="https://localhost:${testutil.ports.basicauth.Server}/DoubleItBasicAuth2" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort2" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/basicauth/DoubleItBasicAuth.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="BasicAuth2" address="https://localhost:${testutil.ports.basicauth.Server}/DoubleItBasicAuth2" serviceName="s:DoubleItService" endpointName="s:DoubleItBasicAuthPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/basicauth/DoubleItBasicAuth.wsdl" depends-on="tls-settings">
         <jaxws:properties />
     </jaxws:endpoint>
     

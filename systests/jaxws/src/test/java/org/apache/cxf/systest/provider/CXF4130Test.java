@@ -22,12 +22,11 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
-import javax.xml.ws.Endpoint;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.ws.Endpoint;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

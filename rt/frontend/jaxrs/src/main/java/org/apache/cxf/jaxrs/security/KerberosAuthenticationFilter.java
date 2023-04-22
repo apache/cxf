@@ -28,13 +28,13 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
@@ -110,7 +110,6 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
 
             if (!gssContext.getCredDelegState()) {
                 gssContext.dispose();
-                gssContext = null;
             }
 
         } catch (LoginException e) {
@@ -152,7 +151,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         //   meaning that a process which runs this code has the
         //   user identity
 
-        LoginContext lc = null;
+        final LoginContext lc;
         if (!StringUtils.isEmpty(loginContextName) || loginConfig != null) {
             lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
         } else {

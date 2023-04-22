@@ -30,9 +30,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.servlet.ServletConfigAware;

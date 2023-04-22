@@ -1,0 +1,26 @@
+[
+  {
+    "interfaces":["jakarta.xml.bind.annotation.XmlAccessorType","org.glassfish.jaxb.core.v2.model.annotation.Locatable"]
+  },
+  {
+    "interfaces":["org.apache.cxf.binding.soap.wsdl.extensions.SoapAddress"]
+  },
+  {
+    "interfaces":["org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding"]
+  },
+  {
+    "interfaces":["org.apache.cxf.binding.soap.wsdl.extensions.SoapBody"]
+  },
+  {
+    "interfaces":["org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation"]
+  },
+  {
+    "interfaces":["org.apache.cxf.common.jaxb.JAXBContextProxy"]
+  },
+  {
+    "interfaces":["org.apache.handlers.AddNumbers","jakarta.xml.ws.BindingProvider","java.io.Closeable","org.apache.cxf.endpoint.Client"]
+  },
+  {
+    "interfaces":["org.glassfish.jaxb.core.marshaller.CharacterEscapeHandler"]
+  }
+]

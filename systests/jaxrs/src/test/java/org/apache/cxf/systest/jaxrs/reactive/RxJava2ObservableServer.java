@@ -19,55 +19,37 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.rx2.server.ReactiveIOInvoker;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.jaxrs.rx2.server.ReactiveIOCustomizer;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 
-public class RxJava2ObservableServer extends AbstractBusTestServerBase {
+public class RxJava2ObservableServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(RxJava2ObservableServer.class);
 
-    org.apache.cxf.endpoint.Server server;
-    public RxJava2ObservableServer() {
-    }
-
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
-        // Make sure default JSONProvider is not loaded
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         bus.setProperty("skip.default.json.provider.registration", true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-        sf.setInvoker(new ReactiveIOInvoker());
         sf.setProvider(new JacksonJsonProvider());
+        sf.setProvider(new IllegalStateExceptionMapper());
+        new ReactiveIOCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(RxJava2ObservableService.class);
         sf.setResourceProvider(RxJava2ObservableService.class,
                                new SingletonResourceProvider(new RxJava2ObservableService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
-        server = sf.create();
+        return sf.create();
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            RxJava2ObservableServer s = new RxJava2ObservableServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new RxJava2ObservableServer().start();
     }
 
 }

@@ -20,7 +20,7 @@ package org.apache.cxf.systest.aegis;
 
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWsWsdlNs",
         targetNamespace = "http://v1_1_2.rtf2pdf.doc.ws.daisy.marbes.cz")

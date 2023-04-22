@@ -213,7 +213,7 @@ public class CommandLineParser {
     }
 
     public String getFormattedDetailedUsage() throws TransformerException, IOException {
-        String usage = null;
+        final String usage;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
             InputStream is = getClass().getResourceAsStream("detailedUsage.xsl")) {
             toolspec.transform(is, baos);
@@ -231,17 +231,9 @@ public class CommandLineParser {
         int optSpan = optSize + afterOptLen - 1;
         int beforeDesSpan = beforeOptSpan + optSpan + 1;
         String lineSeparator = System.getProperty("line.separator");
-        StringTokenizer st1 = new StringTokenizer(usage, lineSeparator);
-        int i = 0;
-        int length = st1.countTokens();
-        String[] originalStrs = new String[length];
-        while (st1.hasMoreTokens()) {
-            String str = st1.nextToken();
-            originalStrs[i] = str;
-            i++;
-        }
+        String[] originalStrs = usage.split(lineSeparator);
         StringBuilder strbuffer = new StringBuilder();
-        for (int j = 0; j < length - 1; j = j + 2) {
+        for (int j = 0; j < originalStrs.length - 1; j = j + 2) {
             int optionLen = originalStrs[j].length();
             addWhiteNamespace(strbuffer, beforeOptSpan);
             if (optionLen <= optSpan) {
@@ -267,7 +259,7 @@ public class CommandLineParser {
             }
             String tmpStr = originalStrs[j + 1];
 
-            for (i = 0; i < tmpStr.length(); i = i + (totalLen - beforeDesSpan)) {
+            for (int i = 0; i < tmpStr.length(); i = i + (totalLen - beforeDesSpan)) {
                 if (i + totalLen - beforeDesSpan < tmpStr.length()) {
                     addWhiteNamespace(strbuffer, beforeDesSpan);
                     int lastIdx = i + totalLen - beforeDesSpan;
@@ -318,7 +310,7 @@ public class CommandLineParser {
                                                                      "annotation");
 
 
-        if ((annotations != null) && (!annotations.isEmpty())) {
+        if ((annotations != null) && !annotations.isEmpty()) {
             result = annotations.get(0).getFirstChild().getNodeValue();
         }
         return result;

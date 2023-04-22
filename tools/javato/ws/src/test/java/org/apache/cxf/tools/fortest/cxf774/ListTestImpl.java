@@ -19,7 +19,7 @@
 package org.apache.cxf.tools.fortest.cxf774;
 import java.util.List;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(serviceName = "SOAPService",
             portName = "SoapPort",

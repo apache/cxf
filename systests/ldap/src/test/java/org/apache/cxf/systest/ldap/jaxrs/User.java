@@ -19,11 +19,11 @@
 
 package org.apache.cxf.systest.ldap.jaxrs;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 @XmlRootElement(name = "User")

@@ -22,8 +22,7 @@ package org.apache.cxf.bus.managers;
 import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.Resource;
-
+import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;

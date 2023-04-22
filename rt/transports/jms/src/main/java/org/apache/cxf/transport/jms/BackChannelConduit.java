@@ -24,12 +24,11 @@ import java.time.ZonedDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfigurationException;
@@ -90,7 +89,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
      */
     public void prepare(final Message message) throws IOException {
         // setup the message to be sent back
-        javax.jms.Message jmsMessage = (javax.jms.Message)inMessage
+        jakarta.jms.Message jmsMessage = (jakarta.jms.Message)inMessage
             .get(JMSConstants.JMS_REQUEST_MESSAGE);
         message.put(JMSConstants.JMS_REQUEST_MESSAGE, jmsMessage);
 
@@ -103,7 +102,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         Exchange exchange = inMessage.getExchange();
         exchange.setOutMessage(message);
 
-        boolean isTextMessage = (jmsMessage instanceof TextMessage) && !JMSMessageUtils.isMtomEnabled(message);
+        boolean isTextMessage = jmsMessage instanceof TextMessage && !JMSMessageUtils.isMtomEnabled(message);
         MessageStreamUtil.prepareStream(message, isTextMessage, this);
     }
 
@@ -141,7 +140,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         initResponseMessageProperties(outProps, inProps);
 
         // setup the reply message
-        final javax.jms.Message request = (javax.jms.Message)inMessage.get(JMS_REQUEST_MESSAGE);
+        final jakarta.jms.Message request = (jakarta.jms.Message)inMessage.get(JMS_REQUEST_MESSAGE);
         if (isTimedOut(request)) {
             return;
         }
@@ -153,7 +152,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
         final String msgType = getMessageType(outMessage, request);
         String correlationId = determineCorrelationID(request);
-        javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig,
+        jakarta.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig,
                                   outMessage,
                                   replyObj,
                                   msgType,
@@ -164,7 +163,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         sender.sendMessage(session, replyTo, reply);
     }
 
-    private String getMessageType(final Message outMessage, final javax.jms.Message request) {
+    private String getMessageType(final Message outMessage, final jakarta.jms.Message request) {
         String msgType;
         if (JMSMessageUtils.isMtomEnabled(outMessage)
             && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
@@ -195,7 +194,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         messageProperties.setSOAPJMSBindingVersion("1.0");
     }
 
-    private boolean isTimedOut(final javax.jms.Message request) throws JMSException {
+    private boolean isTimedOut(final jakarta.jms.Message request) throws JMSException {
         if (request.getJMSExpiration() > 0) {
             ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
             long timeToLive = request.getJMSExpiration() - dateTime.toInstant().toEpochMilli();
@@ -209,7 +208,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
     }
 
     private Destination getReplyToDestination(Session session, Message inMessage2) throws JMSException {
-        javax.jms.Message message = (javax.jms.Message)inMessage2.get(JMSConstants.JMS_REQUEST_MESSAGE);
+        jakarta.jms.Message message = (jakarta.jms.Message)inMessage2.get(JMSConstants.JMS_REQUEST_MESSAGE);
         // If WS-Addressing had set the replyTo header.
         final String replyToName = (String)inMessage2.get(JMSConstants.JMS_REBASED_REPLY_TO);
         if (replyToName != null) {
@@ -228,7 +227,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
      * @return correlation id of request if set else message id from request
      * @throws JMSException
      */
-    public String determineCorrelationID(javax.jms.Message request) throws JMSException {
+    public String determineCorrelationID(jakarta.jms.Message request) throws JMSException {
         return StringUtils.isEmpty(request.getJMSCorrelationID())
             ? request.getJMSMessageID()
             : request.getJMSCorrelationID();

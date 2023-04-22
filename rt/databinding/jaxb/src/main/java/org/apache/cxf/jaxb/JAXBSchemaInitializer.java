@@ -36,18 +36,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.annotation.XmlAccessOrder;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorOrder;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextProxy;
@@ -253,11 +253,10 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     static XmlJavaTypeAdapter findFromTypeAdapter(JAXBContextProxy context, Class<?> clazz, Annotation[] anns) {
-        JAXBBeanInfo ret = null;
         if (anns != null) {
             for (Annotation a : anns) {
                 if (XmlJavaTypeAdapter.class.isAssignableFrom(a.annotationType())) {
-                    ret = findFromTypeAdapter(context, ((XmlJavaTypeAdapter)a).value());
+                    JAXBBeanInfo ret = findFromTypeAdapter(context, ((XmlJavaTypeAdapter)a).value());
                     if (ret != null) {
                         return (XmlJavaTypeAdapter)a;
                     }
@@ -267,7 +266,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (clazz != null) {
             XmlJavaTypeAdapter xjta = clazz.getAnnotation(XmlJavaTypeAdapter.class);
             if (xjta != null) {
-                ret = findFromTypeAdapter(context, xjta.value());
+                JAXBBeanInfo ret = findFromTypeAdapter(context, xjta.value());
                 if (ret != null) {
                     return xjta;
                 }
@@ -336,10 +335,9 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     private void createBridgeXsElement(MessagePartInfo part, QName qn, QName typeName) {
-        XmlSchemaElement el = null;
         SchemaInfo schemaInfo = serviceInfo.getSchema(qn.getNamespaceURI());
         if (schemaInfo != null) {
-            el = schemaInfo.getElementByQName(qn);
+            XmlSchemaElement el = schemaInfo.getElementByQName(qn);
             if (el == null) {
                 createXsElement(schemaInfo.getSchema(), part, typeName, schemaInfo);
 
@@ -357,7 +355,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         schemaInfo = new SchemaInfo(qn.getNamespaceURI(), qualifiedSchemas, false);
         schemaInfo.setSchema(schema);
 
-        el = createXsElement(schema, part, typeName, schemaInfo);
+        createXsElement(schema, part, typeName, schemaInfo);
 
         NamespaceMap nsMap = new NamespaceMap();
         nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, schema.getTargetNamespace());
@@ -498,7 +496,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             //TODO: handle @XmlAccessOrder
         }
 
-        XmlSchema schema = null;
         if (schemaInfo == null) {
             NamespaceMap nsMap = new NamespaceMap();
             nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, part.getElementQName().getNamespaceURI());
@@ -506,7 +503,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             schemaInfo = createSchemaIfNeeded(part.getElementQName().getNamespaceURI(), nsMap);
 
         }
-        schema = schemaInfo.getSchema();
+        XmlSchema schema = schemaInfo.getSchema();
 
 
         // Before updating everything, make sure we haven't added this
@@ -544,7 +541,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             //we want to return the right type for collections so if we get null
             //from the return type we check if it's ParameterizedType and get the
             //generic return type.
-            if ((type == null) && (f.getGenericType() instanceof ParameterizedType)) {
+            if ((type == null) && f.getGenericType() instanceof ParameterizedType) {
                 type = f.getGenericType();
             }
             if (generateGenericType(type)) {
@@ -563,7 +560,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             // we want to return the right type for collections so if we get null
             // from the return type we check if it's ParameterizedType and get the
             // generic return type.
-            if ((type == null) && (m.getGenericReturnType() instanceof ParameterizedType)) {
+            if ((type == null) && m.getGenericReturnType() instanceof ParameterizedType) {
                 type = m.getGenericReturnType();
             }
 

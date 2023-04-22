@@ -29,11 +29,11 @@ import java.util.logging.Level;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.Reference;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -337,7 +337,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         } else if (token instanceof UsernameToken) {
             // Create a UsernameToken object for derived keys and store the security token
             byte[] salt = UsernameTokenUtil.generateSalt(true);
-            WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, salt, true);
+            WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, salt);
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey(salt);
             Arrays.fill(salt, (byte)0);
@@ -577,7 +577,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 sig.setCustomTokenValueType(tokenType);
             }
         }
-        Crypto crypto = null;
+        Crypto crypto;
         if (secTok.getSecret() == null) {
             sig.setX509Certificate(secTok.getX509Certificate());
 

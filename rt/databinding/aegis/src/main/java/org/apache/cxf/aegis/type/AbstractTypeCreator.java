@@ -20,6 +20,7 @@ package org.apache.cxf.aegis.type;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -34,8 +35,8 @@ import org.apache.cxf.aegis.type.basic.ObjectType;
 import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
-import org.apache.cxf.aegis.util.ServiceUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -107,7 +108,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     public AegisType createTypeForClass(TypeClassInfo info) {
 
         Class<?> javaClass = TypeUtil.getTypeRelatedClass(info.getType());
-        AegisType result = null;
+        final AegisType result;
         boolean newType = true;
         if (info.getType() instanceof TypeVariable) {
             //it's the generic type
@@ -158,7 +159,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
 
     protected boolean isHolder(Class<?> javaType) {
-        return "javax.xml.ws.Holder".equals(javaType.getName());
+        return "jakarta.xml.ws.Holder".equals(javaType.getName());
     }
 
     protected AegisType createHolderType(TypeClassInfo info) {
@@ -179,7 +180,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected AegisType createUserType(TypeClassInfo info) {
         try {
-            AegisType type = info.getAegisTypeClass().newInstance();
+            AegisType type = info.getAegisTypeClass().getDeclaredConstructor().newInstance();
 
             QName name = info.getTypeName();
             if (name == null) {
@@ -203,10 +204,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             type.setTypeMapping(getTypeMapping());
 
             return type;
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | IllegalArgumentException | InvocationTargetException 
+                | NoSuchMethodException e) {
             throw new DatabindingException("Couldn't instantiate type classs "
                                            + info.getAegisTypeClass().getName(), e);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | SecurityException e) {
             throw new DatabindingException("Couldn't access type classs "
                                            + info.getAegisTypeClass().getName(), e);
         }

@@ -22,6 +22,7 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -237,10 +238,8 @@ public class Java2WSMojo extends AbstractMojo {
         if (requiresModules) {
             // Since JEP 261 ("Jigsaw"), access to some packages must be granted
             fork = true;
-            boolean skipXmlWsModule = JavaUtils.isJava11Compatible(); //
             additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + (skipXmlWsModule ? "" : "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED ")
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "
@@ -293,9 +292,9 @@ public class Java2WSMojo extends AbstractMojo {
         List<String> args = new ArrayList<>();
 
         if (fork) {
-            String[] split = additionalJvmArgs.split("\\s+");
-            for (String each : split) {
-                args.add(each);
+            if (!StringUtils.isEmpty(additionalJvmArgs)) {
+                String[] split = additionalJvmArgs.split("\\s+");
+                args.addAll(Arrays.asList(split));
             }
             // @see JavaToWS#isExitOnFinish()
             args.add("-DexitOnFinish=true");

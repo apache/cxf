@@ -35,6 +35,7 @@ import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.RaisesType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
@@ -251,6 +252,9 @@ public class CorbaConduitTest {
     public void testBuildArguments() throws Exception {
         Message msg = new MessageImpl();
         CorbaMessage message = new CorbaMessage(msg);
+        Exchange exchange = new ExchangeImpl();
+        exchange.put(Bus.class, bus);
+        message.setExchange(exchange);
         CorbaStreamable[] arguments = new CorbaStreamable[1];
         QName objName = new QName("object");
         QName objIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "short", CorbaConstants.NP_WSDL_CORBA);
@@ -277,6 +281,9 @@ public class CorbaConduitTest {
     public void testBuildReturn() throws Exception {
         Message msg = new MessageImpl();
         CorbaMessage message = new CorbaMessage(msg);
+        Exchange exchange = new ExchangeImpl();
+        exchange.put(Bus.class, bus);
+        message.setExchange(exchange);
 
         QName objName = new QName("returnName");
         QName objIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "short", CorbaConstants.NP_WSDL_CORBA);

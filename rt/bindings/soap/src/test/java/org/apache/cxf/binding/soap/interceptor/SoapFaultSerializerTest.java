@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathConstants;
@@ -35,6 +33,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPPart;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -334,7 +334,7 @@ public class SoapFaultSerializerTest {
         new StartBodyInterceptor().handleMessage(m);
         new Soap12FaultInInterceptor().handleMessage(m);
 
-        nd = m.getContent(Node.class);
+        //nd = m.getContent(Node.class);
 
         fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);

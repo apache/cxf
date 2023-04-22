@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;

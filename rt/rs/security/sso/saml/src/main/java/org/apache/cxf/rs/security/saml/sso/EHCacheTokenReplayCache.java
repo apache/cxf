@@ -99,9 +99,8 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     private URL getConfigFileURL(URL suppliedConfigFileURL) {
         if (suppliedConfigFileURL == null) {
             //using the default
-            URL configFileURL = null;
             try {
-                configFileURL = Loader.getResource(DEFAULT_CONFIG_URL);
+                URL configFileURL = Loader.getResource(DEFAULT_CONFIG_URL);
                 if (configFileURL == null) {
                     configFileURL = new URL(DEFAULT_CONFIG_URL);
                 }

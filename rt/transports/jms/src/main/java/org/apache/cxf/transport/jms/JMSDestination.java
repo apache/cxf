@@ -24,14 +24,13 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.InvalidClientIDException;
-import javax.jms.JMSException;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.InvalidClientIDException;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageListener;
+import jakarta.jms.Session;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -113,12 +112,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }
             if (!jmsConfig.isOneSessionPerConnection()) {
                 // If first connect fails we will try to establish the connection in the background
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        restartConnection();
-                    }
-                }).start();
+                new Thread(() -> restartConnection()).start();
             }
         }
     }
@@ -126,19 +120,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
-        try {
+        try { // NOPMD - UseTryWithResources
             ExceptionListener exListener = new ExceptionListener() {
                 private boolean restartTriggered;
 
                 public synchronized void onException(JMSException exception) {
                     if (!shutdown && !restartTriggered) {
                         LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                restartConnection();
-                            }
-                        }).start();
+                        new Thread(() -> restartConnection()).start();
                         restartTriggered = true;
                     }
                 }
@@ -151,7 +140,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 Destination destination = jmsConfig.getTargetDestination(session);
                 container = new PollingMessageListenerContainer(connection, destination, this, exListener);
             } else {
-                container = new PollingMessageListenerContainer(jmsConfig, false, this);
+                container = new PollingMessageListenerContainer(jmsConfig, false, this, exListener);
             }
 
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
@@ -229,7 +218,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      * using the BackChannelConduit
      *
      */
-    public void onMessage(javax.jms.Message message) {
+    public void onMessage(jakarta.jms.Message message) {
         ClassLoaderHolder origLoader = null;
         Bus origBus = null;
         try {

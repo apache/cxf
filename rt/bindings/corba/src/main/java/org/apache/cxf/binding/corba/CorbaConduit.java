@@ -163,7 +163,7 @@ public class CorbaConduit implements Conduit {
     }
 
     public final EndpointReferenceType getTargetReference(EndpointReferenceType t) {
-        EndpointReferenceType ref = null;
+        final EndpointReferenceType ref;
         if (null == t) {
             ref = new EndpointReferenceType();
             AttributedURIType address = new AttributedURIType();
@@ -189,7 +189,7 @@ public class CorbaConduit implements Conduit {
         if (request == null) {
             throw new CorbaBindingException("Couldn't build the corba request");
         }
-        Exception ex = null;
+        Exception ex;
         try {
             request.invoke();
             ex = request.env().exception();
@@ -232,13 +232,13 @@ public class CorbaConduit implements Conduit {
             prepareOrb();
         }
         // Build the list of DII arguments, returns, and exceptions
-        NVList list = null;
+        final NVList list;
         if (message.getStreamableArguments() != null) {
             CorbaStreamable[] arguments = message.getStreamableArguments();
             list = orb.create_list(arguments.length);
 
             for (CorbaStreamable argument : arguments) {
-                Any value = CorbaAnyHelper.createAny(orb);
+                Any value = CorbaAnyHelper.createAny(orb, message.getExchange().getBus());
                 argument.getObject().setIntoAny(value, argument, true);
                 list.add_value(argument.getName(), value, argument.getMode());
             }
@@ -254,9 +254,9 @@ public class CorbaConduit implements Conduit {
             prepareOrb();
         }
         CorbaStreamable retVal = message.getStreamableReturn();
-        NamedValue ret = null;
+        final NamedValue ret;
         if (retVal != null) {
-            Any returnAny = CorbaAnyHelper.createAny(orb);
+            Any returnAny = CorbaAnyHelper.createAny(orb, message.getExchange().getBus());
             retVal.getObject().setIntoAny(returnAny, retVal, false);
             ret = orb.create_named_value(retVal.getName(), returnAny, org.omg.CORBA.ARG_OUT.value);
         } else {
@@ -279,13 +279,9 @@ public class CorbaConduit implements Conduit {
         // These are defined in the operation definition from WSDL.
         ExceptionList exList = orb.create_exception_list();
 
-
         if (exceptions != null) {
-            Object[] tcs = null;
-            tcs = exceptions.keySet().toArray();
-
-            for (int i = 0; i < exceptions.size(); ++i) {
-                exList.add((TypeCode)tcs[i]);
+            for (TypeCode typeCode : exceptions.keySet()) {
+                exList.add(typeCode);
             }
         }
         return exList;

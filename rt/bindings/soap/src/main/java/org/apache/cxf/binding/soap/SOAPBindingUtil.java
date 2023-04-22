@@ -87,7 +87,7 @@ public final class SOAPBindingUtil {
         /*
          * If we put proxies into the loader of the proxied class, they'll just pile up.
          */
-        Object proxy = null;
+        Object proxy;
         try {
             proxy = Proxy.newProxyInstance(getContextClassLoader(),
                                               new Class[] {cls}, ih);
@@ -362,7 +362,6 @@ public final class SOAPBindingUtil {
     public static boolean isMixedStyle(Binding binding) {
         String bindingStyle = "";
         String previousOpStyle = "";
-        String style = "";
 
         for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
@@ -378,7 +377,7 @@ public final class SOAPBindingUtil {
             for (Object obj : bop.getExtensibilityElements()) {
                 if (isSOAPOperation(obj)) {
                     SoapOperation soapOperation = getSoapOperation(obj);
-                    style = soapOperation.getStyle();
+                    String style = soapOperation.getStyle();
                     if (style == null) {
                         style = "";
                     }
@@ -431,7 +430,7 @@ public final class SOAPBindingUtil {
 
     public static SoapAddress createSoapAddress(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(Port.class,
                                                                WSDLConstants.QNAME_SOAP12_BINDING_ADDRESS);
@@ -444,7 +443,7 @@ public final class SOAPBindingUtil {
 
     public static SoapBody createSoapBody(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(clz, new QName(WSDLConstants.NS_SOAP12,
                                                                            "body"));
@@ -457,7 +456,7 @@ public final class SOAPBindingUtil {
 
     public static SoapBinding createSoapBinding(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(Binding.class,
                                                                new QName(WSDLConstants.NS_SOAP12,
@@ -474,7 +473,7 @@ public final class SOAPBindingUtil {
 
     public static SoapOperation createSoapOperation(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(BindingOperation.class,
                                                                  new QName(WSDLConstants.NS_SOAP12,
@@ -489,7 +488,7 @@ public final class SOAPBindingUtil {
 
     public static SoapFault createSoapFault(ExtensionRegistry extReg, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(BindingFault.class,
                                                              new QName(WSDLConstants.NS_SOAP12,
@@ -504,7 +503,7 @@ public final class SOAPBindingUtil {
 
     public static SoapHeader createSoapHeader(ExtensionRegistry extReg, Class<?> clz, boolean isSOAP12)
         throws WSDLException {
-        ExtensibilityElement extElement = null;
+        final ExtensibilityElement extElement;
         if (isSOAP12) {
             extElement = extReg.createExtension(clz,
                                                               new QName(WSDLConstants.NS_SOAP12,
@@ -528,23 +527,23 @@ public final class SOAPBindingUtil {
         }
     }
 
-    public static javax.jws.soap.SOAPBinding.Style getSoapStyle(String soapStyle) {
+    public static jakarta.jws.soap.SOAPBinding.Style getSoapStyle(String soapStyle) {
         if ("".equals(soapStyle)) {
             return null;
         } else if ("RPC".equalsIgnoreCase(soapStyle)) {
-            return javax.jws.soap.SOAPBinding.Style.RPC;
+            return jakarta.jws.soap.SOAPBinding.Style.RPC;
         } else {
-            return javax.jws.soap.SOAPBinding.Style.DOCUMENT;
+            return jakarta.jws.soap.SOAPBinding.Style.DOCUMENT;
         }
     }
 
-    public static javax.jws.soap.SOAPBinding.Use getSoapUse(String soapUse) {
+    public static jakarta.jws.soap.SOAPBinding.Use getSoapUse(String soapUse) {
         if ("".equals(soapUse)) {
             return null;
         } else if ("ENCODED".equalsIgnoreCase(soapUse)) {
-            return javax.jws.soap.SOAPBinding.Use.ENCODED;
+            return jakarta.jws.soap.SOAPBinding.Use.ENCODED;
         } else {
-            return javax.jws.soap.SOAPBinding.Use.LITERAL;
+            return jakarta.jws.soap.SOAPBinding.Use.LITERAL;
         }
     }
 

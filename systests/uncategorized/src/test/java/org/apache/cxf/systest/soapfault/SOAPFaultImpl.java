@@ -19,9 +19,8 @@
 
 package org.apache.cxf.systest.soapfault;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
 import org.apache.cxf.soapfault.SoapFaultPortType;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 

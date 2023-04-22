@@ -19,7 +19,7 @@
 
 package org.apache.cxf.jaxrs.servlet.jetty;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
@@ -50,8 +50,7 @@ public class JettyEmptyPathApplicationTest extends AbstractSciTest {
 
         @Override
         protected void configureContext(final WebAppContext context) throws Exception {
-            context.setDescriptor(Resource
-                .newClassPathResource("/WEB-INF/web-subclass.xml").getFile().toURI().getPath());
+            context.setDescriptor(getClass().getResource("/WEB-INF/web-subclass.xml").toString());
         }
     }
 

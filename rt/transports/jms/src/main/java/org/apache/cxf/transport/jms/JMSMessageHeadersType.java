@@ -27,12 +27,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Queue;
-import javax.jms.Topic;
-
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Queue;
+import jakarta.jms.Topic;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
@@ -374,13 +373,13 @@ public class JMSMessageHeadersType {
         while (enm.hasMoreElements()) {
             String name = enm.nextElement();
             String val = message.getStringProperty(name);
-            String unescapedName = name.replace("__", ".");
+            String unescapedName = name.replace("_$_", "-").replace("__", ".");
             putProperty(unescapedName, val);
         }
     }
 
     public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
-        String name = origName.replace(".", "__");
+        String name = origName.replace(".", "__").replace("-", "_$_");
         if (value == null) {
             jmsMessage.setStringProperty(name, null);
             return;

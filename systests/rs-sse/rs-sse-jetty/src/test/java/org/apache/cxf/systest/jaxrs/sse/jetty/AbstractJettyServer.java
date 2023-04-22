@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.sse.jetty;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
@@ -31,6 +31,7 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import static org.junit.Assert.fail;
@@ -72,7 +73,7 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             } else {
                 final WebAppContext context = new WebAppContext();
                 context.setContextPath(contextPath);
-                context.setWar(getClass().getResource(resourcePath).toURI().getPath());
+                context.setBaseResource(Resource.newClassPathResource(resourcePath));
 
                 HandlerCollection handlers = new HandlerCollection();
                 handlers.setHandlers(new Handler[] {context, new DefaultHandler()});

@@ -36,27 +36,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBContext;
-
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.Providers;
+import jakarta.xml.bind.JAXBContext;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
@@ -564,7 +563,6 @@ public class JAXRSUtilsTest {
         List<MediaType> methodMimeTypes = new ArrayList<>(
              JAXRSUtils.parseMediaTypes("application/mytype,application/xml,application/json"));
 
-        MediaType acceptContentType = MediaType.valueOf("application/json");
         List <MediaType> candidateList = JAXRSUtils.intersectMimeTypes(methodMimeTypes,
                                                  MediaType.valueOf("application/json"));
 
@@ -588,7 +586,7 @@ public class JAXRSUtilsTest {
 
         //test accept wild card application/*
         methodMimeTypes = JAXRSUtils.parseMediaTypes("text/html,text/xml,application/xml");
-        acceptContentType = MediaType.valueOf("text/*");
+        MediaType acceptContentType = MediaType.valueOf("text/*");
         candidateList = JAXRSUtils.intersectMimeTypes(methodMimeTypes, acceptContentType);
 
         assertEquals(2, candidateList.size());
@@ -1572,7 +1570,7 @@ public class JAXRSUtilsTest {
         Class<?>[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         Message messageImpl = createMessage();
-        String body = "p1=1&p2=2&p2=3";
+        String body = "p1=hello%2bworld&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
         MultivaluedMap<String, String> headers = new MetadataMap<>();
         if (useMediaType) {
@@ -1586,7 +1584,7 @@ public class JAXRSUtilsTest {
         assertEquals("2 form params should've been identified", 2, params.size());
 
         assertEquals("First Form Parameter not matched correctly",
-                     "1", params.get(0));
+                     "hello+world", params.get(0));
         List<String> list = (List<String>)params.get(1);
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
@@ -1633,6 +1631,24 @@ public class JAXRSUtilsTest {
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
         assertEquals("3", list.get(1));
+    }
+
+    @Test
+    public void testEncodedFormParameters() throws Exception {
+        Class<?>[] argType = {String.class, String.class};
+        Method m = Customer.class.getMethod("testEncodedFormParams", argType);
+        final Message messageImpl = createMessage();
+        String body = "p1=yay&p2=%21";
+        messageImpl.put(Message.REQUEST_URI, "/foo");
+        messageImpl.put("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
+                                                               new ClassResourceInfo(Customer.class)),
+                                                           new MetadataMap<String, String>(), messageImpl);
+        assertEquals("2 params should've been identified", 2, params.size());
+        assertEquals("yay", (String)params.get(0));
+        assertEquals("%21", (String)params.get(1)); // if decoded, this will return "!" instead of "%21"
     }
 
     private static Map<ClassResourceInfo, MultivaluedMap<String, String>> getMap(ClassResourceInfo cri) {
@@ -2061,6 +2077,42 @@ public class JAXRSUtilsTest {
         SimpleFactory sf = (SimpleFactory)params.get(1);
         assertEquals(2, sf.getId());
     }
+    
+    @Test
+    public void testBeanParamsWithBooleanConverter() throws Exception {
+        Class<?>[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testBeanParam", argType);
+        Message messageImpl = createMessage();
+        messageImpl.put(Message.REQUEST_URI, "/bar");
+        
+        // The converter converts any Boolean to null
+        ProviderFactory.getInstance(messageImpl)
+            .registerUserProvider(new MyBoolParamConverterProvider());
+        
+        MultivaluedMap<String, String> headers = new MetadataMap<>();
+        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
+        String body = "value=true";
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+
+        final ClassResourceInfo cri = new ClassResourceInfo(Customer.class);
+        final MethodDispatcher md = new MethodDispatcher();
+        
+        final OperationResourceInfo ori = new OperationResourceInfo(m, cri);
+        md.bind(ori, m);
+        
+        cri.setMethodDispatcher(md);
+        cri.initBeanParamInfo(ServerProviderFactory.getInstance(messageImpl));
+
+        List<Object> params = JAXRSUtils.processParameters(ori,
+                                                           null,
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+
+        assertNull(cb.getBool());
+    }
 
     private static OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
                                                                 Message message,
@@ -2108,6 +2160,32 @@ public class JAXRSUtilsTest {
         return endpoint;
     }
 
+    @SuppressWarnings("unchecked")
+    static class MyBoolParamConverterProvider implements ParamConverterProvider {
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+            if (rawType.isAssignableFrom(Boolean.TYPE) || rawType.isAssignableFrom(Boolean.class)) {
+                return (ParamConverter<T>) new ParamConverter<Boolean>() {
+                    @Override
+                    public Boolean fromString(String value) {
+                        if (rawType.isAssignableFrom(Boolean.TYPE)) {
+                            return true;
+                        }
+                        return null;
+                    }
+        
+                    @Override
+                    public String toString(Boolean value) {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+            
+            return null;
+        }
+    }
+    
+    
     static class MyTypeParamConverterProvider
         implements ParamConverterProvider, ParamConverter<MyType<Integer>> {
 

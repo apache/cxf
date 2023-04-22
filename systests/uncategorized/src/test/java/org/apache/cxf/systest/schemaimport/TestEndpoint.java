@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.schemaimport;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService(name = "TestEndpoint", targetNamespace = "http://cxf.apache.org/schemaimport")
 public interface TestEndpoint {

@@ -101,7 +101,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
     /**
      * Create a default attribute
      */
-    private AttributeBean createDefaultAttribute(String tokenType) {
+    private static AttributeBean createDefaultAttribute(String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
 
         if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)

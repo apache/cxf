@@ -17,9 +17,9 @@
  * under the License.
  */
 package org.apache.cxf.systest.ws.addr_responses;
-import javax.jws.WebService;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature.Responses;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature.Responses;
 
 
 @WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort",

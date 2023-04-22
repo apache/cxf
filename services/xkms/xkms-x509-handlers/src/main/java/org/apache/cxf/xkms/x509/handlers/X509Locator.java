@@ -25,8 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.xkms.exception.XKMSCertificateException;
 import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.handlers.Applications;

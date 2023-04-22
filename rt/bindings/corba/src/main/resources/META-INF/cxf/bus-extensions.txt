@@ -1,2 +1,3 @@
 org.apache.cxf.binding.corba.CorbaBindingFactory::true
 org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister::true
+org.apache.cxf.binding.corba.utils.CorbaFixedAnyImplClassCreatorProxyService:org.apache.cxf.binding.corba.utils.CorbaFixedAnyImplClassCreator:true

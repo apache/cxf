@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.discovery.sub;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 @Path("/bookstore/")
 public interface BookStoreInterface {

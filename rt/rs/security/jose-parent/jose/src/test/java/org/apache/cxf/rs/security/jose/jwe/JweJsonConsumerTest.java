@@ -223,7 +223,7 @@ public class JweJsonConsumerTest {
                                        ContentAlgorithm contentEncryptionAlgo,
                                        final byte[] wrapperKeyBytes,
                                        final byte[] cek) throws Exception {
-        JweDecryptionProvider jwe = null;
+        final JweDecryptionProvider jwe;
         if (wrapperKeyBytes != null) {
             SecretKey wrapperKey = CryptoUtils.createSecretKeySpec(wrapperKeyBytes, "AES");
             jwe = JweUtils.createJweDecryptionProvider(wrapperKey,

@@ -39,20 +39,21 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.ParamConverterProvider;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
-
+import jakarta.ws.rs.ConstrainedTo;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.RuntimeType;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -133,7 +134,7 @@ public abstract class ProviderFactory {
                             return c.newInstance(bus);
                         }
                     }
-                    return cls.newInstance();
+                    return cls.getDeclaredConstructor().newInstance();
                 } catch (Throwable ex) {
                     String message = "Problem with creating the provider " + className;
                     if (ex.getMessage() != null) {
@@ -230,7 +231,7 @@ public abstract class ProviderFactory {
                     return c.newInstance(bus);
                 }
             }
-            return cls.newInstance();
+            return cls.getDeclaredConstructor().newInstance();
         } catch (Throwable ex) {
             String message = "Problem with creating the default provider " + className;
             if (ex.getMessage() != null) {
@@ -253,7 +254,7 @@ public abstract class ProviderFactory {
 
         Message responseMessage = isRequestor ? m.getExchange().getInMessage()
                                               : m.getExchange().getOutMessage();
-        Object ctProperty = null;
+        final Object ctProperty;
         if (responseMessage != null) {
             ctProperty = responseMessage.get(Message.CONTENT_TYPE);
         } else {
@@ -436,7 +437,7 @@ public abstract class ProviderFactory {
         if (mr != null || size > 0) {
             ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, getResponseMessage(m));
 
-            List<ReaderInterceptor> interceptors = null;
+            final List<ReaderInterceptor> interceptors;
             if (size > 0) {
                 interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<ReaderInterceptor>> readers =
@@ -474,7 +475,7 @@ public abstract class ProviderFactory {
             })
             WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw, m);
 
-            List<WriterInterceptor> interceptors = null;
+            final List<WriterInterceptor> interceptors;
             if (size > 0) {
                 interceptors = new ArrayList<>(size + 1);
                 List<ProviderInfo<WriterInterceptor>> writers =
@@ -623,13 +624,18 @@ public abstract class ProviderFactory {
     protected abstract void setProviders(boolean custom, boolean busGlobal, Object... providers);
 
     @SuppressWarnings("unchecked")
-    protected void setCommonProviders(List<ProviderInfo<? extends Object>> theProviders) {
+    protected void setCommonProviders(List<ProviderInfo<? extends Object>> theProviders, RuntimeType type) {
         List<ProviderInfo<ReaderInterceptor>> readInts =
             new LinkedList<>();
         List<ProviderInfo<WriterInterceptor>> writeInts =
             new LinkedList<>();
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(bus, provider.getProvider());
+
+            // Check if provider is constrained to runtime type
+            if (!constrainedTo(providerCls, type)) {
+                continue;
+            }
 
             if (filterContractSupported(provider, providerCls, MessageBodyReader.class)) {
                 addProviderToList(messageReaders, provider);
@@ -662,6 +668,7 @@ public abstract class ProviderFactory {
         sortReaders();
         sortWriters();
         sortContextResolvers();
+        sortParamConverterProviders();
 
         mapInterceptorFilters(readerInterceptors, readInts, ReaderInterceptor.class, true);
         mapInterceptorFilters(writerInterceptors, writeInts, WriterInterceptor.class, true);
@@ -740,6 +747,14 @@ public abstract class ProviderFactory {
             messageWriters.sort(new MessageBodyWriterComparator());
         } else {
             doCustomSort(messageWriters);
+        }
+    }
+    
+    private <T> void sortParamConverterProviders() {
+        if (!customComparatorAvailable(ParamConverterProvider.class)) {
+            paramConverters.sort(new ParamConverterProviderComparator(bus));
+        } else {
+            doCustomSort(paramConverters);
         }
     }
 
@@ -903,12 +918,34 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
+            
             result = compareCustomStatus(p1, p2);
             if (result != 0) {
                 return result;
             }
 
             return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
+        }
+    }
+
+    private static class ParamConverterProviderComparator implements Comparator<ProviderInfo<ParamConverterProvider>> {
+        private final Bus bus;
+        
+        ParamConverterProviderComparator(Bus bus) {
+            this.bus = bus;
+        }
+        
+        @Override
+        public int compare(ProviderInfo<ParamConverterProvider> p1, ProviderInfo<ParamConverterProvider> p2) {
+            final int result = compareCustomStatus(p1, p2);
+            if (result != 0) {
+                return result;
+            }
+
+            final Class<?> cl1 = ClassHelper.getRealClass(bus, p1.getProvider());
+            final Class<?> cl2 = ClassHelper.getRealClass(bus, p2.getProvider());
+
+            return comparePriorityStatus(cl1, cl2);
         }
     }
 
@@ -1131,8 +1168,13 @@ public abstract class ProviderFactory {
         if (realClass1.isAssignableFrom(realClass2)) {
             // subclass should go first
             return 1;
+        } else if (realClass2.isAssignableFrom(realClass1)) {
+            // superclass should go last
+            return -1;
         }
-        return -1;
+        
+        // there is no relation between the types returned by the providers
+        return 0;
     }
 
     private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass) {
@@ -1237,7 +1279,7 @@ public abstract class ProviderFactory {
                 }
             }
         }
-        Object instance = null;
+        final Object instance;
         try {
             instance = c.newInstance(cArgs);
         } catch (Throwable ex) {
@@ -1349,8 +1391,7 @@ public abstract class ProviderFactory {
 
     }
     protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
-        Class<?> pClass = ClassHelper.getRealClass(bus, provider);
-        Set<String> names = AnnotationUtils.getNameBindings(pClass.getAnnotations());
+        Set<String> names = AnnotationUtils.getInstanceNameBindings(bus, provider);
         if (names.isEmpty()) {
             names = Collections.singleton(DEFAULT_FILTER_NAME_BINDING);
         }
@@ -1476,7 +1517,8 @@ public abstract class ProviderFactory {
 
         sortReaders();
         sortWriters();
-
+        sortParamConverterProviders();
+        
         NameKeyMap<ProviderInfo<ReaderInterceptor>> sortedReaderInterceptors =
             new NameKeyMap<>(
                 (Comparator<ProviderInfo<?>>) providerComparator, true);
@@ -1490,4 +1532,15 @@ public abstract class ProviderFactory {
         writerInterceptors = sortedWriterInterceptors;
     }
 
+    /**
+     * Checks the presence of {@link ConstrainedTo} annotation and, if present, applicability to 
+     * the runtime type.
+     * @param providerCls provider class
+     * @param type runtime type
+     * @return "true" if provider could be used with runtime type, "false" otherwise
+     */
+    protected static boolean constrainedTo(Class<?> providerCls, RuntimeType type) {
+        final ConstrainedTo constrained = AnnotationUtils.getClassAnnotation(providerCls, ConstrainedTo.class);
+        return constrained == null || constrained.value() == type;
+    }
 }

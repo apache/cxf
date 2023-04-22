@@ -21,12 +21,12 @@ package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.core.IsCollectionContaining;
+import org.hamcrest.core.IsIterableContaining;
 
 import io.jaegertracing.internal.JaegerSpan;
 import io.jaegertracing.internal.LogData;
 
-public class HasSpan extends IsCollectionContaining<JaegerSpan> {
+public class HasSpan extends IsIterableContaining<JaegerSpan> {
     public HasSpan(final String name) {
         this(name, null);
     }

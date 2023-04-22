@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.jaxws.metrics;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 @WebService(name = "Library", serviceName = "Book",
 endpointInterface = "org.apache.cxf.systest.jaxws.metrics.IBookWebService")

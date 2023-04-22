@@ -21,11 +21,10 @@ package org.apache.cxf.jaxws.binding.http;
 
 import java.util.List;
 
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.http.HTTPBinding;
-
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.http.HTTPBinding;
 import org.apache.cxf.jaxws.binding.AbstractBindingImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingInfo;

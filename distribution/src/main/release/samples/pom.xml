@@ -22,20 +22,34 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>4.0.1-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
     <properties>
+        <cxf.jdk.version>11</cxf.jdk.version>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
-        <spring.cloud.eureka.version>2.2.1.RELEASE</spring.cloud.eureka.version>
-        <cxf.jetty9.version>9.4.27.v20200227</cxf.jetty9.version>
-        <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>3.25.0</cxf.swagger.ui.version>
-        <cxf.tika.version>1.24</cxf.tika.version>
+        <spring.boot.version>3.0.6</spring.boot.version>
+        <spring.cloud.eureka.version>4.0.1</spring.cloud.eureka.version>
+        <cxf.jetty11.version>11.0.15</cxf.jetty11.version>
+        <cxf.netty.version>4.1.91.Final</cxf.netty.version>
+        <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
+        <cxf.swagger.ui.version>4.18.2</cxf.swagger.ui.version>
+        <cxf.tika.version>2.7.0</cxf.tika.version>
+        <cxf.tomcat.version>10.1.8</cxf.tomcat.version>
+        <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
+        <cxf.gson.version>2.10.1</cxf.gson.version>
+        <cxf.lucene.version>9.5.0</cxf.lucene.version>
+        <cxf.olingo.server.version>4.9.0</cxf.olingo.server.version>
+        <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
+        <cxf.brave.version>5.15.1</cxf.brave.version>
+        <cxf.zest.version>2.1</cxf.zest.version>
+        <cxf.activemq.artemis.version>2.27.1</cxf.activemq.artemis.version>
+        <cxf.h2.version>2.1.214</cxf.h2.version>
+        <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
+        <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -49,15 +63,12 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-logging</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <modules>
         <module>aegis</module>
         <module>aegis_standalone</module>
         <module>callback</module>
-        <module>clustering/failover_jaxws_osgi</module>
-        <module>clustering/failover_server</module>
         <module>configuration_interceptor</module>
         <module>corba/bank</module>
         <module>corba/bank_ws_addressing</module>
@@ -75,17 +86,10 @@
         <module>jax_rs/big_query</module>
         <module>jax_rs/content_negotiation</module>
         <module>jax_rs/description_openapi_v3</module>
-        <module>jax_rs/description_openapi_v3_osgi</module>
         <module>jax_rs/description_openapi_v3_web</module>
         <module>jax_rs/description_openapi_v3_spring</module>
-        <module>jax_rs/description_swagger2</module>
-        <module>jax_rs/description_swagger2_osgi</module>
-        <module>jax_rs/description_swagger2_spring</module>
-        <module>jax_rs/description_swagger2_web</module>
-        <module>jax_rs/minimal_osgi</module>
         <module>jax_rs/odata</module>
         <module>jax_rs/search</module>
-        <module>jax_rs/spark</module>
         <module>jax_rs/spring_boot</module>
         <module>jax_rs/spring_boot_scan/application</module>
         <module>jax_rs/spring_boot_scan/client</module>
@@ -93,23 +97,17 @@
         <module>jax_rs/spring_security</module>
         <module>jax_rs/sse_cdi</module>
         <module>jax_rs/sse_client</module>
-        <module>jax_rs/sse_osgi</module>
         <module>jax_rs/sse_spring</module>
         <module>jax_rs/sse_tomcat</module>
         <module>jax_rs/tracing_brave</module>
-        <module>jax_rs/tracing_brave_osgi</module>
         <module>jax_rs/tracing_opentracing</module>
-        <module>jax_rs/tracing_opentracing_camel</module>
-        <module>jax_rs/tracing_opentracing_osgi</module>
         <module>jax_rs/websocket</module>
-        <module>jax_rs/websocket_osgi</module>
         <module>jax_rs/websocket_web</module>
         <module>jax_server_aegis_client</module>
         <module>jaxws_async</module>
         <module>jaxws_dispatch_provider</module>
         <module>jaxws_handlers</module>
         <module>jaxws_spring_boot</module>
-        <module>jaxws_tracing_brave_osgi</module>
         <module>jms_pubsub</module>
         <module>jms_queue</module>
         <module>jms_spec_demo</module>
@@ -119,8 +117,6 @@
         <module>js_client</module>
         <module>js_provider</module>
         <module>mtom</module>
-        <module>oauth/client</module>
-        <module>oauth/server</module>
         <module>restful_dispatch</module>
         <module>ruby_spring_support</module>
         <module>soap_header</module>
@@ -145,6 +141,13 @@
         <module>wsdl_first_soap12</module>
         <module>wsdl_first_xml_wrapped</module>
         <module>jax_rs/description_openapi_microprofile_spring</module>
+        <module>jaxws_graalvm</module>
+        <module>jaxws_graalvm_dynamic/client</module>
+        <module>jaxws_graalvm_dynamic/server</module>
+        <module>jax_rs/graalvm_basic</module>
+        <module>jax_rs/basic_http2_undertow</module>
+        <module>jax_rs/basic_http2_netty</module>
+        <module>jax_rs/basic_http2_jetty</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -168,6 +171,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.corba</groupId>
+                <artifactId>glassfish-corba-orb</artifactId>
+                <version>4.2.4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -177,36 +185,53 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>${cxf.jdk.version}</source>
+                        <target>${cxf.jdk.version}</target>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>4.2.1</version>
+                    <version>5.1.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>${cxf.jetty9.version}</version>
+                    <version>${cxf.jetty11.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.3.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -242,54 +267,29 @@
             </pluginRepositories>
         </profile>
         <profile>
-            <id>java9-plus</id>
+            <id>jdk11</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <jdk>[11,16)</jdk>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                    <version>1.3.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.xml.ws</groupId>
-                    <artifactId>jakarta.xml.ws-api</artifactId>
-                    <version>2.3.3</version>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                    <version>1.2.2</version>
-                </dependency>
-                <dependency>
-                    <groupId>jakarta.jws</groupId>
-                    <artifactId>jakarta.jws-api</artifactId>
-                    <version>1.1.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.xml.messaging.saaj</groupId>
-                    <artifactId>saaj-impl</artifactId>
-                    <version>1.3.23</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jta_1.1_spec</artifactId>
-                    <version>1.1.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-runtime</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-xjc</artifactId>
-                </dependency>
-            </dependencies>
+            <properties>
+                <cxf.spring.boot.version>2.7.6</cxf.spring.boot.version>
+                <cxf.spring.version>5.3.24</cxf.spring.version>
+                <spring.boot.version>2.7.6</spring.boot.version>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>spring.milestone</id>
+                    <url>https://repo.spring.io/milestone/</url>
+                    <name>Spring Milestone Repo</name>
+                </repository>
+                <repository>
+                    <id>netflix.candidates</id>
+                    <url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
         </profile>
     </profiles>
     <!--

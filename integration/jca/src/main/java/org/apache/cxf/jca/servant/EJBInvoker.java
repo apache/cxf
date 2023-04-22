@@ -21,8 +21,7 @@ package org.apache.cxf.jca.servant;
 
 import java.lang.reflect.Method;
 
-import javax.ejb.EJBHome;
-
+import jakarta.ejb.EJBHome;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 
@@ -50,13 +49,11 @@ public class EJBInvoker extends AbstractInvoker {
 
     @Override
     public Object getServiceObject(Exchange context) {
-        Object ejbObject = null;
         try {
-            ejbObject = createMethod.invoke(home, EMPTY_OBJECT);
+            return createMethod.invoke(home, EMPTY_OBJECT);
         } catch (Exception e) {
             throw new RuntimeException("Error in creating EJB Object");
         }
-        return ejbObject;
     }
 
 }

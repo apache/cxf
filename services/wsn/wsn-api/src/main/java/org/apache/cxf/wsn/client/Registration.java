@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.wsn.client;
 
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.br_2.DestroyRegistration;
 import org.oasis_open.docs.wsn.brw_2.PublisherRegistrationManager;

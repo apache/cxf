@@ -26,13 +26,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Holder;
-import javax.xml.ws.soap.SOAPBinding;
+
+import jakarta.activation.DataHandler;
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.mime.TestMtomPortType;
 import org.apache.cxf.mime.TestMtomService;

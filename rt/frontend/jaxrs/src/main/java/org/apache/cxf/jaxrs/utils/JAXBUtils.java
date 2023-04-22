@@ -27,12 +27,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.common.logging.LogUtils;
 
 public final class JAXBUtils {
@@ -51,7 +50,7 @@ public final class JAXBUtils {
 
         JAXBContext ctx;
         try {
-            ctx = JAXBContext.newInstance(classes.toArray(new Class[0]), contextProperties);
+            ctx = org.apache.cxf.common.jaxb.JAXBUtils.createContext(classes, contextProperties);
             return ctx;
         } catch (JAXBException ex) {
             LOG.log(Level.SEVERE, "No JAXB context can be created", ex);
@@ -150,7 +149,7 @@ public final class JAXBUtils {
         if (typeAdapter != null) {
             try {
                 @SuppressWarnings("rawtypes")
-                XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
+                XmlAdapter xmlAdapter = typeAdapter.value().getDeclaredConstructor().newInstance();
                 if (marshal) {
                     return xmlAdapter.marshal(obj);
                 }

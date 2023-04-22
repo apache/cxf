@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
-import java.io.File;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -58,18 +56,4 @@ public final class SecurityTestUtil {
         return UNRESTRICTED_POLICIES_INSTALLED;
     }
 
-    public static void cleanup() {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        if (tmpDir != null) {
-            File[] tmpFiles = new File(tmpDir).listFiles();
-            if (tmpFiles != null) {
-                for (File tmpFile : tmpFiles) {
-                    // Cleanup eh-caches
-                    if (tmpFile.exists() && tmpFile.getName().matches("cxf.*.data")) {
-                        tmpFile.delete();
-                    }
-                }
-            }
-        }
-    }
 }

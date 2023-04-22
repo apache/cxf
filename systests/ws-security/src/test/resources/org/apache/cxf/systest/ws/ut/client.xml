@@ -54,6 +54,7 @@
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
+            <entry key="ws-security.actor" value="recipient"/>
         </jaxws:properties>
     </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextSupportingSP11Port" createdFromAPI="true">

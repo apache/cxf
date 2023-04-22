@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.tools.fortest.cxf2934;
 
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.xml.ws.Holder;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.xml.ws.Holder;
 
 public class WebParamService {
     @WebMethod(operationName = "helloString", action = "urn:HelloString")

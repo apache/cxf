@@ -23,14 +23,13 @@ package org.apache.cxf.transport.http.netty.server.spring;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBContext;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.bind.JAXBContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -229,7 +228,6 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         String threadingRef;
         String tlsRef;
-        Bus bus;
         NettyHttpServerEngineFactory factory;
 
         public SpringNettyHttpServerEngine(
@@ -237,8 +235,7 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             Bus b,
             String host,
             int port) {
-            super(host, port);
-            bus = b;
+            super(host, port, b);
             factory = fac;
         }
 
@@ -247,15 +244,15 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
         }
 
         public void setBus(Bus b) {
-            bus = b;
-            if (null != bus && null == factory) {
-                factory = bus.getExtension(NettyHttpServerEngineFactory.class);
+            super.setBus(b);
+            if (null != getBus() && null == factory) {
+                factory = getBus().getExtension(NettyHttpServerEngineFactory.class);
             }
         }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (bus == null) {
-                bus = BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx);
+            if (getBus() == null) {
+                setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
 

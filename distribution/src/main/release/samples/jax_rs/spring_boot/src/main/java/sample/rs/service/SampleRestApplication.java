@@ -25,6 +25,8 @@ import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
+import org.apache.cxf.metrics.MetricsFeature;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,6 +39,8 @@ import sample.rs.service.hello2.HelloServiceImpl2;
 public class SampleRestApplication {
     @Autowired
     private Bus bus;
+    @Autowired
+    private MetricsProvider metricsProvider;
 
     public static void main(String[] args) {
         SpringApplication.run(SampleRestApplication.class, args);
@@ -48,7 +52,7 @@ public class SampleRestApplication {
         endpoint.setBus(bus);
         endpoint.setServiceBeans(Arrays.<Object>asList(new HelloServiceImpl1(), new HelloServiceImpl2()));
         endpoint.setAddress("/");
-        endpoint.setFeatures(Arrays.asList(createOpenApiFeature(), new LoggingFeature()));
+        endpoint.setFeatures(Arrays.asList(createOpenApiFeature(), metricsFeature(), new LoggingFeature()));
         return endpoint.create();
     }
 
@@ -66,5 +70,10 @@ public class SampleRestApplication {
             new SwaggerUiConfig()
                 .url("/services/helloservice/openapi.json"));
         return openApiFeature;
+    }
+    
+    @Bean
+    public MetricsFeature metricsFeature() {
+        return new MetricsFeature(metricsProvider);
     }
 }

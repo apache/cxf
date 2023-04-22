@@ -26,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,24 +43,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.ParamConverter;
-import javax.ws.rs.ext.WriterInterceptor;
 import javax.xml.stream.XMLStreamWriter;
 
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.InvocationCallback;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.WriterInterceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -103,6 +102,7 @@ import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
  * Common proxy and http-centric client implementation
@@ -439,6 +439,11 @@ public abstract class AbstractClient implements Client {
         if (responseMessage == null) {
             return currentResponseBuilder;
         }
+        
+        final String reasonPhrase = (String)responseMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE);
+        if (reasonPhrase != null) {
+            currentResponseBuilder.status(status, reasonPhrase);
+        }
 
         Map<String, List<Object>> protocolHeaders =
             CastUtils.cast((Map<?, ?>)responseMessage.get(Message.PROTOCOL_HEADERS));
@@ -448,7 +453,7 @@ public abstract class AbstractClient implements Client {
             if (null == entry.getKey()) {
                 continue;
             }
-            if (entry.getValue().size() > 0) {
+            if (!entry.getValue().isEmpty()) {
                 if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
                     currentResponseBuilder.header(entry.getKey(), entry.getValue().get(0));
                     continue;
@@ -456,8 +461,8 @@ public abstract class AbstractClient implements Client {
                 entry.getValue().forEach(valObject -> {
                     if (splitHeaders && valObject instanceof String) {
                         String val = (String) valObject;
-                        String[] values;
-                        if (val.length() == 0) {
+                        final String[] values;
+                        if (val.isEmpty()) {
                             values = new String[]{""};
                         } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
                             // if the value starts with a quote and ends with a quote, we do a best
@@ -470,7 +475,7 @@ public abstract class AbstractClient implements Client {
                         }
                         for (String s : values) {
                             String theValue = s.trim();
-                            if (theValue.length() > 0) {
+                            if (!theValue.isEmpty()) {
                                 currentResponseBuilder.header(entry.getKey(), theValue);
                             }
                         }
@@ -486,6 +491,7 @@ public abstract class AbstractClient implements Client {
         }
         InputStream mStream = responseMessage.getContent(InputStream.class);
         currentResponseBuilder.entity(mStream);
+        
 
         return currentResponseBuilder;
     }
@@ -555,7 +561,7 @@ public abstract class AbstractClient implements Client {
 
     protected boolean responseStreamCanBeClosed(Message outMessage, Class<?> cls) {
         return !JAXRSUtils.isStreamingOutType(cls)
-            && MessageUtils.getContextualBoolean(outMessage, "response.stream.auto.close");
+            && MessageUtils.getContextualBoolean(outMessage, ResponseImpl.RESPONSE_STREAM_AUTO_CLOSE);
     }
 
     protected void completeExchange(Exchange exchange, boolean proxy) {
@@ -766,7 +772,7 @@ public abstract class AbstractClient implements Client {
             } else {
                 addMatrixOrQueryToBuilder(ub, paramName, pt, pValues);
             }
-        } else {
+        } else if (pValues != null && pValues.length > 0) {
             Object pValue = pValues[0];
             MultivaluedMap<String, Object> values = InjectionUtils.extractValuesFromBean(pValue, "");
             values.forEach((key, value) -> {
@@ -847,19 +853,6 @@ public abstract class AbstractClient implements Client {
         throw new ProcessingException(errorMessage, actualEx);
     }
 
-    protected static void setAllHeaders(MultivaluedMap<String, String> headers, HttpURLConnection conn) {
-        headers.forEach((key, value) -> {
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < value.size(); i++) {
-                b.append(value.get(i));
-                if (i + 1 < value.size()) {
-                    b.append(',');
-                }
-            }
-            conn.setRequestProperty(key, b.toString());
-        });
-    }
-
     protected String[] parseQuotedHeaderValue(String originalValue) {
         // this algorithm isn't perfect; see CXF-3518 for further discussion.
         List<String> results = new ArrayList<>();
@@ -868,10 +861,10 @@ public abstract class AbstractClient implements Client {
         int lastIndex = chars.length - 1;
 
         boolean quote = false;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         for (int pos = 0; pos <= lastIndex; pos++) {
-            char c = chars[pos];
+            final char c = chars[pos];
             if (pos == lastIndex) {
                 sb.append(c);
                 results.add(sb.toString());
@@ -882,16 +875,7 @@ public abstract class AbstractClient implements Client {
                     quote = !quote;
                     break;
                 case '\\':
-                    if (quote) {
-                        pos++;
-                        if (pos <= lastIndex) {
-                            c = chars[pos];
-                            sb.append(c);
-                        }
-                        if (pos == lastIndex) {
-                            results.add(sb.toString());
-                        }
-                    } else {
+                    if (!quote) {
                         sb.append(c);
                     }
                     break;
@@ -900,7 +884,7 @@ public abstract class AbstractClient implements Client {
                         sb.append(c);
                     } else {
                         results.add(sb.toString());
-                        sb = new StringBuilder();
+                        sb.setLength(0);
                     }
                     break;
                 default:
@@ -978,6 +962,8 @@ public abstract class AbstractClient implements Client {
     }
 
     protected void setSupportOnewayResponseProperty(Message outMessage) {
+        // Do propagate the response down to observer chain
+        outMessage.put(Message.PROPAGATE_202_RESPONSE_ONEWAY_OR_PARTIAL, true);
         if (!outMessage.getExchange().isOneWay()) {
             outMessage.put(Message.PROCESS_ONEWAY_RESPONSE, true);
         }
@@ -1071,7 +1057,7 @@ public abstract class AbstractClient implements Client {
     protected Object checkIfBodyEmpty(Object body, String contentType) {
         //CHECKSTYLE:OFF
         if (body != null
-            && (body.getClass() == String.class && ((String)body).length() == 0
+            && (body.getClass() == String.class && ((String)body).isEmpty()
             || body.getClass() == Form.class && ((Form)body).asMap().isEmpty()
             || Map.class.isAssignableFrom(body.getClass()) && ((Map<?, ?>)body).isEmpty()
                 && !MediaType.APPLICATION_JSON.equals(contentType)
@@ -1210,7 +1196,7 @@ public abstract class AbstractClient implements Client {
         }
     }
 
-    protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
+    protected abstract static class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
 
         public AbstractBodyWriter() {
             super(Phase.WRITE);

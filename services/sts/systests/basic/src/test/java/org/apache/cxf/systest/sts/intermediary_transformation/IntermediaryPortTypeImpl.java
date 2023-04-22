@@ -22,15 +22,15 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebServiceContext;
 
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -41,7 +41,7 @@ import org.junit.Assert;
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")
-public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
+public class IntermediaryPortTypeImpl extends AbstractClientServerTestBase implements DoubleItPortType {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");

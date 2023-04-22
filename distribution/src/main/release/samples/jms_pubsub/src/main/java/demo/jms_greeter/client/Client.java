@@ -20,7 +20,9 @@ package demo.jms_greeter.client;
 
 import java.io.Closeable;
 import java.io.File;
+
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
 

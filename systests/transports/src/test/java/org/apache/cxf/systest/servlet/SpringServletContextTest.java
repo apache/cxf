@@ -20,30 +20,41 @@ package org.apache.cxf.systest.servlet;
 
 import java.util.Arrays;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.servletunit.ServletUnitClient;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SpringServletContextTest extends AbstractServletTest {
+
+    @Ignore
+    public static class EmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+
+        public EmbeddedJettyServer() {
+            super("/org/apache/cxf/systest/servlet/web-spring-context.xml", "/", CONTEXT, PORT);
+        }
+    }
+
     @Configuration
     public static class AppConfig {
         @Bean(destroyMethod = "shutdown")
@@ -77,26 +88,33 @@ public class SpringServletContextTest extends AbstractServletTest {
         }
     }
     
-    @Override
-    protected String getConfiguration() {
-        return "/org/apache/cxf/systest/servlet/web-spring-context.xml";
+    @BeforeClass
+    public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        createStaticBus();
     }
 
-    @Override
-    protected Bus createBus() throws BusException {
-        // don't set up the bus, let the servlet do it
-        return null;
+    @AfterClass
+    public static void tearDown() throws Exception {
+        stopAllServers();
     }
 
     @Test
     public void testContextRefresh() throws Exception {
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(true);
-
-        for (int i = 0; i < 5; ++i) {
-            final WebRequest request = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/context/refresh");
-            final WebResponse response = client.getResponse(request);
-            assertThat(response.getResponseCode(), equalTo(204));
+        try (CloseableHttpClient client = newClient()) {
+            final HttpGet method = new HttpGet(uri("/services/context/refresh"));
+            
+            for (int i = 0; i < 5; ++i) {
+                try (CloseableHttpResponse response = client.execute(method)) {
+                    assertThat(response.getStatusLine().getStatusCode(), equalTo(204));
+                }
+            }
         }
+    }
+    
+    @Override
+    protected int getPort() {
+        return EmbeddedJettyServer.PORT;
     }
 }

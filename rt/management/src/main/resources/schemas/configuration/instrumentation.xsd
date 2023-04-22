@@ -21,10 +21,10 @@
 <xs:schema targetNamespace="http://cxf.apache.org/management"
     xmlns:tns="http://cxf.apache.org/management"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jaxb="https://jakarta.ee//xml/ns/jaxb"
     elementFormDefault="qualified" 
     attributeFormDefault="unqualified"
-    jaxb:version="2.0">
+    jaxb:version="3.0">
         
     <xs:complexType name="JMXConnectorPolicyType">
         <xs:attribute name="Enabled" type="xs:boolean" use="required" />        

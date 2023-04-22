@@ -24,9 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Link;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
-
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.common.util.StringUtils;
 
 public class LinkHeaderProvider implements HeaderDelegate<Link> {

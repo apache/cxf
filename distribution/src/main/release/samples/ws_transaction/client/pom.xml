@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>ws_transaction</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>spring-boot-sample-ws-cxf-client</artifactId>
@@ -37,20 +37,7 @@
         <dependency>
             <groupId>org.apache.cxf.samples</groupId>
             <artifactId>spring-boot-sample-ws-cxf-second-service</artifactId>
-	    <version>${project.version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-		<version>3.1</version>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

@@ -190,7 +190,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     }
 
     private Query createEqualsQuery(Class<?> cls, String name, Object value) {
-        Query query = null;
+        final Query query;
         if (cls == String.class) {
             String strValue = value.toString();
             if (caseInsensitiveMatch) {
@@ -233,7 +233,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         boolean maxInclusive = type == ConditionType.LESS_OR_EQUALS || type == ConditionType.EQUALS;
 
         if (String.class.isAssignableFrom(cls) || Number.class.isAssignableFrom(cls)) {
-            Query query = null;
+            final Query query;
 
             if (Double.class.isAssignableFrom(cls)) {
                 query = createDoubleRangeQuery(name, value, type, minInclusive, maxInclusive);

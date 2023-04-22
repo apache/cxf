@@ -26,14 +26,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.core.Configuration;
-
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.ClientResponseFilter;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.AbstractClient;
+import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -41,6 +43,7 @@ import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.FilterProviderInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.microprofile.client.cdi.CDIInterceptorWrapper;
 import org.apache.cxf.microprofile.client.proxy.MicroProfileClientProxyImpl;
@@ -49,29 +52,33 @@ import org.eclipse.microprofile.rest.client.RestClientBuilder;
 public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
     private final Comparator<ProviderInfo<?>> comparator;
     private final List<Object> registeredProviders;
+    private final Configurable<RestClientBuilder> configurable;
     private final Configuration configuration;
     private ClassLoader proxyLoader;
     private boolean inheritHeaders;
     private ExecutorService executorService;
     private TLSConfiguration secConfig;
 
-    public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configuration,
+    public MicroProfileClientFactoryBean(MicroProfileClientConfigurableImpl<RestClientBuilder> configurable,
                                          String baseUri, Class<?> aClass, ExecutorService executorService,
                                          TLSConfiguration secConfig) {
         super(new MicroProfileServiceFactoryBean());
-        this.configuration = configuration.getConfiguration();
+        this.configurable = configurable;
+        this.configuration = configurable.getConfiguration();
         this.comparator = MicroProfileClientProviderFactory.createComparator(this);
-        this.executorService = executorService;
+        this.executorService = (executorService == null) ? Utils.defaultExecutorService() : executorService; 
         this.secConfig = secConfig;
         super.setAddress(baseUri);
         super.setServiceClass(aClass);
         super.setProviderComparator(comparator);
+        super.setProperties(this.configuration.getProperties());
         registeredProviders = new ArrayList<>();
         registeredProviders.addAll(processProviders());
-        if (!configuration.isDefaultExceptionMapperDisabled()) {
+        if (!configurable.isDefaultExceptionMapperDisabled()) {
             registeredProviders.add(new ProviderInfo<>(new DefaultResponseExceptionMapper(), getBus(), false));
         }
         registeredProviders.add(new ProviderInfo<>(new JsrJsonpProvider(), getBus(), false));
+        registeredProviders.add(new ProviderInfo<>(new JsrJsonbProvider(), getBus(), false));
         super.setProviders(registeredProviders);
     }
 
@@ -102,6 +109,17 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
             client.getConfiguration().getHttpConduit().setTlsClientParameters(tlsParams);
         }
 
+        if (PropertyUtils.isTrue(configuration.getProperty(ClientProperties.HTTP_AUTOREDIRECT_PROP))) {
+            client.getConfiguration().getHttpConduit().getClient().setAutoRedirect(true);
+        }
+
+        String proxyHost = (String) configuration.getProperty(ClientProperties.HTTP_PROXY_SERVER_PROP);
+        if (proxyHost != null) {
+            client.getConfiguration().getHttpConduit().getClient().setProxyServer(proxyHost);
+            int proxyPort = (int) configuration.getProperty(ClientProperties.HTTP_PROXY_SERVER_PORT_PROP);
+            client.getConfiguration().getHttpConduit().getClient().setProxyServerPort(proxyPort);
+        }
+
         MicroProfileClientProviderFactory factory = MicroProfileClientProviderFactory.createInstance(getBus(),
                 comparator);
         factory.setUserProviders(registeredProviders);
@@ -119,6 +137,11 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
             return new MicroProfileClientProxyImpl(actualState, proxyLoader, cri, isRoot,
                     inheritHeaders, executorService, configuration, interceptorWrapper, secConfig, varValues);
         }
+    }
+    
+    @Override
+    protected <C extends Configurable<C>> Configurable<?> getConfigurableFor(C context) {
+        return configurable;
     }
 
     Configuration getConfiguration() {

@@ -29,13 +29,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -174,7 +174,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                     }
                     if (rmUri != null && rmUri.equals(ns)) {
                         if (codec == null) {
-                            String wsauri = null;
+                            final String wsauri;
                             AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
                             if (maps == null) {
                                 RMConfiguration config = getManager(message).getEffectiveConfiguration(message);
@@ -248,7 +248,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         RMManager manager = getManager(message);
         assert manager != null;
 
-        RMEndpoint rme = null;
+        final RMEndpoint rme;
         try {
             rme = manager.getReliableEndpoint(message);
         } catch (RMException e) {

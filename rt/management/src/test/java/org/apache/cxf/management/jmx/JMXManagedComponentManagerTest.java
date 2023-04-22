@@ -45,8 +45,6 @@ public class JMXManagedComponentManagerTest {
         manager = new InstrumentationManagerImpl();
         manager.setEnabled(true);
         manager.init();
-        //Wait for MBeanServer connector to be initialized on separate thread.
-        Thread.sleep(2000);
     }
 
     @After

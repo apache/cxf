@@ -21,18 +21,17 @@ package org.apache.cxf.transport.jms.util;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.transaction.Status;
-import javax.transaction.Transaction;
-
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageListener;
+import jakarta.jms.Session;
+import jakarta.jms.Topic;
+import jakarta.transaction.Status;
+import jakarta.transaction.Transaction;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSFactory;
@@ -46,9 +45,15 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     public PollingMessageListenerContainer(JMSConfiguration jmsConfig, boolean isReply,
                                            MessageListener listenerHandler) {
+        this(jmsConfig, isReply, listenerHandler, null);
+    }
+
+    public PollingMessageListenerContainer(JMSConfiguration jmsConfig, boolean isReply,
+                                           MessageListener listenerHandler, ExceptionListener exceptionListener) {
         this.jmsConfig = jmsConfig;
         this.reply = isReply;
         this.listenerHandler = listenerHandler;
+        this.exceptionListener = exceptionListener;
     }
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,
@@ -63,7 +68,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         @Override
         public void run() {
-            Session session = null;
             while (running) {
                 try (ResourceCloser closer = new ResourceCloser()) {
                     closer.register(createInitialContext());
@@ -74,7 +78,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         connection = PollingMessageListenerContainer.this.connection;
                     }
                     // Create session early to optimize performance
-                    session = closer.register(connection.createSession(transacted, acknowledgeMode));
+                    Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
                     MessageConsumer consumer = closer.register(createConsumer(connection, session));
 
                     while (running) {

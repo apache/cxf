@@ -41,8 +41,7 @@ public class ParamTypeSpecVisitor extends VisitorBase {
         //                     | <scoped_name>
 
 
-        Visitor visitor = null;
-
+        final Visitor visitor;
 
         if (PrimitiveTypesVisitor.accept(node)) {
             // base_type_spec

@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.aegis.services;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 /**
  * An array service for testing.

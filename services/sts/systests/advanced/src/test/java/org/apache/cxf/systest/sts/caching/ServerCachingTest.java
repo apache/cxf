@@ -23,18 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.systest.sts.common.SecurityTestUtil;
+import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -65,43 +63,27 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
     private static final String PUBLIC_KEY_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
 
-    private static final String PORT = allocatePort(CachingServer.class);
-    private static final String PORT2 = allocatePort(CachingServer.class, 2);
+    private static final String PORT = allocatePort(DoubleItServer.class);
+    private static final String PORT2 = allocatePort(DoubleItServer.class, 2);
 
     private static final String DEFAULT_ADDRESS =
         "https://localhost:" + PORT + "/doubleit/services/doubleittransportsaml1alternative";
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(CachingServer.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
-    }
+        assertTrue(launchServer(new DoubleItServer(
+            ServerCachingTest.class.getResource("cxf-service.xml")
+        )));
+        assertTrue(launchServer(new DoubleItServer(
+            ServerCachingTest.class.getResource("cxf-caching-service.xml")
+        )));
 
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-        stopAllServers();
+        assertTrue(launchServer(new STSServer()));
     }
 
     @org.junit.Test
     public void testServerSideSAMLTokenCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ServerCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -142,18 +124,11 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         doubleIt(port, 35);
 
         ((java.io.Closeable)port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testServerSideUsernameTokenCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ServerCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -181,18 +156,11 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         doubleIt(transportUTPort, 35);
 
         ((java.io.Closeable)transportUTPort).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testServerSideBinarySecurityTokenCaching() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ServerCachingTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+        createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -222,7 +190,6 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         doubleIt(bstPort, 35);
 
         ((java.io.Closeable)bstPort).close();
-        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(
@@ -259,6 +226,6 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
-        assertEquals(numToDouble * 2, resp);
+        assertEquals(numToDouble * 2L, resp);
     }
 }

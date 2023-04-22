@@ -19,8 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
-import javax.jws.WebMethod;
-
+import jakarta.jws.WebMethod;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
@@ -31,7 +30,7 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 public class WebMethodAnnotator implements Annotator {
 
     public void annotate(JavaAnnotatable ja) {
-        JavaMethod method = null;
+        final JavaMethod method;
         if (ja instanceof JavaMethod) {
             method = (JavaMethod) ja;
         } else {

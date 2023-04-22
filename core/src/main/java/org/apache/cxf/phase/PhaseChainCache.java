@@ -82,10 +82,9 @@ public final class PhaseChainCache {
 
             PhaseInterceptorChain chain = new PhaseInterceptorChain(phaseList);
             List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> copy
-                = new ArrayList<ModCountCopyOnWriteArrayList<
-                    Interceptor<? extends Message>>>(providers.length);
+                = new ArrayList<>(providers.length);
             for (List<Interceptor<? extends Message>> p : providers) {
-                copy.add(new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>(p));
+                copy.add(new ModCountCopyOnWriteArrayList<>(p));
                 chain.add(p);
             }
             last = new ChainHolder(chain, copy);

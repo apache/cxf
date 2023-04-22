@@ -19,13 +19,9 @@
 package org.apache.cxf.sts.request;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -34,6 +30,9 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
@@ -144,9 +143,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
@@ -174,9 +171,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 
@@ -205,9 +200,7 @@ public class RequestParserUnitTest {
 
         WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
-        List<WSHandlerResult> resultsList = new ArrayList<>();
-        resultsList.add(results);
-        msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
+        msgContext.put(WSHandlerConstants.RECV_RESULTS, Collections.singletonList(results));
 
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
 

@@ -85,8 +85,8 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             throwFault("XML Signature is not available", null);
         }
 
-        String cryptoKey = null;
-        String propKey = null;
+        final String cryptoKey;
+        final String propKey;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;

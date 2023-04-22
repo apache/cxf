@@ -189,6 +189,37 @@ public class JweJsonConsumer {
         }
         return new String(aad, StandardCharsets.UTF_8);
     }
+
+    public byte[] getIvBytes() {
+        return iv;
+    }
+    public String getIvText() {
+        if (iv == null) {
+            return null;
+        }
+        return new String(iv, StandardCharsets.UTF_8);
+    }
+
+    public byte[] getCipherBytes() {
+        return cipherBytes;
+    }
+    public String getCipherText() {
+        if (cipherBytes == null) {
+            return null;
+        }
+        return new String(cipherBytes, StandardCharsets.UTF_8);
+    }
+
+    public byte[] getAuthTagBytes() {
+        return authTag;
+    }
+    public String getAuthTagText() {
+        if (authTag == null) {
+            return null;
+        }
+        return new String(authTag, StandardCharsets.UTF_8);
+    }
+
     public List<JweJsonEncryptionEntry> getRecipients() {
         return recipients;
     }

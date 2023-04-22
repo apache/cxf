@@ -18,11 +18,11 @@
  */
 package org.apache.attachment;
 
-import javax.activation.DataHandler;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlAttachmentRef;
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlAttachmentRef;
 
 @WebService
 public interface AddNumbers {

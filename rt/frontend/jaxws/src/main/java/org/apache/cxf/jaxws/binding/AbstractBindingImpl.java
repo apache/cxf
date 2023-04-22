@@ -22,9 +22,8 @@ package org.apache.cxf.jaxws.binding;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.ws.Binding;
-import javax.xml.ws.handler.Handler;
-
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.handler.Handler;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 
 public abstract class AbstractBindingImpl implements Binding {

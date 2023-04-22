@@ -21,15 +21,13 @@ package org.apache.cxf.systest.jaxrs.metrics;
 
 import java.util.Arrays;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -38,9 +36,13 @@ import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.springframework.util.SocketUtils;
+import org.apache.cxf.testutil.common.TestUtil;
+
+import io.specto.hoverfly.junit.core.SimulationSource;
+import io.specto.hoverfly.junit.rule.HoverflyRule;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -48,19 +50,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static io.specto.hoverfly.junit.core.HoverflyConfig.localConfigs;
+import static io.specto.hoverfly.junit.dsl.HoverflyDsl.response;
+import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JAXRSClientMetricsTest {
-    @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
+    @ClassRule public static HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode(localConfigs().asWebServer());
     @Rule public ExpectedException expectedException = ExpectedException.none();
     
     private MetricsProvider provider;
@@ -95,13 +94,14 @@ public class JAXRSClientMetricsTest {
     public void usingClientProxyStopIsCalledWhenServerReturnsNotFound() throws Exception {
         final JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
         factory.setResourceClass(Library.class);
-        factory.setAddress("http://localhost:" + wireMockRule.port() + "/");
+        factory.setAddress("http://localhost:" + hoverflyRule.getProxyPort() + "/");
         factory.setFeatures(Arrays.asList(new MetricsFeature(provider)));
         factory.setProvider(JacksonJsonProvider.class);
-        
-        stubFor(get(urlEqualTo("/books/10"))
-            .willReturn(aResponse()
-                .withStatus(404)));
+
+        hoverflyRule.simulate(SimulationSource.dsl(
+            service("localhost")
+                .get("/books/10")
+                .willReturn(response().status(404))));
 
         try {
             final Library client = factory.create(Library.class);
@@ -123,14 +123,15 @@ public class JAXRSClientMetricsTest {
                 .register(new MetricsFeature(provider))
                 .register(JacksonJsonProvider.class);
 
-        stubFor(get(urlEqualTo("/books/10"))
-            .willReturn(aResponse()
-                .withStatus(404)));
+        hoverflyRule.simulate(SimulationSource.dsl(
+            service("localhost")
+                .get("/books/10")
+                .willReturn(response().status(404))));
 
         try {
             expectedException.expect(ProcessingException.class);
             client
-                .target("http://localhost:" + wireMockRule.port() + "/books/10")
+                .target("http://localhost:" + hoverflyRule.getProxyPort() + "/books/10")
                 .request(MediaType.APPLICATION_JSON).get()
                 .readEntity(Book.class);
         } finally {
@@ -144,7 +145,7 @@ public class JAXRSClientMetricsTest {
 
     @Test
     public void usingClientStopIsCalledWhenConnectionIsRefused() throws Exception {
-        final int port = SocketUtils.findAvailableTcpPort();
+        final int port = Integer.parseInt(TestUtil.getNewPortNumber(getClass()));
         
         final Client client = ClientBuilder
             .newClient()
@@ -174,16 +175,18 @@ public class JAXRSClientMetricsTest {
             .register(new MetricsFeature(provider))
             .register(JacksonJsonProvider.class);
 
-        stubFor(get(urlEqualTo("/books/10"))
-            .withHeader("Accept", equalTo(MediaType.APPLICATION_JSON))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON)
-                .withBody("{}")
-                .withStatus(200)));
+        hoverflyRule.simulate(SimulationSource.dsl(
+            service("localhost")
+                .get("/books/10")
+                    .header("Accept", MediaType.APPLICATION_JSON)
+                .willReturn(response()
+                    .header("Content-Type", MediaType.APPLICATION_JSON)
+                    .body("{}")
+                    .status(200))));
 
         try {
             client
-                .target("http://localhost:" + wireMockRule.port() + "/books/10")
+                .target("http://localhost:" + hoverflyRule.getProxyPort() + "/books/10")
                 .request(MediaType.APPLICATION_JSON)
                 .get()
                 .readEntity(Book.class);
@@ -198,12 +201,13 @@ public class JAXRSClientMetricsTest {
     
     @Test
     public void usingWebClientStopIsCalledWhenServerReturnsNotFound() throws Exception {
-        final WebClient client = WebClient.create("http://localhost:" + wireMockRule.port() + "/books/10",
+        final WebClient client = WebClient.create("http://localhost:" + hoverflyRule.getProxyPort() + "/books/10",
             Arrays.asList(JacksonJsonProvider.class), Arrays.asList(new MetricsFeature(provider)), null);
 
-        stubFor(get(urlEqualTo("/books/10"))
-            .willReturn(aResponse()
-                .withStatus(404)));
+        hoverflyRule.simulate(SimulationSource.dsl(
+            service("localhost")
+                .get("/books/10")
+                .willReturn(response().status(404))));
 
         try {
             expectedException.expect(ProcessingException.class);

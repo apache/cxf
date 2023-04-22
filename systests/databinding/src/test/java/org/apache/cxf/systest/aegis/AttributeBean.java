@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.aegis;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 /**
  * Test class for attribute forms.

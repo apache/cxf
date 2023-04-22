@@ -19,11 +19,11 @@
 
 package org.apache.cxf.jaxrs;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.core.Context;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.core.Context;
 
 public class AbstractCustomer {
 

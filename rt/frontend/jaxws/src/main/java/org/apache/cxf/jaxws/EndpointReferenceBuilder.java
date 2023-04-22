@@ -27,13 +27,13 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.ws.EndpointReference;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -59,19 +59,21 @@ public class EndpointReferenceBuilder {
             while (extensionElements.hasNext()) {
                 ExtensibilityElement ext = extensionElements.next();
                 if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
-                    Element eprEle = ((UnknownExtensibilityElement)ext).getElement();
-                    List<Element> addressElements = DOMUtils.getChildrenWithName(eprEle,
-                                                                                 Names.WSA_NAMESPACE_NAME,
-                                                                                 Names.WSA_ADDRESS_NAME);
-                    if (!addressElements.isEmpty()) {
-                        /*
-                         * [WSA-WSDL Binding] : in a SOAP 1.1 port described using WSDL 1.1, the location
-                         * attribute of a soap11:address element (if present) would have the same value as the
-                         * wsa:Address child element of the wsa:EndpointReference element.
-                         */
-                        addressElements.get(0).setTextContent(this.endpoint.getEndpointInfo().getAddress());
+                    final Element eprEle = ((UnknownExtensibilityElement)ext).getElement();
+                    synchronized (eprEle.getOwnerDocument()) {
+                        List<Element> addressElements = DOMUtils.getChildrenWithName(eprEle,
+                                                                                     Names.WSA_NAMESPACE_NAME,
+                                                                                     Names.WSA_ADDRESS_NAME);
+                        if (!addressElements.isEmpty()) {
+                            /*
+                             * [WSA-WSDL Binding] : in a SOAP 1.1 port described using WSDL 1.1, the location
+                             * attribute of a soap11:address element (if present) would have the same value as the
+                             * wsa:Address child element of the wsa:EndpointReference element.
+                             */
+                            addressElements.get(0).setTextContent(this.endpoint.getEndpointInfo().getAddress());
+                        }
+                        return EndpointReference.readFrom(new DOMSource(eprEle));
                     }
-                    return EndpointReference.readFrom(new DOMSource(eprEle));
                 }
 
             }

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.client;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public class ClientTokenContextImpl implements ClientTokenContext {

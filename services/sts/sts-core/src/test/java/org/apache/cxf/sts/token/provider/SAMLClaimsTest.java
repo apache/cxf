@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -261,9 +260,7 @@ public class SAMLClaimsTest {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<String> supportedClaims = new ArrayList<>();
-        supportedClaims.add(CLAIM_APPLICATION);
-        claimsHandler.setSupportedClaims(supportedClaims);
+        claimsHandler.setSupportedClaims(Collections.singletonList(CLAIM_APPLICATION));
 
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
@@ -316,9 +313,7 @@ public class SAMLClaimsTest {
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
-        List<String> supportedClaims = new ArrayList<>();
-        supportedClaims.add(CLAIM_APPLICATION);
-        claimsHandler.setSupportedClaims(supportedClaims);
+        claimsHandler.setSupportedClaims(Collections.singletonList(CLAIM_APPLICATION));
 
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
@@ -387,7 +382,7 @@ public class SAMLClaimsTest {
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
         ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
-        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        claimsManager.setClaimHandlers(Arrays.asList(claimsHandler, claimsHandler2));
         providerParameters.setClaimsManager(claimsManager);
 
         ClaimCollection claims = new ClaimCollection();
@@ -431,7 +426,7 @@ public class SAMLClaimsTest {
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         ClaimsHandler claimsHandler2 = new CustomClaimsHandler();
         ((CustomClaimsHandler) claimsHandler2).setRole("CustomRole");
-        claimsManager.setClaimHandlers(new ArrayList<ClaimsHandler>(Arrays.asList(claimsHandler, claimsHandler2)));
+        claimsManager.setClaimHandlers(Arrays.asList(claimsHandler, claimsHandler2));
         providerParameters.setClaimsManager(claimsManager);
 
         ClaimCollection claims = new ClaimCollection();

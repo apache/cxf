@@ -20,10 +20,9 @@ package org.apache.cxf.systest.ws.common;
 
 import java.security.Principal;
 
-import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -39,13 +38,29 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
 
-    public int doubleIt(int numberToDouble) throws DoubleItFault  {
-        Principal pr = wsContext.getUserPrincipal();
+    private boolean enforcePrincipal = true;
 
-        Assert.assertNotNull("Principal must not be null", pr);
-        Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+    public int doubleIt(int numberToDouble) throws DoubleItFault  {
+        if (enforcePrincipal) {
+            Principal pr = wsContext.getUserPrincipal();
+
+            Assert.assertNotNull("Principal must not be null", pr);
+            Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
+        }
+
+        if (numberToDouble == 0) {
+            throw new DoubleItFault("0 can't be doubled!");
+        }
 
         return numberToDouble * 2;
+    }
+
+    public boolean isEnforcePrincipal() {
+        return enforcePrincipal;
+    }
+
+    public void setEnforcePrincipal(boolean enforcePrincipal) {
+        this.enforcePrincipal = enforcePrincipal;
     }
 
 }

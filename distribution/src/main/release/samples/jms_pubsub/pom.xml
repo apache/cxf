@@ -25,10 +25,9 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
     <properties>
-        <cxf.artemis.version>2.10.1</cxf.artemis.version>
         <cxf.version>${project.version}</cxf.version>
         <wsdl.file>${basedir}/src/main/config/jms_greeter.wsdl</wsdl.file>
     </properties>
@@ -37,7 +36,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>3.4.0-SNAPSHOT</version>
+                <version>4.0.1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -138,24 +137,14 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
-            <version>3.4.0-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-cli</artifactId>
-            <version>${cxf.artemis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-openwire-protocol</artifactId>
-            <version>${cxf.artemis.version}</version>
+            <artifactId>artemis-jakarta-server</artifactId>
         </dependency>
-
     </dependencies>
 </project>

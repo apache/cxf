@@ -22,10 +22,9 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.soap.SOAPMessage;
-
 import org.w3c.dom.Document;
 
+import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
@@ -89,7 +88,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertFalse(sigv.isEmpty());
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -139,7 +138,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
+        StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 

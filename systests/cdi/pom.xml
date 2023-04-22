@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -31,10 +31,6 @@
     <name>Apache CXF CDI Integration System Tests</name>
     <description>Apache CXF CDI Integration System Tests</description>
     <url>https://cxf.apache.org</url>
-    <properties>
-        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
-        <cxf.openwebbeans.version>2.0.14</cxf.openwebbeans.version>
-    </properties>
     <modules>
         <module>base</module>
         <module>cdi-weld</module>
@@ -49,7 +45,7 @@
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
+                <artifactId>jakarta.el</artifactId>
                 <version>${cxf.glassfish.el.version}</version>
             </dependency>
             <dependency>

@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;
@@ -373,13 +372,15 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         protected <T> T getNextAlternate(List<T> alternates) {
             totalCount++;
             T next = super.getNextAlternate(alternates);
-            String address = (String)next;
-            Integer count = map.get(address);
-            if (count == null) {
-                count = 0;
+            if (next != null) {
+                String address = (String)next;
+                Integer count = map.get(address);
+                if (count == null) {
+                    count = map.isEmpty() ? 1 /* count first call */ : 0;
+                }
+                count++;
+                map.put(address, count);
             }
-            count++;
-            map.put(address, count);
             return next;
         }
 

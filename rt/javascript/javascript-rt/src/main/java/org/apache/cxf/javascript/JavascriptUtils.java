@@ -99,7 +99,7 @@ public class JavascriptUtils {
     private String xmlStringAccumulatorVariable;
 
     public JavascriptUtils(StringBuilder code) {
-        this.code = code;
+        this.code = code == null ? new StringBuilder(128) : code;
 
         prefixStack.push("    ");
     }
@@ -534,13 +534,13 @@ public class JavascriptUtils {
     public static XmlSchemaAnnotated getObjectAnnotated(XmlSchemaObject object, QName contextName) {
 
         if (!(object instanceof XmlSchemaAnnotated)) {
-            unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE",
+            throw unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE",
                                                 object.getClass().getSimpleName(),
                                                 contextName, object);
         }
         if (!(object instanceof XmlSchemaAttribute)
             && !(object instanceof XmlSchemaAnyAttribute)) {
-            unsupportedConstruct("EXOTIC_ATTRIBUTE",
+            throw unsupportedConstruct("EXOTIC_ATTRIBUTE",
                                                 object.getClass().getSimpleName(), contextName,
                                                 object);
         }
@@ -557,7 +557,7 @@ public class JavascriptUtils {
                                                       XmlSchema currentSchema) {
 
         if (!(object instanceof XmlSchemaParticle)) {
-            unsupportedConstruct("NON_PARTICLE_CHILD",
+            throw unsupportedConstruct("NON_PARTICLE_CHILD",
                                                 object.getClass().getSimpleName(),
                                                 contextName, object);
         }
@@ -566,14 +566,14 @@ public class JavascriptUtils {
             QName groupName = ((XmlSchemaGroupRef) object).getRefName();
             XmlSchemaGroup group = currentSchema.getGroupByName(groupName);
             if (group == null) {
-                unsupportedConstruct("MISSING_GROUP",
+                throw unsupportedConstruct("MISSING_GROUP",
                         groupName.toString(), contextName, null);
             }
 
             XmlSchemaParticle groupParticle = group.getParticle();
 
             if (!(groupParticle instanceof XmlSchemaSequence)) {
-                unsupportedConstruct("GROUP_REF_UNSUPPORTED_TYPE",
+                throw unsupportedConstruct("GROUP_REF_UNSUPPORTED_TYPE",
                         groupParticle.getClass().getSimpleName(), contextName, groupParticle);
             }
 
@@ -584,7 +584,7 @@ public class JavascriptUtils {
             && !(object instanceof XmlSchemaAny)
             && !(object instanceof XmlSchemaChoice)
             && !(object instanceof XmlSchemaSequence)) {
-            unsupportedConstruct("GROUP_CHILD",
+            throw unsupportedConstruct("GROUP_CHILD",
                     object.getClass().getSimpleName(), contextName,
                                                 object);
         }
@@ -594,7 +594,6 @@ public class JavascriptUtils {
 
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {
         XmlSchemaParticle particle = type.getParticle();
-        XmlSchemaSequence sequence = null;
 
         if (particle == null) {
             // the code that uses this wants to iterate. An empty one is more useful than
@@ -602,17 +601,17 @@ public class JavascriptUtils {
             return EMPTY_SEQUENCE;
         }
 
+        final XmlSchemaSequence sequence;
         try {
             sequence = (XmlSchemaSequence) particle;
         } catch (ClassCastException cce) {
-            unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
+            throw unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
         }
 
         return sequence;
     }
     public static XmlSchemaChoice getChoice(XmlSchemaComplexType type) {
         XmlSchemaParticle particle = type.getParticle();
-        XmlSchemaChoice choice = null;
 
         if (particle == null) {
             // the code that uses this wants to iterate. An empty one is more useful than
@@ -620,17 +619,17 @@ public class JavascriptUtils {
             return EMPTY_CHOICE;
         }
 
+        final XmlSchemaChoice choice;
         try {
             choice = (XmlSchemaChoice) particle;
         } catch (ClassCastException cce) {
-            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+            throw unsupportedConstruct("NON_CHOICE_PARTICLE", type);
         }
 
         return choice;
     }
     public static XmlSchemaAll getAll(XmlSchemaComplexType type) {
         XmlSchemaParticle particle = type.getParticle();
-        XmlSchemaAll all = null;
 
         if (particle == null) {
             // the code that uses this wants to iterate. An empty one is more useful than
@@ -638,10 +637,11 @@ public class JavascriptUtils {
             return EMPTY_ALL;
         }
 
+        final XmlSchemaAll all;
         try {
             all = (XmlSchemaAll) particle;
         } catch (ClassCastException cce) {
-            unsupportedConstruct("NON_CHOICE_PARTICLE", type);
+            throw unsupportedConstruct("NON_CHOICE_PARTICLE", type);
         }
 
         return all;
@@ -694,30 +694,30 @@ public class JavascriptUtils {
         if (particle == null) {
             return null;
         }
-        XmlSchemaSequence sequence = null;
+        final XmlSchemaSequence sequence;
         try {
             sequence = (XmlSchemaSequence) particle;
         } catch (ClassCastException cce) {
-            unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
+            throw unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
         }
         return sequence;
     }
 
-    static void unsupportedConstruct(String messageKey,
+    static UnsupportedConstruct unsupportedConstruct(String messageKey,
                                              String what,
                                              QName subjectName,
                                              XmlSchemaObject subject) {
         Message message = new Message(messageKey, LOG, what,
                                       subjectName == null ? "anonymous" : subjectName,
                                       cleanedUpSchemaSource(subject));
-        throw new UnsupportedConstruct(message);
+        return new UnsupportedConstruct(message);
     }
 
 
-    static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
+    static UnsupportedConstruct unsupportedConstruct(String messageKey, XmlSchemaType subject) {
         Message message = new Message(messageKey, LOG, subject.getQName(),
                                       cleanedUpSchemaSource(subject));
-        throw new UnsupportedConstruct(message);
+        return new UnsupportedConstruct(message);
     }
 
     static String cleanedUpSchemaSource(XmlSchemaObject subject) {

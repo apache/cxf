@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.performance.complex_type.ComplexPortType;
 import org.apache.cxf.performance.complex_type.types.NestedComplexTypeSeq;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "ComplexService",
+@jakarta.jws.WebService(portName = "SoapPort", serviceName = "ComplexService",
                       targetNamespace = "http://cxf.apache.org/performance/complex_type",
                       endpointInterface = "org.apache.cxf.performance.complex_type.ComplexPortType")
 

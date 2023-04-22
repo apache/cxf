@@ -19,38 +19,35 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.rx3.server.ReactiveIOCustomizer;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 
-public class RxJava3FlowableServer extends AbstractBusTestServerBase {
+public class RxJava3FlowableServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(RxJava3FlowableServer.class);
 
-    org.apache.cxf.endpoint.Server server;
-    org.apache.cxf.endpoint.Server server2;
-    public RxJava3FlowableServer() {
-    }
-
-    protected void run() {
-        Bus bus = BusFactory.getDefaultBus();
+    @Override
+    protected Server createServer(Bus bus) throws Exception {
         // Make sure default JSONProvider is not loaded
         bus.setProperty("skip.default.json.provider.registration", true);
-        server = createFactoryBean(bus, false, "/rx3").create();
-        server = createFactoryBean(bus, true, "/rx33").create();
+        createFactoryBean(false, "/rx3").create();
+        return createFactoryBean(true, "/rx33").create();
     }
 
-    private JAXRSServerFactoryBean createFactoryBean(Bus bus, boolean useStreamingSubscriber,
+    private JAXRSServerFactoryBean createFactoryBean(boolean useStreamingSubscriber,
                                                      String relAddress) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.getProperties(true).put("useStreamingSubscriber", useStreamingSubscriber);
         sf.setProvider(new JacksonJsonProvider());
+        sf.setProvider(new IllegalArgumentExceptionMapper());
+        sf.setProvider(new IllegalStateExceptionMapper());
         new ReactiveIOCustomizer().customize(sf);
         sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(RxJava3FlowableService.class);
@@ -60,22 +57,8 @@ public class RxJava3FlowableServer extends AbstractBusTestServerBase {
         return sf;
     }
 
-    public void tearDown() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            RxJava3FlowableServer s = new RxJava3FlowableServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new RxJava3FlowableServer().start();
     }
 
 }

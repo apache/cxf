@@ -26,10 +26,10 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Element;
 
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.BusFactory;
 
 import org.junit.After;

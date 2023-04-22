@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:fc="http://cxf.apache.org/testcase/cxf3105" wsdlLocation="cxf3105.wsdl" xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd                 http://java.sun.com/xml/ns/jaxws http://java.sun.com/xml/ns/jaxws/wsdl_customizationschema_2_0.xsd">
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:fc="http://cxf.apache.org/testcase/cxf3105" wsdlLocation="cxf3105.wsdl" xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_2_0.xsd                 https://jakarta.ee/xml/ns/jaxws https://jakarta.ee/xml/ns/jaxws/wsdl_customizationschema_2_0.xsd">
     <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
         <jaxb:bindings node="xs:element//xs:element[@name='login' and @type='fc:loginrequest']">
             <jaxb:property name="LoginRequest"/>

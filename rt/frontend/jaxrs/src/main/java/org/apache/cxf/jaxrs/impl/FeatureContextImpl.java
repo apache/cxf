@@ -20,9 +20,9 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Map;
 
-import javax.ws.rs.core.Configurable;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.Configurable;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.FeatureContext;
 
 public class FeatureContextImpl implements FeatureContext {
     private Configurable<?> cfg;

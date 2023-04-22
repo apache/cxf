@@ -130,7 +130,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
     static byte[] createDerivedKey(String keyAlgoJwt, int keySize,
                                    byte[] password, byte[] saltInput, int pbesCount) {
         byte[] saltValue = createSaltValue(keyAlgoJwt, saltInput);
-        Digest digest = null;
+        final Digest digest;
         int macSigSize = PBES_HMAC_MAP.get(keyAlgoJwt);
         if (macSigSize == 256) {
             digest = new SHA256Digest();

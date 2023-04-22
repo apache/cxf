@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
@@ -47,41 +49,43 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Providers;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.ReaderInterceptorContext;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Providers;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.ReaderInterceptorContext;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -164,43 +168,191 @@ public final class JAXRSUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PATH_SEGMENT_SEP = "/";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
-    private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
+    private static final String NO_CONTENT_EXCEPTION = "jakarta.ws.rs.core.NoContentException";
     private static final String HTTP_CHARSET_PARAM = "charset";
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<>(
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
+    private static final Set<String> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
+        Arrays.asList(
+            "org.apache.cxf.jaxrs.ext.xml.XMLSource", 
+            "org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource", 
+            "org.apache.cxf.jaxrs.ext.multipart.MultipartBody", 
+            "org.apache.cxf.jaxrs.ext.multipart.Attachment"
+        ));
+    private static final Set<String> REACTIVE_OUT_TYPES = new HashSet<>(
+        Arrays.asList(
+            // Reactive Streams
+            "org.reactivestreams.Publisher",
+            // Project Reactor
+            "reactor.core.publisher.Mono",
+            "reactor.core.publisher.Flux",
+            // RxJava
+            "rx.Observable",
+            // RxJava2
+            "io.reactivex.Flowable",
+            "io.reactivex.Maybe",
+            "io.reactivex.Observable",
+            "io.reactivex.Single",
+            // RxJava3
+            "io.reactivex.rxjava3.core.Flowable",
+            "io.reactivex.rxjava3.core.Maybe",
+            "io.reactivex.rxjava3.core.Observable",
+            "io.reactivex.rxjava3.core.Single",
+            // JDK
+            "java.util.concurrent.CompletableFuture",
+            "java.util.concurrent.CompletionStage"
+        ));
+    private static final LazyLoadedClass DATA_SOURCE_CLASS = new LazyLoadedClass("javax.activation.DataSource");
+
+    // Class to lazily call the ClassLoaderUtil.loadClass, but do it once
+    // and cache the result.  Then use the class to create instances as needed.
+    // This avoids calling loadClass every time as calling loadClass is super expensive, 
+    // particularly if the class cannot be found and particularly in OSGi where the 
+    // search is very complex. This would record that the class is not found and prevent 
+    // future searches.
+    private static class LazyLoadedClass {
+        private final String className;
+        private volatile boolean initialized;
+        private Class<?> cls;
+
+        LazyLoadedClass(String cn) {
+            className = cn;
+        }
+
+        synchronized Optional<Class<?>> load() {
+            if (!initialized) {
+                try {
+                    cls = ClassLoaderUtils.loadClass(className, ProviderFactory.class);
+                } catch (final Throwable ex) {
+                    LOG.fine(className + " not available, skipping");
+                }
+                initialized = true;
+            }
+
+            return Optional.ofNullable(cls);
+        }
+
+        boolean isAssignableFrom(Class<?> clz) {
+            return load().map(c -> c.isAssignableFrom(clz)).orElse(false);
+        }
+    }
 
     private JAXRSUtils() {
     }
 
+    /**
+     * Consider additional types as stream-like and returns if the class and corresponding type
+     * refer to one of those. 
+     * @param cls class to check
+     * @param type type to check
+     * @return "true" is the class and corresponding type could be considered streaming-like, 
+     * "false" otherwise.
+     */
+    public static boolean isStreamingLikeOutType(Class<?> cls, Type type) {
+        if (cls != null && (isStreamingOutType(cls) 
+                || STREAMING_LIKE_OUT_TYPES.contains(cls.getName()) 
+                || REACTIVE_OUT_TYPES.contains(cls.getName()))) {
+            return true;
+        }
+
+        if (type instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType)type;
+            for (Type arg: parameterizedType.getActualTypeArguments()) {
+                if (isStreamingLikeOutType(null, arg)) {
+                    return true;
+                }
+            }
+        }
+        
+        if (type instanceof Class) {
+            final Class<?> typeCls = (Class<?>)type;
+            return isStreamingOutType(typeCls) || STREAMING_LIKE_OUT_TYPES.contains(typeCls.getName());
+        }
+        
+        return false;
+    }
+    
     public static boolean isStreamingOutType(Class<?> type) {
-        return STREAMING_OUT_TYPES.contains(type);
+        return STREAMING_OUT_TYPES.contains(type) 
+            || Closeable.class.isAssignableFrom(type)
+            || Source.class.isAssignableFrom(type)
+            || DATA_SOURCE_CLASS.isAssignableFrom(type);
     }
 
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
         return getPathSegments(thePath, decode, true);
     }
 
+    /**
+     * Parses path segments taking into account the URI templates and template regexes. Per RFC-3986, 
+     * "A path consists of a sequence of path segments separated by a slash ("/") character.", however
+     * it is possible to include slash ("/") inside template regex, for example "/my/path/{a:b/c}", see 
+     * please {@link URITemplate}. In this case, the whole template definition is extracted as a path 
+     * segment, without breaking it.
+     * @param thePath path
+     * @param decode should the path segments be decoded or not
+     * @param ignoreLastSlash should the last slash be ignored or not
+     * @return
+     */
     public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
-        List<PathSegment> theList =
-            Arrays.asList(thePath.split("/")).stream()
-            .filter(StringUtils.notEmpty())
-            .map(p -> new PathSegmentImpl(p, decode))
-            .collect(Collectors.toList());
-
-        int len = thePath.length();
-        if (len > 0 && thePath.charAt(len - 1) == '/') {
-            String value = ignoreLastSlash ? "" : "/";
-            theList.add(new PathSegmentImpl(value, false));
+        
+        final List<PathSegment> segments = new ArrayList<>();
+        int templateDepth = 0;
+        int start = 0;
+        for (int i = 0; i < thePath.length(); ++i) {
+            if (thePath.charAt(i) == '/') {
+                // The '/' is in template (possibly, with arbitrary regex) definition
+                if (templateDepth != 0) {
+                    continue;
+                } else if (start != i) {
+                    final String segment = thePath.substring(start, i);
+                    segments.add(new PathSegmentImpl(segment, decode));
+                }
+                
+                // advance the positions, empty path segments
+                start = i + 1;
+            } else if (thePath.charAt(i) == '{') {
+                ++templateDepth;
+            } else if (thePath.charAt(i) == '}') {
+                --templateDepth; // could go negative, since the template could be unbalanced
+            }
         }
-        return theList;
+        
+        // the URI has unbalanced curly braces, backtrack to the last seen position of the path
+        // segment separator and just split segments as-is from there
+        if (templateDepth != 0) {
+            segments.addAll(
+                Arrays
+                    .stream(thePath.substring(start).split("/"))
+                    .filter(StringUtils.notEmpty())
+                    .map(p -> new PathSegmentImpl(p, decode))
+                    .collect(Collectors.toList()));
+
+            int len = thePath.length();
+            if (len > 0 && thePath.charAt(len - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            }
+        } else {
+            // the last symbol is slash
+            if (start == thePath.length() && start > 0 && thePath.charAt(start - 1) == '/') {
+                String value = ignoreLastSlash ? "" : "/";
+                segments.add(new PathSegmentImpl(value, false));
+            } else if (!thePath.isEmpty()) {
+                final String segment = thePath.substring(start);
+                segments.add(new PathSegmentImpl(segment, decode));
+            }
+        }
+        
+        return segments;
     }
 
     private static String[] getUserMediaTypes(Object provider, boolean consumes) {
         String[] values = null;
         if (AbstractConfigurableProvider.class.isAssignableFrom(provider.getClass())) {
-            List<String> types = null;
+            final List<String> types;
             if (consumes) {
                 types = ((AbstractConfigurableProvider)provider).getConsumeMediaTypes();
             } else {
@@ -280,7 +432,7 @@ public final class JAXRSUtils {
         for (Field f : bri.getParameterFields()) {
             Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(),
                                                      f.getType());
-            Object o = null;
+            final Object o;
 
             if (p.getType() == ParameterType.BEAN) {
                 o = createBeanParamValue(message, f.getType(), ori);
@@ -393,7 +545,7 @@ public final class JAXRSUtils {
         int pathMatched = 0;
         int methodMatched = 0;
         int consumeMatched = 0;
-
+        
         List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
@@ -444,7 +596,12 @@ public final class JAXRSUtils {
                 LOG.fine(matchMessageLogSupplier(ori, path, httpMethod, requestType, acceptContentTypes, added));
             }
         }
-        if (finalPathSubresources != null && pathMatched > 0
+        
+        // We may get several matching candidates with different HTTP methods which match subresources
+        // and resources. Before excluding subresources, let us make sure we have at least one matching
+        // HTTP method candidate.
+        boolean isOptions = HttpMethod.OPTIONS.equalsIgnoreCase(httpMethod);
+        if (finalPathSubresources != null && (methodMatched > 0 || isOptions)
             && !MessageUtils.getContextualBoolean(message, KEEP_SUBRESOURCE_CANDIDATES, false)) {
             for (OperationResourceInfo key : finalPathSubresources) {
                 candidateList.remove(key);
@@ -876,11 +1033,16 @@ public final class JAXRSUtils {
             contentType = defaultCt == null ? MediaType.APPLICATION_OCTET_STREAM : defaultCt;
         }
 
-        MessageContext mc = new MessageContextImpl(message);
+        final MediaType contentTypeMt = toMediaType(contentType);
+        final MessageContext mc = new MessageContextImpl(message);
+
         MediaType mt = mc.getHttpHeaders().getMediaType();
+        if (mt == null) {
+            mt = contentTypeMt;
+        }
 
         InputStream is;
-        if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+        if (mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
             is = copyAndGetEntityStream(message);
         } else {
             is = message.getContent(InputStream.class);
@@ -897,7 +1059,7 @@ public final class JAXRSUtils {
                                    parameterType,
                                    parameterAnns,
                                    is,
-                                   toMediaType(contentType),
+                                   contentTypeMt,
                                    ori,
                                    message);
     }
@@ -1024,15 +1186,16 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> params =
             (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
 
+        String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         if (params == null) {
             params = new MetadataMap<>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 InputStream entityStream = copyAndGetEntityStream(m);
-                String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(entityStream, enc);
-                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, decode);
+                // Do not decode unless the key is empty value, fe @FormParam("")
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1046,6 +1209,14 @@ public final class JAXRSUtils {
                     LOG.warning(errorMsg.toString());
                     throw ExceptionUtils.toNotSupportedException(null, null);
                 }
+            }
+        }
+
+        if (decode && !MessageUtils.getContextualBoolean(m, FormUtils.FORM_PARAM_MAP_DECODED, false)) {
+            List<String> values = params.get(key);
+            if (values != null) {
+                values = values.stream().map(value -> HttpUtils.urlDecode(value, enc)).collect(Collectors.toList());
+                params.replace(key, values);
             }
         }
 
@@ -1133,7 +1304,7 @@ public final class JAXRSUtils {
         }
         Object instance;
         try {
-            instance = clazz.newInstance();
+            instance = clazz.getDeclaredConstructor().newInstance();
         } catch (Throwable t) {
             throw ExceptionUtils.toInternalServerErrorException(t, null);
         }
@@ -1170,7 +1341,10 @@ public final class JAXRSUtils {
         } else if (ResourceInfo.class.isAssignableFrom(clazz)) {
             o = new ResourceInfoImpl(contextMessage);
         } else if (ResourceContext.class.isAssignableFrom(clazz)) {
-            o = new ResourceContextImpl(contextMessage, contextMessage.getExchange().get(OperationResourceInfo.class));
+            final OperationResourceInfo ori = contextMessage.getExchange().get(OperationResourceInfo.class);
+            if (ori != null) {
+                o = new ResourceContextImpl(contextMessage, ori);
+            }
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {
@@ -1325,8 +1499,10 @@ public final class JAXRSUtils {
                     value = index < part.length() ? part.substring(index + 1) : "";
                 }
                 if (valueIsCollection) {
-                    for (String s : value.split(",")) {
-                        addStructuredPartToMap(queries, sep, name, s, decode, decodePlus);
+                    if (value != null) {
+                        for (String s : value.split(",")) {
+                            addStructuredPartToMap(queries, sep, name, s, decode, decodePlus);
+                        }
                     }
                 } else {
                     addStructuredPartToMap(queries, sep, name, value, decode, decodePlus);
@@ -1352,7 +1528,11 @@ public final class JAXRSUtils {
             }
         }
 
-        queries.add(HttpUtils.urlDecode(name), value);
+        if (decode) {
+            queries.add(HttpUtils.urlDecode(name), value);
+        } else {
+            queries.add(name, value);
+        }
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,
@@ -1442,8 +1622,8 @@ public final class JAXRSUtils {
         throws WebApplicationException, IOException {
 
         OutputStream entityStream = message.getContent(OutputStream.class);
-        if (entity.getClass().getName().equals(
-            "org.apache.cxf.jaxrs.reactivestreams.server.StreamingAsyncSubscriber$StreamingResponseImpl")) {
+        if ("org.apache.cxf.jaxrs.reactivestreams.server.StreamingAsyncSubscriber$StreamingResponseImpl".equals(
+            entity.getClass().getName())) {
             //cache the OutputStream when it's reactive response
             entityStream = new CacheAndWriteOutputStream(entityStream);
         }
@@ -1856,7 +2036,7 @@ public final class JAXRSUtils {
         }
 
 
-        List<String> values = null;
+        final List<String> values;
         if (params.size() <= 1) {
             values = Collections.emptyList();
         } else {
@@ -1887,6 +2067,104 @@ public final class JAXRSUtils {
         String errorMessage = errorMsg.toString();
         LOG.severe(errorMessage);
         return errorMessage;
+    }
+    
+    /**
+     * Get path URI template, combining base path, class & method & subresource templates 
+     * @param message message instance
+     * @param cri class resource info
+     * @param ori operation resource info
+     * @param subOri operation subresource info
+     * @return the URI template for the method in question
+     */
+    public static String getUriTemplate(Message message, ClassResourceInfo cri, OperationResourceInfo ori, 
+            OperationResourceInfo subOri) {
+        final String template = getUriTemplate(message, cri, ori);
+        final String methodPathTemplate = getUriTemplate(subOri);
+        return combineUriTemplates(template, methodPathTemplate);
+    }
+
+    /**
+     * Get path URI template, combining base path, class & method templates 
+     * @param message message instance
+     * @param cri class resource info
+     * @param ori operation resource info
+     * @return the URI template for the method in question
+     */
+    public static String getUriTemplate(Message message, ClassResourceInfo cri, OperationResourceInfo ori) {
+        final String basePath = (String)message.get(Message.BASE_PATH);
+        final String classPathTemplate = getUriTemplate(cri);
+        final String methodPathTemplate = getUriTemplate(ori);
+
+        // The application path (@ApplicationPath) is incorporated into Message.BASE_PATH,
+        // since it is part of the address.
+        String template = basePath;
+        if (StringUtils.isEmpty(template)) {
+            template = "/";
+        } else if (!template.startsWith("/")) {
+            template = "/" + template;
+        }
+        
+        template = combineUriTemplates(template, classPathTemplate);
+        return combineUriTemplates(template, methodPathTemplate);
+    }
+    
+    /**
+     * Gets the URI template of the operation from its resource info
+     * to assemble final URI template 
+     * @param ori operation resource info
+     * @return URI template
+     */
+    private static String getUriTemplate(OperationResourceInfo ori) {
+        final URITemplate template = ori.getURITemplate();
+        if (template != null) {
+            return template.getValue();
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Goes over sub-resource class resource templates (through parent chain) if necessary
+     * to assemble final URI template 
+     * @param cri root or subresource class resource info
+     * @return URI template chain
+     */
+    private static String getUriTemplate(ClassResourceInfo cri) {
+        final URITemplate template = cri.getURITemplate();
+        if (template != null) {
+            return template.getValue();
+        } else if (cri.getParent() != null) { /* probably subresource */
+            return getUriTemplate(cri.getParent());
+        } else {
+            return null; /* should not happen */
+        }
+    }
+    
+    /**
+     * Combines two URI templates together
+     * @param parent parent URI template
+     * @param child child URI template
+     * @return the URI template combined from the parent and child
+     */
+    private static String combineUriTemplates(final String parent, final String child) {
+        if (StringUtils.isEmpty(child)) {
+            return parent;
+        }
+
+        // The way URI templates are normalized in org.apache.cxf.jaxrs.model.URITemplate:
+        //  - empty or null become "/"
+        //  - "/" is added at the start if not present 
+        if ("/".equals(parent)) {
+            return child;
+        } else if ("/".equals(child)) {
+            return parent;
+        } else if (parent.endsWith("/")) {
+            // Remove only last slash
+            return parent.substring(0, parent.length() - 1) + child;
+        } else {
+            return parent + child;
+        }
     }
 
     // copy the input stream so that it is not inadvertently closed

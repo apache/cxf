@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.transport.jms.util;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
 
 public class JMSSender {
     private boolean explicitQosEnabled;
@@ -46,9 +46,9 @@ public class JMSSender {
     }
 
     public void sendMessage(Session session, Destination targetDest,
-                            javax.jms.Message message) throws JMSException {
+                            jakarta.jms.Message message) throws JMSException {
         MessageProducer producer = null;
-        try {
+        try { // NOPMD - UseTryWithResources
             producer = session.createProducer(targetDest);
             if (explicitQosEnabled) {
                 producer.send(message, deliveryMode, priority, timeToLive);

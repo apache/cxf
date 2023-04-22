@@ -23,7 +23,10 @@ import java.lang.management.ManagementFactory;
 
 import javax.management.MBeanServer;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
 import org.apache.cxf.wsn.AbstractNotificationBroker;
 
@@ -31,8 +34,10 @@ import org.apache.cxf.wsn.AbstractNotificationBroker;
  * Starts up an instance of a WS-Notification service
  */
 public class Service {
+    private static final String EMBEDED_BROKER = "vm:(broker:(tcp://localhost:6000)?persistent=false)";
+
     String rootURL = "http://0.0.0.0:9000/wsn";
-    String activeMqUrl = "vm:(broker:(tcp://localhost:6000)?persistent=false)";
+    String activeMqUrl = EMBEDED_BROKER;
     String userName;
     String password;
 
@@ -67,7 +72,21 @@ public class Service {
     }
 
     public void start() throws Exception {
-        ActiveMQConnectionFactory activemq = new ActiveMQConnectionFactory(userName, password, activeMqUrl);
+        // By default, start embedded broker
+        if (EMBEDED_BROKER.equalsIgnoreCase(activeMqUrl)) {
+            Configuration config = new ConfigurationImpl();
+
+            config.addAcceptorConfiguration("vm", "vm://0");
+            config.addAcceptorConfiguration("tcp", "tcp://localhost:6000");
+            config.setPersistenceEnabled(false);
+            config.setSecurityEnabled(false);
+
+            final EmbeddedActiveMQ server = new EmbeddedActiveMQ();
+            server.setConfiguration(config);
+            server.start();
+        }
+        
+        ActiveMQConnectionFactory activemq = new ActiveMQConnectionFactory(activeMqUrl, userName, password);
 
         notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
         notificationBrokerServer.setAddress(rootURL + "/NotificationBroker");

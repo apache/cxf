@@ -21,29 +21,40 @@ package org.apache.cxf.validation;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.spi.ValidationProvider;
-
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ParameterNameProvider;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.ValidationProviderResolver;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.executable.ExecutableValidator;
+import jakarta.validation.metadata.MethodDescriptor;
+import jakarta.validation.spi.ValidationProvider;
 import org.apache.cxf.common.logging.LogUtils;
 
-public class BeanValidationProvider {
+import static java.util.Collections.emptySet;
+
+public class BeanValidationProvider implements AutoCloseable {
     private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
 
-    private final ValidatorFactory factory;
+    private final Runnable close;
+    private final Supplier<Validator> factory;
+    private final RuntimeCache runtimeCache; // /!must only be created when a single factory is used
 
     public BeanValidationProvider() {
         try {
-            factory = Validation.buildDefaultValidatorFactory();
+            final ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+            this.factory = vf::getValidator;
+            this.close = vf::close;
+            this.runtimeCache = new RuntimeCache();
         } catch (final ValidationException ex) {
             LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
@@ -58,18 +69,34 @@ public class BeanValidationProvider {
         try {
             Configuration<?> factoryCfg = Validation.byDefaultProvider().configure();
             initFactoryConfig(factoryCfg, cfg);
-            factory = factoryCfg.buildValidatorFactory();
+            final ValidatorFactory vf = factoryCfg.buildValidatorFactory();
+            this.factory = vf::getValidator;
+            this.close = vf::close;
+            this.runtimeCache = new RuntimeCache();
         } catch (final ValidationException ex) {
             LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
         }
     }
 
+    public BeanValidationProvider(Validator validator) {
+        if (validator == null) {
+            throw new NullPointerException("Validator is null");
+        }
+        this.factory = () -> validator;
+        this.close = () -> {
+        };
+        this.runtimeCache = new RuntimeCache();
+    }
+
     public BeanValidationProvider(ValidatorFactory factory) {
         if (factory == null) {
             throw new NullPointerException("Factory is null");
         }
-        this.factory = factory;
+        this.factory = factory::getValidator;
+        this.close = () -> {
+        };
+        this.runtimeCache = new RuntimeCache();
     }
 
     public BeanValidationProvider(ValidationProviderResolver resolver) {
@@ -91,7 +118,11 @@ public class BeanValidationProvider {
                 ? Validation.byProvider(providerType).providerResolver(resolver).configure()
                 : Validation.byDefaultProvider().providerResolver(resolver).configure();
             initFactoryConfig(factoryCfg, cfg);
-            factory = factoryCfg.buildValidatorFactory();
+            final ValidatorFactory vf = factoryCfg.buildValidatorFactory();
+            this.factory = vf::getValidator;
+            this.close = () -> {
+            };
+            this.runtimeCache = new RuntimeCache();
         } catch (final ValidationException ex) {
             LOG.severe("Bean Validation provider can not be found, no validation will be performed");
             throw ex;
@@ -111,46 +142,87 @@ public class BeanValidationProvider {
     }
 
     public< T > void validateParameters(final T instance, final Method method, final Object[] arguments) {
-
-        final ExecutableValidator methodValidator = getExecutableValidator();
-        final Set< ConstraintViolation< T > > violations = methodValidator.validateParameters(instance,
-            method, arguments);
-
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(violations);
+        final Validator validator = factory.get();
+        final ExecutableValidator methodValidator = validator.forExecutables();
+        if (runtimeCache == null || runtimeCache.shouldValidateParameters(validator, method)) {
+            final Set<ConstraintViolation<T>> violations = methodValidator.validateParameters(instance,
+                    method, arguments);
+            if (!violations.isEmpty()) {
+                throw new ConstraintViolationException(violations);
+            }
         }
     }
 
     public< T > void validateReturnValue(final T instance, final Method method, final Object returnValue) {
-        final ExecutableValidator methodValidator = getExecutableValidator();
-        final Set<ConstraintViolation< T > > violations = methodValidator.validateReturnValue(instance,
-            method, returnValue);
-
-        if (!violations.isEmpty()) {
-            throw new ResponseConstraintViolationException(violations);
+        final Validator validator = factory.get();
+        final ExecutableValidator methodValidator = validator.forExecutables();
+        if (runtimeCache == null || runtimeCache.shouldValidateReturnedValue(validator, method)) {
+            final Set<ConstraintViolation<T>> violations = methodValidator.validateReturnValue(instance,
+                    method, returnValue);
+            if (!violations.isEmpty()) {
+                throw new ResponseConstraintViolationException(violations);
+            }
         }
     }
 
     public< T > void validateReturnValue(final T bean) {
-        final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
+        Validator validator = factory.get();
+        if (runtimeCache != null && bean != null
+                && !runtimeCache.shouldValidateBean(validator, bean.getClass())) {
+            return;
+        }
+        final Set<ConstraintViolation< T > > violations = doValidateBean(validator, bean);
         if (!violations.isEmpty()) {
             throw new ResponseConstraintViolationException(violations);
         }
     }
 
     public< T > void validateBean(final T bean) {
-        final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
+        final Set<ConstraintViolation< T > > violations = doValidateBean(factory.get(), bean);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
     }
 
-    private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
-        return factory.getValidator().validate(bean);
+    private< T > Set<ConstraintViolation< T > > doValidateBean(final Validator validator, final T bean) {
+        if (validator.getConstraintsForClass(bean.getClass()).isBeanConstrained()) {
+            return validator.validate(bean);
+        }
+        return emptySet();
     }
 
-    private ExecutableValidator getExecutableValidator() {
+    @Override
+    public void close() {
+        close.run();
+    }
 
-        return factory.getValidator().forExecutables();
+    // only created when there is a single validator/factory so it is safe to cache
+    // note: the validator is passed as param to avoid to create useless ones
+    private static class RuntimeCache {
+        private final ConcurrentMap<Class<?>, Boolean> types = new ConcurrentHashMap<>();
+        private final ConcurrentMap<Method, Boolean> params = new ConcurrentHashMap<>();
+        private final ConcurrentMap<Method, Boolean> returnedValues = new ConcurrentHashMap<>();
+
+        public boolean shouldValidateParameters(final Validator validator, final Method method) {
+            return params.computeIfAbsent(method, m -> {
+                final MethodDescriptor constraint = validator
+                    .getConstraintsForClass(m.getDeclaringClass())
+                    .getConstraintsForMethod(m.getName(), m.getParameterTypes());
+                return constraint != null && constraint.hasConstrainedParameters();
+            });
+        }
+
+        public boolean shouldValidateReturnedValue(final Validator validator, final Method method) {
+            return returnedValues.computeIfAbsent(method, m -> {
+                final MethodDescriptor constraint = validator
+                    .getConstraintsForClass(m.getDeclaringClass())
+                    .getConstraintsForMethod(m.getName(), method.getParameterTypes());
+                return constraint != null && constraint.hasConstrainedReturnValue();
+            });
+        }
+
+        public boolean shouldValidateBean(final Validator validator, final Class<?> clazz) {
+            return types.computeIfAbsent(clazz, it -> validator.getConstraintsForClass(it).isBeanConstrained());
+        }
     }
 }

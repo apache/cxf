@@ -19,9 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 @Path("/bookstorestorage/")
 public abstract class AbstractSecureBookStore implements Injectable {

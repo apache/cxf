@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +60,6 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
-import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import org.opensaml.security.credential.BasicCredential;
@@ -120,7 +120,7 @@ public class SAMLProtocolResponseValidator {
         }
 
         if (samlResponse.getIssueInstant() != null) {
-            DateTime currentTime = new DateTime();
+            Instant currentTime = Instant.now();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (samlResponse.getIssueInstant().isAfter(currentTime)) {
                 LOG.warning("SAML Response IssueInstant not met");
@@ -185,7 +185,7 @@ public class SAMLProtocolResponseValidator {
         }
 
         if (samlResponse.getIssueInstant() != null) {
-            DateTime currentTime = new DateTime();
+            Instant currentTime = Instant.now();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (samlResponse.getIssueInstant().isAfter(currentTime)) {
                 LOG.warning("SAML Response IssueInstant not met");
@@ -343,7 +343,7 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        BasicCredential credential = null;
+        final BasicCredential credential;
         if (samlKeyInfo.getCerts() != null) {
             credential = new BasicX509Credential(samlKeyInfo.getCerts()[0]);
         } else if (samlKeyInfo.getPublicKey() != null) {
@@ -413,9 +413,7 @@ public class SAMLProtocolResponseValidator {
                 assertion.verifySignature(samlKeyInfo);
 
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(requestData),
-                    requestData.getSigVerCrypto(),
-                    requestData.getCallbackHandler()
+                    new WSSSAMLKeyInfoProcessor(requestData), requestData.getSigVerCrypto()
                 );
             } catch (WSSecurityException e) {
                 LOG.log(Level.FINE, "Assertion failed signature validation", e);
@@ -469,7 +467,7 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        PrivateKey key = null;
+        final PrivateKey key;
         try {
             key = sigCrypto.getPrivateKey(cert, callbackHandler);
         } catch (Exception ex) {
@@ -478,7 +476,7 @@ public class SAMLProtocolResponseValidator {
         }
         Cipher cipher =
                 EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
-        byte[] decryptedBytes = null;
+        final byte[] decryptedBytes;
         try {
             byte[] encryptedBytes = Base64Utility.decode(cipherValue.getTextContent().trim());
             decryptedBytes = cipher.doFinal(encryptedBytes);
@@ -492,7 +490,7 @@ public class SAMLProtocolResponseValidator {
 
         String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
 
-        byte[] decryptedPayload = null;
+        final byte[] decryptedPayload;
         try {
             decryptedPayload = decryptPayload(encryptedDataDOM, decryptedBytes, symKeyAlgo);
         } catch (Exception ex) {
@@ -503,9 +501,8 @@ public class SAMLProtocolResponseValidator {
         // Clean the symmetric key from memory now that we're done with it
         Arrays.fill(decryptedBytes, (byte) 0);
 
-        Document payloadDoc = null;
         try {
-            payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
+            Document payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                StandardCharsets.UTF_8));
             return payloadDoc.getDocumentElement();
         } catch (Exception ex) {

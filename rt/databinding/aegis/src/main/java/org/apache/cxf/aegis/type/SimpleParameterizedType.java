@@ -70,7 +70,7 @@ class SimpleParameterizedType implements ParameterizedType {
             return false;
         }
 
-        ParameterizedType opt = null;
+        final ParameterizedType opt;
         try {
             opt = (ParameterizedType) obj;
         } catch (ClassCastException cce) {

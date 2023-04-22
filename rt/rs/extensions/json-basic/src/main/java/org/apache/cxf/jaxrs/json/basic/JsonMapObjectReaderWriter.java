@@ -22,13 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -36,6 +30,7 @@ import org.apache.cxf.helpers.IOUtils;
 
 
 public class JsonMapObjectReaderWriter {
+    private static final Set<Character> ESCAPED_CHARS;
     private static final char DQUOTE = '"';
     private static final char COMMA = ',';
     private static final char COLON = ':';
@@ -46,6 +41,19 @@ public class JsonMapObjectReaderWriter {
     private static final char ESCAPE = '\\';
     private static final String NULL_VALUE = "null";
     private boolean format;
+
+    static {
+        Set<Character> chars = new HashSet<>();
+        chars.add('"');
+        chars.add('\\');
+        chars.add('/');
+        chars.add('b');
+        chars.add('f');
+        chars.add('h');
+        chars.add('r');
+        chars.add('t');
+        ESCAPED_CHARS = Collections.unmodifiableSet(chars);
+    }
 
     public JsonMapObjectReaderWriter() {
 
@@ -82,7 +90,7 @@ public class JsonMapObjectReaderWriter {
         out.append(OBJECT_START);
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
-            out.append(DQUOTE).append(entry.getKey()).append(DQUOTE);
+            out.append(DQUOTE).append(escapeJson(entry.getKey())).append(DQUOTE);
             out.append(COLON);
             toJsonInternal(out, entry.getValue(), it.hasNext());
         }
@@ -120,7 +128,12 @@ public class JsonMapObjectReaderWriter {
             if (quotesNeeded) {
                 out.append(DQUOTE);
             }
-            out.append(value.toString());
+            String valueStr = value.toString();
+            if (value instanceof String) {
+                // If the value is a String, make sure to escape quotes
+                valueStr = escapeJson(valueStr);
+            }
+            out.append(valueStr);
             if (quotesNeeded) {
                 out.append(DQUOTE);
             }
@@ -181,6 +194,9 @@ public class JsonMapObjectReaderWriter {
             int from = json.charAt(i) == DQUOTE ? i + 1 : i;
             String name = json.substring(from, closingQuote);
             int sepIndex = json.indexOf(COLON, closingQuote + 1);
+            if (sepIndex == -1) {
+                throw new UncheckedIOException(new IOException("Error in parsing json"));
+            }
 
             int j = 1;
             while (Character.isWhitespace(json.charAt(sepIndex + j))) {
@@ -247,8 +263,18 @@ public class JsonMapObjectReaderWriter {
         }
 
         if (value instanceof String) {
-            // Escape an encoded forward slash
-            value = ((String) value).replace("\\/", "/");
+            if (((String) value).contains("\\/")) {
+                // Escape an encoded forward slash
+                value = ((String) value).replace("\\/", "/");
+            }
+            if (((String) value).contains("\\\"")) {
+                // Escape an encoded quotation mark
+                value = ((String) value).replace("\\\"", "\"");
+            }
+            if (((String) value).contains("\\\\")) {
+                // Escape an encoded backslash
+                value = ((String) value).replace("\\\\", "\\");
+            }
         }
         return value;
     }
@@ -356,6 +382,28 @@ public class JsonMapObjectReaderWriter {
             return this;
         }
 
+    }
+
+    private String escapeJson(String value) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            // If we have " and the previous char was not \ then escape it
+            if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
+                sb.append('\\').append(c);
+            // If we have \ and the previous char was not \ and the next char is not an escaped char, then escape it
+            } else if (c == '\\' && (i == 0 || value.charAt(i - 1) != '\\')
+                    && (i == value.length() - 1 || !isEscapedChar(value.charAt(i + 1)))) {
+                sb.append('\\').append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean isEscapedChar(char c) {
+        return ESCAPED_CHARS.contains(Character.valueOf(c));
     }
 
 }

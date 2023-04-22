@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http.asyncclient;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
@@ -26,10 +27,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Response;
-
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
@@ -37,6 +37,9 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
@@ -161,7 +164,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTimeoutWithPropertySetting() throws Exception {
-        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)g).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
             "3000");
         updateAddressPort(g, PORT);
 
@@ -188,9 +191,35 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testRetransmitAsync() throws Exception {
+                
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        HTTPClientPolicy cp = new HTTPClientPolicy();
+        cp.setMaxRetransmits(2);
+        cp.setChunkLength(20);
+        c.setClient(cp);
+        GreetMeResponse resp = (GreetMeResponse)g.greetMeAsync(request, new AsyncHandler<GreetMeResponse>() {
+            public void handleResponse(Response<GreetMeResponse> res) {
+                try {
+                    res.get().getResponseType();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).get();
+        assertEquals("Hello " + request, resp.getResponseType());
+
+        g.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
+            public void handleResponse(Response<GreetMeLaterResponse> res) {
+            }
+        }).get();
+    }
+    
+    @Test
     public void testTimeoutAsyncWithPropertySetting() throws Exception {
         updateAddressPort(g, PORT);
-        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+        ((jakarta.xml.ws.BindingProvider)g).getRequestContext().put("jakarta.xml.ws.client.receiveTimeout",
             "3000");
         try {
             Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-5000L);
@@ -316,7 +345,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                         // Sleep long enough so that the workqueue will fill up and then
                         // handleResponseOnWorkqueue will fail for the calls from both
                         // responseReceived and consumeContent
-                        Thread.sleep(3 * asyncExecuteTimeout);
+                        Thread.sleep(3L * asyncExecuteTimeout);
                         initialThreadsLatch.countDown();
                     } else {
                         Thread.sleep(50);
@@ -448,4 +477,39 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         System.out.println("Total: " + (end - start) + " " + rlatch.getCount());
     }
 
+    @Test
+    public void testPathWithQueryParams() throws IOException {
+        final String address = "http://localhost:" + PORT + "/SoapContext/SoapPort?param1=value1&param2=value2";
+        final Greeter greeter = new SOAPService().getSoapPort();
+        setAddress(greeter, address);
+
+        final HTTPConduit c = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
+        final MessageImpl message = new MessageImpl();
+        message.put(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+
+        final Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        c.prepare(message);
+
+        final CXFHttpRequest e = message.get(CXFHttpRequest.class);
+        assertEquals(address, e.getURI().toString());
+    }
+
+    @Test
+    public void testEmptyPathWithQueryParams() throws IOException {
+        final String address = "http://localhost:" + PORT + "?param1=value1&param2=value2";
+        final Greeter greeter = new SOAPService().getSoapPort();
+        setAddress(greeter, address);
+
+        final HTTPConduit c = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
+        final MessageImpl message = new MessageImpl();
+        message.put(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+
+        final Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        c.prepare(message);
+
+        final CXFHttpRequest e = message.get(CXFHttpRequest.class);
+        assertEquals("http://localhost:" + PORT + "/?param1=value1&param2=value2", e.getURI().toString());
+    }
 }

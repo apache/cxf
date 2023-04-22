@@ -58,6 +58,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -220,6 +221,7 @@ public class SpringBeansTest {
             }
         }
         assertTrue(saaj);
+        assertTrue(logging);
     }
 
     @Test
@@ -286,6 +288,7 @@ public class SpringBeansTest {
         assertTrue("Not soap version 1.2: " + sbc.getVersion(),  sbc.getVersion() instanceof Soap12);
 
         bean = (JaxWsServerFactoryBean) ctx.getBean("inlineDataBinding");
+        assertNotNull(bean);
 
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(SpringServerFactoryBean.class);
@@ -467,7 +470,11 @@ public class SpringBeansTest {
         assertEquals(2, PostConstructCalledCount.getCount());
         assertEquals(2, PostConstructCalledCount.getInjectedCount());
     }
-    @Test
+    @Ignore
+    //Spring5 has this setting in org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+    //this.ignoreResourceType("javax.xml.ws.WebServiceContext");
+    //but this setting for jakarta.xml.ws.WebServiceContext is removed in Spring6, see
+    //https://github.com/spring-projects/spring-framework/issues/27422
     public void testCXF3959SpringInject() throws Exception {
         PostConstructCalledCount.reset();
         ClassPathXmlApplicationContext ctx

@@ -26,11 +26,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Priority;
-import javax.ws.rs.BadRequestException;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;

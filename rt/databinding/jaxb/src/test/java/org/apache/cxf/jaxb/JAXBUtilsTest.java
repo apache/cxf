@@ -24,9 +24,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.hello_world_soap_http.types.GreetMe;
@@ -172,7 +173,8 @@ public class JAXBUtilsTest {
         Marshaller marshaller = ctx.createMarshaller();
         Map<String, String> nspref = new HashMap<>();
         nspref.put("http://cxf.apache.org/hello_world_soap_http/types", "x");
-        JAXBUtils.setNamespaceMapper(nspref, marshaller);
+        Bus bus = new ExtensionManagerBus();
+        JAXBUtils.setNamespaceMapper(bus, nspref, marshaller);
         String mapperkey = null;
         if (marshaller.getClass().getName().contains(".internal.")) {
             mapperkey = "com.sun.xml.internal.bind.namespacePrefixMapper";

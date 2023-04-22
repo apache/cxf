@@ -22,8 +22,8 @@ package org.apache.cxf.systest.coloc;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Holder;
 
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.headers.coloc.types.HeaderInfo;
 import org.apache.headers.coloc.types.InHeaderResponseT;

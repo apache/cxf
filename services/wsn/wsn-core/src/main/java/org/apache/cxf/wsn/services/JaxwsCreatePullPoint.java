@@ -20,10 +20,9 @@ package org.apache.cxf.wsn.services;
 
 import java.net.URI;
 
-import javax.jms.ConnectionFactory;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-
+import jakarta.jms.ConnectionFactory;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingType;
 import org.apache.cxf.wsn.AbstractPullPoint;
 import org.apache.cxf.wsn.EndpointManager;
 import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
@@ -32,7 +31,7 @@ import org.apache.cxf.wsn.jms.JmsCreatePullPoint;
             targetNamespace = "http://cxf.apache.org/wsn/jaxws",
             serviceName = "CreatePullPointService",
             portName = "CreatePullPointPort")
-@BindingType(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
+@BindingType(jakarta.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING)
 public class JaxwsCreatePullPoint extends JmsCreatePullPoint
     implements JaxwsCreatePullPointMBean {
 

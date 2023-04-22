@@ -21,12 +21,12 @@ package org.apache.cxf.jaxrs.interceptor;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;

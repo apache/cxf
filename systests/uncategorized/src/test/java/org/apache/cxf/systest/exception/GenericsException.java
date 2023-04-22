@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.exception;
 
-@javax.xml.ws.WebFault
+@jakarta.xml.ws.WebFault
 public class GenericsException extends Exception {
     private static final long serialVersionUID = 1L;
 

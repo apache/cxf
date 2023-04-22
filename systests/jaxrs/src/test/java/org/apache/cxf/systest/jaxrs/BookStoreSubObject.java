@@ -19,15 +19,26 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 
 @Path("/bookstore")
 public class BookStoreSubObject {
-
     @Path("/booksubresourceobject")
     public Object getBookSubResourceObject() throws BookNotFoundFault {
         return new Book();
+    }
+    
+    @Path("consumeslocator")
+    public BookResourceLocator consumeslocator() {
+        return new BookResourceLocator();
+    }
+    
+    @GET
+    @Path("{id}")
+    public Book book(@PathParam("id") Long id) {
+        return new Book("Book", id);
     }
 }
 

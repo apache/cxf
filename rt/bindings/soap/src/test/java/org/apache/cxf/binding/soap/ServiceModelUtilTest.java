@@ -26,7 +26,6 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.helpers.CastUtils;
@@ -53,7 +52,6 @@ import static org.junit.Assert.assertTrue;
 
 public class ServiceModelUtilTest {
     private static final String WSDL_PATH = "test-soap-header.wsdl";
-    private Definition def;
     private Service service;
     private ServiceInfo serviceInfo;
 
@@ -67,9 +65,8 @@ public class ServiceModelUtilTest {
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
-        def = wsdlReader.readWSDL(wsdlUrl);
+        Definition def = wsdlReader.readWSDL(wsdlUrl);
 
-        WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
         for (Service serv : CastUtils.cast(def.getServices().values(), Service.class)) {
             if (serv != null) {
                 service = serv;
@@ -80,7 +77,7 @@ public class ServiceModelUtilTest {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        wsdlServiceBuilder = new WSDLServiceBuilder(bus);
+        WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
 
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
 
@@ -98,8 +95,7 @@ public class ServiceModelUtilTest {
 
     @Test
     public void testGetSchema() throws Exception {
-        BindingInfo bindingInfo = null;
-        bindingInfo = serviceInfo.getBindings().iterator().next();
+        BindingInfo bindingInfo = serviceInfo.getBindings().iterator().next();
         QName name = new QName(serviceInfo.getName().getNamespaceURI(), "inHeader");
         BindingOperationInfo inHeader = bindingInfo.getOperation(name);
         BindingMessageInfo input = inHeader.getInput();

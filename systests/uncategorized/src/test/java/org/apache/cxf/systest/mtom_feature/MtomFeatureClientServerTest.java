@@ -26,12 +26,12 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.Holder;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.MTOMFeature;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.MTOMFeature;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;

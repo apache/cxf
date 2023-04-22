@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
+import jakarta.ws.rs.core.MediaType;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -40,8 +40,8 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
 
 import org.junit.Before;
@@ -52,12 +52,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
+public class JAXRSClientServerTikaTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(JAXRSClientServerTikaTest.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
             final Map< String, Object > properties = new HashMap<>();
@@ -73,19 +74,11 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             sf.setProvider(new SearchContextProvider());
             sf.setProvider(new JacksonJsonProvider());
 
-            sf.create();
+            return sf.create();
         }
 
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -94,7 +87,6 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Before
@@ -111,7 +103,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
 
-        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16T09:00:00");
+        final Collection<ScoreDoc> hits = search("dcterms:modified=le=2007-09-16T09:00:00");
         assertEquals(hits.size(), 1);
     }
 
@@ -125,7 +117,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         wc.post(new MultipartBody(attachment));
 
         // Use user-defined date pattern
-        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");
+        final Collection<ScoreDoc> hits = search("dcterms:modified=le=2007/09/16");
         assertEquals(hits.size(), 1);
     }
 

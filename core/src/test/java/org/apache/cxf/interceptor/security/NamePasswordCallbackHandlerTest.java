@@ -26,6 +26,7 @@ import javax.security.auth.callback.PasswordCallback;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -73,6 +74,16 @@ public class NamePasswordCallbackHandlerTest {
         handler.handle(callbacks);
         assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
         assertEquals("dog", new String(((CharArrayCallback)callbacks[1]).getValue()));
+    }
+
+    @Test
+    public void testHandleCallbackNullPassword() throws Exception {
+        NamePasswordCallbackHandler handler = new NamePasswordCallbackHandler("Barry", null);
+        Callback[] callbacks =
+            new Callback[]{new NameCallback("name"), new PasswordCallback("password", false)};
+        handler.handle(callbacks);
+        assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
+        assertNull(((PasswordCallback)callbacks[1]).getPassword());
     }
 
     static class ObjectCallback implements Callback {

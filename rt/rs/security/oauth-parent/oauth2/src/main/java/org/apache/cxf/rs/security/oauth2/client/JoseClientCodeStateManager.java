@@ -21,8 +21,7 @@ package org.apache.cxf.rs.security.oauth2.client;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -107,10 +106,9 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
             throw new SecurityException();
         }
         String json = jws.getUnsignedEncodedSequence();
-        //CHECKSTYLE:OFF
+
         Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
         return (MultivaluedMap<String, String>)map; //NOPMD
-        //CHECKSTYLE:ON
     }
 
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {

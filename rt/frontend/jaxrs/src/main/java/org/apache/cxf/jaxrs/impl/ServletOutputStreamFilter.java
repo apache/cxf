@@ -21,9 +21,8 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 

@@ -30,9 +30,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -177,7 +176,14 @@ public abstract class AbstractResourceInfo {
 
     @SuppressWarnings("unchecked")
     private <T> Map<Class<?>, Map<T, ThreadLocalProxy<?>>> getProxyMap(String prop, boolean create) {
-        Object property = null;
+        // Avoid synchronizing on the bus for a ConcurrentHashMAp
+        if (bus.getProperties() instanceof ConcurrentHashMap) {
+            return (Map<Class<?>, Map<T, ThreadLocalProxy<?>>>) bus.getProperties().computeIfAbsent(prop, k ->
+                new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2)
+            );
+        }
+
+        Object property;
         synchronized (bus) {
             property = bus.getProperty(prop);
             if (property == null && create) {

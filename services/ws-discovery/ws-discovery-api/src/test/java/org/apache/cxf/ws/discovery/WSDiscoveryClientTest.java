@@ -22,20 +22,21 @@ package org.apache.cxf.ws.discovery;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-import javax.xml.ws.wsaddressing.W3CEndpointReference;
-
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
@@ -61,17 +62,22 @@ public final class WSDiscoveryClientTest {
     static NetworkInterface findIpv4Interface() throws Exception {
         Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
         List<NetworkInterface> possibles = new ArrayList<>();
-        while (ifcs.hasMoreElements()) {
-            NetworkInterface ni = ifcs.nextElement();
-            if (ni.supportsMulticast()
-                && ni.isUp()) {
-                for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
-                    if (ia.getAddress() instanceof java.net.Inet4Address
-                        && !ia.getAddress().isLoopbackAddress()
-                        && !ni.getDisplayName().startsWith("vnic")) {
-                        possibles.add(ni);
+        if (ifcs != null) {
+            while (ifcs.hasMoreElements()) {
+                NetworkInterface ni = ifcs.nextElement();
+                if (ni.supportsMulticast() && ni.isUp()) {
+                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                        if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
+                                && !ni.getDisplayName().startsWith("vnic")) {
+                            possibles.add(ni);
+                        }
                     }
                 }
+            }
+        }
+        for (NetworkInterface p : possibles) {
+            if (p.isPointToPoint()) {
+                return p;
             }
         }
         return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
@@ -88,12 +94,14 @@ public final class WSDiscoveryClientTest {
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = interfaces.nextElement();
-            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                continue;
+        if (interfaces != null) {
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                    continue;
+                }
+                count++;
             }
-            count++;
         }
         if (count == 0) {
             //no non-loopbacks, cannot do broadcasts
@@ -108,10 +116,11 @@ public final class WSDiscoveryClientTest {
                     InetAddress address = InetAddress.getByName("239.255.255.250");
                     MulticastSocket s = new MulticastSocket(Integer.parseInt(PORT));
                     s.setBroadcast(true);
-                    s.setNetworkInterface(findIpv4Interface());
-                    s.setLoopbackMode(false);
+                    NetworkInterface ni = findIpv4Interface();
+                    s.setNetworkInterface(ni);
+                    s.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
                     s.setReuseAddress(true);
-                    s.joinGroup(address);
+                    s.joinGroup(new InetSocketAddress(address, 0), ni);
                     s.setReceiveBufferSize(64 * 1024);
                     s.setSoTimeout(5000);
                     byte[] bytes = new byte[64 * 1024];
@@ -140,7 +149,6 @@ public final class WSDiscoveryClientTest {
                 }
             }
         }).start();
-
 
         Bus bus = BusFactory.newInstance().createBus();
         WSDiscoveryClient c = new WSDiscoveryClient(bus);

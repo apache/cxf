@@ -21,11 +21,11 @@ package org.apache.cxf.tools.fortest.withannotation.doc;
 
 import java.util.List;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
+import jakarta.xml.bind.annotation.XmlList;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 
 @WebService(name = "SayHi")
 public interface SayHiNoWrapperBean {

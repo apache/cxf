@@ -78,7 +78,7 @@ public class CorbaPrimitiveHandlerTest {
 
     @Test
     public void testCreateCorbaChararacter() {
-        Character val = new Character('c');
+        Character val = Character.valueOf('c');
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("char"),
                                       CorbaConstants.NT_CORBA_CHAR,
@@ -106,7 +106,7 @@ public class CorbaPrimitiveHandlerTest {
 
     @Test
     public void testCreateCorbaWChararacter() {
-        Character val = new Character('w');
+        Character val = Character.valueOf('w');
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("wchar"),
                                       CorbaConstants.NT_CORBA_WCHAR,
@@ -282,7 +282,7 @@ public class CorbaPrimitiveHandlerTest {
 
     @Test
     public void testCreateCorbaFloat() {
-        Float val = new Float(1234.56);
+        Float val = Float.valueOf(1234.56f);
         CorbaPrimitiveHandler obj =
             new CorbaPrimitiveHandler(new QName("float"),
                                       CorbaConstants.NT_CORBA_FLOAT,

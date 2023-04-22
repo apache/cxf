@@ -81,7 +81,6 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             fork = "true";
             additionalJvmArgs =  "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
                     + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
-                    + "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED "
                     + "--add-opens java.base/java.security=ALL-UNNAMED "
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "

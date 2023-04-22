@@ -42,7 +42,7 @@ import org.apache.cxf.common.util.Base64Utility;
 
 public final class HmacUtils {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(HmacUtils.class);
 
     private HmacUtils() {
 

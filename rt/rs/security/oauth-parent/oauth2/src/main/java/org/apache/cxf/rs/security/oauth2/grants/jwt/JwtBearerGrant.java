@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 public class JwtBearerGrant extends AbstractJwtBearerGrant {
     private static final long serialVersionUID = -7296527609343431294L;

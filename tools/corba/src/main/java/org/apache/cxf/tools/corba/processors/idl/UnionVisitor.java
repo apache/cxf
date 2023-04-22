@@ -141,9 +141,8 @@ public class UnionVisitor extends VisitorBase {
                                   XmlSchemaChoice choice,
                                   Union corbaUnion) {
         while (caseNode != null) {
-            AST typeNode = null;
-            AST nameNode = null;
-            AST labelNode = null;
+            final AST typeNode;
+            final AST nameNode;
 
             // xmlschema:element
             XmlSchemaElement element = new XmlSchemaElement(schema, false);
@@ -161,7 +160,7 @@ public class UnionVisitor extends VisitorBase {
                 // case:
                 createCase(caseNode, unionBranch);
 
-                labelNode = caseNode.getFirstChild();
+                AST labelNode = caseNode.getFirstChild();
                 if (labelNode.getType() == IDLTokenTypes.LITERAL_case) {
                     labelNode = labelNode.getNextSibling();
                 }

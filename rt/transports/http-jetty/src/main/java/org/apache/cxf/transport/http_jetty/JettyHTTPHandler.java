@@ -20,15 +20,15 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.http.HttpUrlUtil;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
 
 public class JettyHTTPHandler extends AbstractHandler {
     private static final String METHOD_TRACE = "TRACE";
@@ -81,6 +81,10 @@ public class JettyHTTPHandler extends AbstractHandler {
             }
         }
 
+    }
+    
+    public ContextHandler createContextHandler() {
+        return new ContextHandler();
     }
 
     public Bus getBus() {

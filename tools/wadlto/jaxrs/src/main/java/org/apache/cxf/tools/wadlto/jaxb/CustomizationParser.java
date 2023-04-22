@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.wadlto.jaxb;
 
 import java.io.File;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -65,11 +66,9 @@ public final class CustomizationParser {
 
     public void parse(ToolContext env) {
         // JAXB schema customizations
-        String[] bindingFiles = getBindingFiles(env);
-
-        for (int i = 0; i < bindingFiles.length; i++) {
+        for (String bindingFile : getBindingFiles(env)) {
             try {
-                addBinding(bindingFiles[i]);
+                addBinding(bindingFile);
             } catch (XMLStreamException xse) {
                 Message msg = new Message("STAX_PARSER_ERROR", LOG);
                 throw new ToolException(msg, xse);
@@ -109,16 +108,14 @@ public final class CustomizationParser {
 
         // Schema Namespace to Package customizations
         for (String ns : env.getNamespacePackageMap().keySet()) {
-            File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, env.mapPackageName(ns));
-            packageFiles.add(new InputSource(file.toURI().toString()));
+            packageFiles.add(JAXBUtils.getPackageMappingSchemaBinding(ns, env.mapPackageName(ns)));
         }
     }
 
     private void addBinding(String bindingFile) throws XMLStreamException {
 
-        Element root = null;
-        try {
-            URIResolver resolver = new URIResolver(bindingFile);
+        final Element root;
+        try (URIResolver resolver = new URIResolver(bindingFile)) {
             root = StaxUtils.read(resolver.getInputStream()).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
@@ -130,18 +127,15 @@ public final class CustomizationParser {
             String schemaLocation = root.getAttribute("schemaLocation");
             String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
             if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = schemaLocation.length() == 0
+                resolvedSchemaLocation = schemaLocation.isEmpty()
                     ? wadlPath : getBaseWadlPath() + schemaLocation;
             }
-            InputSource tmpIns = null;
             try {
-                tmpIns = convertToTmpInputSource(root, resolvedSchemaLocation);
+                jaxbBindings.add(convertToTmpInputSource(root, resolvedSchemaLocation));
             } catch (Exception e1) {
                 Message msg = new Message("FAILED_TO_ADD_SCHEMALOCATION", LOG, bindingFile);
                 throw new ToolException(msg, e1);
             }
-            jaxbBindings.add(tmpIns);
-
         }
     }
 
@@ -150,14 +144,14 @@ public final class CustomizationParser {
         return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
     }
 
-    private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
-        InputSource result = null;
+    private static InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
         ele.setAttribute("schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
-        result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
+        try (Writer w = Files.newBufferedWriter(tmpFile.toPath())) {
+            StaxUtils.writeTo(ele, w);
+        }
         tmpFile.deleteOnExit();
-        return result;
+        return new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
     }
 
     private String resolveByCatalog(String url) {

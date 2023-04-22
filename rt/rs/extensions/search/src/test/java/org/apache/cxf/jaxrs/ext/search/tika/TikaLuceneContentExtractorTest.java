@@ -90,13 +90,14 @@ public class TikaLuceneContentExtractorTest {
         assertEquals(1, getHits("ct==incubation").length);
         assertEquals(0, getHits("ct==toolsuite").length);
         // meta-data
-        assertEquals(1, getHits("Author==Bertrand*").length);
+        assertEquals(1, getHits("dc:creator==Bertrand*").length);
     }
 
     @Test
     public void testExtractedTextContentMatchesTypesAndDateSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
-            .withField("modified", Date.class);
+                .withField("modified", Date.class)
+                .withField("dcterms:modified", Date.class);
 
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
@@ -105,15 +106,16 @@ public class TikaLuceneContentExtractorTest {
         writer.addDocument(document);
         writer.commit();
         // testPDF.pdf 'modified' is set to '2007-09-14T09:02:31Z'
-        assertEquals(1, getHits("modified=gt=2007-09-14T09:02:31Z", documentMetadata.getFieldTypes()).length);
-        assertEquals(1, getHits("modified=le=2007-09-15T09:02:31-0500", documentMetadata.getFieldTypes()).length);
-        assertEquals(1, getHits("modified=ge=2007-09-15", documentMetadata.getFieldTypes()).length);
-        assertEquals(1, getHits("modified==2007-09-15", documentMetadata.getFieldTypes()).length);
-        assertEquals(0, getHits("modified==2007-09-16", documentMetadata.getFieldTypes()).length);
-        assertEquals(0, getHits("modified=gt=2007-09-16", documentMetadata.getFieldTypes()).length);
-        assertEquals(0, getHits("modified=lt=2007-09-15", documentMetadata.getFieldTypes()).length);
-        assertEquals(0, getHits("modified=gt=2007-09-16T09:02:31", documentMetadata.getFieldTypes()).length);
-        assertEquals(0, getHits("modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("dcterms:modified=gt=2007-09-14T09:02:31Z", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("dcterms:modified=le=2007-09-15T09:02:31-0500",
+                documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("dcterms:modified=ge=2007-09-15", documentMetadata.getFieldTypes()).length);
+        assertEquals(1, getHits("dcterms:modified==2007-09-15", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("dcterms:modified==2007-09-16", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("dcterms:modified=gt=2007-09-16", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("dcterms:modified=lt=2007-09-15", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("dcterms:modified=gt=2007-09-16T09:02:31", documentMetadata.getFieldTypes()).length);
+        assertEquals(0, getHits("dcterms:modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
     }
 
     @Test

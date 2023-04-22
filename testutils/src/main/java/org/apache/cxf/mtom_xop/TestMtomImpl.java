@@ -19,10 +19,9 @@
 
 package org.apache.cxf.mtom_xop;
 
-import javax.activation.DataHandler;
-import javax.jws.WebService;
-import javax.xml.ws.Holder;
-
+import jakarta.activation.DataHandler;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 

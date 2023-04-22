@@ -18,15 +18,15 @@
 -->
 
 <jaxws:bindings wsdlLocation="echo_calendar.wsdl"
-          xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+          xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
-          xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+          xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <jaxws:bindings  node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://date.fortest.tools.cxf.apache.org/']">
-      <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <jxb:globalBindings xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <jxb:javaType name="java.util.Calendar" xmlType="xs:dateTime"
-                      parseMethod="javax.xml.bind.DatatypeConverter.parseDateTime"
-                      printMethod="javax.xml.bind.DatatypeConverter.printDateTime"/>
+                      parseMethod="jakarta.xml.bind.DatatypeConverter.parseDateTime"
+                      printMethod="jakarta.xml.bind.DatatypeConverter.printDateTime"/>
       </jxb:globalBindings>
   </jaxws:bindings>
 </jaxws:bindings>

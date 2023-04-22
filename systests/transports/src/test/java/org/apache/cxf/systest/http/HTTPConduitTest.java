@@ -38,6 +38,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -45,6 +46,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -170,9 +174,26 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testResponseMessage() throws Exception {
+        startServer("Mortimer");
+        Greeter mortimer = getMortimerGreeter();
+        Client client = ClientProxy.getClient(mortimer);
+        client.getRequestContext().put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, true);
+        
+        String answer = mortimer.sayHi();
+        answer = mortimer.sayHi();
+        answer = mortimer.sayHi();
+        assertTrue("Unexpected answer: " + answer,
+                "Bonjour from Mortimer".equals(answer));
+        assertProxyRequestCount(3);
+        assertThat(client.getResponseContext().get(HTTPConduit.HTTP_RESPONSE_MESSAGE), equalTo("OK"));
+    }
+    
+    @Test
     public void testBasicConnection() throws Exception {
         startServer("Mortimer");
         Greeter mortimer = getMortimerGreeter();
+        Client client = ClientProxy.getClient(mortimer);
 
         String answer = mortimer.sayHi();
         answer = mortimer.sayHi();
@@ -180,6 +201,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Mortimer".equals(answer));
         assertProxyRequestCount(3);
+        assertThat(client.getResponseContext().get(HTTPConduit.HTTP_RESPONSE_MESSAGE), nullValue());
     }
 
     @Test

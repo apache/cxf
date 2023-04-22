@@ -66,7 +66,7 @@ public class AbstractJwsJsonWriterProvider {
             }
             return Collections.emptyList();
         }
-        List<String> propLocs = null;
+        final List<String> propLocs;
         if (propLocsProp instanceof String) {
             String[] props = ((String)propLocsProp).split(",");
             propLocs = Arrays.asList(props);

@@ -24,11 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.handler.types.CString;
 import org.apache.cxf.jaxws.handler.types.FullyQualifiedClassType;

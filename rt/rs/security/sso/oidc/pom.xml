@@ -27,16 +27,12 @@
   <parent>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>4.0.1-SNAPSHOT</version>
     <relativePath>../../../../../parent/pom.xml</relativePath>
   </parent>
   <properties>
     <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
     <cxf.module.name>org.apache.cxf.rs.security.sso.oidc</cxf.module.name>
-    <cxf.osgi.import>
-        javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
-        *
-    </cxf.osgi.import>
   </properties>
   <dependencies>
     <dependency>
@@ -77,26 +73,31 @@
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
       <version>${cxf.openjpa.version}</version>
+      <classifier>jakarta</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
       <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
         <exclusions>
           <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>bind-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
           </exclusion>
         </exclusions> 
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-jcache</artifactId>
       <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
@@ -144,23 +145,14 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jta_1.1_spec</artifactId>
-    </dependency>
-    <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.javax.persistence</groupId>
-      <artifactId>hibernate-jpa-2.1-api</artifactId>
-      <version>${cxf.hibernate.jpa.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <version>${cxf.ehcache3.version}</version>
+      <classifier>jakarta</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>

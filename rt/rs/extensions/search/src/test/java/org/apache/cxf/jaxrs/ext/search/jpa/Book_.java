@@ -18,10 +18,10 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.SingularAttribute;
+import jakarta.persistence.metamodel.ListAttribute;
+import jakarta.persistence.metamodel.SingularAttribute;
 
-@javax.persistence.metamodel.StaticMetamodel(Book.class)
+@jakarta.persistence.metamodel.StaticMetamodel(Book.class)
 //CHECKSTYLE:OFF
 public final class Book_ {
     private Book_() {

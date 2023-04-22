@@ -29,19 +29,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.annotation.Resource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 
+import jakarta.activation.DataHandler;
+import jakarta.annotation.Resource;
+import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -50,7 +50,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 @WebServiceProvider(serviceName = "AttachmentStreamSourceXMLProvider")
 @ServiceMode(value = Service.Mode.PAYLOAD)
-@javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
+@jakarta.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource> {
 
     @Resource
@@ -85,7 +85,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
                     InputStream is = entry.getValue().getInputStream();
                     IOUtils.copy(is, bous);
 
-                    buf.append("<att contentId=\"" + entry.getKey() + "\">");
+                    buf.append("<att contentId=\"").append(entry.getKey()).append("\">");
                     buf.append(Base64Utility.encode(bous.toByteArray()));
                     buf.append("</att>");
 

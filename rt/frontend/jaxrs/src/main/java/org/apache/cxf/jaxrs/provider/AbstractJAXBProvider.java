@@ -39,25 +39,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -68,6 +49,25 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.helpers.DefaultHandler;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -101,6 +101,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected Set<Class<?>> collectionContextClasses = ConcurrentHashMap.newKeySet();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
+    protected Map<String, Boolean> objectFactoryOrIndexMap = new ConcurrentHashMap<>();
     protected boolean unmarshalAsJaxbElement;
     protected boolean marshalAsJaxbElement;
     protected boolean xmlTypeAsJaxbElementOnly;
@@ -166,7 +167,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
     protected void setNamespaceMapper(Marshaller ms,
                                       Map<String, String> map) throws Exception {
-        Object nsMapper = JAXBUtils.setNamespaceMapper(map, ms);
+        Object nsMapper = JAXBUtils.setNamespaceMapper(getBus(), map, ms);
         if (nsMapper != null && namespaceMapperPropertyName != null) {
             setMarshallerProp(ms, nsMapper, namespaceMapperPropertyName, null);
         }
@@ -594,8 +595,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected boolean objectFactoryOrIndexAvailable(Class<?> type) {
-        return type.getResource("ObjectFactory.class") != null
+        if (this.objectFactoryOrIndexMap.get(type.getName()) != null) {
+            return this.objectFactoryOrIndexMap.get(type.getName());
+        } else {
+            boolean ret = type.getResource("ObjectFactory.class") != null
                || type.getResource("jaxb.index") != null;
+            this.objectFactoryOrIndexMap.put(type.getName(), ret);
+            return ret;
+        }
+        
     }
 
     private boolean objectFactoryForType(Type genericType) {
@@ -666,7 +674,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
 
     protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
-        Class<?> theType = null;
+        Class<?> theType;
         if (JAXBElement.class.isAssignableFrom(type)) {
             theType = InjectionUtils.getActualType(genericType);
         } else {
@@ -704,6 +712,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public void clearContexts() {
         classContexts.clear();
         packageContexts.clear();
+        objectFactoryOrIndexMap.clear();
     }
 
     //TODO: move these methods into the dedicated utility class

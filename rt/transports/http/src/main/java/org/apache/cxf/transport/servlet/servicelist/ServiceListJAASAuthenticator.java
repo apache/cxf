@@ -19,7 +19,7 @@
 package org.apache.cxf.transport.servlet.servicelist;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,19 +33,19 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.AccountException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.transport.http.blueprint.HttpDestinationBPBeanDefinitionParser;
+
 
 
 
 public class ServiceListJAASAuthenticator {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(HttpDestinationBPBeanDefinitionParser.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ServiceListJAASAuthenticator.class);
 
     private static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
 
@@ -72,12 +72,13 @@ public class ServiceListJAASAuthenticator {
         try {
             Subject subject = new Subject();
             LoginContext loginContext = new LoginContext(realm, subject, new CallbackHandler() {
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                public void handle(Callback[] callbacks) throws UnsupportedCallbackException {
                     for (int i = 0; i < callbacks.length; i++) {
                         if (callbacks[i] instanceof NameCallback) {
                             ((NameCallback)callbacks[i]).setName(username);
                         } else if (callbacks[i] instanceof PasswordCallback) {
-                            ((PasswordCallback)callbacks[i]).setPassword(password.toCharArray());
+                            ((PasswordCallback)callbacks[i]).setPassword(
+                                password == null ? null : password.toCharArray());
                         } else {
                             throw new UnsupportedCallbackException(callbacks[i]);
                         }
@@ -149,11 +150,10 @@ public class ServiceListJAASAuthenticator {
     }
 
     private static String base64Decode(String srcString) {
-        byte[] transformed = null;
         try {
-            transformed = Base64Utility.decode(srcString);
-            return new String(transformed, "ISO-8859-1");
-        } catch (UnsupportedEncodingException | Base64Exception e) {
+            byte[] transformed = Base64Utility.decode(srcString);
+            return new String(transformed, StandardCharsets.ISO_8859_1);
+        } catch (Base64Exception e) {
             return srcString;
         }
     }

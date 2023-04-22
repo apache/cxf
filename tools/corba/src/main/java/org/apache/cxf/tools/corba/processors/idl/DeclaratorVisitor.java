@@ -96,7 +96,6 @@ public class DeclaratorVisitor extends VisitorBase {
 
     private void visitNewTypes(Scope newScope) {
         CorbaType nextCorbaType = null;
-        XmlSchemaType nextSchemaType = null;
 
         CorbaType oldCorbaType = getCorbaType();
 
@@ -118,7 +117,7 @@ public class DeclaratorVisitor extends VisitorBase {
             // Sequence
             //
 
-            nextSchemaType = duplicateXmlSchemaComplexType(newScope);
+            XmlSchemaType nextSchemaType = duplicateXmlSchemaComplexType(newScope);
 
             Sequence oldSequence = (Sequence) oldCorbaType;
             Sequence newSequence = new Sequence();
@@ -135,7 +134,8 @@ public class DeclaratorVisitor extends VisitorBase {
             // Fixed
             //
 
-            nextSchemaType = duplicateXmlSchemaSimpleType(newScope);
+//            nextSchemaType =
+            duplicateXmlSchemaSimpleType(newScope);
 
             Fixed oldFixed = (Fixed) getCorbaType();
             Fixed newFixed = new Fixed();
@@ -149,7 +149,7 @@ public class DeclaratorVisitor extends VisitorBase {
             nextCorbaType = newFixed;
         } else {
             System.err.println("[DeclaratorVisitor: Unexpected CORBA type error!]");
-            System.exit(1);
+            System.exit(1); //NOPMD
         }
 
         if (nextCorbaType != null) {

@@ -20,9 +20,8 @@ package org.apache.cxf.rs.security.oidc.idp;
 
 import java.util.Collections;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;

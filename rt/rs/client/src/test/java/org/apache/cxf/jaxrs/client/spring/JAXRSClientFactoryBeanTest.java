@@ -18,20 +18,28 @@
  */
 package org.apache.cxf.jaxrs.client.spring;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.cache.CacheControlClientReaderInterceptor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.After;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+
 
 
 public class JAXRSClientFactoryBeanTest {
@@ -92,6 +100,48 @@ public class JAXRSClientFactoryBeanTest {
             assertNotNull(bean);
             assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
                 endsWith("?list=1&list=2"));
+        }
+    }
+    
+    @Test
+    public void testClientPropertiesWithState() throws Exception {
+        try (ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"})) {
+            Client bean = (Client) ctx.getBean("client3");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1,2"));
+            
+            bean = (Client) ctx.getBean("client1");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1&list=2"));
+        }
+    }
+    
+    @Test
+    public void testClientWithFeatures() throws Exception {
+        try (ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"})) {
+            final Client bean = (Client) ctx.getBean("client4");
+            assertNotNull(bean);
+            
+            final JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean)ctx.getBean("client4.proxyFactory");
+            assertNotNull(bean);
+            
+            assertThat((List<Object>)cfb.getProviders(), 
+                hasItem(instanceOf(CacheControlClientReaderInterceptor.class)));
+            
+            assertThat((List<Object>)cfb.getProviders(), 
+                hasItem(instanceOf(SpringParameterHandler.class)));
+        }
+    }
+    
+    public static class SomeFeature implements Feature {
+        @Override
+        public boolean configure(FeatureContext context) {
+            context.register(SpringParameterHandler.class);
+            return true;
         }
     }
 }

@@ -22,10 +22,9 @@ package org.apache.cxf.jaxws.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.ws.Binding;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-
+import jakarta.xml.ws.Binding;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.message.AbstractWrappedMessage;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;

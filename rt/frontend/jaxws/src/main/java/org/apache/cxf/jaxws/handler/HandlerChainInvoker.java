@@ -26,21 +26,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
-import javax.xml.ws.ProtocolException;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Node;
 
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPFault;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.ws.ProtocolException;
+import jakarta.xml.ws.handler.Handler;
+import jakarta.xml.ws.handler.LogicalHandler;
+import jakarta.xml.ws.handler.LogicalMessageContext;
+import jakarta.xml.ws.handler.MessageContext;
+import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -247,7 +247,7 @@ public class HandlerChainInvoker {
             handlerChain = reverseHandlerChain(handlerChain);
         }
 
-        boolean continueProcessing = true;
+        boolean continueProcessing;
         MessageContext oldCtx = null;
         try {
             oldCtx = WebServiceContextImpl.setMessageContext(ctx);
@@ -304,7 +304,7 @@ public class HandlerChainInvoker {
             handlerChain = reverseHandlerChain(handlerChain);
         }
 
-        boolean continueProcessing = true;
+        boolean continueProcessing;
         MessageContext oldCtx = null;
         try {
             oldCtx = WebServiceContextImpl.setMessageContext(ctx);
@@ -339,7 +339,6 @@ public class HandlerChainInvoker {
             }
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "HANDLER_RAISED_RUNTIME_EXCEPTION", e);
-            continueProcessing = false;
             throw e;
         }
         return continueProcessing;
@@ -415,14 +414,12 @@ public class HandlerChainInvoker {
             //observer, we have to call close here.
             if (isRequestor()) {
                 invokeReversedClose();
-                continueProcessing = false;
                 setFault(e);
                 throw e;
             } else if (!responseExpected && !outbound) {
                 invokeReversedClose();
                 continueProcessing = false;
             } else {
-                continueProcessing = false;
                 setFault(e);
                 throw e;
             }
@@ -453,13 +450,11 @@ public class HandlerChainInvoker {
         msg.removeContent(Source.class);
 
         try {
-            SOAPMessage soapMessage = null;
-
             SoapVersion version = null;
             if (msg instanceof SoapMessage) {
                 version = ((SoapMessage)msg).getVersion();
             }
-            soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
+            SOAPMessage soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
             msg.setContent(SOAPMessage.class, soapMessage);
 
             SOAPBody body = SAAJUtils.getBody(soapMessage);
@@ -529,7 +524,6 @@ public class HandlerChainInvoker {
         } catch (RuntimeException e) {
             LOG.log(Level.WARNING, "HANDLER_RAISED_RUNTIME_EXCEPTION", e);
             invokeReversedClose();
-            continueProcessing = false;
             closed = true;
 
             throw e;

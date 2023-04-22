@@ -19,7 +19,7 @@
 // START SNIPPET: service
 package demo.spring;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface HelloWorld {

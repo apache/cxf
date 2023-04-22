@@ -68,7 +68,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             return;
         }
         String baseUri = (String)message.get(Message.REQUEST_URL);
-        URI uri = null;
+        final URI uri;
 
         try {
             uri = URI.create(baseUri);
@@ -87,6 +87,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
                 c.prepare(mout);
                 OutputStream os = mout.getContent(OutputStream.class);
                 writeResponse(uri, map, os, message.getExchange().getEndpoint());
+                message.getInterceptorChain().pause();                
             } catch (IOException ioe) {
                 throw new Fault(ioe);
             }
@@ -101,20 +102,18 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     public static void writeUtilsToResponseStream(Class<?> referenceClass, OutputStream outputStream) {
-        InputStream utils = referenceClass.getResourceAsStream(JS_UTILS_PATH);
-        if (utils == null) {
-            throw new RuntimeException("Unable to get stream for " + JS_UTILS_PATH);
-        }
-        try {
-            IOUtils.copyAndCloseInput(utils, outputStream);
-            outputStream.flush();
+        try (InputStream utils = referenceClass.getResourceAsStream(JS_UTILS_PATH)) {
+            if (utils == null) {
+                throw new RuntimeException("Unable to get stream for " + JS_UTILS_PATH);
+            }
+            IOUtils.copy(utils, outputStream, 4096);
+            //outputStream.flush();
         } catch (IOException e) {
             throw new RuntimeException("Failed to write javascript utils to HTTP response.", e);
         }
     }
 
     private void writeResponse(URI uri, Map<String, String> map, OutputStream os, Endpoint serverEndpoint) {
-        OutputStreamWriter writer = new OutputStreamWriter(os, UTF_8);
         if (!map.containsKey(NO_UTILS_QUERY_KEY)) {
             writeUtilsToResponseStream(JavascriptGetInterceptor.class, os);
         }
@@ -126,6 +125,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
                 .getXmlSchemaCollection());
             try {
+                OutputStreamWriter writer = new OutputStreamWriter(os, UTF_8);
                 for (SchemaInfo schema : schemata) {
                     SchemaJavascriptBuilder builder = new SchemaJavascriptBuilder(serviceInfo
                         .getXmlSchemaCollection(), prefixManager, nameManager);

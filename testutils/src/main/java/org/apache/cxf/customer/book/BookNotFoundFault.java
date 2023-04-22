@@ -19,7 +19,7 @@
 
 package org.apache.cxf.customer.book;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 @WebFault
 public class BookNotFoundFault extends Exception {

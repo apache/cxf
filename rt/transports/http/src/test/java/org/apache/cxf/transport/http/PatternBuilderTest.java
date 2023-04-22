@@ -33,10 +33,8 @@ public class PatternBuilderTest {
     @Test
     public void testPatternBuilder() {
 
-        Pattern pattern = null;
-
         // Simple matching
-        pattern = PatternBuilder.build("localhost");
+        Pattern pattern = PatternBuilder.build("localhost");
 
         assertTrue(pattern.matcher("localhost").matches());
         assertFalse(pattern.matcher("localhost-after").matches());

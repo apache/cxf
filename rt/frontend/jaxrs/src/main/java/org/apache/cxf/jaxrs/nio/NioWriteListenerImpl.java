@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-import javax.servlet.WriteListener;
-
+import jakarta.servlet.WriteListener;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;

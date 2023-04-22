@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.4.0-SNAPSHOT</version>
+        <version>4.0.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     
@@ -36,6 +36,14 @@
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -132,6 +140,7 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${cxf.ehcache3.version}</version>
+            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -144,8 +153,8 @@
             <version>${cxf.hazelcast.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -153,7 +162,11 @@
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
@@ -215,7 +228,6 @@
                             <systemPropertyVariables>
                                 <sts.deployment>standalone</sts.deployment>
                                 <java.security.auth.login.config>src/test/resources/kerberos.jaas</java.security.auth.login.config>
-                                <java.io.tmpdir>${basedir}/target/tmp</java.io.tmpdir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>

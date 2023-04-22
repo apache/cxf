@@ -44,7 +44,7 @@ public class ObjectMethodInvocationHandler extends CXFInvocationHandlerBase {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object ret = null;
+        final Object ret;
 
         LOG.fine(this + " on " + method);
 

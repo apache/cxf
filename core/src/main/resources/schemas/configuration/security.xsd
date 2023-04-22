@@ -22,11 +22,11 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified"
-           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
            xmlns:tns="http://cxf.apache.org/configuration/security"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:pt="http://cxf.apache.org/configuration/parameterized-types" 
-           jaxb:version="2.0">
+           jaxb:version="3.0">
 
     <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
                schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
@@ -654,6 +654,13 @@
                 <xs:documentation>
                 This attribute specifies whether to enable revocation when checking the client certificate,
                 if client authentication is enabled. The default is false.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
+           <xs:attribute name="sniHostCheck" type="pt:ParameterizedBoolean" default="true">
+             <xs:annotation>
+                <xs:documentation>
+                    If the SNI host name must match.
                 </xs:documentation>
              </xs:annotation>
            </xs:attribute>

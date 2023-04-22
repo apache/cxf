@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.wsdl.OperationType;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -299,7 +299,7 @@ public class ParameterProcessor extends AbstractProcessor {
                         if (p.getQName().equals(ProcessorUtil.getElementName(outpart))
                             && p.getPartName().equals(outpart.getName().getLocalPart())) {
                             p.setHolder(true);
-                            p.setHolderName(javax.xml.ws.Holder.class.getName());
+                            p.setHolderName(jakarta.xml.ws.Holder.class.getName());
                             String holderClass = p.getClassName();
                             if (JAXBUtils.holderClass(holderClass) != null) {
                                 holderClass = JAXBUtils.holderClass(holderClass).getName();
@@ -526,9 +526,7 @@ public class ParameterProcessor extends AbstractProcessor {
     private JavaParameter getParameterFromQName(QName wrapperElement, QName item, JavaType.Style style,
                                                 MessagePartInfo part) {
 
-        String fullJavaName = "";
-
-        fullJavaName = this.dataBinding.getWrappedElementType(wrapperElement, item);
+        String fullJavaName = this.dataBinding.getWrappedElementType(wrapperElement, item);
 
         String targetNamespace = item.getNamespaceURI();
 
@@ -543,7 +541,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
         if (style == JavaType.Style.OUT || style == JavaType.Style.INOUT) {
             parameter.setHolder(true);
-            parameter.setHolderName(javax.xml.ws.Holder.class.getName());
+            parameter.setHolderName(jakarta.xml.ws.Holder.class.getName());
             String holderClass = fullJavaName;
             if (JAXBUtils.holderClass(fullJavaName) != null) {
                 holderClass = JAXBUtils.holderClass(fullJavaName).getName();
@@ -556,10 +554,8 @@ public class ParameterProcessor extends AbstractProcessor {
 
     private JavaReturn getReturnFromQName(QName element, MessagePartInfo part) {
 
-        String fullJavaName = "";
-        String simpleJavaName = "";
-        fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
-        simpleJavaName = fullJavaName;
+        String fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
+        String simpleJavaName = fullJavaName;
 
         int index = fullJavaName.lastIndexOf('.');
 
@@ -567,7 +563,7 @@ public class ParameterProcessor extends AbstractProcessor {
             simpleJavaName = fullJavaName.substring(index);
         }
 
-        String targetNamespace = "";
+        final String targetNamespace;
         if (isHeader(part)) {
             targetNamespace = part.getMessageInfo().getOperation().getInterface().
             getService().getTargetNamespace();

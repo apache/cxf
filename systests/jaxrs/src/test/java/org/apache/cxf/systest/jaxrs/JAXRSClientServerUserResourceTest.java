@@ -24,36 +24,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTestBase {
+public class JAXRSClientServerUserResourceTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
-    @Ignore
-    public static class Server extends AbstractBusTestServerBase {
-        org.apache.cxf.endpoint.Server server;
-        protected void run() {
+    public static class Server extends AbstractServerTestServerBase {
+
+        @Override
+        protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setAddress("http://localhost:" + PORT + "/");
 
@@ -90,25 +89,11 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
             sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
             sf.setServiceBean(new BookStoreNoAnnotationsImpl());
-            server = sf.create();
+            return sf.create();
         }
 
-        @Override
-        public void tearDown() {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public static void main(String[] args) throws Exception {
+            new Server().start();
         }
     }
 
@@ -117,7 +102,6 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
-        createStaticBus();
     }
 
     @Test

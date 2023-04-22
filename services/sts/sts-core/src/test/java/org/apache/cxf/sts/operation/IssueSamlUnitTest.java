@@ -20,21 +20,17 @@ package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -49,7 +45,6 @@ import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.BinarySecretType;
@@ -79,7 +74,6 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -114,9 +108,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -186,9 +179,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -259,9 +251,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -331,9 +322,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -434,9 +424,8 @@ public class IssueSamlUnitTest {
         issueOperation.setEncryptIssuedToken(true);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -511,9 +500,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -602,9 +590,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -653,7 +640,11 @@ public class IssueSamlUnitTest {
         // Now add Entropy
         BinarySecretType binarySecretType = new BinarySecretType();
         binarySecretType.setType(STSConstants.NONCE_TYPE);
-        binarySecretType.setValue(WSSecurityUtil.generateNonce(256 / 8));
+
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecretType.setValue(secret);
         JAXBElement<BinarySecretType> binarySecretTypeJaxb =
             new JAXBElement<BinarySecretType>(
                 QNameConstants.BINARY_SECRET, BinarySecretType.class, binarySecretType
@@ -700,9 +691,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -746,7 +736,11 @@ public class IssueSamlUnitTest {
         // Now add Entropy
         BinarySecretType binarySecretType = new BinarySecretType();
         binarySecretType.setType(STSConstants.SYMMETRIC_KEY_TYPE);
-        binarySecretType.setValue(WSSecurityUtil.generateNonce(256 / 8));
+
+        Random random = new Random();
+        byte[] secret = new byte[256 / 8];
+        random.nextBytes(secret);
+        binarySecretType.setValue(secret);
         JAXBElement<BinarySecretType> binarySecretTypeJaxb =
             new JAXBElement<BinarySecretType>(
                 QNameConstants.BINARY_SECRET, BinarySecretType.class, binarySecretType
@@ -792,9 +786,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -896,7 +889,7 @@ public class IssueSamlUnitTest {
         data.setWsDocInfo(new WSDocInfo(assertion.getOwnerDocument()));
 
         assertionWrapper.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(), data.getCallbackHandler()
+            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
         );
 
         SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
@@ -913,9 +906,8 @@ public class IssueSamlUnitTest {
         issueOperation.setReturnReferences(false);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -980,9 +972,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -1000,10 +991,9 @@ public class IssueSamlUnitTest {
         stsProperties.setIssuer("STS");
 
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedC14nAlgorithms = new ArrayList<>();
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_OMIT_COMMENTS);
-        acceptedC14nAlgorithms.add(WSS4JConstants.C14N_EXCL_WITH_COMMENTS);
-        sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
+        sigProperties.setAcceptedC14nAlgorithms(Arrays.asList(
+            WSS4JConstants.C14N_EXCL_OMIT_COMMENTS,
+            WSS4JConstants.C14N_EXCL_WITH_COMMENTS));
         stsProperties.setSignatureProperties(sigProperties);
 
         issueOperation.setStsProperties(stsProperties);
@@ -1070,9 +1060,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -1090,11 +1079,10 @@ public class IssueSamlUnitTest {
         stsProperties.setIssuer("STS");
 
         SignatureProperties sigProperties = new SignatureProperties();
-        List<String> acceptedSignatureAlgorithms = new ArrayList<>();
-        String signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
-        acceptedSignatureAlgorithms.add(signatureAlgorithm);
-        acceptedSignatureAlgorithms.add(WSS4JConstants.RSA_SHA1);
-        sigProperties.setAcceptedSignatureAlgorithms(acceptedSignatureAlgorithms);
+        final String signatureAlgorithm = WSS4JConstants.RSA_SHA256;
+        sigProperties.setAcceptedSignatureAlgorithms(Arrays.asList(
+            signatureAlgorithm,
+            WSS4JConstants.RSA_SHA1));
         stsProperties.setSignatureProperties(sigProperties);
 
         issueOperation.setStsProperties(stsProperties);
@@ -1157,9 +1145,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -1263,9 +1250,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();
@@ -1355,9 +1341,8 @@ public class IssueSamlUnitTest {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<>();
-        providerList.add(new SAMLTokenProvider());
-        issueOperation.setTokenProviders(providerList);
+        issueOperation.setTokenProviders(Collections.singletonList(
+            new SAMLTokenProvider()));
 
         // Add Service
         ServiceMBean service = new StaticService();

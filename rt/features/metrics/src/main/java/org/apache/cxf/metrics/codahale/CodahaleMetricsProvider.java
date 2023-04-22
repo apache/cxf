@@ -33,7 +33,6 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsProvider;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
@@ -51,9 +50,8 @@ public class CodahaleMetricsProvider implements MetricsProvider {
      *
      */
     public CodahaleMetricsProvider(Bus b) {
-        this.bus = b;
-        registry = b.getExtension(MetricRegistry.class);
         bus = b;
+        registry = b.getExtension(MetricRegistry.class);
         if (registry == null) {
             registry = new MetricRegistry();
             setupJMXReporter(b, registry);
@@ -91,25 +89,18 @@ public class CodahaleMetricsProvider implements MetricsProvider {
     StringBuilder getBaseServiceName(Endpoint endpoint, boolean isClient, String clientId) {
         StringBuilder buffer = new StringBuilder();
         if (endpoint.get("org.apache.cxf.management.service.counter.name") != null) {
-            buffer.append((String)endpoint.get("org.apache.cxf.management.service.counter.name"));
+            buffer.append(endpoint.get("org.apache.cxf.management.service.counter.name"));
         } else {
-            Service service = endpoint.getService();
-
-            String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
-            String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
-
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
-            buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
+            buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
             buffer.append(ManagementConstants.TYPE_PROP).append("=Metrics");
-            if (isClient) {
-                buffer.append(".Client,");
-            } else {
-                buffer.append(".Server,");
-            }
-            buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-            buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName + ",");
+            buffer.append(isClient ? ".Client," : ".Server,");
+            buffer.append(ManagementConstants.SERVICE_NAME_PROP)
+                .append("=\"").append(escapePatternChars(endpoint.getService().getName().toString())).append("\",");
+            buffer.append(ManagementConstants.PORT_NAME_PROP)
+                .append("=\"").append(endpoint.getEndpointInfo().getName().getLocalPart()).append("\",");
             if (clientId != null) {
-                buffer.append("Client=" + clientId + ",");
+                buffer.append("Client=").append(clientId).append(',');
             }
         }
         return buffer;

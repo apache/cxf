@@ -22,20 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.jws.Oneway;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.ws.Holder;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
-
+import jakarta.jws.Oneway;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.jws.soap.SOAPBinding;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.WSDLDocumentation;
@@ -47,17 +46,15 @@ import org.apache.cxf.systest.jaxws.types.Bar;
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT,
              use = SOAPBinding.Use.LITERAL)
-@WSDLDocumentationCollection(
-    {
-        @WSDLDocumentation("DocLitWrappedCodeFirstService interface"),
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService top level doc",
-                           placement = WSDLDocumentation.Placement.TOP),
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc",
-                           placement = WSDLDocumentation.Placement.BINDING),
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc",
-                           placement = WSDLDocumentation.Placement.SERVICE_PORT)
-    }
-)
+@WSDLDocumentationCollection({
+    @WSDLDocumentation("DocLitWrappedCodeFirstService interface"),
+    @WSDLDocumentation(value = "DocLitWrappedCodeFirstService top level doc",
+                       placement = WSDLDocumentation.Placement.TOP),
+    @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc",
+                       placement = WSDLDocumentation.Placement.BINDING),
+    @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc",
+                       placement = WSDLDocumentation.Placement.SERVICE_PORT)
+})
 @GZIP
 @FastInfoset
 public interface DocLitWrappedCodeFirstService {
@@ -90,25 +87,23 @@ public interface DocLitWrappedCodeFirstService {
     String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y);
 
     @WebMethod
-    @WSDLDocumentationCollection(
-        {
-            @WSDLDocumentation("multiInOut doc"),
-            @WSDLDocumentation(value = "multiInOut Input doc",
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_INPUT),
-            @WSDLDocumentation(value = "multiInOut Output doc",
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_OUTPUT),
-            @WSDLDocumentation(value = "multiInOut InputMessage doc",
-                               placement = WSDLDocumentation.Placement.INPUT_MESSAGE),
-            @WSDLDocumentation(value = "multiInOut OutputMessage doc",
-                               placement = WSDLDocumentation.Placement.OUTPUT_MESSAGE),
-            @WSDLDocumentation(value = "multiInOut binding doc",
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION),
-            @WSDLDocumentation(value = "multiInOut binding Input doc",
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),
-            @WSDLDocumentation(value = "multiInOut binding Output doc",
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)
-        }
-    )
+    @WSDLDocumentationCollection({
+        @WSDLDocumentation("multiInOut doc"),
+        @WSDLDocumentation(value = "multiInOut Input doc",
+                           placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_INPUT),
+        @WSDLDocumentation(value = "multiInOut Output doc",
+                           placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_OUTPUT),
+        @WSDLDocumentation(value = "multiInOut InputMessage doc",
+                           placement = WSDLDocumentation.Placement.INPUT_MESSAGE),
+        @WSDLDocumentation(value = "multiInOut OutputMessage doc",
+                           placement = WSDLDocumentation.Placement.OUTPUT_MESSAGE),
+        @WSDLDocumentation(value = "multiInOut binding doc",
+                           placement = WSDLDocumentation.Placement.BINDING_OPERATION),
+        @WSDLDocumentation(value = "multiInOut binding Input doc",
+                           placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),
+        @WSDLDocumentation(value = "multiInOut binding Output doc",
+                           placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)
+    })
     String multiInOut(@WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> a,
                       @WebParam(mode = WebParam.Mode.INOUT)
@@ -154,8 +149,7 @@ public interface DocLitWrappedCodeFirstService {
         @WSDLDocumentation(value = "fault porttype doc",
                            placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_FAULT,
                            faultClass = CustomException.class)
-        }
-    )
+    })
     int throwException(int i)
         throws ServiceTestFault,
         CustomException,

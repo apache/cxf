@@ -22,9 +22,8 @@ package org.apache.cxf.systest.jaxrs.security.oidc;
 import java.net.URL;
 import java.util.Collections;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;

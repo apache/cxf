@@ -19,7 +19,7 @@
 
 package org.apache.cxf.tools.fortest.aegis2ws;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 public interface TestAegisSEI {

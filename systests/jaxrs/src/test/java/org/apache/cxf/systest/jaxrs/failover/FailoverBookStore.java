@@ -20,10 +20,10 @@
 package org.apache.cxf.systest.jaxrs.failover;
 
 
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ServiceUnavailableException;
 import org.apache.cxf.systest.jaxrs.Book;
 
 /**
@@ -33,6 +33,7 @@ import org.apache.cxf.systest.jaxrs.Book;
 public class FailoverBookStore {
 
     private int counter;
+    private int unavailableCounter;
 
     @GET
     @Path("/")
@@ -44,4 +45,13 @@ public class FailoverBookStore {
         return new Book("root", 124L);
     }
 
+    
+    @GET
+    @Path("/unavailable")
+    public Book getBookRootUnavailable() {
+        if (unavailableCounter++ < 4) {
+            throw new ServiceUnavailableException();
+        }
+        return new Book("root", 124L);
+    }
 }

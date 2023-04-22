@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Context;
+import jakarta.servlet.ServletContext;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Context;
 
 @ApplicationPath("/the%20books2")
 public class BookApplication2 extends BookApplication {

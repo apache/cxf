@@ -19,8 +19,7 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator;
 
-import javax.jws.WebService;
-
+import jakarta.jws.WebService;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
@@ -30,7 +29,7 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 public final class WebServiceAnnotator implements Annotator {
 
     public void annotate(JavaAnnotatable  ja) {
-        JavaInterface intf = null;
+        final JavaInterface intf;
         if (ja instanceof JavaInterface) {
             intf = (JavaInterface) ja;
         } else {

@@ -19,7 +19,9 @@
 package org.apache.cxf.jaxrs.sse.client;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -30,19 +32,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.sse.InboundSseEvent;
-import javax.ws.rs.sse.SseEventSource;
-
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.sse.InboundSseEvent;
+import jakarta.ws.rs.sse.SseEventSource;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
@@ -53,6 +55,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -62,7 +65,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SseEventSourceImplTest {
 
     enum Type {
-        NO_CONTENT, NO_SERVER, BUSY,
+        NO_CONTENT, NO_SERVER, BUSY, UNAVAILABLE, RETRY_AFTER,
         EVENT, EVENT_JUST_DATA, EVENT_JUST_NAME, EVENT_MULTILINE_DATA, EVENT_NO_RETRY, EVENT_BAD_RETRY, EVENT_MIXED,
         EVENT_BAD_NEW_LINES, EVENT_NOT_AUTHORIZED, EVENT_LAST_EVENT_ID, EVENT_RETRY_LAST_EVENT_ID;
     }
@@ -127,6 +130,34 @@ public class SseEventSourceImplTest {
             assertThat(eventSource.isOpen(), equalTo(false));
 
             assertThat(events.size(), equalTo(0));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectWhenUnavailableIsReturned() {
+        try (SseEventSource eventSource = withNoReconnect(Type.UNAVAILABLE)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+
+            await()
+                .during(Duration.ofMillis(3000L))
+                .untilAsserted(() -> assertThat(eventSource.isOpen(), equalTo(false)));
+
+            assertThat(events.size(), equalTo(0));
+        }
+    }
+    
+    @Test
+    public void testNoReconnectWhenRetryAfterIsReturned() {
+        try (SseEventSource eventSource = withNoReconnect(Type.RETRY_AFTER)) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+
+            await()
+                .atMost(Duration.ofMillis(3000L))
+                .untilAsserted(() -> assertThat(eventSource.isOpen(), equalTo(true)));
+
+            assertThat(events.size(), equalTo(1));
         }
     }
 
@@ -195,7 +226,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -213,7 +247,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data"));
     }
@@ -229,13 +266,37 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data\nin multiple lines"));
     }
-
+    
     @Test
     public void testNoReconnectAndJustEventNameIsReceived() throws InterruptedException, IOException {
+        final Map<String, Object> properties = Collections
+            .singletonMap(SseEventSourceImpl.DISCARD_INCOMPLETE_EVENTS, false);
+        
+        try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME, properties)) {
+            eventSource.open();
+
+            assertThat(eventSource.isOpen(), equalTo(true));
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
+        assertThat(events.get(0).getName(), equalTo("just name"));
+    }
+
+    @Test
+    public void testNoReconnectAndIncompleteEventIsDiscarded() throws InterruptedException, IOException {
         try (SseEventSource eventSource = withNoReconnect(Type.EVENT_JUST_NAME)) {
             eventSource.open();
 
@@ -245,8 +306,12 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
-        assertThat(events.get(0).getName(), equalTo("just name"));
+        // incomplete event should be discarded
+        await()
+            .during(Duration.ofMillis(500L))
+            .until(events::isEmpty);
+
+        assertThat(events.size(), equalTo(0));
     }
 
     @Test
@@ -260,7 +325,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(2)));
+
         assertThat(events.get(0).getName(), nullValue());
         assertThat(events.get(0).readData(), equalTo("just test data"));
         assertThat(events.get(1).getId(), equalTo("1"));
@@ -294,7 +362,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(2)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
         assertThat(events.get(0).readData(), equalTo("test data"));
@@ -314,7 +385,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
         
-        assertThat(errors.size(), equalTo(2));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(errors.size(), equalTo(2)));
+
         assertThat(events.size(), equalTo(0));
     }
 
@@ -329,7 +403,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
         
-        assertThat(errors.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(errors.size(), equalTo(1)));
+
         assertThat(events.size(), equalTo(0));
     }
 
@@ -358,7 +435,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+
         assertThat(events.get(0).getId(), equalTo("1"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(-1L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -389,7 +469,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+        
         assertThat(events.get(0).getId(), equalTo("10"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -407,7 +490,10 @@ public class SseEventSourceImplTest {
             Thread.sleep(150L);
         }
 
-        assertThat(events.size(), equalTo(1));
+        await()
+            .atMost(Duration.ofMillis(500L))
+            .untilAsserted(() -> assertThat(events.size(), equalTo(1)));
+        
         assertThat(events.get(0).getId(), equalTo("10"));
         assertThat(events.get(0).getReconnectDelay(), equalTo(10000L));
         assertThat(events.get(0).getComment(), equalTo("test comment"));
@@ -415,11 +501,19 @@ public class SseEventSourceImplTest {
     }
     
     private SseEventSource withNoReconnect(Type type) {
-        return withNoReconnect(type, null);
+        return withNoReconnect(type, null, Collections.emptyMap());
+    }
+    
+    private SseEventSource withNoReconnect(Type type, Map<String, Object> properties) {
+        return withNoReconnect(type, null, properties);
     }
     
     private SseEventSource withNoReconnect(Type type, String lastEventId) {
-        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId)).build();
+        return withNoReconnect(type, lastEventId, Collections.emptyMap());
+    }
+    
+    private SseEventSource withNoReconnect(Type type, String lastEventId, Map<String, Object> properties) {
+        SseEventSource eventSource = SseEventSource.target(target(type, lastEventId, properties)).build();
         eventSource.register(events::add, errors::add);
         return eventSource;
     }
@@ -437,7 +531,16 @@ public class SseEventSourceImplTest {
     }
 
     private static WebTarget target(Type type, String lastEventId) {
-        final WebTarget target = ClientBuilder.newClient().target(LOCAL_ADDRESS + type.name());
+        return target(type, lastEventId, Collections.emptyMap());
+    }
+    
+    private static WebTarget target(Type type, String lastEventId, Map<String, Object> properties) {
+        final Client client = ClientBuilder.newClient();
+        if (properties != null) {
+            properties.forEach(client::property);
+        }
+        
+        final WebTarget target = client.target(LOCAL_ADDRESS + type.name());
         if (lastEventId != null) {
             target.property(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
         }
@@ -451,6 +554,8 @@ public class SseEventSourceImplTest {
 
         startBusyServer(Type.BUSY);
         startNotAuthorizedServer(Type.EVENT_NOT_AUTHORIZED);
+        startUnavailableServer(Type.UNAVAILABLE);
+        startUnavailableServer(Type.RETRY_AFTER);
 
         startServer(Type.EVENT, EVENT);
         startServer(Type.EVENT_JUST_DATA, EVENT_JUST_DATA);
@@ -487,7 +592,15 @@ public class SseEventSourceImplTest {
         sf.setServiceBean(new BusyEventServer());
         SERVERS.put(type, sf.create());
     }
+    
+    private static void startUnavailableServer(Type type) {
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setAddress(LOCAL_ADDRESS + type.name());
+        sf.setServiceBean(new StatusServer(503, type));
+        SERVERS.put(type, sf.create());
+    }
 
+    
     private static void startServer(Type type, String payload) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setAddress(LOCAL_ADDRESS + type.name());
@@ -507,6 +620,42 @@ public class SseEventSourceImplTest {
         for (Server server : SERVERS.values()) {
             server.stop();
             server.destroy();
+        }
+    }
+    
+    public static class StatusServer {
+        private final int status;
+        private final Type type;
+        private volatile boolean triggered;
+
+        public StatusServer(int status, Type type) {
+            this.status = status;
+            this.type = type;
+        }
+
+        @GET
+        @Produces(MediaType.SERVER_SENT_EVENTS)
+        public Response event() {
+            try {
+                if (triggered) {
+                    return Response.ok(EVENT).build();
+                } else if (status == 503) {
+                    if (type == Type.RETRY_AFTER) {
+                        return Response
+                           .status(status)
+                           .header(HttpHeaders.RETRY_AFTER, "2")
+                           .build();
+                    } else {
+                        return Response
+                            .status(status)
+                            .build();
+                    }
+                } else {
+                    return Response.status(status).build();
+                }
+            } finally {
+                triggered = true;
+            }
         }
     }
 
@@ -548,7 +697,7 @@ public class SseEventSourceImplTest {
 
     public static class DynamicServer {
         private final Function<HttpHeaders, String> function;
-        private volatile boolean fail = true; 
+        private volatile boolean fail; 
 
         public DynamicServer(Function<HttpHeaders, String> function, boolean fail) {
             this.function = function;

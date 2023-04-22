@@ -132,7 +132,7 @@ public class STSTokenValidator implements Validator {
             synchronized (c) {
                 System.setProperty("noprint", "true");
 
-                SecurityToken returnedToken = null;
+                final SecurityToken returnedToken;
 
                 if (useIssueBinding && useOnBehalfOf) {
                     ElementCallbackHandler callbackHandler = new ElementCallbackHandler(tokenElement);

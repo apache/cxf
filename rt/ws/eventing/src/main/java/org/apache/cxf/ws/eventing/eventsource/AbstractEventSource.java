@@ -21,9 +21,8 @@ package org.apache.cxf.ws.eventing.eventsource;
 
 import java.util.logging.Logger;
 
-import javax.annotation.Resource;
-import javax.xml.ws.WebServiceContext;
-
+import jakarta.annotation.Resource;
+import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.eventing.Subscribe;
 import org.apache.cxf.ws.eventing.SubscribeResponse;
