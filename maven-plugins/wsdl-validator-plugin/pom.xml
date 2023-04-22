@@ -53,5 +53,10 @@
             <artifactId>cxf-tools-validator</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>${cxf.plexus-utils.version}</version>
+        </dependency>
     </dependencies>
 </project>
