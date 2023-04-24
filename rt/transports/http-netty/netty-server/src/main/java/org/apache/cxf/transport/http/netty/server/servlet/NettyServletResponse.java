@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -227,5 +228,30 @@ public class NettyServletResponse implements HttpServletResponse {
         throw new IllegalStateException(
                 "Method 'setLocale' not yet implemented!");
 
+    }
+
+    @Override
+    public void setContentLengthLong(long len) {
+        throw new IllegalStateException("Method 'setContentLengthLong' not yet implemented!");
+    }
+
+    @Override
+    public int getStatus() {
+        throw new IllegalStateException("Method 'getStatus' not yet implemented!");
+    }
+
+    @Override
+    public String getHeader(String name) {
+        throw new IllegalStateException("Method 'getHeader' not yet implemented!");
+    }
+
+    @Override
+    public Collection<String> getHeaders(String name) {
+        throw new IllegalStateException("Method 'getHeaders' not yet implemented!");
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        throw new IllegalStateException("Method 'getHeaderNames' not yet implemented!");
     }
 }

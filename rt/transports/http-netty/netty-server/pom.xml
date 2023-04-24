@@ -34,7 +34,7 @@
         <cxf.module.name>org.apache.cxf.transport.http.netty.server</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.transport.http.netty.server.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
-            javax.servlet*;version="[2,4)",
+            javax.servlet*;version="[2,5)",
             io.netty.*;version="${cxf.netty.version.range}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
@@ -68,10 +68,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <!-- we don't implement the servlet 3.0 specification here -->
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
-            <version>1.2</version>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
+            <version>${cxf.servlet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
