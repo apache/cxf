@@ -178,7 +178,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
 
         boolean found = false;
         for (Claim claim: claims) {
-            if (claim.getClaimType().toString().equals(this.groupURI)) {
+            if (claim.getClaimType().equals(this.groupURI)) {
                 found = true;
                 break;
             }

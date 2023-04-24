@@ -67,7 +67,7 @@
         <cxf.osgi.dynamic.import />
         <cxf.osgi.spring.version>[3.1,6)</cxf.osgi.spring.version>
         <cxf.osgi.spring.osgi.version>[1.2.0,2)</cxf.osgi.spring.osgi.version>
-        <cxf.osgi.slf4j.version>[2,3)</cxf.osgi.slf4j.version>
+        <cxf.osgi.slf4j.version>[1.7,3)</cxf.osgi.slf4j.version>
         <cxf.osgi.javax.annotation.version>[1.2,2)</cxf.osgi.javax.annotation.version>
         <cxf.osgi.javax.bind.version>[0,3)</cxf.osgi.javax.bind.version>
         <cxf.osgi.javax.stream.version>[0,2)</cxf.osgi.javax.stream.version>
@@ -83,8 +83,8 @@
         <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
         <cxf.assertj.version>3.24.2</cxf.assertj.version>
-        <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
-        <cxf.atmosphere.version>3.0.3</cxf.atmosphere.version>
+        <cxf.atmosphere.version.range>[2.4, 3.0)</cxf.atmosphere.version.range>
+        <cxf.atmosphere.version>2.6.1</cxf.atmosphere.version>
         <cxf.bcprov.version>1.70</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.16.2</cxf.brave.reporter.version>
         <cxf.brave.version>5.15.1</cxf.brave.version>
@@ -99,7 +99,7 @@
         <cxf.commons-lang3.version>3.12.0</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.2</cxf.commons-logging.version>
         <cxf.commons-text.version>1.10.0</cxf.commons-text.version>
-        <cxf.derby.version>10.16.1.1</cxf.derby.version>
+        <cxf.derby.version>10.15.2.0</cxf.derby.version>
         <cxf.dom4j.version>2.1.4</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
         <cxf.dropwizard4.version>4.2.18</cxf.dropwizard4.version>
@@ -154,7 +154,7 @@
         <cxf.jetty.osgi.version>[9.2,11)</cxf.jetty.osgi.version>
         <cxf.jetty10.version>10.0.15</cxf.jetty10.version>
         <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
-        <cxf.jexl.version>3.3</cxf.jexl.version>
+        <cxf.jexl.version>3.2.1</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.2.20</cxf.johnzon.version>
         <cxf.json.api.version>1.1.6</cxf.json.api.version>
@@ -169,9 +169,9 @@
         <cxf.lucene.version>9.5.0</cxf.lucene.version>
         <cxf.maven.core.version>3.9.1</cxf.maven.core.version>
         <cxf.micrometer.version>1.10.6</cxf.micrometer.version>
-        <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
-        <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
-        <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
+        <cxf.microprofile.config.version>2.0</cxf.microprofile.config.version>
+        <cxf.microprofile.rest.client.version>2.0</cxf.microprofile.rest.client.version>
+        <cxf.microprofile.openapi.version>2.0</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
         <cxf.mockito.version>5.3.1</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
@@ -397,7 +397,6 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <encoding>UTF-8</encoding>
                         <includeResources>false</includeResources>
                     </configuration>
                     <executions>
@@ -444,7 +443,6 @@
                         <rulesets>
                             <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
                         </rulesets>
-                        <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>11</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>

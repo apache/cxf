@@ -34,7 +34,8 @@
         <cxf.module.name>org.apache.cxf.tools.common</cxf.module.name>
         <cxf.osgi.import>
             javax.jws*;version="${cxf.osgi.jws.version}",
-            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            org.slf4j.helpers*;resolution:=optional;version="${cxf.osgi.slf4j.version}"
         </cxf.osgi.import>
     </properties>
     <dependencies>

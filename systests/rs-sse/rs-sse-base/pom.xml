@@ -32,6 +32,9 @@
 
     <properties>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.base</cxf.module.name>
+        <cxf.osgi.import>
+            org.slf4j*;version="${cxf.osgi.slf4j.version}"
+        </cxf.osgi.import>
     </properties>
 
     <dependencies>

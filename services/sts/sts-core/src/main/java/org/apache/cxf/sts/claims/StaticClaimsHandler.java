@@ -53,11 +53,11 @@ public class StaticClaimsHandler implements ClaimsHandler {
 
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         for (Claim claim : claims) {
-            if (getGlobalClaims().keySet().contains(claim.getClaimType().toString())) {
+            if (getGlobalClaims().keySet().contains(claim.getClaimType())) {
                 ProcessedClaim c = new ProcessedClaim();
                 c.setClaimType(claim.getClaimType());
                 c.setPrincipal(parameters.getPrincipal());
-                c.addValue(getGlobalClaims().get(claim.getClaimType().toString()));
+                c.addValue(getGlobalClaims().get(claim.getClaimType()));
                 claimsColl.add(c);
             } else {
                 if (LOG.isLoggable(Level.FINER)) {

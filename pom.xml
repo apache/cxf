@@ -40,7 +40,7 @@
     </issueManagement>
     <properties>
         <cxf.compiler.fork>false</cxf.compiler.fork>
-        <cxf.build-utils.version>4.0.0</cxf.build-utils.version>
+        <cxf.build-utils.version>4.0.1-SNAPSHOT</cxf.build-utils.version>
         <cxf.xjc-utils.version>3.3.2</cxf.xjc-utils.version>
         <cxf.jdk.version>11</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -218,8 +218,7 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <version>3.11.0</version>
                             <configuration>
-                                <source>${cxf.jdk.version}</source>
-                                <target>${cxf.jdk.version}</target>
+                                <release>${cxf.jdk.version}</release>
                                 <maxmem>256M</maxmem>
                                 <fork>${cxf.compiler.fork}</fork>
                             </configuration>
@@ -489,8 +488,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.11.0</version>
                     <configuration>
-                        <source>${cxf.jdk.version}</source>
-                        <target>${cxf.jdk.version}</target>
+                        <release>${cxf.jdk.version}</release>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>

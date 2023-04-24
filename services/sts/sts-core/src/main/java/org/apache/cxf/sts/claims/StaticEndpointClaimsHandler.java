@@ -72,11 +72,11 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
             return claimsColl;
         }
         for (Claim claim : claims) {
-            if (endpointClaims.keySet().contains(claim.getClaimType().toString())) {
+            if (endpointClaims.keySet().contains(claim.getClaimType())) {
                 ProcessedClaim c = new ProcessedClaim();
                 c.setClaimType(claim.getClaimType());
                 c.setPrincipal(parameters.getPrincipal());
-                c.addValue(endpointClaims.get(claim.getClaimType().toString()));
+                c.addValue(endpointClaims.get(claim.getClaimType()));
                 claimsColl.add(c);
             } else {
                 if (LOG.isLoggable(Level.FINER)) {

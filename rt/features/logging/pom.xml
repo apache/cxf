@@ -12,6 +12,9 @@
     <properties>
         <cxf.module.name>org.apache.cxf.logging</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ext.logging.osgi.Activator</cxf.bundle.activator>
+        <cxf.osgi.import>
+            org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}"
+        </cxf.osgi.import>
     </properties>
 
     <name>Apache CXF Advanced Logging Feature</name>

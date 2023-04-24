@@ -32,6 +32,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.sts.core</cxf.module.name>
+        <cxf.osgi.import>
+            org.slf4j*;version="${cxf.osgi.slf4j.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

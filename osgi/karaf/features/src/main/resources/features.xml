@@ -251,10 +251,6 @@
         <feature version="${project.version}">cxf-rt-security-saml</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
     </feature>
-    <feature name="cxf-rs-security-sso-saml" version="${project.version}">
-        <feature version="${project.version}">cxf-rs-security-xml</feature>
-        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-sso-saml/${project.version}</bundle>
-    </feature>
     <feature name="cxf-rs-security-cors" version="${project.version}">
         <feature version="${project.version}">cxf-jaxrs</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-cors/${project.version}</bundle>
@@ -265,6 +261,19 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-json-basic/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-jose/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-jose-jaxrs/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-rs-security-oauth2-saml" version="${project.version}">
+        <feature version="${project.version}">cxf-rs-security-xml</feature>
+        <feature version="${project.version}">cxf-rs-security-jose</feature>
+        <bundle start-level="25" dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:org.apache.santuario/xmlsec/${cxf.xmlsec.bundle.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
+        <bundle start-level="25" dependency="true">mvn:com.google.guava/guava/${cxf.guava.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
+        <bundle start-level="25" dependency='true'>mvn:io.dropwizard.metrics/metrics-core/${cxf.dropwizard3.version}</bundle>
+        <bundle start-level="25" dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.opensaml/${cxf.opensaml.osgi.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
+        <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-rs-security-oauth2-saml/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-security-oauth2" version="${project.version}">
         <feature version="${project.version}">cxf-rs-security-jose</feature>

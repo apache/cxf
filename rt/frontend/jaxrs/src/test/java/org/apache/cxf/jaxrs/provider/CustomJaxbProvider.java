@@ -44,7 +44,7 @@ public class CustomJaxbProvider implements MessageBodyReader<JAXBElement<String>
     @Override
     public long getSize(JAXBElement<String> t, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
-        return t.getValue().toString().length() + 2;
+        return t.getValue().length() + 2;
     }
 
     @Override
