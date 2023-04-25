@@ -161,7 +161,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                     if (claim.getValues().size() == 1) {
                         claimValues = claim.getValues().get(0);
                     }
-                    claims.setProperty(translateClaim(claim.getClaimType().toString()), claimValues);
+                    claims.setProperty(translateClaim(claim.getClaimType()), claimValues);
                 }
             }
         }

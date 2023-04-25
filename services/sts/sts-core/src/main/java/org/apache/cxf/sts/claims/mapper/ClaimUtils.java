@@ -101,7 +101,7 @@ public class ClaimUtils {
             return null;
         }
         for (ProcessedClaim c : processedClaims) {
-            if (c.getClaimType() != null && processedClaimType.equals(c.getClaimType().toString())) {
+            if (c.getClaimType() != null && processedClaimType.equals(c.getClaimType())) {
                 return c;
             }
         }
@@ -121,7 +121,7 @@ public class ClaimUtils {
         if (processedClaims != null && map != null) {
             for (ProcessedClaim c : processedClaims) {
                 String processedClaimType = (c.getClaimType() != null)
-                    ? c.getClaimType().toString()
+                    ? c.getClaimType()
                     : "";
                 String mappedProcessedClaimType = map.get(processedClaimType);
                 if (mappedProcessedClaimType != null) {
