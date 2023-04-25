@@ -71,6 +71,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -115,6 +116,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             clientParameters = new TLSClientParameters();
         }
         Object o = message.getContextualProperty("force.urlconnection.http.conduit");
+        if (o == null) {
+            o = message.get("USING_URLCONNECTION");
+        }
         //o = true;
         if ("https".equals(uri.getScheme()) && clientParameters != null) {
             if (clientParameters.getSSLSocketFactory() != null) {
@@ -123,13 +127,18 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 //the SSLSocketFactory.
                 o = Boolean.TRUE;
             }
-            if (clientParameters.getSslContext() != null 
-                && clientParameters.isDisableCNCheck()) {
-                // If they specify their own SSLContext, we cannot handle the
-                // HostnameVerifier so we'll need to use the URLConnection
-                o = Boolean.TRUE;
+            if (clientParameters.isDisableCNCheck()) {
+                if (clientParameters.getSslContext() != null) { 
+                    // If they specify their own SSLContext, we cannot handle the
+                    // HostnameVerifier so we'll need to use the URLConnection
+                    o = Boolean.TRUE;
+                }
+                if (clientParameters.getTrustManagers() != null 
+                    && JavaUtils.getJavaMajorVersion() < 14) {
+                    // trustmanagers hacks don't work on Java11
+                    o = Boolean.TRUE;                    
+                }
             }
-            
         }
         if (Boolean.TRUE.equals(o)) {
             message.put("USING_URLCONNECTION", Boolean.TRUE);
