@@ -117,8 +117,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
             fail("should have failed");
         } catch (Exception t) {
             //expected
-            assertTrue(t.getCause().getCause().toString(),
-                       t.getCause() instanceof java.net.ConnectException
+            assertTrue(t.getCause() instanceof java.net.ConnectException
                        || t.getCause().getCause() instanceof java.net.ConnectException
                        || t.getCause().getCause() instanceof java.net.SocketTimeoutException);
         }
