@@ -546,7 +546,7 @@ public class DoMerges {
         if (gitLogs == null) {
             return false;
         }
-        List<List<String>> matchingLogs = new LinkedList<>();
+        Set<List<String>> matchingLogs = new HashSet<>();
         for (String[] f : gitLogs) {
             List<String> ll = compareLogs(f, logLines);
             if (!ll.isEmpty()) {
@@ -557,11 +557,15 @@ public class DoMerges {
         if (!matchingLogs.isEmpty()) {
             //everything in the source log is in a log on this branch, let's prompt to record the merge
             System.out.println("Found possible commit(s) already on branch:");
+            int m = 0;
             for (List<String> f : matchingLogs) {
                 for (String s : f) {
                     System.out.println("    " + s);
                 }
                 System.out.println("------------------------");
+                if (++m == 4) {
+                    break;
+                }
             }
 
             while (System.in.available() > 0) {
