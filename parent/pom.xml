@@ -607,8 +607,9 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- Please do not update to 3.0.0, see https://issues.apache.org/jira/browse/CXF-8802 -->
                 <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>1.7.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.cxf.build-utils</groupId>
