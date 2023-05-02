@@ -1,32 +1,26 @@
-Apache CXF 3.5.0 Release Notes
+Apache CXF 3.6.0 Release Notes
 
 1. Overview
 
-The 3.5.x versions of Apache CXF is a significant new version of CXF
+The 3.6.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include:
-* Support for Java 17
+* Support for Spring Boot 2.7 and Spring Security 5.8
 * Many updated dependencies.  We've updated to the latest versions of most
   dependencies.  Some may be incompatible with previous versions.
   Some notables that may impact applications include:
-    * ehCache upgraded to 3.9.x
-    * Jackson to 2.13.x
-    * Mozilla Rhino upgraded to 1.7.13 (groupId/artifactId changed, be careful)
-    * WSS4j 2.4.x
-    * Spring Boot 2.6.x / Spring Framework 5.3.x base line
-    * Apache Karaf 4.3.x base line
-    * Apache HttpClient 5 support (Asynchronous Client HTTP Transport)
-    * HTTP/2 support (server-side only)
+    * Jetty upgraded to 10.x
+    * Haxelcast to 5.2.x
+    * Apache HttpClient 5.2.x support (Asynchronous Client HTTP Transport)
+    * HTTP/2 support, new HttpClient based conduit for client side
     * JUnit 5 support
 
 Important notes:
-* 3.5 is the last branch of CXF that will support Java 8.   Future
-  non-patch releases of CXF will require Java 11 or newer.
-* The old OATH 1.0 module was removed
+* 3.6 no longer supports Java 8.  Java11+ is required.
 
 Users are encouraged to review the migration guide at:
-http://cxf.apache.org/docs/34-migration-guide.html
+http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
@@ -36,7 +30,7 @@ versions of CXF.
 Before installing Apache CXF, make sure the following products,
 with the specified versions, are installed on your system:
 
-    * Java 8 Development Kit
+    * Java 11 Development Kit
     * Apache Maven 3.x to build the samples
 
 
@@ -65,5 +59,5 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/35-migration-guide.html
+http://cxf.apache.org/docs/36-migration-guide.html
 for caveats when upgrading.
