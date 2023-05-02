@@ -76,7 +76,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
                 server.getHost().setAppBase(base.toString());
                 server.getHost().setAutoDeploy(true);
                 server.getHost().setDeployOnStartup(true);
-                server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());
+                server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath());
             }
 
             server.start();
