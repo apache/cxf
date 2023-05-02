@@ -1,4 +1,4 @@
-Apache CXF 3.5.5 Release Notes
+Apache CXF 3.5.6 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.5 fixes over 9 JIRA issues reported by users and the community.
+3.5.6 fixes over 15 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -73,19 +73,24 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
+
+** Sub-task
+    * [CXF-8815] - Fix org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitTest.testResponseSameBufferSize
+    * [CXF-8830] - Fix org.apache.cxf.transport.http.netty.client.NettyHttpConduitTest.testCallAsyncCallbackInvokedOnlyOnce
+
 ** Bug
-    * [CXF-8706] - CXF MTOM handler allow content injection
-    * [CXF-8761] - DigestAuthSupplier: Must not decode URL encoded URI parts
-    * [CXF-8771] - Fix SortedArraySet remove method
-    * [CXF-8776] - Version 3.5.4 contains security vulnerable woodstox version
-    * [CXF-8777] - cxf-codegen-plugin : 3.5.4 : commons-text :1.9
-    * [CXF-8796] - IllegalArgumentException: argument type mismatch with code first RPC when parameter omitted
-    * [CXF-8798] - UDPDestination throws NPE under some conditions
-    * [CXF-8799] - Unxepected URLEncode in MTOM Content-Id
+    * [CXF-8669] - Multipart annotation not working 3.4.6 onwards.
+    * [CXF-8745] - MemoryLeak when using SpringBus in a spring context which has a reusable parent context
+    * [CXF-8797] - NameBinding ignored when implementing interface
+    * [CXF-8810] - Exception on cxf-rt-transports-http-hc Osgi startup
+    * [CXF-8816] - Deflater and Inflater initialized with different 'nowrap' value
+    * [CXF-8822] - AsyncHTTPConduit removes query-parameters when path is empty
+    * [CXF-8824] - CDI beans produced by @Produces methods are generated twice
+    * [CXF-8826] - AsyncHTTPConduit (hc5) - Unexpected EOF during response processing
+    * [CXF-8833] - GZIPInInterceptor, when processing HTTP 204 empty response, throws EOFException
+    * [CXF-8837] - Allow P11 RSA Keys within JwsUtils
+    * [CXF-8839] - Missing dependency on plexus-utils in cxf-wsdl-validator-plugin
 
 ** Improvement
-    * [CXF-8785] - Make Jsonb lazy initializable in the JsrJsonbProvider
-
-
-
-
+    * [CXF-8809] - Migrate LDAP systest cases from ApacheDS to UnboundID LDAP
+    * [CXF-8835] - Upgrade to Spring 5.3.26
