@@ -1,34 +1,28 @@
-Apache CXF 3.5.0 Release Notes
+Apache CXF 4.0.1 Release Notes
 
 1. Overview
 
-The 3.5.x versions of Apache CXF is a significant new version of CXF
+The 4.0.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include:
-* Support for Java 17
-* Many updated dependencies.  We've updated to the latest versions of most
-  dependencies.  Some may be incompatible with previous versions.
-  Some notables that may impact applications include:
-    * ehCache upgraded to 3.9.x
-    * Jackson to 2.13.x
-    * Mozilla Rhino upgraded to 1.7.13 (groupId/artifactId changed, be careful)
-    * WSS4j 2.4.x
-    * Spring Boot 2.6.x / Spring Framework 5.3.x base line
-    * Apache Karaf 4.3.x base line
-    * Apache HttpClient 5 support (Asynchronous Client HTTP Transport)
-    * HTTP/2 support (server-side only)
-    * JUnit 5 support
+* The release is based on JakartaEE 9.1: the javax.* packages are migrated to jakarta.*
+* Support of Spring Framework 6 / Spring Boot 3
+* HTTP/2 support
 
 Important notes:
-* 3.5 is the last branch of CXF that will support Java 8.   Future
-  non-patch releases of CXF will require Java 11 or newer.
-* The old OATH 1.0 module was removed
+* Many features of CXF 4.x now require Java 17.  While CXF is compiled for Java 11,
+many of the dependencies require Java 17 and thus various features may only
+work with Java 17.
 
 Users are encouraged to review the migration guide at:
-http://cxf.apache.org/docs/34-migration-guide.html
+https://cxf.apache.org/docs/40-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+
+4.0.1 fixes over 20 JIRA issues reported by users and the community.
+
 
 
 2. Installation Prerequisites 
@@ -36,7 +30,7 @@ versions of CXF.
 Before installing Apache CXF, make sure the following products,
 with the specified versions, are installed on your system:
 
-    * Java 8 Development Kit
+    * Java 17 Development Kit
     * Apache Maven 3.x to build the samples
 
 
@@ -65,5 +59,74 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/35-migration-guide.html
+http://cxf.apache.org/docs/40-migration-guide.html
 for caveats when upgrading.
+
+7. Specific issues, features, and improvements fixed in this version
+
+
+** Sub-task
+    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support
+    * [CXF-8815] - Fix org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitTest.testResponseSameBufferSize
+    * [CXF-8830] - Fix org.apache.cxf.transport.http.netty.client.NettyHttpConduitTest.testCallAsyncCallbackInvokedOnlyOnce
+** Bug
+    * [CXF-8666] - Spring6 for JSR 250 annotations isn't disabled for jakarta.xml.ws.WebServiceContext
+    * [CXF-8669] - Multipart annotation not working 3.4.6 onwards.
+    * [CXF-8745] - MemoryLeak when using SpringBus in a spring context which has a reusable parent context
+    * [CXF-8797] - NameBinding ignored when implementing interface
+    * [CXF-8813] - CXF v4: NoClassDefFoundError: jakarta/xml/bind/Validator
+    * [CXF-8816] - Deflater and Inflater initialized with different 'nowrap' value
+    * [CXF-8818] - wsdl2java fails in 4.0.0 due to incorrect versions in Manifest
+    * [CXF-8821] - Remove org.eclipse.tycho plugins since OSGi support is removed
+    * [CXF-8822] - AsyncHTTPConduit removes query-parameters when path is empty
+    * [CXF-8824] - CDI beans produced by @Produces methods are generated twice
+    * [CXF-8826] - AsyncHTTPConduit (hc5) - Unexpected EOF during response processing
+    * [CXF-8833] - GZIPInInterceptor, when processing HTTP 204 empty response, throws EOFException
+    * [CXF-8837] - Allow P11 RSA Keys within JwsUtils
+    * [CXF-8838] - Regression in cxf-codegen-plugin wsdl2java 4.0.0
+    * [CXF-8839] - Missing dependency on plexus-utils in cxf-wsdl-validator-plugin
+
+** Improvement
+    * [CXF-8758] - Migration path for Wiremock (Jetty 11/JakartaEE)
+    * [CXF-8788] - Remove the 'jakarta' profile (which enables the Spring milestone repositories)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
