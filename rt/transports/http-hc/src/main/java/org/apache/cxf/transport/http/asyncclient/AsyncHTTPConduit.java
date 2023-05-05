@@ -130,10 +130,11 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     }
 
     @Override
-    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy,
+                                    boolean forceGET) throws IOException {
         if (factory.isShutdown()) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, address, csPolicy);
+            super.setupConnection(message, address, csPolicy, forceGET);
             return;
         }
         propagateJaxwsSpecTimeoutSettings(message, csPolicy);
@@ -187,7 +188,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         }
         if (!PropertyUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy, forceGET);
             return;
         }
 
@@ -210,7 +211,11 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         message.put("http.scheme", uri.getScheme());
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if (httpRequestMethod == null) {
+
+        if (forceGET) {
+            httpRequestMethod = "GET";
+            message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
+        } else if (httpRequestMethod == null) {
             httpRequestMethod = "POST";
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
@@ -845,7 +850,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     //ignore
                 }
                 cookies.writeToMessageHeaders(outMessage);
-                retransmit(url.toString());
+                retransmit(url.toString(), false);
                 return true;
             }
             return b;
@@ -859,7 +864,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             wrappedStream.close();
         }
 
-        protected void setupNewConnection(String newURL) throws IOException {
+        protected void setupNewConnection(String newURL, boolean forceGET) throws IOException {
             httpResponse = null;
             isAsync = outMessage != null && outMessage.getExchange() != null
                 && !outMessage.getExchange().isSynchronous();
@@ -876,11 +881,11 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             outbuf = new SharedOutputBuffer(bufSize, allocator);
             try {
                 if (defaultAddress.getString().equals(newURL)) {
-                    setupConnection(outMessage, defaultAddress, csPolicy);
+                    setupConnection(outMessage, defaultAddress, csPolicy, forceGET);
                 } else {
                     Address address = new Address(newURL);
                     this.url = address.getURI();
-                    setupConnection(outMessage, address, csPolicy);
+                    setupConnection(outMessage, address, csPolicy, forceGET);
                 }
                 entity = outMessage.get(CXFHttpRequest.class);
                 basicEntity = (BasicHttpEntity)entity.getEntity();

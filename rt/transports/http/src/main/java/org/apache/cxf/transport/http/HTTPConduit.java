@@ -206,6 +206,8 @@ public abstract class HTTPConduit
     private static final String AUTO_REDIRECT_ALLOWED_URI = "http.redirect.allowed.uri";
     private static final String AUTO_REDIRECT_MAX_SAME_URI_COUNT = "http.redirect.max.same.uri.count";
 
+    private static final String AUTO_REDIRECT_FORCE_GET_ON_301_302 = "http.redirect.force.GET";
+
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_GET_METHOD = "GET";
 
@@ -488,7 +490,8 @@ public abstract class HTTPConduit
     }
 
 
-    protected abstract void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy)
+    protected abstract void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy,
+                                            boolean forceGET)
         throws IOException;
 
     /**
@@ -527,7 +530,7 @@ public abstract class HTTPConduit
         boolean needToCacheRequest = false;
 
         HTTPClientPolicy csPolicy = getClient(message);
-        setupConnection(message, currentAddress, csPolicy);
+        setupConnection(message, currentAddress, csPolicy, false);
 
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
@@ -1198,7 +1201,7 @@ public abstract class HTTPConduit
         protected abstract InputStream getPartialResponse() throws IOException;
 
         //methods to support retransmission for auth or redirects
-        protected abstract void setupNewConnection(String newURL) throws IOException;
+        protected abstract void setupNewConnection(String newURL, boolean forceGET) throws IOException;
         protected abstract void retransmitStream() throws IOException;
         protected abstract void updateCookiesBeforeRetransmit() throws IOException;
 
@@ -1282,8 +1285,8 @@ public abstract class HTTPConduit
         }
 
 
-        protected void retransmit(String newURL) throws IOException {
-            setupNewConnection(newURL);
+        protected void retransmit(String newURL, boolean forceGET) throws IOException {
+            setupNewConnection(newURL, forceGET);
             if (cachedStream != null && cachedStream.size() < Integer.MAX_VALUE) {
                 setFixedLengthStreamingMode((int)cachedStream.size());
             }
@@ -1487,7 +1490,7 @@ public abstract class HTTPConduit
             case HttpURLConnection.HTTP_SEE_OTHER:
             case 307:
             case 308:
-                return redirectRetransmit();
+                return redirectRetransmit(responseCode);
             case HttpURLConnection.HTTP_UNAUTHORIZED:
             case HttpURLConnection.HTTP_PROXY_AUTH:
                 return authorizationRetransmit();
@@ -1496,7 +1499,7 @@ public abstract class HTTPConduit
             }
             return false;
         }
-        protected boolean redirectRetransmit() throws IOException {
+        protected boolean redirectRetransmit(int responseCode) throws IOException {
             // If we are not redirecting by policy, then we don't.
             if (!getClient(outMessage).isAutoRedirect()) {
                 return false;
@@ -1507,10 +1510,13 @@ public abstract class HTTPConduit
             String newURL = extractLocation(Headers.getSetProtocolHeaders(m));
             String urlString = url.toString();
 
+            boolean forceGET = false;
+
             try {
                 newURL = convertToAbsoluteUrlIfNeeded(conduitName, urlString, newURL, outMessage);
                 detectRedirectLoop(conduitName, urlString, newURL, outMessage);
                 checkAllowedRedirectUri(conduitName, urlString, newURL, outMessage);
+                forceGET = forceGET(responseCode, outMessage);
             } catch (IOException ex) {
                 // Consider introducing ClientRedirectException instead - it will require
                 // those client runtimes which want to check for it have a direct link to it
@@ -1532,7 +1538,7 @@ public abstract class HTTPConduit
                 }
                 cookies.writeToMessageHeaders(outMessage);
                 outMessage.put("transport.retransmit.url", newURL);
-                retransmit(newURL);
+                retransmit(newURL, forceGET);
                 return true;
             }
             return false;
@@ -1572,7 +1578,7 @@ public abstract class HTTPConduit
             }
             new Headers(outMessage).setAuthorization(authorizationToken);
             cookies.writeToMessageHeaders(outMessage);
-            retransmit(url.toString());
+            retransmit(url.toString(), false);
             return true;
         }
 
@@ -1860,6 +1866,12 @@ public abstract class HTTPConduit
                 }
             }
         }
+    }
+
+    private static boolean forceGET(int responseCode, Message message) {
+        return MessageUtils.getContextualBoolean(message, AUTO_REDIRECT_FORCE_GET_ON_301_302)
+                && (responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_MOVED_TEMP);
     }
 
     private static void checkAllowedRedirectUri(String conduitName,

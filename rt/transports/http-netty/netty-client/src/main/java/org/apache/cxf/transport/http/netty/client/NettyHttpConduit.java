@@ -106,7 +106,11 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
     }
 
     // Using Netty API directly
-    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+    /*protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+        setupConnection(message, address, csPolicy, false)
+    }*/
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy,
+                                    boolean forceGET) throws IOException {
 
         URI uri = address.getURI();
         boolean addressChanged = false;
@@ -159,7 +163,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         }
         if (!PropertyUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
-            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
+            super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy, forceGET);
             return;
         }
         message.put(USE_ASYNC, Boolean.TRUE);
@@ -172,7 +176,10 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         message.put("http.scheme", uri.getScheme());
         String httpRequestMethod =
                 (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if (httpRequestMethod == null) {
+        if (forceGET) {
+            httpRequestMethod = "GET";
+            message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
+        } else if (httpRequestMethod == null) {
             httpRequestMethod = "POST";
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
@@ -621,7 +628,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         }
 
         @Override
-        protected void setupNewConnection(String newURL) throws IOException {
+        protected void setupNewConnection(String newURL, boolean forceGET) throws IOException {
             httpResponse = null;
             isAsync = false;
             exception = null;
@@ -639,7 +646,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
                     this.url = new URI(newURL);
                     address = new Address(newURL, this.url);
                 }
-                setupConnection(outMessage, address, csPolicy);
+                setupConnection(outMessage, address, csPolicy, forceGET);
                 entity = outMessage.get(NettyHttpClientRequest.class);
                 //reset the buffers
                 outBuffer.clear();

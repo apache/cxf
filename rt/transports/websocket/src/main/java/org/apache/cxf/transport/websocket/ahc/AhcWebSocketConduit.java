@@ -77,8 +77,10 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     }
 
     @Override
-    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy)
+    protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy, boolean forceGET)
         throws IOException {
+
+        forceGET = false; // this option is not enabled in this AhcWebSocket context
 
         URI currentURL = address.getURI();
         String s = currentURL.getScheme();
@@ -272,7 +274,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         }
 
         @Override
-        protected void setupNewConnection(String newURL) throws IOException {
+        protected void setupNewConnection(String newURL, boolean forceGET) throws IOException {
             // TODO
             throw new IOException("not supported");
         }
