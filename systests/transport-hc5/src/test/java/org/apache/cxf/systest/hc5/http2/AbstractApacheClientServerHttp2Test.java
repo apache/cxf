@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.http2.netty;
+package org.apache.cxf.systest.hc5.http2;
 
 import javax.ws.rs.core.Response;
 
@@ -25,7 +25,7 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.http.netty.client.NettyHttpConduit;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 import org.apache.cxf.transport.https.InsecureTrustManager;
 
 import org.junit.Test;
@@ -35,30 +35,31 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
-abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServerTestBase {
+abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/notFound", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(NettyHttpConduit.class));
-
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        
         final Response response = client
             .accept("text/plain")
+            .path(getContext() + "/web/bookstore/notFound")
             .get();
         
         assertThat(response.getStatus(), equalTo(404));
-        client.close();
     }
-    
+
     @Test
     public void testBookTraceWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/trace", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(NettyHttpConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
 
         final Response response = client
             .accept("text/plain")
             .invoke("TRACE", null);
         
-        assertThat(response.getStatus(), equalTo(406));
+        // Apache CXF Jetty transport does not allow TRACE HTTP verb
+        assertThat(response.getStatus(), equalTo(405));
 
         client.close();
     }
@@ -66,7 +67,7 @@ abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServe
     @Test
     public void testBookWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/booknames", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(NettyHttpConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
         
         final Response response = client
             .accept("text/plain")
@@ -81,7 +82,7 @@ abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServe
     @Test
     public void testGetBookStreamHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/bookstream", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(NettyHttpConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
         
         final Response response = client
             .accept("application/xml")
@@ -110,20 +111,28 @@ abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServe
     public void testBookTraceWithHttp() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/trace", false);
 
+        // Apache CXF Jetty transport does not allow TRACE HTTP verb
         try (Response response = client.invoke("TRACE", null)) {
-            assertThat(response.getStatus(), equalTo(406));
+            assertThat(response.getStatus(), equalTo(405));
         }
 
         client.close();
     }
 
+    protected abstract String getAddress();
+    protected abstract String getContext();
+
+    protected boolean isSecure() {
+        return getAddress().startsWith("https");
+    }
+    
     private WebClient createWebClient(final String path, final boolean enableHttp2) {
         final WebClient wc = WebClient
             .create(getAddress() + getContext() + path)
             .accept("text/plain");
 
-        WebClient.getConfig(wc).getRequestContext().put(NettyHttpConduit.ENABLE_HTTP2, enableHttp2);
-        WebClient.getConfig(wc).getRequestContext().put(NettyHttpConduit.USE_ASYNC, "ALWAYS");
+        WebClient.getConfig(wc).getRequestContext().put(AsyncHTTPConduit.ENABLE_HTTP2, enableHttp2);
+        WebClient.getConfig(wc).getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, "ALWAYS");
 
         if (isSecure()) {
             final HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
@@ -140,12 +149,5 @@ abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServe
         }
         
         return wc;
-    }
-
-    protected abstract String getAddress();
-    protected abstract String getContext();
-
-    protected boolean isSecure() {
-        return getAddress().startsWith("https");
     }
 }

@@ -54,6 +54,7 @@ import org.apache.hc.core5.http.config.Lookup;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.reactor.IOReactorConfig;
@@ -371,6 +372,10 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                 public void addCookie(Cookie cookie) {
                 }
             });
+
+        if (Boolean.FALSE.equals(clientPolicy.isEnableHttp2())) {
+            httpAsyncClientBuilder.setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1);
+        }
 
         adaptClientBuilder(httpAsyncClientBuilder);
 
