@@ -80,6 +80,10 @@ import io.netty.handler.ssl.SslHandler;
 
 
 public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCycleListener {
+    /**
+     * Enable HTTP/2 support
+     */
+    public static final String ENABLE_HTTP2 = "org.apache.cxf.transports.http2.enabled";
     public static final String USE_ASYNC = "use.async.http.conduit";
     public static final String MAX_RESPONSE_CONTENT_LENGTH =
         "org.apache.cxf.transport.http.netty.maxResponseContentLength";
@@ -107,6 +111,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
     // Using Netty API directly
     protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
+        propagateProtocolSettings(message, csPolicy);
 
         URI uri = address.getURI();
         boolean addressChanged = false;
@@ -177,7 +182,8 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
         // setup a new NettyHttpClientRequest
-        final NettyHttpClientRequest request = new NettyHttpClientRequest(uri, httpRequestMethod);
+        final boolean enableHttp2 = csPolicy.isSetEnableHttp2() && csPolicy.isEnableHttp2();
+        final NettyHttpClientRequest request = new NettyHttpClientRequest(uri, httpRequestMethod, enableHttp2);
         final int ctimeout = determineConnectionTimeout(message, csPolicy);
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
         final int maxResponseContentLength = determineMaxResponseContentLength(message);
@@ -187,6 +193,15 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         message.put(NettyHttpClientRequest.class, request);
 
+    }
+
+    private void propagateProtocolSettings(Message message, HTTPClientPolicy csPolicy) {
+        if (message != null) {
+            final Object o = message.getContextualProperty(ENABLE_HTTP2);
+            if (o != null) {
+                csPolicy.setEnableHttp2(PropertyUtils.isTrue(o));
+            }
+        }
     }
 
     protected OutputStream createOutputStream(Message message,
@@ -217,6 +232,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
     public class NettyWrappedOutputStream extends WrappedOutputStream {
         final HTTPClientPolicy csPolicy;
+        final boolean enableHttp2;
         NettyHttpClientRequest entity;
         volatile HttpResponse httpResponse;
         volatile Throwable exception;
@@ -238,6 +254,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             outBuffer = Unpooled.buffer(bufSize);
             outputStream = new ByteBufOutputStream(outBuffer);
+            enableHttp2 = csPolicy.isSetEnableHttp2() && csPolicy.isEnableHttp2();
         }
 
         protected ByteBuf getOutBuffer() {
@@ -280,7 +297,6 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         protected HttpContent getHttpResponseContent() throws IOException {
             return (HttpContent) getHttpResponse();
         }
-
 
         protected Channel getChannel() throws IOException {
             syncLock.lock();
@@ -371,14 +387,18 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         }
 
         protected void connect(boolean output) {
+            final NettyHttpClientPipelineFactory handler; 
             if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
-                bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout(),
-                    entity.getMaxResponseContentLength()));
+                handler = new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout(),
+                    entity.getMaxResponseContentLength(), enableHttp2);
             } else {
-                bootstrap.handler(new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout(),
-                    entity.getMaxResponseContentLength()));
+                handler = new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout(),
+                    entity.getMaxResponseContentLength(), enableHttp2);
             }
+
+            // Set handler
+            bootstrap.handler(handler);
 
             ChannelFuture connFuture =
                 bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort() != -1 ? url.getPort()
@@ -386,7 +406,6 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
-
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -407,7 +426,6 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
             };
 
             connFuture.addListener(listener);
-
 
             // setup the CxfResponseCallBack
             CxfResponseCallBack callBack = new CxfResponseCallBack() {
@@ -440,8 +458,15 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception {
                             if (future.isSuccess()) {
-                                ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
-                                channelFuture.addListener(writeFailureListener);
+                                handler.whenReady().addListener(new ChannelFutureListener() {
+                                    @Override
+                                    public void operationComplete(ChannelFuture future) throws Exception {
+                                        if (future.isSuccess()) {
+                                            ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
+                                            channelFuture.addListener(writeFailureListener);
+                                        }
+                                    }
+                                });
                             }
                         }
                     });

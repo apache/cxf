@@ -38,6 +38,7 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
+import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
@@ -54,6 +55,7 @@ import org.apache.hc.core5.http.config.Lookup;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.reactor.IOReactorConfig;
@@ -351,6 +353,13 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnections);
 
+        if (Boolean.FALSE.equals(clientPolicy.isEnableHttp2())) {
+            connectionManager.setDefaultTlsConfig(TlsConfig
+                .custom()
+                .setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1)
+                .build());
+        }
+
         final RedirectStrategy redirectStrategy = new RedirectStrategy() {
             public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)
                     throws ProtocolException {
@@ -371,7 +380,6 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                 public void addCookie(Cookie cookie) {
                 }
             });
-
         adaptClientBuilder(httpAsyncClientBuilder);
 
         final CloseableHttpAsyncClient client = httpAsyncClientBuilder
