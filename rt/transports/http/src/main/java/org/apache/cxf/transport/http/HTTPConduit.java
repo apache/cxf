@@ -152,7 +152,6 @@ public abstract class HTTPConduit
     extends AbstractConduit
     implements Configurable, Assertor, PropertyChangeListener {
 
-
     /**
      *  This constant is the Message(Map) key for the HttpURLConnection that
      *  is used to get the response.

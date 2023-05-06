@@ -98,6 +98,10 @@ import org.apache.hc.core5.util.Timeout;
  * Async HTTP Conduit using Apache HttpClient 5
  */
 public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
+    /**
+     * Enable HTTP/2 support
+     */
+    public static final String ENABLE_HTTP2 = "org.apache.cxf.transports.http2.enabled";
     public static final String USE_ASYNC = "use.async.http.conduit";
 
     private final AsyncHTTPConduitFactory factory;
@@ -137,7 +141,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             super.setupConnection(message, address, csPolicy);
             return;
         }
+
         propagateJaxwsSpecTimeoutSettings(message, csPolicy);
+        propagateProtocolSettings(message, csPolicy);
+
         boolean addressChanged = false;
         // need to do some clean up work on the URI address
         URI uri = address.getURI();
@@ -250,6 +257,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         e.setConfig(b.build());
 
         message.put(CXFHttpRequest.class, e);
+    }
+
+    private void propagateProtocolSettings(Message message, HTTPClientPolicy csPolicy) {
+        if (message != null) {
+            final Object o = message.getContextualProperty(ENABLE_HTTP2);
+            if (o != null) {
+                csPolicy.setEnableHttp2(PropertyUtils.isTrue(o));
+            }
+        }
     }
 
     private void propagateJaxwsSpecTimeoutSettings(Message message, HTTPClientPolicy csPolicy) {
