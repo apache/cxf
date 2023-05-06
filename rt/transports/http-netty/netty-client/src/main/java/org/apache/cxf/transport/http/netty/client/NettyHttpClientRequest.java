@@ -27,21 +27,28 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http2.HttpConversionUtil.ExtensionHeaderNames;
 
 public class NettyHttpClientRequest {
 
     private HttpRequest request;
     private HttpResponse response;
-    private URI uri;
-    private String method;
+    private final URI uri;
+    private final String method;
     private CxfResponseCallBack cxfResponseCallback;
     private int connectionTimeout;
     private int receiveTimeout;
     private int maxResponseContentLength;
+    private final boolean enableHttp2;
 
     public NettyHttpClientRequest(URI requestUri, String method) {
+        this(requestUri, method, false);
+    }
+
+    public NettyHttpClientRequest(URI requestUri, String method, boolean enableHttp2) {
         this.uri = requestUri;
         this.method = method;
+        this.enableHttp2 = enableHttp2;
     }
 
     public void createRequest(ByteBuf content) {
@@ -53,6 +60,10 @@ public class NettyHttpClientRequest {
         request.headers().set("Connection", "keep-alive");
         request.headers().set("Host", uri.getHost() + ":"
             + (uri.getPort() != -1 ? uri.getPort() : "http".equals(uri.getScheme()) ? 80 : 443));
+
+        if (enableHttp2) {
+            request.headers().set(ExtensionHeaderNames.SCHEME.text(), uri.getScheme());
+        }
     }
 
     public HttpRequest getRequest() {

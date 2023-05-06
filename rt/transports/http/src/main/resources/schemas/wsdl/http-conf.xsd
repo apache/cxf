@@ -400,6 +400,14 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute>
+        <xs:attribute name="EnableHttp2" type="ptp:ParameterizedBoolean" use="optional" default="true">
+            <xs:annotation>
+                <xs:documentation>
+                If true, the client is free to use HTTP/2 if it supports it, but it is not 
+                required to do so. If false, the client must use HTTP/1.1 in all cases.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
     </xs:complexType>
     
