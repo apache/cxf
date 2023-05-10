@@ -373,7 +373,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                 }
             });
 
-        if (Boolean.FALSE.equals(clientPolicy.isEnableHttp2())) {
+        if (!"2.0".equals(clientPolicy.getVersion())) {
             httpAsyncClientBuilder.setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1);
         }
 

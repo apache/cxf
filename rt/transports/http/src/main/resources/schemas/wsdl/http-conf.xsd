@@ -313,6 +313,16 @@
             </xs:annotation>      
 
         </xs:attribute>
+        
+        <xs:attribute name="Version" type="xs:string" use="optional" default="auto">
+            <xs:annotation>
+                <xs:documentation>
+                HTTP Version used for the connection.  The "auto" default will use whatever the default is
+                for the HTTPConduit implementation.
+                </xs:documentation>
+            </xs:annotation>
+
+        </xs:attribute>
 
         <xs:attribute name="Cookie" type="xs:string" use="optional">
             <xs:annotation>
@@ -389,14 +399,6 @@
                 Specifies the type of the proxy server. Can be either HTTP or SOCKS.
                 </xs:documentation>
             </xs:annotation>      
-        </xs:attribute>
-        <xs:attribute name="EnableHttp2" type="ptp:ParameterizedBoolean" use="optional" default="true">
-            <xs:annotation>
-                <xs:documentation>
-                If true, the client is free to use HTTP/2 if it supports it, but it is not 
-                required to do so. If false, the client must use HTTP/1.1 in all cases.
-                </xs:documentation>
-            </xs:annotation>
         </xs:attribute>
         <xs:anyAttribute namespace="http://schemas.xmlsoap.org/wsdl/"/>
     </xs:complexType>
