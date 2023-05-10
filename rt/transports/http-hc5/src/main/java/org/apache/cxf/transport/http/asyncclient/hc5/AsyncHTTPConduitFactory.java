@@ -353,7 +353,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnections);
 
-        if (Boolean.FALSE.equals(clientPolicy.isEnableHttp2())) {
+        if (!"2.0".equals(clientPolicy.getVersion())) {
             connectionManager.setDefaultTlsConfig(TlsConfig
                 .custom()
                 .setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1)

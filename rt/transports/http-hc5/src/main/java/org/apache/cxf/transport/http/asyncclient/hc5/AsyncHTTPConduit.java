@@ -263,7 +263,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         if (message != null) {
             final Object o = message.getContextualProperty(ENABLE_HTTP2);
             if (o != null) {
-                csPolicy.setEnableHttp2(PropertyUtils.isTrue(o));
+                csPolicy.setVersion("2.0");
             }
         }
     }

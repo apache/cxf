@@ -182,7 +182,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
         // setup a new NettyHttpClientRequest
-        final boolean enableHttp2 = csPolicy.isSetEnableHttp2() && csPolicy.isEnableHttp2();
+        final boolean enableHttp2 = "2.0".equals(csPolicy.getVersion());
         final NettyHttpClientRequest request = new NettyHttpClientRequest(uri, httpRequestMethod, enableHttp2);
         final int ctimeout = determineConnectionTimeout(message, csPolicy);
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
@@ -199,7 +199,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
         if (message != null) {
             final Object o = message.getContextualProperty(ENABLE_HTTP2);
             if (o != null) {
-                csPolicy.setEnableHttp2(PropertyUtils.isTrue(o));
+                csPolicy.setVersion("2.0");
             }
         }
     }
@@ -254,7 +254,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             outBuffer = Unpooled.buffer(bufSize);
             outputStream = new ByteBufOutputStream(outBuffer);
-            enableHttp2 = csPolicy.isSetEnableHttp2() && csPolicy.isEnableHttp2();
+            enableHttp2 = "2.0".equals(csPolicy.getVersion());
         }
 
         protected ByteBuf getOutBuffer() {
