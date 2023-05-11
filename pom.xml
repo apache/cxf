@@ -468,6 +468,7 @@
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
                         <doclint>none</doclint>
+                        <sourcepath>src/main/java:src/main/generated:target/generated-sources:target/generated/src/main/java</sourcepath>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
