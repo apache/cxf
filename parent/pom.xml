@@ -589,7 +589,7 @@
             <plugin>
                 <groupId>org.apache.cxf.build-utils</groupId>
                 <artifactId>cxf-xml2fastinfoset-plugin</artifactId>
-                <version>4.0.1-SNAPSHOT</version>
+                <version>${cxf.build-utils.version}</version>
                 <configuration>
                     <includes>
                         <include>META-INF/cxf/cxf*.xml</include>
