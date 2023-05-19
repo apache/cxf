@@ -22,7 +22,6 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -30,8 +29,6 @@ import java.nio.channels.ReadableByteChannel;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
 import org.apache.hc.core5.http.nio.DataStreamChannel;
 import org.apache.hc.core5.http.nio.RequestChannel;
@@ -51,21 +48,6 @@ public class CXFHttpAsyncRequestProducer implements AsyncRequestProducer {
         this.request = request;
     }
 
-    public HttpHost getTarget() {
-        URI uri = request.getUri();
-        if (uri == null) {
-            throw new IllegalStateException("Request URI is null");
-        }
-        if (!uri.isAbsolute()) {
-            throw new IllegalStateException("Request URI is not absolute");
-        }
-        return new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
-    }
-
-    public HttpRequest generateRequest() throws IOException, HttpException {
-        return request;
-    }
-    
     @Override
     public void produce(DataStreamChannel channel) throws IOException {
         if (content != null) {
@@ -94,28 +76,17 @@ public class CXFHttpAsyncRequestProducer implements AsyncRequestProducer {
         }
     }
 
-    public void requestCompleted(final HttpContext context) {
-        if (fis != null) {
-            try {
-                fis.close();
-            } catch (IOException io) {
-                //ignore
-            }
-            chan = null;
-            fis = null;
-        }
-        buffer = null;
-    }
-
+    @Override
     public void failed(final Exception ex) {
         buf.shutdown();
     }
 
+    @Override
     public boolean isRepeatable() {
         return request.getOutputStream().retransmitable();
     }
 
-    public void resetRequest() throws IOException {
+    private void resetRequest() {
         if (request.getOutputStream().retransmitable()) {
             content = request.getOutputStream().getCachedStream();
         }
@@ -139,6 +110,7 @@ public class CXFHttpAsyncRequestProducer implements AsyncRequestProducer {
             fis = null;
         }
         buffer = null;
+        resetRequest();
     }
 
     @Override

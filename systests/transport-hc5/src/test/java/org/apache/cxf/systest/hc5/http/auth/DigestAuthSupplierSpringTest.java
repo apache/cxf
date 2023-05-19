@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.http.auth;
+package org.apache.cxf.systest.hc5.http.auth;
 
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.core.MediaType;
