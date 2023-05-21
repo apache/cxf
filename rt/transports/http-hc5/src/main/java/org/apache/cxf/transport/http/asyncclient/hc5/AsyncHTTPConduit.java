@@ -606,7 +606,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             final HttpAsyncClient c = getHttpAsyncClient(tlsStrategy);
             final Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
             if (creds != null) {
-                credsProvider.setCredentials(new AnyAuthScope(), creds);
+                credsProvider.setCredentials(new AuthScope(url.getHost(), url.getPort()), creds);
                 ctx.setUserToken(creds.getUserPrincipal());
             }
             @SuppressWarnings("unchecked")

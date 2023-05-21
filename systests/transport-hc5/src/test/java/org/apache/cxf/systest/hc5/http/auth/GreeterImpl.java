@@ -16,18 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.hc5.http.auth;
 
-package org.apache.cxf.transport.http.asyncclient.hc5;
+import org.apache.hello_world.Greeter;
+import org.apache.hello_world.messages.PingMeFault;
 
-import org.apache.hc.client5.http.auth.AuthScope;
+public class GreeterImpl implements Greeter {
 
-class AnyAuthScope extends AuthScope {
-    AnyAuthScope() {
-        super(null, null, 1, null, null);
+    public String sayHi() {
+        return "Hi";
     }
 
-    @Override
-    public int match(AuthScope that) {
-        return 1;
+    public void pingMe() throws PingMeFault {
     }
+
+    public String greetMe(String requestType) {
+        return null;
+    }
+
 }
