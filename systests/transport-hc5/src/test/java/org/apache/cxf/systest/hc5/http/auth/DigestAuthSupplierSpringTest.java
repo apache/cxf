@@ -30,12 +30,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -91,18 +89,17 @@ public class DigestAuthSupplierSpringTest {
 
     }
 
-    static class SecurityConfig {
+    static class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
             DigestAuthenticationEntryPoint authenticationEntryPoint = digestAuthenticationEntryPoint();
-            return http
+            http
                 .authorizeRequests().anyRequest().authenticated()
                     .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                     .and()
-                .addFilter(digestAuthenticationFilter(authenticationEntryPoint))
-                .build();
+                .addFilter(digestAuthenticationFilter(authenticationEntryPoint));
         }
 
         private DigestAuthenticationFilter digestAuthenticationFilter(
@@ -120,15 +117,10 @@ public class DigestAuthSupplierSpringTest {
             return digestAuthenticationEntryPoint;
         }
 
-        @Bean
-        public InMemoryUserDetailsManager userDetailsService() {
-            final UserDetails user = User
-                .builder()
-                .username(USER)
-                .password(PWD)
-                .roles("")
-                .build();
-            return new InMemoryUserDetailsManager(user);
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.inMemoryAuthentication()
+                .withUser(USER).password(PWD).roles("");
         }
 
         @Bean
