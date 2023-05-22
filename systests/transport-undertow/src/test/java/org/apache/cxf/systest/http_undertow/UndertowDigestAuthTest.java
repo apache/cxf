@@ -44,13 +44,13 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
-import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -119,7 +119,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         cond.setClient(client);
         if (async) {
             if (cond instanceof AsyncHTTPConduit) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd");
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
                 bp.getRequestContext().put(Credentials.class.getName(), creds);
                 bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
                 client.setAutoRedirect(true);
@@ -166,7 +166,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         try {
             BindingProvider bp = (BindingProvider)greeter;
             if (async) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("blah", "foo");
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("blah", "foo".toCharArray());
                 bp.getRequestContext().put(Credentials.class.getName(), creds);
             } else {
                 bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "blah");
