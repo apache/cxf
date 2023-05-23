@@ -24,72 +24,89 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 import org.apache.cxf.transport.https.InsecureTrustManager;
-
-import io.undertow.client.ClientResponse;
-import io.undertow.util.Protocols;
 
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
-        
-        final ClientResponse response = client
-            .request(getAddress())
+        final WebClient client = createWebClient("/web/bookstore/notFound", true);
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+
+        final Response response = client
             .accept("text/plain")
             .path(getContext() + "/web/bookstore/notFound")
-            .http2()
             .get();
-        
-        assertThat(response.getResponseCode(), equalTo(404));
-        assertThat(response.getProtocol(), equalTo(Protocols.HTTP_2_0));
+
+        assertThat(response.getStatus(), equalTo(404));
+
+        client.close();
     }
     
     @Test
     public void testBookWithHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
-        
-        final ClientResponse response = client
-            .request(getAddress())
+        final WebClient client = createWebClient("/web/bookstore/booknames", true);
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+
+        final Response response = client
             .accept("text/plain")
-            .path(getContext() + "/web/bookstore/booknames")
-            .http2()
             .get();
         
-        assertThat(response.getResponseCode(), equalTo(200));
-        assertThat(response.getProtocol(), equalTo(Protocols.HTTP_2_0));
-        assertEquals("CXF in Action", client.getBody(response));
+        assertThat(response.getStatus(), equalTo(200));
+        assertEquals("CXF in Action", response.readEntity(String.class));
+
+        client.close();
     }
 
     @Test
     public void testGetBookStreamHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
+        final WebClient client = createWebClient("/web/bookstore/bookstream", true);
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
         
-        final ClientResponse response = client
-            .request(getAddress())
+        final Response response = client
             .accept("application/json")
-            .path(getContext() + "/web/bookstore/bookstream")
-            .http2()
             .get();
 
-        assertThat(response.getResponseCode(), equalTo(200));
-        assertThat(response.getProtocol(), equalTo(Protocols.HTTP_2_0));
-        assertEquals("{\"Book\":{\"id\":1,\"name\":\"WebSocket1\"}}", 
-            client.getBody(response));
+        assertThat(response.getStatus(), equalTo(200));
+        assertEquals("{\"Book\":{\"id\":1,\"name\":\"WebSocket1\"}}", response.readEntity(String.class));
+
+        client.close();
     }
 
     @Test
     public void testBookWithHttp() throws Exception {
-        final WebClient wc = WebClient
-            .create(getAddress() + getContext() + "/web/bookstore/booknames")
-            .accept("text/plain");
+        final WebClient client = createWebClient("/web/bookstore/booknames", false);
         
+        try (Response resp = client.get()) {
+            assertThat(resp.getStatus(), equalTo(200));
+            assertEquals("CXF in Action", resp.readEntity(String.class));
+        }
+        
+        client.close();
+    }
+
+    protected abstract String getAddress();
+    protected abstract String getContext();
+
+    protected boolean isSecure() {
+        return getAddress().startsWith("https");
+    }
+    
+    private WebClient createWebClient(final String path, final boolean enableHttp2) {
+        final WebClient wc = WebClient
+            .create(getAddress() + getContext() + path)
+            .accept("text/plain");
+
+        WebClient.getConfig(wc).getRequestContext().put(AsyncHTTPConduit.ENABLE_HTTP2, enableHttp2);
+        WebClient.getConfig(wc).getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, "ALWAYS");
+
         if (isSecure()) {
             final HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
             TLSClientParameters params = conduit.getTlsClientParameters();
@@ -104,16 +121,6 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
             params.setDisableCNCheck(true);
         }
         
-        try (Response resp = wc.get()) {
-            assertThat(resp.getStatus(), equalTo(200));
-            assertEquals("CXF in Action", resp.readEntity(String.class));
-        }
-    }
-
-    protected abstract String getAddress();
-    protected abstract String getContext();
-
-    protected boolean isSecure() {
-        return getAddress().startsWith("https");
+        return wc;
     }
 }
