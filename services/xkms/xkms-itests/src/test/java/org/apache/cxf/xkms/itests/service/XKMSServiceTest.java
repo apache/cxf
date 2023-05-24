@@ -55,7 +55,7 @@ public class XKMSServiceTest extends BasicIntegrationTest {
         QueryKeyBindingType queryKeyBindingType = XKMS_OF.createQueryKeyBindingType();
 
         UseKeyWithType useKeyWithType = XKMS_OF.createUseKeyWithType();
-        useKeyWithType.setIdentifier("CN=Dave, OU=Apache, O=CXF, L=CGN, ST=NRW, C=DE");
+        useKeyWithType.setIdentifier("CN=Dave, O=www.issuer.com, ST=Some-State, C=AU");
         useKeyWithType.setApplication(Applications.PKIX.getUri());
 
         locateCertificate(request, queryKeyBindingType, useKeyWithType);
