@@ -55,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
@@ -83,7 +85,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 
 public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
-
+    private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
     volatile HttpClient client;
     volatile int lastTlsHash = -1;
     volatile URI sslURL;
@@ -96,7 +98,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         super(b, ei, t);
     }
     
-    
+    private static Set<String> getRestrictedHeaders() {
+        Set<String> headers = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        headers.addAll(Set.of("Connection", "Content-Length", "Expect", "Host", "Upgrade"));
+        return headers;
+    }
+
     private boolean isSslTargetDifferent(URI lastURL, URI url) {
         return !lastURL.getScheme().equals(url.getScheme())
                 || !lastURL.getHost().equals(url.getHost())
@@ -313,8 +320,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             for (Map.Entry<String, List<String>>  head : h.headerMap().entrySet()) {
                 List<String> headerList = head.getValue();
                 String header = head.getKey();
-                if ("Connection".equals(header)) {
-                    //HttpClient does not allow the Connection header
+                if (RESTRICTED_HEADERS.contains(header)) {
+                    //HttpClient does not allow some restricted headers
                     continue;
                 }
                 if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
