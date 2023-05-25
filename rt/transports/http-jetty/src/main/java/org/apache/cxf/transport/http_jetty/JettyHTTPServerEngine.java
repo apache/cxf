@@ -23,6 +23,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,13 +57,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.http.HttpServerEngineSupport;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
-import org.eclipse.jetty.http.BadMessageException;
-import org.eclipse.jetty.http.HttpFields.Mutable;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
-import org.eclipse.jetty.io.Connection;
-import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -608,7 +605,13 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
 
         try {
             Container container = getContainer(server);
-            container.addEventListener(mBeanContainer);
+            Method[] methods = ReflectionUtil.getDeclaredMethods(container.getClass());
+            for (Method m : methods) {
+                if ("addEventListener".equals(m.getName())) {
+                    ReflectionUtil.setAccessible(m).invoke(container, mBeanContainer);
+                }
+            }
+            //container.addEventListener(mBeanContainer);
             mBeanContainer.beanAdded(null, server);
         } catch (RuntimeException rex) {
             throw rex;
@@ -693,9 +696,18 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                         // additional dependency.
                         final ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
                         alpn.setDefaultProtocol(httpFactory.getProtocol());
+                                                
+                        Constructor<SslConnectionFactory>[] cons 
+                            = ReflectionUtil.getDeclaredConstructors(SslConnectionFactory.class);
+                        for (Constructor<SslConnectionFactory> c : cons) {
+                            if (c.getParameterCount() == 2 
+                                && c.getParameterTypes()[1] == String.class
+                                && c.getParameterTypes()[0].isInstance(sslcf)) {
+                                SslConnectionFactory scf = c.newInstance(sslcf, alpn.getProtocol());
+                                connectionFactories.add(scf);
+                            }
+                        }
                         
-                        final SslConnectionFactory scf = new SslConnectionFactory(sslcf, alpn.getProtocol());
-                        connectionFactories.add(scf);
                         connectionFactories.add(alpn);
                         connectionFactories.add(new HTTP2ServerConnectionFactory(httpConfig));
                     } catch (Throwable ex) {
@@ -705,8 +717,16 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                     }
                 }
                 if (connectionFactories.size() == 1) {
-                    final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());
-                    connectionFactories.add(scf);
+                    Constructor<SslConnectionFactory>[] cons 
+                        = ReflectionUtil.getDeclaredConstructors(SslConnectionFactory.class);
+                    for (Constructor<SslConnectionFactory> c : cons) {
+                        if (c.getParameterCount() == 2 
+                            && c.getParameterTypes()[1] == String.class
+                            && c.getParameterTypes()[0].isInstance(sslcf)) {
+                            SslConnectionFactory scf = c.newInstance(sslcf, httpFactory.getProtocol());
+                            connectionFactories.add(scf);
+                        }
+                    }
                 }
 
                 // Has to be set before the default protocol change
@@ -717,22 +737,13 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             } else if (isHttp2Enabled(bus)) {
                 connectionFactories.add(httpFactory);
                 try {
-                    connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig) {
-
-                        @Override
-                        public Connection upgradeConnection(Connector c, EndPoint endPoint,
-                                                            org.eclipse.jetty.http.MetaData.Request request,
-                                                            Mutable response101)
-                            throws BadMessageException {
-                            if (request.getContentLength() > 0 
-                                || request.getFields().contains("Transfer-Encoding")) {
-                                // if there is a body, we cannot upgrade
-                                return null;
-                            }
-                            return super.upgradeConnection(c, endPoint, request, response101);
-                        }
-                    });
+                    connectionFactories.add(new NoUpgradeHTTP2CServerConnectionFactory(httpConfig));
                 } catch (Throwable ex) {
+                    try {
+                        connectionFactories.add(new HTTP2CServerConnectionFactory(httpConfig));
+                    } catch (Throwable e2) {
+                        //ignore
+                    }
                     if (isHttp2Required(bus)) {
                         throw ex;
                     }
@@ -1104,7 +1115,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 }
                 //After upgrade Jetty to 10.0.12, server.destroy() will clear all MBeans from container
                 //The old version doesn't behavior like this and this 
-                //server.destroy();
+                server.destroy();
                 server = null;
             }
         }

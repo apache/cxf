@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,7 +71,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 
@@ -676,17 +676,17 @@ public class JettyHTTPDestinationTest {
                 EasyMock.expect(request.getAttribute("org.eclipse.jetty.ajax.Continuation")).andReturn(null);
                 EasyMock.expect(request.getAttribute("http.service.redirection")).andReturn(null).anyTimes();
 
-                HttpFields.Mutable httpFields = HttpFields.build();
-                httpFields.add("content-type", "text/xml");
-                httpFields.add("content-type", "charset=utf8");
-                httpFields.put(JettyHTTPDestinationTest.AUTH_HEADER, JettyHTTPDestinationTest.BASIC_AUTH);
-
-                EasyMock.expect(request.getHeaderNames()).andReturn(httpFields.getFieldNames());
+                List<String> headers = Arrays.asList(new String[] {"content-type",
+                                                                   JettyHTTPDestinationTest.AUTH_HEADER});
+                List<String> ct = Arrays.asList(new String[] {"text/xml", "charset=utf8"});
+                EasyMock.expect(request.getHeaderNames()).andReturn(Collections.enumeration(headers));
                 request.getHeaders("content-type");
-                EasyMock.expectLastCall().andReturn(httpFields.getValues("content-type"));
+                EasyMock.expectLastCall().andReturn(Collections.enumeration(ct));
                 request.getHeaders(JettyHTTPDestinationTest.AUTH_HEADER);
-                EasyMock.expectLastCall().andReturn(
-                    httpFields.getValues(JettyHTTPDestinationTest.AUTH_HEADER));
+                EasyMock.expectLastCall()
+                    .andReturn(Collections
+                               .enumeration(Collections
+                                            .singletonList(JettyHTTPDestinationTest.BASIC_AUTH)));
 
                 EasyMock.expect(request.getInputStream()).andReturn(is);
                 request.setHandled(true);
