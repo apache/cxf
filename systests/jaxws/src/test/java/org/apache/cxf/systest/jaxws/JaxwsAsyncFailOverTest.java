@@ -37,6 +37,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
@@ -105,12 +106,13 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
 
         Response<GreetMeResponse>  response = proxy.greetMeAsync("cxf");
         int waitCount = 0;
-        while (!response.isDone() && waitCount < 15) {
-            Thread.sleep(1000);
+        while (!response.isDone() && waitCount < 150) {
+            Thread.sleep(100);
             waitCount++;
         }
         assertTrue("Response still not received.", response.isDone());
-
+        //make sure we actually got a proper response and not an exception
+        assertEquals("CXF", response.get().getResponseType());
     }
 
 }

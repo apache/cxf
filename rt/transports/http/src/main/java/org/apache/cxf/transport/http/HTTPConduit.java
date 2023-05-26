@@ -1217,6 +1217,9 @@ public abstract class HTTPConduit
                     } catch (Throwable e) {
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
                         outMessage.setContent(Exception.class, e);
+                        if (e instanceof Exception) {
+                            outMessage.put(Exception.class, (Exception)e);
+                        }
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                         MessageObserver mo = outMessage.getInterceptorChain().getFaultObserver();
                         if (mo == null) {
