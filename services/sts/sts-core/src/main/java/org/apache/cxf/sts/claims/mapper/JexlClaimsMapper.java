@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
+import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.claims.ClaimsMapper;
@@ -52,7 +53,12 @@ public class JexlClaimsMapper implements ClaimsMapper {
         Map<String, Object> functions = new HashMap<>();
         functions.put("claims", new ClaimUtils());
         functions.put("LOG", LOG);
-        jexlEngine = new JexlBuilder().silent(false).namespaces(functions).create();
+        jexlEngine = new JexlBuilder()
+                .silent(false)
+                .namespaces(functions)
+                .permissions(new ClassPermissions(java.net.URI.class)
+                    .compose("org.apache.cxf.*"))
+                .create();
     }
 
     public JexlClaimsMapper(String script) throws IOException {
