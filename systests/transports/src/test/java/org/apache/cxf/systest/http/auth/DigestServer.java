@@ -18,27 +18,30 @@
  */
 package org.apache.cxf.systest.http.auth;
 
-import java.net.URL;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+
+
+
 
 public class DigestServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(DigestServer.class);
 
     private org.eclipse.jetty.server.Server server;
 
-    private void configureServer() throws Exception {
-        URL resource = getClass().getResource("jetty-realm.properties");
+    private void configureServer(WebAppContext webappcontext) throws Exception {
+        
 
         LoginService realm =
-            new HashLoginService("BookStoreRealm", resource.toString());
+            new HashLoginService("BookStoreRealm", ResourceFactory.
+                                 of(webappcontext).
+                                 newClassPathResource("/org/apache/cxf/systest/http/auth/jetty-realm.properties"));
         server.addBean(realm);
     }
 
@@ -47,15 +50,11 @@ public class DigestServer extends AbstractBusTestServerBase {
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/digestauth");
-        webappcontext.setBaseResource(Resource.newClassPathResource("/digestauth"));
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
+        webappcontext.setBaseResource(ResourceFactory.of(webappcontext).newClassPathResource("/digestauth"));
+        server.setHandler(new Handler.Sequence(webappcontext, new DefaultHandler()));
 
         try {
-            configureServer();
+            configureServer(webappcontext);
             server.start();
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -36,9 +36,9 @@
         <module>transports</module>
         <module>forked</module>
         <module>transport-undertow</module>
-        <module>jaxws</module>
+        <module>jaxws</module><!--ClientServerWebSocketTest left-->
         <module>databinding</module>
-        <module>ws-specs</module>
+        <module>ws-specs</module><!--WSAFaultToClientServerTest#testOneWayFaultTo-->
         <module>ws-rm</module>
         <module>ws-security</module>
         <module>ws-security-examples</module>
@@ -50,12 +50,12 @@
         <module>rs-http-sci</module>
         <module>tracing</module>
         <module>ws-transfer</module>
-        <module>rs-sse</module>
-        <module>microprofile</module>
+        <module>rs-sse</module><!--flaky-->
+        <!--module>microprofile</module--><!--wiremock still depends on jetty11-->
         <module>spring-boot</module>
         <module>transport-netty</module>
         <module>transport-hc5</module>
         <module>transport-jms</module>
-        <module>jaxrs</module>
+        <module>jaxrs</module><!--exclude websocket related tests-->
     </modules>
 </project>

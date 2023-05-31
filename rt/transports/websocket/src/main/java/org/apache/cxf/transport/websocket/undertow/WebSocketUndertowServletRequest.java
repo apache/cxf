@@ -42,6 +42,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -260,7 +261,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         return new BufferedReader(new InputStreamReader(in, UTF_8));
     }
 
-    @Override
+    //@Override
     public String getRealPath(String path) {
         LOG.log(Level.FINE, "getRealPath");
         return null;
@@ -538,7 +539,7 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         return false;
     }
 
-    @Override
+    //@Override
     public boolean isRequestedSessionIdFromUrl() {
         LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
         return false;
@@ -580,5 +581,23 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getRequestId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

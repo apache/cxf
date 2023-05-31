@@ -50,7 +50,6 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponseImpl;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.atmosphere.util.VoidServletConfig;
-import org.eclipse.jetty.server.Request;
 import org.springframework.util.ClassUtils;
 
 
@@ -165,20 +164,21 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
             super(jhd, cmExact);
         }
 
+        
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request,
-                           HttpServletResponse response) throws IOException, ServletException {
+        protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
             if (AtmosphereUtils.useAtmosphere(request)) {
                 try {
                     framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
                                              AtmosphereResponseImpl.wrap(response));
-                    baseRequest.setHandled(true);
+                    //baseRequest.setHandled(true);
                 } catch (ServletException e) {
                     throw new IOException(e);
                 }
                 return;
             }
-            super.handle(target, baseRequest, request, response);
+            super.service(request, response);
         }
     }
 

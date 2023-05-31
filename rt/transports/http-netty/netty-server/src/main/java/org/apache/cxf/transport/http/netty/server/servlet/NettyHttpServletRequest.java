@@ -40,6 +40,7 @@ import javax.net.ssl.SSLSession;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -451,12 +452,6 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public boolean isRequestedSessionIdFromUrl() {
-        throw new IllegalStateException(
-                "Method 'isRequestedSessionIdFromUrl' not yet implemented!");
-    }
-
-    @Override
     public boolean isRequestedSessionIdValid() {
         return false;
     }
@@ -465,12 +460,6 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     public boolean isUserInRole(String role) {
         throw new IllegalStateException(
                 "Method 'isUserInRole' not yet implemented!");
-    }
-
-    @Override
-    public String getRealPath(String path) {
-        throw new IllegalStateException(
-                "Method 'getRealPath' not yet implemented!");
     }
 
     @Override
@@ -553,6 +542,21 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass)
             throws IOException, ServletException {
+        throw new IllegalStateException("Method 'upgrade' not yet implemented!");
+    }
+    
+    @Override
+    public String getRequestId() {
+        throw new IllegalStateException("Method 'upgrade' not yet implemented!");
+    }
+    
+    @Override
+    public ServletConnection getServletConnection() {
+        throw new IllegalStateException("Method 'upgrade' not yet implemented!");
+    }
+    
+    @Override
+    public String getProtocolRequestId() {
         throw new IllegalStateException("Method 'upgrade' not yet implemented!");
     }
 }

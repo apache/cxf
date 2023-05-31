@@ -48,7 +48,7 @@ public class BookLoginModule implements LoginModule {
         Class<?> clz = null;
         try {
             // try the jetty9 version
-            clz = Class.forName("org.eclipse.jetty.jaas.spi.PropertyFileLoginModule",
+            clz = Class.forName("org.eclipse.jetty.security.jaas.spi.PropertyFileLoginModule",
                                            true, BookLoginModule.class.getClassLoader());
         } catch (Throwable t) {
             if (clz == null) {

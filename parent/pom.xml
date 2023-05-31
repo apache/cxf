@@ -39,7 +39,7 @@
         <cxf.surefire.fork.vmargs>-ea</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
         <cxf.surefire.enable.assertions>true</cxf.surefire.enable.assertions>
-        <cxf.surefire.rerun.count>3</cxf.surefire.rerun.count>
+        <cxf.surefire.rerun.count>0</cxf.surefire.rerun.count>
         <cxf.checkstyle.extension />
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
@@ -112,7 +112,7 @@
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
         <cxf.dropwizard4.version>4.2.21</cxf.dropwizard4.version>
         <cxf.ehcache3.version>3.10.8</cxf.ehcache3.version>
-        <cxf.el-api.version>3.0.3</cxf.el-api.version>
+        <cxf.el-api.version>5.0.1</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.hisrc.basicjaxb.version>2.1.1</cxf.hisrc.basicjaxb.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
@@ -161,8 +161,8 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty11.version>11.0.17</cxf.jetty11.version>
-        <cxf.jetty.version>11.0.17</cxf.jetty.version>
+        <cxf.jetty11.version>12.0.1</cxf.jetty11.version>
+        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.2.20</cxf.johnzon.version>
@@ -207,7 +207,7 @@
         <cxf.saaj-impl.version>2.0.1</cxf.saaj-impl.version>
         <cxf.servlet-api.artifact>jakarta.servlet-api</cxf.servlet-api.artifact>
         <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
-        <cxf.servlet-api.version>5.0.0</cxf.servlet-api.version>
+        <cxf.servlet-api.version>6.0.0</cxf.servlet-api.version>
         <cxf.slf4j.version>2.0.9</cxf.slf4j.version>
         <cxf.snakeyaml.version>2.2</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
@@ -215,6 +215,7 @@
         <cxf.spring.ldap.version>3.0.6</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.security.version>6.0.8</cxf.spring.security.version>
+        <cxf.spring.security.version>6.1.4</cxf.spring.security.version>
         <cxf.spring.version>6.0.13</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.9.0</cxf.swagger.ui.version>
@@ -222,8 +223,7 @@
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.14</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
-        <cxf.undertow.version>2.2.20.Final</cxf.undertow.version>
-
+        <cxf.undertow.version>2.3.7.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
@@ -1166,18 +1166,23 @@
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-webapp</artifactId>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-webapp</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-apache-jsp</artifactId>
+                <version>${cxf.jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-servlet</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${cxf.jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlets</artifactId>
+                <artifactId>jetty-session</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
@@ -1213,7 +1218,7 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>
-                <artifactId>http2-server</artifactId>
+                <artifactId>jetty-http2-server</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
@@ -1227,8 +1232,8 @@
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-annotations</artifactId>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-annotations</artifactId>
                 <version>${cxf.jetty.version}</version>
             </dependency>
             <dependency>
@@ -1238,7 +1243,7 @@
             </dependency>
             <dependency>
                  <groupId>io.undertow</groupId>
-                 <artifactId>undertow-servlet-jakarta</artifactId>
+                 <artifactId>undertow-servlet</artifactId>
                  <version>${cxf.undertow.version}</version>
             </dependency>
             <dependency>

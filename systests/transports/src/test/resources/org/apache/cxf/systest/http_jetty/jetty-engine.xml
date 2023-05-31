@@ -29,23 +29,17 @@
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.EngineLifecycleTest.2}">
             <httpj:handlers>
-                <bean class="org.eclipse.jetty.webapp.WebAppContext">
+                <bean class="org.eclipse.jetty.ee10.webapp.WebAppContext">
                     <constructor-arg value="."/>
                     <constructor-arg value="/jsunit"/>
                 </bean>
                 <bean class="org.eclipse.jetty.server.handler.ContextHandler">
                     <property name="contextPath" value="/"/>
+                    <property name="baseResourceAsString" value="${jetty.staticResourceURL}"/>
                     <property name="handler">
-                        <bean class="org.eclipse.jetty.server.handler.ResourceHandler">
-                            <property name="baseResource">
-                                <bean class="org.eclipse.jetty.util.resource.Resource" factory-method="newClassPathResource">
-                                    <constructor-arg value="${jetty.staticResourceURL}"/>
-                                </bean>
-                            </property>
-                        </bean>
+                        <bean class="org.eclipse.jetty.server.handler.ResourceHandler"/>
                     </property>
                 </bean>
-                <bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </httpj:handlers>
         </httpj:engine>
     </httpj:engine-factory>

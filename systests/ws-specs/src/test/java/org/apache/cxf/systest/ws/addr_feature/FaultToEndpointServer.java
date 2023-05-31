@@ -46,8 +46,9 @@ import org.apache.hello_world_soap_http.types.GreetMeSometimeResponse;
 import org.apache.hello_world_soap_http.types.SayHiResponse;
 import org.apache.hello_world_soap_http.types.TestDocLitFaultResponse;
 import org.apache.hello_world_soap_http.types.TestNillableResponse;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
+import org.eclipse.jetty.server.Handler;
+
 
 public class FaultToEndpointServer extends AbstractBusTestServerBase {
     static final String FAULT_PORT = allocatePort(FaultToEndpointServer.class);
@@ -109,11 +110,14 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
 
 
 
-    public static class HelloHandler extends AbstractHandler {
+    public static class HelloHandler extends Handler.Abstract {
         private static String faultRequestPath;
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request,
-                           HttpServletResponse response) throws IOException, ServletException {
+        public boolean handle(org.eclipse.jetty.server.Request req,
+                           org.eclipse.jetty.server.Response resp,
+                           org.eclipse.jetty.util.Callback callback) throws IOException, ServletException {
+            HttpServletRequest request = ((ServletContextRequest)req).getServletApiRequest();
+            HttpServletResponse response = ((ServletContextRequest)req).getHttpServletResponse();
             response.setContentType("text/html;charset=utf-8");
 
             //System.out.println("In handler: " + request.getContentLength());
@@ -133,7 +137,7 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
             PrintWriter writer = response.getWriter();
             writer.println("Received");
             writer.close();
-            baseRequest.setHandled(true);
+            return true;
         }
 
         public static String getFaultRequestPath() {

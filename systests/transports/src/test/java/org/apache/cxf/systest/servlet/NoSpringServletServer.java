@@ -25,10 +25,11 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+
 
 public class NoSpringServletServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(NoSpringServletServer.class);
@@ -44,8 +45,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             ContextHandlerCollection contexts = new ContextHandlerCollection();
             httpServer.setHandler(contexts);
 
-            ServletContextHandler root = new ServletContextHandler(contexts, "/",
-                                                                   ServletContextHandler.SESSIONS);
+            ServletContextHandler root = new ServletContextHandler("/");
             bus = BusFactory.getDefaultBus(true);
             CXFServlet cxf = new CXFServlet();
             cxf.setBus(bus);
@@ -53,7 +53,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             servlet.setName("soap");
             servlet.setForcedPath("soap");
             root.addServlet(servlet, "/soap/*");
-
+            contexts.addHandler(root);
             httpServer.start();
             setBus(bus);
             BusFactory.setDefaultBus(bus);

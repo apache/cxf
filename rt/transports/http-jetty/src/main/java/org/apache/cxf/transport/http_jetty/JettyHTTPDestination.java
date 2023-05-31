@@ -47,10 +47,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
-import org.eclipse.jetty.server.HttpChannel;
-import org.eclipse.jetty.server.HttpConnection;
-import org.eclipse.jetty.server.HttpOutput;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.ee10.servlet.HttpOutput;
 
 
 public class JettyHTTPDestination extends ServletDestination {
@@ -223,14 +220,14 @@ public class JettyHTTPDestination extends ServletDestination {
         if (context == null) {
             context = servletContext;
         }
-        Request baseRequest = (req instanceof Request)
-            ? (Request)req : getCurrentRequest();
+        /*Request baseRequest = (req instanceof Request)
+            ? (Request)req : getCurrentRequest();*/
 
         HTTPServerPolicy sp = getServer();
         if (sp.isSetRedirectURL()) {
             resp.sendRedirect(sp.getRedirectURL());
             resp.flushBuffer();
-            baseRequest.setHandled(true);
+            //baseRequest.setHandled(true);
             return;
         }
 
@@ -257,11 +254,11 @@ public class JettyHTTPDestination extends ServletDestination {
                                   final HttpServletResponse resp,
                                   Message m) throws IOException {
         resp.flushBuffer();
-        Request baseRequest = (req instanceof Request)
+        /*Request baseRequest = (req instanceof Request)
             ? (Request)req : getCurrentRequest();
         if (baseRequest != null) {
             baseRequest.setHandled(true);
-        }
+        }*/
         super.invokeComplete(context, req, resp, m);
     }
 
@@ -369,7 +366,7 @@ public class JettyHTTPDestination extends ServletDestination {
     protected Message retrieveFromContinuation(HttpServletRequest req) {
         return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
     }
-    private Request getCurrentRequest() {
+    /*private Request getCurrentRequest() {
         try {
             HttpConnection con = HttpConnection.getCurrentConnection();
 
@@ -379,5 +376,5 @@ public class JettyHTTPDestination extends ServletDestination {
             //
         }
         return null;
-    }
+    }*/
 }

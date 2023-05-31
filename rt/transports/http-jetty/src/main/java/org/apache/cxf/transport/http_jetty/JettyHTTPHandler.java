@@ -18,19 +18,22 @@
  */
 package org.apache.cxf.transport.http_jetty;
 
+
 import java.io.IOException;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.http.HttpUrlUtil;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 
-public class JettyHTTPHandler extends AbstractHandler {
+
+
+public class JettyHTTPHandler extends HttpServlet {
     private static final String METHOD_TRACE = "TRACE";
 
     protected JettyHTTPDestination jettyHTTPDestination;
@@ -65,10 +68,26 @@ public class JettyHTTPHandler extends AbstractHandler {
         return urlName;
     }
 
-    public void handle(String target, Request baseRequest, HttpServletRequest request,
-                       HttpServletResponse response) throws IOException, ServletException {
+    
+    public ServletContextHandler createContextHandler() {
+        return new ServletContextHandler();
+    }
+
+    public Bus getBus() {
+        return jettyHTTPDestination != null ? jettyHTTPDestination.getBus() : bus;
+    }
+    
+    
+    
+    
+    
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        //String target = ((ServletApiRequest)request).getServletRequestInfo().getDecodedPathInContext();
+        String target = ServletContextRequest.getServletContextRequest(request).getDecodedPathInContext();
         if (request.getMethod().equals(METHOD_TRACE)) {
-            baseRequest.setHandled(true);
+            // baseRequest.setHandled(true);
             response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {
             if (contextMatchExact) {
@@ -83,12 +102,5 @@ public class JettyHTTPHandler extends AbstractHandler {
         }
 
     }
-    
-    public ContextHandler createContextHandler() {
-        return new JettyContextHandler();
-    }
 
-    public Bus getBus() {
-        return jettyHTTPDestination != null ? jettyHTTPDestination.getBus() : bus;
-    }
 }

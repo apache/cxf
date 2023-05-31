@@ -192,7 +192,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         return null;
     }
 
-    @Override
+    //@Override
     public String encodeRedirectUrl(String url) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "encodeRedirectUrl({0})", url);
@@ -208,7 +208,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         return null;
     }
 
-    @Override
+    //@Override
     public String encodeUrl(String url) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "encodeUrl({0})", url);
@@ -303,7 +303,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
 
-    @Override
+    //@Override
     public void setStatus(int sc, String sm) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "setStatus({0}, {1})", new Object[]{sc, sm});

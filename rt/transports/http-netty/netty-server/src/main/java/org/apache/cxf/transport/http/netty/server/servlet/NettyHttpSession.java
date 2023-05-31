@@ -82,37 +82,12 @@ public class NettyHttpSession implements HttpSession {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
-        throw new IllegalStateException(
-                "As of Version 2.1, this method is deprecated and has no replacement.");
-    }
-
-    @Override
-    public Object getValue(String name) {
-        return getAttribute(name);
-    }
-
-    @Override
-    public String[] getValueNames() {
-        if (attributes == null) {
-            return null;
-        }
-        return attributes.keySet().toArray(
-                new String[attributes.keySet().size()]);
-    }
-
+    
     @Override
     public void invalidate() {
         if (attributes != null) {
             attributes.clear();
         }
-    }
-
-    @Override
-    public void putValue(String name, Object value) {
-        this.setAttribute(name, value);
     }
 
     @Override
@@ -126,11 +101,6 @@ public class NettyHttpSession implements HttpSession {
             }
             attributes.remove(name);
         }
-    }
-
-    @Override
-    public void removeValue(String name) {
-        this.removeAttribute(name);
     }
 
     @Override

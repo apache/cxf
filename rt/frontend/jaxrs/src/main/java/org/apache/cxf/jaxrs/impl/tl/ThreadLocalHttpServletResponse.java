@@ -58,18 +58,9 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
         return get().encodeRedirectURL(url);
     }
 
-    @SuppressWarnings("deprecation")
-    public String encodeRedirectUrl(String url) {
-        return get().encodeRedirectUrl(url);
-    }
-
+    
     public String encodeURL(String url) {
         return get().encodeURL(url);
-    }
-
-    @SuppressWarnings("deprecation")
-    public String encodeUrl(String url) {
-        return get().encodeUrl(url);
     }
 
     public void sendError(int sc) throws IOException {
@@ -100,11 +91,6 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
     public void setStatus(int sc) {
         get().setStatus(sc);
 
-    }
-
-    @SuppressWarnings("deprecation")
-    public void setStatus(int sc, String sm) {
-        get().setStatus(sc, sm);
     }
 
     public void flushBuffer() throws IOException {
