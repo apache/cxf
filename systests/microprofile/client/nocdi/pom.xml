@@ -140,7 +140,7 @@
         </dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
-            <artifactId>wiremock</artifactId>
+            <artifactId>wiremock-standalone</artifactId>
             <version>${cxf.wiremock.version}</version>
             <scope>test</scope>
             <exclusions>

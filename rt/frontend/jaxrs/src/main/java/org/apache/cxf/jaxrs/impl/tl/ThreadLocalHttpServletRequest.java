@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
@@ -317,19 +318,19 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         ServletException {
         return get().upgrade(handlerClass);
     }
-
     @Override
     public String getRequestId() {
         return get().getRequestId();
     }
-
-    @Override
-    public String getProtocolRequestId() {
-        return get().getProtocolRequestId();
-    }
-
+    
     @Override
     public ServletConnection getServletConnection() {
         return get().getServletConnection();
     }
+    
+    @Override
+    public String getProtocolRequestId() {
+        return get().getProtocolRequestId();
+    }
+    
 }

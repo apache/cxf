@@ -190,21 +190,7 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
         return responseHeaders.containsKey(name);
     }
 
-    @Override
-    public String encodeRedirectURL(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeRedirectURL({0})", url);
-        }
-        return null;
-    }
-
-    @Override
-    public String encodeURL(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeURL({0})", url);
-        }
-        return null;
-    }
+    
 
     @Override
     public String getHeader(String name) {
@@ -368,16 +354,16 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public String encodeUrl(String url) {
+    public String encodeURL(String url) {
         return URLEncoder.encode(url, StandardCharsets.UTF_8);
     }
 
     @Override
-    public String encodeRedirectUrl(String url) {
+    public String encodeRedirectURL(String url) {
         return URLEncoder.encode(url, StandardCharsets.UTF_8);
     }
 
-    @Override
+
     public void setStatus(int sc, String sm) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "setStatus({0})", sc);

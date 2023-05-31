@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket.jetty11;
+package org.apache.cxf.transport.websocket.jetty12;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -53,23 +53,21 @@ import org.apache.cxf.transport.websocket.jetty.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.ee10.websocket.server.JettyServerUpgradeRequest;
+import org.eclipse.jetty.ee10.websocket.server.JettyServerUpgradeResponse;
+import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketCreator;
+import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
+import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
-import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
-import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
-import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
-import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
+
 
 /**
  *
  */
-public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
+public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
     WebSocketDestinationService {
-    private static final Logger LOG = LogUtils.getL7dLogger(Jetty11WebSocketDestination.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(Jetty12WebSocketDestination.class);
 
     //REVISIT make these keys configurable
     private static final String REQUEST_ID_KEY = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
@@ -77,8 +75,9 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
 
     private final Executor executor;
     private JettyWebSocketServerContainer webSocketServerContainer;
+    private Object address;
 
-    public Jetty11WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+    public Jetty12WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
         super(bus, registry, ei,
               serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
@@ -98,10 +97,16 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
 
         JettyWebSocketServerContainer wssc = getWebSocketContainer(context);
         JettyWebSocketCreator creator = getCreator();
-
-        if (wssc.upgrade(creator, request, response)) {
-            ((Request)request).setHandled(true);
-            return;
+        address = request.getAttribute("org.apache.cxf.transport.endpoint.address");
+        try {
+            if (wssc.upgrade(creator, request, response)) {
+                return;
+            }
+        } catch (Exception ex) {
+            //do nothing
+        }
+        if (address != null) {
+            request.setAttribute("org.apache.cxf.transport.endpoint.address", address);
         }
         super.invoke(config, context, request, response);
     }
@@ -118,11 +123,7 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
         return getNonWSAddress(endpointInfo);
     }
 
-    Server getServer(ServletConfig config, ServletContext context) {
-        ContextHandler.Context c = (ContextHandler.Context)context;
-        ContextHandler h = c.getContextHandler();
-        return h.getServer();
-    }
+   
     
     public JettyWebSocketCreator getCreator() {
         return new Creator();
@@ -143,6 +144,25 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new JettyWebSocketHandler(jhd, cmExact, this);
     }
+    
+    /**
+     * Activate receipt of incoming messages.
+     */
+    protected void activate() {
+        synchronized (this) {
+            if (registry != null) {
+                registry.addDestination(this);
+            }
+        }
+        LOG.log(Level.FINE, "Activating receipt of incoming messages");
+        // pick the handler supporting websocket if jetty-websocket is available otherwise pick the default handler.
+
+        if (engine != null) {
+            handler = createJettyHTTPHandler(this, contextMatchOnExact());
+            engine.addServant(nurl, handler);
+            ((JettyWebSocketHandler)handler).initHandler(engine.getServer());
+        }
+    }
 
     @Override
     public void shutdown() {
@@ -159,7 +179,7 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
             public void run() {
                 HttpServletResponse response = null;
                 try {
-                    WebSocketServletHolder holder = new Jetty11WebSocketHolder(session);
+                    WebSocketServletHolder holder = new Jetty12WebSocketHolder(session);
                     response = createServletResponse(holder);
                     HttpServletRequest request = createServletRequest(data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
@@ -212,40 +232,19 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
         return new WebSocketVirtualServletResponse(holder);
     }
 
-    // hide this jetty9 interface here to avoid CNFE on WebSocketCreator
+    
     private final class Creator implements JettyWebSocketCreator {
 
         @Override
         public Object createWebSocket(JettyServerUpgradeRequest req, JettyServerUpgradeResponse resp) {
-            return new WebSocketAdapter() {
-                Session session;
-                @Override
-                public void onWebSocketConnect(Session session) {
-                    this.session = session;
-                }
-                @Override
-                public void onWebSocketBinary(byte[] payload, int offset, int len) {
-                    invoke(payload, offset, len, session);
-                }
-                @Override
-                public void onWebSocketText(String message) {
-                    //TODO may want use string directly instead of converting it to byte[]
-                    try {
-                        byte[] bdata = message.getBytes("utf-8");
-                        onWebSocketBinary(bdata, 0, bdata.length);
-                    } catch (UnsupportedEncodingException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            };
+            return new Jetty12WebSocket();
         }
 
     }
 
-    class Jetty11WebSocketHolder implements WebSocketServletHolder {
+    class Jetty12WebSocketHolder implements WebSocketServletHolder {
         final Session session;
-        Jetty11WebSocketHolder(Session s) {
+        Jetty12WebSocketHolder(Session s) {
             session = s;
         }
         public String getAuthType() {
@@ -312,18 +311,26 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public int getServerPort() {
-            return ((InetSocketAddress)session.getLocalAddress()).getPort();
+            return ((InetSocketAddress)session.getLocalSocketAddress()).getPort();
         }
         public Principal getUserPrincipal() {
             return null;
         }
         public Object getAttribute(String name) {
-            final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
-            return getHttpServletRequest(upgradeRequest).getAttribute(name);
+            try {
+                final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
+                return getHttpServletRequest(upgradeRequest).getAttribute(name);
+            } catch (Exception ex) {
+                if (name.equals("org.apache.cxf.transport.endpoint.address")) {
+                    return address;
+                } else {
+                    return null;
+                }
+            }
         }
         @Override
         public void write(byte[] data, int offset, int length) throws IOException {
-            session.getRemote().sendBytes(ByteBuffer.wrap(data,  offset, length));
+            session.sendBinary(ByteBuffer.wrap(data,  offset, length), null);
         }
         
         private HttpServletRequest getHttpServletRequest(final UpgradeRequest upgradeRequest) {
@@ -335,5 +342,36 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
         }
     }
 
+    @org.eclipse.jetty.websocket.api.annotations.WebSocket
+    public class Jetty12WebSocket {
+        volatile Session session;
 
+        @org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen
+        public void onOpen(Session sess) {
+            this.session = sess;
+        }
+
+        @org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage
+        public void onMessage(String message) {
+            try {
+                byte[] bdata = message.getBytes("utf-8");
+                onBinaryMessage(ByteBuffer.wrap(bdata), null);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        @org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage
+        public void onBinaryMessage(ByteBuffer message, Callback callback) {
+            byte[] payload = new byte[message.remaining()];
+            message.get(payload);
+            invoke(payload, 0, payload.length, session);
+        }
+
+
+        @org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose
+        public void onClose(int code, String message) {
+            // members.remove(this);
+        }
+    }
 }

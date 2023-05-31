@@ -124,7 +124,17 @@
                     <groupId>org.xmlunit</groupId>
                     <artifactId>xmlunit-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -178,7 +188,7 @@
                     <dependency>
                         <groupId>com.github.tomakehurst</groupId>
                         <artifactId>wiremock-jre8-standalone</artifactId>
-                        <version>2.35.1</version>
+                        <version>3.0.1</version>
                     </dependency>
                 </dependencies>
             </plugin>

@@ -21,13 +21,13 @@ package org.apache.cxf.systest.hc5.http.auth;
 import java.net.URL;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 public class DigestServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(DigestServer.class);
@@ -38,7 +38,8 @@ public class DigestServer extends AbstractBusTestServerBase {
         URL resource = getClass().getResource("jetty-realm.properties");
 
         LoginService realm =
-            new HashLoginService("BookStoreRealm", resource.toString());
+            new HashLoginService("BookStoreRealm", 
+                ResourceFactory.of(new ContextHandler()).newResource(resource.toString()));
         server.addBean(realm);
     }
 
@@ -47,9 +48,9 @@ public class DigestServer extends AbstractBusTestServerBase {
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/digestauth");
-        webappcontext.setBaseResource(Resource.newClassPathResource("/digestauth"));
+        webappcontext.setBaseResourceAsString(this.getClass().getResource("/digestauth").toString());
 
-        HandlerCollection handlers = new HandlerCollection();
+        Handler.Collection handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
 
         server.setHandler(handlers);

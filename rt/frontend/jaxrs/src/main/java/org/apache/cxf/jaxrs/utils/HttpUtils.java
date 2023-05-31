@@ -475,6 +475,9 @@ public final class HttpUtils {
 
     public static String getBaseAddress(Message m) {
         String endpointAddress = getEndpointAddress(m);
+        if (endpointAddress.startsWith("ws")) {
+            endpointAddress = "http" + endpointAddress.substring(2);
+        }
         try {
             URI uri = new URI(endpointAddress);
             String path = uri.getRawPath();
@@ -553,6 +556,7 @@ public final class HttpUtils {
         if (ind == 0) {
             path = path.substring(address.length());
         }
+        
         if (addSlash && !path.startsWith("/")) {
             path = "/" + path;
         }

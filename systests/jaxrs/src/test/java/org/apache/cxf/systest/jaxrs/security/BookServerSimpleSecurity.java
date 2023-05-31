@@ -24,7 +24,8 @@ import java.net.URL;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
-
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 
 public class BookServerSimpleSecurity extends AbstractSpringServer {
@@ -39,7 +40,8 @@ public class BookServerSimpleSecurity extends AbstractSpringServer {
         URL resource = getClass()
             .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties");
         LoginService realm =
-            new HashLoginService("BookStoreRealm", resource.toString());
+            new HashLoginService("BookStoreRealm", 
+                                 ResourceFactory.of(new ContextHandler()).newResource(resource.toString()));
         server.addBean(realm);
     }
 

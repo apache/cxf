@@ -40,6 +40,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -191,7 +192,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return webSocketHolder.getLocale();
     }
 
-    @Override
     public Enumeration<Locale> getLocales() {
         LOG.log(Level.FINE, "getLocales()");
         return webSocketHolder.getLocales();
@@ -284,7 +284,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return webSocketHolder.getServletContext();
     }
 
-    @Override
     public boolean isAsyncStarted() {
         LOG.log(Level.FINE, "isAsyncStarted");
         return false;
@@ -296,7 +295,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return false;
     }
 
-    @Override
     public boolean isSecure() {
         LOG.log(Level.FINE, "isSecure");
         return webSocketHolder.isSecure();
@@ -545,14 +543,31 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+
     public String getRealPath(String path) {
         return path;
     }
 
-    @Override
+    
     public boolean isRequestedSessionIdFromUrl() {
         LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
         return false;
+    }
+
+    public String getRequestId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
