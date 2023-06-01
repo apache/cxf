@@ -171,9 +171,13 @@ public final class ToolConstants {
 
     // Binding namespace
     public static final String NS_JAXWS_BINDINGS = "https://jakarta.ee/xml/ns/jaxws";
+    public static final String OLD_NS_JAXWS_BINDINGS = "https://java.sun.com/xml/ns/jaxws";
     public static final String NS_JAXB_BINDINGS = "https://jakarta.ee/xml/ns/jaxb";
+    public static final String OLD_NS_JAXB_BINDINGS = "https://java.sun.com/xml/ns/jaxb";
     public static final QName  JAXWS_BINDINGS = new QName(NS_JAXWS_BINDINGS, "bindings");
+    public static final QName  OLD_JAXWS_BINDINGS = new QName(OLD_NS_JAXWS_BINDINGS, "bindings");
     public static final QName  JAXB_BINDINGS = new QName(NS_JAXB_BINDINGS, "bindings");
+    public static final QName  OLD_JAXB_BINDINGS = new QName(OLD_NS_JAXB_BINDINGS, "bindings");
     public static final QName SCHEMA = new QName(SCHEMA_URI, "schema");
     public static final String JAXWS_BINDINGS_WSDL_LOCATION = "wsdlLocation";
     public static final String JAXWS_BINDING_NODE = "node";

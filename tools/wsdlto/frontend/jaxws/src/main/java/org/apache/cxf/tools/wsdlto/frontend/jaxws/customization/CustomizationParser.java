@@ -30,17 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -59,6 +48,16 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public final class CustomizationParser {
     // For WSDL1.1
@@ -342,6 +341,9 @@ public final class CustomizationParser {
     }
 
     protected void internalizeBinding(Element bindings, Element targetNode, String expression) {
+        if (isOldJAXWSBindings(bindings)) {
+            LOG.warning(new Message("OLD_JAXWS_NAMESPACE", LOG).toString());
+        }
         if (bindings.getAttributeNode("wsdlLocation") != null) {
             expression = "/";
         }
@@ -489,6 +491,7 @@ public final class CustomizationParser {
         }
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(root);
         StaxUtils.toNextTag(reader);
+        
         if (isValidJaxwsBindingFile(bindingFile, reader)) {
 
             String wsdlLocation = root.getAttribute("wsdlLocation");
@@ -589,14 +592,24 @@ public final class CustomizationParser {
     }
 
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {
+        if (ToolConstants.OLD_JAXB_BINDINGS.equals(reader.getName())) {
+            LOG.warning(new Message("OLD_JAXB_NAMESPACE", LOG).toString());
+            return false;
+        }
         return ToolConstants.JAXB_BINDINGS.equals(reader.getName())
             || ToolConstants.SCHEMA.equals(reader.getName());
     }
 
+        
     private boolean isValidJaxwsBindingFile(String bindingLocation, XMLStreamReader reader) {
+        if (ToolConstants.OLD_JAXWS_BINDINGS.equals(reader.getName())) {
+            LOG.warning(new Message("OLD_JAXWS_NAMESPACE", LOG).toString());
+            return false;
+        }
         return ToolConstants.JAXWS_BINDINGS.equals(reader.getName());
     }
-
+    
+    
     protected void setWSDLNode(final Element node) {
         this.wsdlNode = node;
     }
@@ -614,6 +627,12 @@ public final class CustomizationParser {
         return ToolConstants.NS_JAXWS_BINDINGS.equals(bindings.getNamespaceURI())
                && "bindings".equals(bindings.getLocalName());
     }
+    
+    private boolean isOldJAXWSBindings(Node bindings) {
+        return ToolConstants.OLD_NS_JAXWS_BINDINGS.equals(bindings.getNamespaceURI())
+               && "bindings".equals(bindings.getLocalName());
+    }
+
 
     private boolean isJaxbBindings(Node bindings) {
         return ToolConstants.NS_JAXB_BINDINGS.equals(bindings.getNamespaceURI());
