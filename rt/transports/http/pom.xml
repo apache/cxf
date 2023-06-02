@@ -32,6 +32,20 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http</cxf.module.name>
+        <cxf.osgi.import>
+            javax.net,
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
+            com.sun.activation.registries;resolution:=optional
+        </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.apache.cxf.transports.http*,
+            org.apache.cxf.transport.http.*,
+            org.apache.cxf.transport.https.*,
+            org.apache.cxf.transport.servlet.*
+        </cxf.osgi.export>
         <cxf.public.suffix.list.url>
             https://publicsuffix.org/list/effective_tld_names.dat
         </cxf.public.suffix.list.url>

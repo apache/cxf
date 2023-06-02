@@ -32,6 +32,13 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.binding.soap</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.xml.soap;version="${cxf.osgi.saaj.version}",
+            jakarta.jws*;version="${cxf.osgi.jakarta.jwsapi.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
