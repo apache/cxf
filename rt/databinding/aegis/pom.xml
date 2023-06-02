@@ -33,6 +33,11 @@
 
     <properties>
         <cxf.module.name>org.apache.cxf.databinding.aegis</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.jws*;version="${cxf.osgi.jakarta.jwsapi.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

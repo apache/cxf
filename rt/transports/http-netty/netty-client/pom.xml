@@ -32,6 +32,10 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.netty.client</cxf.module.name>
+        <cxf.osgi.import>
+            io.netty.*;version="${cxf.osgi.netty.version}",
+            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

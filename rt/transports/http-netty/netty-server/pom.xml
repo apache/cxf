@@ -32,6 +32,16 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.netty.server</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="[5,6)",
+            io.netty.*;version="${cxf.osgi.netty.version}",
+            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
+        </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.apache.cxf.*,
+        </cxf.osgi.export>
     </properties>
     <dependencies>
         <dependency>

@@ -32,6 +32,13 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.security.sso.saml</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            org.ehcache*;resolution:=optional;version="${cxf.ehcache.osgi.version}",
+            org.opensaml*;version="${cxf.opensaml.osgi.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

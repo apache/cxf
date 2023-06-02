@@ -32,10 +32,38 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.core</cxf.module.name>
+        <cxf.osgi.export>
+            !org.apache.cxf.internal,
+            META-INF.cxf,
+            org.apache.cxf.*
+        </cxf.osgi.export>
         <cxf.osgi.import>
-            org.slf4j.impl;resolution:=optional,
-            com.sun.*;resolution:=optional
+            com.sun.xml.messaging.saaj.soap;resolution:=optional,
+            com.sun.xml.internal.messaging.saaj.soap;resolution:=optional,
+            com.ctc.wstx*;resolution:=optional,
+            org.codehaus.stax2*;resolution:=optional,
+            com.sun.msv*;resolution:=optional,
+            com.sun.tools*;resolution:=optional,
+            com.sun.xml*;resolution:=optional,
+            com.sun.codemodel.writer;resolution:=optional,
+            org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
+            net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
+            org.springframework.aop*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.beans*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.context*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.core*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.springframework.util*;resolution:=optional;version="${cxf.osgi.spring.version}",
+            org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
+            jakarta.activation;version="${cxf.osgi.jakarta.activation.version}",
+            jakarta.annotation;version="${cxf.osgi.jakarta.annotation.version}",
+            jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
+            !sun.misc
         </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>
+            org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
+        </cxf.osgi.dynamic.import>
     </properties>
     <dependencies>
         <dependency>

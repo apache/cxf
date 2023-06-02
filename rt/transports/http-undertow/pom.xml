@@ -32,6 +32,14 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.undertow</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            io.undertow*;version="${cxf.undertow.osgi.version}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}",
+            org.xnio*;version="${cxf.undertow.xnio.osgi.version}",
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

@@ -32,6 +32,9 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.clustering</cxf.module.name>
+        <cxf.osgi.import>
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

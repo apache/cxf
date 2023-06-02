@@ -33,6 +33,15 @@
     
     <properties>
         <cxf.module.name>org.apache.cxf.cdi</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            jakarta.enterprise*;version="${cxf.osgi.cdi.version}",
+            jakarta.ws.rs*;version="[3,4)",
+            org.apache.cxf.interceptor;resolution:=optional
+        </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.apache.cxf.cdi
+        </cxf.osgi.export>
     </properties>
     
     <dependencies>

@@ -32,6 +32,16 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.http.jetty</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
+        </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>
+            org.eclipse.jetty.jmx
+        </cxf.osgi.dynamic.import>
     </properties>
     <dependencies>
         <dependency>
