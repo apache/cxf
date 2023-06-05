@@ -57,14 +57,6 @@
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
         <cxf.asm.version>9.5</cxf.asm.version>
         <cxf.easymock.version>5.1.0</cxf.easymock.version>
-        
-        <!-- OSGi related properties -->
-        <cxf.fragment.host />
-        <cxf.bundle.activation.policy>lazy</cxf.bundle.activation.policy>
-        <cxf.bundle.activator />
-        <cxf.osgi.import />
-        <cxf.osgi.symbolic.name>${project.groupId}.${project.artifactId}</cxf.osgi.symbolic.name>
-        <cxf.osgi.dynamic.import />
 
         <!-- OSGi related properties -->
         <cxf.fragment.host />
