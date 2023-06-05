@@ -32,6 +32,15 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.transport.websocket</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}";resolution:=optional,
+            org.atmosphere*;version="${cxf.atmosphere.version.range}";resolution:=optional,
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+        </cxf.osgi.import>
+        <cxf.osgi.dynamic.import>
+            org.eclipse.jetty.jmx
+        </cxf.osgi.dynamic.import>
     </properties>
     <dependencies>
         <dependency>

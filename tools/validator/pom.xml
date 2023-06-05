@@ -32,6 +32,13 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.tools.validator</cxf.module.name>
+        <cxf.osgi.export>
+            =org.apache.cxf.tools.validator.internal,
+            org.apache.cxf.tools.validator.*,
+        </cxf.osgi.export>
+        <cxf.osgi.import>
+            jakarta.jws*;version="${cxf.osgi.jakarta.jwsapi.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
