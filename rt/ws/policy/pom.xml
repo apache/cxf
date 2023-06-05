@@ -32,6 +32,11 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.ws.policy</cxf.module.name>
+        <cxf.osgi.import>
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
+            jakarta.annotation*;version="${cxf.osgi.jakarta.annotation.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>

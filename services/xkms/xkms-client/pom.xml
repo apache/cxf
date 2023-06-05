@@ -32,6 +32,14 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.xkms.client</cxf.module.name>
+        <cxf.osgi.import>
+            jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
+        </cxf.osgi.import>
+        <cxf.osgi.export>
+            org.apache.cxf.xkms.crypto.provider,
+            org.apache.cxf.xkms.cache,
+            org.apache.cxf.xkms.client
+        </cxf.osgi.export>
     </properties>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>

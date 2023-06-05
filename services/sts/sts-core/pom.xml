@@ -32,6 +32,19 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.sts.core</cxf.module.name>
+        <cxf.osgi.symbolic.name>org.apache.cxf.services.sts.core</cxf.osgi.symbolic.name>
+        <cxf.osgi.export>
+            org.apache.cxf.sts.*;version=${cxf.osgi.version.clean}
+        </cxf.osgi.export>
+        <cxf.osgi.import>
+            jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
+            !org.apache.cxf.sts.*,
+            org.apache.cxf.*,
+            org.springframework.ldap*;resolution:=optional,
+            org.ehcache*;resolution:=optional;version="${cxf.ehcache.osgi.version}",
+            org.opensaml*;version="${cxf.opensaml.osgi.version}",
+            jakarta.xml.bind;version="${cxf.osgi.jakarta.bind.version}"
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
