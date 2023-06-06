@@ -635,8 +635,8 @@ public final class ResponseImpl extends Response {
 
     @Override
     public String toString() {
-        return "ResponseImpl{" +
-                "status=" + (status == null ? "null" : status.getStatusCode()) +
-                '}';
+        return "ResponseImpl{"
+                + "status=" + (status == null ? "null" : status.getStatusCode())
+                + "}";
     }
 }
