@@ -1,4 +1,4 @@
-Apache CXF 4.0.1 Release Notes
+Apache CXF 4.0.2 Release Notes
 
 1. Overview
 
@@ -21,7 +21,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.1 fixes over 20 JIRA issues reported by users and the community.
+4.0.2 fixes over 7 JIRA issues reported by users and the community.
 
 
 
@@ -64,38 +64,18 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Sub-task
-    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support
-    * [CXF-8815] - Fix org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitTest.testResponseSameBufferSize
-    * [CXF-8830] - Fix org.apache.cxf.transport.http.netty.client.NettyHttpConduitTest.testCallAsyncCallbackInvokedOnlyOnce
+    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support (Netty & HttpClient 5)
+
 ** Bug
-    * [CXF-8666] - Spring6 for JSR 250 annotations isn't disabled for jakarta.xml.ws.WebServiceContext
-    * [CXF-8669] - Multipart annotation not working 3.4.6 onwards.
-    * [CXF-8745] - MemoryLeak when using SpringBus in a spring context which has a reusable parent context
-    * [CXF-8797] - NameBinding ignored when implementing interface
-    * [CXF-8813] - CXF v4: NoClassDefFoundError: jakarta/xml/bind/Validator
-    * [CXF-8816] - Deflater and Inflater initialized with different 'nowrap' value
-    * [CXF-8818] - wsdl2java fails in 4.0.0 due to incorrect versions in Manifest
-    * [CXF-8821] - Remove org.eclipse.tycho plugins since OSGi support is removed
-    * [CXF-8822] - AsyncHTTPConduit removes query-parameters when path is empty
-    * [CXF-8824] - CDI beans produced by @Produces methods are generated twice
-    * [CXF-8826] - AsyncHTTPConduit (hc5) - Unexpected EOF during response processing
-    * [CXF-8833] - GZIPInInterceptor, when processing HTTP 204 empty response, throws EOFException
-    * [CXF-8837] - Allow P11 RSA Keys within JwsUtils
-    * [CXF-8838] - Regression in cxf-codegen-plugin wsdl2java 4.0.0
-    * [CXF-8839] - Missing dependency on plexus-utils in cxf-wsdl-validator-plugin
+    * [CXF-8879] - OSGi bundle manifest are broken since version 4
+    * [CXF-8880] - Catch wrong XML binding file during parsing
+    * [CXF-8881] - WSDLValidator link doesn't work
+    * [CXF-8882] - Apache HttpClient 5 async conduit does not handle authentication
+    * [CXF-8884] - Update commons-jexl3 to 3.3
 
 ** Improvement
-    * [CXF-8758] - Migration path for Wiremock (Jetty 11/JakartaEE)
-    * [CXF-8788] - Remove the 'jakarta' profile (which enables the Spring milestone repositories)
-
-
-
-
-
-
-
+    * [CXF-8802] - Update to Maven Remote Resources Plugin 3.1.0
 
 
 

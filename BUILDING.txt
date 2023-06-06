@@ -6,13 +6,14 @@ Initial Setup
 
 1) Install J2SE SDK, which can be downloaded from 
    http://www.oracle.com/technetwork/java/archive-139210.html#javase
-   The minimum suported Java version is 11.
+   The minimum suported Java version for building CXF is 17.  Java 11 can be
+   use to run SOME parts of CXF.
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
    $JAVA_HOME$/bin (unix).
 
-3) Install Maven 3.1 or newer, which can be downloaded from 
+3) Install Maven 3.8 or newer, which can be downloaded from
    http://maven.apache.org/download.html. Make sure that your PATH includes 
    the MVN_HOME/bin directory. 
 
