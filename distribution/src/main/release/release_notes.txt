@@ -1,4 +1,4 @@
-Apache CXF 3.6.0 Release Notes
+Apache CXF 3.6.1 Release Notes
 
 1. Overview
 
@@ -23,6 +23,8 @@ Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+3.6.1 fixes over 5 issues reported by users.
 
 
 2. Installation Prerequisites 
@@ -61,3 +63,19 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/36-migration-guide.html
 for caveats when upgrading.
+
+7. Release Notes
+
+** Sub-task
+    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support (Netty & HttpClient 5)
+
+** Bug
+    * [CXF-8881] - WSDLValidator link doesn't work
+    * [CXF-8882] - Apache HttpClient 5 async conduit does not handle authentication
+    * [CXF-8884] - Update commons-jexl3 to 3.3
+
+** Improvement
+    * [CXF-8802] - Update to Maven Remote Resources Plugin 3.1.0
+
+
+
