@@ -18,7 +18,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -37,7 +37,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>11</source>
                     <target>11</target>
@@ -85,7 +85,7 @@
           <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.0-B1</version>
+            <version>2.1.1</version>
           </dependency>
           <dependency>
             <groupId>jakarta.xml.ws</groupId>

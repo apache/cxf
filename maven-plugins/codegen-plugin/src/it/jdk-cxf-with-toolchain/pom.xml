@@ -17,7 +17,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>enforce-jdk9-of-higher</id>
@@ -60,7 +60,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.9.1</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>add-wsdl-source</id>
@@ -92,7 +92,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-toolchains-plugin</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
             <configuration>
               <toolchains>
                 <jdk>
@@ -120,7 +120,7 @@
           <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.0-B1</version>
+            <version>2.1.1</version>
           </dependency>
           <dependency>
             <groupId>jakarta.xml.ws</groupId>
