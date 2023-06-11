@@ -51,13 +51,11 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for testing DocLiteralInInterceptor to use Source Data Binding
@@ -66,17 +64,6 @@ import static org.junit.Assert.assertEquals;
 public class DocLiteralInInterceptorTest {
 
     private static final String NS = "http://cxf.apache.org/wsdl-first/types";
-    protected IMocksControl control;
-
-    @Before
-    public void setUp() throws Exception {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        control.verify();
-    }
 
     @Test
     public void testUnmarshalSourceData() throws Exception {
@@ -95,13 +82,13 @@ public class DocLiteralInInterceptorTest {
         Message m = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
 
-        Service service = control.createMock(Service.class);
+        Service service = mock(Service.class);
         exchange.put(Service.class, service);
-        EasyMock.expect(service.getDataBinding()).andReturn(new SourceDataBinding());
-        EasyMock.expect(service.size()).andReturn(0).anyTimes();
-        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
+        when(service.getDataBinding()).thenReturn(new SourceDataBinding());
+        when(service.size()).thenReturn(0);
+        when(service.isEmpty()).thenReturn(true);
 
-        Endpoint endpoint = control.createMock(Endpoint.class);
+        Endpoint endpoint = mock(Endpoint.class);
         exchange.put(Endpoint.class, endpoint);
 
         OperationInfo operationInfo = new OperationInfo();
@@ -122,35 +109,32 @@ public class DocLiteralInInterceptorTest {
         BindingOperationInfo boi = new BindingOperationInfo(null, operationInfo);
         exchange.put(BindingOperationInfo.class, boi);
 
-        EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
-        BindingInfo binding = control.createMock(BindingInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
-        EasyMock.expect(endpointInfo.getBinding()).andReturn(binding).anyTimes();
-        EasyMock.expect(binding.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        BindingInfo binding = mock(BindingInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
+        when(endpointInfo.getBinding()).thenReturn(binding);
+        when(binding.getProperties()).thenReturn(new HashMap<String, Object>());
+        when(endpointInfo.getProperties()).thenReturn(new HashMap<String, Object>());
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
 
-        ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
-        EasyMock.expect(endpointInfo.getService()).andReturn(serviceInfo).anyTimes();
+        ServiceInfo serviceInfo = mock(ServiceInfo.class);
+        when(endpointInfo.getService()).thenReturn(serviceInfo);
 
-        EasyMock.expect(serviceInfo.getName()).andReturn(new QName("http://foo.com", "service")).anyTimes();
-        InterfaceInfo interfaceInfo = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(serviceInfo.getInterface()).andReturn(interfaceInfo).anyTimes();
-        EasyMock.expect(interfaceInfo.getName())
-            .andReturn(new QName("http://foo.com", "interface")).anyTimes();
+        when(serviceInfo.getName()).thenReturn(new QName("http://foo.com", "service"));
+        InterfaceInfo interfaceInfo = mock(InterfaceInfo.class);
+        when(serviceInfo.getInterface()).thenReturn(interfaceInfo);
+        when(interfaceInfo.getName()).thenReturn(new QName("http://foo.com", "interface"));
 
-        EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
-        EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
+        when(endpointInfo.getName()).thenReturn(new QName("http://foo.com", "endpoint"));
+        when(endpointInfo.getProperty("URI", URI.class)).thenReturn(new URI("dummy"));
 
         List<OperationInfo> operations = new ArrayList<>();
-        EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
+        when(interfaceInfo.getOperations()).thenReturn(operations);
 
         m.setExchange(exchange);
         m.put(Message.SCHEMA_VALIDATION_ENABLED, false);
         m.setContent(XMLStreamReader.class, reader);
-
-        control.replay();
 
         new DocLiteralInInterceptor().handleMessage(m);
 
@@ -183,13 +167,13 @@ public class DocLiteralInInterceptorTest {
         m.put(DocLiteralInInterceptor.KEEP_PARAMETERS_WRAPPER, true);
         Exchange exchange = new ExchangeImpl();
 
-        Service service = control.createMock(Service.class);
+        Service service = mock(Service.class);
         exchange.put(Service.class, service);
-        EasyMock.expect(service.getDataBinding()).andReturn(new SourceDataBinding()).anyTimes();
-        EasyMock.expect(service.size()).andReturn(0).anyTimes();
-        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
+        when(service.getDataBinding()).thenReturn(new SourceDataBinding());
+        when(service.size()).thenReturn(0);
+        when(service.isEmpty()).thenReturn(true);
 
-        Endpoint endpoint = control.createMock(Endpoint.class);
+        Endpoint endpoint = mock(Endpoint.class);
         exchange.put(Endpoint.class, endpoint);
 
         // wrapped
@@ -209,39 +193,36 @@ public class DocLiteralInInterceptorTest {
         operationInfoWrapper.setInput("inputName", messageInfoWrapper);
         operationInfoWrapper.setUnwrappedOperation(operationInfo);
 
-        ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
+        ServiceInfo serviceInfo = mock(ServiceInfo.class);
 
-        EasyMock.expect(serviceInfo.getName()).andReturn(new QName("http://foo.com", "service")).anyTimes();
-        InterfaceInfo interfaceInfo = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(serviceInfo.getInterface()).andReturn(interfaceInfo).anyTimes();
-        EasyMock.expect(interfaceInfo.getName()).andReturn(new QName("http://foo.com", "interface"))
-            .anyTimes();
+        when(serviceInfo.getName()).thenReturn(new QName("http://foo.com", "service"));
+        InterfaceInfo interfaceInfo = mock(InterfaceInfo.class);
+        when(serviceInfo.getInterface()).thenReturn(interfaceInfo);
+        when(interfaceInfo.getName()).thenReturn(new QName("http://foo.com", "interface"));
 
         BindingInfo bindingInfo = new BindingInfo(serviceInfo, "");
         BindingOperationInfo boi = new BindingOperationInfo(bindingInfo, operationInfoWrapper);
         exchange.put(BindingOperationInfo.class, boi);
 
-        EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
-        BindingInfo binding = control.createMock(BindingInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
-        EasyMock.expect(endpointInfo.getBinding()).andReturn(binding).anyTimes();
-        EasyMock.expect(binding.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
-        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(endpointInfo.getService()).andReturn(serviceInfo).anyTimes();
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        BindingInfo binding = mock(BindingInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
+        when(endpointInfo.getBinding()).thenReturn(binding);
+        when(binding.getProperties()).thenReturn(new HashMap<String, Object>());
+        when(endpointInfo.getProperties()).thenReturn(new HashMap<String, Object>());
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpointInfo.getService()).thenReturn(serviceInfo);
 
-        EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
-        EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
+        when(endpointInfo.getName()).thenReturn(new QName("http://foo.com", "endpoint"));
+        when(endpointInfo.getProperty("URI", URI.class)).thenReturn(new URI("dummy"));
 
         List<OperationInfo> operations = new ArrayList<>();
-        EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
+        when(interfaceInfo.getOperations()).thenReturn(operations);
 
         m.setExchange(exchange);
         m.put(Message.SCHEMA_VALIDATION_ENABLED, false);
         m.setContent(XMLStreamReader.class, reader);
-
-        control.replay();
 
         new DocLiteralInInterceptor().handleMessage(m);
 
