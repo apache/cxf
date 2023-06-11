@@ -32,13 +32,13 @@ import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.ServiceInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServiceInvokerInterceptorTest {
 
@@ -70,15 +70,12 @@ public class ServiceInvokerInterceptorTest {
     }
 
     Endpoint createEndpoint(Invoker i) throws Exception {
-        IMocksControl control = EasyMock.createNiceControl();
-        Endpoint endpoint = control.createMock(Endpoint.class);
+        Endpoint endpoint = mock(Endpoint.class);
 
         ServiceImpl service = new ServiceImpl((ServiceInfo)null);
         service.setInvoker(i);
         service.setExecutor(new SimpleExecutor());
-        EasyMock.expect(endpoint.getService()).andReturn(service).anyTimes();
-
-        control.replay();
+        when(endpoint.getService()).thenReturn(service);
 
         return endpoint;
     }

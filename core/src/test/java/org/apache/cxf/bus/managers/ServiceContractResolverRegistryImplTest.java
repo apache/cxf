@@ -26,8 +26,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.ServiceContractResolver;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +36,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServiceContractResolverRegistryImplTest {
     private ServiceContractResolverRegistryImpl registry;
@@ -45,15 +45,13 @@ public class ServiceContractResolverRegistryImplTest {
     private ServiceContractResolver resolver2;
     private URI uri1;
     private URI uri2;
-    private IMocksControl control;
     private QName serviceName;
 
     @Before
     public void setUp() throws URISyntaxException {
         registry = new ServiceContractResolverRegistryImpl();
-        control = EasyMock.createNiceControl();
-        resolver1 = control.createMock(ServiceContractResolver.class);
-        resolver2 = control.createMock(ServiceContractResolver.class);
+        resolver1 = mock(ServiceContractResolver.class);
+        resolver2 = mock(ServiceContractResolver.class);
         uri1 = new URI("http://mock");
         uri2 = new URI("file:///foo/bar");
 
@@ -114,38 +112,22 @@ public class ServiceContractResolverRegistryImplTest {
     public void testGetContactLocation() {
         registry.register(resolver1);
         registry.register(resolver2);
-        resolver1.getContractLocation(serviceName);
-        EasyMock.expectLastCall().andReturn(uri1);
-        control.replay();
+        when(resolver1.getContractLocation(serviceName)).thenReturn(uri1);
 
         URI resolved = registry.getContractLocation(serviceName);
-
-        control.verify();
         assertSame("unexpected physical EPR", uri1, resolved);
 
-        control.reset();
-        resolver1.getContractLocation(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.getContractLocation(serviceName);
-        EasyMock.expectLastCall().andReturn(uri2);
-        control.replay();
+        when(resolver1.getContractLocation(serviceName)).thenReturn(null);
+        when(resolver2.getContractLocation(serviceName)).thenReturn(uri2);
 
         resolved = registry.getContractLocation(serviceName);
-
-        control.verify();
         assertSame("unexpected physical EPR", uri2, resolved);
         assertNotSame("unexpected physical EPR", uri1, resolved);
 
-        control.reset();
-        resolver1.getContractLocation(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        resolver2.getContractLocation(serviceName);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        when(resolver1.getContractLocation(serviceName)).thenReturn(null);
+        when(resolver2.getContractLocation(serviceName)).thenReturn(null);
 
         resolved = registry.getContractLocation(serviceName);
-
-        control.verify();
         assertNull("unexpected physical EPR", resolved);
     }
 

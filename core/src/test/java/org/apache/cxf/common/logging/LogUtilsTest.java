@@ -25,15 +25,18 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
-import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class LogUtilsTest {
 
@@ -52,87 +55,94 @@ public class LogUtilsTest {
 
     @Test
     public void testHandleL7dMessage() throws Exception {
+        final ArgumentCaptor<LogRecord> captor = ArgumentCaptor.forClass(LogRecord.class);
+        
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testHandleL7dMessage");
-        Handler handler = EasyMock.createNiceMock(Handler.class);
+        Handler handler = mock(Handler.class);
         log.addHandler(handler);
         // handler called *before* localization of message
         LogRecord record = new LogRecord(Level.WARNING, "FOOBAR_MSG");
         record.setResourceBundle(log.getResourceBundle());
-        EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
-        EasyMock.replay(handler);
         log.log(Level.WARNING, "FOOBAR_MSG");
-        EasyMock.verify(handler);
+
+        verify(handler, times(2)).publish(captor.capture());
+        assertThat(captor.getValue(), new LogRecordMatcher(record));
         log.removeHandler(handler);
     }
 
     @Test
     public void testLogNoParamsOrThrowable() {
+        final ArgumentCaptor<LogRecord> captor = ArgumentCaptor.forClass(LogRecord.class);
+
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsOrThrowable");
-        Handler handler = EasyMock.createNiceMock(Handler.class);
+        Handler handler = mock(Handler.class);
         log.addHandler(handler);
         // handler called *after* localization of message
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in {0} only");
-        EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
-        EasyMock.replay(handler);
         LogUtils.log(log, Level.SEVERE, "SUB1_MSG");
-        EasyMock.verify(handler);
+        
+        verify(handler, times(2)).publish(captor.capture());
+        assertThat(captor.getValue(), new LogRecordMatcher(record));
         log.removeHandler(handler);
     }
 
     @Test
     public void testLogNoParamsWithThrowable() {
+        final ArgumentCaptor<LogRecord> captor = ArgumentCaptor.forClass(LogRecord.class);
+
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsWithThrowable");
-        Handler handler = EasyMock.createNiceMock(Handler.class);
+        Handler handler = mock(Handler.class);
         Exception ex = new Exception("x");
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in {0} only");
         record.setThrown(ex);
-        EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
-        EasyMock.replay(handler);
         synchronized (log) {
             log.addHandler(handler);
             // handler called *after* localization of message
             LogUtils.log(log, Level.SEVERE, "SUB1_MSG", ex);
-            EasyMock.verify(handler);
+            verify(handler, times(2)).publish(captor.capture());
+            assertThat(captor.getValue(), new LogRecordMatcher(record));
             log.removeHandler(handler);
         }
     }
 
     @Test
     public void testLogParamSubstitutionWithThrowable() throws Exception {
+        final ArgumentCaptor<LogRecord> captor = ArgumentCaptor.forClass(LogRecord.class);
+
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogParamSubstitutionWithThrowable");
-        Handler handler = EasyMock.createNiceMock(Handler.class);
+        Handler handler = mock(Handler.class);
         Exception ex = new Exception();
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in 1 only");
         record.setThrown(ex);
-        EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
-        EasyMock.replay(handler);
         synchronized (log) {
             log.addHandler(handler);
             LogUtils.log(log, Level.SEVERE, "SUB1_MSG", ex, 1);
-            EasyMock.verify(handler);
+            verify(handler, times(2)).publish(captor.capture());
+            assertThat(captor.getValue(), new LogRecordMatcher(record));
             log.removeHandler(handler);
         }
     }
 
     @Test
     public void testLogParamsSubstitutionWithThrowable() throws Exception {
+        final ArgumentCaptor<LogRecord> captor = ArgumentCaptor.forClass(LogRecord.class);
+
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null,
                                            "testLogParamsSubstitutionWithThrowable");
-        Handler handler = EasyMock.createNiceMock(Handler.class);
+        Handler handler = mock(Handler.class);
         Exception ex = new Exception();
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in 4 & 3");
         record.setThrown(ex);
-        EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
-        EasyMock.replay(handler);
         synchronized (log) {
             log.addHandler(handler);
             LogUtils.log(log, Level.SEVERE, "SUB2_MSG", ex, new Object[] {3, 4});
-            EasyMock.verify(handler);
+            verify(handler, times(2)).publish(captor.capture());
+            assertThat(captor.getValue(), new LogRecordMatcher(record));
             log.removeHandler(handler);
         }
     }
@@ -175,7 +185,7 @@ public class LogUtilsTest {
         }
     }
 
-    private static final class LogRecordMatcher implements IArgumentMatcher {
+    private static final class LogRecordMatcher extends BaseMatcher<LogRecord> {
         private final LogRecord record;
 
         private LogRecordMatcher(LogRecord r) {
@@ -197,8 +207,9 @@ public class LogUtilsTest {
             return false;
         }
 
-        public void appendTo(StringBuffer buffer) {
-            buffer.append("log records did not match");
+        @Override
+        public void describeTo(Description description) {
+            description.appendValue(record);
         }
     }
 }

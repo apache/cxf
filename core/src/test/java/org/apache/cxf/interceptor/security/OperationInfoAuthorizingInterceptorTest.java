@@ -29,8 +29,10 @@ import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingInterceptorTest {
 
@@ -38,18 +40,17 @@ public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingIn
     @Override
     public void setUp() throws Exception {
         Exchange ex = setUpExchange();
-        Service service = EasyMock.createMock(Service.class);
+        Service service = mock(Service.class);
         ex.put(Service.class, service);
-        MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
-        EasyMock.expect(service.get(MethodDispatcher.class.getName())).andReturn(md).anyTimes();
+        MethodDispatcher md = mock(MethodDispatcher.class);
+        when(service.get(MethodDispatcher.class.getName())).thenReturn(md);
 
-        BindingOperationInfo boi = EasyMock.createMock(BindingOperationInfo.class);
+        BindingOperationInfo boi = mock(BindingOperationInfo.class);
         ex.put(BindingOperationInfo.class, boi);
-        EasyMock.expect(md.getMethod(boi)).andReturn(null);
-        OperationInfo opinfo = EasyMock.createMock(OperationInfo.class);
-        EasyMock.expect(opinfo.getName()).andReturn(new QName("urn:test", "echo")).anyTimes();
-        EasyMock.expect(boi.getOperationInfo()).andReturn(opinfo).anyTimes();
-        EasyMock.replay(service, md, boi, opinfo);
+        when(md.getMethod(boi)).thenReturn(null);
+        OperationInfo opinfo = mock(OperationInfo.class);
+        when(opinfo.getName()).thenReturn(new QName("urn:test", "echo"));
+        when(boi.getOperationInfo()).thenReturn(opinfo);
     }
 
     @Override

@@ -47,7 +47,6 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
 
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Test;
 
@@ -57,6 +56,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class SpringBusFactoryTest {
 
@@ -143,19 +144,14 @@ public class SpringBusFactoryTest {
 
     @Test
     public void testForLifeCycle() {
-        BusLifeCycleListener bl = EasyMock.createMock(BusLifeCycleListener.class);
+        BusLifeCycleListener bl = mock(BusLifeCycleListener.class);
         Bus bus = new SpringBusFactory().createBus();
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         lifeCycleManager.registerLifeCycleListener(bl);
-        EasyMock.reset(bl);
-        bl.preShutdown();
-        EasyMock.expectLastCall();
-        bl.postShutdown();
-        EasyMock.expectLastCall();
-        EasyMock.replay(bl);
         bus.shutdown(true);
-        EasyMock.verify(bl);
-
+        
+        verify(bl).preShutdown();
+        verify(bl).postShutdown();
     }
 
     @Test

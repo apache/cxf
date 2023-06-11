@@ -34,13 +34,13 @@ import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CXFBusImplTest {
 
@@ -67,17 +67,14 @@ public class CXFBusImplTest {
     @Test
     public void testConstructionWithExtensions() throws BusException {
 
-        IMocksControl control;
         BindingFactoryManager bindingFactoryManager;
         InstrumentationManager instrumentationManager;
         PhaseManager phaseManager;
 
-        control = EasyMock.createNiceControl();
-
         Map<Class<?>, Object> extensions = new HashMap<>();
-        bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        instrumentationManager = control.createMock(InstrumentationManager.class);
-        phaseManager = control.createMock(PhaseManager.class);
+        bindingFactoryManager = mock(BindingFactoryManager.class);
+        instrumentationManager = mock(InstrumentationManager.class);
+        phaseManager = mock(PhaseManager.class);
 
         extensions.put(BindingFactoryManager.class, bindingFactoryManager);
         extensions.put(InstrumentationManager.class, instrumentationManager);
@@ -114,16 +111,14 @@ public class CXFBusImplTest {
     public void testShutdownWithBusLifecycle() {
         final Bus bus = new ExtensionManagerBus();
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
-        BusLifeCycleListener listener = EasyMock.createMock(BusLifeCycleListener.class);
-        EasyMock.reset(listener);
-        listener.preShutdown();
-        EasyMock.expectLastCall();
-        listener.postShutdown();
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+        BusLifeCycleListener listener = mock(BusLifeCycleListener.class);
+        
         lifeCycleManager.registerLifeCycleListener(listener);
         bus.shutdown(true);
-        EasyMock.verify(listener);
+        
+        verify(listener).preShutdown();
+        verify(listener).postShutdown();
+
         bus.shutdown(true);
     }
 

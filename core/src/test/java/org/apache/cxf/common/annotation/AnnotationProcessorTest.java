@@ -30,12 +30,16 @@ import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceContext;
 
-import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AnnotationProcessorTest {
 
@@ -43,12 +47,7 @@ public class AnnotationProcessorTest {
     AnnotationProcessor processor = new AnnotationProcessor(greeterImpl);
     List<Class<? extends Annotation>> expectedAnnotations = new ArrayList<>();
 
-    AnnotationVisitor visitor = EasyMock.createMock(AnnotationVisitor.class);
-
-    @Before
-    public void setUp() {
-        EasyMock.checkOrder(visitor, false);
-    }
+    AnnotationVisitor visitor = mock(AnnotationVisitor.class);
 
     @Test
     public void testVisitClass() {
@@ -56,8 +55,8 @@ public class AnnotationProcessorTest {
         expectedAnnotations.add(WebService.class);
 
         prepareCommonExpectations(visitor);
-        visitor.visitClass(EasyMock.eq(AnnotatedGreeterImpl.class),
-                           EasyMock.isA(WebService.class));
+        visitor.visitClass(eq(AnnotatedGreeterImpl.class),
+                           isA(WebService.class));
 
         runProcessor(visitor);
     }
@@ -69,9 +68,9 @@ public class AnnotationProcessorTest {
 
         expectedAnnotations.add(Resource.class);
         prepareCommonExpectations(visitor);
-        visitor.visitField(EasyMock.eq(expectedField),
-                           EasyMock.isA(Resource.class));
-        visitor.visitMethod((Method)EasyMock.anyObject(), (Annotation)EasyMock.anyObject());
+        visitor.visitField(eq(expectedField),
+                           isA(Resource.class));
+        visitor.visitMethod(any(Method.class), any(Annotation.class));
 
         runProcessor(visitor);
 
@@ -92,18 +91,18 @@ public class AnnotationProcessorTest {
         expectedAnnotations.add(Resource.class);
 
         prepareCommonExpectations(visitor);
-        visitor.visitField(EasyMock.eq(expectedField),
-                           EasyMock.isA(Resource.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod1),
-                           EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod2),
-                           EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod3),
-                           EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod4),
-                           EasyMock.isA(Resource.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod5),
-                            EasyMock.isA(WebMethod.class));
+        visitor.visitField(eq(expectedField),
+                           isA(Resource.class));
+        visitor.visitMethod(eq(expectedMethod1),
+                            isA(WebMethod.class));
+        visitor.visitMethod(eq(expectedMethod2),
+                            isA(WebMethod.class));
+        visitor.visitMethod(eq(expectedMethod3),
+                            isA(WebMethod.class));
+        visitor.visitMethod(eq(expectedMethod4),
+                            isA(Resource.class));
+        visitor.visitMethod(eq(expectedMethod5),
+                            isA(WebMethod.class));
         runProcessor(visitor);
     }
 
@@ -133,14 +132,12 @@ public class AnnotationProcessorTest {
 
 
     private void prepareCommonExpectations(AnnotationVisitor v) {
-        v.getTargetAnnotations();
-        EasyMock.expectLastCall().andReturn(expectedAnnotations);
+        when(v.getTargetAnnotations()).thenReturn(expectedAnnotations);
         v.setTarget(greeterImpl);
     }
 
     private void runProcessor(AnnotationVisitor v) {
-        EasyMock.replay(v);
         processor.accept(v);
-        EasyMock.verify(v);
+        verify(v, times(1)).getTargetAnnotations();
     }
 }
