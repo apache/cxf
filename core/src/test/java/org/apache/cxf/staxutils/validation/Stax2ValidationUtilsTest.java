@@ -42,16 +42,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.anyString;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.mock;
-import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class Stax2ValidationUtilsTest {
@@ -121,10 +120,9 @@ public class Stax2ValidationUtilsTest {
         schemaCol.read(new StreamSource(io, sysId));
         serviceInfo.addSchema(schemaInfo);
         schemaInfo.setSchema(schemaCol.getXmlSchema(sysId)[0]);
-        expect(endpoint.get(anyObject())).andReturn(null);
-        expect(endpoint.containsKey(anyObject())).andReturn(false);
-        expect(endpoint.put(anyString(), anyObject())).andReturn(null);
-        replay(endpoint);
+        when(endpoint.get(any())).thenReturn(null);
+        when(endpoint.containsKey(any())).thenReturn(false);
+        when(endpoint.put(anyString(), any())).thenReturn(null);
     }
 
     @Test

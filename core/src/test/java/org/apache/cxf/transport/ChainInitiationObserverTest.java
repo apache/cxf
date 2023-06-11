@@ -26,17 +26,17 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ChainInitiationObserverTest {
 
-    private IMocksControl control;
     private TestChain chain;
     private Message message;
     private ChainInitiationObserver observer;
@@ -44,8 +44,7 @@ public class ChainInitiationObserverTest {
     @Before
     public void setUp() {
 
-        control = EasyMock.createNiceControl();
-        message = control.createMock(Message.class);
+        message = mock(Message.class);
 
         Phase phase1 = new Phase("phase1", 1);
         SortedSet<Phase> phases = new TreeSet<>();
@@ -54,19 +53,14 @@ public class ChainInitiationObserverTest {
         observer = new ChainInitiationObserver(null, null);
     }
 
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testPausedChain() {
-        message.getInterceptorChain();
-        EasyMock.expectLastCall().andReturn(chain).times(2);
-        control.replay();
+        when(message.getInterceptorChain()).thenReturn(chain);
 
         observer.onMessage(message);
         assertTrue(chain.isInvoked());
+
+        verify(message, times(2)).getInterceptorChain();
     }
 
     private static class TestChain extends PhaseInterceptorChain {

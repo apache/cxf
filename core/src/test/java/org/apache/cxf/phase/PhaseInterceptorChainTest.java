@@ -35,9 +35,6 @@ import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,10 +42,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class PhaseInterceptorChainTest {
-
-    private IMocksControl control;
 
     private PhaseInterceptorChain chain;
 
@@ -56,9 +58,7 @@ public class PhaseInterceptorChainTest {
 
     @Before
     public void setUp() {
-
-        control = EasyMock.createNiceControl();
-        message = control.createMock(Message.class);
+        message = mock(Message.class);
 
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
@@ -71,16 +71,10 @@ public class PhaseInterceptorChainTest {
         chain = new PhaseInterceptorChain(phases);
     }
 
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testState() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p = setUpPhaseInterceptor("phase1", "p1");
 
-        control.replay();
         chain.add(p);
 
         assertSame("Initial state is State.EXECUTING",
@@ -103,10 +97,7 @@ public class PhaseInterceptorChainTest {
         SuspendedInvocationInterceptor p2 =
             new SuspendedInvocationInterceptor("phase2", "p2");
 
-        message.getInterceptorChain();
-        EasyMock.expectLastCall().andReturn(chain).anyTimes();
-
-        control.replay();
+        when(message.getInterceptorChain()).thenReturn(chain);
 
         chain.add(p1);
         chain.add(p2);
@@ -121,12 +112,13 @@ public class PhaseInterceptorChainTest {
         assertSame("No previous interceptor selected", p1, chain.iterator().next());
         assertSame("Suspended invocation should lead to State.PAUSED",
                    InterceptorChain.State.PAUSED, chain.getState());
+
+        verify(message).getInterceptorChain();
     }
 
     @Test
     public void testAddOneInterceptor() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p = setUpPhaseInterceptor("phase1", "p1");
-        control.replay();
         chain.add(p);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
@@ -135,9 +127,7 @@ public class PhaseInterceptorChainTest {
 
     @Test
     public void testForceAddSameInterceptor() throws Exception {
-
         AbstractPhaseInterceptor<? extends Message> p = setUpPhaseInterceptor("phase1", "p1");
-        control.replay();
         chain.add(p, false);
         chain.add(p, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
@@ -152,10 +142,8 @@ public class PhaseInterceptorChainTest {
 
     @Test
     public void testForceAddSameInterceptorType() throws Exception {
-
         AbstractPhaseInterceptor<? extends Message> p1 = setUpPhaseInterceptor("phase1", "p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p1");
-        control.replay();
         chain.add(p1, false);
         chain.add(p2, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
@@ -174,7 +162,6 @@ public class PhaseInterceptorChainTest {
         Set<String> after = new HashSet<>();
         after.add("p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p2", null, after);
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
@@ -193,7 +180,6 @@ public class PhaseInterceptorChainTest {
         Set<String> before1 = new HashSet<>();
         before1.add("p2");
         AbstractPhaseInterceptor<? extends Message> p3 = setUpPhaseInterceptor("phase1", "p3", before1, null);
-        control.replay();
         chain.add(p3);
         chain.add(p1);
         chain.add(p2);
@@ -209,18 +195,18 @@ public class PhaseInterceptorChainTest {
     public void testSingleInterceptorPass() throws Exception {
         AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, false, false);
-        control.replay();
         chain.add(p);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p, false, false);
     }
 
     @Test
     public void testSingleInterceptorFail() throws Exception {
         AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, true, true);
-        control.replay();
         chain.add(p);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p, true, true);
     }
 
     @Test
@@ -228,9 +214,9 @@ public class PhaseInterceptorChainTest {
         AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, true, true);
         setUpCustomLogger(true, true, false);
-        control.replay();
         chain.add(p);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p, true, true);
     }
 
     @Test
@@ -238,9 +224,9 @@ public class PhaseInterceptorChainTest {
         AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, true, true);
         setUpCustomLogger(true, true, true);
-        control.replay();
         chain.add(p);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p, true, true);
     }
 
     @Test
@@ -248,9 +234,9 @@ public class PhaseInterceptorChainTest {
         AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, true, true);
         setUpCustomLogger(false, true, false);
-        control.replay();
         chain.add(p);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p, true, true);
     }
 
     @Test
@@ -259,10 +245,10 @@ public class PhaseInterceptorChainTest {
         setUpPhaseInterceptorInvocations(p1, false, false);
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase1", "p2");
         setUpPhaseInterceptorInvocations(p2, false, false);
-        control.replay();
         chain.add(p2);
         chain.add(p1);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p2, false, false);
     }
 
     @Test
@@ -272,11 +258,12 @@ public class PhaseInterceptorChainTest {
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase1", "p2");
         setUpPhaseInterceptorInvocations(p2, true, true);
         AbstractPhaseInterceptor<Message> p3 = setUpPhaseInterceptor("phase1", "p3");
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.add(p3);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p1, false, true);
+        verifyPhaseInterceptorInvocations(p2, true, true);
     }
 
     @Test
@@ -285,10 +272,10 @@ public class PhaseInterceptorChainTest {
         setUpPhaseInterceptorInvocations(p1, false, true);
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase1", "p2");
         setUpPhaseInterceptorInvocations(p2, true, true);
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p2, true, true);
     }
 
     @Test
@@ -297,10 +284,10 @@ public class PhaseInterceptorChainTest {
         setUpPhaseInterceptorInvocations(p1, false, false);
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase2", "p2");
         setUpPhaseInterceptorInvocations(p2, false, false);
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p1, false, false);
     }
 
     @Test
@@ -309,10 +296,11 @@ public class PhaseInterceptorChainTest {
         setUpPhaseInterceptorInvocations(p1, false, true);
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase2", "p2");
         setUpPhaseInterceptorInvocations(p2, true, true);
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.doIntercept(message);
+        verifyPhaseInterceptorInvocations(p1, false, true);
+        verifyPhaseInterceptorInvocations(p2, true, true);
     }
 
     @Test
@@ -324,12 +312,13 @@ public class PhaseInterceptorChainTest {
         setUpPhaseInterceptorInvocations(p3, false, false);
         InsertingPhaseInterceptor p1 = new InsertingPhaseInterceptor(chain, p2,
                 "phase1", "p1");
-        control.replay();
         chain.add(p3);
         chain.add(p1);
         chain.doIntercept(message);
         assertEquals(1, p1.invoked);
         assertEquals(0, p1.faultInvoked);
+        verifyPhaseInterceptorInvocations(p2, false, false);
+        verifyPhaseInterceptorInvocations(p3, false, false);
     }
 
     @Test
@@ -344,12 +333,12 @@ public class PhaseInterceptorChainTest {
         InsertingPhaseInterceptor p1 = new InsertingPhaseInterceptor(chain, p3,
                 "phase1", "p1");
         p1.addBefore("p2");
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.doIntercept(message);
         assertEquals(1, p1.invoked);
         assertEquals(0, p1.faultInvoked);
+        verifyPhaseInterceptorInvocations(p2, false, false);
     }
 
     @Test
@@ -361,10 +350,8 @@ public class PhaseInterceptorChainTest {
         CountingPhaseInterceptor p3 = new CountingPhaseInterceptor("phase3",
                 "p3");
 
-        message.getInterceptorChain();
-        EasyMock.expectLastCall().andReturn(chain).anyTimes();
+        when(message.getInterceptorChain()).thenReturn(chain);
 
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.add(p3);
@@ -372,6 +359,8 @@ public class PhaseInterceptorChainTest {
         assertEquals(1, p1.invoked);
         assertEquals(1, p2.invoked);
         assertEquals(1, p3.invoked);
+
+        verify(message).getInterceptorChain();
     }
 
     @Test
@@ -383,10 +372,8 @@ public class PhaseInterceptorChainTest {
         CountingPhaseInterceptor p3 = new CountingPhaseInterceptor("phase3",
                 "p3");
 
-        message.getInterceptorChain();
-        EasyMock.expectLastCall().andReturn(chain).anyTimes();
+        when(message.getInterceptorChain()).thenReturn(chain);
 
-        control.replay();
         chain.add(p1);
         chain.add(p2);
         chain.add(p3);
@@ -394,6 +381,8 @@ public class PhaseInterceptorChainTest {
         assertEquals(0, p1.invoked);
         assertEquals(0, p2.invoked);
         assertEquals(1, p3.invoked);
+
+        verify(message, never()).getInterceptorChain();
     }
 
     AbstractPhaseInterceptor<Message> setUpPhaseInterceptor(String phase, String id) throws Exception {
@@ -405,8 +394,8 @@ public class PhaseInterceptorChainTest {
                                                    Set<String> b,
                                                    Set<String> a) throws Exception {
 
-        AbstractPhaseInterceptor<Message> p = control
-            .createMock(AbstractPhaseInterceptor.class);
+        @SuppressWarnings("unchecked")
+        AbstractPhaseInterceptor<Message> p = mock(AbstractPhaseInterceptor.class);
 
         if (a == null) {
             a = new SortedArraySet<>();
@@ -435,18 +424,20 @@ public class PhaseInterceptorChainTest {
 
     void setUpPhaseInterceptorInvocations(AbstractPhaseInterceptor<Message> p,
             boolean fail, boolean expectFault) {
-        p.handleMessage(message);
         if (fail) {
-            EasyMock.expectLastCall().andThrow(new RuntimeException());
-            message.setContent(EasyMock.eq(Exception.class),
-                               EasyMock.isA(Exception.class));
-            EasyMock.expectLastCall();
+            doThrow(new RuntimeException()).when(p).handleMessage(message);
+        }
+    }
+
+    void verifyPhaseInterceptorInvocations(AbstractPhaseInterceptor<Message> p,
+            boolean fail, boolean expectFault) {
+        if (fail) {
+            verify(message).setContent(eq(Exception.class), isA(Exception.class));
         } else {
-            EasyMock.expectLastCall();
+            verify(p).handleMessage(message);
         }
         if (expectFault) {
-            p.handleFault(message);
-            EasyMock.expectLastCall();
+            verify(p).handleFault(message);
         }
     }
 
@@ -454,21 +445,20 @@ public class PhaseInterceptorChainTest {
                                    boolean expectFault,
                                    boolean returnFromCustomLogger) {
         if (useCustomLogger) {
-            FaultListener customLogger = control.createMock(FaultListener.class);
-            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(customLogger);
+            FaultListener customLogger = mock(FaultListener.class);
+            when(message.getContextualProperty(FaultListener.class.getName())).thenReturn(customLogger);
             if (expectFault) {
-                customLogger.faultOccurred(EasyMock.isA(Exception.class),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.isA(Message.class));
-                EasyMock.expectLastCall().andReturn(returnFromCustomLogger);
+                when(customLogger.faultOccurred(isA(Exception.class),
+                                 isA(String.class),
+                                 isA(Message.class))).thenReturn(returnFromCustomLogger);
                 if (returnFromCustomLogger) {
                     //default logging should also be invoked
                     //not too beautiful way to verify that defaultLogging was invoked.
-                    EasyMock.expect(message.get(FaultMode.class)).andReturn(FaultMode.RUNTIME_FAULT);
+                    when(message.get(FaultMode.class)).thenReturn(FaultMode.RUNTIME_FAULT);
                 }
             }
         } else {
-            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(null);
+            when(message.getContextualProperty(FaultListener.class.getName())).thenReturn(null);
         }
     }
 

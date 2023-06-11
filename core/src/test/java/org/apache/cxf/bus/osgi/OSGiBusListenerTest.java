@@ -34,13 +34,16 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -52,36 +55,32 @@ public class OSGiBusListenerTest {
     private static final String RESTRICTED = "me\\.my\\.app\\..*";
     private static final String BUNDLE_NAME = "me.my.app";
 
-    private IMocksControl control;
     private Bus bus;
     private BundleContext bundleContext;
     private Bundle bundle;
-
+    private BusLifeCycleManager blcManager;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        BusLifeCycleManager blcManager = control.createMock(BusLifeCycleManager.class);
-        EasyMock.expect(bus.getExtension(BusLifeCycleManager.class)).andReturn(blcManager).anyTimes();
+        bus = mock(Bus.class);
+        blcManager = mock(BusLifeCycleManager.class);
+        when(bus.getExtension(BusLifeCycleManager.class)).thenReturn(blcManager);
 
-        blcManager.registerLifeCycleListener(EasyMock.isA(OSGIBusListener.class));
-        EasyMock.expectLastCall();
-        bundleContext = control.createMock(BundleContext.class);
+        doNothing().when(blcManager).registerLifeCycleListener(isA(OSGIBusListener.class));
+        bundleContext = mock(BundleContext.class);
 
-        BundleContext app = control.createMock(BundleContext.class);
-        EasyMock.expect(bus.getExtension(BundleContext.class)).andReturn(app).anyTimes();
-        bundle = control.createMock(Bundle.class);
-        EasyMock.expect(app.getBundle()).andReturn(bundle).anyTimes();
-        EasyMock.expect(bundle.getSymbolicName()).andReturn(BUNDLE_NAME).anyTimes();
+        BundleContext app = mock(BundleContext.class);
+        when(bus.getExtension(BundleContext.class)).thenReturn(app);
+        bundle = mock(Bundle.class);
+        when(app.getBundle()).thenReturn(bundle);
+        when(bundle.getSymbolicName()).thenReturn(BUNDLE_NAME);
     }
 
     @Test
     public void testRegistratioWithNoServices() throws Exception {
-        control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
 
-        control.verify();
+        verify(blcManager, atLeastOnce()).registerLifeCycleListener(isA(OSGIBusListener.class));
     }
 
     @Test
@@ -91,12 +90,11 @@ public class OSGiBusListenerTest {
         Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
 
-        control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
 
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null), lst.size());
 
-        control.verify();
+        verify(blcManager, atLeastOnce()).registerLifeCycleListener(isA(OSGIBusListener.class));
     }
 
     @Test
@@ -105,13 +103,12 @@ public class OSGiBusListenerTest {
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
         Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
-        EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
-        control.replay();
+        when(bus.getProperty("bus.extension.bundles.excludes")).thenReturn(EXCLUDES);
         new OSGIBusListener(bus, new Object[]{bundleContext});
 
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES), lst.size());
 
-        control.verify();
+        verify(blcManager, atLeastOnce()).registerLifeCycleListener(isA(OSGIBusListener.class));
     }
 
     @Test
@@ -120,43 +117,40 @@ public class OSGiBusListenerTest {
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
         Collection<Feature> lst = new ArrayList<>();
         setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, lst);
-        EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
-        control.replay();
+        when(bus.getProperty("bus.extension.bundles.excludes")).thenReturn(EXCLUDES);
         new OSGIBusListener(bus, new Object[]{bundleContext});
 
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES), lst.size());
 
-        control.verify();
+        verify(blcManager, atLeastOnce()).registerLifeCycleListener(isA(OSGIBusListener.class));
     }
 
     private void setUpClientLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
         ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
-        EasyMock.expect(bundleContext.getServiceReferences(ClientLifeCycleListener.class.getName(), null))
-            .andReturn(svcrefs);
-        ClientLifeCycleManager lcmanager = control.createMock(ClientLifeCycleManager.class);
-        EasyMock.expect(bus.getExtension(ClientLifeCycleManager.class)).andReturn(lcmanager).anyTimes();
+        when(bundleContext.getServiceReferences(ClientLifeCycleListener.class.getName(), null))
+            .thenReturn(svcrefs);
+        ClientLifeCycleManager lcmanager = mock(ClientLifeCycleManager.class);
+        when(bus.getExtension(ClientLifeCycleManager.class)).thenReturn(lcmanager);
         for (int i = 0; i < names.length; i++) {
-            ClientLifeCycleListener cl = control.createMock(ClientLifeCycleListener.class);
-            EasyMock.expect(bundleContext.getService(svcrefs[i])).andReturn(cl).anyTimes();
+            ClientLifeCycleListener cl = mock(ClientLifeCycleListener.class);
+            when(bundleContext.getService(svcrefs[i])).thenReturn(cl);
             if (!isExcluded(BUNDLE_NAME, names[i], restricted[i], excludes)) {
-                lcmanager.registerListener(cl);
-                EasyMock.expectLastCall();
+                doNothing().when(lcmanager).registerListener(cl);
             }
         }
     }
 
     private void setUpServerLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
         ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
-        EasyMock.expect(bundleContext.getServiceReferences(ServerLifeCycleListener.class.getName(), null))
-            .andReturn(svcrefs);
-        ServerLifeCycleManager lcmanager = control.createMock(ServerLifeCycleManager.class);
-        EasyMock.expect(bus.getExtension(ServerLifeCycleManager.class)).andReturn(lcmanager).anyTimes();
+        when(bundleContext.getServiceReferences(ServerLifeCycleListener.class.getName(), null))
+            .thenReturn(svcrefs);
+        ServerLifeCycleManager lcmanager = mock(ServerLifeCycleManager.class);
+        when(bus.getExtension(ServerLifeCycleManager.class)).thenReturn(lcmanager);
         for (int i = 0; i < names.length; i++) {
-            ServerLifeCycleListener cl = control.createMock(ServerLifeCycleListener.class);
-            EasyMock.expect(bundleContext.getService(svcrefs[i])).andReturn(cl).anyTimes();
+            ServerLifeCycleListener cl = mock(ServerLifeCycleListener.class);
+            when(bundleContext.getService(svcrefs[i])).thenReturn(cl);
             if (!isExcluded(BUNDLE_NAME, names[i], restricted[i], excludes)) {
-                lcmanager.registerListener(cl);
-                EasyMock.expectLastCall();
+                doNothing().when(lcmanager).registerListener(cl);
             }
         }
     }
@@ -164,13 +158,13 @@ public class OSGiBusListenerTest {
     private void setFeatures(String[] names, String[] restricted,
                              Collection<Feature> lst) throws Exception {
         ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
-        EasyMock.expect(bundleContext.getServiceReferences(Feature.class.getName(), null))
-            .andReturn(svcrefs);
+        when(bundleContext.getServiceReferences(Feature.class.getName(), null))
+            .thenReturn(svcrefs);
         for (int i = 0; i < names.length; i++) {
-            Feature f = control.createMock(Feature.class);
-            EasyMock.expect(bundleContext.getService(svcrefs[i])).andReturn(f).anyTimes();
+            Feature f = mock(Feature.class);
+            when(bundleContext.getService(svcrefs[i])).thenReturn(f);
         }
-        EasyMock.expect(bus.getFeatures()).andReturn(lst).anyTimes();
+        when(bus.getFeatures()).thenReturn(lst);
 
     }
 
@@ -186,12 +180,13 @@ public class OSGiBusListenerTest {
 
 
     // Creates a test service reference with the specified symbolic name and the restricted extension property.
+    @SuppressWarnings("unchecked")
     private ServiceReference<Object> createTestServiceReference(String name, String rst) {
-        ServiceReference<Object> ref = control.createMock(ServiceReference.class);
-        Bundle b = control.createMock(Bundle.class);
-        EasyMock.expect(b.getSymbolicName()).andReturn(name).anyTimes();
-        EasyMock.expect(ref.getBundle()).andReturn(b).anyTimes();
-        EasyMock.expect(ref.getProperty("org.apache.cxf.bus.restricted.extension")).andReturn(rst).anyTimes();
+        ServiceReference<Object> ref = mock(ServiceReference.class);
+        Bundle b = mock(Bundle.class);
+        when(b.getSymbolicName()).thenReturn(name);
+        when(ref.getBundle()).thenReturn(b);
+        when(ref.getProperty("org.apache.cxf.bus.restricted.extension")).thenReturn(rst);
         return ref;
     }
 

@@ -38,15 +38,16 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 public class OutgoingChainInterceptorTest {
 
-    private IMocksControl control;
     private Bus bus;
     private Service service;
     private Endpoint endpoint;
@@ -61,44 +62,34 @@ public class OutgoingChainInterceptorTest {
     @Before
     public void setUp() throws Exception {
 
-        control = EasyMock.createNiceControl();
-
         phases = new ArrayList<>();
         phases.add(new Phase(Phase.SEND, 1000));
         empty = new ArrayList<>();
 
-        bus = control.createMock(Bus.class);
+        bus = mock(Bus.class);
         PhaseManager pm = new PhaseManagerImpl();
-        EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(pm).anyTimes();
+        when(bus.getExtension(PhaseManager.class)).thenReturn(pm);
 
-        service = control.createMock(Service.class);
-        endpoint = control.createMock(Endpoint.class);
-        binding = control.createMock(Binding.class);
-        EasyMock.expect(endpoint.getBinding()).andStubReturn(binding);
+        service = mock(Service.class);
+        endpoint = mock(Endpoint.class);
+        binding = mock(Binding.class);
+        when(endpoint.getBinding()).thenReturn(binding);
         MessageImpl m = new MessageImpl();
-        EasyMock.expect(binding.createMessage()).andStubReturn(m);
+        when(binding.createMessage()).thenReturn(m);
 
-        EasyMock.expect(endpoint.getService()).andReturn(service).anyTimes();
-        EasyMock.expect(endpoint.getOutInterceptors()).andReturn(empty);
-        EasyMock.expect(service.getOutInterceptors()).andReturn(empty);
-        EasyMock.expect(bus.getOutInterceptors()).andReturn(empty);
+        when(endpoint.getService()).thenReturn(service);
+        when(endpoint.getOutInterceptors()).thenReturn(empty);
+        when(service.getOutInterceptors()).thenReturn(empty);
+        when(bus.getOutInterceptors()).thenReturn(empty);
 
-        bopInfo = control.createMock(BindingOperationInfo.class);
-        opInfo = control.createMock(OperationInfo.class);
-        mInfo = control.createMock(MessageInfo.class);
-        bmInfo = control.createMock(BindingMessageInfo.class);
-        EasyMock.expect(bopInfo.getOperationInfo()).andReturn(opInfo).times(3);
-        EasyMock.expect(opInfo.getOutput()).andReturn(mInfo);
-        EasyMock.expect(opInfo.isOneWay()).andReturn(false);
-        EasyMock.expect(bopInfo.getOutput()).andReturn(bmInfo);
-
-        control.replay();
-
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
+        bopInfo = mock(BindingOperationInfo.class);
+        opInfo = mock(OperationInfo.class);
+        mInfo = mock(MessageInfo.class);
+        bmInfo = mock(BindingMessageInfo.class);
+        when(bopInfo.getOperationInfo()).thenReturn(opInfo);
+        when(opInfo.getOutput()).thenReturn(mInfo);
+        when(opInfo.isOneWay()).thenReturn(false);
+        when(bopInfo.getOutput()).thenReturn(bmInfo);
     }
 
     @Test
@@ -114,6 +105,8 @@ public class OutgoingChainInterceptorTest {
         exchange.put(BindingOperationInfo.class, bopInfo);
         exchange.setOutMessage(m);
         intc.handleMessage(m);
+
+        verify(bopInfo, times(3)).getOperationInfo();
     }
 
 }

@@ -35,7 +35,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +42,7 @@ import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.FO
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 
 /**
  * Test for the parsing of Accept-Encoding by the GZIPOutInterceptor. For
@@ -70,13 +70,12 @@ public class GZIPAcceptEncodingTest {
         exchange.setOutMessage(outMessage);
         outMessage.setExchange(exchange);
         outMessage.setContent(OutputStream.class, new ByteArrayOutputStream());
-        outInterceptors = EasyMock.createMock(InterceptorChain.class);
+        outInterceptors = mock(InterceptorChain.class);
         outMessage.setInterceptorChain(outInterceptors);
     }
 
     @Test
     public void testNoAcceptEncoding() throws Exception {
-        EasyMock.replay(outInterceptors);
         interceptor.handleMessage(outMessage);
     }
 
@@ -112,7 +111,6 @@ public class GZIPAcceptEncodingTest {
 
     @Test(expected = Fault.class)
     public void testNoValidEncodings() throws Exception {
-        EasyMock.replay();
         setAcceptEncoding("*;q=0, deflate;q=0.5");
         interceptor.handleMessage(outMessage);
     }
@@ -121,7 +119,6 @@ public class GZIPAcceptEncodingTest {
                             GZIPOutInterceptor.UseGzip expectedUseGzip, String expectedGzipEncoding)
         throws Exception {
 
-        EasyMock.replay(outInterceptors);
         setAcceptEncoding(encoding);
         interceptor.handleMessage(outMessage);
         assertSame("Wrong value of " + GZIPOutInterceptor.USE_GZIP_KEY, expectedUseGzip, outMessage
