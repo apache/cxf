@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.model.doc;
 
+import java.lang.reflect.Field;
+
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.petstore.PetStore;
@@ -32,23 +34,37 @@ public class JavaDocProviderTest {
 
     @Test
     public void testJava6Docs() throws Exception {
-        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc16.jar", "1.6");
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc1.6.jar", JavaDocProvider.JAVA_VERSION_1_6);
     }
 
     @Test
     public void testJava7Docs() throws Exception {
-        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar", "1.7");
-    }
-    @Test
-    public void testJava8Docs() throws Exception {
-        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc18.jar", "1.8");
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc1.7.jar", JavaDocProvider.JAVA_VERSION_1_7);
     }
 
-    private void doTestJavaDocs(String path, String version) throws Exception {
+    @Test
+    public void testJava8Docs() throws Exception {
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc1.8.jar", JavaDocProvider.JAVA_VERSION_1_8);
+    }
+
+    @Test
+    public void testJava11Docs() throws Exception {
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc11.jar", JavaDocProvider.JAVA_VERSION_11);
+    }
+
+    @Test
+    public void testJava17Docs() throws Exception {
+        doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar", JavaDocProvider.JAVA_VERSION_17);
+    }
+
+    private void doTestJavaDocs(String path, double version) throws Exception {
         JavaDocProvider p = new JavaDocProvider(path);
-        p.setJavaDocsBuiltByVersion(version);
-        ClassResourceInfo cri =
-            ResourceUtils.createClassResourceInfo(PetStore.class, PetStore.class, true, true);
+
+        Field javaDocsBuiltByVersion = JavaDocProvider.class.getDeclaredField("javaDocsBuiltByVersion");
+        javaDocsBuiltByVersion.setAccessible(true);
+        javaDocsBuiltByVersion.set(p, version);
+
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(PetStore.class, PetStore.class, true, true);
         String classDoc = p.getClassDoc(cri);
         assertEquals("The Pet Store", classDoc);
 
@@ -89,6 +105,7 @@ public class JavaDocProviderTest {
         assertEquals("status", p.getMethodResponseDoc(ori));
         assertEquals("the pet id", p.getMethodParameterDoc(ori, 0));
     }
+
     private void testGetStatus2JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
         assertEquals("Return Pet Status with 2 params", p.getMethodDoc(ori));
         assertEquals(2, ori.getParameters().size());
@@ -96,6 +113,7 @@ public class JavaDocProviderTest {
         assertEquals("the pet id", p.getMethodParameterDoc(ori, 0));
         assertEquals("the query", p.getMethodParameterDoc(ori, 1));
     }
+
     private void testGetStatus3JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
         assertEquals("Return Pet Status With 3 Params", p.getMethodDoc(ori));
         assertEquals(3, ori.getParameters().size());
@@ -104,5 +122,4 @@ public class JavaDocProviderTest {
         assertEquals("the query", p.getMethodParameterDoc(ori, 1));
         assertEquals("the query2", p.getMethodParameterDoc(ori, 2));
     }
-
 }
