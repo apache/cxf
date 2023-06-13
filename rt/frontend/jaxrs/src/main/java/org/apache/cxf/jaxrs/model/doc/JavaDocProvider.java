@@ -86,7 +86,7 @@ public class JavaDocProvider implements DocumentationProvider {
     private static double getVersion() {
         String version = System.getProperty("java.version");
         try {
-            return Double.parseDouble(version.substring(0, 3));
+            return Double.parseDouble(version.substring(0, Math.min(version.length(), 3)));
         } catch (NumberFormatException ex) {
             return JAVA_VERSION_1_6;
         }
