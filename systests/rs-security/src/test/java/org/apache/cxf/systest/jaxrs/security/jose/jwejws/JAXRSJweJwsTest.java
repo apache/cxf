@@ -451,6 +451,65 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         return bean.create(BookStore.class);
     }
 
+
+    @Test
+    public void testJweJwsUseReqSigCert(){
+        String address = "https://localhost:" + PORT + "/jwejwsreqsigcert";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<>();
+
+        // writer
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+//        jwsWriter.setUseJwsOutputStream(true);
+        // reader
+        JweClientResponseFilter jweReader = new JweClientResponseFilter();
+        JwsClientResponseFilter jwsReader = new JwsClientResponseFilter();
+
+        providers.add(jweWriter);
+        providers.add(jwsWriter);
+
+        providers.add(jweReader);
+        providers.add(jwsReader);
+        bean.setProviders(providers);
+
+        //CLIENT == ALICE
+        bean.getProperties(true).put(
+                "rs.security.encryption.out.properties",
+                "org/apache/cxf/systest/jaxrs/security/bob.rs.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.signature.out.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.rs.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.encryption.in.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.rs.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.signature.in.properties",
+                "org/apache/cxf/systest/jaxrs/security/bob.rs.properties"
+        );
+
+        bean.getProperties(true).put("jose.debug", true);
+        bean.getProperties(true).put("rs.security.signature.include.cert", "true");
+//        bean.getProperties(true).put("rs.security.accept.public.key", "true");
+
+
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+
+
+    }
+
     @Test
     public void testJweAesGcmDirect() throws Exception {
         String address = "https://localhost:" + PORT + "/jweaesgcmdirect";

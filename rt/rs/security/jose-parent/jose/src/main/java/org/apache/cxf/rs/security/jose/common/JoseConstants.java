@@ -202,6 +202,11 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String ENABLE_UNSIGNED_JWT_PRINCIPAL = "rs.security.enable.unsigned-jwt.principal";
 
     /**
+     * Whether to use request signing certificate to create encryption provider
+     */
+    public static final String USE_REQ_SIG_CERT = "useReqSigCert";
+
+    /**
      * Whether to trace JOSE headers.
      */
     public static final String JOSE_DEBUG = "jose.debug";

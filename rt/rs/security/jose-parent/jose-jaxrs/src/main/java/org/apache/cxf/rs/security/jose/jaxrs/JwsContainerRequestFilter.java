@@ -31,10 +31,13 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.PublicKeyJwsSignatureVerifier;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.security.SecurityContext;
 
 @PreMatching
@@ -55,6 +58,9 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         if (!p.verifySignatureWith(theSigVerifier)) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
+        }
+        if(p.getJwsHeaders().containsHeader(JoseConstants.HEADER_X509_CHAIN)) {
+            JAXRSUtils.getCurrentMessage().getExchange().put("reqsigcert", CryptoUtils.decodeCertificate(p.getJwsHeaders().getX509Chain().get(0)));
         }
         JoseUtils.validateRequestContextProperty(p.getJwsHeaders());
         
