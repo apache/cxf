@@ -83,7 +83,7 @@ public class JavaDocProvider implements DocumentationProvider {
         }
     }
 
-    protected static double getVersion() {
+    private static double getVersion() {
         String version = System.getProperty("java.version");
         try {
             return Double.parseDouble(version.substring(0, 3));
