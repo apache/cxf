@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PushbackInputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -34,7 +33,6 @@ import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
@@ -73,7 +71,6 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.JavaUtils;
@@ -137,7 +134,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         }
         try {        
             ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
-            Thread threads[] = new Thread[rootGroup.activeCount()];
+            Thread[] threads = new Thread[rootGroup.activeCount()];
             int cnt = rootGroup.enumerate(threads);
             for (int x = 0; x < cnt; x++) {
                 if (threads[x].getName().contains(n)) {
