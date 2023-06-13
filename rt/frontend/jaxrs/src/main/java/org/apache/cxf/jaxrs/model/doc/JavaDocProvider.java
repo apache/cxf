@@ -49,11 +49,11 @@ public class JavaDocProvider implements DocumentationProvider {
 
     protected static final double JAVA_VERSION_17 = 17.0D;
 
-    protected ClassLoader javaDocLoader;
+    private ClassLoader javaDocLoader;
 
-    protected final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
 
-    protected double javaDocsBuiltByVersion = JAVA_VERSION;
+    private double javaDocsBuiltByVersion = JAVA_VERSION;
 
     public JavaDocProvider() {
     }
@@ -151,7 +151,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
 
-    protected Class<?> getPathAnnotatedClass(Class<?> cls) {
+    private Class<?> getPathAnnotatedClass(Class<?> cls) {
         if (cls.getAnnotation(Path.class) != null) {
             return cls;
         }
@@ -166,7 +166,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return cls;
     }
 
-    protected ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
+    private ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
         Class<?> annotatedClass = getPathAnnotatedClass(cls);
         String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
@@ -191,7 +191,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return classDocs;
     }
 
-    protected MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
+    private MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
         Method method = ori.getAnnotatedMethod() == null
                 ? ori.getMethodToInvoke()
                 : ori.getAnnotatedMethod();
@@ -274,7 +274,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return mDocs;
     }
 
-    protected String getJavaDocText(String doc, String tag, String notAfterTag, int index) {
+    private String getJavaDocText(String doc, String tag, String notAfterTag, int index) {
         int tagIndex = doc.indexOf(tag, index);
         if (tagIndex != -1) {
             int notAfterIndex = doc.indexOf(notAfterTag, index);
@@ -335,13 +335,13 @@ public class JavaDocProvider implements DocumentationProvider {
         return javaDocsBuiltByVersion == JAVA_VERSION_1_8 ? "-" : ",";
     }
 
-    protected static class ClassDocs {
+    private static class ClassDocs {
 
-        protected final String classDoc;
+        private final String classDoc;
 
-        protected final String classInfo;
+        private final String classInfo;
 
-        protected final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>();
 
         ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
@@ -365,13 +365,13 @@ public class JavaDocProvider implements DocumentationProvider {
         }
     }
 
-    protected static class MethodDocs {
+    private static class MethodDocs {
 
-        protected final String methodInfo;
+        private final String methodInfo;
 
-        protected final List<String> paramInfo;
+        private final List<String> paramInfo;
 
-        protected final String responseInfo;
+        private final String responseInfo;
 
         MethodDocs(String methodInfo, List<String> paramInfo, String responseInfo) {
             this.methodInfo = methodInfo;
