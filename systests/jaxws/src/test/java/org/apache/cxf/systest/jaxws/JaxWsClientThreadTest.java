@@ -224,7 +224,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
     public void testMultiGreeterThreadSafety() throws Throwable {
 
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
-        final jakarta.xml.ws.Service s = jakarta.xml.ws.Service.create(url, serviceName);
+        final javax.xml.ws.Service s = javax.xml.ws.Service.create(url, serviceName);
 
         final int numThreads = 50;
         final Throwable[] errorHolder = new Throwable[numThreads];
@@ -237,15 +237,15 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         int start = rootGroup.activeCount();
 
         Thread[] threads = new Thread[numThreads];
-        for (int i = 0; i < numThreads; i++) {
-            final int tid = i;
+        for (int t = 0; t < numThreads; t++) {
+            final int tid = t;
             Runnable r = new Runnable() {
                 public void run() {
                     final Greeter greeter = s.getPort(portName, Greeter.class);
-                    try (AutoCloseable c = (AutoCloseable)greeter){
+                    try (AutoCloseable c = (AutoCloseable)greeter) {
                         final InvocationHandler handler = Proxy.getInvocationHandler(greeter);
-                        Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();                        
-                        
+                        Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
+
                         final String protocol = "http-" + Thread.currentThread().getId();
                         for (int i = 0; i < 10; i++) {
                             String threadSpecificaddress = protocol + "://localhost:80/" + i;
@@ -277,7 +277,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                     }
                 }
             };
-            threads[i] = new Thread(r);
+            threads[t] = new Thread(r);
         }
         for (int i = 0; i < numThreads; i++) {
             threads[i].start();
@@ -301,8 +301,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         
         
         System.out.println("Start: " + start + "     End: " + end);
-        // we'll allow a few extra threads to be created for various things like GC, but we definitely shouldn't be anywhere 
-        // near numThreads of extra threads
+        // we'll allow a few extra threads to be created for various things like GC, but we
+        // definitely shouldn't be anywhere near numThreads of extra threads
         assertTrue("Too many extra trheads created  " + end + "/" + start, (end - start) < 5);
 
     }
