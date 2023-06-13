@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.jaxrs.model.doc;
 
 import java.io.InputStream;
@@ -37,14 +36,24 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class JavaDocProvider implements DocumentationProvider {
-    public static final double JAVA_VERSION = getVersion();
-    public static final double JAVA_VERSION_16 = 1.6D;
-    public static final double JAVA_VERSION_17 = 1.7D;
-    public static final double JAVA_VERSION_18 = 1.8D;
 
-    private ClassLoader javaDocLoader;
-    private final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
-    private double javaDocsBuiltByVersion = JAVA_VERSION;
+    protected static final double JAVA_VERSION = getVersion();
+
+    protected static final double JAVA_VERSION_1_6 = 1.6D;
+
+    protected static final double JAVA_VERSION_1_7 = 1.7D;
+
+    protected static final double JAVA_VERSION_1_8 = 1.8D;
+
+    protected static final double JAVA_VERSION_11 = 11.0D;
+
+    protected static final double JAVA_VERSION_17 = 17.0D;
+
+    protected ClassLoader javaDocLoader;
+
+    protected final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
+
+    protected double javaDocsBuiltByVersion = JAVA_VERSION;
 
     public JavaDocProvider() {
     }
@@ -77,8 +86,8 @@ public class JavaDocProvider implements DocumentationProvider {
         String version = System.getProperty("java.version");
         try {
             return Double.parseDouble(version.substring(0, 3));
-        } catch (Exception ex) {
-            return JAVA_VERSION_16;
+        } catch (NumberFormatException ex) {
+            return JAVA_VERSION_1_6;
         }
     }
 
@@ -142,7 +151,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return null;
     }
 
-    private Class<?> getPathAnnotatedClass(Class<?> cls) {
+    protected Class<?> getPathAnnotatedClass(Class<?> cls) {
         if (cls.getAnnotation(Path.class) != null) {
             return cls;
         }
@@ -157,7 +166,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return cls;
     }
 
-    private ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
+    protected ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
         Class<?> annotatedClass = getPathAnnotatedClass(cls);
         String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
@@ -173,7 +182,7 @@ public class JavaDocProvider implements DocumentationProvider {
                 if (index != -1) {
                     String classInfoTag = getClassInfoTag();
                     String classInfo = getJavaDocText(doc, classInfoTag,
-                                                      "Method Summary", index + classMarker.length());
+                            "Method Summary", index + classMarker.length());
                     classDocs = new ClassDocs(doc, classInfo);
                     docs.putIfAbsent(resource, classDocs);
                 }
@@ -182,8 +191,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return classDocs;
     }
 
-
-    private MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
+    protected MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
         Method method = ori.getAnnotatedMethod() == null
                 ? ori.getMethodToInvoke()
                 : ori.getAnnotatedMethod();
@@ -199,8 +207,7 @@ public class JavaDocProvider implements DocumentationProvider {
             int operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker);
             while (operMarkerIndex != -1) {
                 int startOfOpSigIndex = operMarkerIndex + operMarker.length();
-                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(getOperationMarkerClose(),
-                                                                     startOfOpSigIndex);
+                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(getOperationMarkerClose(), startOfOpSigIndex);
                 int paramLen = method.getParameterTypes().length;
                 if (endOfOpSigIndex == startOfOpSigIndex && paramLen == 0) {
                     break;
@@ -214,8 +221,7 @@ public class JavaDocProvider implements DocumentationProvider {
                         }
                     }
                 }
-                operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker,
-                                                                 operMarkerIndex + operMarker.length());
+                operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker, operMarkerIndex + operMarker.length());
             }
 
             if (operMarkerIndex == -1) {
@@ -237,7 +243,7 @@ public class JavaDocProvider implements DocumentationProvider {
                 int paramIndex = operDoc.indexOf("Parameters:");
                 if (paramIndex != -1 && (nextOpIndex == -1 || paramIndex < nextOpIndex)) {
                     String paramString = returnsIndex == -1 ? operDoc.substring(paramIndex)
-                        : operDoc.substring(paramIndex, returnsIndex);
+                            : operDoc.substring(paramIndex, returnsIndex);
 
                     String codeTag = getCodeTag();
 
@@ -268,9 +274,7 @@ public class JavaDocProvider implements DocumentationProvider {
         return mDocs;
     }
 
-
-
-    private String getJavaDocText(String doc, String tag, String notAfterTag, int index) {
+    protected String getJavaDocText(String doc, String tag, String notAfterTag, int index) {
         int tagIndex = doc.indexOf(tag, index);
         if (tagIndex != -1) {
             int notAfterIndex = doc.indexOf(notAfterTag, index);
@@ -285,13 +289,14 @@ public class JavaDocProvider implements DocumentationProvider {
     }
 
     protected String getClassInfoTag() {
-        if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
+        if (javaDocsBuiltByVersion == JAVA_VERSION_1_6) {
             return "<P>";
         }
         return "<div class=\"block\">";
     }
+
     protected String getOperInfoTag() {
-        if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
+        if (javaDocsBuiltByVersion == JAVA_VERSION_1_6) {
             return "<DD>";
         }
         return "<div class=\"block\">";
@@ -299,40 +304,45 @@ public class JavaDocProvider implements DocumentationProvider {
 
     protected String getOperLink() {
         String operLink = "<A NAME=\"";
-        return javaDocsBuiltByVersion == JAVA_VERSION_16
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_6
                 ? operLink
-                : javaDocsBuiltByVersion <= JAVA_VERSION_18
+                : javaDocsBuiltByVersion <= JAVA_VERSION_1_8
                         ? operLink.toLowerCase()
-                        : "<a id=\"";
+                        : javaDocsBuiltByVersion <= JAVA_VERSION_11
+                                ? "<a id=\""
+                                : "<section class=\"detail\" id=\"";
     }
 
     protected String getResponseMarker() {
         String tag = "<DD>";
-        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_6 ? tag : tag.toLowerCase();
     }
 
     protected String getCodeTag() {
         String tag = "</CODE>";
-        return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_6 ? tag : tag.toLowerCase();
     }
 
     protected String getOperationMarkerOpen() {
-        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : "(";
-    }
-    protected String getOperationMarkerClose() {
-        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-\"" : ")";
-    }
-    protected String getOperationParamSeparator() {
-        return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : ",";
-    }
-    public void setJavaDocsBuiltByVersion(String version) {
-        javaDocsBuiltByVersion = Double.valueOf(version);
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_8 ? "-" : "(";
     }
 
-    private static class ClassDocs {
-        private final String classDoc;
-        private final String classInfo;
-        private final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>();
+    protected String getOperationMarkerClose() {
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_8 ? "-\"" : ")";
+    }
+
+    protected String getOperationParamSeparator() {
+        return javaDocsBuiltByVersion == JAVA_VERSION_1_8 ? "-" : ",";
+    }
+
+    protected static class ClassDocs {
+
+        protected final String classDoc;
+
+        protected final String classInfo;
+
+        protected final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>();
+
         ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
             this.classInfo = classInfo;
@@ -355,10 +365,14 @@ public class JavaDocProvider implements DocumentationProvider {
         }
     }
 
-    private static class MethodDocs {
-        private final String methodInfo;
-        private final List<String> paramInfo;
-        private final String responseInfo;
+    protected static class MethodDocs {
+
+        protected final String methodInfo;
+
+        protected final List<String> paramInfo;
+
+        protected final String responseInfo;
+
         MethodDocs(String methodInfo, List<String> paramInfo, String responseInfo) {
             this.methodInfo = methodInfo;
             this.paramInfo = paramInfo;
