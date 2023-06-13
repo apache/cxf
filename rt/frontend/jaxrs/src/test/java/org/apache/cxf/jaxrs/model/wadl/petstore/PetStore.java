@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.jaxrs.model.wadl.petstore;
 
 import jakarta.ws.rs.GET;
@@ -34,24 +33,21 @@ public class PetStore {
 
     public static final String CLOSED = "The Pet Store is closed";
 
-    public PetStore() {
-    }
-
-    @GET
-    @Produces("text/plain")
     /**
      * Return Pet Status with no params
      *
      * @return status
      * @throws Exception
      */
+    @GET
+    @Produces("text/plain")
     public Response getBaseStatus() throws Exception {
-
         return Response.ok(CLOSED).build();
     }
 
     /**
      * Return Pet Status with 2 params
+     *
      * @param petId the pet id
      * @param query the query
      * @return status
@@ -60,14 +56,16 @@ public class PetStore {
     @GET
     @Path("/petstore/pets/{petId}/")
     @Produces("text/xml")
-    public Response getStatus2Params(@PathParam("petId") String petId,
-                              @QueryParam("query") String query) throws Exception {
+    public Response getStatus2Params(
+            @PathParam("petId") String petId,
+            @QueryParam("query") String query) throws Exception {
 
         return Response.ok(CLOSED).build();
     }
 
     /**
      * Return Pet Status With 1 Param
+     *
      * @param petId the pet id
      * @return status
      * @throws Exception
@@ -76,13 +74,12 @@ public class PetStore {
     @Path("/petstore/pets/id/{petId}/")
     @Produces("text/xml")
     public Response getStatus1Param(@PathParam("petId") String petId) throws Exception {
-
         return Response.ok(CLOSED).build();
     }
 
-
     /**
      * Return Pet Status With 3 Params
+     *
      * @param petId the pet id
      * @param query the query
      * @param query2 the query2
@@ -92,11 +89,11 @@ public class PetStore {
     @GET
     @Path("/petstore/pets/{petId}/")
     @Produces("text/xml")
-    public Response getStatus3Params(@PathParam("petId") String petId,
-                              @QueryParam("query") String query,
-                              @QueryParam("query2") String query2) throws Exception {
+    public Response getStatus3Params(
+            @PathParam("petId") String petId,
+            @QueryParam("query") String query,
+            @QueryParam("query2") String query2) throws Exception {
 
         return Response.ok(CLOSED).build();
     }
-
 }
