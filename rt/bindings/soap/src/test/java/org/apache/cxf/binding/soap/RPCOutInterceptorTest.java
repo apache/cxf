@@ -40,14 +40,14 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RPCOutInterceptorTest extends TestBase {
 
@@ -56,8 +56,6 @@ public class RPCOutInterceptorTest extends TestBase {
     private static final String OPNAME = "sendReceiveData";
 
     private ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
-
-    private IMocksControl control = EasyMock.createNiceControl();
 
     @Before
     public void setUp() throws Exception {
@@ -70,19 +68,16 @@ public class RPCOutInterceptorTest extends TestBase {
         boi.getOperationInfo().getOutput().getMessagePartByIndex(0).setIndex(0);
         soapMessage.getExchange().put(BindingOperationInfo.class, boi);
 
-        control.reset();
-        Service service = control.createMock(Service.class);
-        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
+        Service service = mock(Service.class);
+        when(service.isEmpty()).thenReturn(true);
         JAXBDataBinding dataBinding = new JAXBDataBinding(MyComplexStruct.class);
-        service.getDataBinding();
-        EasyMock.expectLastCall().andReturn(dataBinding).anyTimes();
-        service.getServiceInfos();
+        when(service.getDataBinding()).thenReturn(dataBinding);
+
         List<ServiceInfo> list = Arrays.asList(si);
-        EasyMock.expectLastCall().andReturn(list).anyTimes();
+        when(service.getServiceInfos()).thenReturn(list);
 
         soapMessage.getExchange().put(Service.class, service);
         soapMessage.getExchange().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
-        control.replay();
 
         MyComplexStruct mcs = new MyComplexStruct();
         mcs.setElem1("elem1");
