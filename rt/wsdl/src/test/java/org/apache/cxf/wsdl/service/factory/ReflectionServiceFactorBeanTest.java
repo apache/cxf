@@ -27,43 +27,27 @@ import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.wsdl.WSDLManager;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class ReflectionServiceFactorBeanTest {
-    protected IMocksControl control;
-
-    @Before
-    public void setUp() throws Exception {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        control.verify();
-    }
-
     @Test
     public void testEmptyWsdlAndNoServiceClass() throws Exception {
         final String dummyWsdl = "target/dummy.wsdl";
         ReflectionServiceFactoryBean bean = new ReflectionServiceFactoryBean();
-        Bus bus = control.createMock(Bus.class);
+        Bus bus = mock(Bus.class);
 
-        WSDLManager wsdlmanager = control.createMock(WSDLManager.class);
-        EasyMock.expect(bus.getExtension(WSDLManager.class)).andReturn(wsdlmanager);
-        EasyMock.expect(wsdlmanager.getDefinition(dummyWsdl))
-            .andThrow(new WSDLException("PARSER_ERROR", "Problem parsing '" + dummyWsdl + "'."));
-        EasyMock.expect(bus.getExtension(FactoryBeanListenerManager.class)).andReturn(null);
-
-        control.replay();
+        WSDLManager wsdlmanager = mock(WSDLManager.class);
+        when(bus.getExtension(WSDLManager.class)).thenReturn(wsdlmanager);
+        when(wsdlmanager.getDefinition(dummyWsdl))
+            .thenThrow(new WSDLException("PARSER_ERROR", "Problem parsing '" + dummyWsdl + "'."));
+        when(bus.getExtension(FactoryBeanListenerManager.class)).thenReturn(null);
 
         bean.setWsdlURL(dummyWsdl);
         bean.setServiceName(new QName("http://cxf.apache.org/hello_world_soap_http", "GreeterService"));
