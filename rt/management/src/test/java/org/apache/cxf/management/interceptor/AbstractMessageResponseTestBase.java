@@ -34,9 +34,14 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AbstractMessageResponseTestBase {
     protected static final QName SERVICE_NAME = new QName("http://org.apache.cxf", "hello");
@@ -63,10 +68,10 @@ public class AbstractMessageResponseTestBase {
 
     @Before
     public void setUp() throws Exception {
-        message = EasyMock.createMock(Message.class);
-        exchange = EasyMock.createMock(Exchange.class);
-        bus = EasyMock.createMock(Bus.class);
-        cRepository = EasyMock.createMock(CounterRepository.class);
+        message = mock(Message.class);
+        exchange = mock(Exchange.class);
+        bus = mock(Bus.class);
+        cRepository = mock(CounterRepository.class);
         clientServiceCounterOName = new ObjectName(CLIENT_SERVICE_ONAME);
         serverServiceCounterOName = new ObjectName(SERVER_SERVICE_ONAME);
         clientOperationCounterOName = new ObjectName(CLIENT_SERVICE_ONAME
@@ -86,59 +91,49 @@ public class AbstractMessageResponseTestBase {
             operationCounterOName = serverOperationCounterOName;
         }
         BusFactory.setDefaultBus(bus);
-        bus.getExtension(CounterRepository.class);
-        EasyMock.expectLastCall().andReturn(cRepository).anyTimes();
+        when(bus.getExtension(CounterRepository.class)).thenReturn(cRepository);
         if (increase) {
-            EasyMock.expect(bus.getId()).andReturn(Bus.DEFAULT_BUS_ID).anyTimes();
-            cRepository.increaseCounter(EasyMock.eq(serviceCounterOName),
-                EasyMock.isA(MessageHandlingTimeRecorder.class));
-            EasyMock.expectLastCall();
-            cRepository.increaseCounter(EasyMock.eq(operationCounterOName),
-                EasyMock.isA(MessageHandlingTimeRecorder.class));
-            EasyMock.expectLastCall();
-            EasyMock.expect(cRepository.getCounter(EasyMock.isA(ObjectName.class))).andReturn(null);
-            EasyMock.replay(cRepository);
+            when(bus.getId()).thenReturn(Bus.DEFAULT_BUS_ID);
+            doNothing().when(cRepository).increaseCounter(eq(serviceCounterOName),
+                isA(MessageHandlingTimeRecorder.class));
+
+            doNothing().when(cRepository).increaseCounter(eq(operationCounterOName),
+                isA(MessageHandlingTimeRecorder.class));
+
+            when(cRepository.getCounter(any(ObjectName.class))).thenReturn(null);
         }
 
-        EasyMock.replay(bus);
         // increase the number
     }
 
     protected void setupExchangeForMessage() {
-        EasyMock.expect(exchange.getBus()).andReturn(bus).anyTimes();
+        when(exchange.getBus()).thenReturn(bus);
 
-        Service service = EasyMock.createMock(Service.class);
-        EasyMock.expect(service.getName()).andReturn(SERVICE_NAME).anyTimes();
-        EasyMock.expect(exchange.getService()).andReturn(service).anyTimes();
-        EasyMock.replay(service);
+        Service service = mock(Service.class);
+        when(service.getName()).thenReturn(SERVICE_NAME);
+        when(exchange.getService()).thenReturn(service);
 
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        EndpointInfo endpointInfo = EasyMock.createMock(EndpointInfo.class);
-        EasyMock.expect(endpointInfo.getName()).andReturn(PORT_NAME).anyTimes();
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
-        EasyMock.expect(endpoint.get("javax.management.ObjectName")).andReturn(null).anyTimes();
-        EasyMock.expect(endpoint.put(EasyMock.eq("javax.management.ObjectName"), EasyMock.anyObject(ObjectName.class)))
-            .andReturn(null).anyTimes();
-        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint).anyTimes();
-        EasyMock.replay(endpointInfo);
-        EasyMock.replay(endpoint);
-
+        Endpoint endpoint = mock(Endpoint.class);
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        when(endpointInfo.getName()).thenReturn(PORT_NAME);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
+        when(endpoint.get("javax.management.ObjectName")).thenReturn(null);
+        when(endpoint.put(eq("javax.management.ObjectName"), any(ObjectName.class))).thenReturn(null);
+        when(exchange.getEndpoint()).thenReturn(endpoint);
 
         //EasyMock.expect(exchange.getBus()).andReturn(bus);
-        EasyMock.expect(exchange.get("org.apache.cxf.management.service.counter.name")).andReturn(null).anyTimes();
+        when(exchange.get("org.apache.cxf.management.service.counter.name")).thenReturn(null);
     }
 
     protected void setupOperationForMessage() {
-        OperationInfo op = EasyMock.createMock(OperationInfo.class);
-        BindingOperationInfo bop = EasyMock.createMock(BindingOperationInfo.class);
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(bop);
-        EasyMock.expect(bop.getOperationInfo()).andReturn(op);
-        EasyMock.expect(op.getName()).andReturn(OPERATION_NAME);
-        EasyMock.expect(op.getProperty("javax.management.ObjectName", ObjectName.class)).andReturn(null).anyTimes();
-        op.setProperty(EasyMock.eq("javax.management.ObjectName"),
-                                       EasyMock.anyObject(ObjectName.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(bop, op);
+        OperationInfo op = mock(OperationInfo.class);
+        BindingOperationInfo bop = mock(BindingOperationInfo.class);
+        when(exchange.getBindingOperationInfo()).thenReturn(bop);
+        when(bop.getOperationInfo()).thenReturn(op);
+        when(op.getName()).thenReturn(OPERATION_NAME);
+        when(op.getProperty("javax.management.ObjectName", ObjectName.class)).thenReturn(null);
+        doNothing().when(op).setProperty(eq("javax.management.ObjectName"),
+                                       any(ObjectName.class));
     }
 
 }

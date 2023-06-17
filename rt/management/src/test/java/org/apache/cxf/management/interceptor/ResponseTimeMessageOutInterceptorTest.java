@@ -24,8 +24,14 @@ import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
+
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageResponseTestBase {
     private ResponseTimeMessageOutInterceptor rtmoi = new ResponseTimeMessageOutInterceptor();
@@ -36,28 +42,22 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         setupCounterRepository(true, false);
         setupExchangeForMessage();
         setupOperationForMessage();
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
-        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
-        EasyMock.expect(exchange.get(Exception.class)).andReturn(null);
-        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        mhtr.endHandling();
-        EasyMock.expectLastCall();
-        mhtr.setFaultMode(null);
-        EasyMock.expectLastCall();
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr).anyTimes();
-        EasyMock.replay(mhtr);
-        EasyMock.replay(exchange);
-        EasyMock.replay(message);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.FALSE);
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.FALSE);
+        when(exchange.getOutMessage()).thenReturn(message);
+        when(exchange.get("org.apache.cxf.management.counter.enabled")).thenReturn(null);
+        when(exchange.get(Exception.class)).thenReturn(null);
+        when(exchange.get(FaultMode.class)).thenReturn(null);
+        MessageHandlingTimeRecorder mhtr = mock(MessageHandlingTimeRecorder.class);
+        doNothing().when(mhtr).endHandling();
+        doNothing().when(mhtr).setFaultMode(null);
+
+        when(exchange.get(MessageHandlingTimeRecorder.class)).thenReturn(mhtr);
 
         rtmoi.handleMessage(message);
-        EasyMock.verify(message);
-        EasyMock.verify(bus);
-        EasyMock.verify(exchange);
-        EasyMock.verify(mhtr);
+        verify(mhtr, atLeastOnce()).endHandling();
+        verify(mhtr, atLeastOnce()).setFaultMode(null);
     }
 
     @Test
@@ -84,24 +84,13 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         // need to increase the counter and is not a client
         setupCounterRepository(true, false);
         setupExchangeForMessage();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.get(FaultMode.class)).andReturn(faultMode).anyTimes();
-        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
-        EasyMock.expectLastCall();
-        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(faultMode).anyTimes();
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-
-        EasyMock.replay(mhtr);
-        //EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);
-        EasyMock.replay(exchange);
-        EasyMock.replay(message);
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.FALSE);
+        when(message.get(FaultMode.class)).thenReturn(faultMode);
+        when(exchange.get("org.apache.cxf.management.counter.enabled")).thenReturn(null);
+        when(exchange.get(FaultMode.class)).thenReturn(faultMode);
 
         rtmoi.handleFault(message);
-        EasyMock.verify(message);
-        EasyMock.verify(bus);
-        EasyMock.verify(exchange);
-        EasyMock.verify(mhtr);
     }
 
     @Test
@@ -110,43 +99,34 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         setupCounterRepository(true, true);
         setupExchangeForMessage();
         setupOperationForMessage();
-        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
-        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
-        EasyMock.expect(exchange.get(Exception.class)).andReturn(null);
-        EasyMock.expect(exchange.isOneWay()).andReturn(true).anyTimes();
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr).anyTimes();
-        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.FALSE);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(exchange.getOutMessage()).thenReturn(message);
+        when(exchange.get(FaultMode.class)).thenReturn(null);
+        when(exchange.get(Exception.class)).thenReturn(null);
+        when(exchange.isOneWay()).thenReturn(true);
+        MessageHandlingTimeRecorder mhtr = mock(MessageHandlingTimeRecorder.class);
+        when(exchange.get(MessageHandlingTimeRecorder.class)).thenReturn(mhtr);
+        when(exchange.get("org.apache.cxf.management.counter.enabled")).thenReturn(null);
 
-        InterceptorChain chain = EasyMock.createMock(InterceptorChain.class);
-        EasyMock.expect(message.getInterceptorChain()).andReturn(chain);
-        chain.add(EasyMock.isA(ResponseTimeMessageOutInterceptor.EndingInterceptor.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(exchange);
-        EasyMock.replay(message);
+        InterceptorChain chain = mock(InterceptorChain.class);
+        when(message.getInterceptorChain()).thenReturn(chain);
+        doNothing().when(chain).add(isA(ResponseTimeMessageOutInterceptor.EndingInterceptor.class));
 
         rtmoi.handleMessage(message);
         rtmoi.getEndingInterceptor().handleMessage(message);
 
-        EasyMock.verify(message);
-        EasyMock.verify(bus);
-        EasyMock.verify(exchange);
+        verify(chain, atLeastOnce()).add(isA(ResponseTimeMessageOutInterceptor.EndingInterceptor.class));
     }
 
     @Test
     public void testClientMessageOut() {
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.getBus()).andReturn(bus);
-        EasyMock.expect(exchange.get("org.apache.cxf.management.counter.enabled")).andReturn(null);
-        EasyMock.replay(exchange);
-        EasyMock.replay(message);
-        rtmoi.handleMessage(message);
-        EasyMock.verify(message);
-        EasyMock.verify(exchange);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.FALSE);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getBus()).thenReturn(bus);
+        when(exchange.get("org.apache.cxf.management.counter.enabled")).thenReturn(null);
 
+        rtmoi.handleMessage(message);
     }
 }
