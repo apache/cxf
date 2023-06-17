@@ -62,8 +62,6 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Test;
 
@@ -71,6 +69,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServiceWSDLBuilderTest {
 
@@ -86,7 +86,6 @@ public class ServiceWSDLBuilderTest {
     private WSDLServiceBuilder wsdlServiceBuilder;
     private ServiceInfo serviceInfo;
 
-    private IMocksControl control;
     private Bus bus;
     private BindingFactoryManager bindingFactoryManager;
     private DestinationFactoryManager destinationFactoryManager;
@@ -104,11 +103,10 @@ public class ServiceWSDLBuilderTest {
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         def = wsdlReader.readWSDL(wsdlUrl);
 
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        destinationFactoryManager = control.createMock(DestinationFactoryManager.class);
-        destinationFactory = control.createMock(DestinationFactory.class);
+        bus = mock(Bus.class);
+        bindingFactoryManager = mock(BindingFactoryManager.class);
+        destinationFactoryManager = mock(DestinationFactoryManager.class);
+        destinationFactory = mock(DestinationFactory.class);
         wsdlServiceBuilder = new WSDLServiceBuilder(bus, false);
 
         for (Service serv : CastUtils.cast(def.getServices().values(), Service.class)) {
@@ -117,17 +115,15 @@ public class ServiceWSDLBuilderTest {
                 break;
             }
         }
-        EasyMock.expect(bus.getExtension(WSDLManager.class)).andReturn(new WSDLManagerImpl()).anyTimes();
+        when(bus.getExtension(WSDLManager.class)).thenReturn(new WSDLManagerImpl());
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
-            .andReturn(destinationFactoryManager);
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bindingFactoryManager);
+        when(bus.getExtension(DestinationFactoryManager.class))
+            .thenReturn(destinationFactoryManager);
 
-        EasyMock.expect(destinationFactoryManager
+        when(destinationFactoryManager
                         .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/"))
-            .andReturn(destinationFactory);
-
-        control.replay();
+            .thenReturn(destinationFactory);
 
         serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
         ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, serviceInfo);
@@ -138,7 +134,6 @@ public class ServiceWSDLBuilderTest {
 
     @After
     public void tearDown() throws Exception {
-        control.verify();
         newDef = null;
     }
 
