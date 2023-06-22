@@ -21,12 +21,11 @@ package org.apache.cxf.ws.policy;
 
 import org.apache.neethi.Policy;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -36,8 +35,7 @@ public class PolicyRegistryImplTest {
     @Test
     public void testAll() {
         PolicyRegistryImpl reg = new PolicyRegistryImpl();
-        IMocksControl control = EasyMock.createNiceControl();
-        Policy policy = control.createMock(Policy.class);
+        Policy policy = mock(Policy.class);
         String key = "key";
         assertNull(reg.lookup(key));
         reg.register(key, policy);

@@ -29,30 +29,13 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.util.PolicyComparator;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class NormalizeTest {
-
-    private IMocksControl control;
-
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testNormalize() throws Exception {
         Bus bus = createBus(Constants.URI_POLICY_13_NS);
@@ -93,8 +76,7 @@ public class NormalizeTest {
     }
 
     private Bus createBus(String policyNamespace) {
-        Bus bus = control.createMock(Bus.class);
-        control.replay();
+        Bus bus = mock(Bus.class);
         return bus;
     }
 
