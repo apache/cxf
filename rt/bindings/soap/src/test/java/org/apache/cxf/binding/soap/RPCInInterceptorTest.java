@@ -34,21 +34,19 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RPCInInterceptorTest extends TestBase {
 
     private static final String TNS = "http://apache.org/hello_world_rpclit";
 
     private static final String OPNAME = "sendReceiveData";
-
-    private IMocksControl control = EasyMock.createNiceControl();
 
     @Before
     public void setUp() throws Exception {
@@ -64,19 +62,16 @@ public class RPCInInterceptorTest extends TestBase {
         boi.getOperationInfo().getOutput().getMessagePartByIndex(0).setIndex(0);
         soapMessage.getExchange().put(BindingOperationInfo.class, boi);
 
-        control.reset();
-        Service service = control.createMock(Service.class);
+        Service service = mock(Service.class);
         JAXBDataBinding dataBinding = new JAXBDataBinding(MyComplexStruct.class);
-        service.getDataBinding();
-        EasyMock.expectLastCall().andReturn(dataBinding).anyTimes();
-        service.getServiceInfos();
+        when(service.getDataBinding()).thenReturn(dataBinding);
+
         List<ServiceInfo> list = Arrays.asList(si);
-        EasyMock.expectLastCall().andReturn(list).anyTimes();
-        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
+        when(service.getServiceInfos()).thenReturn(list);
+        when(service.isEmpty()).thenReturn(true);
 
         soapMessage.getExchange().put(Service.class, service);
         soapMessage.getExchange().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
-        control.replay();
     }
 
     @Test

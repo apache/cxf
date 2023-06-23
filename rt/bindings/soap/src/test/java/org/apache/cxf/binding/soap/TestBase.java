@@ -45,12 +45,12 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestBase {
 
@@ -118,10 +118,9 @@ public class TestBase {
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         Definition def = wsdlReader.readWSDL(wsdlUrl);
 
-        IMocksControl control = EasyMock.createNiceControl();
-        Bus bus = control.createMock(Bus.class);
-        BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
+        Bus bus = mock(Bus.class);
+        BindingFactoryManager bindingFactoryManager = mock(BindingFactoryManager.class);
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
 
         Service service = null;
@@ -133,9 +132,8 @@ public class TestBase {
             }
         }
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        control.replay();
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bindingFactoryManager);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
         ServiceInfo serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
         serviceInfo.setProperty(WSDLServiceBuilder.WSDL_DEFINITION, null);

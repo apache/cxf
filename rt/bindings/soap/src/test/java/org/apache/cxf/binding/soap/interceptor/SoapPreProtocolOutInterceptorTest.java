@@ -38,8 +38,6 @@ import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,12 +49,10 @@ import static org.junit.Assert.assertTrue;
  *
  */
 public class SoapPreProtocolOutInterceptorTest {
-    private IMocksControl control;
     private SoapPreProtocolOutInterceptor interceptor;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
         interceptor = new SoapPreProtocolOutInterceptor();
     }
 
@@ -64,7 +60,6 @@ public class SoapPreProtocolOutInterceptorTest {
     public void testRequestorOutboundSoapAction() throws Exception {
         SoapMessage message = setUpMessage();
         interceptor.handleMessage(message);
-        control.verify();
 
         Map<String, List<String>> reqHeaders
             = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
@@ -89,7 +84,6 @@ public class SoapPreProtocolOutInterceptorTest {
         message.setExchange(exchange);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
 
-        control.replay();
         return message;
     }
 
