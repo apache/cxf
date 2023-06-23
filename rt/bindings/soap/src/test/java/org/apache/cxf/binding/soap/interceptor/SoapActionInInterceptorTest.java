@@ -31,68 +31,50 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class SoapActionInInterceptorTest {
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testGetSoapActionForSOAP11() throws Exception {
         SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), "urn:cxf");
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
     public void testGetSoapActionForSOAP11None() throws Exception {
         SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertNull(action);
-        control.verify();
     }
 
     @Test
     public void testGetSoapActionForSOAP12() throws Exception {
         SoapMessage message = setUpMessage("application/soap+xml; action=\"urn:cxf\"", Soap12.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
     public void testGetSoapActionForSOAP12None() throws Exception {
         SoapMessage message = setUpMessage("application/soap+xml", Soap12.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertNull(action);
-        control.verify();
     }
 
     @Test
     public void testGetSoapActionForSOAP11SwA() throws Exception {
         SoapMessage message = setUpMessage("multipart/related", Soap11.getInstance(), "urn:cxf");
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
@@ -102,10 +84,8 @@ public class SoapActionInInterceptorTest {
         SoapMessage message = setUpMessage(
             "multipart/related; start-info=\"application/soap+xml; action=\\\"urn:cxf\\\"",
             Soap12.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
@@ -116,10 +96,8 @@ public class SoapActionInInterceptorTest {
         SoapMessage message = setUpMessage(
             "multipart/related; start-info=\"application/soap+xml\"; action=\"urn:cxf\"",
             Soap12.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
@@ -129,10 +107,8 @@ public class SoapActionInInterceptorTest {
         SoapMessage message = setUpMessage(
             "multipart/related",
             Soap12.getInstance(), "urn:cxf");
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
@@ -141,10 +117,8 @@ public class SoapActionInInterceptorTest {
         SoapMessage message = setUpMessage(
             "multipart/related",
             Soap12.getInstance(), null);
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertNull(action);
-        control.verify();
     }
 
     @Test
@@ -152,10 +126,8 @@ public class SoapActionInInterceptorTest {
         SoapMessage message = setUpMessage(
             "multipart/related; type=\"application/xop+xml\"; start-info=\"text/xml\"",
             Soap11.getInstance(), "urn:cxf");
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     @Test
@@ -167,14 +139,12 @@ public class SoapActionInInterceptorTest {
             "multipart/related; type=\"application/xop+xml\""
                 + "; start-info=\"application/soap+xml\"; action=\"urn:cxf\"",
             Soap11.getInstance(), "urn:cxf");
-        control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
-        control.verify();
     }
 
     private SoapMessage setUpMessage(String contentType, SoapVersion version, String prop) {
-        SoapMessage message = control.createMock(SoapMessage.class);
+        SoapMessage message = mock(SoapMessage.class);
         Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, List<String>> partHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         if (version instanceof Soap11 && prop != null) {
@@ -183,10 +153,10 @@ public class SoapActionInInterceptorTest {
             partHeaders.put(Message.CONTENT_TYPE,
                             Collections.singletonList("application/soap+xml; action=\"" + prop + "\""));
         }
-        EasyMock.expect(message.getVersion()).andReturn(version).anyTimes();
-        EasyMock.expect(message.get(Message.CONTENT_TYPE)).andReturn(contentType).anyTimes();
-        EasyMock.expect(message.get(Message.PROTOCOL_HEADERS)).andReturn(headers).anyTimes();
-        EasyMock.expect(message.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS)).andReturn(partHeaders).anyTimes();
+        when(message.getVersion()).thenReturn(version);
+        when(message.get(Message.CONTENT_TYPE)).thenReturn(contentType);
+        when(message.get(Message.PROTOCOL_HEADERS)).thenReturn(headers);
+        when(message.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS)).thenReturn(partHeaders);
         return message;
     }
 }
