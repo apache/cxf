@@ -31,37 +31,39 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ServletControllerTest {
 
-    private HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
-    private HttpServletResponse res = EasyMock.createMock(HttpServletResponse.class);
-    private DestinationRegistry registry = EasyMock.createMock(DestinationRegistry.class);
-    private HttpServlet serviceListGenerator = EasyMock.createMock(HttpServlet.class);
+    private HttpServletRequest req = mock(HttpServletRequest.class);
+    private HttpServletResponse res = mock(HttpServletResponse.class);
+    private DestinationRegistry registry = mock(DestinationRegistry.class);
+    private HttpServlet serviceListGenerator = mock(HttpServlet.class);
 
     private void setReq(String pathInfo, String requestUri, String styleSheet, String formatted) {
-        EasyMock.expect(req.getPathInfo()).andReturn(pathInfo).anyTimes();
-        EasyMock.expect(req.getContextPath()).andReturn("").anyTimes();
-        EasyMock.expect(req.getServletPath()).andReturn("").anyTimes();
-        req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
-        EasyMock.expectLastCall().anyTimes();
-        EasyMock.expect(req.getRequestURI()).andReturn(requestUri).times(2);
-        EasyMock.expect(req.getParameter("stylesheet")).andReturn(styleSheet);
-        EasyMock.expect(req.getParameter("formatted")).andReturn(formatted);
-        EasyMock.expect(req.getRequestURL()).andReturn(new StringBuffer("http://localhost:8080").append(requestUri));
-        EasyMock.expect(registry.getDestinationsPaths()).andReturn(Collections.emptySet()).atLeastOnce();
-        EasyMock.expect(registry.getDestinationForPath("", true)).andReturn(null).anyTimes();
+        when(req.getPathInfo()).thenReturn(pathInfo);
+        when(req.getContextPath()).thenReturn("");
+        when(req.getServletPath()).thenReturn("");
+        when(req.getRequestURI()).thenReturn(requestUri);
+        when(req.getParameter("stylesheet")).thenReturn(styleSheet);
+        when(req.getParameter("formatted")).thenReturn(formatted);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080").append(requestUri));
+        when(registry.getDestinationsPaths()).thenReturn(Collections.emptySet());
+        when(registry.getDestinationForPath("", true)).thenReturn(null);
     }
 
     private void expectServiceListGeneratorCalled() throws ServletException, IOException {
-        serviceListGenerator.service(EasyMock.isA(HttpServletRequest.class),
-                                     EasyMock.isA(HttpServletResponse.class));
-        EasyMock.expectLastCall();
+        verify(serviceListGenerator, atLeastOnce()).service(isA(HttpServletRequest.class),
+                                     isA(HttpServletResponse.class));
     }
 
     private void expectServiceListGeneratorNotCalled() throws ServletException, IOException {
@@ -70,90 +72,79 @@ public class ServletControllerTest {
     @Test
     public void testGenerateServiceListing() throws Exception {
         setReq(null, "/services", null, "true");
-        expectServiceListGeneratorCalled();
-        EasyMock.replay(req, registry, serviceListGenerator);
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
+        verify(req, atLeastOnce()).setAttribute(Message.BASE_PATH, "http://localhost:8080");
+        verify(req, times(1)).getRequestURI();
+        expectServiceListGeneratorCalled();
     }
 
     @Test
     public void testGenerateUnformattedServiceListing() throws Exception {
-        req.getPathInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        req.getContextPath();
-        EasyMock.expectLastCall().andReturn("").anyTimes();
-        req.getServletPath();
-        EasyMock.expectLastCall().andReturn("").anyTimes();
-        req.getRequestURI();
-        EasyMock.expectLastCall().andReturn("/services").times(2);
+        when(req.getPathInfo()).thenReturn(null);
+        when(req.getContextPath()).thenReturn("");
+        when(req.getServletPath()).thenReturn("");
+        when(req.getRequestURI()).thenReturn("/services");
 
-        req.getParameter("stylesheet");
-        EasyMock.expectLastCall().andReturn(null);
-        req.getParameter("formatted");
-        EasyMock.expectLastCall().andReturn("false");
-        req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080/services"));
-        req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
-        EasyMock.expectLastCall().anyTimes();
-        registry.getDestinationsPaths();
-        EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
-        registry.getDestinationForPath("", true);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-
-        expectServiceListGeneratorCalled();
-        EasyMock.replay(req, registry, serviceListGenerator);
+        when(req.getParameter("stylesheet")).thenReturn(null);
+        when(req.getParameter("formatted")).thenReturn("false");
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/services"));
+        when(registry.getDestinationsPaths()).thenReturn(Collections.emptySet());
+        when(registry.getDestinationForPath("", true)).thenReturn(null);
 
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
+
+        verify(req, atLeastOnce()).setAttribute(Message.BASE_PATH, "http://localhost:8080");
+        verify(req, times(1)).getRequestURI();
+        expectServiceListGeneratorCalled();
     }
 
     @Test
     public void testHideServiceListing() throws Exception {
-        req.getPathInfo();
-        EasyMock.expectLastCall().andReturn(null);
+        when(req.getPathInfo()).thenReturn(null);
 
-        registry.getDestinationForPath("", true);
-        EasyMock.expectLastCall().andReturn(null).atLeastOnce();
-        AbstractHTTPDestination dest = EasyMock.createMock(AbstractHTTPDestination.class);
-        registry.checkRestfulRequest("");
-        EasyMock.expectLastCall().andReturn(dest).atLeastOnce();
-        dest.getBus();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        dest.getMessageObserver();
-        EasyMock.expectLastCall().andReturn(EasyMock.createMock(MessageObserver.class)).atLeastOnce();
+        when(registry.getDestinationForPath("", true)).thenReturn(null);
+        AbstractHTTPDestination dest = mock(AbstractHTTPDestination.class);
+        when(registry.checkRestfulRequest("")).thenReturn(dest);
+        when(dest.getBus()).thenReturn(null);
+        when(dest.getMessageObserver()).thenReturn(mock(MessageObserver.class));
 
-        expectServiceListGeneratorNotCalled();
-
-        EasyMock.replay(req, registry, serviceListGenerator, dest);
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.setHideServiceList(true);
         sc.invoke(req, res);
         assertTrue(sc.invokeDestinationCalled());
+
+        expectServiceListGeneratorNotCalled();
     }
 
     @Test
     public void testDifferentServiceListPath() throws Exception {
         setReq(null, "/listing", null, "true");
-        expectServiceListGeneratorCalled();
-        EasyMock.replay(req, registry, serviceListGenerator);
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.setServiceListRelativePath("/listing");
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
+        
+        verify(req, atLeastOnce()).setAttribute(Message.BASE_PATH, "http://localhost:8080");
+        verify(req, times(1)).getRequestURI();
+        expectServiceListGeneratorCalled();
     }
 
     @Test
     public void testHealthcheck() throws Exception {
         setReq(null, "/services", null, "true");
-        EasyMock.expect(req.getAttribute(ServletController.AUTH_SERVICE_LIST)).andReturn(null);
-        EasyMock.expect(req.getMethod()).andReturn("HEAD");
+        when(req.getAttribute(ServletController.AUTH_SERVICE_LIST)).thenReturn(null);
+        when(req.getMethod()).thenReturn("HEAD");
 
-        EasyMock.replay(req, registry);
         TestServletController sc = new TestServletController(registry, new ServiceListGeneratorServlet(registry, null));
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
+        
+        verify(req, atLeastOnce()).setAttribute(Message.BASE_PATH, "http://localhost:8080");
+        verify(req, times(1)).getRequestURI();
     }
 
 

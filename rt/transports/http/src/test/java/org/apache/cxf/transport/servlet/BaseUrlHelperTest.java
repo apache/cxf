@@ -20,32 +20,28 @@ package org.apache.cxf.transport.servlet;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BaseUrlHelperTest {
     private String testGetBaseURL(String requestUrl, String contextPath,
                                   String servletPath, String pathInfo) {
-        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
-        req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer(requestUrl));
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getRequestURL()).thenReturn(new StringBuffer(requestUrl));
 
-        req.getContextPath();
-        EasyMock.expectLastCall().andReturn(contextPath).anyTimes();
-        req.getServletPath();
-        EasyMock.expectLastCall().andReturn(servletPath).anyTimes();
+        when(req.getContextPath()).thenReturn(contextPath);
+        when(req.getServletPath()).thenReturn(servletPath);
 
-        req.getPathInfo();
-        EasyMock.expectLastCall().andReturn(pathInfo).times(2);
+        when(req.getPathInfo()).thenReturn(pathInfo);
 
         String basePath = contextPath + servletPath;
         if (basePath.length() == 0) {
-            req.getRequestURI();
-            EasyMock.expectLastCall().andReturn(pathInfo);
+            when(req.getRequestURI()).thenReturn(pathInfo);
         }
 
-        EasyMock.replay(req);
         return BaseUrlHelper.getBaseURL(req);
     }
 

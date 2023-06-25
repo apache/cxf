@@ -49,8 +49,6 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -62,6 +60,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -75,7 +78,6 @@ public class HTTPConduitURLEasyMockTest {
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
     private static final String PAYLOAD = "message payload";
-    private IMocksControl control;
     private EndpointInfo endpointInfo;
     private HttpsURLConnectionFactory connectionFactory;
     private HttpURLConnection connection;
@@ -145,19 +147,16 @@ public class HTTPConduitURLEasyMockTest {
 
     @Test
     public void testSend() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.FALSE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         assertNull(inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     @Test
     public void testSendWithHeaders() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
@@ -165,7 +164,6 @@ public class HTTPConduitURLEasyMockTest {
         conduit.prepare(message);
         verifySentMessage(conduit, message, true, "POST", false);
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     private Message createMessage() {
@@ -178,7 +176,6 @@ public class HTTPConduitURLEasyMockTest {
     @Test
     @org.junit.Ignore
     public void testSendWithHeadersCheckErrorStream() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = new MessageImpl();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
@@ -187,36 +184,30 @@ public class HTTPConduitURLEasyMockTest {
         conduit.prepare(message);
         verifySentMessage(conduit, message, true, "POST", true);
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     @Test
     public void testSendHttpConnection() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     @Test
     public void testSendHttpConnectionAutoRedirect() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, true, "POST");
         Message message = createMessage();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     @Test
     public void testSendHttpGetConnectionAutoRedirect() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, true, "GET");
         Message message = new MessageImpl();
         message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
@@ -225,12 +216,10 @@ public class HTTPConduitURLEasyMockTest {
         verifySentMessage(conduit, message, "GET");
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         conduit.close(message);
-        finalVerify();
     }
 
     @Test
     public void testSendHttpGetConnection() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "GET");
         Message message = new MessageImpl();
         message.put(Message.HTTP_REQUEST_METHOD, "GET");
@@ -239,13 +228,11 @@ public class HTTPConduitURLEasyMockTest {
         verifySentMessage(conduit, message, "GET");
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         conduit.close(message);
-        finalVerify();
     }
 
     @Test
     public void testSendOnewayChunkedEmptyPartialResponseProcessResponse()
         throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
@@ -256,13 +243,11 @@ public class HTTPConduitURLEasyMockTest {
                           ResponseDelimiter.CHUNKED,
                           true,  // empty response
                           "POST");
-        finalVerify();
     }
 
     @Test
     public void testSendOnewayDoNotProcessResponse()
         throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
@@ -272,13 +257,11 @@ public class HTTPConduitURLEasyMockTest {
                           ResponseDelimiter.CHUNKED,
                           true,  // empty response
                           "POST");
-        finalVerify();
     }
 
     @Test
     public void testSendTwowayDecoupledEmptyPartialResponse()
         throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
@@ -288,12 +271,10 @@ public class HTTPConduitURLEasyMockTest {
                           ResponseDelimiter.EOF,
                           true,  // empty response
                           "POST");
-        finalVerify();
     }
 
     @Test
     public void testSendHttpConnectionAllowedRedirectVerbs() throws Exception {
-        control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         message.put("http.redirect.allowed.verbs", "POST");
@@ -302,7 +283,6 @@ public class HTTPConduitURLEasyMockTest {
         conduit.getClient().setAutoRedirect(true);
         verifySentMessage(conduit, message, "POST");
         assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
-        finalVerify();
     }
 
     private void setUpHeaders(Message message) {
@@ -325,14 +305,11 @@ public class HTTPConduitURLEasyMockTest {
     }
 
     private void setUpExchange(Message message, boolean oneway) {
-        Exchange exchange = control.createMock(Exchange.class);
+        Exchange exchange = mock(Exchange.class);
         message.setExchange(exchange);
-        exchange.isOneWay();
-        EasyMock.expectLastCall().andReturn(oneway).anyTimes();
-        exchange.isSynchronous();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        exchange.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        when(exchange.isOneWay()).thenReturn(oneway);
+        when(exchange.isSynchronous()).thenReturn(true);
+        when(exchange.isEmpty()).thenReturn(true);
     }
 
     private HTTPConduit setUpConduit(
@@ -342,49 +319,36 @@ public class HTTPConduitURLEasyMockTest {
         endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(NOWHERE + "bar/foo");
         connectionFactory =
-            control.createMock(HttpsURLConnectionFactory.class);
+            mock(HttpsURLConnectionFactory.class);
 
         if (send) {
-            //proxy = control.createMock(Proxy.class);
+            //proxy = mock(Proxy.class);
             proxy = Proxy.NO_PROXY;
             connection =
-                control.createMock(HttpURLConnection.class);
-            connection.getURL();
-            EasyMock.expectLastCall().andReturn(new URL(NOWHERE + "bar/foo")).anyTimes();
+                mock(HttpURLConnection.class);
+            when(connection.getURL()).thenReturn(new URL(NOWHERE + "bar/foo"));
 
-            connectionFactory.createConnection((TLSClientParameters)EasyMock.isNull(),
-                                      EasyMock.eq(proxy),
-                                      EasyMock.eq(new URL(NOWHERE + "bar/foo")));
-            EasyMock.expectLastCall().andReturn(connection);
+            when(connectionFactory.createConnection(nullable(TLSClientParameters.class),
+                                      eq(proxy),
+                                      eq(new URL(NOWHERE + "bar/foo")))).thenReturn(connection);
 
-            connection.setDoOutput(true);
-            EasyMock.expectLastCall();
-
-            connection.setRequestMethod(method);
-            EasyMock.expectLastCall();
+            doNothing().when(connection).setDoOutput(true);
+            doNothing().when(connection).setRequestMethod(method);
 
             if (!autoRedirect && "POST".equals(method)) {
-                connection.setChunkedStreamingMode(-1);
-                EasyMock.expectLastCall();
+                doNothing().when(connection).setChunkedStreamingMode(-1);
             }
-            connection.getRequestMethod();
-            EasyMock.expectLastCall().andReturn(method).anyTimes();
+            when(connection.getRequestMethod()).thenReturn(method);
 
-            connection.setInstanceFollowRedirects(false);
-            EasyMock.expectLastCall().times(1);
+            doNothing().when(connection).setInstanceFollowRedirects(false);
 
-            connection.setConnectTimeout(303030);
-            EasyMock.expectLastCall();
-            connection.setReadTimeout(404040);
-            EasyMock.expectLastCall();
-            connection.setUseCaches(false);
-            EasyMock.expectLastCall();
+            doNothing().when(connection).setConnectTimeout(303030);
+            doNothing().when(connection).setReadTimeout(404040);
+            doNothing().when(connection).setUseCaches(false);
 
         }
 
         ExtensionManagerBus bus = new ExtensionManagerBus();
-
-        control.replay();
 
         HTTPConduit conduit = new HTTPTestConduit(bus,
                                               endpointInfo,
@@ -468,30 +432,21 @@ public class HTTPConduitURLEasyMockTest {
                                    boolean emptyResponse,
                                    String method)
         throws IOException {
-        control.verify();
-        control.reset();
 
         OutputStream wrappedOS = verifyRequestHeaders(message, expectHeaders, method);
 
         if (!"GET".equals(method)) {
-            os.write(PAYLOAD.getBytes(), 0, PAYLOAD.length());
-            EasyMock.expectLastCall();
+            doNothing().when(os).write(PAYLOAD.getBytes(), 0, PAYLOAD.length());
 
-            os.flush();
-            EasyMock.expectLastCall();
-            os.flush();
-            EasyMock.expectLastCall();
-            os.close();
-            EasyMock.expectLastCall();
+            doNothing().when(os).flush();
+            doNothing().when(os).flush();
+            doNothing().when(os).close();
         }
 
         setUpExchange(message, style == ResponseStyle.NONE || style == ResponseStyle.ONEWAY_NONE);
 
-        connection.getRequestMethod();
-        EasyMock.expectLastCall().andReturn(method).anyTimes();
+        when(connection.getRequestMethod()).thenReturn(method);
         verifyHandleResponse(style, delimiter, emptyResponse, conduit);
-
-        control.replay();
 
         wrappedOS.flush();
         wrappedOS.flush();
@@ -516,8 +471,6 @@ public class HTTPConduitURLEasyMockTest {
                 }
             }
         }
-
-        finalVerify();
     }
 
     private OutputStream verifyRequestHeaders(Message message, boolean expectHeaders, String method)
@@ -528,31 +481,23 @@ public class HTTPConduitURLEasyMockTest {
         assertTrue("expected output stream format",
                    message.getContentFormats().contains(OutputStream.class));
 
-        connection.getRequestMethod();
-        EasyMock.expectLastCall().andReturn(method).anyTimes();
+        when(connection.getRequestMethod()).thenReturn(method);
 
         if (!"GET".equals(method)) {
-            os = EasyMock.createMock(OutputStream.class);
-            connection.getOutputStream();
-            EasyMock.expectLastCall().andReturn(os);
+            os = mock(OutputStream.class);
+            when(connection.getOutputStream()).thenReturn(os);
         }
 
         message.put(HTTPConduit.KEY_HTTP_CONNECTION, connection);
         if (expectHeaders) {
-            connection.setRequestProperty(EasyMock.eq("Authorization"),
-                                          EasyMock.eq("Basic Qko6dmFsdWU="));
-            EasyMock.expectLastCall();
-            connection.setRequestProperty(EasyMock.eq("Content-Type"),
-                                          EasyMock.eq("text/xml;charset=utf8"));
-            EasyMock.expectLastCall();
-            connection.setRequestProperty(EasyMock.eq("Accept"),
-                                          EasyMock.eq("text/xml;charset=utf8,text/plain"));
-            EasyMock.expectLastCall();
+            doNothing().when(connection).setRequestProperty(eq("Authorization"),
+                                          eq("Basic Qko6dmFsdWU="));
+            doNothing().when(connection).setRequestProperty(eq("Content-Type"),
+                                          eq("text/xml;charset=utf8"));
+            doNothing().when(connection).setRequestProperty(eq("Accept"),
+                                          eq("text/xml;charset=utf8,text/plain"));
         }
-        connection.getRequestProperties();
-        EasyMock.expectLastCall().andReturn(new HashMap<String, List<String>>()).anyTimes();
-
-        control.replay();
+        when(connection.getRequestProperties()).thenReturn(new HashMap<String, List<String>>());
 
         AbstractThresholdOutputStream wrappedOS
             = (AbstractThresholdOutputStream) message.getContent(OutputStream.class);
@@ -561,93 +506,70 @@ public class HTTPConduitURLEasyMockTest {
         wrappedOS.write(PAYLOAD.getBytes());
         wrappedOS.unBuffer();
 
-        control.verify();
-        control.reset();
-
         return wrappedOS;
     }
 
+    @SuppressWarnings("unchecked")
     private void verifyHandleResponse(ResponseStyle style,
                                       ResponseDelimiter delimiter,
                                       boolean emptyResponse,
                                       HTTPConduit conduit) throws IOException {
-        connection.getHeaderFields();
-        EasyMock.expectLastCall().andReturn(Collections.EMPTY_MAP).anyTimes();
+        when(connection.getHeaderFields()).thenReturn(Collections.EMPTY_MAP);
         
-        connection.getResponseMessage();
-        EasyMock.expectLastCall().andReturn(HTTP_RESPONSE_MESSAGE).anyTimes();
+        when(connection.getResponseMessage()).thenReturn(HTTP_RESPONSE_MESSAGE);
         
         int responseCode = getResponseCode(style);
         if (conduit.getClient().isAutoRedirect()) {
-            connection.getResponseCode();
-            EasyMock.expectLastCall().andReturn(301).once().andReturn(responseCode).anyTimes();
-            connection.getURL();
-            EasyMock.expectLastCall().andReturn(new URL(NOWHERE + "bar/foo/redirect")).anyTimes();
+            when(connection.getResponseCode()).thenReturn(301).thenReturn(responseCode);
+            when(connection.getURL()).thenReturn(new URL(NOWHERE + "bar/foo/redirect"));
         } else {
-            connection.getResponseCode();
-            EasyMock.expectLastCall().andReturn(responseCode).anyTimes();
+            when(connection.getResponseCode()).thenReturn(responseCode);
         }
 
         switch (style) {
         case NONE:
         case DECOUPLED:
-            is = control.createMock(InputStream.class);
-            connection.getInputStream();
-            EasyMock.expectLastCall().andReturn(is).anyTimes();
+            is = mock(InputStream.class);
+            when(connection.getInputStream()).thenReturn(is);
             connection.getContentLength();
             if (delimiter == ResponseDelimiter.CHUNKED
                 || delimiter == ResponseDelimiter.EOF) {
-                EasyMock.expectLastCall().andReturn(-1).anyTimes();
+                when(connection.getContentLength()).thenReturn(-1);
                 if (delimiter == ResponseDelimiter.CHUNKED) {
-                    connection.getHeaderField("Transfer-Encoding");
-                    EasyMock.expectLastCall().andReturn("chunked");
+                    when(connection.getHeaderField("Transfer-Encoding")).thenReturn("chunked");
                 } else if (delimiter == ResponseDelimiter.EOF) {
-                    connection.getHeaderField("Connection");
-                    EasyMock.expectLastCall().andReturn("close");
+                    when(connection.getHeaderField("Connection")).thenReturn("close");
                 }
-                is.read();
                 if (emptyResponse) {
-                    EasyMock.expectLastCall().andReturn(-1).anyTimes();
+                    when(is.read()).thenReturn(-1);
                 } else {
-                    EasyMock.expectLastCall().andReturn((int)'<');
+                    when(is.read()).thenReturn((int)'<');
                 }
             } else {
-                EasyMock.expectLastCall().andReturn(123).anyTimes();
+                when(connection.getContentLength()).thenReturn(123);
             }
             if (emptyResponse) {
-                is.close();
-                EasyMock.expectLastCall();
+                doNothing().when(is).close();
             }
             break;
 
         case BACK_CHANNEL:
-            is = EasyMock.createMock(InputStream.class);
-            connection.getInputStream();
-            EasyMock.expectLastCall().andReturn(is).anyTimes();
+            is = mock(InputStream.class);
+            when(connection.getInputStream()).thenReturn(is);
             break;
 
         case BACK_CHANNEL_ERROR:
-            is = EasyMock.createMock(InputStream.class);
-            connection.getInputStream();
-            EasyMock.expectLastCall().andReturn(is).anyTimes();
-            connection.getErrorStream();
-            EasyMock.expectLastCall().andReturn(null);
+            is = mock(InputStream.class);
+            when(connection.getInputStream()).thenReturn(is);
+            when(connection.getErrorStream()).thenReturn(null);
             break;
 
         case ONEWAY_NONE:
-            connection.getInputStream();
-            EasyMock.expectLastCall().andReturn(new ByteArrayInputStream(new byte[0])).anyTimes();
+            when(connection.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
             break;
 
         default:
             break;
-        }
-    }
-
-    private void finalVerify() {
-        if (control != null) {
-            control.verify();
-            control = null;
         }
     }
 
