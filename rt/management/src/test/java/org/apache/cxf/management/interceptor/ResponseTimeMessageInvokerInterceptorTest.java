@@ -22,8 +22,13 @@ package org.apache.cxf.management.interceptor;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
+
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageResponseTestBase {
 
@@ -38,25 +43,18 @@ public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageRe
         setupCounterRepository(true, false);
         setupExchangeForMessage();
         setupOperationForMessage();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
-        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
-        mhtr.setOneWay(true);
-        EasyMock.expectLastCall();
-        mhtr.endHandling();
-        EasyMock.expectLastCall();
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.FALSE);
+        when(exchange.getOutMessage()).thenReturn(message);
+        MessageHandlingTimeRecorder mhtr = mock(MessageHandlingTimeRecorder.class);
+        doNothing().when(mhtr).setOneWay(true);
+        doNothing().when(mhtr).endHandling();
 
-        EasyMock.replay(mhtr);
-        EasyMock.expect(exchange.isOneWay()).andReturn(true);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);
-        EasyMock.replay(exchange);
-        EasyMock.replay(message);
+        when(exchange.isOneWay()).thenReturn(true);
+        when(exchange.get(MessageHandlingTimeRecorder.class)).thenReturn(mhtr);
 
         rtmii.handleMessage(message);
-        EasyMock.verify(message);
-        EasyMock.verify(bus);
-        EasyMock.verify(exchange);
-        EasyMock.verify(mhtr);
+        verify(mhtr, atLeastOnce()).setOneWay(true);
+        verify(mhtr, atLeastOnce()).endHandling();
     }
 }
