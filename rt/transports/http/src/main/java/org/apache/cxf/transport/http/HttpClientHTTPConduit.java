@@ -74,6 +74,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -379,19 +380,69 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }            
         }
         
+        private boolean isConnectionAttemptCompleted(HTTPClientPolicy csPolicy, PipedOutputStream out)
+            throws IOException {
+            if (!connectionComplete) {
+                // if we haven't connected yet, we'll see if an exception is the reason
+                // why we haven't connected.  Otherwise, wait for the connection
+                // to complete.
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+                try {
+                    out.wait(csPolicy.getConnectionTimeout());
+                } catch (InterruptedException e) {
+                    //ignore
+                }
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+        
         @Override
         protected void setProtocolHeaders() throws IOException {
             HttpClient cl = outMessage.get(HttpClient.class);
             Address address = (Address)outMessage.get(KEY_HTTP_CONNECTION_ADDRESS);
-            HTTPClientPolicy csPolicy = getClient(outMessage);
+            final HTTPClientPolicy csPolicy = getClient(outMessage);
             String httpRequestMethod =
                 (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
 
             pin = new PipedInputStream(csPolicy.getChunkLength() <= 0
                                         ? 4096 : csPolicy.getChunkLength());
-            pout = new PipedOutputStream(pin);
-            
-            
+            pout = new PipedOutputStream(pin) {
+                synchronized boolean canWrite() throws IOException {
+                    return isConnectionAttemptCompleted(csPolicy, this);
+                }
+                @Override
+                public void write(int b) throws IOException {
+                    if (connectionComplete || canWrite()) {
+                        super.write(b);
+                    }
+                }
+                @Override
+                public void write(byte[] b, int off, int len) throws IOException {
+                    if (connectionComplete || canWrite()) {
+                        super.write(b, off, len);
+                    }
+                }
+                
+            };
             
             if (KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
                 || PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY))) {
@@ -402,6 +453,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 @Override
                 public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
                     connectionComplete = true;
+                    synchronized (pout) {
+                        pout.notifyAll();
+                    }
                     BodyPublishers.ofInputStream(new Supplier<InputStream>() {
                         public InputStream get() {
                             return pin;
@@ -443,8 +497,14 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             
             
             final BodyHandler<InputStream> handler =  BodyHandlers.ofInputStream();
-            
+
             future = cl.sendAsync(request, handler);
+            future.exceptionally(ex -> {
+                synchronized (pout) {
+                    pout.notifyAll();
+                }
+                return null;
+            });
         }
         @Override
         protected void setupWrappedStream() throws IOException {
