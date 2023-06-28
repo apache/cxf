@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -47,6 +48,7 @@ import org.xml.sax.InputSource;
 import jakarta.jws.WebService;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPElement;
 import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingProvider;
@@ -205,6 +207,32 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                        || ex.getCause() instanceof java.net.SocketTimeoutException
                        || ex.getCause()  instanceof HttpConnectTimeoutException);
         }
+        
+        try {            
+            //create a really big message to make sure the write gets called
+            Iterator<jakarta.xml.soap.Node> nodes = soapReqMsg.getSOAPBody().getChildElements();
+            while (nodes.hasNext()) {
+                jakarta.xml.soap.Node nd = nodes.next();
+                if (nd instanceof SOAPElement) {
+                    SOAPElement se = ((SOAPElement)nd);
+                    for (int x = 0; x < 100; x++) {
+                        se.addTextNode("TestSoapMessageTestSoapMessageTestSoapMessageTestSoapMessage");
+                    }
+                }
+            }            
+            
+            disp.invoke(soapReqMsg);
+            fail("Should have faulted");
+        } catch (SOAPFaultException ex) {
+            fail("should not be a SOAPFaultException");
+        } catch (WebServiceException ex) {
+            //expected
+            assertTrue(ex.getCause().getClass().getName(),
+                       ex.getCause() instanceof java.net.ConnectException
+                       || ex.getCause() instanceof java.net.SocketTimeoutException
+                       || ex.getCause()  instanceof HttpConnectTimeoutException);
+        }
+        
         dispImpl.close();
 
     }
