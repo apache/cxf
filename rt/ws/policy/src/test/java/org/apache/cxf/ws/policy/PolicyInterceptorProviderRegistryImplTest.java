@@ -28,14 +28,13 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -44,13 +43,7 @@ public class PolicyInterceptorProviderRegistryImplTest {
 
     private static final QName ASSERTION = new QName("testns", "test");
     private static final QName WRONG_ASSERTION = new QName("testns", "wrong");
-    private IMocksControl control;
 
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-        Integer.valueOf(4);
-    }
 
     @Test
     public void testConstructors() {
@@ -59,15 +52,16 @@ public class PolicyInterceptorProviderRegistryImplTest {
         assertEquals(PolicyInterceptorProviderRegistry.class, reg.getRegistrationType());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testRegister() {
         PolicyInterceptorProviderRegistryImpl reg = new PolicyInterceptorProviderRegistryImpl();
-        PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);
-        Interceptor<Message> pi1 = control.createMock(Interceptor.class);
-        Interceptor<Message> pi2 = control.createMock(Interceptor.class);
-        Interceptor<Message> pif = control.createMock(Interceptor.class);
-        Interceptor<Message> po = control.createMock(Interceptor.class);
-        Interceptor<Message> pof = control.createMock(Interceptor.class);
+        PolicyInterceptorProvider pp = mock(PolicyInterceptorProvider.class);
+        Interceptor<Message> pi1 = mock(Interceptor.class);
+        Interceptor<Message> pi2 = mock(Interceptor.class);
+        Interceptor<Message> pif = mock(Interceptor.class);
+        Interceptor<Message> po = mock(Interceptor.class);
+        Interceptor<Message> pof = mock(Interceptor.class);
         List<Interceptor<? extends Message>> pil = new ArrayList<>();
         pil.add(pi1);
         pil.add(pi2);
@@ -77,21 +71,20 @@ public class PolicyInterceptorProviderRegistryImplTest {
         pol.add(po);
         List<Interceptor<? extends Message>> pofl = new ArrayList<>();
         pofl.add(pof);
-        EasyMock.expect(pp.getInInterceptors()).andReturn(pil);
-        EasyMock.expect(pp.getInFaultInterceptors()).andReturn(pifl);
-        EasyMock.expect(pp.getOutInterceptors()).andReturn(pol);
-        EasyMock.expect(pp.getOutFaultInterceptors()).andReturn(pofl);
+        when(pp.getInInterceptors()).thenReturn(pil);
+        when(pp.getInFaultInterceptors()).thenReturn(pifl);
+        when(pp.getOutInterceptors()).thenReturn(pol);
+        when(pp.getOutFaultInterceptors()).thenReturn(pofl);
         Collection<QName> assertionTypes = new ArrayList<>();
         assertionTypes.add(ASSERTION);
-        EasyMock.expect(pp.getAssertionTypes()).andReturn(assertionTypes);
-        control.replay();
+        when(pp.getAssertionTypes()).thenReturn(assertionTypes);
+
         reg.register(pp);
         assertEquals(pil, reg.getInInterceptorsForAssertion(ASSERTION));
         assertEquals(pifl, reg.getInFaultInterceptorsForAssertion(ASSERTION));
         assertEquals(pol, reg.getOutInterceptorsForAssertion(ASSERTION));
         assertEquals(pofl, reg.getOutFaultInterceptorsForAssertion(ASSERTION));
         assertTrue(reg.getInInterceptorsForAssertion(WRONG_ASSERTION).isEmpty());
-        control.verify();
     }
 
     @Test

@@ -30,36 +30,26 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.Policy;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class PolicyAttachmentTest {
-
-    private IMocksControl control;
-
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testBasic() {
         PolicyAttachment pa = new PolicyAttachment();
         assertNull(pa.getDomainExpressions());
         assertNull(pa.getPolicy());
 
-        Policy p = control.createMock(Policy.class);
+        Policy p = mock(Policy.class);
         Collection<DomainExpression> des = CastUtils.cast(Collections.emptyList(), DomainExpression.class);
 
         pa.setPolicy(p);
@@ -70,87 +60,83 @@ public class PolicyAttachmentTest {
 
     @Test
     public void testAppliesToService() {
-        ServiceInfo si1 = control.createMock(ServiceInfo.class);
-        ServiceInfo si2 = control.createMock(ServiceInfo.class);
-        DomainExpression de = control.createMock(DomainExpression.class);
+        ServiceInfo si1 = mock(ServiceInfo.class);
+        ServiceInfo si2 = mock(ServiceInfo.class);
+        DomainExpression de = mock(DomainExpression.class);
         Collection<DomainExpression> des = Collections.singletonList(de);
         PolicyAttachment pa = new PolicyAttachment();
         pa.setDomainExpressions(des);
 
-        EasyMock.expect(de.appliesTo(si1)).andReturn(false);
-        EasyMock.expect(de.appliesTo(si2)).andReturn(true);
-        control.replay();
+        when(de.appliesTo(si1)).thenReturn(false);
+        when(de.appliesTo(si2)).thenReturn(true);
+
         assertFalse(pa.appliesTo(si1));
         assertTrue(pa.appliesTo(si2));
-        control.verify();
     }
 
     @Test
     public void testAppliesToEndpoint() {
-        EndpointInfo ei1 = control.createMock(EndpointInfo.class);
-        EndpointInfo ei2 = control.createMock(EndpointInfo.class);
-        DomainExpression de = control.createMock(DomainExpression.class);
+        EndpointInfo ei1 = mock(EndpointInfo.class);
+        EndpointInfo ei2 = mock(EndpointInfo.class);
+        DomainExpression de = mock(DomainExpression.class);
         Collection<DomainExpression> des = Collections.singletonList(de);
         PolicyAttachment pa = new PolicyAttachment();
         pa.setDomainExpressions(des);
 
-        EasyMock.expect(de.appliesTo(ei1)).andReturn(false);
-        EasyMock.expect(de.appliesTo(ei2)).andReturn(true);
-        control.replay();
+        when(de.appliesTo(ei1)).thenReturn(false);
+        when(de.appliesTo(ei2)).thenReturn(true);
+
         assertFalse(pa.appliesTo(ei1));
         assertTrue(pa.appliesTo(ei2));
-        control.verify();
+
     }
 
     @Test
     public void testAppliesToOperation() {
-        BindingOperationInfo boi1 = control.createMock(BindingOperationInfo.class);
-        BindingOperationInfo boi2 = control.createMock(BindingOperationInfo.class);
-        DomainExpression de = control.createMock(DomainExpression.class);
+        BindingOperationInfo boi1 = mock(BindingOperationInfo.class);
+        BindingOperationInfo boi2 = mock(BindingOperationInfo.class);
+        DomainExpression de = mock(DomainExpression.class);
         Collection<DomainExpression> des = Collections.singletonList(de);
         PolicyAttachment pa = new PolicyAttachment();
         pa.setDomainExpressions(des);
 
-        EasyMock.expect(de.appliesTo(boi1)).andReturn(false);
-        EasyMock.expect(de.appliesTo(boi2)).andReturn(true);
-        control.replay();
+        when(de.appliesTo(boi1)).thenReturn(false);
+        when(de.appliesTo(boi2)).thenReturn(true);
+
         assertFalse(pa.appliesTo(boi1));
         assertTrue(pa.appliesTo(boi2));
-        control.verify();
     }
 
     @Test
     public void testAppliesToMessage() {
-        BindingMessageInfo bmi1 = control.createMock(BindingMessageInfo.class);
-        BindingMessageInfo bmi2 = control.createMock(BindingMessageInfo.class);
-        DomainExpression de = control.createMock(DomainExpression.class);
+        BindingMessageInfo bmi1 = mock(BindingMessageInfo.class);
+        BindingMessageInfo bmi2 = mock(BindingMessageInfo.class);
+        DomainExpression de = mock(DomainExpression.class);
         Collection<DomainExpression> des = Collections.singletonList(de);
         PolicyAttachment pa = new PolicyAttachment();
         pa.setDomainExpressions(des);
 
-        EasyMock.expect(de.appliesTo(bmi1)).andReturn(false);
-        EasyMock.expect(de.appliesTo(bmi2)).andReturn(true);
-        control.replay();
+        when(de.appliesTo(bmi1)).thenReturn(false);
+        when(de.appliesTo(bmi2)).thenReturn(true);
+
         assertFalse(pa.appliesTo(bmi1));
         assertTrue(pa.appliesTo(bmi2));
-        control.verify();
     }
 
     @Test
     public void testAppliesToFault() {
-        BindingFaultInfo bfi1 = control.createMock(BindingFaultInfo.class);
-        BindingFaultInfo bfi2 = control.createMock(BindingFaultInfo.class);
-        DomainExpression de = control.createMock(DomainExpression.class);
+        BindingFaultInfo bfi1 = mock(BindingFaultInfo.class);
+        BindingFaultInfo bfi2 = mock(BindingFaultInfo.class);
+        DomainExpression de = mock(DomainExpression.class);
         Collection<DomainExpression> des = Collections.singletonList(de);
         PolicyAttachment pa = new PolicyAttachment();
         pa.setDomainExpressions(des);
 
-        EasyMock.expect(de.appliesTo(bfi1)).andReturn(false);
-        EasyMock.expect(de.appliesTo(bfi2)).andReturn(true);
-        control.replay();
+        when(de.appliesTo(bfi1)).thenReturn(false);
+        when(de.appliesTo(bfi2)).thenReturn(true);
+
         assertFalse(pa.appliesTo(bfi1));
         assertTrue(pa.appliesTo(bfi2));
-        control.verify();
     }
 
 

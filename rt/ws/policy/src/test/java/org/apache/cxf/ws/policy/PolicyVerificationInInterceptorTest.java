@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.lang.reflect.Method;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -29,17 +27,17 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.neethi.Policy;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class PolicyVerificationInInterceptorTest {
 
-    private IMocksControl control;
     private Bus bus;
     private Message message;
     private Exchange exchange;
@@ -51,8 +49,7 @@ public class PolicyVerificationInInterceptorTest {
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
+        bus = mock(Bus.class);
     }
 
     @Test
@@ -61,68 +58,44 @@ public class PolicyVerificationInInterceptorTest {
         PolicyVerificationInInterceptor interceptor = new PolicyVerificationInInterceptor();
 
         setupMessage(false, false, false, false);
-        control.replay();
         interceptor.handleMessage(message);
-        control.verify();
 
-        control.reset();
         setupMessage(true, false, false, false);
-        control.replay();
         interceptor.handleMessage(message);
-        control.verify();
-        control.reset();
+
         setupMessage(true, true, false, false);
-        control.replay();
         interceptor.handleMessage(message);
-        control.verify();
 
-        control.reset();
         setupMessage(true, true, true, false);
-        control.replay();
         interceptor.handleMessage(message);
-        control.verify();
-
     }
 
     @Test
     public void testHandleMessage() throws NoSuchMethodException {
-
-        control.reset();
-        Method m = AbstractPolicyInterceptor.class.getDeclaredMethod("getTransportAssertions",
-            new Class[] {Message.class});
-        PolicyVerificationInInterceptor interceptor =
-            EasyMock.createMockBuilder(PolicyVerificationInInterceptor.class)
-                .addMockedMethod(m).createMock(control);
+        PolicyVerificationInInterceptor interceptor = new PolicyVerificationInInterceptor();
         setupMessage(true, true, true, true);
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.FALSE);
         interceptor.getTransportAssertions(message);
-        EasyMock.expectLastCall();
-        EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
-        EasyMock.expect(engine.getEffectiveClientResponsePolicy(ei, boi, message)).andReturn(effectivePolicy);
-        Policy policy = control.createMock(Policy.class);
-        EasyMock.expect(effectivePolicy.getPolicy()).andReturn(policy);
-        aim.checkEffectivePolicy(policy);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
-        interceptor.handleMessage(message);
-        control.verify();
 
-        control.reset();
-        setupMessage(true, true, true, true);
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE);
-        interceptor.getTransportAssertions(message);
-        EasyMock.expectLastCall();
-        effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE);
-        EasyMock.expect(engine.getEffectiveServerRequestPolicy(ei, boi, message)).andReturn(effectivePolicy);
-        policy = control.createMock(Policy.class);
-        EasyMock.expect(effectivePolicy.getPolicy()).andReturn(policy);
-        aim.checkEffectivePolicy(policy);
-        EasyMock.expectLastCall().andReturn(null);
-        control.replay();
+        EffectivePolicy effectivePolicy = mock(EffectivePolicy.class);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(engine.getEffectiveClientResponsePolicy(ei, boi, message)).thenReturn(effectivePolicy);
+        Policy policy = mock(Policy.class);
+        when(effectivePolicy.getPolicy()).thenReturn(policy);
+        when(aim.checkEffectivePolicy(policy)).thenReturn(null);
         interceptor.handleMessage(message);
-        control.verify();
+
+        setupMessage(true, true, true, true);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.FALSE);
+        interceptor.getTransportAssertions(message);
+
+        effectivePolicy = mock(EffectivePolicy.class);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.FALSE);
+        when(engine.getEffectiveServerRequestPolicy(ei, boi, message)).thenReturn(effectivePolicy);
+        policy = mock(Policy.class);
+        when(effectivePolicy.getPolicy()).thenReturn(policy);
+        when(aim.checkEffectivePolicy(policy)).thenReturn(null);
+        interceptor.handleMessage(message);
     }
 
     void setupMessage(boolean setupBindingOperationInfo,
@@ -130,42 +103,42 @@ public class PolicyVerificationInInterceptorTest {
                       boolean setupPolicyEngine,
                       boolean setupAssertionInfoMap) {
         if (null == message) {
-            message = control.createMock(Message.class);
+            message = mock(Message.class);
         }
         if (null == exchange) {
-            exchange = control.createMock(Exchange.class);
+            exchange = mock(Exchange.class);
         }
         if (setupAssertionInfoMap && null == aim) {
-            aim = control.createMock(AssertionInfoMap.class);
+            aim = mock(AssertionInfoMap.class);
         }
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
         if (aim == null) {
             return;
         }
 
-        EasyMock.expect(exchange.getBus()).andReturn(bus).anyTimes();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
+        when(exchange.getBus()).thenReturn(bus);
+        when(message.getExchange()).thenReturn(exchange);
         if (setupBindingOperationInfo && null == boi) {
-            boi = control.createMock(BindingOperationInfo.class);
+            boi = mock(BindingOperationInfo.class);
         }
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
         if (!setupBindingOperationInfo) {
             return;
         }
         if (setupEndpoint && null == endpoint) {
-            endpoint = control.createMock(Endpoint.class);
+            endpoint = mock(Endpoint.class);
         }
-        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
+        when(exchange.getEndpoint()).thenReturn(endpoint);
         if (!setupEndpoint) {
             return;
         }
-        ei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
+        ei = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(ei);
 
         if (setupPolicyEngine && null == engine) {
-            engine = control.createMock(PolicyEngine.class);
+            engine = mock(PolicyEngine.class);
         }
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(engine);
+        when(bus.getExtension(PolicyEngine.class)).thenReturn(engine);
         if (!setupPolicyEngine) {
             return;
         }

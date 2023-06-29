@@ -27,40 +27,25 @@ import org.apache.cxf.Bus;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class AssertionBuilderRegistryImplTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testBuildUnknownAssertion() {
-        Bus bus = control.createMock(Bus.class);
+        Bus bus = mock(Bus.class);
 
-        PolicyBuilder builder = control.createMock(PolicyBuilder.class);
-        EasyMock.expect(bus.getExtension(PolicyBuilder.class)).andReturn(builder).anyTimes();
+        PolicyBuilder builder = mock(PolicyBuilder.class);
+        when(bus.getExtension(PolicyBuilder.class)).thenReturn(builder);
 
         AssertionBuilderRegistryImpl reg = new AssertionBuilderRegistryImpl() {
             protected void loadDynamic() {
@@ -72,12 +57,11 @@ public class AssertionBuilderRegistryImplTest {
         QName[] qnames = new QName[11];
         for (int i = 0; i < 11; i++) {
             qnames[i] = new QName("http://my.company.com", "type" + Integer.toString(i));
-            elems[i] = control.createMock(Element.class);
-            EasyMock.expect(elems[i].getNamespaceURI()).andReturn(qnames[i].getNamespaceURI()).anyTimes();
-            EasyMock.expect(elems[i].getLocalName()).andReturn(qnames[i].getLocalPart()).anyTimes();
+            elems[i] = mock(Element.class);
+            when(elems[i].getNamespaceURI()).thenReturn(qnames[i].getNamespaceURI());
+            when(elems[i].getLocalName()).thenReturn(qnames[i].getLocalPart());
         }
 
-        control.replay();
         reg.setBus(bus);
 
         assertFalse(reg.isIgnoreUnknownAssertions());

@@ -29,11 +29,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.policy.PolicyCalculator;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PolicyDataEngineImplTest {
     private static final QName TEST_POLICY_NAME = new QName("http://test", "TestPolicy");
@@ -101,13 +101,10 @@ public class PolicyDataEngineImplTest {
         PolicyDataEngineImpl pde = new PolicyDataEngineImpl(null);
         pde.setPolicyEngine(new PolicyEngineImpl());
         TestPolicy confPol = new TestPolicy();
-        IMocksControl control = EasyMock.createControl();
         PolicyCalculator<TestPolicy> policyCalculator = new TestPolicyCalculator();
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(message.get(TestPolicy.class)).andReturn(confPol);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(assertionInfoMap);
-        control.replay();
+        Message message = mock(Message.class);
+        when(message.get(TestPolicy.class)).thenReturn(confPol);
+        when(message.get(AssertionInfoMap.class)).thenReturn(assertionInfoMap);
         pde.assertMessage(message, confPol, policyCalculator);
-        control.verify();
     }
 }
