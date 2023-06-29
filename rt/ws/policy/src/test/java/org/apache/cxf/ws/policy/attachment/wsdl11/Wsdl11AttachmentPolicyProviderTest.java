@@ -50,9 +50,6 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.util.PolicyComparator;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -64,6 +61,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -76,24 +76,19 @@ public class Wsdl11AttachmentPolicyProviderTest {
     private static EndpointInfo[] endpoints;
     private Wsdl11AttachmentPolicyProvider app;
     private Bus bus;
-    private IMocksControl control = EasyMock.createNiceControl();
-
 
 
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
-
-        IMocksControl control = EasyMock.createNiceControl();
-        Bus bus = control.createMock(Bus.class);
+        Bus bus = mock(Bus.class);
         WSDLManager manager = new WSDLManagerImpl();
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andReturn(dfm).anyTimes();
-        EasyMock.expect(dfm.getDestinationFactory(EasyMock.isA(String.class))).andReturn(null).anyTimes();
-        BindingFactoryManager bfm = control.createMock(BindingFactoryManager.class);
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bfm).anyTimes();
-        EasyMock.expect(bfm.getBindingFactory(EasyMock.isA(String.class))).andReturn(null).anyTimes();
-        control.replay();
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
+        when(dfm.getDestinationFactory(isA(String.class))).thenReturn(null);
+        BindingFactoryManager bfm = mock(BindingFactoryManager.class);
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bfm);
+        when(bfm.getBindingFactory(isA(String.class))).thenReturn(null);
 
         int n = 19;
         services = new ServiceInfo[n];
@@ -111,9 +106,6 @@ public class Wsdl11AttachmentPolicyProviderTest {
             endpoints[i] = services[i].getEndpoints().iterator().next();
             assertNotNull(endpoints[i]);
         }
-
-        control.verify();
-
     }
 
     @AfterClass
@@ -125,10 +117,8 @@ public class Wsdl11AttachmentPolicyProviderTest {
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bus.getExtension(ConfiguredBeanLocator.class);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        bus = mock(Bus.class);
+        when(bus.getExtension(ConfiguredBeanLocator.class)).thenReturn(null);
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         abr.setIgnoreUnknownAssertions(false);
 
@@ -139,23 +129,13 @@ public class Wsdl11AttachmentPolicyProviderTest {
         abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
 
         PolicyBuilderImpl pb = new PolicyBuilderImpl();
-        bus.getExtension(PolicyBuilder.class);
-        EasyMock.expectLastCall().andReturn(pb).anyTimes();
-        bus.getExtension(PolicyEngine.class);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        when(bus.getExtension(PolicyBuilder.class)).thenReturn(pb);
+        when(bus.getExtension(PolicyEngine.class)).thenReturn(null);
 
         pb.setAssertionBuilderRegistry(abr);
         app = new Wsdl11AttachmentPolicyProvider();
         app.setBuilder(pb);
         app.setRegistry(new PolicyRegistryImpl());
-        control.replay();
-
-    }
-
-
-    @After
-    public void tearDown() {
-        control.verify();
     }
 
     @Test
