@@ -37,26 +37,16 @@ import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyDataEngineImpl;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class PolicyUtilsTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-
     @Test
     public void testAssertClientPolicyNoop() {
         testAssertPolicyNoop(true);
@@ -69,24 +59,20 @@ public class PolicyUtilsTest {
 
     void testAssertPolicyNoop(boolean isRequestor) {
         PolicyDataEngine pde = new PolicyDataEngineImpl(null);
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        control.replay();
+        Message message = mock(Message.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(null);
 
         pde.assertMessage(message, null, new ClientPolicyCalculator());
-        control.verify();
 
-        control.reset();
         Collection<PolicyAssertion> as = new ArrayList<>();
         AssertionInfoMap aim = new AssertionInfoMap(as);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
-        control.replay();
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
+
         if (isRequestor) {
             pde.assertMessage(message, null, new ClientPolicyCalculator());
         } else {
             pde.assertMessage(message, null, new ServerPolicyCalculator());
         }
-        control.verify();
     }
 
 
@@ -108,7 +94,7 @@ public class PolicyUtilsTest {
     }
 
     void testAssertClientPolicy(boolean outbound) {
-        Message message = control.createMock(Message.class);
+        Message message = mock(Message.class);
         HTTPClientPolicy ep = new HTTPClientPolicy();
         HTTPClientPolicy cmp = new HTTPClientPolicy();
 
@@ -127,21 +113,19 @@ public class PolicyUtilsTest {
         ais.add(cmai);
         ais.add(icmai);
         aim.put(new ClientPolicyCalculator().getDataClassName(), ais);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).atLeastOnce();
-        EasyMock.expect(ex.getOutMessage()).andReturn(outbound ? message : null).atLeastOnce();
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
+        Exchange ex = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(ex);
+        when(ex.getOutMessage()).thenReturn(outbound ? message : null);
         if (!outbound) {
-            EasyMock.expect(ex.getOutFaultMessage()).andReturn(null).atLeastOnce();
+            when(ex.getOutFaultMessage()).thenReturn(null);
         }
 
-        control.replay();
         PolicyDataEngine pde = new PolicyDataEngineImpl(null);
         pde.assertMessage(message, ep, new ClientPolicyCalculator());
         assertTrue(eai.isAsserted());
         assertTrue(cmai.isAsserted());
         assertTrue(icmai.isAsserted());
-        control.verify();
     }
 
     @Test
@@ -162,7 +146,7 @@ public class PolicyUtilsTest {
     }
 
     void testAssertServerPolicy(boolean outbound) {
-        Message message = control.createMock(Message.class);
+        Message message = mock(Message.class);
         HTTPServerPolicy ep = new HTTPServerPolicy();
         HTTPServerPolicy mp = new HTTPServerPolicy();
         HTTPServerPolicy cmp = new HTTPServerPolicy();
@@ -183,21 +167,19 @@ public class PolicyUtilsTest {
         AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         aim.put(new ServerPolicyCalculator().getDataClassName(), ais);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim).atLeastOnce();
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).atLeastOnce();
-        EasyMock.expect(ex.getOutMessage()).andReturn(outbound ? message : null).atLeastOnce();
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
+        Exchange ex = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(ex);
+        when(ex.getOutMessage()).thenReturn(outbound ? message : null);
         if (!outbound) {
-            EasyMock.expect(ex.getOutFaultMessage()).andReturn(null).atLeastOnce();
+            when(ex.getOutFaultMessage()).thenReturn(null);
         }
 
-        control.replay();
         new PolicyDataEngineImpl(null).assertMessage(message, ep,
                                                      new ServerPolicyCalculator());
         assertTrue(eai.isAsserted());
         assertTrue(mai.isAsserted());
         assertTrue(outbound ? cmai.isAsserted() : !cmai.isAsserted());
         assertTrue(outbound ? icmai.isAsserted() : !icmai.isAsserted());
-        control.verify();
     }
 }

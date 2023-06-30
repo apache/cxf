@@ -26,8 +26,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +34,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -52,20 +52,17 @@ public class DestinationRegistryImplTest {
     private static final int[] MATCHED_PATH_INDEXES = {0, 0, 1, -1,
                                                        3, 0, 0, 4,
                                                        -1, 5, 5, 5};
-    private IMocksControl control;
     private DestinationRegistry registry;
     private MessageObserver observer;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
         registry = new DestinationRegistryImpl();
-        observer = control.createMock(MessageObserver.class);
+        observer = mock(MessageObserver.class);
     }
 
     @After
     public void tearDown() {
-        control = null;
         registry = null;
     }
 
@@ -93,19 +90,17 @@ public class DestinationRegistryImplTest {
             for (int j = 0; j < REGISTERED_PATHS.length; j++) {
                 AbstractHTTPDestination target = registry.getDestinationForPath(REGISTERED_PATHS[j]);
                 if (mi == j) {
-                    EasyMock.expect(target.getMessageObserver()).andReturn(observer);
+                    when(target.getMessageObserver()).thenReturn(observer);
                     EndpointInfo endpoint = new EndpointInfo();
                     endpoint.setAddress(REGISTERED_PATHS[mi]);
                     endpoint.setName(QNAME);
-                    EasyMock.expect(target.getEndpointInfo()).andReturn(endpoint);
+                    when(target.getEndpointInfo()).thenReturn(endpoint);
 
                 } else {
-                    EasyMock.expect(target.getMessageObserver()).andReturn(observer).anyTimes();
+                    when(target.getMessageObserver()).thenReturn(observer);
                 }
 
             }
-
-            control.replay();
 
             AbstractHTTPDestination destination = registry.checkRestfulRequest(REQUEST_PATHS[i]);
 
@@ -117,25 +112,19 @@ public class DestinationRegistryImplTest {
             } else {
                 assertNull(destination);
             }
-
-            control.verify();
-
-            control.reset();
         }
 
     }
 
     private void setUpDestinations() {
         for (int i = 0; i < REGISTERED_PATHS.length; i++) {
-            AbstractHTTPDestination destination = control.createMock(AbstractHTTPDestination.class);
+            AbstractHTTPDestination destination = mock(AbstractHTTPDestination.class);
             EndpointInfo endpoint = new EndpointInfo();
             endpoint.setAddress(REGISTERED_PATHS[i]);
             endpoint.setName(QNAME);
-            EasyMock.expect(destination.getEndpointInfo()).andReturn(endpoint);
+            when(destination.getEndpointInfo()).thenReturn(endpoint);
 
-            control.replay();
             registry.addDestination(destination);
-            control.reset();
         }
 
     }
