@@ -35,7 +35,6 @@ import org.apache.cxf.jaxws.handler.types.ParamValueType;
 import org.apache.cxf.jaxws.handler.types.PortComponentHandlerType;
 import org.apache.cxf.jaxws.handler.types.XsdStringType;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -45,16 +44,17 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("rawtypes")
 public class HandlerChainBuilderTest {
 
-    Handler[] allHandlers = {EasyMock.createMock(LogicalHandler.class), EasyMock.createMock(Handler.class),
-                             EasyMock.createMock(Handler.class), EasyMock.createMock(LogicalHandler.class)};
+    Handler[] allHandlers = {mock(LogicalHandler.class), mock(Handler.class),
+                             mock(Handler.class), mock(LogicalHandler.class)};
     Handler[] logicalHandlers = {allHandlers[0], allHandlers[3]};
     Handler[] protocolHandlers = {allHandlers[1], allHandlers[2]};
 
-    HandlerChainBuilder builder = new HandlerChainBuilder(EasyMock.createNiceMock(Bus.class));
+    HandlerChainBuilder builder = new HandlerChainBuilder(mock(Bus.class));
 
 
     @Test

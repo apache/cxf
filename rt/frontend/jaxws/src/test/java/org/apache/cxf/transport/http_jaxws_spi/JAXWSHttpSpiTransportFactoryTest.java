@@ -24,27 +24,26 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 
 public class JAXWSHttpSpiTransportFactoryTest {
 
-    private IMocksControl control;
     private HttpContext context;
     private JAXWSHttpSpiTransportFactory factory;
     private Bus bus;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        context = control.createMock(HttpContext.class);
-        bus = control.createMock(Bus.class);
+        context = mock(HttpContext.class);
+        bus = mock(Bus.class);
         factory = new JAXWSHttpSpiTransportFactory(context);
     }
 
@@ -66,8 +65,7 @@ public class JAXWSHttpSpiTransportFactoryTest {
     }
 
     public void getDestination(String endpointAddress) throws Exception {
-        context.setHandler(EasyMock.isA(HttpHandler.class));
-        control.replay();
+        doNothing().when(context).setHandler(isA(HttpHandler.class));
 
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(endpointAddress);
@@ -78,7 +76,6 @@ public class JAXWSHttpSpiTransportFactoryTest {
         assertNotNull(destination.getAddress().getAddress());
         assertEquals(endpointAddress, destination.getAddress().getAddress().getValue());
         assertEquals(endpointAddress, endpoint.getAddress());
-        control.verify();
     }
 
 }

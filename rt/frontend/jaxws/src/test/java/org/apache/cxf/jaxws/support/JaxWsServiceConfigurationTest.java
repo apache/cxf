@@ -40,8 +40,6 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,6 +47,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JaxWsServiceConfigurationTest {
 
@@ -153,10 +153,9 @@ public class JaxWsServiceConfigurationTest {
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         Definition def = wsdlReader.readWSDL(new CatalogWSDLLocator(wsdlUrl));
 
-        IMocksControl control = EasyMock.createNiceControl();
-        Bus bus = control.createMock(Bus.class);
-        BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
+        Bus bus = mock(Bus.class);
+        BindingFactoryManager bindingFactoryManager = mock(BindingFactoryManager.class);
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
 
         Service service = null;
@@ -168,9 +167,8 @@ public class JaxWsServiceConfigurationTest {
             }
         }
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        control.replay();
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bindingFactoryManager);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
         ServiceInfo serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
         serviceInfo.setProperty(WSDLServiceBuilder.WSDL_DEFINITION, null);

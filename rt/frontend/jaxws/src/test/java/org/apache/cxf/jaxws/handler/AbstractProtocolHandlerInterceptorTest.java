@@ -29,20 +29,17 @@ import org.apache.cxf.message.AbstractWrappedMessage;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createNiceControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AbstractProtocolHandlerInterceptorTest {
 
-    private IMocksControl control;
     private Binding binding;
     private HandlerChainInvoker invoker;
     private IIOPMessage message;
@@ -50,31 +47,24 @@ public class AbstractProtocolHandlerInterceptorTest {
 
     @Before
     public void setUp() {
-        control = createNiceControl();
-        invoker = control.createMock(HandlerChainInvoker.class);
-        message = control.createMock(IIOPMessage.class);
-        exchange = control.createMock(Exchange.class);
-        binding = control.createMock(Binding.class);
+        invoker = mock(HandlerChainInvoker.class);
+        message = mock(IIOPMessage.class);
+        exchange = mock(Exchange.class);
+        binding = mock(Binding.class);
 
         @SuppressWarnings("rawtypes")
         List<Handler> list = new ArrayList<>();
         list.add(null);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
+        when(binding.getHandlerChain()).thenReturn(list);
     }
 
     @Test
     public void testInterceptSuccess() {
-        expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
-        expect(invoker.invokeProtocolHandlers(eq(false),
-                        isA(MessageContext.class))).andReturn(true);
-        expect(exchange.getOutMessage()).andReturn(message);
-        control.replay();
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
+        when(invoker.invokeProtocolHandlers(eq(false),
+                        isA(MessageContext.class))).thenReturn(true);
+        when(exchange.getOutMessage()).thenReturn(message);
         IIOPHandlerInterceptor pi = new IIOPHandlerInterceptor(binding);
         assertEquals("unexpected phase", "user-protocol", pi.getPhase());
         pi.handleMessage(message);
@@ -82,13 +72,12 @@ public class AbstractProtocolHandlerInterceptorTest {
 
     @Test
     public void testInterceptFailure() {
-        expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
-        expect(exchange.getOutMessage()).andReturn(message);
-        expect(
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
+        when(exchange.getOutMessage()).thenReturn(message);
+        when(
                 invoker.invokeProtocolHandlers(eq(false),
-                        isA(MessageContext.class))).andReturn(false);
-        control.replay();
+                        isA(MessageContext.class))).thenReturn(false);
         IIOPHandlerInterceptor pi = new IIOPHandlerInterceptor(binding);
         pi.handleMessage(message);
     }
