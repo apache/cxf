@@ -54,8 +54,6 @@ import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.Relationship;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,11 +68,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MAPCodecTest {
 
     private MAPCodec codec;
-    private IMocksControl control;
     private QName[] expectedNames;
     private Object[] expectedValues;
     private String expectedNamespaceURI;
@@ -87,7 +86,6 @@ public class MAPCodecTest {
     @Before
     public void setUp() {
         codec = new MAPCodec();
-        control = EasyMock.createNiceControl();
     }
 
     @After
@@ -117,7 +115,6 @@ public class MAPCodecTest {
         String uri = Names200403.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, false, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, false, false);
     }
 
@@ -126,7 +123,6 @@ public class MAPCodecTest {
         String uri = Names200403.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(false, false, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, false, false);
     }
 
@@ -135,7 +131,6 @@ public class MAPCodecTest {
         String uri = Names200403.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, true, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -144,7 +139,6 @@ public class MAPCodecTest {
         String uri = Names200403.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(false, true, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, true, false);
     }
 
@@ -152,7 +146,6 @@ public class MAPCodecTest {
     public void testRequestorOutbound() throws Exception {
         SoapMessage message = setUpMessage(true, true);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -161,7 +154,6 @@ public class MAPCodecTest {
         SoapMessage message = setUpMessage(true, true, false, true);
         codec.handleMessage(message);
         verifyAction();
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -170,7 +162,6 @@ public class MAPCodecTest {
         String uri = Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, true, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -178,7 +169,6 @@ public class MAPCodecTest {
     public void testResponderInbound() throws Exception {
         SoapMessage message = setUpMessage(false, false);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, false, true);
     }
 
@@ -186,7 +176,6 @@ public class MAPCodecTest {
     public void testResponderOutbound() throws Exception {
         SoapMessage message = setUpMessage(false, true);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -199,7 +188,6 @@ public class MAPCodecTest {
             codec.uncorrelatedExchanges.remove(key);
         }
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, false, false);
     }
 
@@ -208,7 +196,6 @@ public class MAPCodecTest {
         String uri = Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(false, false, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, false, false);
     }
 
@@ -221,7 +208,6 @@ public class MAPCodecTest {
         } catch (SoapFault sfe) {
             assertEquals("unexpected fault string", "Duplicate Message ID urn:uuid:12345", sfe.getMessage());
         }
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -230,7 +216,6 @@ public class MAPCodecTest {
         SoapMessage message = setUpMessage(false, true, false, true);
         codec.handleMessage(message);
         verifyAction();
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -239,7 +224,6 @@ public class MAPCodecTest {
         String uri = Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(false, true, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, false, true, false);
     }
 
@@ -247,7 +231,6 @@ public class MAPCodecTest {
     public void testRequestorInbound() throws Exception {
         SoapMessage message = setUpMessage(true, false);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, false, true);
     }
 
@@ -256,7 +239,6 @@ public class MAPCodecTest {
         String uri = Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, false, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, false, false);
     }
 
@@ -265,7 +247,6 @@ public class MAPCodecTest {
         nonReplyRelationship = "wsat:correlatedOneway";
         SoapMessage message = setUpMessage(true, false);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, false, true);
     }
 
@@ -275,7 +256,6 @@ public class MAPCodecTest {
         String uri = Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(true, false, false, false, uri);
         codec.handleMessage(message);
-        control.verify();
         verifyMessage(message, true, false, false);
     }
 
@@ -308,14 +288,14 @@ public class MAPCodecTest {
         message.put(REQUESTOR_ROLE, Boolean.valueOf(requestor));
         String mapProperty = getMAPProperty(requestor, outbound);
         AddressingProperties maps = getMAPs(requestor, outbound, exposeAs);
-        final Element header = control.createMock(Element.class);
+        final Element header = mock(Element.class);
         codec.setHeaderFactory(new MAPCodec.HeaderFactory() {
             public Element getHeader(SoapVersion version) {
                 return header;
             }
         });
         List<Header> headers = message.getHeaders();
-        JAXBContext jaxbContext = control.createMock(JAXBContext.class);
+        JAXBContext jaxbContext = mock(JAXBContext.class);
         ContextJAXBUtils.setJAXBContext(jaxbContext);
         Names200408.setJAXBContext(jaxbContext);
         Names200403.setJAXBContext(jaxbContext);
@@ -324,7 +304,6 @@ public class MAPCodecTest {
         } else {
             setUpDecode(message, headers, maps, mapProperty, requestor);
         }
-        control.replay();
         return message;
     }
 
@@ -350,9 +329,8 @@ public class MAPCodecTest {
 
     private void setUpDecode(SoapMessage message, List<Header> headers, AddressingProperties maps,
                              String mapProperty, boolean requestor) throws Exception {
-        Unmarshaller unmarshaller = control.createMock(Unmarshaller.class);
-        ContextJAXBUtils.getJAXBContext().createUnmarshaller();
-        EasyMock.expectLastCall().andReturn(unmarshaller);
+        Unmarshaller unmarshaller = mock(Unmarshaller.class);
+        when(ContextJAXBUtils.getJAXBContext().createUnmarshaller()).thenReturn(unmarshaller);
         String uri = maps.getNamespaceURI();
         boolean exposedAsNative = Names.WSA_NAMESPACE_NAME.equals(uri);
         boolean exposedAs200408 = Names200408.WSA_NAMESPACE_NAME.equals(uri);
@@ -386,17 +364,14 @@ public class MAPCodecTest {
 
     private <T> void setUpHeaderDecode(List<Header> headers, String uri, String name, Class<?> clz,
                                        int index, Unmarshaller unmarshaller) throws Exception {
-        Element headerElement = control.createMock(Element.class);
+        Element headerElement = mock(Element.class);
         headers.add(new Header(new QName(uri, name), headerElement));
-        headerElement.getNamespaceURI();
-        EasyMock.expectLastCall().andReturn(uri);
-        headerElement.getLocalName();
-        EasyMock.expectLastCall().andReturn(name);
+        when(headerElement.getNamespaceURI()).thenReturn(uri);
+        when(headerElement.getLocalName()).thenReturn(name);
         Object v = expectedValues[index];
         @SuppressWarnings("unchecked")
         JAXBElement<?> jaxbElement = new JAXBElement<>(new QName(uri, name), (Class<Object>)clz, clz.cast(v));
-        unmarshaller.unmarshal(headerElement, clz);
-        EasyMock.expectLastCall().andReturn(jaxbElement);
+        when(unmarshaller.unmarshal(headerElement, clz)).thenAnswer(i -> jaxbElement);
     }
 
     private void setUpOutbound(Message message, boolean outbound) {

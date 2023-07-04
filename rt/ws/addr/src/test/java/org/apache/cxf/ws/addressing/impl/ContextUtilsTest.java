@@ -42,14 +42,13 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -60,55 +59,40 @@ public class ContextUtilsTest {
     private static final QName OLD_WSDL_WSA_ACTION_QNAME =
         new QName(Names.WSA_NAMESPACE_WSDL_NAME_OLD, Names.WSAW_ACTION_NAME);
 
-    private IMocksControl control;
-
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testGetActionFromExtensible() {
         Map<QName, Object> attributes = new HashMap<>();
-        Extensible ext = control.createMock(Extensible.class);
-        EasyMock.expect(ext.getExtensionAttributes()).andReturn(attributes).anyTimes();
+        Extensible ext = mock(Extensible.class);
+        when(ext.getExtensionAttributes()).thenReturn(attributes);
         attributes.put(WSA_ACTION_QNAME, "urn:foo:test:2");
-        EasyMock.expect(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
-            andReturn("urn:foo:test:1");
-        control.replay();
+        when(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
+            thenReturn("urn:foo:test:1");
 
         String action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:1", action);
 
-        control.reset();
         attributes.clear();
-        EasyMock.expect(ext.getExtensionAttributes()).andReturn(attributes).anyTimes();
-        EasyMock.expect(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
-            andReturn(null);
+        when(ext.getExtensionAttributes()).thenReturn(attributes);
+        when(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
+            thenReturn(null);
         attributes.put(WSA_ACTION_QNAME, "urn:foo:test:2");
-        control.replay();
 
         action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:2", action);
 
-        control.reset();
         attributes.clear();
-        EasyMock.expect(ext.getExtensionAttributes()).andReturn(attributes).anyTimes();
-        EasyMock.expect(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
-            andReturn(null);
+        when(ext.getExtensionAttributes()).thenReturn(attributes);
+        when(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
+            thenReturn(null);
         attributes.put(OLD_WSDL_WSA_ACTION_QNAME, "urn:foo:test:3");
-        control.replay();
 
         action = InternalContextUtils.getAction(ext);
         assertEquals("urn:foo:test:3", action);
 
-        control.reset();
         attributes.clear();
-        EasyMock.expect(ext.getExtensionAttributes()).andReturn(attributes).anyTimes();
-        EasyMock.expect(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
-            andReturn(null);
-        control.replay();
+        when(ext.getExtensionAttributes()).thenReturn(attributes);
+        when(ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME)).
+            thenReturn(null);
 
         action = InternalContextUtils.getAction(ext);
         assertEquals(null, action);
@@ -116,8 +100,8 @@ public class ContextUtilsTest {
 
     @Test
     public void testGetActionFromMessage() {
-        Message msg = control.createMock(Message.class);
-        Exchange exchange = control.createMock(Exchange.class);
+        Message msg = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
 
         QName mqname = new QName("http://foo.com", "bar");
         QName fqname = new QName("urn:foo:test:4", "fault");
@@ -130,76 +114,66 @@ public class ContextUtilsTest {
         BindingOperationInfo boi = new BindingOperationInfo(null, operationInfo);
 
         // test 1 : retrieving the normal action prop from the message
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        EasyMock.expect(msg.get(ContextUtils.ACTION)).andReturn("urn:foo:test:1");
-        control.replay();
+        when(msg.getExchange()).thenReturn(exchange);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
+        when(msg.get(ContextUtils.ACTION)).thenReturn("urn:foo:test:1");
 
         AttributedURIType action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals("urn:foo:test:1", action.getValue());
-        control.reset();
 
         // test 2 : retrieving the normal soap action prop from the message
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        EasyMock.expect(msg.get(SoapBindingConstants.SOAP_ACTION)).andReturn("urn:foo:test:2");
-        control.replay();
-
+        when(msg.getExchange()).thenReturn(exchange);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
+        when(msg.get(SoapBindingConstants.SOAP_ACTION)).thenReturn("urn:foo:test:2");
+        when(msg.get(ContextUtils.ACTION)).thenReturn(null);
+        
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals("urn:foo:test:2", action.getValue());
-        control.reset();
 
         // test 3 : retrieving the action prop from the message info
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
+        when(msg.getExchange()).thenReturn(exchange);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
+        when(msg.get(SoapBindingConstants.SOAP_ACTION)).thenReturn(null);
         messageInfo.setProperty(ContextUtils.ACTION, "urn:foo:test:3");
-        control.replay();
 
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals("urn:foo:test:3", action.getValue());
-        control.reset();
 
         // test 4 : retrieving the action for a fault without message part
         SoapFault fault = new SoapFault("faulty service", new RuntimeException(), fqname);
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(msg.getContent(Exception.class)).andReturn(fault).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        control.replay();
+        when(msg.getExchange()).thenReturn(exchange);
+        when(msg.getContent(Exception.class)).thenReturn(fault);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
 
         action = InternalContextUtils.getAction(msg);
         assertNull(action);
-        control.reset();
 
         // test 5 : retrieving the action for a fault with matching message part
         faultInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "faultInfo"), null));
         faultInfo.getMessagePart(0).setTypeClass(RuntimeException.class);
         faultInfo.addExtensionAttribute(Names.WSAW_ACTION_QNAME, "urn:foo:test:4");
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(msg.getContent(Exception.class)).andReturn(fault).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        control.replay();
+        when(msg.getExchange()).thenReturn(exchange);
+        when(msg.getContent(Exception.class)).thenReturn(fault);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
 
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals("urn:foo:test:4", action.getValue());
-        control.reset();
 
         // test 6 : retrieving the action for a ws-addr fault with matching message part
         fault = new SoapFault("Action Mismatch",
                               new QName(Names.WSA_NAMESPACE_NAME,
                                         Names.ACTION_MISMATCH_NAME));
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(msg.getContent(Exception.class)).andReturn(fault).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        control.replay();
+        when(msg.getExchange()).thenReturn(exchange);
+        when(msg.getContent(Exception.class)).thenReturn(fault);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
 
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
         assertEquals(Names.WSA_DEFAULT_FAULT_ACTION, action.getValue());
-        control.reset();
 
         // test 7 : retrieve the action for a fault matching the fault class with the WebFault annotation
         fault = new SoapFault("faulty service", new TestFault(), Fault.FAULT_CODE_SERVER);
@@ -207,10 +181,9 @@ public class ContextUtilsTest {
         faultInfo.getMessagePart(0).setTypeClass(Object.class);
         faultInfo.getMessagePart(0).setConcreteName(new QName("urn:foo:test:7", "testFault"));
         faultInfo.addExtensionAttribute(Names.WSAW_ACTION_QNAME, "urn:foo:test:7");
-        EasyMock.expect(msg.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(msg.getContent(Exception.class)).andReturn(fault).anyTimes();
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
-        control.replay();
+        when(msg.getExchange()).thenReturn(exchange);
+        when(msg.getContent(Exception.class)).thenReturn(fault);
+        when(exchange.getBindingOperationInfo()).thenReturn(boi);
 
         action = InternalContextUtils.getAction(msg);
         assertNotNull(action);
