@@ -181,7 +181,7 @@
         <cxf.micrometer.version>1.10.8</cxf.micrometer.version>
         <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
-        <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
+        <cxf.microprofile.openapi.version>3.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
         <cxf.mockito.version>5.4.0</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
