@@ -31,7 +31,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +38,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class DecoupledFaultHandlerTest {
 
@@ -47,7 +47,7 @@ public class DecoupledFaultHandlerTest {
         DecoupledFaultHandler handler = new DecoupledFaultHandler() {
             protected Destination createDecoupledDestination(Exchange exchange, EndpointReferenceType epr) {
                 assertEquals("http://bar", epr.getAddress().getValue());
-                return EasyMock.createMock(Destination.class);
+                return mock(Destination.class);
             }
         };
 

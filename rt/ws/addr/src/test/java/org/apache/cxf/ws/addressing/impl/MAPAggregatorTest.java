@@ -74,8 +74,6 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,11 +86,15 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PRO
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MAPAggregatorTest {
 
     private MAPAggregatorImpl aggregator;
-    private IMocksControl control;
     private AddressingProperties expectedMAPs;
     private String expectedTo;
     private String expectedReplyTo;
@@ -102,7 +104,6 @@ public class MAPAggregatorTest {
     @Before
     public void setUp() {
         aggregator = new MAPAggregatorImpl();
-        control = EasyMock.createNiceControl();
     }
 
     @After
@@ -119,7 +120,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -128,7 +128,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -137,7 +136,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -146,7 +144,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, true, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -155,7 +152,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, true, false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -163,7 +159,6 @@ public class MAPAggregatorTest {
     public void testRequestorOutboundNotUsingAddressing() throws Exception {
         Message message = setUpMessage(true, true, false, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -172,7 +167,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, false, false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -181,7 +175,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, true, true, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -190,7 +183,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, true, true, true);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -199,7 +191,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, true, true, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -208,7 +199,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, true, true, false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, true);
     }
 
@@ -216,7 +206,6 @@ public class MAPAggregatorTest {
     public void testRequestorOutboundOnewayNotUsingAddressing() throws Exception {
         Message message = setUpMessage(true, true, true, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -226,7 +215,6 @@ public class MAPAggregatorTest {
         throws Exception {
         Message message = setUpMessage(true, true, true, false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, true, false);
     }
 
@@ -234,7 +222,6 @@ public class MAPAggregatorTest {
     public void testResponderInboundValidMAPs() throws Exception {
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, false, false);
     }
 
@@ -243,7 +230,6 @@ public class MAPAggregatorTest {
         Message message =
             setUpMessage(false, false, false, true, false, true, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, false, true);
     }
 
@@ -252,7 +238,6 @@ public class MAPAggregatorTest {
         Message message =
             setUpMessage(false, false, true, true, false, true, true);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, false, true);
     }
 
@@ -260,7 +245,6 @@ public class MAPAggregatorTest {
     public void testResponderInboundValidMAPsFault() throws Exception {
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, false, false, true);
     }
 
@@ -270,7 +254,6 @@ public class MAPAggregatorTest {
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
 
@@ -280,7 +263,6 @@ public class MAPAggregatorTest {
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
 
@@ -300,7 +282,6 @@ public class MAPAggregatorTest {
         Message message = setUpMessage(args);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
 
@@ -320,7 +301,6 @@ public class MAPAggregatorTest {
         Message message = setUpMessage(args);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
 
@@ -328,7 +308,6 @@ public class MAPAggregatorTest {
     public void testResponderOutbound() throws Exception {
         Message message = setUpMessage(false, true, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -337,7 +316,6 @@ public class MAPAggregatorTest {
         Message message =
             setUpMessage(false, true, false, false, false, false, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -357,7 +335,6 @@ public class MAPAggregatorTest {
         Message message =
             setUpMessage(args);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -377,7 +354,6 @@ public class MAPAggregatorTest {
         Message message = setUpMessage(args);
 
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, false, true, true);
     }
 
@@ -385,7 +361,6 @@ public class MAPAggregatorTest {
     public void testRequestorInbound() throws Exception {
         Message message = setUpMessage(true, false, false);
         aggregator.mediate(message, false);
-        control.verify();
         verifyMessage(message, true, false, false /*check*/);
     }
 
@@ -393,7 +368,6 @@ public class MAPAggregatorTest {
     public void testRequestorInboundFault() throws Exception {
         Message message = setUpMessage(true, false, false);
         aggregator.mediate(message, true);
-        control.verify();
         verifyMessage(message, true, false, false /*check*/);
     }
 
@@ -454,7 +428,6 @@ public class MAPAggregatorTest {
     public void testGetActionUriForNormalOp() throws Exception {
         Message message = setUpMessage(true, true, false, true, true);
         String action = aggregator.getActionUri(message, false);
-        control.verify();
         assertEquals("http://foo/bar/SEI/opRequest", action);
     }
 
@@ -481,14 +454,13 @@ public class MAPAggregatorTest {
         ei.setAddress("http://nowhere.com/bar/foo");
         ei.setName(new QName("http://nowhere.com/port", "foo"));
         Bus bus = new ExtensionManagerBus();
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        DestinationFactory df = control.createMock(DestinationFactory.class);
-        Destination d = control.createMock(Destination.class);
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        DestinationFactory df = mock(DestinationFactory.class);
+        Destination d = mock(Destination.class);
         bus.setExtension(dfm, DestinationFactoryManager.class);
-        EasyMock.expect(dfm.getDestinationFactoryForUri(localReplyTo)).andReturn(df);
-        EasyMock.expect(df.getDestination(
-            EasyMock.anyObject(EndpointInfo.class), EasyMock.anyObject(Bus.class))).andReturn(d);
-        EasyMock.expect(d.getAddress()).andReturn(EndpointReferenceUtils.getEndpointReference(localReplyTo));
+        when(dfm.getDestinationFactoryForUri(localReplyTo)).thenReturn(df);
+        when(df.getDestination(any(EndpointInfo.class), any(Bus.class))).thenReturn(d);
+        when(d.getAddress()).thenReturn(EndpointReferenceUtils.getEndpointReference(localReplyTo));
 
         Endpoint ep = new EndpointImpl(bus, svc, ei);
         exchange.put(Endpoint.class, ep);
@@ -509,13 +481,11 @@ public class MAPAggregatorTest {
         setUpMessageProperty(message,
                              CLIENT_ADDRESSING_PROPERTIES,
                              maps);
-        control.replay();
         aggregator.mediate(message, false);
         AddressingProperties props =
             (AddressingProperties)message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
 
         assertEquals(replyTo, props.getReplyTo().getAddress().getValue());
-        control.verify();
     }
 
     private Message setUpMessage(boolean requestor,
@@ -627,24 +597,19 @@ public class MAPAggregatorTest {
             srArgs.fault = args.fault;
             srArgs.noMessageId = args.noMessageId;
 
-            Endpoint endpoint = control.createMock(Endpoint.class);
-            exchange.getEndpoint();
-            EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
+            Endpoint endpoint = mock(Endpoint.class);
+            when(exchange.getEndpoint()).thenReturn(endpoint);
 
             setUpResponder(message,
                            exchange,
                            srArgs, 
                            endpoint);
 
-            endpoint.getOutInterceptors();
-            EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
-            Service serv = control.createMock(Service.class);
-            endpoint.getService();
-            EasyMock.expectLastCall().andReturn(serv).anyTimes();
-            serv.getOutInterceptors();
-            EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
+            when(endpoint.getOutInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
+            Service serv = mock(Service.class);
+            when(endpoint.getService()).thenReturn(serv);
+            when(serv.getOutInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
         }
-        control.replay();
         return message;
     }
 
@@ -652,36 +617,28 @@ public class MAPAggregatorTest {
                                       Exchange exchange,
                                       boolean usingAddressing) {
         setUpMessageExchange(message, exchange);
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        endpoint.getOutInterceptors();
-        EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getOutInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
 
         setUpExchangeGet(exchange, Endpoint.class, endpoint);
-        EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(endpointInfo).anyTimes();
+        EndpointInfo endpointInfo = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(endpointInfo);
         List<ExtensibilityElement> endpointExts =
             new ArrayList<>();
-        endpointInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(endpointExts).anyTimes();
-        BindingInfo bindingInfo = control.createMock(BindingInfo.class);
-        endpointInfo.getBinding();
-        EasyMock.expectLastCall().andReturn(bindingInfo).anyTimes();
-        bindingInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST).anyTimes();
-        ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
-        endpointInfo.getService();
-        EasyMock.expectLastCall().andReturn(serviceInfo).anyTimes();
-        serviceInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
-        EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST).anyTimes();
+        when(endpointInfo.getExtensors(eq(ExtensibilityElement.class))).thenReturn(endpointExts);
+        BindingInfo bindingInfo = mock(BindingInfo.class);
+        when(endpointInfo.getBinding()).thenReturn(bindingInfo);
+        when(bindingInfo.getExtensors(eq(ExtensibilityElement.class))).thenReturn(Collections.emptyList());
+        ServiceInfo serviceInfo = mock(ServiceInfo.class);
+        when(endpointInfo.getService()).thenReturn(serviceInfo);
+        when(serviceInfo.getExtensors(eq(ExtensibilityElement.class))).thenReturn(Collections.emptyList());
         ExtensibilityElement ext =
-            control.createMock(ExtensibilityElement.class);
+            mock(ExtensibilityElement.class);
         if (usingAddressing) {
             QName elementType = usingAddressing
                 ? Names.WSAW_USING_ADDRESSING_QNAME
                 : new QName(SOAP_NAMESPACE, "encodingStyle");
-            ext.getElementType();
-            EasyMock.expectLastCall().andReturn(elementType).anyTimes();
+            when(ext.getElementType()).thenReturn(elementType);
             endpointExts.add(ext);
         }
     }
@@ -728,7 +685,7 @@ public class MAPAggregatorTest {
         //            mapsInContext
         //            ? maps
         //            : new AddressingPropertiesImpl());
-        //EasyMock.expectLastCall().andReturn(null);
+        //whenLastCall().thenReturn(null);
     }
 
     private void setUpResponder(Message message,
@@ -815,7 +772,7 @@ public class MAPAggregatorTest {
             //EasyMock.reportMatcher(new MAPMatcher());
             //message.put(SERVER_ADDRESSING_PROPERTIES_OUTBOUND,
             //            new AddressingPropertiesImpl());
-            //EasyMock.expectLastCall().andReturn(null);
+            //whenLastCall().thenReturn(null);
         }
     }
 
@@ -824,18 +781,15 @@ public class MAPAggregatorTest {
         setUpMessageProperty(message,
                              "org.apache.cxf.ws.addressing.partial.response.sent",
                              Boolean.FALSE);
-        Binding binding = control.createMock(Binding.class);
-        endpoint.getBinding();
-        EasyMock.expectLastCall().andReturn(binding).anyTimes();
+        Binding binding = mock(Binding.class);
+        when(endpoint.getBinding()).thenReturn(binding);
         Message partialResponse = getMessage();
-        binding.createMessage(EasyMock.isA(Message.class));
-        EasyMock.expectLastCall().andReturn(partialResponse);
+        when(binding.createMessage(isA(Message.class))).thenReturn(partialResponse);
 
-        Destination target = control.createMock(Destination.class);
+        Destination target = mock(Destination.class);
         setUpMessageDestination(message, target);
-        Conduit backChannel = control.createMock(Conduit.class);
-        target.getBackChannel(EasyMock.eq(message));
-        EasyMock.expectLastCall().andReturn(backChannel);
+        Conduit backChannel = mock(Conduit.class);
+        when(target.getBackChannel(eq(message))).thenReturn(backChannel);
         // REVISIT test interceptor chain setup & send
     }
 
@@ -851,13 +805,12 @@ public class MAPAggregatorTest {
 
     private void setUpConduit(Message message, Exchange exchange) {
         setUpMessageExchange(message, exchange);
-        Conduit conduit = EasyMock.createMock(Conduit.class);
+        Conduit conduit = mock(Conduit.class);
         setUpExchangeConduit(message, exchange, conduit);
         EndpointReferenceType to =
             ContextUtils.WSA_OBJECT_FACTORY.createEndpointReferenceType();
         to.setAddress(ContextUtils.getAttributedURI(expectedTo));
-        conduit.getTarget();
-        EasyMock.expectLastCall().andReturn(to).anyTimes();
+        when(conduit.getTarget()).thenReturn(to);
     }
 
     private void setUpMethod(Message message, Exchange exchange, Method method) {
@@ -867,15 +820,15 @@ public class MAPAggregatorTest {
                                                                        "opResponse",
                                                                        "opFault", method);
         setUpExchangeGet(exchange, BindingOperationInfo.class, bindingOpInfo);
-        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(bindingOpInfo).anyTimes();
+        when(exchange.getBindingOperationInfo()).thenReturn(bindingOpInfo);
         // Usual fun with EasyMock not always working as expected
         //BindingOperationInfo bindingOpInfo =
         //    EasyMock.createMock(BindingOperationInfo.class);
         //OperationInfo opInfo = EasyMock.createMock(OperationInfo.class);
         //bindingOpInfo.getOperationInfo();
-        //EasyMock.expectLastCall().andReturn(opInfo);
+        //whenLastCall().thenReturn(opInfo);
         //opInfo.getProperty(EasyMock.eq(Method.class.getName()));
-        //EasyMock.expectLastCall().andReturn(method);
+        //whenLastCall().thenReturn(method);
     }
 
     private BindingOperationInfo setUpBindingOperationInfo(String nsuri,
@@ -896,49 +849,45 @@ public class MAPAggregatorTest {
     }
 
     private Message getMessage() {
-        //return control.createMock(Message.class);
+        //return mock(Message.class);
         return new MessageImpl();
     }
 
     private Exchange getExchange() {
-        Bus bus = control.createMock(Bus.class);
-        bus.getExtension(PhaseManager.class);
-        EasyMock.expectLastCall().andReturn(new PhaseManagerImpl()).anyTimes();
+        Bus bus = mock(Bus.class);
+        when(bus.getExtension(PhaseManager.class)).thenReturn(new PhaseManagerImpl());
 
-        Exchange exchange = control.createMock(Exchange.class);
-        exchange.getBus();
-        EasyMock.expectLastCall().andReturn(bus).anyTimes();
-        EasyMock.expect(exchange.isEmpty()).andReturn(true).anyTimes();
+        Exchange exchange = mock(Exchange.class);
+        when(exchange.getBus()).thenReturn(bus);
+        when(exchange.isEmpty()).thenReturn(true);
         return exchange;
     }
 
     private void setUpMessageProperty(Message message, String key, Object value) {
         //message.get(key);
-        //EasyMock.expectLastCall().andReturn(value);
+        //whenLastCall().thenReturn(value);
         message.put(key, value);
     }
 
     private void setUpMessageExchange(Message message, Exchange exchange) {
         //message.getExchange();
-        //EasyMock.expectLastCall().andReturn(exchange);
+        //whenLastCall().thenReturn(exchange);
         message.setExchange(exchange);
     }
 
     private void setUpMessageDestination(Message message, Destination target) {
         //message.getDestination();
-        //EasyMock.expectLastCall().andReturn(target);
+        //whenLastCall().thenReturn(target);
         ((MessageImpl)message).setDestination(target);
     }
 
     private <T> void setUpExchangeGet(Exchange exchange, Class<T> clz, T value) {
-        exchange.get(clz);
-        EasyMock.expectLastCall().andReturn(value).anyTimes();
+        when(exchange.get(clz)).thenReturn(value);
         //exchange.put(Endpoint.class, value);
     }
 
     private void setUpExchangeOneway(Exchange exchange, boolean oneway) {
-        exchange.isOneWay();
-        EasyMock.expectLastCall().andReturn(oneway).anyTimes();
+        when(exchange.isOneWay()).thenReturn(oneway);
         //exchange.setOneWay(oneway);
     }
 
@@ -947,11 +896,10 @@ public class MAPAggregatorTest {
                                        boolean outbound,
                                        boolean fault) {
         if (fault) {
-            exchange.getOutFaultMessage();
+            when(exchange.getOutFaultMessage()).thenReturn(outbound ? message : null);
         } else {
-            exchange.getOutMessage();
+            when(exchange.getOutMessage()).thenReturn(outbound ? message : null);
         }
-        EasyMock.expectLastCall().andReturn(outbound ? message : null).anyTimes();
         //exchange.setOutMessage(outbound ? message : new MessageImpl());
     }
 
@@ -959,7 +907,7 @@ public class MAPAggregatorTest {
                                       Exchange exchange,
                                       Conduit conduit) {
         //exchange.getConduit(message);
-        //EasyMock.expectLastCall().andReturn(conduit);
+        //whenLastCall().thenReturn(conduit);
         //exchange.setConduit(conduit);
     }
 
