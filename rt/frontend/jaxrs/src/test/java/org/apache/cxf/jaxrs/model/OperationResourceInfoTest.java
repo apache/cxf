@@ -39,10 +39,11 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OperationResourceInfoTest {
 
@@ -199,9 +200,8 @@ public class OperationResourceInfoTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        EasyMock.expect(endpoint.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.get("org.apache.cxf.jaxrs.comparator")).thenReturn(null);
         e.put(Endpoint.class, endpoint);
         return m;
     }

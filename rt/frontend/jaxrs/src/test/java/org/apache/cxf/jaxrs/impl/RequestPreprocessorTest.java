@@ -34,25 +34,13 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RequestPreprocessorTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-        control.makeThreadSafe(true);
-    }
-
     @Test
     public void testMethodQuery() {
         Message m = mockMessage("http://localhost:8080", "/bar", "_method=GET", "POST");
@@ -109,18 +97,17 @@ public class RequestPreprocessorTest {
         m.put("org.apache.cxf.endpoint.private", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
-        control.reset();
-        Endpoint endp = control.mock(Endpoint.class);
+
+        Endpoint endp = mock(Endpoint.class);
         e.put(Endpoint.class, endp);
-        EasyMock.expect(endp.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(endp.get(ServerProviderFactory.class.getName())).andReturn(ServerProviderFactory.getInstance())
-                .anyTimes();
-        ServletDestination d = control.createMock(ServletDestination.class);
+        when(endp.isEmpty()).thenReturn(true);
+        when(endp.get(ServerProviderFactory.class.getName())).thenReturn(ServerProviderFactory.getInstance());
+        ServletDestination d = mock(ServletDestination.class);
         e.setDestination(d);
         EndpointInfo epr = new EndpointInfo();
         epr.setAddress(baseAddress);
-        EasyMock.expect(d.getEndpointInfo()).andReturn(epr).anyTimes();
-        EasyMock.expect(endp.getEndpointInfo()).andReturn(epr).anyTimes();
+        when(d.getEndpointInfo()).thenReturn(epr);
+        when(endp.getEndpointInfo()).thenReturn(epr);
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, method);
@@ -129,11 +116,10 @@ public class RequestPreprocessorTest {
             headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));
         }
         m.put(Message.PROTOCOL_HEADERS, headers);
-        BindingInfo bi = control.createMock(BindingInfo.class);
+        BindingInfo bi = mock(BindingInfo.class);
         epr.setBinding(bi);
-        EasyMock.expect(bi.getProperties()).andReturn(Collections.emptyMap()).anyTimes();
+        when(bi.getProperties()).thenReturn(Collections.emptyMap());
 
-        control.replay();
         return m;
     }
 

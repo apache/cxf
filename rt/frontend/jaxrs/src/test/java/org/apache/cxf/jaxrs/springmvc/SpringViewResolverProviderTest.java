@@ -52,24 +52,24 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 
-import org.easymock.EasyMockRule;
-import org.easymock.EasyMockSupport;
-import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
-public class SpringViewResolverProviderTest extends EasyMockSupport {
+public class SpringViewResolverProviderTest {
 
     @Rule
-    public EasyMockRule rule = new EasyMockRule(this);
+    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private ViewResolver viewResolverMock;
@@ -116,9 +116,9 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
     public void testIsWriteableEnum() throws Exception {
         String viewName = "/test";
         View view = expectGetView(viewName);
+        when(localeResolverMock.resolveLocale(any(HttpServletRequest.class))).thenReturn(locale);
         viewResolver.setClassResources(Collections.singletonMap(TestEnum.class.getName() + "."
                 + TestEnum.ONE, viewName));
-        replayAll();
         assertTrue(viewResolver.isWriteable(TestEnum.ONE.getClass(), null, null, null));
         assertEquals(view, viewResolver.getView(TestEnum.ONE.getClass(), TestEnum.ONE));
     }
@@ -127,8 +127,8 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
     public void testIsWriteableEnum2() {
         String viewName = "/test";
         View view = expectGetView(viewName);
+        when(localeResolverMock.resolveLocale(any(HttpServletRequest.class))).thenReturn(locale);
         viewResolver.setEnumResources(Collections.singletonMap(TestEnum.ONE, viewName));
-        replayAll();
         assertTrue(viewResolver.isWriteable(TestEnum.ONE.getClass(), null, null, null));
         assertEquals(view, viewResolver.getView(TestEnum.ONE.getClass(), TestEnum.ONE));
     }
@@ -138,10 +138,8 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
     public void testWriteTo() throws Exception {
         String viewName = "/test";
         expectWriteTo(viewName);
-        viewMock.render(anyObject(Map.class), anyObject(HttpServletRequest.class),
-                anyObject(HttpServletResponse.class));
-        expectLastCall();
-        replayAll();
+        doNothing().when(viewMock).render(any(Map.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class));
         viewResolver.writeTo(TestEnum.ONE, TestEnum.ONE.getClass(), null, new Annotation[] {},
                 MediaType.TEXT_HTML_TYPE,
                 new MultivaluedHashMap<String, Object>(), null);
@@ -153,16 +151,13 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
         String viewName = "/test";
         Exception exception = new RuntimeException("my exception");
         expectWriteTo(viewName);
-        viewMock.render(anyObject(Map.class), anyObject(HttpServletRequest.class),
-                anyObject(HttpServletResponse.class));
-        expectLastCall().andThrow(exception);
+        doThrow(exception).when(viewMock).render(any(Map.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class));
         requestMock.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
         requestMock.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, 500);
         requestMock.setAttribute(RequestDispatcher.ERROR_MESSAGE, exception.getMessage());
-        expect(servletContextMock.getRequestDispatcher("/error")).andReturn(requestDispatcherMock);
-        requestDispatcherMock.forward(anyObject(HttpServletRequest.class), anyObject(HttpServletResponse.class));
-        expectLastCall();
-        replayAll();
+        when(servletContextMock.getRequestDispatcher("/error")).thenReturn(requestDispatcherMock);
+        doNothing().when(requestDispatcherMock).forward(any(HttpServletRequest.class), any(HttpServletResponse.class));
         viewResolver.writeTo(TestEnum.ONE, TestEnum.ONE.getClass(), null, new Annotation[] {},
                 MediaType.TEXT_HTML_TYPE,
                 new MultivaluedHashMap<String, Object>(), null);
@@ -174,16 +169,14 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
         String viewName = "/test";
         Exception exception = new RuntimeException("my exception");
         expectWriteTo(viewName);
-        viewMock.render(anyObject(Map.class), anyObject(HttpServletRequest.class),
-                anyObject(HttpServletResponse.class));
-        expectLastCall().andThrow(exception);
+        doThrow(exception).when(viewMock).render(any(Map.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class));
         requestMock.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
         requestMock.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, 500);
         requestMock.setAttribute(RequestDispatcher.ERROR_MESSAGE, exception.getMessage());
-        expect(servletContextMock.getRequestDispatcher("/error")).andReturn(requestDispatcherMock);
-        requestDispatcherMock.forward(anyObject(HttpServletRequest.class), anyObject(HttpServletResponse.class));
-        expectLastCall().andThrow(new RuntimeException("internal"));
-        replayAll();
+        when(servletContextMock.getRequestDispatcher("/error")).thenReturn(requestDispatcherMock);
+        doThrow(new RuntimeException("internal")).when(requestDispatcherMock).forward(any(HttpServletRequest.class),
+                any(HttpServletResponse.class));
         viewResolver.writeTo(TestEnum.ONE, TestEnum.ONE.getClass(), null, new Annotation[] {},
                 MediaType.TEXT_HTML_TYPE,
                 new MultivaluedHashMap<String, Object>(), null);
@@ -196,10 +189,8 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
         String viewName = "/test";
         Exception exception = new RuntimeException("my exception");
         expectWriteTo(viewName);
-        viewMock.render(anyObject(Map.class), anyObject(HttpServletRequest.class),
-                anyObject(HttpServletResponse.class));
-        expectLastCall().andThrow(exception);
-        replayAll();
+        doThrow(exception).when(viewMock).render(any(Map.class), any(HttpServletRequest.class),
+                any(HttpServletResponse.class));
         viewResolver.writeTo(TestEnum.ONE, TestEnum.ONE.getClass(), null, new Annotation[] {},
                 MediaType.TEXT_HTML_TYPE,
                 new MultivaluedHashMap<String, Object>(), null);
@@ -216,9 +207,8 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
     }
 
     private View expectGetView(String viewName) {
-        expect(localeResolverMock.resolveLocale(anyObject(HttpServletRequest.class))).andReturn(locale);
         try {
-            expect(viewResolverMock.resolveViewName(viewName, locale)).andReturn(viewMock);
+            when(viewResolverMock.resolveViewName(viewName, locale)).thenReturn(viewMock);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -228,9 +218,9 @@ public class SpringViewResolverProviderTest extends EasyMockSupport {
     private void expectWriteTo(String viewName) {
         expectGetView(viewName);
         viewResolver.setEnumResources(Collections.singletonMap(TestEnum.ONE, viewName));
-        expect(localeResolverMock.resolveLocale(anyObject(HttpServletRequest.class))).andReturn(locale);
+        when(localeResolverMock.resolveLocale(any(HttpServletRequest.class))).thenReturn(locale);
         try {
-            expect(viewResolverMock.resolveViewName(viewName, locale)).andReturn(viewMock);
+            when(viewResolverMock.resolveViewName(viewName, locale)).thenReturn(viewMock);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

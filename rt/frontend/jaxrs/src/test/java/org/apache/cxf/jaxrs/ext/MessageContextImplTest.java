@@ -59,9 +59,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -70,6 +67,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MessageContextImplTest {
 
@@ -144,7 +144,7 @@ public class MessageContextImplTest {
     public void testHttpRequest() {
         Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
-        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
 
         assertSame(request.getClass(),
@@ -157,7 +157,7 @@ public class MessageContextImplTest {
     public void testHttpResponse() {
         Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
-        HttpServletResponse request = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse request = mock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, request);
         HttpServletResponseFilter filter = (HttpServletResponseFilter)mc.getHttpServletResponse();
         assertSame(request.getClass(), filter.getResponse().getClass());
@@ -169,7 +169,7 @@ public class MessageContextImplTest {
     public void testServletContext() {
         Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
-        ServletContext request = EasyMock.createMock(ServletContext.class);
+        ServletContext request = mock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, request);
         assertSame(request.getClass(), mc.getServletContext().getClass());
         assertSame(request.getClass(), mc.getContext(ServletContext.class).getClass());
@@ -179,7 +179,7 @@ public class MessageContextImplTest {
     public void testServletConfig() {
         Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
-        ServletConfig request = EasyMock.createMock(ServletConfig.class);
+        ServletConfig request = mock(ServletConfig.class);
         m.put(AbstractHTTPDestination.HTTP_CONFIG, request);
         assertSame(request.getClass(), mc.getServletConfig().getClass());
         assertSame(request.getClass(), mc.getContext(ServletConfig.class).getClass());
@@ -196,9 +196,8 @@ public class MessageContextImplTest {
         Exchange ex = new ExchangeImpl();
         m.setExchange(ex);
         ex.setInMessage(m);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        EasyMock.expect(e.get(ServerProviderFactory.class.getName())).andReturn(factory);
-        EasyMock.replay(e);
+        Endpoint e = mock(Endpoint.class);
+        when(e.get(ServerProviderFactory.class.getName())).thenReturn(factory);
         ex.put(Endpoint.class, e);
         MessageContext mc = new MessageContextImpl(m);
         ContextResolver<JAXBContext> resolver2 =
@@ -226,16 +225,7 @@ public class MessageContextImplTest {
             in.getExchange().setOutMessage(out);
             
             final Binding binding = in.getExchange().getEndpoint().getBinding();
-            final Capture<Message> capture = Capture.newInstance();
-            EasyMock.expect(binding.createMessage(EasyMock.capture(capture)))
-                .andAnswer(
-                    new IAnswer<Message>() {
-                        @Override
-                        public Message answer() throws Throwable {
-                            return capture.getValue();
-                        }
-                    }
-                ).anyTimes();
+            when(binding.createMessage(any(Message.class))).thenAnswer(i -> i.getArguments()[0]);
     
             final String id = UUID.randomUUID().toString();
             final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
@@ -256,15 +246,14 @@ public class MessageContextImplTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Binding binding = EasyMock.mock(Binding.class);
-        Endpoint endpoint = EasyMock.mock(Endpoint.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
-        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
-        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
-        EasyMock.expect(endpoint.getBinding()).andReturn(binding).anyTimes();
-        EasyMock.replay(endpoint);
+        Binding binding = mock(Binding.class);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getEndpointInfo()).thenReturn(null);
+        when(endpoint.get(Application.class.getName())).thenReturn(null);
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(factory);
+        when(endpoint.getBinding()).thenReturn(binding);
         e.put(Endpoint.class, endpoint);
         return m;
     }
