@@ -103,8 +103,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         this.sensitiveProtocolHeaderNames.addAll(protocolHeaderNames);
     }
 
-    public void setSensitiveDataHelper(MaskSensitiveHelper maskSensitiveHelper) {
-        this.maskSensitiveHelper = maskSensitiveHelper;
+    public void setSensitiveDataHelper(MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
     }
 
     public void setPrettyLogging(boolean prettyLogging) {
