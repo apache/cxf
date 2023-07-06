@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -206,15 +207,16 @@ public class ServerLauncher {
 
             }
         } else {
-            List<String> cmd = getCommand();
+            Map.Entry<Map<String, String>, List<String>> commandAndEnvironment = getCommandAndEnvironment();
+            List<String> cmd = commandAndEnvironment.getValue();
 
             LOG.fine("CMD: " + cmd);
             if (DEBUG) {
                 System.err.print("CMD: " + cmd);
             }
 
-
             ProcessBuilder pb = new ProcessBuilder(cmd);
+            pb.environment().putAll(commandAndEnvironment.getKey());
             pb.redirectErrorStream(true);
             process = pb.start();
 
@@ -334,8 +336,8 @@ public class ServerLauncher {
         }
     }
 
-    private List<String> getCommand() {
-
+    private Map.Entry<Map<String, String>, List<String>> getCommandAndEnvironment() {
+        Map<String, String> env = new HashMap<>();
         List<String> cmd = new ArrayList<>();
         cmd.add(JAVA_EXE);
 
@@ -379,7 +381,6 @@ public class ServerLauncher {
             cmd.add("-Djava.util.logging.config.file=" + loggingPropertiesFile);
         }
 
-        cmd.add("-classpath");
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (classpath.indexOf("/.compatibility/") != -1) {
             classpath.append(':');
@@ -390,8 +391,14 @@ public class ServerLauncher {
             classpath.replace(idx1, idx2, ":");
         }
 
-        cmd.add(classpath.toString());
-
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        if (!isWindows) {
+            cmd.add("-classpath");
+            cmd.add(classpath.toString());
+        } else {
+            // Overcoming "CreateProcess error=206, The filename or extension is too long"
+            env.putIfAbsent("CLASSPATH", classpath.toString());
+        }
 
         // If the client set the transformer factory property,
         // we want the server to also set that property.
@@ -420,7 +427,7 @@ public class ServerLauncher {
             }
         }
 
-        return cmd;
+        return new SimpleEntry<>(env, cmd);
     }
 
     static class Mutex {
