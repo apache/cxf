@@ -198,7 +198,16 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
     public void addSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
         delegate.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
     }
-
+    
+    /**
+     * Replaces MaskSensitiveHelper implementation with given one.
+     *
+     * @param maskSensitiveHelper new MaskSensitiveHelper to be used.
+     */
+    public void setSensitiveDataHelper(MaskSensitiveHelper maskSensitiveHelper) {
+        delegate.setSensitiveDataHelper(maskSensitiveHelper);
+    }
+    
     public static class Portable implements AbstractPortableFeature {
         private LoggingInInterceptor in;
         private LoggingOutInterceptor out;
@@ -302,6 +311,11 @@ public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
         public void addSensitiveProtocolHeaderNames(final Set<String> sensitiveProtocolHeaderNames) {
             in.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
             out.addSensitiveProtocolHeaderNames(sensitiveProtocolHeaderNames);
+        }
+        
+        public void setSensitiveDataHelper(MaskSensitiveHelper maskSensitiveHelper) {
+            in.setSensitiveDataHelper(maskSensitiveHelper);
+            out.setSensitiveDataHelper(maskSensitiveHelper);
         }
     }
 }
