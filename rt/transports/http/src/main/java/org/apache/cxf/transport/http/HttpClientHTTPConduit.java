@@ -262,8 +262,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (verc == null) {
                 verc = csPolicy.getVersion();
             }
-            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)) {
-                cb.version(Version.HTTP_1_1);  
+            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)
+                    || ("auto".equals(verc) && !"2".equals(HTTP_VERSION))) {
+                cb.version(Version.HTTP_1_1);
             }
 
             cl = cb.build();
@@ -470,7 +471,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (verc == null) {
                 verc = csPolicy.getVersion();
             }
-            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)) {
+            if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)
+                    || ("auto".equals(verc) && !"2".equals(HTTP_VERSION))) {
                 rb.version(Version.HTTP_1_1);  
             }            
             try {
