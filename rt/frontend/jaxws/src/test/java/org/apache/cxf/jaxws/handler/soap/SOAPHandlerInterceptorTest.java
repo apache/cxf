@@ -72,17 +72,16 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 
-import static org.easymock.EasyMock.createNiceControl;
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SOAPHandlerInterceptorTest {
 
@@ -126,15 +125,14 @@ public class SOAPHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker = new HandlerChainInvoker(list);
 
-        IMocksControl control = createNiceControl();
-        Binding binding = control.createMock(Binding.class);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-        Exchange exchange = control.createMock(Exchange.class);
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
+        Binding binding = mock(Binding.class);
+        when(binding.getHandlerChain()).thenReturn(list);
+        Exchange exchange = mock(Exchange.class);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
         SoapMessage message = new SoapMessage(new MessageImpl());
         message.setExchange(exchange);
         // This is to set direction to outbound
-        expect(exchange.getOutMessage()).andReturn(message).anyTimes();
+        when(exchange.getOutMessage()).thenReturn(message);
         CachedStream originalEmptyOs = new CachedStream();
 
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(originalEmptyOs);
@@ -165,11 +163,8 @@ public class SOAPHandlerInterceptorTest {
 
         chain.add(new SOAPHandlerInterceptor(binding));
         message.setInterceptorChain(chain);
-        control.replay();
 
         chain.doIntercept(message);
-
-        control.verify();
 
         writer.flush();
 
@@ -231,13 +226,12 @@ public class SOAPHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker = new HandlerChainInvoker(list);
 
-        IMocksControl control = createNiceControl();
-        Binding binding = control.createMock(Binding.class);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-        Exchange exchange = control.createMock(Exchange.class);
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
+        Binding binding = mock(Binding.class);
+        when(binding.getHandlerChain()).thenReturn(list);
+        Exchange exchange = mock(Exchange.class);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
         // This is to set direction to inbound
-        expect(exchange.getOutMessage()).andReturn(null);
+        when(exchange.getOutMessage()).thenReturn(null);
 
         SoapMessage message = new SoapMessage(new MessageImpl());
         message.setExchange(exchange);
@@ -251,11 +245,8 @@ public class SOAPHandlerInterceptorTest {
 
         message.getHeaders().add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
 
-        control.replay();
-
         SOAPHandlerInterceptor li = new SOAPHandlerInterceptor(binding);
         li.handleMessage(message);
-        control.verify();
 
         // Verify SOAPMessage header
         SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
@@ -332,15 +323,14 @@ public class SOAPHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker = new HandlerChainInvoker(list);
 
-        IMocksControl control = createNiceControl();
-        Binding binding = control.createMock(Binding.class);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-        Exchange exchange = control.createMock(Exchange.class);
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
+        Binding binding = mock(Binding.class);
+        when(binding.getHandlerChain()).thenReturn(list);
+        Exchange exchange = mock(Exchange.class);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
         SoapMessage message = new SoapMessage(new MessageImpl());
         message.setExchange(exchange);
         // This is to set direction to outbound
-        expect(exchange.getOutMessage()).andReturn(message).anyTimes();
+        when(exchange.getOutMessage()).thenReturn(message);
         CachedStream originalEmptyOs = new CachedStream();
         message.setContent(OutputStream.class, originalEmptyOs);
 
@@ -372,11 +362,8 @@ public class SOAPHandlerInterceptorTest {
         });
         chain.add(new SOAPHandlerInterceptor(binding));
         message.setInterceptorChain(chain);
-        control.replay();
 
         chain.doIntercept(message);
-
-        control.verify();
 
         // Verify SOAPMessage header
         SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
@@ -418,24 +405,21 @@ public class SOAPHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker = new HandlerChainInvoker(list);
 
-        IMocksControl control = createNiceControl();
-        Binding binding = control.createMock(Binding.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
+        Binding binding = mock(Binding.class);
+        Exchange exchange = mock(Exchange.class);
+        when(binding.getHandlerChain()).thenReturn(list);
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
         // This is to set direction to inbound
-        expect(exchange.getOutMessage()).andReturn(null);
+        when(exchange.getOutMessage()).thenReturn(null);
 
         SoapMessage message = new SoapMessage(new MessageImpl());
         message.setExchange(exchange);
 
         XMLStreamReader reader = preparemXMLStreamReader("resources/greetMeRpcLitReq.xml");
         message.setContent(XMLStreamReader.class, reader);
-        control.replay();
 
         SOAPHandlerInterceptor li = new SOAPHandlerInterceptor(binding);
         li.handleMessage(message);
-        control.verify();
 
         // Verify SOAPMessage
         SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
@@ -472,15 +456,13 @@ public class SOAPHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker = new HandlerChainInvoker(list);
 
-        IMocksControl control = createNiceControl();
-        Binding binding = control.createMock(Binding.class);
-        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
-        SoapMessage message = control.createMock(SoapMessage.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(message.keySet()).andReturn(new HashSet<>());
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);
-        control.replay();
+        Binding binding = mock(Binding.class);
+        when(binding.getHandlerChain()).thenReturn(list);
+        SoapMessage message = mock(SoapMessage.class);
+        Exchange exchange = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.keySet()).thenReturn(new HashSet<>());
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
 
         SOAPHandlerInterceptor li = new SOAPHandlerInterceptor(binding);
         Set<QName> understood = li.getUnderstoodHeaders();
