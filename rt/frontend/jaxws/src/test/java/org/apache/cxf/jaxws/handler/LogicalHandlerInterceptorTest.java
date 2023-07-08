@@ -38,21 +38,21 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.handlers.types.AddNumbersResponse;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createNiceControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LogicalHandlerInterceptorTest {
 
-    private IMocksControl control;
     private Binding binding;
     private HandlerChainInvoker invoker;
     private Message message;
@@ -60,11 +60,10 @@ public class LogicalHandlerInterceptorTest {
 
     @Before
     public void setUp() {
-        control = createNiceControl();
-        binding = control.createMock(Binding.class);
-        invoker = control.createMock(HandlerChainInvoker.class);
-        message = control.createMock(Message.class);
-        exchange = control.createMock(Exchange.class);
+        binding = mock(Binding.class);
+        invoker = mock(HandlerChainInvoker.class);
+        message = mock(Message.class);
+        exchange = mock(Exchange.class);
     }
 
     @After
@@ -88,21 +87,19 @@ public class LogicalHandlerInterceptorTest {
         });
         @SuppressWarnings("rawtypes")
         List<Handler> hList = CastUtils.cast(list);
-        expect(binding.getHandlerChain()).andReturn(hList).anyTimes();
-        expect(invoker.getLogicalHandlers()).andReturn(list);
-        expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
-        expect(message.keySet()).andReturn(new TreeSet<String>()).anyTimes();
-        expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);
-        expect(exchange.getOutMessage()).andReturn(message);
-        expect(invoker.invokeLogicalHandlers(eq(true), isA(LogicalMessageContext.class)))
-            .andReturn(true);
+        when(binding.getHandlerChain()).thenReturn(hList);
+        when(invoker.getLogicalHandlers()).thenReturn(list);
+        when(message.getExchange()).thenReturn(exchange);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(message.keySet()).thenReturn(new TreeSet<String>());
+        when(exchange.get(HandlerChainInvoker.class)).thenReturn(invoker);
+        when(exchange.getOutMessage()).thenReturn(message);
+        when(invoker.invokeLogicalHandlers(eq(true), isA(LogicalMessageContext.class)))
+            .thenReturn(true);
 
-        control.replay();
         LogicalHandlerInInterceptor li = new LogicalHandlerInInterceptor(binding);
-        assertEquals("unexpected phase", "pre-protocol-frontend", li.getPhase());
+        assertEquals("unwhened phase", "pre-protocol-frontend", li.getPhase());
         li.handleMessage(message);
-        control.verify();
     }
 
     //JAX-WS spec: If handler returns false, for a request-response MEP, if the message
@@ -132,28 +129,24 @@ public class LogicalHandlerInterceptorTest {
         });
         HandlerChainInvoker invoker1 = new HandlerChainInvoker(list);
 
-        IMocksControl control1 = createNiceControl();
-        Binding binding1 = control1.createMock(Binding.class);
+        Binding binding1 = mock(Binding.class);
         @SuppressWarnings("rawtypes")
         List<Handler> hList = CastUtils.cast(list);
-        expect(binding1.getHandlerChain()).andReturn(hList).anyTimes();
-        Exchange exchange1 = control1.createMock(Exchange.class);
-        expect(exchange1.get(HandlerChainInvoker.class)).andReturn(invoker1).anyTimes();
+        when(binding1.getHandlerChain()).thenReturn(hList);
+        Exchange exchange1 = mock(Exchange.class);
+        when(exchange1.get(HandlerChainInvoker.class)).thenReturn(invoker1);
         Message outMessage = new MessageImpl();
         outMessage.setExchange(exchange1);
-        InterceptorChain chain = control1.createMock(InterceptorChain.class);
+        InterceptorChain chain = spy(InterceptorChain.class);
         outMessage.setInterceptorChain(chain);
         chain.abort();
-        EasyMock.expectLastCall();
-        MessageObserver observer = control1.createMock(MessageObserver.class);
-        expect(exchange1.get(MessageObserver.class)).andReturn(observer).anyTimes();
+        MessageObserver observer = spy(MessageObserver.class);
+        when(exchange1.get(MessageObserver.class)).thenReturn(observer);
         observer.onMessage(isA(Message.class));
-        EasyMock.expectLastCall();
-
-        control1.replay();
 
         LogicalHandlerInInterceptor li = new LogicalHandlerInInterceptor(binding1);
         li.handleMessage(outMessage);
-        control1.verify();
+        verify(chain, atLeastOnce()).abort();
+        verify(observer, atLeastOnce()).onMessage(isA(Message.class));
     }
 }
