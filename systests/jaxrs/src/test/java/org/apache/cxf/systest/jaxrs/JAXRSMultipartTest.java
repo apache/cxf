@@ -1062,11 +1062,13 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
         try {
             CloseableHttpResponse response = client.execute(post);
-            assertEquals(status, response.getStatusLine().getStatusCode());
+            final String body = EntityUtils.toString(response.getEntity());
+            assertThat("Unexpected status code for response:" + response, 
+                response.getStatusLine().getStatusCode(), equalTo(status));
             if (status == 200) {
                 InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
                 assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
-                             stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
+                             stripXmlInstructionIfNeeded(body));
             }
         } finally {
             // Release current connection to the connection pool once you are done
