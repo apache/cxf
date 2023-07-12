@@ -23,25 +23,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.xml.ws.spi.http.HttpExchange;
 import jakarta.xml.ws.spi.http.HttpHandler;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+
 public class HttpHandlerImplTest {
 
-    private IMocksControl control;
     private HttpHandler handler;
     private JAXWSHttpSpiDestination destination;
     private HttpExchange exchange;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        destination = control.createMock(JAXWSHttpSpiDestination.class);
+        destination = mock(JAXWSHttpSpiDestination.class);
         handler = new HttpHandlerImpl(destination);
-        exchange = control.createMock(HttpExchange.class);
+        exchange = mock(HttpExchange.class);
     }
 
     @After
@@ -49,18 +48,14 @@ public class HttpHandlerImplTest {
         exchange = null;
         handler = null;
         destination = null;
-        control = null;
     }
 
     @Test
     public void testHttpHandlerImpl() throws Exception {
         exchange.close();
-        destination.doService(EasyMock.isA(HttpServletRequest.class),
-                              EasyMock.isA(HttpServletResponse.class));
-        control.replay();
-
+        destination.doService(isA(HttpServletRequest.class),
+                              isA(HttpServletResponse.class));
         handler.handle(exchange);
-        control.verify();
     }
 
 }

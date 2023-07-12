@@ -19,64 +19,46 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.lang.reflect.Method;
-
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.Destination;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class PolicyVerificationOutInterceptorTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testHandleMessage() throws NoSuchMethodException {
-        Method m = AbstractPolicyInterceptor.class.getDeclaredMethod("getTransportAssertions",
-            new Class[] {Message.class});
-        PolicyVerificationOutInterceptor interceptor =
-            EasyMock.createMockBuilder(PolicyVerificationOutInterceptor.class)
-                .addMockedMethod(m).createMock(control);
+        PolicyVerificationOutInterceptor interceptor = new PolicyVerificationOutInterceptor();
 
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.TRUE);
-        control.replay();
+        Destination destination = mock(Destination.class);
+        Exchange exchange = mock(Exchange.class);
+        when(exchange.getDestination()).thenReturn(destination);
+        Message message = mock(Message.class);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(Boolean.TRUE);
+        when(message.getExchange()).thenReturn(exchange);
         interceptor.handleMessage(message);
-        control.verify();
 
-        control.reset();
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(null);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        control.replay();
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(null);
+        when(message.get(AssertionInfoMap.class)).thenReturn(null);
         interceptor.handleMessage(message);
-        control.verify();
 
-        control.reset();
-        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(null);
-        AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        when(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).thenReturn(null);
+        AssertionInfoMap aim = mock(AssertionInfoMap.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
         interceptor.getTransportAssertions(message);
-        EasyMock.expectLastCall();
-        EffectivePolicy ep = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(message.get(EffectivePolicy.class)).andReturn(ep);
-        EasyMock.expect(ep.getPolicy()).andReturn(null);
 
-        aim.checkEffectivePolicy(null);
+        EffectivePolicy ep = mock(EffectivePolicy.class);
+        when(message.get(EffectivePolicy.class)).thenReturn(ep);
+        when(ep.getPolicy()).thenReturn(null);
 
-        EasyMock.expectLastCall().andReturn(null);
+        when(aim.checkEffectivePolicy(null)).thenReturn(null);
 
-        control.replay();
         interceptor.handleMessage(message);
-        control.verify();
     }
 }

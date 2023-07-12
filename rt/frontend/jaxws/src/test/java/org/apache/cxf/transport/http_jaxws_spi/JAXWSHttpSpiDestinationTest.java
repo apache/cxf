@@ -32,23 +32,22 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JAXWSHttpSpiDestinationTest {
 
     private static final String ADDRESS = "http://localhost:80/foo/bar";
     private static final String CONTEXT_PATH = "/foo";
-    private IMocksControl control;
     private Bus bus;
     private HttpContext context;
     private MessageObserver observer;
@@ -56,12 +55,10 @@ public class JAXWSHttpSpiDestinationTest {
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bus.getExtension(org.apache.cxf.policy.PolicyDataEngine.class);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        observer = control.createMock(MessageObserver.class);
-        context = control.createMock(HttpContext.class);
+        bus = mock(Bus.class);
+        when(bus.getExtension(org.apache.cxf.policy.PolicyDataEngine.class)).thenReturn(null);
+        observer = mock(MessageObserver.class);
+        context = mock(HttpContext.class);
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }
@@ -75,7 +72,6 @@ public class JAXWSHttpSpiDestinationTest {
 
     @Test
     public void testCtor() throws Exception {
-        control.replay();
         JAXWSHttpSpiDestination destination =
             new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
 
@@ -89,7 +85,6 @@ public class JAXWSHttpSpiDestinationTest {
     @Test
     public void testMessage() throws Exception {
         HttpExchange exchange = setUpExchange();
-        control.replay();
 
         JAXWSHttpSpiDestination destination =
             new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
@@ -97,27 +92,23 @@ public class JAXWSHttpSpiDestinationTest {
 
         destination.doService(new HttpServletRequestAdapter(exchange),
                               new HttpServletResponseAdapter(exchange));
-
-        control.verify();
     }
 
 
     private HttpExchange setUpExchange() throws Exception {
-        HttpExchange exchange = control.createMock(HttpExchange.class);
-        expect(exchange.getHttpContext()).andReturn(context).anyTimes();
-        expect(exchange.getQueryString()).andReturn(null);
-        expect(exchange.getPathInfo()).andReturn(null);
-        expect(exchange.getRequestURI()).andReturn(CONTEXT_PATH);
-        expect(exchange.getContextPath()).andReturn(CONTEXT_PATH);
+        HttpExchange exchange = mock(HttpExchange.class);
+        when(exchange.getHttpContext()).thenReturn(context);
+        when(exchange.getQueryString()).thenReturn(null);
+        when(exchange.getPathInfo()).thenReturn(null);
+        when(exchange.getRequestURI()).thenReturn(CONTEXT_PATH);
+        when(exchange.getContextPath()).thenReturn(CONTEXT_PATH);
         Map<String, List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type", Collections.singletonList("text/xml"));
-        expect(exchange.getRequestHeaders()).andReturn(reqHeaders).anyTimes();
-        OutputStream responseBody = control.createMock(OutputStream.class);
-        responseBody.flush();
-        EasyMock.expectLastCall();
-        expect(exchange.getResponseBody()).andReturn(responseBody).anyTimes();
-        observer.onMessage(isA(Message.class));
-        EasyMock.expectLastCall();
+        when(exchange.getRequestHeaders()).thenReturn(reqHeaders);
+        OutputStream responseBody = mock(OutputStream.class);
+        doNothing().when(responseBody).flush();
+        when(exchange.getResponseBody()).thenReturn(responseBody);
+        doNothing().when(observer).onMessage(isA(Message.class));
 
         return exchange;
     }

@@ -35,61 +35,50 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class ReferenceResolverTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testLocalServiceModelReferenceResolver() {
-        DescriptionInfo di = control.createMock(DescriptionInfo.class);
-        PolicyBuilder builder = control.createMock(PolicyBuilder.class);
+        DescriptionInfo di = mock(DescriptionInfo.class);
+        PolicyBuilder builder = mock(PolicyBuilder.class);
         LocalServiceModelReferenceResolver resolver =
             new LocalServiceModelReferenceResolver(di, builder);
 
         List<UnknownExtensibilityElement> extensions = new ArrayList<>();
-        EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
+        when(di.getExtensors(UnknownExtensibilityElement.class)).thenReturn(extensions);
 
-        control.replay();
         assertNull(resolver.resolveReference("A"));
-        control.verify();
 
-        control.reset();
-        UnknownExtensibilityElement extension = control.createMock(UnknownExtensibilityElement.class);
+        UnknownExtensibilityElement extension = mock(UnknownExtensibilityElement.class);
         extensions.add(extension);
-        EasyMock.expect(di.getExtensors(UnknownExtensibilityElement.class)).andReturn(extensions);
-        Element e = control.createMock(Element.class);
+        when(di.getExtensors(UnknownExtensibilityElement.class)).thenReturn(extensions);
+        Element e = mock(Element.class);
         QName qn = new QName(Constants.URI_POLICY_NS,
                              Constants.ELEM_POLICY);
-        EasyMock.expect(extension.getElementType()).andReturn(qn).anyTimes();
-        EasyMock.expect(extension.getElement()).andReturn(e).times(1);
-        Document ownerDocument = control.createMock(Document.class);
-        EasyMock.expect(e.getOwnerDocument()).andReturn(ownerDocument);
-        EasyMock.expect(e.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+        when(extension.getElementType()).thenReturn(qn);
+        when(extension.getElement()).thenReturn(e);
+        Document ownerDocument = mock(Document.class);
+        when(e.getOwnerDocument()).thenReturn(ownerDocument);
+        when(e.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                          PolicyConstants.WSU_ID_ATTR_NAME))
-                        .andReturn("A");
-        Policy p = control.createMock(Policy.class);
-        EasyMock.expect(builder.getPolicy(e)).andReturn(p);
+                        .thenReturn("A");
+        Policy p = mock(Policy.class);
+        when(builder.getPolicy(e)).thenReturn(p);
 
-        control.replay();
         assertSame(p, resolver.resolveReference("A"));
-        control.verify();
-
+        verify(extension, times(1)).getElement();
     }
 
     @Test
@@ -107,17 +96,14 @@ public class ReferenceResolverTest {
 
         URL url = ReferenceResolverTest.class.getResource("referring.wsdl");
         String baseURI = url.toString();
-        PolicyBuilder builder = control.createMock(PolicyBuilder.class);
+        PolicyBuilder builder = mock(PolicyBuilder.class);
         RemoteReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
 
         assertNull(resolver.resolveReference("referred.wsdl#PolicyB"));
 
-        Policy p = control.createMock(Policy.class);
-        EasyMock.expect(builder.getPolicy(EasyMock.isA(Element.class))).andReturn(p);
+        Policy p = mock(Policy.class);
+        when(builder.getPolicy(isA(Element.class))).thenReturn(p);
 
-        control.replay();
         assertSame(p, resolver.resolveReference("referred.wsdl#PolicyA"));
-        control.verify();
-        control.reset();
     }
 }

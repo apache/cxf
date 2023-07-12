@@ -39,23 +39,21 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServiceModelUtilTest {
     private static final String WSDL_PATH = "test-soap-header.wsdl";
     private Service service;
     private ServiceInfo serviceInfo;
 
-    private IMocksControl control;
     private Bus bus;
     private BindingFactoryManager bindingFactoryManager;
 
@@ -74,17 +72,15 @@ public class ServiceModelUtilTest {
             }
         }
 
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bindingFactoryManager = control.createMock(BindingFactoryManager.class);
+        bus = mock(Bus.class);
+        bindingFactoryManager = mock(BindingFactoryManager.class);
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bindingFactoryManager);
 
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
-        control.replay();
         serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
     }
 

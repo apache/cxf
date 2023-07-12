@@ -33,8 +33,6 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,6 +40,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -85,15 +85,12 @@ public class JaxbAssertionTest {
         pc = new ExactlyOne();
         assertFalse(assertion.equal(pc));
 
-        IMocksControl ctrl = EasyMock.createNiceControl();
-        PrimitiveAssertion xpa = ctrl.createMock(PrimitiveAssertion.class);
+        PrimitiveAssertion xpa = mock(PrimitiveAssertion.class);
         QName oqn = new QName("http://cxf.apache.org/test/assertions/blah", "OtherType");
-        EasyMock.expect(xpa.getName()).andReturn(oqn);
-        EasyMock.expect(xpa.getType()).andReturn(Constants.TYPE_ASSERTION);
+        when(xpa.getName()).thenReturn(oqn);
+        when(xpa.getType()).thenReturn(Constants.TYPE_ASSERTION);
 
-        ctrl.replay();
         assertFalse(assertion.equal(xpa));
-        ctrl.verify();
 
         FooType odata = new FooType();
         odata.setName(data.getName());

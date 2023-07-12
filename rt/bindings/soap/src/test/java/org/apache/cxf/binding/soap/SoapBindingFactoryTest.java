@@ -46,28 +46,18 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createNiceControl;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SoapBindingFactoryTest {
-    IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = createNiceControl();
-    }
-
     private Bus getMockBus() {
-        return control.createMock(Bus.class);
+        return mock(Bus.class);
     }
 
     private BindingFactoryManager getBindingFactoryManager(String ns, Bus bus) throws BusException {
@@ -84,13 +74,10 @@ public class SoapBindingFactoryTest {
 
         BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP11, bus);
 
-        bus.getExtension(BindingFactoryManager.class);
-        expectLastCall().andReturn(bfm).anyTimes();
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bfm);
 
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-
-        control.replay();
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         ServiceInfo serviceInfo = builder
@@ -133,13 +120,10 @@ public class SoapBindingFactoryTest {
 
         BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP11, bus);
 
-        bus.getExtension(BindingFactoryManager.class);
-        expectLastCall().andReturn(bfm).anyTimes();
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bfm);
 
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-
-        control.replay();
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         ServiceInfo serviceInfo = builder
@@ -180,12 +164,10 @@ public class SoapBindingFactoryTest {
 
         BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP12, bus);
 
-        expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bfm);
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bfm);
 
-        DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
-        expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-
-        control.replay();
+        DestinationFactoryManager dfm = mock(DestinationFactoryManager.class);
+        when(bus.getExtension(DestinationFactoryManager.class)).thenReturn(dfm);
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         ServiceInfo serviceInfo = builder

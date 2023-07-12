@@ -70,11 +70,12 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testPostBookStore() throws IOException {
+        byte[] bytes = IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt"));
         try (Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
             .type(MediaType.TEXT_PLAIN)
-            .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")))) {
+            .post(bytes)) {
             assertEquals(200, response.getStatus());
-            assertThat(response.readEntity(String.class), equalTo("Book Store uploaded: 10355 bytes"));
+            assertThat(response.readEntity(String.class), equalTo("Book Store uploaded: " + bytes.length + " bytes"));
         }
     }
 

@@ -52,6 +52,9 @@ import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assume.assumeThat;
 
 /**
  *
@@ -85,6 +88,9 @@ public final class WSDiscoveryClientTest {
 
     @Test
     public void testMultiResponses() throws Exception {
+        assumeThat("The UDP multicast is disabled on Windows by default",
+            System.getProperties().getProperty("os.name"), not(startsWith("Windows")));
+
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
         if ("Linux".equals(System.getProperties().getProperty("os.name"))
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {

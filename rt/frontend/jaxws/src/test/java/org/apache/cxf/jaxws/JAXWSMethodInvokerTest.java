@@ -54,7 +54,6 @@ import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -64,23 +63,23 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class JAXWSMethodInvokerTest {
     private static final QName TEST_HEADER_NAME = new QName("testHeader");
-    Factory factory = EasyMock.createMock(Factory.class);
-    Object target = EasyMock.createMock(Hello.class);
+    Factory factory = mock(Factory.class);
+    Object target = mock(Hello.class);
 
     @Test
     public void testFactoryBeans() throws Throwable {
-        Exchange ex = EasyMock.createMock(Exchange.class);
-        EasyMock.reset(factory);
-        factory.create(ex);
-        EasyMock.expectLastCall().andReturn(target);
-        EasyMock.replay(factory);
+        Exchange ex = mock(Exchange.class);
+        when(factory.create(ex)).thenReturn(target);
         JAXWSMethodInvoker jaxwsMethodInvoker = new JAXWSMethodInvoker(factory);
         Object object = jaxwsMethodInvoker.getServiceObject(ex);
         assertEquals("the target object and service object should be equal ", object, target);
-        EasyMock.verify(factory);
     }
 
 
@@ -105,6 +104,8 @@ public class JAXWSMethodInvokerTest {
             assertSame(suspendedEx, serviceObject.getSuspendedException());
             assertSame(originalException, suspendedEx.getRuntimeException());
         }
+        
+        verify(factory, atLeastOnce()).release(ex, serviceObject);
     }
 
     @Test
@@ -124,6 +125,8 @@ public class JAXWSMethodInvokerTest {
             Message outMsg = ex.getOutMessage();
             assertNull(outMsg);
         }
+        
+        verify(factory, atLeastOnce()).release(ex, serviceObject);
     }
 
     @Test
@@ -150,6 +153,8 @@ public class JAXWSMethodInvokerTest {
             assertEquals(1, headers.size());
             assertEquals(TEST_HEADER_NAME, headers.get(0).getName());
         }
+        
+        verify(factory, atLeastOnce()).release(ex, serviceObject);
     }
 
     @Test
@@ -209,36 +214,27 @@ public class JAXWSMethodInvokerTest {
             .invoke(ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertNull(obj);
         assertTrue(ex.isOneWay());
+        
+        verify(factory, atLeastOnce()).release(ex, serviceObject);
     }
 
     private JAXWSMethodInvoker prepareJAXWSMethodInvoker(Exchange ex, Object serviceObject,
                                                          Method serviceMethod) throws Throwable {
-        EasyMock.reset(factory);
-        factory.create(ex);
-        EasyMock.expectLastCall().andReturn(serviceObject).anyTimes();
+        when(factory.create(ex)).thenReturn(serviceObject);
         factory.release(ex, serviceObject);
-        EasyMock.expectLastCall().anyTimes();
-        EasyMock.replay(factory);
 
         BindingOperationInfo boi = new BindingOperationInfo();
         ex.put(BindingOperationInfo.class, boi);
 
-        Service serviceClass = EasyMock.createMock(Service.class);
-        serviceClass.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        serviceClass.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        Service serviceClass = mock(Service.class);
+        when(serviceClass.size()).thenReturn(0);
+        when(serviceClass.isEmpty()).thenReturn(true);
         ex.put(Service.class, serviceClass);
 
-        MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
-        serviceClass.get(MethodDispatcher.class.getName());
-        EasyMock.expectLastCall().andReturn(md).anyTimes();
+        MethodDispatcher md = mock(MethodDispatcher.class);
+        when(serviceClass.get(MethodDispatcher.class.getName())).thenReturn(md);
 
-        md.getMethod(boi);
-        EasyMock.expectLastCall().andReturn(serviceMethod).anyTimes();
-
-        EasyMock.replay(md);
-        EasyMock.replay(serviceClass);
+        when(md.getMethod(boi)).thenReturn(serviceMethod);
 
         // initialize the contextCache
         ex.getInMessage().getContextualProperty("dummy");

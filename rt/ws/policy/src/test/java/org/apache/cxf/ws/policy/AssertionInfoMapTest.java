@@ -34,9 +34,6 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,32 +41,26 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class AssertionInfoMapTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testAlternativeSupported() {
-        PolicyAssertion a1 = control.createMock(PolicyAssertion.class);
+        PolicyAssertion a1 = mock(PolicyAssertion.class);
         QName aqn = new QName("http://x.y.z", "a");
-        EasyMock.expect(a1.getName()).andReturn(aqn).anyTimes();
-        PolicyAssertion a2 = control.createMock(PolicyAssertion.class);
-        EasyMock.expect(a2.getName()).andReturn(aqn).anyTimes();
-        PolicyAssertion b = control.createMock(PolicyAssertion.class);
+        when(a1.getName()).thenReturn(aqn);
+        PolicyAssertion a2 = mock(PolicyAssertion.class);
+        when(a2.getName()).thenReturn(aqn);
+        PolicyAssertion b = mock(PolicyAssertion.class);
         QName bqn = new QName("http://x.y.z", "b");
-        EasyMock.expect(b.getName()).andReturn(bqn).anyTimes();
-        PolicyAssertion c = control.createMock(PolicyAssertion.class);
+        when(b.getName()).thenReturn(bqn);
+        PolicyAssertion c = mock(PolicyAssertion.class);
         QName cqn = new QName("http://x.y.z", "c");
-        EasyMock.expect(c.getName()).andReturn(cqn).anyTimes();
+        when(c.getName()).thenReturn(cqn);
         AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         AssertionInfo ai1 = new AssertionInfo(a1);
@@ -85,14 +76,14 @@ public class AssertionInfoMapTest {
         ai2.setAsserted(true);
         bi.setAsserted(true);
         ci.setAsserted(true);
-        EasyMock.expect(a1.equal(a1)).andReturn(true).anyTimes();
-        EasyMock.expect(a2.equal(a2)).andReturn(true).anyTimes();
-        EasyMock.expect(b.equal(b)).andReturn(true).anyTimes();
-        EasyMock.expect(c.equal(c)).andReturn(true).anyTimes();
+        when(a1.equal(a1)).thenReturn(true);
+        when(a2.equal(a2)).thenReturn(true);
+        when(b.equal(b)).thenReturn(true);
+        when(c.equal(c)).thenReturn(true);
 
-        EasyMock.expect(a2.isAsserted(aim)).andReturn(true).anyTimes();
-        EasyMock.expect(b.isAsserted(aim)).andReturn(true).anyTimes();
-        EasyMock.expect(c.isAsserted(aim)).andReturn(true).anyTimes();
+        when(a2.isAsserted(aim)).thenReturn(true);
+        when(b.isAsserted(aim)).thenReturn(true);
+        when(c.isAsserted(aim)).thenReturn(true);
 
 
         List<Assertion> alt1 = new ArrayList<>();
@@ -103,10 +94,8 @@ public class AssertionInfoMapTest {
         alt2.add(a2);
         alt2.add(c);
 
-        control.replay();
         assertFalse(aim.supportsAlternative(alt1, new ArrayList<>()));
         assertTrue(aim.supportsAlternative(alt2, new ArrayList<>()));
-        control.verify();
     }
 
     @Test

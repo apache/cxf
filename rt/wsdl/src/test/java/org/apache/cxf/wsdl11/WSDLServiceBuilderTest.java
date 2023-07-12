@@ -67,8 +67,6 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -77,6 +75,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class WSDLServiceBuilderTest {
     // TODO: reuse the wsdl in testutils and add the parameter order into one of the wsdl
@@ -98,8 +100,6 @@ public class WSDLServiceBuilderTest {
 
     private ServiceInfo serviceInfo;
     private List<ServiceInfo> serviceInfos;
-
-    private IMocksControl control;
 
     private Bus bus;
 
@@ -144,33 +144,30 @@ public class WSDLServiceBuilderTest {
     }
 
     private void buildService(QName endpointName) throws Exception {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        destinationFactoryManager = control.createMock(DestinationFactoryManager.class);
-        DestinationFactory destinationFactory = control.createMock(DestinationFactory.class);
+        bus = mock(Bus.class);
+        bindingFactoryManager = mock(BindingFactoryManager.class);
+        destinationFactoryManager = mock(DestinationFactoryManager.class);
+        DestinationFactory destinationFactory = mock(DestinationFactory.class);
 
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class))
-            .andReturn(bindingFactoryManager).anyTimes();
+        when(bus.getExtension(BindingFactoryManager.class))
+            .thenReturn(bindingFactoryManager);
 
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
-            .andReturn(destinationFactoryManager).atLeastOnce();
+        when(bus.getExtension(DestinationFactoryManager.class))
+            .thenReturn(destinationFactoryManager);
 
-        EasyMock.expect(destinationFactoryManager
+        when(destinationFactoryManager
                         .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/"))
-            .andReturn(destinationFactory).anyTimes();
+            .thenReturn(destinationFactory);
 
 
-        control.replay();
         serviceInfos = wsdlServiceBuilder.buildServices(def, service, endpointName);
         if (!serviceInfos.isEmpty()) {
             serviceInfo = serviceInfos.get(0);
         } else {
             serviceInfo = null;
         }
-
     }
 
     @Test
@@ -186,7 +183,8 @@ public class WSDLServiceBuilderTest {
     public void testMultiPorttype() throws Exception {
         setUpWSDL(MULTIPORT_WSDL_PATH, 0);
         assertEquals(2, serviceInfos.size());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -204,14 +202,16 @@ public class WSDLServiceBuilderTest {
         assertNotNull(ei);
         assertEquals("http://schemas.xmlsoap.org/wsdl/soap/", ei.getTransportId());
         assertNotNull(ei.getBinding());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
     public void testInterfaceInfo() throws Exception {
         setUpBasic();
         assertEquals("Greeter", serviceInfo.getInterface().getName().getLocalPart());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -291,7 +291,8 @@ public class WSDLServiceBuilderTest {
         assertTrue(pingMe.hasOutput());
 
         assertNull(serviceInfo.getInterface().getOperation(new QName("what ever")));
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -303,7 +304,8 @@ public class WSDLServiceBuilderTest {
         assertEquals(bindingInfo.getInterface().getName().getLocalPart(), "Greeter");
         assertEquals(bindingInfo.getName().getLocalPart(), "Greeter_SOAPBinding");
         assertEquals(bindingInfo.getName().getNamespaceURI(), "http://apache.org/hello_world_soap_http");
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -334,7 +336,8 @@ public class WSDLServiceBuilderTest {
         BindingOperationInfo pingMe = bindingInfo.getOperation(name);
         assertNotNull(pingMe);
         assertEquals(pingMe.getName(), name);
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -392,7 +395,8 @@ public class WSDLServiceBuilderTest {
         elementName = fault.getFaultInfo().getMessageParts().get(0).getElementQName();
         assertEquals(elementName.getLocalPart(), "faultDetail");
         assertEquals(elementName.getNamespaceURI(), "http://apache.org/hello_world_soap_http/types");
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -410,7 +414,8 @@ public class WSDLServiceBuilderTest {
         // with schema in serviceInfo
         Schema schema = EndpointReferenceUtils.getSchema(serviceInfo);
         assertNotNull(schema);
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -444,7 +449,8 @@ public class WSDLServiceBuilderTest {
         assertFalse("greetMe should be a Unwrapped operation ", greetMe.isUnwrappedCapable());
 
         assertNotNull(serviceInfo.getXmlSchemaCollection());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -486,7 +492,8 @@ public class WSDLServiceBuilderTest {
         assertNotNull(ele);
         Schema schema = EndpointReferenceUtils.getSchema(serviceInfo, null);
         assertNotNull(schema);
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
 
@@ -496,7 +503,8 @@ public class WSDLServiceBuilderTest {
         doDiffPortTypeNsImport();
         setUpWSDL("/DiffPortTypeNs.wsdl", 1);
         doDiffPortTypeNsImport();
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     private void doDiffPortTypeNsImport() {
@@ -555,7 +563,8 @@ public class WSDLServiceBuilderTest {
         assertEquals("in3", parts.get(0).getName().getLocalPart());
         assertEquals("in1", parts.get(1).getName().getLocalPart());
         assertEquals("in2", parts.get(2).getName().getLocalPart());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/http/");
     }
 
     @Test
@@ -569,7 +578,8 @@ public class WSDLServiceBuilderTest {
         assertEquals(2, parts.size());
         assertEquals("header_info", parts.get(0).getName().getLocalPart());
         assertEquals("the_request", parts.get(1).getName().getLocalPart());
-        control.verify();
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     @Test
@@ -637,8 +647,8 @@ public class WSDLServiceBuilderTest {
 
         assertBindingOperationMessageExtensions(boi, true, true, faultName);
         assertBindingOperationMessageExtensions(bi.getOperation(greetMeOpName), false, true, null);
-        control.verify();
-
+        verify(destinationFactoryManager, atLeastOnce())
+            .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/");
     }
 
     private void assertPortTypeOperationExtensions(OperationInfo oi, boolean expectExtensions) {

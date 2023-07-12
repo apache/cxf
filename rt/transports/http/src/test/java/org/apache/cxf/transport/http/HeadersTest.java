@@ -34,14 +34,14 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -50,7 +50,6 @@ public class HeadersTest {
 
     @Test
     public void setHeadersTest() throws Exception {
-        IMocksControl control = EasyMock.createNiceControl();
         String[] headerNames = {"Content-Type", "authorization", "soapAction"};
         String[] headerValues = {"text/xml", "Basic Zm9vOmJhcg==", "foo"};
         Map<String, List<String>> inmap = new HashMap<>();
@@ -58,15 +57,13 @@ public class HeadersTest {
             inmap.put(headerNames[i], Arrays.asList(headerValues[i]));
         }
 
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.enumeration(inmap.keySet()));
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeaderNames()).thenReturn(Collections.enumeration(inmap.keySet()));
         for (int i = 0; i < headerNames.length; i++) {
-            EasyMock.expect(req.getHeaders(headerNames[i])).
-                andReturn(Collections.enumeration(inmap.get(headerNames[i])));
+            when(req.getHeaders(headerNames[i])).
+                thenReturn(Collections.enumeration(inmap.get(headerNames[i])));
         }
-        EasyMock.expect(req.getContentType()).andReturn(headerValues[0]).anyTimes();
-
-        control.replay();
+        when(req.getContentType()).thenReturn(headerValues[0]);
 
         Message message = new MessageImpl();
         message.put(AbstractHTTPDestination.HTTP_REQUEST, req);
@@ -93,8 +90,6 @@ public class HeadersTest {
         assertEquals("unexpected header", protocolHeaders.get("soapaction").get(0), headerValues[2]);
         assertEquals("unexpected header", protocolHeaders.get("SOAPACTION").get(0), headerValues[2]);
         assertEquals("unexpected header", protocolHeaders.get("soapAction").get(0), headerValues[2]);
-
-        control.verify();
     }
 
     @Test
@@ -169,8 +164,6 @@ public class HeadersTest {
 
     @Test
     public void nullContentTypeTest() {
-        IMocksControl control = EasyMock.createNiceControl();
-
         Message message = new MessageImpl();
 
         // first check - content-type==null in message, nothing specified in request
@@ -182,10 +175,10 @@ public class HeadersTest {
 
         // second check - null specified in request, valid content-type specified in message
         // expect that determineContentType returns the content-type specified in the message
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.emptyEnumeration());
-        EasyMock.expect(req.getContentType()).andReturn(null).anyTimes();
-        control.replay();
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+        when(req.getContentType()).thenReturn(null);
+
         message = new MessageImpl();
         message.put(Message.CONTENT_TYPE, "application/json");
         headers = new Headers(message);
@@ -193,23 +186,18 @@ public class HeadersTest {
         assertEquals("Unexpected content-type determined - expected application/json", "application/json",
                      headers.determineContentType());
 
-        control.verify();
-
         // third check - content-type==null in message, null in request
         // expect that determineContentType returns the default value of text/xml
-        control = EasyMock.createNiceControl();
-        req = control.createMock(HttpServletRequest.class);
-        EasyMock.expect(req.getHeaderNames()).andReturn(Collections.emptyEnumeration());
-        EasyMock.expect(req.getContentType()).andReturn(null).anyTimes();
-        control.replay();
+        req = mock(HttpServletRequest.class);
+        when(req.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+        when(req.getContentType()).thenReturn(null);
+
         message = new MessageImpl();
         message.put(Message.CONTENT_TYPE, null);
         headers = new Headers(message);
         headers.copyFromRequest(req);
         assertEquals("Unexpected content-type determined - expected text/xml", "text/xml",
                      headers.determineContentType());
-
-        control.verify();
     }
     
     @Test

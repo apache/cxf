@@ -220,4 +220,90 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                    .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
     }
 
+    @Test
+    public void testMultiGreeterThreadSafety() throws Throwable {
+
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        final jakarta.xml.ws.Service s = jakarta.xml.ws.Service.create(url, serviceName);
+
+        final int numThreads = 50;
+        final Throwable[] errorHolder = new Throwable[numThreads];
+        
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup parentGroup;
+        while ((parentGroup = rootGroup.getParent()) != null) {
+            rootGroup = parentGroup;
+        }
+        int start = rootGroup.activeCount();
+
+        Thread[] threads = new Thread[numThreads];
+        for (int t = 0; t < numThreads; t++) {
+            final int tid = t;
+            Runnable r = new Runnable() {
+                public void run() {
+                    final Greeter greeter = s.getPort(portName, Greeter.class);
+                    try (AutoCloseable c = (AutoCloseable)greeter) {
+                        final InvocationHandler handler = Proxy.getInvocationHandler(greeter);
+                        Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
+
+                        final String protocol = "http-" + Thread.currentThread().getId();
+                        for (int i = 0; i < 10; i++) {
+                            String threadSpecificaddress = protocol + "://localhost:80/" + i;
+                            requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                               threadSpecificaddress);
+                            assertEquals("we get what we set", threadSpecificaddress, requestContext
+                                         .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
+                            try {
+                                greeter.greetMe("Hi");
+                            } catch (WebServiceException expected) {
+                                //expected.getCause().printStackTrace();
+                                MalformedURLException mue = (MalformedURLException)expected
+                                    .getCause();
+                                if (mue == null || mue.getMessage() == null) {
+                                    throw expected;
+                                }
+                                assertTrue("protocol contains thread id from context", mue.getMessage()
+                                    .indexOf(protocol) != 0);
+                            }
+
+                            requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
+                            assertNull("property is null", requestContext
+                                         .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
+
+                        }
+                    } catch (Throwable t) {
+                        // capture assert failures
+                        errorHolder[tid] = t;
+                    }
+                }
+            };
+            threads[t] = new Thread(r);
+        }
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].start();
+        }
+        for (int i = 0; i < numThreads; i++) {
+            threads[i].join();
+        }
+        for (int i = 0; i < numThreads; i++) {
+            if (errorHolder[i] != null) {
+                throw errorHolder[i];
+            }
+        }
+        
+        int end = rootGroup.activeCount();
+        int count = 0;
+        while (end > start && count < 30) {
+            Thread.sleep(100);
+            System.gc();
+            end = rootGroup.activeCount();
+        }
+        
+        
+        System.out.println("Start: " + start + "     End: " + end);
+        // we'll allow a few extra threads to be created for various things like GC, but we
+        // definitely shouldn't be anywhere near numThreads of extra threads
+        assertTrue("Too many extra trheads created  " + end + "/" + start, (end - start) < 5);
+
+    }
 }
