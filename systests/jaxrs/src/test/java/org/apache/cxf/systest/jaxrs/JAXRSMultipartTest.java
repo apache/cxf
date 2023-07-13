@@ -360,7 +360,13 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddBookMixedMultiValueMapParameter() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/mixedmultivaluedmap";
-        doAddBook("multipart/mixed", address, "attachmentFormMixed", 200);
+
+        InputStream is = getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentFormMixed");
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            is = new NoCarriageReturnFileInputStream(is);
+        } 
+
+        doAddBook("multipart/mixed", address, is, 200);
     }
 
     @Test
@@ -1122,4 +1128,25 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return str;
     }
 
+    /**
+     * Windows attachment handling
+     */
+    private static class NoCarriageReturnFileInputStream extends InputStream {
+        private final InputStream is;
+
+        NoCarriageReturnFileInputStream(InputStream is) {
+            this.is = is;
+        }
+
+        @Override
+        public int read() throws IOException {
+            int c;
+
+            do {
+                c = is.read();
+            } while(c != -1 && c == 13);
+
+            return c;
+        }
+    }
 }
