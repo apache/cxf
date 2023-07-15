@@ -33,12 +33,13 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HttpUtilsTest {
 
@@ -225,22 +226,17 @@ public class HttpUtilsTest {
         final String baseURI = "HTTP://LoCALHoST:8080/STORE";
         
         Message m = new MessageImpl();
-        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
         Exchange exchange = new ExchangeImpl();
         
-        req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer(baseURI));
-        req.getPathInfo();
-        EasyMock.expectLastCall().andReturn("/STORE");
-        req.getContextPath();
-        EasyMock.expectLastCall().andReturn("/");
-        req.getServletPath();
-        EasyMock.expectLastCall().andReturn("/");
-        EasyMock.replay(req);
+        when(req.getRequestURL()).thenReturn(new StringBuffer(baseURI));
+        when(req.getPathInfo()).thenReturn("/STORE");
+        when(req.getContextPath()).thenReturn("/");
+        when(req.getServletPath()).thenReturn("/");
 
         m.setExchange(exchange);
-        Destination dest = EasyMock.createMock(Destination.class);
+        Destination dest = mock(Destination.class);
         exchange.setDestination(dest);
         m.put(Message.BASE_PATH, baseURI);
         String address = HttpUtils.getBaseAddress(m);
@@ -250,15 +246,11 @@ public class HttpUtilsTest {
     @Test
     public void testReplaceAnyIPAddress() {
         Message m = new MessageImpl();
-        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
-        req.getScheme();
-        EasyMock.expectLastCall().andReturn("http");
-        req.getServerName();
-        EasyMock.expectLastCall().andReturn("localhost");
-        req.getServerPort();
-        EasyMock.expectLastCall().andReturn(8080);
-        EasyMock.replay(req);
+        when(req.getScheme()).thenReturn("http");
+        when(req.getServerName()).thenReturn("localhost");
+        when(req.getServerPort()).thenReturn(8080);
         URI u = HttpUtils.toAbsoluteUri(URI.create("http://0.0.0.0/bar/foo"), m);
         assertEquals("http://localhost:8080/bar/foo", u.toString());
     }
@@ -274,15 +266,11 @@ public class HttpUtilsTest {
 
     private void doTestReplaceAnyIPAddressWithPort(boolean anyIp) {
         Message m = new MessageImpl();
-        HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
-        req.getScheme();
-        EasyMock.expectLastCall().andReturn("http");
-        req.getServerName();
-        EasyMock.expectLastCall().andReturn("localhost");
-        req.getServerPort();
-        EasyMock.expectLastCall().andReturn(8080);
-        EasyMock.replay(req);
+        when(req.getScheme()).thenReturn("http");
+        when(req.getServerName()).thenReturn("localhost");
+        when(req.getServerPort()).thenReturn(8080);
         String host = anyIp ? "0.0.0.0" : "127.0.0.1";
         URI u = HttpUtils.toAbsoluteUri(URI.create("http://" + host + ":8080/bar/foo"), m);
         assertEquals("http://localhost:8080/bar/foo", u.toString());
@@ -299,7 +287,7 @@ public class HttpUtilsTest {
         Message m = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         m.setExchange(exchange);
-        Destination dest = EasyMock.createMock(Destination.class);
+        Destination dest = mock(Destination.class);
         exchange.setDestination(dest);
         m.put(Message.BASE_PATH, baseURI);
         String address = HttpUtils.getBaseAddress(m);

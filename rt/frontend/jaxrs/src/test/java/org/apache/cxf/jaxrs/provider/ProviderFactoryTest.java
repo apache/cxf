@@ -82,7 +82,6 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -95,6 +94,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ProviderFactoryTest {
 
@@ -495,9 +496,8 @@ public class ProviderFactoryTest {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory);
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(factory);
         e.put(Endpoint.class, endpoint);
         assertSame(ProviderFactory.getInstance(m), factory);
     }

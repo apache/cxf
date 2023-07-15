@@ -29,10 +29,11 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FormUtilsTest {
 
@@ -52,7 +53,6 @@ public class FormUtilsTest {
     @Test
     public void populateMapFromStringFromHTTP() {
         mockObjects(null);
-        EasyMock.replay(mockMessage, mockRequest);
 
         MultivaluedMap<String, String> params = new MetadataMap<>();
         FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
@@ -66,7 +66,6 @@ public class FormUtilsTest {
     @Test
     public void populateMapFromStringFromHTTPWithProp() {
         mockObjects("false");
-        EasyMock.replay(mockMessage, mockRequest);
 
         MultivaluedMap<String, String> params = new MetadataMap<>();
         FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
@@ -78,7 +77,6 @@ public class FormUtilsTest {
     @Test
     public void populateMapFromStringFromBody() {
         mockObjects(null);
-        EasyMock.replay(mockMessage, mockRequest);
 
         MultivaluedMap<String, String> params = new MetadataMap<>();
         String postBody = FORM_PARAM1 + "=" + FORM_PARAM_VALUE1 + "&" + FORM_PARAM2 + "=" + FORM_PARAM_VALUE2;
@@ -92,20 +90,18 @@ public class FormUtilsTest {
 
 
     private void mockObjects(String formPropertyValue) {
-        mockMessage = EasyMock.createMock(Message.class);
-        EasyMock.expect(mockMessage.getContextualProperty(FormUtils.FORM_PARAMS_FROM_HTTP_PARAMS))
-            .andReturn(formPropertyValue).anyTimes();
-        EasyMock.expect(mockMessage.getExchange()).andReturn(null).anyTimes();
-        EasyMock.expect(mockMessage.put(FormUtils.FORM_PARAM_MAP_DECODED, true))
-            .andReturn(null).anyTimes();
+        mockMessage = mock(Message.class);
+        when(mockMessage.getContextualProperty(FormUtils.FORM_PARAMS_FROM_HTTP_PARAMS))
+            .thenReturn(formPropertyValue);
+        when(mockMessage.getExchange()).thenReturn(null);
+        when(mockMessage.put(FormUtils.FORM_PARAM_MAP_DECODED, true))
+            .thenReturn(null);
         
-        mockRequest = EasyMock.createMock(HttpServletRequest.class);
+        mockRequest = mock(HttpServletRequest.class);
         String[] httpParamNames = {HTTP_PARAM1, HTTP_PARAM2};
         Enumeration<String> httpParamsEnum = Collections.enumeration(Arrays.asList(httpParamNames));
-        EasyMock.expect(mockRequest.getParameterNames()).andReturn(httpParamsEnum).anyTimes();
-        EasyMock.expect(mockRequest.getParameterValues(HTTP_PARAM1)).andReturn(new String[] {HTTP_PARAM_VALUE1})
-            .anyTimes();
-        EasyMock.expect(mockRequest.getParameterValues(HTTP_PARAM2)).andReturn(new String[] {HTTP_PARAM_VALUE2})
-            .anyTimes();
+        when(mockRequest.getParameterNames()).thenReturn(httpParamsEnum);
+        when(mockRequest.getParameterValues(HTTP_PARAM1)).thenReturn(new String[] {HTTP_PARAM_VALUE1});
+        when(mockRequest.getParameterValues(HTTP_PARAM2)).thenReturn(new String[] {HTTP_PARAM_VALUE2});
     }
 }
