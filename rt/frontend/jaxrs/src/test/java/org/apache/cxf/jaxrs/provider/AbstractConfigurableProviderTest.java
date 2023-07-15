@@ -21,9 +21,10 @@ package org.apache.cxf.jaxrs.provider;
 
 import org.apache.cxf.Bus;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
 
 public class AbstractConfigurableProviderTest {
     /**
@@ -33,7 +34,7 @@ public class AbstractConfigurableProviderTest {
     public void testSetBus() throws Exception {
 
         AbstractConfigurableProvider provider = new AbstractConfigurableProvider() { };
-        Bus bus = EasyMock.createMock(Bus.class);
+        Bus bus = mock(Bus.class);
 
         provider.setBus(bus);
         Assert.assertSame(bus, provider.getBus());

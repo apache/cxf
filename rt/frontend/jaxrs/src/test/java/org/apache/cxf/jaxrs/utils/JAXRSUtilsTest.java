@@ -106,7 +106,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,6 +117,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JAXRSUtilsTest {
 
@@ -1769,15 +1770,11 @@ public class JAXRSUtilsTest {
                                                      ServletConfig.class}),
                 cri);
         ori.setHttpMethod("GET");
-        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = new HttpServletResponseFilter(
-                                           EasyMock.createMock(HttpServletResponse.class), null);
-        ServletContext context = EasyMock.createMock(ServletContext.class);
-        ServletConfig config = EasyMock.createMock(ServletConfig.class);
-
-        EasyMock.replay(request);
-        EasyMock.replay(context);
-        EasyMock.replay(config);
+                                           mock(HttpServletResponse.class), null);
+        ServletContext context = mock(ServletContext.class);
+        ServletConfig config = mock(ServletConfig.class);
 
         Message m = createMessage();
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
@@ -1807,7 +1804,7 @@ public class JAXRSUtilsTest {
 
         Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
 
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
@@ -1829,11 +1826,11 @@ public class JAXRSUtilsTest {
 
         Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
-        ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
+        ServletContext servletContextMock = mock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
-        HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
 
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
@@ -1877,11 +1874,11 @@ public class JAXRSUtilsTest {
         cri.setResourceProvider(new SingletonResourceProvider(c));
 
         Message m = createMessage();
-        ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
+        ServletContext servletContextMock = mock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
-        HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
         InjectionUtils.injectContextFields(c, cri, m);
@@ -1998,7 +1995,7 @@ public class JAXRSUtilsTest {
                                                                                        new Class[]{}), cri);
 
         Message m = createMessage();
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         Customer c = new Customer();
         ContextResolver<JAXBContext> cr = new JAXBContextProvider();
@@ -2021,12 +2018,9 @@ public class JAXRSUtilsTest {
         Customer c = new Customer();
 
         // Creating mocks for the servlet request, response and context
-        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
-        ServletContext context = EasyMock.createMock(ServletContext.class);
-        EasyMock.replay(request);
-        EasyMock.replay(response);
-        EasyMock.replay(context);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        ServletContext context = mock(ServletContext.class);
 
         Message m = createMessage();
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
@@ -2149,15 +2143,14 @@ public class JAXRSUtilsTest {
     }
 
     private static Endpoint mockEndpoint() {
-        Endpoint endpoint = EasyMock.mock(Endpoint.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
-        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
-        EasyMock.expect(endpoint.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
-        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName()))
-                .andReturn(ServerProviderFactory.getInstance()).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getEndpointInfo()).thenReturn(null);
+        when(endpoint.get(Application.class.getName())).thenReturn(null);
+        when(endpoint.get("org.apache.cxf.jaxrs.comparator")).thenReturn(null);
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpoint.get(ServerProviderFactory.class.getName()))
+                .thenReturn(ServerProviderFactory.getInstance());
         return endpoint;
     }
 

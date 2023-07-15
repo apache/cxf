@@ -31,40 +31,29 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.Servlet3ContinuationProvider;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AsyncResponseImplTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     /**
      * According to the spec, subsequent calls to cancel the same AsyncResponse should
      * have the same behavior as the first call.
      */
     @Test
     public void testCancelBehavesTheSameWhenInvokedMultipleTimes() {
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        HttpServletResponse resp = control.createMock(HttpServletResponse.class);
-        AsyncContext asyncCtx = control.createMock(AsyncContext.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        HttpServletResponse resp = mock(HttpServletResponse.class);
+        AsyncContext asyncCtx = mock(AsyncContext.class);
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
 
-        req.startAsync();
-        EasyMock.expectLastCall().andReturn(asyncCtx);
-        control.replay();
+        when(req.startAsync()).thenReturn(asyncCtx);
 
         AsyncResponse impl = new AsyncResponseImpl(msg);
 
@@ -92,16 +81,14 @@ public class AsyncResponseImplTest {
      */
     @Test
     public void testCancelIntBehavesTheSameWhenInvokedMultipleTimes() {
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        HttpServletResponse resp = control.createMock(HttpServletResponse.class);
-        AsyncContext asyncCtx = control.createMock(AsyncContext.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        HttpServletResponse resp = mock(HttpServletResponse.class);
+        AsyncContext asyncCtx = mock(AsyncContext.class);
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
 
-        req.startAsync();
-        EasyMock.expectLastCall().andReturn(asyncCtx);
-        control.replay();
+        when(req.startAsync()).thenReturn(asyncCtx);
 
         AsyncResponse impl = new AsyncResponseImpl(msg);
 
@@ -129,16 +116,14 @@ public class AsyncResponseImplTest {
      */
     @Test
     public void testCancelDateBehavesTheSameWhenInvokedMultipleTimes() {
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        HttpServletResponse resp = control.createMock(HttpServletResponse.class);
-        AsyncContext asyncCtx = control.createMock(AsyncContext.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        HttpServletResponse resp = mock(HttpServletResponse.class);
+        AsyncContext asyncCtx = mock(AsyncContext.class);
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
 
-        req.startAsync();
-        EasyMock.expectLastCall().andReturn(asyncCtx);
-        control.replay();
+        when(req.startAsync()).thenReturn(asyncCtx);
 
         AsyncResponse impl = new AsyncResponseImpl(msg);
 
@@ -169,14 +154,12 @@ public class AsyncResponseImplTest {
      */
     @Test
     public void testNullContinutaion() {
-        HttpServletRequest req = control.createMock(HttpServletRequest.class);
-        AsyncContext asyncCtx = control.createMock(AsyncContext.class);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        AsyncContext asyncCtx = mock(AsyncContext.class);
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
 
-        req.startAsync();
-        EasyMock.expectLastCall().andReturn(asyncCtx);
-        control.replay();
+        when(req.startAsync()).thenReturn(asyncCtx);
 
         AsyncResponse impl;
         try {
