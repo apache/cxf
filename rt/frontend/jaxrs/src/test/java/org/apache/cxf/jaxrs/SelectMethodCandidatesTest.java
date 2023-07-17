@@ -59,12 +59,13 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SelectMethodCandidatesTest {
 
@@ -855,14 +856,12 @@ public class SelectMethodCandidatesTest {
     }
 
     private static Endpoint mockEndpoint() {
-        Endpoint e = EasyMock.mock(Endpoint.class);
-        EasyMock.expect(e.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(e.size()).andReturn(0).anyTimes();
-        EasyMock.expect(e.getEndpointInfo()).andReturn(null).anyTimes();
-        EasyMock.expect(e.get(ServerProviderFactory.class.getName())).andReturn(ServerProviderFactory.getInstance())
-                .times(3);
-        EasyMock.expect(e.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mock(Endpoint.class);
+        when(e.isEmpty()).thenReturn(true);
+        when(e.size()).thenReturn(0);
+        when(e.getEndpointInfo()).thenReturn(null);
+        when(e.get(ServerProviderFactory.class.getName())).thenReturn(ServerProviderFactory.getInstance());
+        when(e.get("org.apache.cxf.jaxrs.comparator")).thenReturn(null);
         return e;
     }
 

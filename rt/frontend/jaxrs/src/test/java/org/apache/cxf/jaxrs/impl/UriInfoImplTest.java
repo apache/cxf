@@ -43,24 +43,14 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UriInfoImplTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-        control.makeThreadSafe(true);
-    }
-
     @Test
     public void testResolve() {
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/", null), null);
@@ -584,18 +574,15 @@ public class UriInfoImplTest {
     private Message mockMessage(String baseAddress, String pathInfo,
                                 String query, String fragment) {
         Message m = new MessageImpl();
-        control.reset();
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
-        ServletDestination d = control.createMock(ServletDestination.class);
+        ServletDestination d = mock(ServletDestination.class);
         e.setDestination(d);
         EndpointInfo epr = new EndpointInfo();
         epr.setAddress(baseAddress);
-        d.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(epr).anyTimes();
+        when(d.getEndpointInfo()).thenReturn(epr);
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
-        control.replay();
         return m;
     }
 

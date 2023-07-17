@@ -51,13 +51,14 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InjectionUtilsTest {
 
@@ -284,13 +285,12 @@ public class InjectionUtilsTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.mock(Endpoint.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
-        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
-        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
-        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getEndpointInfo()).thenReturn(null);
+        when(endpoint.get(Application.class.getName())).thenReturn(null);
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(factory);
         e.put(Endpoint.class, endpoint);
         return m;
     }
