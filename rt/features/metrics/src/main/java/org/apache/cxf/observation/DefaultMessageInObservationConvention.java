@@ -20,7 +20,10 @@
 package org.apache.cxf.observation;
 
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.observation.CxfObservationDocumentation.LowCardinalityKeys;
+import org.apache.cxf.service.model.BindingOperationInfo;
 
+import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
 
 /**
@@ -32,12 +35,7 @@ public class DefaultMessageInObservationConvention implements MessageInObservati
 
     @Override
     public KeyValues getLowCardinalityKeyValues(MessageInContext context) {
-        return MessageInObservationConvention.super.getLowCardinalityKeyValues(context);
-    }
-
-    @Override
-    public KeyValues getHighCardinalityKeyValues(MessageInContext context) {
-        return MessageInObservationConvention.super.getHighCardinalityKeyValues(context);
+        return CxfObservationConventionUtil.getLowCardinalityKeyValues(context.getEffectiveMessage());
     }
 
     @Override
@@ -47,7 +45,6 @@ public class DefaultMessageInObservationConvention implements MessageInObservati
 
     @Override
     public String getContextualName(MessageInContext context) {
-        Exchange exchange = context.getMessage().getExchange();
-        return exchange.getService().getName().getLocalPart() + "/" + exchange.getBindingOperationInfo().getName().getLocalPart(); // TODO: Check this out
+        return CxfObservationConventionUtil.getContextualName(context.getMessage().getExchange());
     }
 }

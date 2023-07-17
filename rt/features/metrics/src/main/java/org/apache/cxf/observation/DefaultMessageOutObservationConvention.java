@@ -19,8 +19,14 @@
 
 package org.apache.cxf.observation;
 
-import org.apache.cxf.message.Exchange;
+import java.net.URI;
 
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.observation.CxfObservationDocumentation.LowCardinalityKeys;
+import org.apache.cxf.service.model.BindingOperationInfo;
+
+import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
 
 /**
@@ -32,13 +38,9 @@ public class DefaultMessageOutObservationConvention implements MessageOutObserva
 
     @Override
     public KeyValues getLowCardinalityKeyValues(MessageOutContext context) {
-        return MessageOutObservationConvention.super.getLowCardinalityKeyValues(context);
+        return CxfObservationConventionUtil.getLowCardinalityKeyValues(context.getEffectiveMessage());
     }
 
-    @Override
-    public KeyValues getHighCardinalityKeyValues(MessageOutContext context) {
-        return MessageOutObservationConvention.super.getHighCardinalityKeyValues(context);
-    }
 
     @Override
     public String getName() {
@@ -47,7 +49,6 @@ public class DefaultMessageOutObservationConvention implements MessageOutObserva
 
     @Override
     public String getContextualName(MessageOutContext context) {
-        Exchange exchange = context.getMessage().getExchange();
-        return exchange.getService().getName().getLocalPart() + "/" + exchange.getBindingOperationInfo().getName().getLocalPart(); // TODO: Check this out
+        return CxfObservationConventionUtil.getContextualName(context.getMessage().getExchange());
     }
 }

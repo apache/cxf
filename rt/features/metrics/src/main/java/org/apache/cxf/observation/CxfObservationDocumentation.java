@@ -27,10 +27,10 @@ import io.micrometer.observation.docs.ObservationDocumentation;
 /**
  *
  */
-public enum CxfObservationDocumentation implements ObservationDocumentation {
+enum CxfObservationDocumentation implements ObservationDocumentation {
 
     /**
-     * TODO: Add me
+     * Observation created when a message is sent out.
      */
     OUT_OBSERVATION {
         @Override
@@ -46,7 +46,7 @@ public enum CxfObservationDocumentation implements ObservationDocumentation {
     },
 
     /**
-     * TODO: Add me
+     * Observation created when a message is received.
      */
     IN_OBSERVATION {
         @Override
@@ -104,38 +104,6 @@ public enum CxfObservationDocumentation implements ObservationDocumentation {
         },
 
         /**
-         * OSI Transport Layer or Inter-process Communication method. The value SHOULD be normalized to lowercase.
-         */
-        NETWORK_TRANSPORT {
-            @Override
-            public String asString() {
-                return "network.transport";
-            }
-
-            @Override
-            public boolean isRequired() {
-                return false;
-            }
-
-        },
-
-        /**
-         * OSI Network Layer or non-OSI equivalent. The value SHOULD be normalized to lowercase.
-         */
-        NETWORK_TYPE {
-            @Override
-            public String asString() {
-                return "network.type";
-            }
-
-            @Override
-            public boolean isRequired() {
-                return false;
-            }
-
-        },
-
-        /**
          * RPC server host name.
          */
         SERVER_ADDRESS {
@@ -158,38 +126,6 @@ public enum CxfObservationDocumentation implements ObservationDocumentation {
             @Override
             public String asString() {
                 return "server.port";
-            }
-
-            @Override
-            public boolean isRequired() {
-                return false;
-            }
-
-        },
-
-        /**
-         * Physical server IP address or Unix socket address.
-         */
-        SERVER_SOCKET_ADDRESS {
-            @Override
-            public String asString() {
-                return "server.socket.address";
-            }
-
-            @Override
-            public boolean isRequired() {
-                return false;
-            }
-
-        },
-
-        /**
-         * Physical server port.
-         */
-        SERVER_SOCKET_PORT {
-            @Override
-            public String asString() {
-                return "server.socket.port";
             }
 
             @Override
