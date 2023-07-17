@@ -37,6 +37,9 @@ public class ObservationStopInterceptor extends AbstractObservationInterceptor {
         final TraceScopeHolder<ObservationScope> holder =
                 (TraceScopeHolder<ObservationScope>) message.getExchange().get(OBSERVATION_SCOPE);
 
-        super.stopTraceSpan(holder, message);
+        super.stopTraceSpan(holder, observation -> {
+            MessageInContext context = (MessageInContext) observation.getContext();
+            context.setResponse(message);
+        });
     }
 }

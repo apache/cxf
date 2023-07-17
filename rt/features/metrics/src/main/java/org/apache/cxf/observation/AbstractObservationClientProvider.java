@@ -21,6 +21,7 @@ package org.apache.cxf.observation;
 import static org.apache.cxf.observation.CxfObservationDocumentation.OUT_OBSERVATION;
 import static org.apache.cxf.observation.DefaultMessageOutObservationConvention.INSTANCE;
 
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -46,12 +47,7 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
         this.observationRegistry = observationRegistry;
     }
 
-    protected TraceScopeHolder<ObservationScope> startScopedObservation(
-            final MessageOutContext messageOutContext, @Nullable MessageOutObservationConvention convention) {
-        final Observation observation = OUT_OBSERVATION.start(convention,
-                                                                    INSTANCE,
-                                                                    () -> messageOutContext,
-                                                                    this.observationRegistry);
+    protected TraceScopeHolder<ObservationScope> startScopedObservation(final Observation observation) {
 
         // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
@@ -67,7 +63,7 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
         return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
 
-    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, Message response) {
+    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, Consumer<Observation> addResponse) {
         if (holder == null) {
             return;
         }
@@ -83,8 +79,7 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
                     scope = observation.openScope();
                 }
                 if (!observation.isNoop()) {
-                    MessageOutContext messageOutContext = (MessageOutContext) observation.getContext();
-                    messageOutContext.setResponse(response);
+                    addResponse.accept(observation);
                 }
             } finally {
                 if (scope != null) {
@@ -93,5 +88,9 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
                 observationScope.close(); // will close the observation
             }
         }
+    }
+
+    protected ObservationRegistry getObservationRegistry() {
+        return observationRegistry;
     }
 }

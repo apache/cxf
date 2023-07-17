@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.observation;
 
+import static org.apache.cxf.observation.CxfObservationDocumentation.IN_OBSERVATION;
+import static org.apache.cxf.observation.DefaultMessageInObservationConvention.INSTANCE;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
+import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 
 @NoJSR250Annotations
@@ -44,8 +48,12 @@ public class ObservationStartInterceptor extends AbstractObservationInterceptor 
     public void handleMessage(Message message) throws Fault {
         final MessageInContext messageInContext = new MessageInContext(message);
 
-        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(messageInContext,
-                                                                                       this.convention);
+        Observation observation = IN_OBSERVATION.start(convention,
+                                                       INSTANCE,
+                                                       () -> messageInContext,
+                                                       this.observationRegistry);
+
+        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(observation);
 
         if (holder != null) {
             message.getExchange().put(OBSERVATION_SCOPE, holder);

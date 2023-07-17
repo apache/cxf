@@ -39,6 +39,9 @@ public class ObservationClientStopInterceptor extends AbstractObservationClientI
         final TraceScopeHolder<ObservationScope> holder =
                 (TraceScopeHolder<ObservationScope>) message.getExchange().get(OBSERVATION_SCOPE);
 
-        super.stopTraceSpan(holder, message);
+        super.stopTraceSpan(holder, observation -> {
+            MessageOutContext context = (MessageOutContext) observation.getContext();
+            context.setResponse(message);
+        });
     }
 }

@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.observation.jaxrs;
 
+import static org.apache.cxf.observation.CxfObservationDocumentation.OUT_OBSERVATION;
+import static org.apache.cxf.observation.DefaultMessageOutObservationConvention.INSTANCE;
+
 import java.io.IOException;
 
 import org.apache.cxf.jaxrs.ext.Nullable;
@@ -26,6 +29,7 @@ import org.apache.cxf.observation.MessageOutObservationConvention;
 import org.apache.cxf.observation.AbstractObservationClientProvider;
 import org.apache.cxf.observation.ObservationScope;
 
+import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
@@ -52,8 +56,13 @@ public class ObservationClientProvider extends AbstractObservationClientProvider
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
         final MessageOutContext messageOutContext = new MessageOutContext(null);  //TODO: Fix me
-        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(messageOutContext,
-                                                                                       convention);
+
+        Observation observation = OUT_OBSERVATION.start(convention,
+                                                        INSTANCE,
+                                                        () -> messageOutContext,
+                                                        getObservationRegistry());
+
+        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(observation);
 
         if (holder != null) {
             requestContext.setProperty(OBSERVATION_SCOPE, holder);

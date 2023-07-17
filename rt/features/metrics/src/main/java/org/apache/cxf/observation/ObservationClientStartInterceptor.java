@@ -18,16 +18,20 @@
  */
 package org.apache.cxf.observation;
 
+import static org.apache.cxf.observation.CxfObservationDocumentation.OUT_OBSERVATION;
+import static org.apache.cxf.observation.DefaultMessageOutObservationConvention.INSTANCE;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import io.micrometer.common.lang.Nullable;
+import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 
 public class ObservationClientStartInterceptor extends AbstractObservationClientInterceptor {
 
-    final MessageOutObservationConvention messageOutObservationConvention;
+    final MessageOutObservationConvention convention;
 
     public ObservationClientStartInterceptor(final ObservationRegistry observationRegistry) {
         this(Phase.PRE_STREAM, observationRegistry, null);
@@ -35,23 +39,27 @@ public class ObservationClientStartInterceptor extends AbstractObservationClient
 
     public ObservationClientStartInterceptor(final ObservationRegistry observationRegistry,
                                              @Nullable
-                                             MessageOutObservationConvention messageOutObservationConvention) {
-        this(Phase.PRE_STREAM, observationRegistry, messageOutObservationConvention);
+                                             MessageOutObservationConvention convention) {
+        this(Phase.PRE_STREAM, observationRegistry, convention);
     }
 
     public ObservationClientStartInterceptor(final String phase, final ObservationRegistry observationRegistry,
                                              @Nullable
-                                             MessageOutObservationConvention messageOutObservationConvention) {
+                                             MessageOutObservationConvention convention) {
         super(phase, observationRegistry);
-        this.messageOutObservationConvention = messageOutObservationConvention;
+        this.convention = convention;
     }
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        final MessageOutContext context = new MessageOutContext(message);
+        final MessageOutContext messageOutContext = new MessageOutContext(message);
 
-        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(context,
-                                                                                       this.messageOutObservationConvention);
+        Observation observation = OUT_OBSERVATION.start(convention,
+                                          INSTANCE,
+                                          () -> messageOutContext,
+                                          getObservationRegistry());
+
+        final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(observation);
 
         if (holder != null) {
             message.getExchange().put(OBSERVATION_SCOPE, holder);
@@ -64,6 +72,9 @@ public class ObservationClientStartInterceptor extends AbstractObservationClient
         final TraceScopeHolder<ObservationScope> holder =
                 (TraceScopeHolder<ObservationScope>) message.getExchange().get(OBSERVATION_SCOPE);
 
-        super.stopTraceSpan(holder, message);
+        super.stopTraceSpan(holder, observation -> {
+            MessageOutContext context = (MessageOutContext) observation.getContext();
+            context.setResponse(message);
+        });
     }
 }

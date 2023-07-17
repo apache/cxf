@@ -21,6 +21,7 @@ package org.apache.cxf.observation;
 import static org.apache.cxf.observation.CxfObservationDocumentation.IN_OBSERVATION;
 import static org.apache.cxf.observation.DefaultMessageInObservationConvention.INSTANCE;
 
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -30,6 +31,7 @@ import org.apache.cxf.tracing.AbstractTracingProvider;
 
 import io.micrometer.common.lang.Nullable;
 import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationConvention;
 import io.micrometer.observation.ObservationRegistry;
 
 public abstract class AbstractObservationProvider extends AbstractTracingProvider {
@@ -46,13 +48,7 @@ public abstract class AbstractObservationProvider extends AbstractTracingProvide
         this.observationRegistry = observationRegistry;
     }
 
-    protected TraceScopeHolder<ObservationScope> startScopedObservation(
-            final MessageInContext messageInContext, @Nullable MessageInObservationConvention convention) {
-
-        final Observation observation = IN_OBSERVATION.start(convention,
-                                                                   INSTANCE,
-                                                                   () -> messageInContext,
-                                                                   this.observationRegistry);
+    protected TraceScopeHolder<ObservationScope> startScopedObservation(final Observation observation) {
 
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
@@ -67,7 +63,7 @@ public abstract class AbstractObservationProvider extends AbstractTracingProvide
         return new TraceScopeHolder<>(new ObservationScope(observation, scope), scope == null /* detached */);
     }
 
-    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, Message response) {
+    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, Consumer<Observation> addResponse) {
         if (holder == null) {
             return;
         }
@@ -85,8 +81,7 @@ public abstract class AbstractObservationProvider extends AbstractTracingProvide
                 }
 
                 if (!observation.isNoop()) {
-                    MessageInContext messageOutContext = (MessageInContext) observation.getContext();
-                    messageOutContext.setResponse(response);
+                    addResponse.accept(observation);
                 }
             } finally {
                 if (scope != null) {
