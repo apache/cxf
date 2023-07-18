@@ -20,10 +20,13 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import static org.junit.Assert.assertTrue;
 
+import java.net.URI;
 import java.util.function.Function;
 
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.observation.DefaultMessageOutObservationConvention;
+import org.apache.cxf.observation.MessageOutContext;
 import org.apache.cxf.observation.ObservationClientFeature;
 import org.apache.cxf.observation.jaxrs.ContainerRequestReceiverContext;
 import org.apache.cxf.observation.jaxrs.ContainerRequestSenderObservationContext;
@@ -31,6 +34,7 @@ import org.apache.cxf.observation.jaxrs.DefaultContainerRequestReceiverObservati
 import org.apache.cxf.observation.jaxrs.DefaultContainerRequestSenderObservationConvention;
 import org.apache.cxf.observation.jaxrs.ObservationClientProvider;
 import org.apache.cxf.observation.jaxrs.ObservationFeature;
+import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.junit.BeforeClass;
 
 import brave.Tracing;
@@ -137,7 +141,13 @@ public class BraveMicrometerTracingTest extends AbstractBraveTracingTest {
                     return keyValues;
                 }
             });
-            ObservationClientFeature clientFeature = new ObservationClientFeature(observationRegistry);
+            ObservationClientFeature clientFeature = new ObservationClientFeature(observationRegistry, new DefaultMessageOutObservationConvention() {
+                // To align with Brave's defaults
+                @Override
+                public String getContextualName(MessageOutContext context) {
+                    return super.getContextualName(context) + " " + context.getUri().toString();
+                }
+            });
             ObservationClientProvider clientProvider = new ObservationClientProvider(observationRegistry, new DefaultContainerRequestSenderObservationConvention() {
                 @Override
                 public String getContextualName(ContainerRequestSenderObservationContext context) {
@@ -150,12 +160,12 @@ public class BraveMicrometerTracingTest extends AbstractBraveTracingTest {
     }
 
     static class InputData {
-        Object feature;
+        jakarta.ws.rs.core.Feature feature;
         Feature clientFeature;
 
         Object clientProvider;
 
-        InputData(Object feature, Feature clientFeature, Object clientProvider) {
+        InputData(jakarta.ws.rs.core.Feature feature, Feature clientFeature, Object clientProvider) {
             this.feature = feature;
             this.clientFeature = clientFeature;
             this.clientProvider = clientProvider;

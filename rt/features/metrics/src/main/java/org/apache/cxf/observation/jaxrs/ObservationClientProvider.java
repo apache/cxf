@@ -74,7 +74,7 @@ public class ObservationClientProvider extends AbstractObservationClientProvider
                        final ClientResponseContext responseContext) throws IOException {
         final TraceScopeHolder<ObservationScope> holder =
                 (TraceScopeHolder<ObservationScope>) requestContext.getProperty(OBSERVATION_SCOPE);
-        super.stopTraceSpan(holder, observation -> {
+        super.stopTraceSpan(holder, null, observation -> {
             ContainerRequestSenderObservationContext context =
                     (ContainerRequestSenderObservationContext) observation.getContext();
             context.setResponse(responseContext);

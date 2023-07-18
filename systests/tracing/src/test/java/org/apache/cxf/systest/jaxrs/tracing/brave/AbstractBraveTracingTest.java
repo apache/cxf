@@ -56,6 +56,7 @@ import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.brave.TraceScope;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;

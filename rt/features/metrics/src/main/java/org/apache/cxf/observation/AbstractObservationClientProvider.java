@@ -61,9 +61,10 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
 
     private boolean isAsyncInvocation() {
         return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
+
     }
 
-    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, Consumer<Observation> addResponse) {
+    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, @Nullable Exception ex, Consumer<Observation> addResponse) {
         if (holder == null) {
             return;
         }
@@ -75,6 +76,7 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
                 // If the client invocation was asynchronous , the trace span has been created
                 // in another thread and should be re-attached to the current one.
                 Observation observation = observationScope.getObservation();
+                observation.error(ex);
                 if (holder.isDetached()) {
                     scope = observation.openScope();
                 }

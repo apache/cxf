@@ -41,20 +41,24 @@ final class CxfObservationConventionUtil {
     static KeyValues getLowCardinalityKeyValues(Message msg) {
         KeyValue rpcSystem = LowCardinalityKeys.RPC_SYSTEM.withValue("cxf");
         KeyValue rpcService = LowCardinalityKeys.RPC_SERVICE.withValue(msg.getExchange().getService().getName().getLocalPart());
-        KeyValue rpcMethod = LowCardinalityKeys.RPC_METHOD.withValue(msg.getExchange().getBindingOperationInfo().getName().getLocalPart());
+        KeyValues keyValues = KeyValues.of(rpcSystem, rpcService);
+        BindingOperationInfo bindingOperationInfo = msg.getExchange().getBindingOperationInfo();
+        if (bindingOperationInfo != null) {
+            keyValues = keyValues.and(LowCardinalityKeys.RPC_METHOD.withValue(bindingOperationInfo.getName().getLocalPart()));
+        }
         String endpointAdress = url(msg);
         if (endpointAdress != null) {
             try {
                 URI uri = URI.create(endpointAdress);
                 KeyValue serverAddress = LowCardinalityKeys.SERVER_ADDRESS.withValue(uri.getHost());
                 KeyValue serverPort = LowCardinalityKeys.SERVER_PORT.withValue(String.valueOf(uri.getPort()));
-                return KeyValues.of(rpcSystem, rpcService, rpcMethod, serverAddress, serverPort);
+                return keyValues.and(serverAddress, serverPort);
             } catch (Exception ex) {
                 // TODO: Log this out
-                return KeyValues.of(rpcSystem, rpcService, rpcMethod);
+                return keyValues;
             }
         }
-        return KeyValues.of(rpcSystem, rpcService, rpcMethod);
+        return keyValues;
     }
 
     private static String url(Message message) {
@@ -67,11 +71,14 @@ final class CxfObservationConventionUtil {
 
     static String getContextualName(Exchange exchange) {
         BindingOperationInfo bindingOperationInfo = exchange.getBindingOperationInfo();
-        if (bindingOperationInfo == null) {
-            return null;
+        if (bindingOperationInfo != null) {
+            String serviceName = bindingOperationInfo.getBinding().getService().getName().getLocalPart();
+            String operationName = bindingOperationInfo.getOperationInfo().getName().getLocalPart();
+            return serviceName + "/" + operationName;
         }
-        String serviceName = bindingOperationInfo.getBinding().getService().getName().getLocalPart();
-        String operationName = bindingOperationInfo.getOperationInfo().getName().getLocalPart();
-        return serviceName + "/" + operationName;
+        if (exchange.getOutMessage() != null) {
+            return (String) exchange.getOutMessage().get(Message.HTTP_REQUEST_METHOD);
+        }
+        return null;
     }
 }
