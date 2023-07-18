@@ -115,6 +115,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     final Conduit c = ci.getConduit(info, bus);
                     Message message = new MessageImpl();
                     Exchange exch = new ExchangeImpl();
+                    exch.put(Bus.class, bus);
                     message.setExchange(exch);
 
                     message.put(Message.HTTP_REQUEST_METHOD, "GET");
