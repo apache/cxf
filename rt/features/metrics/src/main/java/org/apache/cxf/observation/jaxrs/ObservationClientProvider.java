@@ -18,14 +18,12 @@
  */
 package org.apache.cxf.observation.jaxrs;
 
-import static org.apache.cxf.observation.CxfObservationDocumentation.OUT_OBSERVATION;
-import static org.apache.cxf.observation.DefaultMessageOutObservationConvention.INSTANCE;
+import static org.apache.cxf.observation.jaxrs.DefaultContainerRequestSenderObservationConvention.INSTANCE;
+import static org.apache.cxf.observation.jaxrs.JaxrsObservationDocumentation.OUT_OBSERVATION;
 
 import java.io.IOException;
 
 import org.apache.cxf.jaxrs.ext.Nullable;
-import org.apache.cxf.observation.MessageOutContext;
-import org.apache.cxf.observation.MessageOutObservationConvention;
 import org.apache.cxf.observation.AbstractObservationClientProvider;
 import org.apache.cxf.observation.ObservationScope;
 
@@ -41,25 +39,26 @@ import jakarta.ws.rs.ext.Provider;
 public class ObservationClientProvider extends AbstractObservationClientProvider
         implements ClientRequestFilter, ClientResponseFilter {
 
-    private final MessageOutObservationConvention convention;
+    private final ContainerRequestSenderObservationConvention convention;
 
     public ObservationClientProvider(final ObservationRegistry observationRegistry) {
         this(observationRegistry, null);
     }
 
     public ObservationClientProvider(final ObservationRegistry observationRegistry,
-                                     @Nullable MessageOutObservationConvention convention) {
+                                     @Nullable ContainerRequestSenderObservationConvention convention) {
         super(observationRegistry);
         this.convention = convention;
     }
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final MessageOutContext messageOutContext = new MessageOutContext(null);  //TODO: Fix me
+        final ContainerRequestSenderObservationContext senderContext =
+                new ContainerRequestSenderObservationContext(requestContext);
 
         Observation observation = OUT_OBSERVATION.start(convention,
                                                         INSTANCE,
-                                                        () -> messageOutContext,
+                                                        () -> senderContext,
                                                         getObservationRegistry());
 
         final TraceScopeHolder<ObservationScope> holder = super.startScopedObservation(observation);
@@ -75,6 +74,10 @@ public class ObservationClientProvider extends AbstractObservationClientProvider
                        final ClientResponseContext responseContext) throws IOException {
         final TraceScopeHolder<ObservationScope> holder =
                 (TraceScopeHolder<ObservationScope>) requestContext.getProperty(OBSERVATION_SCOPE);
-        super.stopTraceSpan(holder, null); //TODO: Fix me
+        super.stopTraceSpan(holder, observation -> {
+            ContainerRequestSenderObservationContext context =
+                    (ContainerRequestSenderObservationContext) observation.getContext();
+            context.setResponse(responseContext);
+        });
     }
 }

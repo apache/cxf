@@ -19,7 +19,6 @@
 package org.apache.cxf.observation.jaxrs;
 
 import org.apache.cxf.jaxrs.ext.Nullable;
-import org.apache.cxf.observation.MessageInObservationConvention;
 
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.ws.rs.core.Feature;
@@ -30,21 +29,21 @@ import jakarta.ws.rs.ext.Provider;
 public class ObservationFeature implements Feature {
     private final ObservationRegistry observationRegistry;
 
-    private final MessageInObservationConvention messageInObservationConvention;
+    private final ContainerRequestReceiverObservationConvention receiverConvention;
 
     public ObservationFeature(final ObservationRegistry observationRegistry) {
         this(observationRegistry, null);
     }
 
     public ObservationFeature(final ObservationRegistry observationRegistry,
-                              @Nullable MessageInObservationConvention messageInObservationConvention) {
+                              @Nullable ContainerRequestReceiverObservationConvention receiverConvention) {
         this.observationRegistry = observationRegistry;
-        this.messageInObservationConvention = messageInObservationConvention;
+        this.receiverConvention = receiverConvention;
     }
 
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new ObservationProvider(observationRegistry, messageInObservationConvention));
+        context.register(new ObservationProvider(observationRegistry, receiverConvention));
         context.register(new ObservationContextProvider(observationRegistry));
         return true;
     }
