@@ -23,30 +23,43 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import brave.sampler.Sampler;
+import io.micrometer.tracing.brave.bridge.CompositeSpanHandler;
+import io.micrometer.tracing.exporter.FinishedSpan;
+import io.micrometer.tracing.exporter.SpanExportingPredicate;
+import io.micrometer.tracing.exporter.SpanFilter;
+import io.micrometer.tracing.exporter.SpanReporter;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.Service.Mode;
 import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
+import org.apache.cxf.observation.ObservationClientFeature;
+import org.apache.cxf.observation.ObservationFeature;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.jaxws.resources.HelloService;
 import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.system.CapturedOutput;
@@ -80,6 +93,7 @@ import static org.hamcrest.Matchers.empty;
             "cxf.metrics.server.max-uri-tags=2"
         })
 @ActiveProfiles("jaxws")
+@AutoConfigureObservability
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
@@ -95,6 +109,15 @@ public class SpringJaxwsTest {
     @Autowired
     private MetricsProvider metricsProvider;
 
+    @Autowired
+    private ObjectProvider<ObservationFeature> observationFeature;
+
+    @Autowired
+    private ObjectProvider<ObservationClientFeature> observationClientFeature;
+
+    @Autowired
+    private ArrayListSpanReporter arrayListSpanReporter;
+
     @LocalServerPort
     private int port;
 
@@ -106,10 +129,13 @@ public class SpringJaxwsTest {
         @Autowired
         private MetricsProvider metricsProvider;
 
+        @Autowired
+        private ObjectProvider<ObservationFeature> observationFeature;
+
         @Bean
         public Endpoint helloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
-                new MetricsFeature(metricsProvider)
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
+                new MetricsFeature(metricsProvider), observationFeature.getObject()
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V1);
             return endpoint;
@@ -117,8 +143,8 @@ public class SpringJaxwsTest {
 
         @Bean
         public Endpoint secondHelloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
-                new MetricsFeature(metricsProvider)
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
+                new MetricsFeature(metricsProvider), observationFeature.getObject()
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V2);
             return endpoint;
@@ -126,11 +152,40 @@ public class SpringJaxwsTest {
 
         @Bean
         public Endpoint thirdHelloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
-                new MetricsFeature(metricsProvider)
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
+                new MetricsFeature(metricsProvider), observationFeature.getObject()
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V3);
             return endpoint;
+        }
+
+        @Bean
+        Sampler sampler() {
+            return Sampler.ALWAYS_SAMPLE;
+        }
+
+        @Bean
+        ArrayListSpanReporter arrayListSpanReporter() {
+            return new ArrayListSpanReporter();
+        }
+    }
+
+    static class ArrayListSpanReporter implements SpanReporter, AutoCloseable {
+
+        private final List<FinishedSpan> spans = new ArrayList<>();
+
+        @Override
+        public void report(FinishedSpan span) {
+            spans.add(span);
+        }
+
+        public List<FinishedSpan> getSpans() {
+            return spans;
+        }
+
+        @Override
+        public void close() throws Exception {
+            spans.clear();
         }
     }
 
@@ -380,7 +435,7 @@ public class SpringJaxwsTest {
     private HelloService createApi(final int portToUse, final String serviceName) {
         final JaxWsProxyFactoryBean  factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(HelloService.class);
-        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
+        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider), observationFeature.getObject()));
         factory.setAddress("http://localhost:" + portToUse + "/Service/" + serviceName);
         return factory.create(HelloService.class);
     }
@@ -390,7 +445,7 @@ public class SpringJaxwsTest {
 
         StreamSource source = new StreamSource(new StringReader(requestBody));
         Service service = Service.create(new URL(address + "?wsdl"),
-                new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider));
+                new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider), observationClientFeature.getObject());
         Dispatch<Source> dispatch = service.createDispatch(new QName("http://service.ws.sample/", "HelloPort"),
             Source.class, Mode.PAYLOAD);
 

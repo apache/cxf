@@ -19,7 +19,6 @@
 
 package org.apache.cxf.spring.boot.autoconfigure.micrometer;
 
-import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.observation.MessageInObservationConvention;
 import org.apache.cxf.observation.MessageOutObservationConvention;
 import org.apache.cxf.observation.ObservationClientFeature;
@@ -34,12 +33,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 
 @Configuration
 @AutoConfigureAfter(ObservationAutoConfiguration.class)
-@ConditionalOnClass(MetricsProvider.class)
+@ConditionalOnClass(ObservationRegistry.class)
 @ConditionalOnProperty(name = "cxf.observation.enabled", matchIfMissing = true)
 @ConditionalOnBean(ObservationRegistry.class)
 public class MicrometerObservationAutoConfiguration {
