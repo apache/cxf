@@ -239,6 +239,7 @@
         <cxf.xerces.version>2.12.2</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
+        <cxf.zipkin-reporter.version>2.16.4</cxf.zipkin-reporter.version>
 
         <!-- various OSGi related versions -->
         <cxf.aries.api.version>1.0.1</cxf.aries.api.version>
@@ -1854,7 +1855,17 @@
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-test</artifactId>
+                <version>${cxf.micrometer.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-tracing-bridge-brave</artifactId>
+                <version>${cxf.micrometer-tracing.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-tracing-test</artifactId>
                 <version>${cxf.micrometer-tracing.version}</version>
             </dependency>
             <dependency>
@@ -1871,6 +1882,16 @@
                  <groupId>io.zipkin.brave</groupId>
                  <artifactId>brave-instrumentation-http</artifactId>
                  <version>${cxf.brave.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.zipkin.reporter2</groupId>
+                <artifactId>zipkin-reporter-brave</artifactId>
+                <version>${cxf.zipkin-reporter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.zipkin.reporter2</groupId>
+                <artifactId>zipkin-sender-urlconnection</artifactId>
+                <version>${cxf.zipkin-reporter.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentracing</groupId>
