@@ -40,7 +40,7 @@ enum JaxrsObservationDocumentation implements ObservationDocumentation {
 
         @Override
         public KeyName[] getLowCardinalityKeyNames() {
-            return KeyName.merge(CommonLowCardinalityKeys.values(), ServerLowCardinalityKeys.values());
+            return CommonLowCardinalityKeys.values();
         }
 
         @Override
@@ -60,7 +60,7 @@ enum JaxrsObservationDocumentation implements ObservationDocumentation {
 
         @Override
         public KeyName[] getLowCardinalityKeyNames() {
-            return CommonLowCardinalityKeys.values();
+            return KeyName.merge(CommonLowCardinalityKeys.values(), ServerLowCardinalityKeys.values());
         }
 
         @Override
