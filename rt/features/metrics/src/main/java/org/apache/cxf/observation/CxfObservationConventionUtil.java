@@ -20,7 +20,10 @@
 package org.apache.cxf.observation;
 
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.observation.CxfObservationDocumentation.LowCardinalityKeys;
@@ -33,6 +36,8 @@ import io.micrometer.common.KeyValues;
  *
  */
 final class CxfObservationConventionUtil {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(CxfObservationConventionUtil.class);
 
     private CxfObservationConventionUtil() {
         throw new IllegalStateException("Can't instantiate a utility class");
@@ -54,7 +59,7 @@ final class CxfObservationConventionUtil {
                 KeyValue serverPort = LowCardinalityKeys.SERVER_PORT.withValue(String.valueOf(uri.getPort()));
                 return keyValues.and(serverAddress, serverPort);
             } catch (Exception ex) {
-                // TODO: Log this out
+                LOG.log(Level.FINE, ex, () -> "Exception occurred while trying to parse the URI from [" + endpointAdress + "] address");
                 return keyValues;
             }
         }
