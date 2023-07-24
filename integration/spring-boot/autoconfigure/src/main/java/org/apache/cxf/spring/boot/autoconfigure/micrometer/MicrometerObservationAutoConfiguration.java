@@ -37,7 +37,7 @@ import io.micrometer.observation.ObservationRegistry;
 
 @Configuration
 @AutoConfigureAfter(ObservationAutoConfiguration.class)
-@ConditionalOnClass(ObservationRegistry.class)
+@ConditionalOnClass({ ObservationRegistry.class, ObservationFeature.class })
 @ConditionalOnProperty(name = "cxf.observation.enabled", matchIfMissing = true)
 @ConditionalOnBean(ObservationRegistry.class)
 public class MicrometerObservationAutoConfiguration {
