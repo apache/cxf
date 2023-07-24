@@ -19,10 +19,10 @@
 
 package org.apache.cxf.spring.boot.autoconfigure.micrometer;
 
-import org.apache.cxf.observation.MessageInObservationConvention;
-import org.apache.cxf.observation.MessageOutObservationConvention;
-import org.apache.cxf.observation.ObservationClientFeature;
-import org.apache.cxf.observation.ObservationFeature;
+import org.apache.cxf.tracing.micrometer.MessageInObservationConvention;
+import org.apache.cxf.tracing.micrometer.MessageOutObservationConvention;
+import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
+import org.apache.cxf.tracing.micrometer.ObservationFeature;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;

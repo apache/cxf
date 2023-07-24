@@ -86,7 +86,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-features-metrics</artifactId>
+            <artifactId>cxf-integration-tracing-micrometer</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

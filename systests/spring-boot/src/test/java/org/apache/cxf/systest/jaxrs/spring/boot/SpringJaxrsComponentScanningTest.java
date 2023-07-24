@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.spring.AbstractSpringComponentScanServer;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
-import org.apache.cxf.observation.ObservationFeature;
+import org.apache.cxf.tracing.micrometer.ObservationFeature;
 import org.apache.cxf.systest.jaxrs.resources.Library;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

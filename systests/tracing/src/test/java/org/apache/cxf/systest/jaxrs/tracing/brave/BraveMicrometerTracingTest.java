@@ -25,16 +25,15 @@ import java.util.function.Function;
 
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.observation.DefaultMessageOutObservationConvention;
-import org.apache.cxf.observation.MessageOutContext;
-import org.apache.cxf.observation.ObservationClientFeature;
-import org.apache.cxf.observation.jaxrs.ContainerRequestReceiverContext;
-import org.apache.cxf.observation.jaxrs.ContainerRequestSenderObservationContext;
-import org.apache.cxf.observation.jaxrs.DefaultContainerRequestReceiverObservationConvention;
-import org.apache.cxf.observation.jaxrs.DefaultContainerRequestSenderObservationConvention;
-import org.apache.cxf.observation.jaxrs.ObservationClientProvider;
-import org.apache.cxf.observation.jaxrs.ObservationFeature;
-import org.apache.cxf.tracing.AbstractTracingProvider;
+import org.apache.cxf.tracing.micrometer.DefaultMessageOutObservationConvention;
+import org.apache.cxf.tracing.micrometer.MessageOutContext;
+import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
+import org.apache.cxf.tracing.micrometer.jaxrs.ContainerRequestReceiverContext;
+import org.apache.cxf.tracing.micrometer.jaxrs.ContainerRequestSenderObservationContext;
+import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestReceiverObservationConvention;
+import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestSenderObservationConvention;
+import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
+import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
 import org.junit.BeforeClass;
 
 import brave.Tracing;
