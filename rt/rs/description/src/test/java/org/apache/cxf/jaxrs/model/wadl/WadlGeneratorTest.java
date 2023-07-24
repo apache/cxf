@@ -58,9 +58,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.ws.commons.schema.constants.Constants;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -68,17 +65,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class WadlGeneratorTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-        control.makeThreadSafe(true);
-    }
-
     @Test
     public void testNoWadl() {
         WadlGenerator wg = new WadlGenerator();
@@ -837,25 +827,21 @@ public class WadlGeneratorTest {
         Exchange e = new ExchangeImpl();
         e.put(Service.class, new JAXRSServiceImpl(cris));
         m.setExchange(e);
-        control.reset();
-        ServletDestination d = control.createMock(ServletDestination.class);
+        ServletDestination d = mock(ServletDestination.class);
         EndpointInfo epr = new EndpointInfo();
         epr.setAddress(baseAddress);
-        d.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(epr).anyTimes();
+        when(d.getEndpointInfo()).thenReturn(epr);
 
         Endpoint endpoint = new EndpointImpl(null, null, epr);
         e.put(Endpoint.class, endpoint);
         endpoint.put(ServerProviderFactory.class.getName(), ServerProviderFactory.getInstance());
         e.setDestination(d);
-        BindingInfo bi = control.createMock(BindingInfo.class);
+        BindingInfo bi = mock(BindingInfo.class);
         epr.setBinding(bi);
-        bi.getProperties();
-        EasyMock.expectLastCall().andReturn(Collections.emptyMap()).anyTimes();
+        when(bi.getProperties()).thenReturn(Collections.emptyMap());
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, "GET");
-        control.replay();
         return m;
     }
 
