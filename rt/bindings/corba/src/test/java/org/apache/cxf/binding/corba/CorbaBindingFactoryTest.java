@@ -40,8 +40,6 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +47,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Mockito.mock;
 
 public class CorbaBindingFactoryTest {
 
@@ -85,8 +83,7 @@ public class CorbaBindingFactoryTest {
 
     @Test
     public void testCreateBinding() throws Exception {
-        IMocksControl control = EasyMock.createNiceControl();
-        BindingInfo bindingInfo = control.createMock(BindingInfo.class);
+        BindingInfo bindingInfo = mock(BindingInfo.class);
 
         CorbaBinding binding = (CorbaBinding)factory.createBinding(bindingInfo);
         assertNotNull(binding);
@@ -110,7 +107,7 @@ public class CorbaBindingFactoryTest {
         assertNotNull(conduit);
         conduit = factory.getConduit(endpointInfo, null, bus);
         assertNotNull(conduit);
-        target = EasyMock.createMock(EndpointReferenceType.class);
+        target = mock(EndpointReferenceType.class);
         conduit = factory.getConduit(endpointInfo, target, bus);
         assertNotNull(conduit);
     }
