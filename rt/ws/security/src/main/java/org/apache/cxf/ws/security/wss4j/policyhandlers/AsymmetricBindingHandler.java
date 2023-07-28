@@ -863,6 +863,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         List<WSHandlerResult> results = CastUtils.cast((List<?>)message.getExchange().getInMessage()
             .get(WSHandlerConstants.RECV_RESULTS));
 
+        if (results == null) {
+            return null;
+        }
+
         for (WSHandlerResult rResult : results) {
             List<WSSecurityEngineResult> wsSecEngineResults = rResult.getResults();
 
