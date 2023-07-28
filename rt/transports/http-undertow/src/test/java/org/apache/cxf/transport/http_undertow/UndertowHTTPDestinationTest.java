@@ -75,7 +75,6 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Test;
 
@@ -86,7 +85,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UndertowHTTPDestinationTest {
     protected static final String AUTH_HEADER = "Authorization";
@@ -212,7 +216,7 @@ public class UndertowHTTPDestinationTest {
     @Test
     public void testContinuationsIgnored() throws Exception {
 
-        HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));
@@ -294,6 +298,30 @@ public class UndertowHTTPDestinationTest {
         verifyDoService();
         assertSame("Default thread bus has not been reset",
                     defaultBus, BusFactory.getThreadDefaultBus());
+    }
+
+    @Test
+    public void testDoServiceWithWsdlGET() throws Exception {
+        destination = setUpDestination(false, false);
+        setUpDoService(false,
+                       false,
+                       false,
+                       "GET",
+                       "?wsdl",
+                       200);
+        destination.doService(request, response);
+
+        assertNotNull("unexpected null message", inMessage);
+        assertEquals("unexpected method",
+                     inMessage.get(Message.HTTP_REQUEST_METHOD),
+                     "GET");
+        assertEquals("unexpected path",
+                     inMessage.get(Message.PATH_INFO),
+                     "/bar/foo");
+        assertEquals("unexpected query",
+                     inMessage.get(Message.QUERY_STRING),
+                     "wsdl");
+
     }
 
     @Test
@@ -409,8 +437,7 @@ public class UndertowHTTPDestinationTest {
         endpointInfo.setName(new QName("bla", "Port"));
         endpointInfo.addExtensor(policy);
 
-        engine = EasyMock.createMock(UndertowHTTPServerEngine.class);
-        EasyMock.replay();
+        engine = mock(UndertowHTTPServerEngine.class);
         endpointInfo.setAddress(NOWHERE + "bar/foo");
 
         UndertowHTTPDestination dest =
@@ -473,10 +500,9 @@ public class UndertowHTTPDestinationTest {
         Map<String, Object> context = new HashMap<>();
         assertNull("fails with no context", destination.getId(context));
 
-        AddressingProperties maps = EasyMock.createMock(AddressingProperties.class);
-        maps.getToEndpointReference();
-        EasyMock.expectLastCall().andReturn(refWithId);
-        EasyMock.replay(maps);
+        AddressingProperties maps = mock(AddressingProperties.class);
+        when(maps.getToEndpointReference()).thenReturn(refWithId);
+
         context.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
         String result = destination.getId(context);
         assertNotNull(result);
@@ -536,22 +562,16 @@ public class UndertowHTTPDestinationTest {
             bus = new ExtensionManagerBus();
             bus.setExtension(mgr, ConduitInitiatorManager.class);
         } else {
-            bus = EasyMock.createMock(Bus.class);
-            bus.getExtension(EndpointResolverRegistry.class);
-            EasyMock.expectLastCall().andReturn(null);
-            bus.getExtension(ContinuationProviderFactory.class);
-            EasyMock.expectLastCall().andReturn(null).anyTimes();
-            bus.getExtension(PolicyDataEngine.class);
-            EasyMock.expectLastCall().andReturn(null).anyTimes();
-            bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine");
-            EasyMock.expectLastCall().andReturn(false);
-            bus.getExtension(ClassLoader.class);
-            EasyMock.expectLastCall().andReturn(this.getClass().getClassLoader());
-            EasyMock.replay(bus);
+            bus = mock(Bus.class);
+            when(bus.getExtension(EndpointResolverRegistry.class)).thenReturn(null);
+            when(bus.getExtension(ContinuationProviderFactory.class)).thenReturn(null);
+            when(bus.getExtension(PolicyDataEngine.class)).thenReturn(null);
+            when(bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine")).thenReturn(false);
+            when(bus.getExtension(ClassLoader.class)).thenReturn(this.getClass().getClassLoader());
         }
 
 
-        engine = EasyMock.createNiceMock(UndertowHTTPServerEngine.class);
+        engine = mock(UndertowHTTPServerEngine.class);
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));
         endpointInfo = new EndpointInfo(serviceInfo, "");
@@ -559,12 +579,9 @@ public class UndertowHTTPDestinationTest {
         endpointInfo.setAddress(NOWHERE + "bar/foo");
 
         endpointInfo.addExtensor(policy);
-        engine.addServant(EasyMock.eq(new URL(NOWHERE + "bar/foo")),
-                          EasyMock.isA(UndertowHTTPHandler.class));
-        EasyMock.expectLastCall();
-        engine.getContinuationsEnabled();
-        EasyMock.expectLastCall().andReturn(true);
-        EasyMock.replay(engine);
+        doCallRealMethod().when(engine).addServant(eq(new URL(NOWHERE + "bar/foo")),
+                          isA(UndertowHTTPHandler.class));
+        when(engine.getContinuationsEnabled()).thenReturn(true);
 
         UndertowHTTPDestination dest = new EasyMockUndertowHTTPDestination(bus,
                                                              transportFactory.getRegistry(),
@@ -584,10 +601,7 @@ public class UndertowHTTPDestinationTest {
     }
 
     private void setUpRemoveServant() throws Exception {
-        EasyMock.reset(engine);
-        engine.removeServant(EasyMock.eq(new URL(NOWHERE + "bar/foo")));
-        EasyMock.expectLastCall();
-        EasyMock.replay(engine);
+        doCallRealMethod().when(engine).removeServant(eq(new URL(NOWHERE + "bar/foo")));
     }
 
     private void setUpDoService(boolean setRedirectURL) throws Exception {
@@ -631,48 +645,43 @@ public class UndertowHTTPDestinationTest {
                                 int status
                                 ) throws Exception {
 
-        is = EasyMock.createMock(ServletInputStream.class);
-        os = EasyMock.createMock(ServletOutputStream.class);
-        request = EasyMock.createMock(HttpServletRequest.class);
-        response = EasyMock.createMock(HttpServletResponse.class);
-        request.getMethod();
-        EasyMock.expectLastCall().andReturn(method).atLeastOnce();
-        request.getUserPrincipal();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        is = mock(ServletInputStream.class);
+        os = mock(ServletOutputStream.class);
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        when(request.getMethod()).thenReturn(method);
+        when(request.getUserPrincipal()).thenReturn(null);
 
         if (setRedirectURL) {
             policy.setRedirectURL(NOWHERE + "foo/bar");
-            response.sendRedirect(EasyMock.eq(NOWHERE + "foo/bar"));
-            EasyMock.expectLastCall();
-            response.flushBuffer();
-            EasyMock.expectLastCall();
-            EasyMock.expectLastCall();
+            doNothing().when(response).sendRedirect(eq(NOWHERE + "foo/bar"));
+            doNothing().when(response).flushBuffer();
         } else {
             //getQueryString for if statement
-            request.getQueryString();
-            EasyMock.expectLastCall().andReturn(query);
+            when(request.getQueryString()).thenReturn(query);
 
             if ("GET".equals(method) && "?wsdl".equals(query)) {
+                when(request.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
                 verifyGetWSDLQuery();
             } else { // test for the post
-                EasyMock.expect(request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE))
-                    .andReturn(null);
+                when(request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE))
+                    .thenReturn(null);
 
 
-                EasyMock.expect(request.getInputStream()).andReturn(is);
-                EasyMock.expect(request.getContextPath()).andReturn("/bar");
-                EasyMock.expect(request.getServletPath()).andReturn("");
-                EasyMock.expect(request.getPathInfo()).andReturn("/foo");
-                EasyMock.expect(request.getRequestURI()).andReturn("/foo");
-                EasyMock.expect(request.getRequestURL())
-                    .andReturn(new StringBuffer("http://localhost/foo")).anyTimes();
-                request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", "/foo");
-                EasyMock.expectLastCall();
-                EasyMock.expect(request.getCharacterEncoding()).andReturn(StandardCharsets.UTF_8.name());
-                EasyMock.expect(request.getQueryString()).andReturn(query);
-                EasyMock.expect(request.getHeader("Accept")).andReturn("*/*");
-                EasyMock.expect(request.getContentType()).andReturn("text/xml charset=utf8").times(2);
-                EasyMock.expect(request.getAttribute("http.service.redirection")).andReturn(null).anyTimes();
+                when(request.getInputStream()).thenReturn(is);
+                when(request.getContextPath()).thenReturn("/bar");
+                when(request.getServletPath()).thenReturn("");
+                when(request.getPathInfo()).thenReturn("/foo");
+                when(request.getRequestURI()).thenReturn("/foo");
+                when(request.getRequestURL())
+                    .thenReturn(new StringBuffer("http://localhost/foo"));
+                doNothing().when(request)
+                    .setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", "/foo");
+                when(request.getCharacterEncoding()).thenReturn(StandardCharsets.UTF_8.name());
+                when(request.getQueryString()).thenReturn(query);
+                when(request.getHeader("Accept")).thenReturn("*/*");
+                when(request.getContentType()).thenReturn("text/xml charset=utf8");
+                when(request.getAttribute("http.service.redirection")).thenReturn(null);
 
                 HeaderMap httpFields = new HeaderMap();
                 httpFields.add(new HttpString("content-type"), "text/xml");
@@ -683,55 +692,39 @@ public class UndertowHTTPDestinationTest {
                 for (HttpString header : httpFields.getHeaderNames()) {
                     headers.add(header.toString());
                 }
-                EasyMock.expect(request.getHeaderNames()).andReturn(Collections.enumeration(headers));
-                request.getHeaders("content-type");
-                EasyMock.expectLastCall().andReturn(Collections.enumeration(httpFields.get("content-type")));
-                request.getHeaders(UndertowHTTPDestinationTest.AUTH_HEADER);
-                EasyMock.expectLastCall().andReturn(Collections.enumeration(
-                                                    httpFields.get(UndertowHTTPDestinationTest.AUTH_HEADER)));
+                when(request.getHeaderNames()).thenReturn(Collections.enumeration(headers));
+                when(request.getHeaders("content-type")).thenReturn(
+                    Collections.enumeration(httpFields.get("content-type")));
+                when(request.getHeaders(UndertowHTTPDestinationTest.AUTH_HEADER)).thenReturn(Collections.enumeration(
+                    httpFields.get(UndertowHTTPDestinationTest.AUTH_HEADER)));
 
-                EasyMock.expect(request.getInputStream()).andReturn(is);
-                EasyMock.expectLastCall();
-                response.flushBuffer();
-                EasyMock.expectLastCall();
+                when(request.getInputStream()).thenReturn(is);
+                doNothing().when(response).flushBuffer();
+
                 if (sendResponse) {
-                    response.setStatus(status);
-                    EasyMock.expectLastCall();
-                    response.setContentType("text/xml charset=utf8");
-                    EasyMock.expectLastCall();
-                    response.addHeader(EasyMock.isA(String.class), EasyMock.isA(String.class));
-                    EasyMock.expectLastCall().anyTimes();
-                    response.setContentLength(0);
-                    EasyMock.expectLastCall().anyTimes();
-                    response.getOutputStream();
-                    EasyMock.expectLastCall().andReturn(os);
-                    response.getStatus();
-                    EasyMock.expectLastCall().andReturn(status).anyTimes();
-                    response.flushBuffer();
-                    EasyMock.expectLastCall();
+                    doNothing().when(response).setStatus(status);
+                    doNothing().when(response).setContentType("text/xml charset=utf8");
+                    doNothing().when(response).addHeader(isA(String.class), isA(String.class));
+                    doNothing().when(response).setContentLength(0);
+                    when(response.getOutputStream()).thenReturn(os);
+                    when(response.getStatus()).thenReturn(status);
+                    doNothing().when(response).flushBuffer();
                 }
-                request.getAttribute("jakarta.servlet.request.cipher_suite");
-                EasyMock.expectLastCall().andReturn("anythingwilldoreally");
-                request.getAttribute("javax.net.ssl.session");
-                EasyMock.expectLastCall().andReturn(null);
-                request.getAttribute("jakarta.servlet.request.X509Certificate");
-                EasyMock.expectLastCall().andReturn(null);
+                when(request.getAttribute("jakarta.servlet.request.cipher_suite")).thenReturn("anythingwilldoreally");
+                when(request.getAttribute("javax.net.ssl.session")).thenReturn(null);
+                when(request.getAttribute("jakarta.servlet.request.X509Certificate")).thenReturn(null);
             }
         }
 
         if (decoupled) {
             setupDecoupledBackChannel();
         }
-        EasyMock.replay(response);
-        EasyMock.replay(request);
     }
 
     private void setupDecoupledBackChannel() throws IOException {
-        decoupledBackChannel = EasyMock.createMock(Conduit.class);
-        decoupledBackChannel.setMessageObserver(EasyMock.isA(MessageObserver.class));
-        decoupledBackChannel.prepare(EasyMock.isA(Message.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(decoupledBackChannel);
+        decoupledBackChannel = mock(Conduit.class);
+        doNothing().when(decoupledBackChannel).setMessageObserver(isA(MessageObserver.class));
+        doNothing().when(decoupledBackChannel).prepare(isA(Message.class));
     }
 
     private void setUpInMessage() {
@@ -759,21 +752,12 @@ public class UndertowHTTPDestinationTest {
     }
 
     private void verifyGetWSDLQuery() throws Exception {
-        EasyMock.reset(bus);
-        request.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost/bar/foo")).times(2);
-        request.getPathInfo();
-        EasyMock.expectLastCall().andReturn("/bar/foo");
-        request.getCharacterEncoding();
-        EasyMock.expectLastCall().andReturn(StandardCharsets.UTF_8.name());
-        request.getQueryString();
-        EasyMock.expectLastCall().andReturn("wsdl");
-        response.setContentType("text/xml");
-        EasyMock.expectLastCall();
-        response.getOutputStream();
-        EasyMock.expectLastCall().andReturn(os).anyTimes();
-        EasyMock.expectLastCall();
-        EasyMock.replay(bus);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/bar/foo"));
+        when(request.getPathInfo()).thenReturn("/bar/foo");
+        when(request.getCharacterEncoding()).thenReturn(StandardCharsets.UTF_8.name());
+        when(request.getQueryString()).thenReturn("wsdl");
+        doNothing().when(response).setContentType("text/xml");
+        when(response.getOutputStream()).thenReturn(os);
     }
 
     private void verifyDoService() throws Exception {

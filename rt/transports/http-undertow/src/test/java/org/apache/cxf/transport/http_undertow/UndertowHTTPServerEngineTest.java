@@ -42,15 +42,14 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UndertowHTTPServerEngineTest {
     private static final int PORT1
@@ -62,26 +61,19 @@ public class UndertowHTTPServerEngineTest {
 
 
     private Bus bus;
-    private IMocksControl control;
     private UndertowHTTPServerEngineFactory factory;
 
     @Before
     public void setUp() throws Exception {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
+        bus = mock(Bus.class);
 
         Configurer configurer = new ConfigurerImpl();
-        bus.getExtension(Configurer.class);
-        EasyMock.expectLastCall().andReturn(configurer).anyTimes();
+        when(bus.getExtension(Configurer.class)).thenReturn(configurer);
 
-        InstrumentationManager iManager = control.createMock(InstrumentationManager.class);
-        iManager.getMBeanServer();
-        EasyMock.expectLastCall().andReturn(ManagementFactory.getPlatformMBeanServer()).anyTimes();
+        InstrumentationManager iManager = mock(InstrumentationManager.class);
+        when(iManager.getMBeanServer()).thenReturn(ManagementFactory.getPlatformMBeanServer());
 
-        bus.getExtension(InstrumentationManager.class);
-        EasyMock.expectLastCall().andReturn(iManager).anyTimes();
-
-        control.replay();
+        when(bus.getExtension(InstrumentationManager.class)).thenReturn(iManager);
 
         factory = new UndertowHTTPServerEngineFactory();
         factory.setBus(bus);
