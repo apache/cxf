@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring.boot.version}</version>
+            <version>${cxf.spring.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot.version}</version>
+            <version>${cxf.spring.boot.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
-            <version>${spring.boot.version}</version>
+            <version>${cxf.spring.boot.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${cxf.spring.boot.version}</version>
                 <configuration>
                     <mainClass>sample.ws.SampleWsApplication</mainClass>
                 </configuration>

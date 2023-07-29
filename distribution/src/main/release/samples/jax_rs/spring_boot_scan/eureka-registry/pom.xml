@@ -18,7 +18,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-netflix-dependencies</artifactId>
-                <version>${spring.cloud.eureka.version}</version>
+                <version>${cxf.spring.cloud.eureka.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-            <version>${spring.cloud.eureka.version}</version>
+            <version>${cxf.spring.cloud.eureka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -54,7 +54,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${cxf.spring.boot.version}</version>
                 <executions>
                    <execution>
                       <goals>
