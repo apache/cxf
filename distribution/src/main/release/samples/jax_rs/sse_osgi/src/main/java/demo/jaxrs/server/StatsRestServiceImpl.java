@@ -34,7 +34,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.OutboundSseEvent.Builder;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 
@@ -82,7 +81,7 @@ public class StatsRestServiceImpl {
         new Thread() {
             public void run() {
                 try {
-                    final Builder builder = sse.newEventBuilder();
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
                     sink.send(createStatsEvent(builder, 1));
                     Thread.sleep(1000);
                     sink.send(createStatsEvent(builder, 2));
