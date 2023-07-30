@@ -41,8 +41,6 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +51,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test resend logic.
@@ -62,7 +64,6 @@ public class RetransmissionQueueImplTest {
     private static final Long TWO = Long.valueOf(2);
     private static final Long TEN = Long.valueOf(10);
 
-    private IMocksControl control;
     private RMManager manager;
     private RMEndpoint endpoint;
     private Executor executor;
@@ -76,10 +77,9 @@ public class RetransmissionQueueImplTest {
 
     @Before
     public void setUp() throws RMException {
-        control = EasyMock.createNiceControl();
         manager = createMock(RMManager.class);
         endpoint = createMock(RMEndpoint.class);
-        EasyMock.expect(manager.getReliableEndpoint(EasyMock.anyObject(Message.class))).andReturn(endpoint).anyTimes();
+        when(manager.getReliableEndpoint(any(Message.class))).thenReturn(endpoint);
         queue = new RetransmissionQueueImpl(manager);
         resender = new TestResender();
         queue.replaceResender(resender);
@@ -89,12 +89,10 @@ public class RetransmissionQueueImplTest {
 
     @After
     public void tearDown() {
-        control.verify();
         messages.clear();
         properties.clear();
         sequences.clear();
         mocks.clear();
-        control.reset();
     }
 
     @Test
@@ -115,7 +113,7 @@ public class RetransmissionQueueImplTest {
     public void testResendCandidateCtor() {
         SoapMessage message = createMock(SoapMessage.class);
         setupMessagePolicies(message);
-        control.replay();
+
         long now = System.currentTimeMillis();
         RetransmissionQueueImpl.ResendCandidate candidate = queue.createResendCandidate(message);
         assertSame(message, candidate.getMessage());
@@ -179,12 +177,9 @@ public class RetransmissionQueueImplTest {
         setupMessagePolicies(message2);
         setupMessagePolicies(message3);
 
-        endpoint.handleAccept("sequence1", 1, message1);
-        EasyMock.expectLastCall();
-        endpoint.handleAccept("sequence2", 1, message2);
-        EasyMock.expectLastCall();
-        endpoint.handleAccept("sequence1", 2, message3);
-        EasyMock.expectLastCall();
+        doCallRealMethod().when(endpoint).handleAccept("sequence1", 1, message1);
+        doCallRealMethod().when(endpoint).handleAccept("sequence2", 1, message2);
+        doCallRealMethod().when(endpoint).handleAccept("sequence1", 2, message3);
 
         ready(false);
 
@@ -239,8 +234,7 @@ public class RetransmissionQueueImplTest {
         SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
 
-        endpoint.handleAcknowledgment("sequence1", TEN, message1);
-        EasyMock.expectLastCall();
+        doCallRealMethod().when(endpoint).handleAcknowledgment("sequence1", TEN, message1);
         ready(false);
 
         sequenceList.add(queue.createResendCandidate(message1));
@@ -296,10 +290,8 @@ public class RetransmissionQueueImplTest {
         SoapMessage message2 = setUpMessage("sequence1", messageNumbers[1]);
         setupMessagePolicies(message2);
 
-        endpoint.handleAcknowledgment("sequence1", TEN, message1);
-        EasyMock.expectLastCall();
-        endpoint.handleAcknowledgment("sequence1", ONE, message2);
-        EasyMock.expectLastCall();
+        doCallRealMethod().when(endpoint).handleAcknowledgment("sequence1", TEN, message1);
+        doCallRealMethod().when(endpoint).handleAcknowledgment("sequence1", ONE, message2);
         ready(false);
 
         sequenceList.add(queue.createResendCandidate(message1));
@@ -359,7 +351,6 @@ public class RetransmissionQueueImplTest {
 
     @Test
     public void testStartStop() {
-        control.replay();
         queue.start();
     }
 
@@ -379,22 +370,21 @@ public class RetransmissionQueueImplTest {
 
     private void setupMessagePolicies(Message message) {
         RMConfiguration cfg = new RMConfiguration();
-        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(cfg);
+        when(manager.getEffectiveConfiguration(message)).thenReturn(cfg);
         cfg.setBaseRetransmissionInterval(Long.valueOf(5000));
         cfg.setExponentialBackoff(true);
     }
 
     private void setupRetryPolicy(Message message) {
 
-        SourcePolicyType spt = control.createMock(SourcePolicyType.class);
-        EasyMock.expect(manager.getSourcePolicy()).andReturn(spt).anyTimes();
-        RetryPolicyType rpt = control.createMock(RetryPolicyType.class);
-        EasyMock.expect(spt.getRetryPolicy()).andReturn(rpt);
-        EasyMock.expect(rpt.getMaxRetries()).andReturn(3);
+        SourcePolicyType spt = mock(SourcePolicyType.class);
+        when(manager.getSourcePolicy()).thenReturn(spt);
+        RetryPolicyType rpt = mock(RetryPolicyType.class);
+        when(spt.getRetryPolicy()).thenReturn(rpt);
+        when(rpt.getMaxRetries()).thenReturn(3);
     }
 
     private void ready(boolean doStart) {
-        control.replay();
         if (doStart) {
             queue.start();
         }
@@ -403,21 +393,19 @@ public class RetransmissionQueueImplTest {
     private SequenceType setUpSequenceType(Message message, String sid, Long messageNumber) {
         RMProperties rmps = createMock(RMProperties.class);
         if (message != null) {
-            message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND);
-            EasyMock.expectLastCall().andReturn(rmps);
+            when(message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).thenReturn(rmps);
         }
         properties.add(rmps);
         SequenceType sequence = createMock(SequenceType.class);
         if (message != null) {
-            rmps.getSequence();
-            EasyMock.expectLastCall().andReturn(sequence);
+            when(rmps.getSequence()).thenReturn(sequence);
         }
         if (messageNumber != null) {
-            EasyMock.expect(sequence.getMessageNumber()).andReturn(messageNumber).anyTimes();
+            when(sequence.getMessageNumber()).thenReturn(messageNumber);
         }
         Identifier id = createMock(Identifier.class);
-        EasyMock.expect(sequence.getIdentifier()).andReturn(id).anyTimes();
-        EasyMock.expect(id.getValue()).andReturn(sid).anyTimes();
+        when(sequence.getIdentifier()).thenReturn(id);
+        when(id.getValue()).thenReturn(sid);
         identifiers.add(id);
         sequences.add(sequence);
         return sequence;
@@ -426,28 +414,22 @@ public class RetransmissionQueueImplTest {
     private SourceSequence setUpSequence(String sid,  Long[] messageNumbers, boolean[] isAcked) {
         SourceSequence sequence = createMock(SourceSequence.class);
         Identifier id = createMock(Identifier.class);
-        sequence.getIdentifier();
-        EasyMock.expectLastCall().andReturn(id).anyTimes();
-        id.getValue();
-        EasyMock.expectLastCall().andReturn(sid).anyTimes();
+        when(sequence.getIdentifier()).thenReturn(id);
+        when(id.getValue()).thenReturn(sid);
         identifiers.add(id);
         Source source = createMock(Source.class);
-        sequence.getSource();
-        EasyMock.expectLastCall().andReturn(source).anyTimes();
-        source.getReliableEndpoint();
-        EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
+        when(sequence.getSource()).thenReturn(source);
+        when(source.getReliableEndpoint()).thenReturn(endpoint);
         boolean includesAcked = false;
         for (int i = 0; isAcked != null && i < isAcked.length; i++) {
-            sequence.isAcknowledged(messageNumbers[i]);
-            EasyMock.expectLastCall().andReturn(isAcked[i]);
+            when(sequence.isAcknowledged(messageNumbers[i])).thenReturn(isAcked[i]);
             if (isAcked[i]) {
                 includesAcked = true;
             }
         }
         if (includesAcked) {
             RMStore store = createMock(RMStore.class);
-            manager.getStore();
-            EasyMock.expectLastCall().andReturn(store);
+            when(manager.getStore()).thenReturn(store);
         }
         return sequence;
     }
@@ -461,7 +443,7 @@ public class RetransmissionQueueImplTest {
      * @return the mock object
      */
     <T> T createMock(Class<T> toMock) {
-        T ret = control.createMock(toMock);
+        T ret = mock(toMock);
         mocks.add(ret);
         return ret;
     }

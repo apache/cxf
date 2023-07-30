@@ -22,40 +22,32 @@ package org.apache.cxf.ws.rm;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class AbstractEndpointTest {
 
-    private IMocksControl control;
     private RMEndpoint rme;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        rme = control.createMock(RMEndpoint.class);
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
+        rme = mock(RMEndpoint.class);
     }
 
     @Test
     public void testAccessors() {
-        Endpoint ae = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getApplicationEndpoint()).andReturn(ae);
-        RMManager mgr = control.createMock(RMManager.class);
-        EasyMock.expect(rme.getManager()).andReturn(mgr);
-        control.replay();
+        Endpoint ae = mock(Endpoint.class);
+        when(rme.getApplicationEndpoint()).thenReturn(ae);
+        RMManager mgr = mock(RMManager.class);
+        when(rme.getManager()).thenReturn(mgr);
+
         AbstractEndpoint tested = new AbstractEndpoint(rme);
         assertSame(rme, tested.getReliableEndpoint());
         assertSame(ae, tested.getEndpoint());
@@ -64,15 +56,14 @@ public class AbstractEndpointTest {
 
     @Test
     public void testGenerateSequenceIdentifier() {
-        RMManager mgr = control.createMock(RMManager.class);
-        EasyMock.expect(rme.getManager()).andReturn(mgr);
-        SequenceIdentifierGenerator generator = control.createMock(SequenceIdentifierGenerator.class);
-        EasyMock.expect(mgr.getIdGenerator()).andReturn(generator);
-        Identifier id = control.createMock(Identifier.class);
-        EasyMock.expect(generator.generateSequenceIdentifier()).andReturn(id);
-        control.replay();
+        RMManager mgr = mock(RMManager.class);
+        when(rme.getManager()).thenReturn(mgr);
+        SequenceIdentifierGenerator generator = mock(SequenceIdentifierGenerator.class);
+        when(mgr.getIdGenerator()).thenReturn(generator);
+        Identifier id = mock(Identifier.class);
+        when(generator.generateSequenceIdentifier()).thenReturn(id);
+
         AbstractEndpoint tested = new AbstractEndpoint(rme);
         assertSame(id, tested.generateSequenceIdentifier());
-        control.verify();
     }
 }

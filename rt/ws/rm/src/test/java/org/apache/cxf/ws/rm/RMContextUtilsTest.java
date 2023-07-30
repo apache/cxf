@@ -24,59 +24,42 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class RMContextUtilsTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testCtor() {
-        control.replay();
         assertNotNull(new RMContextUtils());
     }
 
     @Test
     public void testGenerateUUID() {
-        control.replay();
         assertNotNull(RMContextUtils.generateUUID());
     }
 
     @Test
     public void testIsServerSide() {
-        Message msg = control.createMock(Message.class);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(msg.getExchange()).andReturn(ex);
-        EasyMock.expect(ex.getDestination()).andReturn(null);
-        control.replay();
+        Message msg = mock(Message.class);
+        Exchange ex = mock(Exchange.class);
+        when(msg.getExchange()).thenReturn(ex);
+        when(ex.getDestination()).thenReturn(null);
         assertFalse(RMContextUtils.isServerSide(msg));
     }
 
     @Test
     public void testIsRmPrtocolMessage() {
-        control.replay();
         String action = null;
         assertFalse(RMContextUtils.isRMProtocolMessage(action));
         action = "";
@@ -89,70 +72,61 @@ public class RMContextUtilsTest {
 
     @Test
     public void testRetrieveOutboundRMProperties() {
-        Message msg = control.createMock(Message.class);
-        RMProperties rmps = control.createMock(RMProperties.class);
-        EasyMock.expect(msg.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).andReturn(rmps);
-        control.replay();
+        Message msg = mock(Message.class);
+        RMProperties rmps = mock(RMProperties.class);
+        when(msg.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).thenReturn(rmps);
         assertSame(rmps, RMContextUtils.retrieveRMProperties(msg, true));
     }
 
     @Test
     public void testRetrieveInboundRMPropertiesFromOutboundMessage() {
-        Message outMsg = control.createMock(Message.class);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(outMsg.getExchange()).andReturn(ex).times(3);
-        EasyMock.expect(ex.getOutMessage()).andReturn(outMsg);
-        Message inMsg = control.createMock(Message.class);
-        EasyMock.expect(ex.getInMessage()).andReturn(null);
-        EasyMock.expect(ex.getInFaultMessage()).andReturn(inMsg);
-        RMProperties rmps = control.createMock(RMProperties.class);
-        EasyMock.expect(inMsg.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
-        control.replay();
+        Message outMsg = mock(Message.class);
+        Exchange ex = mock(Exchange.class);
+        when(outMsg.getExchange()).thenReturn(ex);
+        when(ex.getOutMessage()).thenReturn(outMsg);
+        Message inMsg = mock(Message.class);
+        when(ex.getInMessage()).thenReturn(null);
+        when(ex.getInFaultMessage()).thenReturn(inMsg);
+        RMProperties rmps = mock(RMProperties.class);
+        when(inMsg.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).thenReturn(rmps);
         assertSame(rmps, RMContextUtils.retrieveRMProperties(outMsg, false));
+        verify(outMsg, times(3)).getExchange();
     }
 
     @Test
     public void testRetrieveInboundRMPropertiesFromInboundMessage() {
-        Message inMsg = control.createMock(Message.class);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(inMsg.getExchange()).andReturn(ex);
-        EasyMock.expect(ex.getOutMessage()).andReturn(null);
-        EasyMock.expect(ex.getOutFaultMessage()).andReturn(null);
-        RMProperties rmps = control.createMock(RMProperties.class);
-        EasyMock.expect(inMsg.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
-        control.replay();
+        Message inMsg = mock(Message.class);
+        Exchange ex = mock(Exchange.class);
+        when(inMsg.getExchange()).thenReturn(ex);
+        when(ex.getOutMessage()).thenReturn(null);
+        when(ex.getOutFaultMessage()).thenReturn(null);
+        RMProperties rmps = mock(RMProperties.class);
+        when(inMsg.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).thenReturn(rmps);
         assertSame(rmps, RMContextUtils.retrieveRMProperties(inMsg, false));
     }
 
     @Test
     public void testStoreRMProperties() {
-        Message msg = control.createMock(Message.class);
-        RMProperties rmps = control.createMock(RMProperties.class);
-        EasyMock.expect(msg.put(RMMessageConstants.RM_PROPERTIES_INBOUND, rmps)).andReturn(null);
-        control.replay();
+        Message msg = mock(Message.class);
+        RMProperties rmps = mock(RMProperties.class);
+        when(msg.put(RMMessageConstants.RM_PROPERTIES_INBOUND, rmps)).thenReturn(null);
         RMContextUtils.storeRMProperties(msg, rmps, false);
     }
 
     @Test
     public void testRetrieveMAPs() {
-        Message msg = control.createMock(Message.class);
-        EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
-        AddressingProperties maps = control.createMock(AddressingProperties.class);
-        EasyMock.expect(msg.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND)).andReturn(maps);
-        control.replay();
+        Message msg = mock(Message.class);
+        when(msg.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        AddressingProperties maps = mock(AddressingProperties.class);
+        when(msg.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND)).thenReturn(maps);
         assertSame(maps, RMContextUtils.retrieveMAPs(msg, false, true));
     }
 
     @Test
     public void testStoreMAPs() {
-        Message msg = control.createMock(Message.class);
-        AddressingProperties maps = control.createMock(AddressingProperties.class);
-        EasyMock.expect(msg.put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, maps)).andReturn(null);
-        control.replay();
+        Message msg = mock(Message.class);
+        AddressingProperties maps = mock(AddressingProperties.class);
+        when(msg.put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, maps)).thenReturn(null);
         RMContextUtils.storeMAPs(maps, msg, true, true);
     }
-
-
-
-
 }

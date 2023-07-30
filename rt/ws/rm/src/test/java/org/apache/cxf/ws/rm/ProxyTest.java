@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -53,9 +52,6 @@ import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.OfferType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,39 +59,38 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class ProxyTest {
 
-    private IMocksControl control;
     private RMEndpoint rme;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        rme = control.createMock(RMEndpoint.class);
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
+        rme = mock(RMEndpoint.class);
     }
 
     @Test
     public void testCtor() {
         Proxy proxy = new Proxy(rme);
         assertSame(rme, proxy.getReliableEndpoint());
-        control.replay();
     }
 
     @Test
     public void testOfferedIdentifier() {
-        OfferType offer = control.createMock(OfferType.class);
-        Identifier id = control.createMock(Identifier.class);
-        EasyMock.expect(offer.getIdentifier()).andReturn(id).anyTimes();
-        control.replay();
+        OfferType offer = mock(OfferType.class);
+        Identifier id = mock(Identifier.class);
+        when(offer.getIdentifier()).thenReturn(id);
+
         Proxy proxy = new Proxy(rme);
         assertNull(proxy.getOfferedIdentifier());
         proxy.setOfferedIdentifier(offer);
@@ -104,88 +99,73 @@ public class ProxyTest {
 
     @Test
     public void testAcknowledgeNotSupported() throws RMException {
-        DestinationSequence ds = control.createMock(DestinationSequence.class);
-        EndpointReferenceType acksToEPR = control.createMock(EndpointReferenceType.class);
-        EasyMock.expect(ds.getAcksTo()).andReturn(acksToEPR).anyTimes();
-        AttributedURIType acksToURI = control.createMock(AttributedURIType.class);
-        EasyMock.expect(acksToEPR.getAddress()).andReturn(acksToURI).anyTimes();
+        DestinationSequence ds = mock(DestinationSequence.class);
+        EndpointReferenceType acksToEPR = mock(EndpointReferenceType.class);
+        when(ds.getAcksTo()).thenReturn(acksToEPR);
+        AttributedURIType acksToURI = mock(AttributedURIType.class);
+        when(acksToEPR.getAddress()).thenReturn(acksToURI);
         String acksToAddress = Names.WSA_ANONYMOUS_ADDRESS;
-        EasyMock.expect(acksToURI.getValue()).andReturn(acksToAddress).anyTimes();
-        control.replay();
+        when(acksToURI.getValue()).thenReturn(acksToAddress);
+
         Proxy proxy = new Proxy(rme);
         proxy.acknowledge(ds);
     }
 
     @Test
     public void testAcknowledge() throws NoSuchMethodException, RMException {
-        Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class, Map.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = mock(Proxy.class);
         proxy.setReliableEndpoint(rme);
-        DestinationSequence ds = control.createMock(DestinationSequence.class);
-        EasyMock.expect(ds.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
-        EndpointReferenceType acksToEPR = control.createMock(EndpointReferenceType.class);
-        EasyMock.expect(ds.getAcksTo()).andReturn(acksToEPR).anyTimes();
-        AttributedURIType acksToURI = control.createMock(AttributedURIType.class);
-        EasyMock.expect(acksToEPR.getAddress()).andReturn(acksToURI).anyTimes();
+        DestinationSequence ds = mock(DestinationSequence.class);
+        when(ds.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
+        EndpointReferenceType acksToEPR = mock(EndpointReferenceType.class);
+        when(ds.getAcksTo()).thenReturn(acksToEPR);
+        AttributedURIType acksToURI = mock(AttributedURIType.class);
+        when(acksToEPR.getAddress()).thenReturn(acksToURI);
         String acksToAddress = "acksTo";
-        EasyMock.expect(acksToURI.getValue()).andReturn(acksToAddress).anyTimes();
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        EndpointInfo epi = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(epi).anyTimes();
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(epi.getService()).andReturn(si).anyTimes();
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        EasyMock.expect(ii.getOperation(RM10Constants.SEQUENCE_ACK_QNAME)).andReturn(oi).anyTimes();
+        when(acksToURI.getValue()).thenReturn(acksToAddress);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        EndpointInfo epi = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(epi);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(epi.getService()).thenReturn(si);
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(si.getInterface()).thenReturn(ii);
+        OperationInfo oi = mock(OperationInfo.class);
+        when(ii.getOperation(RM10Constants.SEQUENCE_ACK_QNAME)).thenReturn(oi);
         expectInvoke(proxy, oi, null);
-        control.replay();
 
         proxy.acknowledge(ds);
     }
 
     @Test
     public void testLastMessage() throws NoSuchMethodException, RMException {
-        Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class,
-                         Map.class, Level.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = mock(Proxy.class);
         proxy.setReliableEndpoint(rme);
-        SourceSequence ss = control.createMock(SourceSequence.class);
-        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
-        EasyMock.expect(ss.getTarget()).andReturn(null).anyTimes();
-        control.replay();
+        SourceSequence ss = mock(SourceSequence.class);
+        when(ss.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
+        when(ss.getTarget()).thenReturn(null);
         proxy.lastMessage(ss);
-        control.verify();
 
-        control.reset();
         org.apache.cxf.ws.addressing.EndpointReferenceType target
             = RMUtils.createAnonymousReference();
-        EasyMock.expect(ss.getTarget()).andReturn(target).anyTimes();
-        control.replay();
+        when(ss.getTarget()).thenReturn(target);
         proxy.lastMessage(ss);
-        control.verify();
 
-        control.reset();
         target = RMUtils.createReference("http://localhost:9000/greeterPort");
-        EasyMock.expect(ss.getTarget()).andReturn(target).anyTimes();
-        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        EndpointInfo epi = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(epi).anyTimes();
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(epi.getService()).andReturn(si).anyTimes();
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        EasyMock.expect(ii.getOperation(RM10Constants.CLOSE_SEQUENCE_QNAME)).andReturn(oi).anyTimes();
+        when(ss.getTarget()).thenReturn(target);
+        when(ss.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        EndpointInfo epi = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(epi);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(epi.getService()).thenReturn(si);
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(si.getInterface()).thenReturn(ii);
+        OperationInfo oi = mock(OperationInfo.class);
+        when(ii.getOperation(RM10Constants.CLOSE_SEQUENCE_QNAME)).thenReturn(oi);
         expectInvokeWithContext(proxy, oi, null);
-        control.replay();
 
         proxy.lastMessage(ss);
 
@@ -193,52 +173,44 @@ public class ProxyTest {
 
     @Test
     public void testTerminate() throws NoSuchMethodException, RMException {
-        Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class, Map.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = mock(Proxy.class);
         proxy.setReliableEndpoint(rme);
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        EndpointInfo epi = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(epi).anyTimes();
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(epi.getService()).andReturn(si).anyTimes();
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        EasyMock.expect(ii.getOperation(RM10Constants.TERMINATE_SEQUENCE_QNAME)).andReturn(oi).anyTimes();
-        SourceSequence ss = control.createMock(SourceSequence.class);
-        Identifier id = control.createMock(Identifier.class);
-        EasyMock.expect(ss.getIdentifier()).andReturn(id).anyTimes();
-        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        EndpointInfo epi = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(epi);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(epi.getService()).thenReturn(si);
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(si.getInterface()).thenReturn(ii);
+        OperationInfo oi = mock(OperationInfo.class);
+        when(ii.getOperation(RM10Constants.TERMINATE_SEQUENCE_QNAME)).thenReturn(oi);
+        SourceSequence ss = mock(SourceSequence.class);
+        Identifier id = mock(Identifier.class);
+        when(ss.getIdentifier()).thenReturn(id);
+        when(ss.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
         expectInvoke(proxy, oi, null);
-        control.replay();
         proxy.terminate(ss);
     }
 
     @Test
     public void testCreateSequenceResponse() throws NoSuchMethodException, RMException {
-        Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class, Map.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = mock(Proxy.class);
         proxy.setReliableEndpoint(rme);
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        EndpointInfo epi = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(epi).anyTimes();
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(epi.getService()).andReturn(si).anyTimes();
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        EasyMock.expect(ii.getOperation(RM10Constants.CREATE_SEQUENCE_RESPONSE_ONEWAY_QNAME))
-            .andReturn(oi).anyTimes();
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        EndpointInfo epi = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(epi);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(epi.getService()).thenReturn(si);
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(si.getInterface()).thenReturn(ii);
+        OperationInfo oi = mock(OperationInfo.class);
+        when(ii.getOperation(RM10Constants.CREATE_SEQUENCE_RESPONSE_ONEWAY_QNAME))
+            .thenReturn(oi);
         org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType csr =
-            control.createMock(org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType.class);
+            mock(org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType.class);
         expectInvoke(proxy, oi, null);
-        control.replay();
         proxy.createSequenceResponse(csr, ProtocolVariation.RM10WSA200408);
     }
 
@@ -254,74 +226,75 @@ public class ProxyTest {
 
     @Test
     public void testInvoke() throws Exception {
-        Method m = Proxy.class.getDeclaredMethod("createClient",
-            new Class[] {Bus.class, Endpoint.class, ProtocolVariation.class, Conduit.class,
-                         org.apache.cxf.ws.addressing.EndpointReferenceType.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = spy(new Proxy(rme));
         proxy.setReliableEndpoint(rme);
 
-        RMManager manager = control.createMock(RMManager.class);
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(manager.getBus()).andReturn(bus).anyTimes();
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        BindingInfo bi = control.createMock(BindingInfo.class);
-        EasyMock.expect(rme.getBindingInfo(ProtocolVariation.RM10WSA200408)).andReturn(bi).anyTimes();
+        RMManager manager = mock(RMManager.class);
+        when(rme.getManager()).thenReturn(manager);
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        BindingInfo bi = mock(BindingInfo.class);
+        when(rme.getBindingInfo(ProtocolVariation.RM10WSA200408)).thenReturn(bi);
 
-        Conduit conduit = control.createMock(Conduit.class);
-        EasyMock.expect(rme.getConduit()).andReturn(conduit).anyTimes();
+        Conduit conduit = mock(Conduit.class);
+        when(rme.getConduit()).thenReturn(conduit);
         org.apache.cxf.ws.addressing.EndpointReferenceType replyTo
-            = control.createMock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
-        EasyMock.expect(rme.getReplyTo()).andReturn(replyTo).anyTimes();
+            = mock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
+        when(rme.getReplyTo()).thenReturn(replyTo);
 
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        EasyMock.expect(bi.getOperation(oi)).andReturn(boi).anyTimes();
-        Client client = control.createMock(Client.class);
-        EasyMock.expect(client.getRequestContext()).andReturn(new HashMap<String, Object>()).anyTimes();
+        OperationInfo oi = mock(OperationInfo.class);
+        BindingOperationInfo boi = mock(BindingOperationInfo.class);
+        when(bi.getOperation(oi)).thenReturn(boi);
+        Client client = mock(Client.class);
+        when(client.getRequestContext()).thenReturn(new HashMap<String, Object>());
 
-        EasyMock.expect(proxy.createClient(bus, endpoint, ProtocolVariation.RM10WSA200408, conduit, replyTo))
-            .andReturn(client).anyTimes();
+        when(bus.getExtension(WSAddressingFeatureApplier.class))
+            .thenReturn(new WSAddressingFeatureApplier() {
+                @Override
+                public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus) {
+                }
+            });
+
+        when(proxy.createClient(bus, endpoint, ProtocolVariation.RM10WSA200408, conduit, replyTo))
+            .thenReturn(client);
         Object[] args = new Object[] {};
         Map<String, Object> context = new HashMap<>();
         Object[] results = new Object[] {"a", "b", "c"};
-        Exchange exchange = control.createMock(Exchange.class);
+        Exchange exchange = mock(Exchange.class);
 
-        EasyMock.expect(client.invoke(boi, args, context, exchange)).andReturn(results).anyTimes();
+        when(client.invoke(boi, args, context, exchange)).thenReturn(results);
 
-        control.replay();
         assertEquals("a", proxy.invoke(oi, ProtocolVariation.RM10WSA200408, args, context, exchange));
     }
 
     @Test
     public void testRMClientConstruction() {
         Proxy proxy = new Proxy(rme);
-        Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(bus.getExtension(WSAddressingFeatureApplier.class))
-            .andReturn(new WSAddressingFeatureApplier() {
+        Bus bus = mock(Bus.class);
+        when(bus.getExtension(WSAddressingFeatureApplier.class))
+            .thenReturn(new WSAddressingFeatureApplier() {
                 @Override
                 public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider,
                                                Bus bus) {
-                } }).anyTimes();
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        Conduit conduit = control.createMock(Conduit.class);
+                } });
+        Endpoint endpoint = mock(Endpoint.class);
+        Conduit conduit = mock(Conduit.class);
         org.apache.cxf.ws.addressing.EndpointReferenceType address =
-            control.createMock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
-        control.replay();
+            mock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
+
         assertNotNull(proxy.createClient(bus, endpoint, ProtocolVariation.RM10WSA200408, conduit, address));
     }
 
     @Test
     public void testRMClientGetConduit() throws Exception {
         Proxy proxy = new Proxy(rme);
-        Bus bus = control.createMock(Bus.class);
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        Conduit conduit = control.createMock(Conduit.class);
-        ConduitSelector cs = control.createMock(ConduitSelector.class);
-        EasyMock.expect(cs.selectConduit(EasyMock.isA(Message.class))).andReturn(conduit).anyTimes();
-        control.replay();
+        Bus bus = mock(Bus.class);
+        Endpoint endpoint = mock(Endpoint.class);
+        Conduit conduit = mock(Conduit.class);
+        ConduitSelector cs = mock(ConduitSelector.class);
+        when(cs.selectConduit(isA(Message.class))).thenReturn(conduit);
         Proxy.RMClient client = proxy.new RMClient(bus, endpoint, cs);
         assertSame(conduit, client.getConduit());
         client.close();
@@ -331,61 +304,75 @@ public class ProxyTest {
 
     @SuppressWarnings("unchecked")
     private void testCreateSequence(boolean isServer) throws NoSuchMethodException, RMException {
-        Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class, Map.class, Exchange.class});
-        Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
-            .addMockedMethod(m).createMock(control);
+        Proxy proxy = spy(new Proxy(rme));
         proxy.setReliableEndpoint(rme);
 
-        RMManager manager = control.createMock(RMManager.class);
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        SourcePolicyType sp = control.createMock(SourcePolicyType.class);
-        EasyMock.expect(manager.getSourcePolicy()).andReturn(sp).anyTimes();
-        EasyMock.expect(sp.getAcksTo()).andReturn(null).anyTimes();
+        RMManager manager = mock(RMManager.class);
+        when(rme.getManager()).thenReturn(manager);
+        SourcePolicyType sp = mock(SourcePolicyType.class);
+        when(manager.getSourcePolicy()).thenReturn(sp);
+        when(sp.getAcksTo()).thenReturn(null);
         Duration d = DatatypeFactory.createDuration("PT12H");
-        EasyMock.expect(sp.getSequenceExpiration()).andReturn(d).anyTimes();
-        EasyMock.expect(sp.isIncludeOffer()).andReturn(Boolean.TRUE).anyTimes();
+        when(sp.getSequenceExpiration()).thenReturn(d);
+        when(sp.isIncludeOffer()).thenReturn(Boolean.TRUE);
         Duration dOffered = DatatypeFactory.createDuration("PT24H");
-        EasyMock.expect(sp.getOfferedSequenceExpiration()).andReturn(dOffered).anyTimes();
-        Source source = control.createMock(Source.class);
-        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        Identifier offeredId = control.createMock(Identifier.class);
-        EasyMock.expect(source.generateSequenceIdentifier()).andReturn(offeredId).anyTimes();
+        when(sp.getOfferedSequenceExpiration()).thenReturn(dOffered);
+        Source source = mock(Source.class);
+        when(rme.getSource()).thenReturn(source);
+        Identifier offeredId = mock(Identifier.class);
+        when(source.generateSequenceIdentifier()).thenReturn(offeredId);
 
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(endpoint).anyTimes();
-        EndpointInfo epi = control.createMock(EndpointInfo.class);
-        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(epi).anyTimes();
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(epi.getService()).andReturn(si).anyTimes();
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
-        EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
-        OperationInfo oi = control.createMock(OperationInfo.class);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(endpoint);
+        EndpointInfo epi = mock(EndpointInfo.class);
+        when(endpoint.getEndpointInfo()).thenReturn(epi);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(epi.getService()).thenReturn(si);
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(si.getInterface()).thenReturn(ii);
+        OperationInfo oi = mock(OperationInfo.class);
         org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType csr = null;
         if (isServer) {
-            EasyMock.expect(ii.getOperation(RM10Constants.CREATE_SEQUENCE_ONEWAY_QNAME))
-                .andReturn(oi).anyTimes();
-            Endpoint ae = control.createMock(Endpoint.class);
-            EasyMock.expect(rme.getApplicationEndpoint()).andReturn(ae).anyTimes();
-            EasyMock.expect(ae.getExecutor()).andReturn(SynchronousExecutor.getInstance()).anyTimes();
+            when(ii.getOperation(RM10Constants.CREATE_SEQUENCE_ONEWAY_QNAME))
+                .thenReturn(oi);
+            Endpoint ae = mock(Endpoint.class);
+            when(rme.getApplicationEndpoint()).thenReturn(ae);
+            when(ae.getExecutor()).thenReturn(SynchronousExecutor.getInstance());
         } else {
-            EasyMock.expect(ii.getOperation(RM10Constants.CREATE_SEQUENCE_QNAME)).andReturn(oi).anyTimes();
+            when(ii.getOperation(RM10Constants.CREATE_SEQUENCE_QNAME)).thenReturn(oi);
 
             csr = new org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType();
         }
         ExchangeImpl exchange = new ExchangeImpl();
 
-        EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class),
-             EasyMock.isA(Object[].class), EasyMock.isA(Map.class),
-             EasyMock.isA(Exchange.class))).andReturn(csr).anyTimes();
-        EndpointReferenceType defaultAcksTo = control.createMock(EndpointReferenceType.class);
-        AttributedURIType aut = control.createMock(AttributedURIType.class);
-        EasyMock.expect(aut.getValue()).andReturn("here").anyTimes();
-        EasyMock.expect(defaultAcksTo.getAddress()).andReturn(aut).anyTimes();
-        RelatesToType relatesTo = control.createMock(RelatesToType.class);
-        control.replay();
+        doReturn(csr).when(proxy).invoke(same(oi), isA(ProtocolVariation.class),
+                isA(Object[].class), isA(Map.class),
+                isA(Exchange.class));
+
+        EndpointReferenceType defaultAcksTo = mock(EndpointReferenceType.class);
+        AttributedURIType aut = mock(AttributedURIType.class);
+        when(aut.getValue()).thenReturn("here");
+        when(defaultAcksTo.getAddress()).thenReturn(aut);
+        RelatesToType relatesTo = mock(RelatesToType.class);
+
         Map<String, Object> context = new HashMap<>();
         if (isServer) {
+            Bus bus = mock(Bus.class);
+            when(manager.getBus()).thenReturn(bus);
+
+            when(bus.getExtension(WSAddressingFeatureApplier.class))
+            .thenReturn(new WSAddressingFeatureApplier() {
+                @Override
+                public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus) {
+                }
+            });
+
+            BindingInfo bi = mock(BindingInfo.class);
+            when(rme.getBindingInfo(ProtocolVariation.RM10WSA200408)).thenReturn(bi);
+
+            BindingOperationInfo boi = mock(BindingOperationInfo.class);
+            when(bi.getOperation(oi)).thenReturn(boi);
+
             assertNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer,
                                             ProtocolVariation.RM10WSA200408, exchange, context));
         } else {
@@ -396,16 +383,16 @@ public class ProxyTest {
 
     @SuppressWarnings("unchecked")
     private void expectInvoke(Proxy proxy, OperationInfo oi, Object expectedReturn) throws RMException {
-        EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class),
-            EasyMock.isA(Object[].class),
-            (Map<String, Object>)EasyMock.isNull())).andReturn(expectedReturn).anyTimes();
+        when(proxy.invoke(same(oi), isA(ProtocolVariation.class),
+            isA(Object[].class),
+            isNull(Map.class))).thenReturn(expectedReturn);
     }
 
     @SuppressWarnings("unchecked")
     private void expectInvokeWithContext(Proxy proxy, OperationInfo oi, Object expectedReturn)
         throws RMException {
-        EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class),
-            EasyMock.isA(Object[].class),
-            EasyMock.isA(Map.class), EasyMock.same(Level.FINER))).andReturn(expectedReturn).anyTimes();
+        when(proxy.invoke(same(oi), isA(ProtocolVariation.class),
+            isA(Object[].class),
+            isA(Map.class), same(Level.FINER))).thenReturn(expectedReturn);
     }
 }
