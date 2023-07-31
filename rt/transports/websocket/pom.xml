@@ -183,8 +183,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-subclass</artifactId>
+            <version>${cxf.mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
