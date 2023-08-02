@@ -68,7 +68,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
     }
 
 
-    private class SoapBindingServiceConfiguration extends AbstractServiceConfiguration {
+    private final class SoapBindingServiceConfiguration extends AbstractServiceConfiguration {
         public String getStyle() {
             if (getBindingConfig() instanceof SoapBindingConfiguration
                 && ((SoapBindingConfiguration)getBindingConfig()).isSetStyle()) {

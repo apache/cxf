@@ -303,7 +303,7 @@ public class TikaContentExtractor {
         }
     }
 
-    private static class IgnoreContentHandler extends ToTextContentHandler {
+    private static final class IgnoreContentHandler extends ToTextContentHandler {
         @Override
         public void characters(char[] ch, int start, int length) throws SAXException {
             // Complete

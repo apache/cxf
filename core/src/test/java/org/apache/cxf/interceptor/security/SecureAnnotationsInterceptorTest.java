@@ -91,19 +91,19 @@ public class SecureAnnotationsInterceptorTest {
         String[] value();
     }
 
-    private static class TestService {
+    private static final class TestService {
         @SecureRolesAllowed("testRole")
         public void echo() {
         }
     }
 
-    private static class TestService2 {
+    private static final class TestService2 {
         @SecureRolesAllowed("baz")
         public void echo() {
         }
     }
 
-    private static class TestSecurityContext implements SecurityContext {
+    private static final class TestSecurityContext implements SecurityContext {
 
         public Principal getUserPrincipal() {
             return new SimplePrincipal("user");

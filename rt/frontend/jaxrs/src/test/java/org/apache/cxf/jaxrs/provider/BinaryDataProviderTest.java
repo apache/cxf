@@ -134,7 +134,7 @@ public class BinaryDataProviderTest {
     }
 
 
-    private static class StreamingOutputImpl implements StreamingOutput {
+    private static final class StreamingOutputImpl implements StreamingOutput {
 
         public void write(OutputStream output) throws IOException {
             output.write("hi".getBytes());

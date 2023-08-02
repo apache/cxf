@@ -192,14 +192,14 @@ public class SimpleAuthorizingInterceptorTest {
         in.handleMessage(message);
     }
 
-    private static class TestService {
+    private static final class TestService {
         @SuppressWarnings("unused")
         public void echo() {
 
         }
     }
 
-    private static class IncompleteSecurityContext implements SecurityContext {
+    private static final class IncompleteSecurityContext implements SecurityContext {
 
         public Principal getUserPrincipal() {
             return null;
@@ -211,7 +211,7 @@ public class SimpleAuthorizingInterceptorTest {
 
     }
 
-    private static class TestSecurityContext implements SecurityContext {
+    private static final class TestSecurityContext implements SecurityContext {
 
         public Principal getUserPrincipal() {
             return new Principal() {

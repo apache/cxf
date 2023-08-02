@@ -305,7 +305,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private static class ModifiedTimestampInterceptor extends AbstractModifyRequestInterceptor {
+    private static final class ModifiedTimestampInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
@@ -328,7 +328,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private static class ModifiedSignatureInterceptor extends AbstractModifyRequestInterceptor {
+    private static final class ModifiedSignatureInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
@@ -349,7 +349,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private static class ModifiedEncryptedKeyInterceptor extends AbstractModifyRequestInterceptor {
+    private static final class ModifiedEncryptedKeyInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
@@ -379,7 +379,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
 
     }
 
-    private static class ModifiedEncryptedSOAPBody extends AbstractModifyRequestInterceptor {
+    private static final class ModifiedEncryptedSOAPBody extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {

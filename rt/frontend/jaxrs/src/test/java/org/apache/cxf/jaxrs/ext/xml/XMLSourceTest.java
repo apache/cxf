@@ -281,16 +281,16 @@ public class XMLSourceTest {
     }
 
     @XmlRootElement
-    private static class Bar {
+    private static final class Bar {
 
     }
 
     @XmlRootElement(name = "bar", namespace = "http://baz")
-    private static class Bar2 {
+    private static final class Bar2 {
 
     }
 
-    private static class Bar3 {
+    private static final class Bar3 {
 
         @XmlAttribute
         private String name;

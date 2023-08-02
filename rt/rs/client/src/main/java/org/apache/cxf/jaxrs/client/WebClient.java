@@ -1198,7 +1198,7 @@ public class WebClient extends AbstractClient {
     }
 
 
-    private class BodyWriter extends AbstractBodyWriter {
+    private final class BodyWriter extends AbstractBodyWriter {
 
         protected void doWriteBody(Message outMessage,
                                    Object body,

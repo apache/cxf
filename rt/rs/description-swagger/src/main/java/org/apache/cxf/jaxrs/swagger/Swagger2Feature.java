@@ -575,7 +575,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Port
             return SwaggerUi.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, swaggerUiVersion);
         }
 
-        private class ServletConfigProvider implements ContextProvider<ServletConfig> {
+        private final class ServletConfigProvider implements ContextProvider<ServletConfig> {
 
             private String id = UUID.randomUUID().toString();
 

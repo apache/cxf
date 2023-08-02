@@ -549,7 +549,7 @@ public class ManagedRMManagerTest {
         }
     }
 
-    private static class TestRetransmissionStatus implements RetryStatus {
+    private static final class TestRetransmissionStatus implements RetryStatus {
         private long interval = 300000L;
         private Date next = new Date(System.currentTimeMillis() + interval / 2);
         private Date previous = new Date(next.getTime() - interval);

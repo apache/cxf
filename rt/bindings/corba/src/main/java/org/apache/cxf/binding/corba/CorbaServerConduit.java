@@ -152,7 +152,7 @@ public class CorbaServerConduit implements Conduit {
         }
     }
 
-    private class CorbaOutputStream extends CachedOutputStream {
+    private final class CorbaOutputStream extends CachedOutputStream {
 
         /**
          * Perform any actions required on stream flush (freeze headers, reset

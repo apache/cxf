@@ -344,7 +344,7 @@ public class WebClientTest {
         assertEquals("en_CA", wc.getHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE));
     }
 
-    private static class ParamConverterProviderImpl implements ParamConverterProvider {
+    private static final class ParamConverterProviderImpl implements ParamConverterProvider {
 
         @SuppressWarnings("unchecked")
         @Override
@@ -354,7 +354,7 @@ public class WebClientTest {
 
     }
 
-    private static class ParamConverterImpl implements ParamConverter<ComplexObject> {
+    private static final class ParamConverterImpl implements ParamConverter<ComplexObject> {
 
         @Override
         public ComplexObject fromString(String value) throws IllegalArgumentException {
@@ -367,7 +367,7 @@ public class WebClientTest {
         }
     }
 
-    private static class ComplexObject {
+    private static final class ComplexObject {
 
     }
 }
