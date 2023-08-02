@@ -735,7 +735,7 @@ public abstract class AbstractCodegenMojo extends AbstractMojo {
     /**
      * Parse each line of the output for "java.version" and see if the version is >= 9
      */
-    private static class Java9StreamConsumer implements StreamConsumer {
+    private static final class Java9StreamConsumer implements StreamConsumer {
         boolean java9;
 
         public void consumeLine(String line) {

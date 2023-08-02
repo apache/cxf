@@ -95,7 +95,7 @@ public class ThreadLocalInvocationHandlerTest {
         void throwThrowable() throws Throwable;
     }
 
-    private class TestClass implements TestIface {
+    private final class TestClass implements TestIface {
 
         @Override
         public void throwCheckedException() throws Exception {

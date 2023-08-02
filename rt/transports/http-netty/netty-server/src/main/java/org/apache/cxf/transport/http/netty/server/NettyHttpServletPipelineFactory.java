@@ -285,7 +285,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         return null;
     }
 
-    private class HttpSessionWatchdog implements Runnable {
+    private final class HttpSessionWatchdog implements Runnable {
 
         private boolean shouldStopWatching;
 

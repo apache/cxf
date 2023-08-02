@@ -222,7 +222,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         assertEquals(1, action.getExecutions());
     }
 
-    private static class CountingUsernameTokenAction extends UsernameTokenAction {
+    private static final class CountingUsernameTokenAction extends UsernameTokenAction {
 
         private int executions;
 

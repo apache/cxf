@@ -1640,7 +1640,7 @@ public final class StaxUtils {
         return addLocation(doc, node, reader.getLocation(), recordLoc);
     }
 
-    private static class LocationUserDataHandler implements UserDataHandler {
+    private static final class LocationUserDataHandler implements UserDataHandler {
         public static final LocationUserDataHandler INSTANCE = new LocationUserDataHandler();
 
         public void handle(short operation, String key, Object data, Node src, Node dst) {

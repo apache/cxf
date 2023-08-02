@@ -42,7 +42,7 @@ public class IdlPreprocessorReaderTest {
         return getClass().getResource(location);
     }
 
-    private class ClassPathIncludeResolver implements IncludeResolver {
+    private final class ClassPathIncludeResolver implements IncludeResolver {
         public URL findSystemInclude(String spec) {
             return findUserInclude(spec);
         }

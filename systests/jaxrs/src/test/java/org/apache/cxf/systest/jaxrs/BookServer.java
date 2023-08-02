@@ -148,7 +148,7 @@ public class BookServer extends AbstractServerTestServerBase {
         new BookServer().start();
     }
 
-    private static class BusMapperExceptionMapper implements ExceptionMapper<BusMapperException> {
+    private static final class BusMapperExceptionMapper implements ExceptionMapper<BusMapperException> {
 
         public Response toResponse(BusMapperException exception) {
             return Response.serverError().type("text/plain;charset=utf-8").header("BusMapper", "the-mapper")
@@ -157,7 +157,7 @@ public class BookServer extends AbstractServerTestServerBase {
 
     }
     @PreMatching
-    private static class BlockingRequestFilter implements ContainerRequestFilter {
+    private static final class BlockingRequestFilter implements ContainerRequestFilter {
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -168,7 +168,7 @@ public class BookServer extends AbstractServerTestServerBase {
         }
 
     }
-    private static class FaultyResponseFilter implements ContainerResponseFilter {
+    private static final class FaultyResponseFilter implements ContainerResponseFilter {
         @Override
         public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
@@ -178,7 +178,7 @@ public class BookServer extends AbstractServerTestServerBase {
         }
 
     }
-    private static class BlockedExceptionMapper implements ExceptionMapper<BlockedException> {
+    private static final class BlockedExceptionMapper implements ExceptionMapper<BlockedException> {
 
         @Override
         public Response toResponse(BlockedException exception) {
@@ -271,7 +271,7 @@ public class BookServer extends AbstractServerTestServerBase {
             }
 
         }
-        private static class ByteConverter implements ParamConverter<Byte> {
+        private static final class ByteConverter implements ParamConverter<Byte> {
             @Override
             public Byte fromString(String t) {
                 return Byte.valueOf(t);

@@ -190,7 +190,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         factory.createClient(ADDRESS + "?wsdl");
     }
 
-    private static class MyHTTPConduitConfigurer implements HTTPConduitConfigurer {
+    private static final class MyHTTPConduitConfigurer implements HTTPConduitConfigurer {
         public void configure(String name, String address, HTTPConduit c) {
 
             AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();

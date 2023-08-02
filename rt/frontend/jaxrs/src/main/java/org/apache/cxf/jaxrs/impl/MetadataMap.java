@@ -225,7 +225,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         return m.toString();
     }
 
-    private static class KeyComparator<K> implements Comparator<K> {
+    private static final class KeyComparator<K> implements Comparator<K> {
 
         public int compare(K k1, K k2) {
             String s1 = k1.toString();

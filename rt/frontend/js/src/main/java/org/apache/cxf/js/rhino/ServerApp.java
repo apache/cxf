@@ -134,8 +134,8 @@ public class ServerApp {
         return index;
     }
 
-    private static class JSFilter implements FileFilter {
-        public final boolean accept(File f) {
+    private static final class JSFilter implements FileFilter {
+        public boolean accept(File f) {
             if (f.isFile()) {
                 String name = f.getName();
                 return name.endsWith(".js") || name.endsWith(".jsx");

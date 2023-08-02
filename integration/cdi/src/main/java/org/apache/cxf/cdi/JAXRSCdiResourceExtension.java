@@ -97,7 +97,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      * Holder of the classified resource classes, converted to appropriate instance
      * representations.
      */
-    private static class ClassifiedClasses {
+    private static final class ClassifiedClasses {
         private List< Object > providers = new ArrayList<>();
         private List< Feature > features = new ArrayList<>();
         private List<ResourceProvider> resourceProviders = new ArrayList<>();

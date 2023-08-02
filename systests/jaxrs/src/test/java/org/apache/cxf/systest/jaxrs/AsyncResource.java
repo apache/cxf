@@ -95,7 +95,7 @@ public class AsyncResource {
         return Response.status(Status.EXPECTATION_FAILED);
     }
 
-    private static class AsyncResponseQueue {
+    private static final class AsyncResponseQueue {
         BlockingQueue<AsyncResponse> queue = new ArrayBlockingQueue<>(1);
 
         public void add(AsyncResponse asyncResponse) {

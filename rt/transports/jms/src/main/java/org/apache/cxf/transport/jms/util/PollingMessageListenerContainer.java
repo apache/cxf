@@ -64,7 +64,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         this.exceptionListener = exceptionListener;
     }
 
-    private class Poller implements Runnable {
+    private final class Poller implements Runnable {
 
         @Override
         public void run() {
@@ -119,7 +119,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     }
 
-    private class XAPoller implements Runnable {
+    private final class XAPoller implements Runnable {
 
         @Override
         public void run() {

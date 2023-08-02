@@ -130,7 +130,7 @@ public class WebFaultOutInterceptorTestCase {
         return message;
     }
 
-    private class SOAPFaultStub implements SOAPFault {
+    private final class SOAPFaultStub implements SOAPFault {
 
         @Override
         public void setFaultCode(Name name) throws SOAPException {

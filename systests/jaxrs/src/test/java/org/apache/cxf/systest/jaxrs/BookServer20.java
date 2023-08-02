@@ -124,7 +124,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
 
     @PreMatching
     @Priority(1)
-    private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
+    private static final class PreMatchContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
@@ -181,7 +181,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
 
     @PreMatching
     @Priority(3)
-    private static class PreMatchContainerRequestFilter2 implements ContainerRequestFilter {
+    private static final class PreMatchContainerRequestFilter2 implements ContainerRequestFilter {
         @Context
         private HttpServletRequest servletRequest;
         @Override
@@ -198,7 +198,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
     }
 
     @PreMatching
-    private static class PreMatchReplaceStreamOrAddress implements ContainerRequestFilter {
+    private static final class PreMatchReplaceStreamOrAddress implements ContainerRequestFilter {
         @Context
         private UriInfo ui;
         @Override
@@ -232,7 +232,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
 
     @PreMatching
     @Priority(2)
-    private static class PreMatchDynamicContainerRequestFilter implements ContainerRequestFilter {
+    private static final class PreMatchDynamicContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
@@ -245,7 +245,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
     }
 
     @CustomHeaderAdded
-    private static class PostMatchContainerRequestFilter implements ContainerRequestFilter {
+    private static final class PostMatchContainerRequestFilter implements ContainerRequestFilter {
         @Context
         private UriInfo ui;
         @Override
@@ -266,7 +266,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
 
     @Faulty
     @CustomHeaderAdded
-    private static class FaultyContainerRequestFilter implements ContainerRequestFilter {
+    private static final class FaultyContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
@@ -524,7 +524,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
         }
 
     }
-    private static class ServerTestFeature implements Feature {
+    private static final class ServerTestFeature implements Feature {
 
         @Context
         private Application app;
@@ -539,7 +539,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
         }
 
     }
-    private static class IOExceptionMapper implements ExceptionMapper<IOException> {
+    private static final class IOExceptionMapper implements ExceptionMapper<IOException> {
 
         @Override
         public Response toResponse(IOException ex) {
@@ -550,7 +550,7 @@ public class BookServer20 extends AbstractServerTestServerBase {
     }
     
     @Provider
-    private class GregorianCalendarMessageBodyWriter implements MessageBodyWriter<GregorianCalendar> {
+    private final class GregorianCalendarMessageBodyWriter implements MessageBodyWriter<GregorianCalendar> {
         @Override
         public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
             return GregorianCalendar.class.equals(type);

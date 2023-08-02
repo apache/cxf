@@ -337,7 +337,7 @@ public class RequestImpl implements Request {
         return null;
     }
 
-    private static class VariantComparator implements Comparator<Variant> {
+    private static final class VariantComparator implements Comparator<Variant> {
 
         static final VariantComparator INSTANCE = new VariantComparator();
 

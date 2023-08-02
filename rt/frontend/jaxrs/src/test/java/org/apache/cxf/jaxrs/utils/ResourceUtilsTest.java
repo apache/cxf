@@ -438,12 +438,12 @@ public class ResourceUtilsTest {
 
     }
 
-    private static class SuperApplication extends BaseApplication {
+    private static final class SuperApplication extends BaseApplication {
 
     }
 
     @ApplicationPath("/custom")
-    private static class CustomApplication extends BaseApplication {
+    private static final class CustomApplication extends BaseApplication {
 
     }
 }

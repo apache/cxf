@@ -56,7 +56,7 @@ public class ClientImplTest {
 
     private static final String MY_INTERCEPTOR_NAME = "MyInterceptor";
 
-    private static class MyInterceptor implements Interceptor<Message> {
+    private static final class MyInterceptor implements Interceptor<Message> {
         @Override
         public String toString() {
             return MY_INTERCEPTOR_NAME;

@@ -81,11 +81,11 @@ abstract class AbstractCXFBean<T> implements Bean<T> {
         return Collections.emptySet();
     }
 
-    private static class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
+    private static final class DefaultLiteral extends AnnotationLiteral<Default> implements Default {
         private static final long serialVersionUID = 1L;
     }
 
-    private static class AnyLiteral extends AnnotationLiteral<Any> implements Any {
+    private static final class AnyLiteral extends AnnotationLiteral<Any> implements Any {
         private static final long serialVersionUID = 1L;
     }
 }

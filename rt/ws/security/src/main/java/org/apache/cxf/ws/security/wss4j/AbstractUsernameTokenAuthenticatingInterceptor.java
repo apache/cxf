@@ -255,7 +255,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
     }
 
-    private static class UsernameTokenSecurityContextCreator extends DefaultWSS4JSecurityContextCreator {
+    private static final class UsernameTokenSecurityContextCreator extends DefaultWSS4JSecurityContextCreator {
 
         @Override
         protected SecurityContext createSecurityContext(final Principal p) {

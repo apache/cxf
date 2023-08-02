@@ -373,7 +373,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         //CHECKSTYLE:ON
     }
 
-    private static class InternalByteArrayOutputStream extends ByteArrayOutputStream {
+    private static final class InternalByteArrayOutputStream extends ByteArrayOutputStream {
         public byte[] getBytes() {
             return buf;
         }

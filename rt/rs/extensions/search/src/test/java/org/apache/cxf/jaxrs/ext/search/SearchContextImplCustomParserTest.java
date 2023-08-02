@@ -40,7 +40,7 @@ public class SearchContextImplCustomParserTest {
         assertFalse(sc.isMet(new Color("blue")));
     }
 
-    private static class CustomParser implements SearchConditionParser<Color> {
+    private static final class CustomParser implements SearchConditionParser<Color> {
 
         @Override
         public SearchCondition<Color> parse(String searchExpression) throws SearchParseException {

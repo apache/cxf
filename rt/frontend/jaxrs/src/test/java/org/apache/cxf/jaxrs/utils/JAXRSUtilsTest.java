@@ -2207,7 +2207,7 @@ public class JAXRSUtilsTest {
         }
 
     }
-    private static class LocaleParameterHandler implements ParamConverterProvider, ParamConverter<Locale> {
+    private static final class LocaleParameterHandler implements ParamConverterProvider, ParamConverter<Locale> {
 
         @SuppressWarnings("unchecked")
         @Override
@@ -2230,7 +2230,7 @@ public class JAXRSUtilsTest {
 
     }
 
-    private static class GenericObjectParameterHandler implements ParamConverterProvider,
+    private static final class GenericObjectParameterHandler implements ParamConverterProvider,
         ParamConverter<Query<String>> {
 
         @SuppressWarnings("unchecked")

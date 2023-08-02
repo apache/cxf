@@ -543,13 +543,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
 
     // Switch the priorities to have encryption run before signature
     @Priority(Priorities.JWS_WRITE_PRIORITY)
-    private static class EncrSignJweWriterInterceptor extends JweWriterInterceptor {
+    private static final class EncrSignJweWriterInterceptor extends JweWriterInterceptor {
 
     }
 
     // Switch the priorities to have encryption run before signature
     @Priority(Priorities.JWE_WRITE_PRIORITY)
-    private static class EncrSignJwsWriterInterceptor extends JwsWriterInterceptor {
+    private static final class EncrSignJwsWriterInterceptor extends JwsWriterInterceptor {
 
     }
 }

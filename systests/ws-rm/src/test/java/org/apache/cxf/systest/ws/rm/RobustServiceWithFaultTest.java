@@ -143,7 +143,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
         assertTrue("still in retransmission", manager.getRetransmissionQueue().isEmpty());
     }
 
-    private static class GreeterCounterImpl extends GreeterImpl {
+    private static final class GreeterCounterImpl extends GreeterImpl {
         private int count;
         private boolean throwAlways;
 

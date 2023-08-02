@@ -281,7 +281,7 @@ public class BookContinuationStore implements BookAsyncInterface {
 
     }
 
-    private class CancelTimeoutHandlerImpl implements TimeoutHandler {
+    private final class CancelTimeoutHandlerImpl implements TimeoutHandler {
 
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
@@ -291,7 +291,7 @@ public class BookContinuationStore implements BookAsyncInterface {
 
     }
 
-    private class CallbackImpl implements CompletionCallback {
+    private final class CallbackImpl implements CompletionCallback {
 
         @Override
         public void onComplete(Throwable throwable) {

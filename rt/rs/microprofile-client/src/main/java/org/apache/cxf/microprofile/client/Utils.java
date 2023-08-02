@@ -51,7 +51,7 @@ public final class Utils {
         return new LazyForkJoinExecutor();
     }
     
-    private static class LazyForkJoinExecutor implements ExecutorService {
+    private static final class LazyForkJoinExecutor implements ExecutorService {
         @Override
         public void execute(Runnable command) {
             getCommonPool().execute(command);

@@ -563,7 +563,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
 
     @Produces("application/xml")
-    private static class FaultyBookWriter implements MessageBodyWriter<Book> {
+    private static final class FaultyBookWriter implements MessageBodyWriter<Book> {
 
         @Override
         public long getSize(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
@@ -585,7 +585,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Consumes("application/xml")
-    private static class FaultyBookReader implements MessageBodyReader<Book> {
+    private static final class FaultyBookReader implements MessageBodyReader<Book> {
 
         @Override
         public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
@@ -610,7 +610,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
     }
     
-    private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
+    private static final class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Object result;
 
         @Override

@@ -1959,7 +1959,7 @@ public class BookStore {
         }
 
     }
-    private class ResponseStreamingOutputImpl implements StreamingOutput {
+    private final class ResponseStreamingOutputImpl implements StreamingOutput {
         public void write(OutputStream output) throws IOException, WebApplicationException {
             if (!"text/plain".equals(BookStore.this.messageContext.get("Content-Type"))) {
                 throw new RuntimeException();

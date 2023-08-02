@@ -2059,7 +2059,7 @@ public class SourceGenerator {
         }
     }
 
-    private static class DefaultImportsComparator implements Comparator<String> {
+    private static final class DefaultImportsComparator implements Comparator<String> {
         private static final String JAVAX_PREFIX = "javax";
         public int compare(String s1, String s2) {
             boolean javax1 = s1.startsWith(JAVAX_PREFIX);
@@ -2158,7 +2158,7 @@ public class SourceGenerator {
 
     }
 
-    private static class WadlValidationErrorHandler implements ErrorHandler {
+    private static final class WadlValidationErrorHandler implements ErrorHandler {
         private int fatalErrors;
         private int errors;
         @Override
