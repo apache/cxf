@@ -132,7 +132,7 @@ public class WebFaultOutInterceptorTestCase {
     }
 
     @SuppressWarnings("rawtypes") // old SAAJ API doesn't have generics
-    private class SOAPFaultStub implements SOAPFault {
+    private final class SOAPFaultStub implements SOAPFault {
 
         @Override
         public void setFaultCode(Name name) throws SOAPException {

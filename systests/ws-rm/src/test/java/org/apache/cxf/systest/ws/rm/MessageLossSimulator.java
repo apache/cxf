@@ -161,7 +161,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    private class DummyOutputStream extends OutputStream {
+    private final class DummyOutputStream extends OutputStream {
 
         @Override
         public void write(int b) throws IOException {

@@ -122,7 +122,7 @@ public class DefaultExceptionClassProviderTest {
         assertThat(actual, is(nullValue()));
     }
 
-    private static class CauseException extends RuntimeException {
+    private static final class CauseException extends RuntimeException {
         private static final long serialVersionUID = 5321136931639340427L;
     }
 }

@@ -1009,7 +1009,7 @@ public final class JAXRSUtils {
         return Arrays.asList(params);
     }
 
-    private static class ParamTuple {
+    private static final class ParamTuple {
         private Class<?> param;
         private Type genericParam;
         private Annotation[] paramAnns;

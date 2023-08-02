@@ -275,7 +275,7 @@ public class JWTTokenValidatorRealmTest {
     /**
      * This class returns a realm associated with a JWTToken depending on the issuer.
      */
-    private static class IssuerJWTRealmCodec implements JWTRealmCodec {
+    private static final class IssuerJWTRealmCodec implements JWTRealmCodec {
 
         public String getRealmFromToken(JwtToken token) {
             if ("A-Issuer".equals(token.getClaim(JwtConstants.CLAIM_ISSUER))) {

@@ -164,7 +164,7 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
         }
     }
 
-    private static class NOOpPolicyValidator implements SecurityPolicyValidator {
+    private static final class NOOpPolicyValidator implements SecurityPolicyValidator {
 
         @Override
         public boolean canValidatePolicy(AssertionInfo assertionInfo) {

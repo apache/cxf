@@ -1020,10 +1020,10 @@ public class MAPAggregatorTest {
         String op();
     }
 
-    private static class TestBindingMessageInfo extends BindingMessageInfo {
+    private static final class TestBindingMessageInfo extends BindingMessageInfo {
     }
 
-    private static class TestBindingOperationInfo extends BindingOperationInfo {
+    private static final class TestBindingOperationInfo extends BindingOperationInfo {
         private Map<QName, BindingFaultInfo> faults;
 
         TestBindingOperationInfo(OperationInfo oi) {
@@ -1052,7 +1052,7 @@ public class MAPAggregatorTest {
         }
     }
 
-    private static class SetupMessageArgs {
+    private static final class SetupMessageArgs {
         boolean requestor;
         boolean outbound;
         boolean oneway;
@@ -1064,7 +1064,7 @@ public class MAPAggregatorTest {
         boolean noMessageId;
     }
 
-    private static class SetupResponderArgs {
+    private static final class SetupResponderArgs {
         boolean outbound;
         boolean oneway;
         boolean decoupled;

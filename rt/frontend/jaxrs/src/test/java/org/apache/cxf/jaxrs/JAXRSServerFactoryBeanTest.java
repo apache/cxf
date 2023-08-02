@@ -68,7 +68,7 @@ public class JAXRSServerFactoryBeanTest {
     }
 
 
-    private static class CustomExceptionMapper implements ExceptionMapper<Exception> {
+    private static final class CustomExceptionMapper implements ExceptionMapper<Exception> {
 
         public Response toResponse(Exception exception) {
             return null;
@@ -76,7 +76,7 @@ public class JAXRSServerFactoryBeanTest {
 
     }
 
-    private static class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+    private static final class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
             return null;

@@ -382,7 +382,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         return p;
     }
 
-    private static class TokenCallbackHandler implements CallbackHandler {
+    private static final class TokenCallbackHandler implements CallbackHandler {
 
         private SecurityToken securityToken;
 

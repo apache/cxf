@@ -55,7 +55,7 @@ public class BookServerThrottled extends AbstractServerTestServerBase {
         new BookServerThrottled().start();
     }
 
-    private static class ThrottlingManagerImpl implements ThrottlingManager {
+    private static final class ThrottlingManagerImpl implements ThrottlingManager {
 
         @Override
         public List<String> getDecisionPhases() {

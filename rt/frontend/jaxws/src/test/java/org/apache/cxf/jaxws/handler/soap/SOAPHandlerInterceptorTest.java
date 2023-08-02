@@ -556,7 +556,7 @@ public class SOAPHandlerInterceptorTest {
     }
 
 
-    private class CachedStream extends CachedOutputStream {
+    private final class CachedStream extends CachedOutputStream {
         protected void doFlush() throws IOException {
             currentStream.flush();
         }

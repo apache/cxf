@@ -164,7 +164,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         return fac.getKeyManagers();
     }
 
-    private class MyLaterResponseHandler implements AsyncHandler<GreetMeLaterResponse> {
+    private final class MyLaterResponseHandler implements AsyncHandler<GreetMeLaterResponse> {
         GreetMeLaterResponse response;
         @Override
         public void handleResponse(Response<GreetMeLaterResponse> res) {

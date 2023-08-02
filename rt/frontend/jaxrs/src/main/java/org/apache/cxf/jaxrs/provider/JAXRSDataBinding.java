@@ -106,7 +106,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
             (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS), true, true);
     }
 
-    private class MessageBodyDataWriter implements DataWriter<XMLStreamWriter> {
+    private final class MessageBodyDataWriter implements DataWriter<XMLStreamWriter> {
 
         public void write(Object obj, XMLStreamWriter output) {
             write(obj, null, output);
@@ -143,7 +143,7 @@ public class JAXRSDataBinding extends AbstractDataBinding {
         }
     }
 
-    private class MessageBodyDataReader implements DataReader<XMLStreamReader> {
+    private final class MessageBodyDataReader implements DataReader<XMLStreamReader> {
 
         public Object read(XMLStreamReader input) {
             throw new UnsupportedOperationException();

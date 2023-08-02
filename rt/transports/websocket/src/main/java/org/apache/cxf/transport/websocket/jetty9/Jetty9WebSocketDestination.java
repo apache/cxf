@@ -233,7 +233,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     }
 
     // hide this jetty9 interface here to avoid CNFE on WebSocketCreator
-    private class Creator implements WebSocketCreator {
+    private final class Creator implements WebSocketCreator {
 
         @Override
         public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {

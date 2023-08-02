@@ -77,7 +77,7 @@ public class FailoverTest extends AbstractFailoverTest {
         return feature;
     }
 
-    private static class ReplaceInitialAddressSelector extends FailoverTargetSelector {
+    private static final class ReplaceInitialAddressSelector extends FailoverTargetSelector {
         @Override
         public synchronized void prepare(Message message) {
             EndpointInfo ei = getEndpoint().getEndpointInfo();

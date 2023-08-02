@@ -417,7 +417,7 @@ public class ValidateJWTTransformationTest {
         return samlRealms;
     }
 
-    private static class CustomJWTRealmCodec implements JWTRealmCodec {
+    private static final class CustomJWTRealmCodec implements JWTRealmCodec {
 
         public String getRealmFromToken(JwtToken token) {
             if ("alice".equals(token.getClaim(JwtConstants.CLAIM_SUBJECT))) {

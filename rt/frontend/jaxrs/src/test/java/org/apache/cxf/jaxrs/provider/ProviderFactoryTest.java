@@ -359,7 +359,7 @@ public class ProviderFactoryTest {
         assertEquals(DWriterInterceptor.class, iterator.next().getProvider().getClass());
     }
 
-    private static class AWriterInterceptor implements WriterInterceptor {
+    private static final class AWriterInterceptor implements WriterInterceptor {
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws
             IOException, WebApplicationException {
@@ -367,7 +367,7 @@ public class ProviderFactoryTest {
         }
     }
 
-    private static class BWriterInterceptor implements WriterInterceptor {
+    private static final class BWriterInterceptor implements WriterInterceptor {
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws
             IOException, WebApplicationException {
@@ -375,7 +375,7 @@ public class ProviderFactoryTest {
         }
     }
 
-    private static class CWriterInterceptor implements WriterInterceptor {
+    private static final class CWriterInterceptor implements WriterInterceptor {
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws
             IOException, WebApplicationException {
@@ -383,7 +383,7 @@ public class ProviderFactoryTest {
         }
     }
 
-    private static class DWriterInterceptor implements WriterInterceptor {
+    private static final class DWriterInterceptor implements WriterInterceptor {
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws
             IOException, WebApplicationException {
@@ -1207,7 +1207,7 @@ public class ProviderFactoryTest {
     }
 
     @Priority(1001)
-    private static class HighPriorityExceptionMapper implements ExceptionMapper<Exception> {
+    private static final class HighPriorityExceptionMapper implements ExceptionMapper<Exception> {
 
         @Override
         public Response toResponse(Exception exception) {
@@ -1216,7 +1216,7 @@ public class ProviderFactoryTest {
     }
 
     @Priority(2001)
-    private static class LowPriorityExceptionMapper implements ExceptionMapper<Exception> {
+    private static final class LowPriorityExceptionMapper implements ExceptionMapper<Exception> {
 
         @Override
         public Response toResponse(Exception exception) {
@@ -1224,7 +1224,7 @@ public class ProviderFactoryTest {
         }
     }
 
-    private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+    private static final class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
             return null;
@@ -1233,7 +1233,7 @@ public class ProviderFactoryTest {
     }
 
     @Priority(100)
-    private static class LowPriorityContextResolver implements ContextResolver<String> {
+    private static final class LowPriorityContextResolver implements ContextResolver<String> {
 
         @Override
         public String getContext(Class<?> paramClass) {
@@ -1242,7 +1242,7 @@ public class ProviderFactoryTest {
     }
 
     @Priority(1)
-    private static class HighPriorityContextResolver implements ContextResolver<String> {
+    private static final class HighPriorityContextResolver implements ContextResolver<String> {
 
         @Override
         public String getContext(Class<?> paramClass) {
@@ -1253,7 +1253,7 @@ public class ProviderFactoryTest {
     @Priority(Priorities.USER - 10)
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class HighPriorityBookReaderWriter
+    private static final class HighPriorityBookReaderWriter
         implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
@@ -1286,7 +1286,7 @@ public class ProviderFactoryTest {
 
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class BookReaderWriter
+    private static final class BookReaderWriter
         implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
@@ -1319,7 +1319,7 @@ public class ProviderFactoryTest {
 
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class SuperBookReaderWriter
+    private static final class SuperBookReaderWriter
         implements MessageBodyReader<SuperBook>, MessageBodyWriter<SuperBook> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
@@ -1353,7 +1353,7 @@ public class ProviderFactoryTest {
 
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class SuperBookReaderWriter2<T>
+    private static final class SuperBookReaderWriter2<T>
         implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
@@ -1404,7 +1404,7 @@ public class ProviderFactoryTest {
     }
     @Produces("*/*")
     @Consumes("*/*")
-    private static class WildcardReader2 implements MessageBodyReader<Object> {
+    private static final class WildcardReader2 implements MessageBodyReader<Object> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
@@ -1419,12 +1419,12 @@ public class ProviderFactoryTest {
 
     }
 
-    private static class RuntimeExceptionMapper1
+    private static final class RuntimeExceptionMapper1
         extends AbstractTestExceptionMapper<RuntimeException> {
 
     }
 
-    private static class RuntimeExceptionMapper2
+    private static final class RuntimeExceptionMapper2
         extends AbstractTestExceptionMapper<WebApplicationException> {
 
     }
@@ -1438,7 +1438,7 @@ public class ProviderFactoryTest {
 
     }
 
-    private static class ComplexMessageBodyReader extends ProviderBase<AClass> {
+    private static final class ComplexMessageBodyReader extends ProviderBase<AClass> {
     }
     private abstract static class ProviderBase<A> implements
         MessageBodyReader<Object>, MessageBodyWriter<Object> {
@@ -1474,10 +1474,10 @@ public class ProviderFactoryTest {
     public static class AClass {
     }
 
-    private static class SecurityExceptionMapper
+    private static final class SecurityExceptionMapper
         extends AbstractBadRequestExceptionMapper<SecurityException> {
     }
-    private static class CustomWebApplicationExceptionMapper
+    private static final class CustomWebApplicationExceptionMapper
         extends AbstractBadRequestExceptionMapper<WebApplicationException> {
     }
     private abstract static class AbstractBadRequestExceptionMapper<T extends Throwable>
@@ -1558,23 +1558,23 @@ public class ProviderFactoryTest {
     private static class RuntimeExceptionA extends RuntimeException {
         private static final long serialVersionUID = 1L;
     }
-    private static class RuntimeExceptionAA extends RuntimeExceptionA {
+    private static final class RuntimeExceptionAA extends RuntimeExceptionA {
         private static final long serialVersionUID = 1L;
     }
     private static class RuntimeExceptionB extends RuntimeException {
         private static final long serialVersionUID = 1L;
     }
-    private static class RuntimeExceptionBB extends RuntimeExceptionB {
+    private static final class RuntimeExceptionBB extends RuntimeExceptionB {
         private static final long serialVersionUID = 1L;
     }
-    private static class GoodRuntimeExceptionAMapper implements ExceptionMapper<RuntimeExceptionA> {
+    private static final class GoodRuntimeExceptionAMapper implements ExceptionMapper<RuntimeExceptionA> {
 
         @Override
         public Response toResponse(RuntimeExceptionA exception) {
             return null;
         }
     }
-    private static class GoodRuntimeExceptionBMapper implements ExceptionMapper<RuntimeExceptionB> {
+    private static final class GoodRuntimeExceptionBMapper implements ExceptionMapper<RuntimeExceptionB> {
 
         @Override
         public Response toResponse(RuntimeExceptionB exception) {

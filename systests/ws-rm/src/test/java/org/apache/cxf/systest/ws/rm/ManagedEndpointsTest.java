@@ -492,7 +492,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         return (ObjectName)it.next();
     }
 
-    private static class AcknowledgementListener implements NotificationListener {
+    private static final class AcknowledgementListener implements NotificationListener {
         private AtomicLong lastAcknowledgement = new AtomicLong();
 
         @Override

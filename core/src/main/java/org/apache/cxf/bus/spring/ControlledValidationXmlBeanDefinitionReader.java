@@ -69,7 +69,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
     /**
      * Exception class used to avoid reading old FastInfoset files.
      */
-    private static class StaleFastinfosetException extends Exception {
+    private static final class StaleFastinfosetException extends Exception {
 
         private static final long serialVersionUID = -3594973504794187383L;
 
