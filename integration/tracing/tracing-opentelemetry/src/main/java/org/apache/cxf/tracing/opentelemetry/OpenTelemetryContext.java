@@ -20,13 +20,14 @@ package org.apache.cxf.tracing.opentelemetry;
 
 import java.util.concurrent.Callable;
 
+import org.apache.cxf.tracing.Traceable;
+import org.apache.cxf.tracing.TracerContext;
+
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import org.apache.cxf.tracing.Traceable;
-import org.apache.cxf.tracing.TracerContext;
 
 public class OpenTelemetryContext implements TracerContext {
     private final Tracer tracer;

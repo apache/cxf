@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.tracing.opentelemetry;
 
-import io.opentelemetry.api.OpenTelemetry;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 public class OpenTelemetryClientStopInterceptor extends AbstractOpenTelemetryClientInterceptor {
     public OpenTelemetryClientStopInterceptor(final OpenTelemetry openTelemetry,

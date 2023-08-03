@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
 
-import static org.hamcrest.Matchers.equalTo;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
+
+import static org.hamcrest.Matchers.equalTo;
 
 public class HasAttribute<T> extends FeatureMatcher<Attributes, T> {
     private final AttributeKey<T> key;

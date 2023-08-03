@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 public class OpenTelemetryStopInterceptor extends AbstractOpenTelemetryInterceptor {
     public OpenTelemetryStopInterceptor(final OpenTelemetry openTelemetry, final String instrumentationName) {

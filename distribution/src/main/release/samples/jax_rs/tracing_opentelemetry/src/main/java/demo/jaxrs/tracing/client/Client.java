@@ -22,12 +22,13 @@ package demo.jaxrs.tracing.client;
 import java.util.Arrays;
 
 import demo.jaxrs.tracing.OpenTelemetrySetup;
-import io.opentelemetry.sdk.OpenTelemetrySdk;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.tracing.opentelemetry.OpenTelemetryFeature;
 import org.apache.cxf.tracing.opentelemetry.jaxrs.OpenTelemetryClientProvider;
+
+import io.opentelemetry.sdk.OpenTelemetrySdk;
 
 public final class Client {
     private Client() {

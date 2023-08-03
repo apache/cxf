@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.tracing.opentelemetry;
 
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -28,6 +26,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Client)

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,17 +17,6 @@
  * under the License.
  */
 package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
-
-import io.opentelemetry.sdk.trace.data.SpanData;
-import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasAttribute.hasAttribute;
-import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasSpan.hasSpan;
-import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.IsLogContaining.hasItem;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.net.MalformedURLException;
 import java.time.Duration;
@@ -41,20 +30,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanContext;
-import io.opentelemetry.api.trace.SpanId;
-import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.api.trace.TraceFlags;
-import io.opentelemetry.api.trace.TraceId;
-import io.opentelemetry.api.trace.TraceState;
-import io.opentelemetry.context.Context;
-import io.opentelemetry.context.Scope;
-import io.opentelemetry.context.propagation.TextMapSetter;
-import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -71,6 +46,22 @@ import org.apache.cxf.tracing.opentelemetry.OpenTelemetryClientFeature;
 import org.apache.cxf.tracing.opentelemetry.jaxrs.OpenTelemetryClientProvider;
 import org.apache.cxf.tracing.opentelemetry.jaxrs.OpenTelemetryFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.SpanId;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceId;
+import io.opentelemetry.api.trace.TraceState;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapSetter;
+import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -78,12 +69,24 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasAttribute.hasAttribute;
+import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasSpan.hasSpan;
+import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.IsLogContaining.hasItem;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(OpenTelemetryTracingTest.class);
 
-    private static final AtomicLong RANDOM = new AtomicLong();
     @ClassRule
     public static OpenTelemetryRule otelRule = OpenTelemetryRule.create();
+
+    private static final AtomicLong RANDOM = new AtomicLong();
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 

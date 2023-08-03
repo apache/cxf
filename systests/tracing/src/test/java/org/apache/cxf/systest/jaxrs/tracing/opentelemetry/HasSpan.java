@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
 
-import io.opentelemetry.sdk.trace.data.EventData;
-import io.opentelemetry.sdk.trace.data.SpanData;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsIterableContaining;
+
+import io.opentelemetry.sdk.trace.data.EventData;
+import io.opentelemetry.sdk.trace.data.SpanData;
 
 public class HasSpan extends IsIterableContaining<SpanData> {
     public HasSpan(final String name) {

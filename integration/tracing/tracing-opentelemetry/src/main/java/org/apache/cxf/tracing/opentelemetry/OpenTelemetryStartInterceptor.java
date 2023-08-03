@@ -21,13 +21,13 @@ package org.apache.cxf.tracing.opentelemetry;
 import java.util.List;
 import java.util.Map;
 
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 @NoJSR250Annotations
 public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryInterceptor {

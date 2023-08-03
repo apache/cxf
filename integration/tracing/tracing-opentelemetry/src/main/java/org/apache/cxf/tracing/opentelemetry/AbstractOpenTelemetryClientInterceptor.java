@@ -22,9 +22,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import io.opentelemetry.api.OpenTelemetry;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 public abstract class AbstractOpenTelemetryClientInterceptor extends AbstractOpenTelemetryClientProvider
     implements PhaseInterceptor<Message> {

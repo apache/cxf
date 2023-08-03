@@ -21,19 +21,20 @@ package org.apache.cxf.tracing.opentelemetry;
 import java.util.List;
 import java.util.Map;
 
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Tracer;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+
+import io.opentelemetry.api.OpenTelemetry;
 
 public class OpenTelemetryClientStartInterceptor extends AbstractOpenTelemetryClientInterceptor {
     public OpenTelemetryClientStartInterceptor(final OpenTelemetry openTelemetry, final String instrumentationName) {
         this(Phase.PRE_STREAM, openTelemetry, instrumentationName);
     }
 
-    public OpenTelemetryClientStartInterceptor(final String phase, final OpenTelemetry openTelemetry, final String instrumentationName) {
+    public OpenTelemetryClientStartInterceptor(final String phase, final OpenTelemetry openTelemetry, 
+            final String instrumentationName) {
         super(phase, openTelemetry, instrumentationName);
     }
 

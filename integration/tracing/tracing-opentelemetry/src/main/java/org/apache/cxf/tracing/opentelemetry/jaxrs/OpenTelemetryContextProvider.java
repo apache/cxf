@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.tracing.opentelemetry.jaxrs;
 
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.cxf.tracing.opentelemetry.OpenTelemetryContext;
+
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 
 public class OpenTelemetryContextProvider implements ContextProvider<TracerContext> {
     private final Tracer tracer;

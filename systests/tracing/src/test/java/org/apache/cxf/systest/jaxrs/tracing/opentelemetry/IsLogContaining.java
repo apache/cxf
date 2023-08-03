@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
 
-import io.opentelemetry.sdk.trace.data.EventData;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsIterableContaining;
+
+import io.opentelemetry.sdk.trace.data.EventData;
 
 public class IsLogContaining extends IsIterableContaining<EventData> {
     public IsLogContaining(final String value) {
