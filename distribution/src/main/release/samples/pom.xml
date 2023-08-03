@@ -101,6 +101,7 @@
         <module>jax_rs/sse_tomcat</module>
         <module>jax_rs/tracing_brave</module>
         <module>jax_rs/tracing_opentracing</module>
+        <module>jax_rs/tracing_opentelemetry</module>
         <module>jax_rs/websocket</module>
         <module>jax_rs/websocket_web</module>
         <module>jax_server_aegis_client</module>
