@@ -184,6 +184,8 @@
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
         <cxf.opensaml.osgi.version>3.4.6_3</cxf.opensaml.osgi.version>
+        <cxf.opentelemetry.version>1.28.0</cxf.opentelemetry.version>
+        <cxf.opentelemetry.semconv.version>1.28.0-alpha</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.persistence-api.version>2.2.3</cxf.persistence-api.version>
@@ -1961,6 +1963,23 @@
                 <artifactId>opentracing-mock</artifactId>
                 <version>${cxf.opentracing.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${cxf.opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${cxf.opentelemetry.semconv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-opentracing-shim</artifactId>
+                <version>${cxf.opentelemetry.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jaegertracing</groupId>
