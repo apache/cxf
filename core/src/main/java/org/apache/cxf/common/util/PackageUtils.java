@@ -89,7 +89,7 @@ public final class PackageUtils {
         if (idx >= 0) {
             final String scheme = nameSpaceURI.substring(0, idx);
             urnScheme = "urn".equalsIgnoreCase(scheme);
-            if ("http".equalsIgnoreCase(scheme) || urnScheme) {
+            if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme) || urnScheme) {
                 nameSpaceURI = nameSpaceURI.substring(idx + (urnScheme ? 1 : 3)); //
             }
         }
