@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.tracing.opentelemetry.internal;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,6 @@ public final class TextMapInjectAdapter
 
     @Override
     public void set(Map<String, List<String>> carrier, String key, String value) {
-        carrier.put(key, List.of(value));
+        carrier.put(key, Collections.singletonList(value));
     }
 }
