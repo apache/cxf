@@ -27,23 +27,22 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
-import org.easymock.EasyMockRule;
-import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 public class AbstractJwtHandlerTest {
     private static final String UNSIGNED_TEXT = "myUnsignedText";
     private static final byte[] SIGNATURE = "mySignature".getBytes();
 
     @Rule
-    public EasyMockRule rule = new EasyMockRule(this);
+    public MockitoRule rule = MockitoJUnit.rule();
 
     private AbstractJwtHandler handler;
     @Mock
@@ -65,21 +64,17 @@ public class AbstractJwtHandlerTest {
 
     @Test
     public void testValidateSignatureWithValidSignature() {
-        expect(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).andReturn(true);
-        replay(signatureVerifier);
+        when(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).thenReturn(true);
         handler.validateSignature(headers, UNSIGNED_TEXT, SIGNATURE);
-        verify(signatureVerifier);
     }
 
     @Test
     public void testValidateSignatureWithInvalidSignature() {
-        expect(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).andReturn(false);
-        replay(signatureVerifier);
+        when(signatureVerifier.verify(headers, UNSIGNED_TEXT, SIGNATURE)).thenReturn(false);
         try {
             handler.validateSignature(headers, UNSIGNED_TEXT, SIGNATURE);
             fail("OAuthServiceException expected");
         } catch (OAuthServiceException expected) {
         }
-        verify(signatureVerifier);
     }
 }

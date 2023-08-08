@@ -20,17 +20,18 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NonceVerifierImplTest {
 
     private NonceVerifierImpl nonceVerifier;
-    private NonceStore nonceStore = EasyMock.createMock(NonceStore.class);
+    private NonceStore nonceStore = mock(NonceStore.class);
 
     @Before
     public void setUp() {
@@ -46,11 +47,9 @@ public class NonceVerifierImplTest {
         NonceHistory nonceHistory = new NonceHistory(200, nonce1); // first request time delta is 200ms
         nonceHistory.addNonce(nonce2);
 
-        EasyMock.expect(nonceStore.getNonceHistory("testTokenKey")).andReturn(nonceHistory);
-        EasyMock.replay(nonceStore);
+        when(nonceStore.getNonceHistory("testTokenKey")).thenReturn(nonceHistory);
         nonceVerifier.setAllowedWindow(2000); // allowed window is 2 seconds
         nonceVerifier.verifyNonce("testTokenKey", "nonce3", Long.toString(now - 500));
-        EasyMock.verify(nonceStore);
     }
 
     @Test
@@ -61,8 +60,7 @@ public class NonceVerifierImplTest {
         NonceHistory nonceHistory = new NonceHistory(200, nonce1); // first request time delta is 200ms
         nonceHistory.addNonce(nonce2);
 
-        EasyMock.expect(nonceStore.getNonceHistory("testTokenKey")).andReturn(nonceHistory);
-        EasyMock.replay(nonceStore);
+        when(nonceStore.getNonceHistory("testTokenKey")).thenReturn(nonceHistory);
         nonceVerifier.setAllowedWindow(2000); // allowed window is 2 seconds
         try {
             nonceVerifier.verifyNonce("testTokenKey", "nonce2", Long.toString(now - 1000));
@@ -80,8 +78,7 @@ public class NonceVerifierImplTest {
         NonceHistory nonceHistory = new NonceHistory(200, nonce1); // first request time delta is 200ms
         nonceHistory.addNonce(nonce2);
 
-        EasyMock.expect(nonceStore.getNonceHistory("testTokenKey")).andReturn(nonceHistory);
-        EasyMock.replay(nonceStore);
+        when(nonceStore.getNonceHistory("testTokenKey")).thenReturn(nonceHistory);
         nonceVerifier.setAllowedWindow(2000); // allowed window is 2 seconds
         try {
             nonceVerifier.verifyNonce("testTokenKey", "nonce3", Long.toString(now - 5000)); // very old timestamp
