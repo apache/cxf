@@ -32,7 +32,6 @@ import jakarta.resource.spi.ResourceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +40,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class ResourceAdapterImplTest {
 
@@ -109,7 +110,7 @@ public class ResourceAdapterImplTest {
     @Test
     public void testRegisterBusNotNull() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        Bus bus = EasyMock.createMock(Bus.class);
+        Bus bus = mock(Bus.class);
         rai.registerBus(bus);
         assertNotNull("bus cache is not null", rai.getBusCache());
         assertTrue("bus registered", rai.getBusCache().contains(bus));
@@ -131,7 +132,7 @@ public class ResourceAdapterImplTest {
     @Test
     public void testGetCorrectBootstrapContext() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        BootstrapContext bc = EasyMock.createMock(BootstrapContext.class);
+        BootstrapContext bc = mock(BootstrapContext.class);
         assertNotNull("BootstrapContext not null", bc);
         rai.start(bc);
         assertEquals("BootstrapContext set", rai.getBootstrapContext(), bc);
@@ -154,13 +155,11 @@ public class ResourceAdapterImplTest {
     public void testStopWithNonEmptyBusCache() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
         rai.setBusCache(new HashSet<>());
-        Bus bus = EasyMock.createMock(Bus.class);
-        bus.shutdown(true);
-        EasyMock.expectLastCall();
-        EasyMock.replay(bus);
+        Bus bus = mock(Bus.class);
+
         rai.registerBus(bus);
         rai.stop();
-        EasyMock.verify(bus);
+        verify(bus, times(1)).shutdown(true);
     }
 
 

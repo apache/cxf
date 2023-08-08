@@ -34,13 +34,16 @@ import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.handlers.ProxyInvocationHandler;
 import org.apache.hello_world_soap_http.Greeter;
 
-import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
 
@@ -147,11 +150,9 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     @Test
     public void testCloseConnection() throws Exception {
         Connection conn = (Connection)mci.getConnection(subj, cri);
-        EasyMock.reset(mockListener);
-        mockListener.connectionClosed(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(mockListener);
         conn.close();
+
+        verify(mockListener, times(1)).connectionClosed(isA(ConnectionEvent.class));
     }
 
 
@@ -194,7 +195,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
     @Test
     public void testAssociateConnectionThrowsException() throws Throwable {
 
-        InvocationHandler ih = EasyMock.createMock(InvocationHandler.class);
+        InvocationHandler ih = mock(InvocationHandler.class);
 
         Object dodgyHandle = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {Foo.class}, ih);
 

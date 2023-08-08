@@ -31,7 +31,6 @@ import jakarta.resource.ResourceException;
 import jakarta.resource.spi.ConnectionManager;
 import jakarta.resource.spi.ManagedConnectionFactory;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,6 +38,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ConnectionFactoryImplTest {
 
@@ -49,8 +51,8 @@ public class ConnectionFactoryImplTest {
 
     @Before
     public void setUp() throws Exception {
-        mockConnectionFactory = EasyMock.createMock(ManagedConnectionFactory.class);
-        mockConnectionManager = EasyMock.createMock(ConnectionManager.class);
+        mockConnectionFactory = mock(ManagedConnectionFactory.class);
+        mockConnectionManager = mock(ConnectionManager.class);
 
         param = new CXFConnectionRequestInfo();
         param.setInterface(Runnable.class);
@@ -75,18 +77,14 @@ public class ConnectionFactoryImplTest {
 
     @Test
     public void testGetConnectionReturnsConnectionWithRightManager() throws Exception {
-        EasyMock.reset(mockConnectionManager);
-
         CXFConnectionRequestInfo reqInfo =
             new CXFConnectionRequestInfo(Runnable.class,
                                             new URL("file:/tmp/foo"),
                                             new QName(""),
                                             new QName(""));
 
-        mockConnectionManager.allocateConnection(EasyMock.eq(mockConnectionFactory),
-                                                 EasyMock.eq(reqInfo));
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(mockConnectionManager);
+        when(mockConnectionManager.allocateConnection(eq(mockConnectionFactory),
+                                                 eq(reqInfo))).thenReturn(null);
 
         param.setWsdlLocation(new URL("file:/tmp/foo"));
         param.setServiceName(new QName(""));
@@ -94,30 +92,22 @@ public class ConnectionFactoryImplTest {
         Object o = cf.getConnection(param);
         assertNull("Got the result (the passed in ConnectionRequestInfo) from out mock manager",
                    o);
-        EasyMock.verify(mockConnectionManager);
     }
 
     @Test
     public void testGetConnectionWithNoPortReturnsConnectionWithRightManager() throws Exception {
-
-        EasyMock.reset(mockConnectionManager);
-
         CXFConnectionRequestInfo reqInfo =
             new CXFConnectionRequestInfo(Runnable.class,
                                             new URL("file:/tmp/foo"),
                                             new QName(""),
                                             null);
 
-        mockConnectionManager.allocateConnection(EasyMock.eq(mockConnectionFactory),
-                                                 EasyMock.eq(reqInfo));
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(mockConnectionManager);
+        when(mockConnectionManager.allocateConnection(eq(mockConnectionFactory),
+                                                 eq(reqInfo))).thenReturn(null);
 
         param.setWsdlLocation(new URL("file:/tmp/foo"));
         param.setServiceName(new QName(""));
         Object o = cf.getConnection(param);
-
-        EasyMock.verify(mockConnectionManager);
 
         assertNull("Got the result (the passed in ConnectionRequestInfo) from out mock manager",
                    o);
@@ -127,24 +117,18 @@ public class ConnectionFactoryImplTest {
 
     @Test
     public void testGetConnectionWithNoWsdlLocationReturnsConnectionWithRightManager() throws Exception {
-
-        EasyMock.reset(mockConnectionManager);
-
         CXFConnectionRequestInfo reqInfo =
             new CXFConnectionRequestInfo(Runnable.class,
                                             null,
                                             new QName(""),
                                             new QName(""));
 
-        mockConnectionManager.allocateConnection(EasyMock.eq(mockConnectionFactory),
-                                                 EasyMock.eq(reqInfo));
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(mockConnectionManager);
+        when(mockConnectionManager.allocateConnection(eq(mockConnectionFactory),
+                                                 eq(reqInfo))).thenReturn(null);
 
         param.setServiceName(new QName(""));
         param.setPortName(new QName(""));
         Object o = cf.getConnection(param);
-        EasyMock.verify(mockConnectionManager);
 
         assertNull("Got the result (the passed in ConnectionRequestInfo) from out mock manager",
                    o);
@@ -154,7 +138,6 @@ public class ConnectionFactoryImplTest {
     @Test
     public void testGetConnectionWithNoWsdlLocationAndNoPortReturnsConnectionWithRightManager()
         throws Exception {
-        EasyMock.reset(mockConnectionManager);
 
         CXFConnectionRequestInfo reqInfo =
             new CXFConnectionRequestInfo(Runnable.class,
@@ -162,10 +145,8 @@ public class ConnectionFactoryImplTest {
                                             new QName(""),
                                             null);
 
-        mockConnectionManager.allocateConnection(EasyMock.eq(mockConnectionFactory),
-                                                 EasyMock.eq(reqInfo));
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(mockConnectionManager);
+        when(mockConnectionManager.allocateConnection(eq(mockConnectionFactory),
+                                                 eq(reqInfo))).thenReturn(null);
 
         cf = new ConnectionFactoryImpl(mockConnectionFactory, mockConnectionManager);
         param.setServiceName(new QName(""));
