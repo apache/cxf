@@ -22,13 +22,13 @@ package org.apache.cxf.js.rhino;
 
 import org.mozilla.javascript.Scriptable;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class AbstractDOMProviderTest {
@@ -39,14 +39,14 @@ public class AbstractDOMProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        scriptMock = EasyMock.createMock(Scriptable.class);
+        scriptMock = mock(Scriptable.class);
     }
 
     @Test
     public void testNoWsdlLocation() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMMessageProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -56,16 +56,15 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_WSDL_LOCATION, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testNoSvcName() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMPayloadProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -75,18 +74,17 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_SERVICE_NAME, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testNoPortName() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("portName", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("portName", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMMessageProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -96,20 +94,19 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_PORT_NAME, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testNoTgtNamespace() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("portName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("targetNamespace", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("portName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("targetNamespace", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMMessageProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -119,22 +116,21 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_TGT_NAMESPACE, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testNoAddr() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("portName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("targetNamespace", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("EndpointAddress", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("portName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("targetNamespace", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("EndpointAddress", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMPayloadProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -144,26 +140,25 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_EP_ADDR, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testNoInvoke() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("portName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("targetNamespace", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("EndpointAddress", scriptMock))
-            .andReturn(epAddr);
-        EasyMock.expect(scriptMock.get("BindingType", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.expect(scriptMock.get("invoke", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("portName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("targetNamespace", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("EndpointAddress", scriptMock))
+            .thenReturn(epAddr);
+        when(scriptMock.get("BindingType", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+        when(scriptMock.get("invoke", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+
         AbstractDOMProvider adp = new DOMPayloadProvider(scriptMock, scriptMock,
                                                          null, false, false);
         try {
@@ -173,24 +168,23 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.NO_INVOKE, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 
     @Test
     public void testIllegalInvoke() throws Exception {
-        EasyMock.expect(scriptMock.get("wsdlLocation", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("serviceName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("portName", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("targetNamespace", scriptMock))
-            .andReturn("found");
-        EasyMock.expect(scriptMock.get("BindingType", scriptMock))
-            .andReturn(Scriptable.NOT_FOUND);
-        EasyMock.expect(scriptMock.get("invoke", scriptMock))
-            .andReturn("string");
-        EasyMock.replay(scriptMock);
+        when(scriptMock.get("wsdlLocation", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("serviceName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("portName", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("targetNamespace", scriptMock))
+            .thenReturn("found");
+        when(scriptMock.get("BindingType", scriptMock))
+            .thenReturn(Scriptable.NOT_FOUND);
+        when(scriptMock.get("invoke", scriptMock))
+            .thenReturn("string");
+
         AbstractDOMProvider adp = new DOMMessageProvider(scriptMock, scriptMock,
                                                          epAddr, true, true);
         try {
@@ -200,6 +194,5 @@ public class AbstractDOMProviderTest {
             assertEquals("wrong exception message",
                          AbstractDOMProvider.ILLEGAL_INVOKE_TYPE, ex.getMessage());
         }
-        EasyMock.verify(scriptMock);
     }
 }
