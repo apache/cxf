@@ -53,7 +53,7 @@ public class SpringJaxrsComponentScanningTest {
         // not JAX-RS Features/@Provider.
         assertThat(scanner.getFeatures())
                 .hasSize(3)
-                .hasOnlyElementsOfTypes(ObservationFeature.class, OpenApiFeature.class, OpenApiFeature.class, JAXRSBeanValidationFeature.class);
+                .hasOnlyElementsOfTypes(ObservationFeature.class, OpenApiFeature.class, JAXRSBeanValidationFeature.class);
 
         assertThat(scanner.getOutInterceptors()).isEmpty();
         assertThat(scanner.getInInterceptors()).isEmpty();
