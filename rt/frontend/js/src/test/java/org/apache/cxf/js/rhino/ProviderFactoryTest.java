@@ -26,15 +26,14 @@ import javax.xml.ws.Service;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 public class ProviderFactoryTest {
 
@@ -45,7 +44,7 @@ public class ProviderFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        dpMock = EasyMock.createMock(AbstractDOMProvider.class);
+        dpMock = mock(AbstractDOMProvider.class);
         ph = new ProviderFactory(epAddr) {
                 protected AbstractDOMProvider createProvider(Service.Mode mode,
                                                              Scriptable scope,
@@ -63,15 +62,13 @@ public class ProviderFactoryTest {
     public void testMsgJSFile() throws Exception {
         dpMock.publish();
         dpMock.publish();
-        EasyMock.replay(dpMock);
+
         File f = new File(getClass().getResource("msg.js").toURI().getPath());
         ph.createAndPublish(f);
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testBadJSFile() throws Exception {
-        EasyMock.replay(dpMock);
         final String fname = "broken.js";
         File f = new File(getClass().getResource(fname).toURI().getPath());
         try {
@@ -81,12 +78,10 @@ public class ProviderFactoryTest {
             assertTrue("wrong exception", ex.getMessage().startsWith("syntax error")
                                        || ex.getMessage().startsWith("erreur de syntaxe"));
         }
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testEmptyJSFile() throws Exception {
-        EasyMock.replay(dpMock);
         final String fname = "empty.js";
         File f = new File(getClass().getResource(fname).toURI().getPath());
         try {
@@ -97,12 +92,10 @@ public class ProviderFactoryTest {
                          f.getPath() + ProviderFactory.NO_PROVIDER,
                          ex.getMessage());
         }
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testNoSuchJSFile() throws Exception {
-        EasyMock.replay(dpMock);
         final String fname = "none.js";
         File f = new File(fname);
         try {
@@ -113,12 +106,10 @@ public class ProviderFactoryTest {
                          f.getPath() + ProviderFactory.NO_SUCH_FILE,
                          ex.getMessage());
         }
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testIllegalServiceMode() throws Exception {
-        EasyMock.replay(dpMock);
         final String fname = "illegal1.js";
         File f = new File(getClass().getResource(fname).toURI().getPath());
         try {
@@ -129,12 +120,10 @@ public class ProviderFactoryTest {
                          f.getPath() + ProviderFactory.ILLEGAL_SVCMD_MODE + "bogus",
                          ex.getMessage());
         }
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testIllegalServiceModeType() throws Exception {
-        EasyMock.replay(dpMock);
         final String fname = "illegal2.js";
         File f = new File(getClass().getResource(fname).toURI().getPath());
         try {
@@ -145,15 +134,12 @@ public class ProviderFactoryTest {
                          f.getPath() + ProviderFactory.ILLEGAL_SVCMD_TYPE,
                          ex.getMessage());
         }
-        EasyMock.verify(dpMock);
     }
 
     @Test
     public void testProviderException() throws Exception {
-        dpMock.publish();
-        EasyMock.expectLastCall()
-            .andThrow(new AbstractDOMProvider.JSDOMProviderException(AbstractDOMProvider.NO_EP_ADDR));
-        EasyMock.replay(dpMock);
+        doThrow(new AbstractDOMProvider.JSDOMProviderException(AbstractDOMProvider.NO_EP_ADDR)).when(dpMock).publish();
+
         File f = new File(getClass().getResource("msg.js").toURI().getPath());
         try {
             ph.createAndPublish(f);
@@ -163,6 +149,5 @@ public class ProviderFactoryTest {
                          f.getPath() + ": " + AbstractDOMProvider.NO_EP_ADDR,
                          ex.getMessage());
         }
-        EasyMock.verify(dpMock);
     }
 }

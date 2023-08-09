@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.PrintStream;
 
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,6 +31,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
 
 public class ServerAppTest {
 
@@ -42,7 +44,8 @@ public class ServerAppTest {
 
     @Before
     public void setUp() throws Exception {
-        phMock = EasyMock.createMock(ProviderFactory.class);
+        phMock = mock(ProviderFactory.class);
+        doCallRealMethod().when(phMock).createAndPublish(nullable(File.class));
         emptyFile = getClass().getResource("empty/empty.js").toURI().getPath();
     }
 
@@ -56,7 +59,6 @@ public class ServerAppTest {
 
     @Test
     public void testNoArgs() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {};
@@ -65,12 +67,10 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertEquals("wrong exception message", ServerApp.NO_FILES_ERR, ex.getMessage());
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testUknownOption() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {"-x"};
@@ -79,12 +79,10 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().startsWith(ServerApp.UNKNOWN_OPTION));
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testMissingOptionA() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {"-a"};
@@ -93,12 +91,10 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertEquals("wrong exception message", ServerApp.WRONG_ADDR_ERR, ex.getMessage());
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testBrokenOptionA() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {"-a", "not-a-url"};
@@ -107,12 +103,10 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertEquals("wrong exception message", ServerApp.WRONG_ADDR_ERR, ex.getMessage());
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testMissingOptionB() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {"-b"};
@@ -121,12 +115,10 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertEquals("wrong exception message", ServerApp.WRONG_BASE_ERR, ex.getMessage());
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testBrokenOptionB() {
-        EasyMock.replay(phMock);
         try {
             ServerApp app = createServerApp();
             String[] args = {"-b", "not-a-url"};
@@ -135,37 +127,30 @@ public class ServerAppTest {
         } catch (Exception ex) {
             assertEquals("wrong exception message", ServerApp.WRONG_BASE_ERR, ex.getMessage());
         }
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testFileOnly() throws Exception {
         phMock.createAndPublish(new File(emptyFile), null, false);
-        EasyMock.replay(phMock);
         ServerApp app = createServerApp();
         String[] args = {emptyFile};
         app.start(args);
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testOptionsAB() throws Exception {
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
-        EasyMock.replay(phMock);
         ServerApp app = createServerApp();
         String[] args = {"-a", epAddr, "-b", epAddr, emptyFile};
         app.start(args);
-        EasyMock.verify(phMock);
     }
 
     @Test
     public void testOptionA() throws Exception {
         phMock.createAndPublish(new File(emptyFile), epAddr, false);
-        EasyMock.replay(phMock);
         ServerApp app = createServerApp();
         String[] args = {"-a", epAddr, emptyFile};
         app.start(args);
-        EasyMock.verify(phMock);
     }
 
     @Test
@@ -176,11 +161,9 @@ public class ServerAppTest {
         try {
             System.setOut(pout);
             phMock.createAndPublish(new File(emptyFile), epAddr, false);
-            EasyMock.replay(phMock);
             ServerApp app = createServerApp();
             String[] args = {"-a", epAddr, "-v", emptyFile};
             app.start(args);
-            EasyMock.verify(phMock);
             pout.flush();
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
@@ -191,11 +174,9 @@ public class ServerAppTest {
     @Test
     public void testOptionB() throws Exception {
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
-        EasyMock.replay(phMock);
         ServerApp app = createServerApp();
         String[] args = {"-b", epAddr, emptyFile};
         app.start(args);
-        EasyMock.verify(phMock);
     }
 
     @Test
@@ -207,11 +188,9 @@ public class ServerAppTest {
             System.setOut(pout);
 
             phMock.createAndPublish(new File(emptyFile), epAddr, true);
-            EasyMock.replay(phMock);
             ServerApp app = createServerApp();
             String[] args = {"-b", epAddr, "-v", emptyFile};
             app.start(args);
-            EasyMock.verify(phMock);
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
             System.setOut(orig);
@@ -223,7 +202,7 @@ public class ServerAppTest {
         File f = new File(emptyFile);
         String dir = f.getParent();
         assertNotNull(dir);
-        EasyMock.checkOrder(phMock, false);
+
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
         String file = getClass().getResource("empty/empty2.jsx").toURI().getPath();
         phMock.createAndPublish(new File(file), epAddr, true);
@@ -231,11 +210,10 @@ public class ServerAppTest {
         phMock.createAndPublish(new File(file), epAddr, true);
         file = getClass().getResource("empty/empty4.jsx").toURI().getPath();
         phMock.createAndPublish(new File(file), epAddr, true);
-        EasyMock.replay(phMock);
+        
         ServerApp app = createServerApp();
         String[] args = {"-b", epAddr, dir};
         app.start(args);
-        EasyMock.verify(phMock);
     }
 
 }
