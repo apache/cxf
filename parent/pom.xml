@@ -235,7 +235,6 @@
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.jakarta.wss4j.version>3.0.1</cxf.jakarta.wss4j.version>
-        <cxf.xerces.version>2.12.2</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
 
@@ -271,7 +270,6 @@
         <cxf.servicemix.specs.jaxb.version>2.3_2</cxf.servicemix.specs.jaxb.version>
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
-        <cxf.xerces.bundle.version>2.12.2_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.2.0</cxf.awaitility.version>
@@ -1756,17 +1754,6 @@
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${cxf.jaxen.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${cxf.xerces.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <!-- if we use the new woodstox artifact, we're using the new version -->
             <dependency>
