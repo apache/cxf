@@ -206,17 +206,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         HttpClient cl = client;
         if (cl == null) {
             int ctimeout = determineConnectionTimeout(message, csPolicy);        
-            ProxySelector ps = new ProxySelector() {
-                public List<Proxy> select(URI uri) {
-                    Proxy proxy = proxyFactory.createProxy(csPolicy, uri);
-                    if (proxy !=  null) {
-                        return Arrays.asList(proxy);
-                    }
-                    return ProxySelector.getDefault().select(uri);
-                }
-                public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-                }
-            };
+            ProxySelector ps = new ProxyFactoryProxySelector(proxyFactory, csPolicy);
             
             HttpClient.Builder cb = HttpClient.newBuilder()
                 .proxy(ps)
@@ -308,6 +298,34 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                                                  getConduitName());
     }
 
+
+    /**
+     * This class <i>must</i> be static so it doesn't capture a reference to {@code HttpClientHTTPConduit.this} and
+     * through that to {@link HttpClientHTTPConduit#client}. Otherwise the client can never be garbage collected, which
+     * means that the companion "SelectorManager" thread keeps running indefinitely (see CXF-8885).
+     */
+    private static final class ProxyFactoryProxySelector extends ProxySelector {
+        private final ProxyFactory proxyFactory;
+        private final HTTPClientPolicy csPolicy;
+
+        ProxyFactoryProxySelector(ProxyFactory proxyFactory, HTTPClientPolicy csPolicy) {
+            this.proxyFactory = proxyFactory;
+            this.csPolicy = csPolicy;
+        }
+
+        @Override
+        public List<Proxy> select(URI uri) {
+            Proxy proxy = proxyFactory.createProxy(csPolicy, uri);
+            if (proxy !=  null) {
+                return Arrays.asList(proxy);
+            }
+            return ProxySelector.getDefault().select(uri);
+        }
+
+        @Override
+        public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
+        }
+    }
 
     class HttpClientWrappedOutputStream extends WrappedOutputStream {
         List<Flow.Subscriber<? super ByteBuffer>> subscribers = new LinkedList<>();
