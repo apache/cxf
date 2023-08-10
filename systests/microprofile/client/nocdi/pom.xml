@@ -139,7 +139,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
+            <groupId>org.wiremock</groupId>
             <artifactId>wiremock</artifactId>
             <version>${cxf.wiremock.version}</version>
             <scope>test</scope>
