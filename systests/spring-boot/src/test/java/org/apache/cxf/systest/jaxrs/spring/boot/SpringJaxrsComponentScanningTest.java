@@ -22,7 +22,6 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.spring.AbstractSpringComponentScanServer;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
-import org.apache.cxf.tracing.micrometer.ObservationFeature;
 import org.apache.cxf.systest.jaxrs.resources.Library;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -52,8 +51,8 @@ public class SpringJaxrsComponentScanningTest {
         // The component scanner only looks for CXF's @Provider annotations, 
         // not JAX-RS Features/@Provider.
         assertThat(scanner.getFeatures())
-                .hasSize(3)
-                .hasOnlyElementsOfTypes(ObservationFeature.class, OpenApiFeature.class, JAXRSBeanValidationFeature.class);
+                .hasSize(2)
+                .hasOnlyElementsOfTypes(OpenApiFeature.class, JAXRSBeanValidationFeature.class);
 
         assertThat(scanner.getOutInterceptors()).isEmpty();
         assertThat(scanner.getInInterceptors()).isEmpty();

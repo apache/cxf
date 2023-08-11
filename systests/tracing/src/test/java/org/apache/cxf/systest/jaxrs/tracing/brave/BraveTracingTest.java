@@ -18,32 +18,61 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.brave;
 
-import static org.junit.Assert.assertTrue;
-
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.tracing.brave.BraveClientFeature;
-import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
-import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
-import org.junit.BeforeClass;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import brave.Tracing;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.systest.brave.AbstractBraveTracingTest;
+import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.jaxrs.tracing.BookStore;
+import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
+import org.apache.cxf.testutil.common.AbstractTestServerBase;
+import org.apache.cxf.tracing.brave.BraveClientFeature;
+import org.apache.cxf.tracing.brave.TraceScope;
+import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
+import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
+
+import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertTrue;
 
 public class BraveTracingTest extends AbstractBraveTracingTest {
+    public static final String PORT = allocatePort(BraveTracingTest.class);
+
+    public static class BraveServer extends AbstractTestServerBase {
+        private org.apache.cxf.endpoint.Server server;
+
+        @Override
+        protected void run() {
+            final Tracing brave = Tracing
+                    .newBuilder()
+                    .spanReporter(new TestSpanReporter())
+                    .build();
+
+            final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+            sf.setResourceClasses(BookStore.class);
+            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
+            sf.setAddress("http://localhost:" + PORT);
+            sf.setProvider(new JacksonJsonProvider());
+            sf.setProvider(new BraveFeature(brave));
+            sf.setProvider(new NullPointerExceptionMapper());
+            server = sf.create();
+        }
+
+        @Override
+        public void tearDown() throws Exception {
+            server.destroy();
+        }
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly",
-                   launchServer(JustBraveServer.class, true));
-    }
-
-    public static class JustBraveServer extends BraveServer {
-
-        @Override
-        Object getProvider(Tracing tracing) {
-            return new BraveFeature(tracing);
-        }
+                   launchServer(BraveServer.class, true));
     }
 
     @Override
@@ -54,5 +83,10 @@ public class BraveTracingTest extends AbstractBraveTracingTest {
     @Override
     protected BraveClientFeature getClientFeature(Tracing brave) {
         return new BraveClientFeature(brave);
+    }
+    
+    @Override
+    protected int getPort() {
+        return Integer.parseInt(PORT);
     }
 }

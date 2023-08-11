@@ -23,32 +23,18 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import brave.sampler.Sampler;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.tck.MeterRegistryAssert;
-import io.micrometer.tracing.Span.Kind;
-import io.micrometer.tracing.brave.bridge.CompositeSpanHandler;
-import io.micrometer.tracing.exporter.FinishedSpan;
-import io.micrometer.tracing.exporter.SpanExportingPredicate;
-import io.micrometer.tracing.exporter.SpanFilter;
-import io.micrometer.tracing.exporter.SpanReporter;
-import io.micrometer.tracing.test.simple.SpanAssert;
-import io.micrometer.tracing.test.simple.SpansAssert;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Endpoint;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.Service.Mode;
 import jakarta.xml.ws.WebServiceException;
-import jakarta.xml.ws.WebServiceFeature;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -59,13 +45,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.jaxws.resources.HelloService;
 import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
-import org.apache.cxf.tracing.micrometer.ObservationFeature;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.web.servlet.WebMvcObservationAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.system.CapturedOutput;
@@ -97,10 +78,8 @@ import static org.hamcrest.Matchers.empty;
         classes = SpringJaxwsTest.TestConfig.class,
         properties = {
             "cxf.metrics.server.max-uri-tags=2"
-        }
-)
+        })
 @ActiveProfiles("jaxws")
-@AutoConfigureObservability
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
@@ -112,25 +91,14 @@ public class SpringJaxwsTest {
 
     @Autowired
     private MeterRegistry registry;
-
+    
     @Autowired
     private MetricsProvider metricsProvider;
-
-    @Autowired
-    private ObjectProvider<ObservationFeature> observationFeature;
-
-    @Autowired
-    private ObjectProvider<ObservationClientFeature> observationClientFeature;
-
-    @Autowired
-    private ArrayListSpanReporter arrayListSpanReporter;
 
     @LocalServerPort
     private int port;
 
-    // We're excluding the autoconfig because we don't want to have HTTP related spans
-    // only RPC related ones
-    @EnableAutoConfiguration(exclude = WebMvcObservationAutoConfiguration.class)
+    @EnableAutoConfiguration
     static class TestConfig {
         @Autowired
         private Bus bus;
@@ -138,13 +106,10 @@ public class SpringJaxwsTest {
         @Autowired
         private MetricsProvider metricsProvider;
 
-        @Autowired
-        private ObjectProvider<ObservationFeature> observationFeature;
-
         @Bean
         public Endpoint helloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
-                new MetricsFeature(metricsProvider), observationFeature.getObject()
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
+                new MetricsFeature(metricsProvider)
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V1);
             return endpoint;
@@ -152,8 +117,8 @@ public class SpringJaxwsTest {
 
         @Bean
         public Endpoint secondHelloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
-                new MetricsFeature(metricsProvider), observationFeature.getObject()
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
+                new MetricsFeature(metricsProvider)
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V2);
             return endpoint;
@@ -161,47 +126,17 @@ public class SpringJaxwsTest {
 
         @Bean
         public Endpoint thirdHelloEndpoint() {
-            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new WebServiceFeature[]{
-                new MetricsFeature(metricsProvider), observationFeature.getObject()
+            EndpointImpl endpoint = new EndpointImpl(bus, new HelloServiceImpl(), null, null, new MetricsFeature[]{
+                new MetricsFeature(metricsProvider)
             });
             endpoint.publish("/" + HELLO_SERVICE_NAME_V3);
             return endpoint;
-        }
-
-        @Bean
-        Sampler sampler() {
-            return Sampler.ALWAYS_SAMPLE;
-        }
-
-        @Bean
-        ArrayListSpanReporter arrayListSpanReporter() {
-            return new ArrayListSpanReporter();
-        }
-    }
-
-    static class ArrayListSpanReporter implements SpanReporter {
-
-        private final List<FinishedSpan> spans = new ArrayList<>();
-
-        @Override
-        public void report(FinishedSpan span) {
-            spans.add(span);
-        }
-
-        public List<FinishedSpan> getSpans() {
-            return spans;
-        }
-
-        @Override
-        public void close() {
-            spans.clear();
         }
     }
 
     @AfterEach
     public void clear() {
         registry.clear();
-        arrayListSpanReporter.close();
     }
 
     @Test
@@ -235,7 +170,7 @@ public class SpringJaxwsTest {
                 entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
-
+        
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
         Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
@@ -250,39 +185,6 @@ public class SpringJaxwsTest {
                 entry("uri", "http://localhost:" + port + "/Service/" + HELLO_SERVICE_NAME_V1),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
-
-        // RPC Send, RPC Receive
-        assertThat(arrayListSpanReporter.getSpans()).hasSize(2);
-
-        // Micrometer Observation with Micrometer Tracing
-        SpansAssert.assertThat(arrayListSpanReporter.getSpans())
-                   .haveSameTraceId()
-                   .hasASpanWithName("HelloService/Invoke", spanAssert -> {
-                       spanAssert.hasKindEqualTo(Kind.CLIENT)
-                                 .hasTag("rpc.method", "Invoke")
-                                 .hasTag("rpc.service", "HelloService")
-                                 .hasTag("rpc.system", "cxf")
-                                 .hasTagWithKey("server.address")
-                                 .hasTagWithKey("server.port")
-                                 .isStarted()
-                                 .isEnded();
-                   })
-                   .hasASpanWithName("HelloService/sayHello", spanAssert -> {
-                       spanAssert.hasKindEqualTo(Kind.SERVER)
-                                 .hasTag("rpc.method", "sayHello")
-                                 .hasTag("rpc.service", "HelloService")
-                                 .hasTag("rpc.system", "cxf")
-                                 .hasTagWithKey("server.address")
-                                 .hasTagWithKey("server.port")
-                                 .isStarted()
-                                 .isEnded();
-                   });
-
-        // Micrometer Observation with Micrometer Core
-        MeterRegistryAssert.assertThat(registry)
-                .hasTimerWithNameAndTags("rpc.client.duration", Tags.of("error", "none", "rpc.method", "Invoke", "rpc.service", "HelloService", "rpc.system", "cxf", "server.address", "localhost", "server.port", String.valueOf(port)))
-                .hasTimerWithNameAndTags("rpc.server.duration", Tags.of("error", "none", "rpc.method", "sayHello", "rpc.service", "HelloService", "rpc.system", "cxf", "server.address", "localhost", "server.port", String.valueOf(port)));
-
     }
 
     @Test
@@ -317,7 +219,7 @@ public class SpringJaxwsTest {
                 entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
-
+        
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
         Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
@@ -364,7 +266,7 @@ public class SpringJaxwsTest {
 
     @Test
     public void testJaxwsProxySuccessMetric() throws MalformedURLException {
-        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1);
+        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
         assertThat(api.sayHello("Elan")).isEqualTo("Hello, Elan");
 
         await()
@@ -385,7 +287,7 @@ public class SpringJaxwsTest {
                 entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
-
+        
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
         Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
@@ -401,10 +303,10 @@ public class SpringJaxwsTest {
                 entry("outcome", "SUCCESS"),
                 entry("status", "200"));
     }
-
+    
     @Test
     public void testJaxwsProxyFailedMetric() {
-        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1);
+        final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
 
         // then
         assertThatThrownBy(() -> api.sayHello(null))
@@ -429,7 +331,7 @@ public class SpringJaxwsTest {
                 entry("uri", "/Service/" + HELLO_SERVICE_NAME_V1),
                 entry("outcome", "SERVER_ERROR"),
                 entry("status", "500"));
-
+        
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
         Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
@@ -449,8 +351,8 @@ public class SpringJaxwsTest {
     @Test
     public void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
         final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
-        final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1);
-
+        final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1); 
+        
         assertThatThrownBy(() -> api.sayHello("Elan"))
             .isInstanceOf(WebServiceException.class)
             .hasMessageContaining("Could not send Message");
@@ -458,7 +360,7 @@ public class SpringJaxwsTest {
         // no server meters
         assertThat(registry.getMeters())
             .noneMatch(m -> "cxf.server.requests".equals(m.getId().getName()));
-
+        
         RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
 
         Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
@@ -474,11 +376,11 @@ public class SpringJaxwsTest {
                 entry("outcome", "UNKNOWN"),
                 entry("status", "UNKNOWN"));
     }
-
+    
     private HelloService createApi(final int portToUse, final String serviceName) {
         final JaxWsProxyFactoryBean  factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(HelloService.class);
-        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider), observationFeature.getObject()));
+        factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
         factory.setAddress("http://localhost:" + portToUse + "/Service/" + serviceName);
         return factory.create(HelloService.class);
     }
@@ -488,7 +390,7 @@ public class SpringJaxwsTest {
 
         StreamSource source = new StreamSource(new StringReader(requestBody));
         Service service = Service.create(new URL(address + "?wsdl"),
-                new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider), observationClientFeature.getObject());
+                new QName("http://service.ws.sample/", "HelloService"), new MetricsFeature(metricsProvider));
         Dispatch<Source> dispatch = service.createDispatch(new QName("http://service.ws.sample/", "HelloPort"),
             Source.class, Mode.PAYLOAD);
 
