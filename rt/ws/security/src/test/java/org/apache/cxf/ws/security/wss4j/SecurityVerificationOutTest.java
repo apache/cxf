@@ -31,59 +31,43 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.policy.interceptors.SecurityVerificationOutInterceptor;
 import org.apache.neethi.Policy;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class SecurityVerificationOutTest extends AbstractPolicySecurityTest {
-    private IMocksControl control;
-
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test(expected = PolicyException.class)
     public void testEncryptedPartsNoBinding() throws Exception {
         SoapMessage message = coachMessage("encrypted_parts_missing_binding.xml");
-        control.replay();
         SecurityVerificationOutInterceptor.INSTANCE.handleMessage(message);
-        control.verify();
     }
 
     @Test(expected = PolicyException.class)
     public void testSignedPartsNoBinding() throws Exception {
         SoapMessage message = coachMessage("signed_parts_missing_binding.xml");
-        control.replay();
         SecurityVerificationOutInterceptor.INSTANCE.handleMessage(message);
-        control.verify();
     }
 
     @Test
     public void testEncryptedPartsOK() throws Exception {
         SoapMessage message = coachMessage("encrypted_parts_policy_body.xml");
-        control.replay();
         SecurityVerificationOutInterceptor.INSTANCE.handleMessage(message);
-        control.verify();
     }
 
     @Test
     public void testSignedPartsOK() throws Exception {
         SoapMessage message = coachMessage("signed_parts_policy_body.xml");
-        control.replay();
         SecurityVerificationOutInterceptor.INSTANCE.handleMessage(message);
-        control.verify();
     }
 
     private SoapMessage coachMessage(String policyName)
         throws IOException, ParserConfigurationException, SAXException {
         Policy policy = policyBuilder.getPolicy(this.getResourceAsStream(policyName));
         AssertionInfoMap aim = new AssertionInfoMap(policy);
-        SoapMessage message = control.createMock(SoapMessage.class);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        SoapMessage message = mock(SoapMessage.class);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
         return message;
     }
 }

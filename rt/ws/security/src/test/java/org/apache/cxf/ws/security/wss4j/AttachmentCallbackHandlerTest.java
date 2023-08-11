@@ -32,12 +32,14 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.dom.engine.WSSConfig;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AttachmentCallbackHandlerTest {
 
@@ -61,12 +63,10 @@ public class AttachmentCallbackHandlerTest {
         Attachment attachment = new AttachmentImpl(attachmentId);
 
         // Mock up a DataHandler for the Attachment
-        DataHandler dataHandler = EasyMock.mock(DataHandler.class);
-        dataHandler.setCommandMap(anyObject(CommandMap.class));
-        EasyMock.expectLastCall();
-        EasyMock.expect(dataHandler.getInputStream()).andReturn(null);
-        EasyMock.expect(dataHandler.getContentType()).andReturn(null);
-        EasyMock.replay(dataHandler);
+        DataHandler dataHandler = mock(DataHandler.class);
+        doCallRealMethod().when(dataHandler).setCommandMap(any(CommandMap.class));
+        when(dataHandler.getInputStream()).thenReturn(null);
+        when(dataHandler.getContentType()).thenReturn(null);
 
         ((AttachmentImpl)attachment).setDataHandler(dataHandler);
         AttachmentCallbackHandler callbackHandler =
@@ -81,7 +81,6 @@ public class AttachmentCallbackHandlerTest {
         List<org.apache.wss4j.common.ext.Attachment> attachments = attachmentRequestCallback.getAttachments();
         assertNotNull(attachments);
         assertEquals(1, attachments.size());
-        EasyMock.verify(dataHandler);
     }
 
 }
