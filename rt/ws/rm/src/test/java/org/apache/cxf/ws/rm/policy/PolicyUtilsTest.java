@@ -34,9 +34,6 @@ import org.apache.cxf.ws.rmp.v200502.RMAssertion.BaseRetransmissionInterval;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.ExponentialBackoff;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,19 +41,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class PolicyUtilsTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testRMAssertionEquals() {
         RMAssertion a = new RMAssertion();
@@ -131,22 +122,16 @@ public class PolicyUtilsTest {
         cfg.setBaseRetransmissionInterval(Long.valueOf(3000));
         cfg.setExponentialBackoff(true);
 
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        control.replay();
+        Message message = mock(Message.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(null);
         assertSame(cfg, RMPolicyUtilities.getRMConfiguration(cfg, message));
-        control.verify();
 
-        control.reset();
-        AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        AssertionInfoMap aim = mock(AssertionInfoMap.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
         Collection<AssertionInfo> ais = new ArrayList<>();
-        EasyMock.expect(aim.get(RM10Constants.RMASSERTION_QNAME)).andReturn(ais);
-        control.replay();
+        when(aim.get(RM10Constants.RMASSERTION_QNAME)).thenReturn(ais);
         assertSame(cfg, RMPolicyUtilities.getRMConfiguration(cfg, message));
-        control.verify();
 
-        control.reset();
         RMAssertion b = new RMAssertion();
         BaseRetransmissionInterval bbri = new RMAssertion.BaseRetransmissionInterval();
         bbri.setMilliseconds(Long.valueOf(2000));
@@ -156,15 +141,14 @@ public class PolicyUtilsTest {
         assertion.setData(b);
         AssertionInfo ai = new AssertionInfo(assertion);
         ais.add(ai);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
-        EasyMock.expect(aim.get(RM10Constants.RMASSERTION_QNAME)).andReturn(ais);
-        control.replay();
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
+        when(aim.get(RM10Constants.RMASSERTION_QNAME)).thenReturn(ais);
+
         RMConfiguration cfg1 = RMPolicyUtilities.getRMConfiguration(cfg, message);
         assertNull(cfg1.getAcknowledgementInterval());
         assertNull(cfg1.getInactivityTimeout());
         assertEquals(2000L, cfg1.getBaseRetransmissionInterval().longValue());
         assertTrue(cfg1.isExponentialBackoff());
-        control.verify();
     }
 
 }

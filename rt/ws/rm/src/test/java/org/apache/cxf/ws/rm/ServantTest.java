@@ -46,16 +46,14 @@ import org.apache.cxf.ws.rm.v200502.TerminateSequenceType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -70,31 +68,16 @@ public class ServantTest {
     private static final Duration DURATION_VERY_SHORT = DatatypeFactory.createDuration("PT2S");
     private static final Duration DURATION_DEFAULT = DatatypeFactory.createDuration("P0Y0M0DT0H0M0.0S");
 
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
-
     @Test
     public void testCreateSequence() throws SequenceFault {
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         RMManager manager = new RMManager();
         Destination destination = new Destination(rme);
         SequenceIdentifierGenerator generator = manager.new DefaultSequenceIdentifierGenerator();
         manager.setIdGenerator(generator);
 
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-
-        control.replay();
+        when(rme.getDestination()).thenReturn(destination);
+        when(rme.getManager()).thenReturn(manager);
 
         Servant servant = new Servant(rme);
 
@@ -226,20 +209,18 @@ public class ServantTest {
 
     @Test
     public void testTerminateSequence() throws SequenceFault {
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         RMManager manager = new RMManager();
         Destination destination = new Destination(rme);
         Source source = new Source(rme);
-        DestinationSequence seq = control.createMock(DestinationSequence.class);
+        DestinationSequence seq = mock(DestinationSequence.class);
         org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
         sid.setValue("123");
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
+        when(seq.getIdentifier()).thenReturn(sid);
 
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-
-        control.replay();
+        when(rme.getDestination()).thenReturn(destination);
+        when(rme.getManager()).thenReturn(manager);
+        when(rme.getSource()).thenReturn(source);
 
         Servant servant = new Servant(rme);
 
@@ -343,27 +324,25 @@ public class ServantTest {
 
     @Test
     public void testInvokeForCloseSequence() {
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         RMManager manager = new RMManager();
         Destination destination = new Destination(rme);
         Source source = new Source(rme);
-        DestinationSequence seq = control.createMock(DestinationSequence.class);
+        DestinationSequence seq = mock(DestinationSequence.class);
         org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
         sid.setValue("123");
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
+        when(seq.getIdentifier()).thenReturn(sid);
 
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
+        when(rme.getDestination()).thenReturn(destination);
+        when(rme.getManager()).thenReturn(manager);
+        when(rme.getSource()).thenReturn(source);
         Message message = createTestCloseSequenceMessage(sid.getValue());
 
-        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        OperationInfo oi = control.createMock(OperationInfo.class);
-        EasyMock.expect(boi.getOperationInfo()).andReturn(oi).anyTimes();
-        EasyMock.expect(oi.getName()).andReturn(RM11Constants.INSTANCE.getCloseSequenceOperationName()).anyTimes();
+        BindingOperationInfo boi = mock(BindingOperationInfo.class);
+        OperationInfo oi = mock(OperationInfo.class);
+        when(boi.getOperationInfo()).thenReturn(oi);
+        when(oi.getName()).thenReturn(RM11Constants.INSTANCE.getCloseSequenceOperationName());
         message.getExchange().put(BindingOperationInfo.class, boi);
-
-        control.replay();
 
         TestServant servant = new TestServant(rme);
 

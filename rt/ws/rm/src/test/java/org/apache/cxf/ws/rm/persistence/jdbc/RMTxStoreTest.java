@@ -28,13 +28,14 @@ import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
-import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -70,14 +71,14 @@ public class RMTxStoreTest extends RMTxStoreTestBase {
         long ird = store.getInitialReconnectDelay();
         store.setInitialReconnectDelay(100);
 
-        SourceSequence seq = control.createMock(SourceSequence.class);
+        SourceSequence seq = mock(SourceSequence.class);
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
         sid1.setValue("sequence1");
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
-        EasyMock.expect(seq.getExpires()).andReturn(null);
-        EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
-        EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
-        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
+        when(seq.getIdentifier()).thenReturn(sid1);
+        when(seq.getExpires()).thenReturn(null);
+        when(seq.getOfferingSequenceIdentifier()).thenReturn(null);
+        when(seq.getEndpointIdentifier()).thenReturn(CLIENT_ENDPOINT_ID);
+        when(seq.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
 
         // intentionally invalidate the connection
         try {
@@ -86,7 +87,6 @@ public class RMTxStoreTest extends RMTxStoreTestBase {
             // ignore
         }
 
-        control.replay();
         try {
             store.createSourceSequence(seq);
             fail("Expected RMStoreException was not thrown.");
@@ -99,16 +99,13 @@ public class RMTxStoreTest extends RMTxStoreTestBase {
         // wait 200 msecs to make sure an reconnect is attempted
         Thread.sleep(200);
 
-        control.reset();
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
-        EasyMock.expect(seq.getExpires()).andReturn(null);
-        EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
-        EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
-        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
+        when(seq.getIdentifier()).thenReturn(sid1);
+        when(seq.getExpires()).thenReturn(null);
+        when(seq.getOfferingSequenceIdentifier()).thenReturn(null);
+        when(seq.getEndpointIdentifier()).thenReturn(CLIENT_ENDPOINT_ID);
+        when(seq.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
 
-        control.replay();
         store.createSourceSequence(seq);
-        control.verify();
 
         // revert to the old initial reconnect delay
         store.setInitialReconnectDelay(ird);
