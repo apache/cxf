@@ -303,19 +303,34 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * This class <i>must</i> be static so it doesn't capture a reference to {@code HttpClientHTTPConduit.this} and
      * through that to {@link HttpClientHTTPConduit#client}. Otherwise the client can never be garbage collected, which
      * means that the companion "SelectorManager" thread keeps running indefinitely (see CXF-8885).
+     * <p>
+     * The {@link HTTPClientPolicy} must be copied here because its property change listeners can still have hard
+     * references to the {@code HttpClientHTTPConduit}.
      */
     private static final class ProxyFactoryProxySelector extends ProxySelector {
         private final ProxyFactory proxyFactory;
-        private final HTTPClientPolicy csPolicy;
+        private final HTTPClientPolicy clientPolicy;
 
         ProxyFactoryProxySelector(ProxyFactory proxyFactory, HTTPClientPolicy csPolicy) {
             this.proxyFactory = proxyFactory;
-            this.csPolicy = csPolicy;
+            this.clientPolicy = new HTTPClientPolicy();
+            if (csPolicy.isSetProxyServerType()) {
+                clientPolicy.setProxyServerType(csPolicy.getProxyServerType());
+            }
+            if (csPolicy.isSetProxyServer()) {
+                clientPolicy.setProxyServer(csPolicy.getProxyServer());
+            }
+            if (csPolicy.isSetProxyServerPort()) {
+                clientPolicy.setProxyServerPort(csPolicy.getProxyServerPort());
+            }
+            if (csPolicy.isSetNonProxyHosts()) {
+                clientPolicy.setNonProxyHosts(csPolicy.getNonProxyHosts());
+            }
         }
 
         @Override
         public List<Proxy> select(URI uri) {
-            Proxy proxy = proxyFactory.createProxy(csPolicy, uri);
+            Proxy proxy = proxyFactory.createProxy(clientPolicy, uri);
             if (proxy !=  null) {
                 return Arrays.asList(proxy);
             }
