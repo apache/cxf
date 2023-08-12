@@ -26,13 +26,13 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import brave.sampler.Sampler;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.systest.ArrayListSpanReporter;
 import org.apache.cxf.systest.jaxrs.resources.Library;
-import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
-import org.apache.cxf.tracing.micrometer.ObservationFeature;
+import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
+import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.observation.web.servlet.WebMvcObservationAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -135,17 +135,23 @@ public class SpringJaxrsObservabiityTest {
                .haveSameTraceId()
                .hasASpanWithName("GET", spanAssert -> {
                    spanAssert.hasKindEqualTo(Kind.CLIENT)
-                             .hasTag("rpc.service", "WebClient")
-                             .hasTag("rpc.system", "cxf")
+                             .hasTag("http.request.method", "GET")
+                             .hasTag("http.response.status_code", "200")
+                             .hasTag("network.protocol.name", "http")
+                             .hasTag("url.scheme", "http")
                              .hasTagWithKey("server.address")
                              .hasTagWithKey("server.port")
+                             .hasTagWithKey("url.full")
                              .isStarted()
                              .isEnded();
                })
-               .hasASpanWithName("rpc.server.duration", spanAssert -> {
+               .hasASpanWithName("GET /api/library", spanAssert -> {
                    spanAssert.hasKindEqualTo(Kind.SERVER)
-                             .hasTag("rpc.service", "Library")
-                             .hasTag("rpc.system", "cxf")
+                             .hasTag("http.request.method", "GET")
+                             .hasTag("http.response.status_code", "200")
+                             .hasTag("http.route", "/api/library")
+                             .hasTag("network.protocol.name", "http")
+                             .hasTag("url.scheme", "http")
                              .hasTagWithKey("server.address")
                              .hasTagWithKey("server.port")
                              .isStarted()
@@ -154,11 +160,13 @@ public class SpringJaxrsObservabiityTest {
 
         // Micrometer Observation with Micrometer Core
         MeterRegistryAssert.assertThat(registry)
-            .hasTimerWithNameAndTags("rpc.client.duration", Tags.of("error", "none",
-                "rpc.service", "WebClient", "rpc.system", "cxf",
+            .hasTimerWithNameAndTags("http.client.duration", Tags.of("error", "none",
+                "http.request.method", "GET", "http.response.status_code", "200",
+                "network.protocol.name", "http", "url.scheme", "http",
                 "server.address", "localhost", "server.port", String.valueOf(port)))
-            .hasTimerWithNameAndTags("rpc.server.duration", Tags.of("error", "none",
-                "rpc.service", "Library", "rpc.system", "cxf",
+            .hasTimerWithNameAndTags("http.server.duration", Tags.of("error", "none",
+                "http.request.method", "GET", "http.response.status_code", "200",
+                "http.route", "/api/library", "network.protocol.name", "http",
                 "server.address", "localhost", "server.port", String.valueOf(port)));
     }
 
@@ -166,7 +174,7 @@ public class SpringJaxrsObservabiityTest {
         return ClientBuilder
             .newClient()
             .register(JacksonJsonProvider.class)
-            .register(new ObservationClientFeature(observationRegistry))
+            .register(new ObservationClientProvider(observationRegistry))
             .target("http://localhost:" + port + "/api/library");
     }
 
