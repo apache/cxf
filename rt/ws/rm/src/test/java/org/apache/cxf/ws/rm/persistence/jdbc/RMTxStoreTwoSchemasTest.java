@@ -25,16 +25,14 @@ import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 /**
  *
  */
@@ -46,8 +44,6 @@ public class RMTxStoreTwoSchemasTest {
 
     private static RMTxStore store1;
     private static RMTxStore store2;
-
-    private IMocksControl control;
 
     @BeforeClass
     public static void setUpOnce() {
@@ -76,11 +72,6 @@ public class RMTxStoreTwoSchemasTest {
         return store;
     }
 
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testSetCurrentSchema() throws Exception {
         // schema should  have been set during initialisation
@@ -90,18 +81,16 @@ public class RMTxStoreTwoSchemasTest {
 
     @Test
     public void testStoreIsolation() throws Exception {
-        SourceSequence seq = control.createMock(SourceSequence.class);
+        SourceSequence seq = mock(SourceSequence.class);
         Identifier sid1 = new Identifier();
         sid1.setValue("sequence1");
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
-        EasyMock.expect(seq.getExpires()).andReturn(null);
-        EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
-        EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
-        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
+        when(seq.getIdentifier()).thenReturn(sid1);
+        when(seq.getExpires()).thenReturn(null);
+        when(seq.getOfferingSequenceIdentifier()).thenReturn(null);
+        when(seq.getEndpointIdentifier()).thenReturn(CLIENT_ENDPOINT_ID);
+        when(seq.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
 
-        control.replay();
         store1.createSourceSequence(seq);
-        control.verify();
 
         SourceSequence rseq = store1.getSourceSequence(sid1);
         assertNotNull(rseq);
@@ -109,16 +98,13 @@ public class RMTxStoreTwoSchemasTest {
         rseq = store2.getSourceSequence(sid1);
         assertNull(rseq);
 
-        control.reset();
-        EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
-        EasyMock.expect(seq.getExpires()).andReturn(null);
-        EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
-        EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
-        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
+        when(seq.getIdentifier()).thenReturn(sid1);
+        when(seq.getExpires()).thenReturn(null);
+        when(seq.getOfferingSequenceIdentifier()).thenReturn(null);
+        when(seq.getEndpointIdentifier()).thenReturn(CLIENT_ENDPOINT_ID);
+        when(seq.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
 
-        control.replay();
         store2.createSourceSequence(seq);
-        control.verify();
 
         rseq = store2.getSourceSequence(sid1);
         assertNotNull(rseq);

@@ -31,8 +31,6 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,10 +40,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SourceSequenceTest {
 
-    private IMocksControl control;
     private ObjectFactory factory;
     private Identifier id;
 
@@ -60,8 +62,6 @@ public class SourceSequenceTest {
         factory = new ObjectFactory();
         id = factory.createIdentifier();
         id.setValue("seq");
-
-        control = EasyMock.createNiceControl();
     }
 
     @After
@@ -74,11 +74,11 @@ public class SourceSequenceTest {
     }
 
     protected void setUpSource() {
-        source = control.createMock(Source.class);
-        manager = control.createMock(RMManager.class);
-        EasyMock.expect(source.getManager()).andReturn(manager).anyTimes();
-        rq = control.createMock(RetransmissionQueue.class);
-        EasyMock.expect(manager.getRetransmissionQueue()).andReturn(rq).anyTimes();
+        source = mock(Source.class);
+        manager = mock(RMManager.class);
+        when(source.getManager()).thenReturn(manager);
+        rq = mock(RetransmissionQueue.class);
+        when(manager.getRetransmissionQueue()).thenReturn(rq);
 
         // default termination policy
 
@@ -88,7 +88,7 @@ public class SourceSequenceTest {
         stp = cfgFactory
             .createSequenceTerminationPolicyType();
         sp.setSequenceTerminationPolicy(stp);
-        EasyMock.expect(manager.getSourcePolicy()).andReturn(sp).anyTimes();
+        when(manager.getSourcePolicy()).thenReturn(sp);
     }
 
     @Test
@@ -188,16 +188,15 @@ public class SourceSequenceTest {
         r.setLower(Long.valueOf(8));
         r.setUpper(Long.valueOf(10));
         ack.getAcknowledgementRange().add(r);
-        rq.purgeAcknowledged(seq);
-        EasyMock.expectLastCall();
+        doNothing().when(rq).purgeAcknowledged(seq);
 
-        control.replay();
         seq.setAcknowledged(ack);
         assertSame(ack, seq.getAcknowledgement());
         assertEquals(3, ack.getAcknowledgementRange().size());
         assertFalse(seq.isAcknowledged(3));
         assertTrue(seq.isAcknowledged(5));
-        control.verify();
+
+        verify(rq, atLeastOnce()).purgeAcknowledged(seq);
     }
 
     @Test
@@ -218,30 +217,25 @@ public class SourceSequenceTest {
         r.setUpper(Long.valueOf(2));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
-        EasyMock.expectLastCall();
 
-        control.replay();
         seq.setAcknowledged(ack);
         assertFalse(seq.allAcknowledged());
         r.setUpper(Long.valueOf(4));
         assertTrue(seq.allAcknowledged());
-        control.verify();
+
+        verify(rq, atLeastOnce()).purgeAcknowledged(seq);
     }
 
     @Test
     public void testNextMessageNumber() throws RMException {
         setUpSource();
-        rq.purgeAcknowledged(EasyMock.isA(SourceSequence.class));
-        EasyMock.expectLastCall().anyTimes();
-        control.replay();
 
         // default termination policy
 
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         assertFalse(nextMessages(seq, 10));
-        control.verify();
-
+        
         // termination policy max length = 1
 
         seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
@@ -249,14 +243,12 @@ public class SourceSequenceTest {
         stp.setMaxLength(1);
         assertTrue(nextMessages(seq, 10));
         assertEquals(1, seq.getCurrentMessageNr());
-        control.verify();
 
         // termination policy max length = 5
         seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         stp.setMaxLength(5);
         assertFalse(nextMessages(seq, 2));
-        control.verify();
 
         // termination policy max range exceeded
 
@@ -267,7 +259,7 @@ public class SourceSequenceTest {
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(nextMessages(seq, 10));
         assertEquals(1, seq.getCurrentMessageNr());
-        control.verify();
+        verify(rq, atLeastOnce()).purgeAcknowledged(seq);
 
         // termination policy max range not exceeded
 
@@ -277,7 +269,6 @@ public class SourceSequenceTest {
         stp.setMaxRanges(4);
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertFalse(nextMessages(seq, 10));
-        control.verify();
 
         // termination policy max unacknowledged
     }
@@ -286,37 +277,31 @@ public class SourceSequenceTest {
     public void testGetEndpointIdentfier() {
         setUpSource();
         String name = "abc";
-        EasyMock.expect(source.getName()).andReturn(name);
-        control.replay();
+        when(source.getName()).thenReturn(name);
 
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         assertEquals("Unexpected endpoint identifier", name, seq.getEndpointIdentifier());
-        control.verify();
     }
 
     @Test
     public void testCheckOfferingSequenceClosed() {
         setUpSource();
 
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
-        Destination destination = control.createMock(Destination.class);
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        DestinationSequence dseq = control.createMock(DestinationSequence.class);
-        Identifier did = control.createMock(Identifier.class);
-        EasyMock.expect(destination.getSequence(did)).andReturn(dseq).anyTimes();
-        EasyMock.expect(dseq.getLastMessageNumber()).andReturn(Long.valueOf(1)).anyTimes();
-        EasyMock.expect(did.getValue()).andReturn("dseq").anyTimes();
-
-        control.replay();
+        RMEndpoint rme = mock(RMEndpoint.class);
+        when(source.getReliableEndpoint()).thenReturn(rme);
+        Destination destination = mock(Destination.class);
+        when(rme.getDestination()).thenReturn(destination);
+        DestinationSequence dseq = mock(DestinationSequence.class);
+        Identifier did = mock(Identifier.class);
+        when(destination.getSequence(did)).thenReturn(dseq);
+        when(dseq.getLastMessageNumber()).thenReturn(Long.valueOf(1));
+        when(did.getValue()).thenReturn("dseq");
 
         SourceSequence seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         seq.nextMessageNumber(did, 1, false);
         assertTrue(seq.isLastMessage());
-
-        control.verify();
     }
 
     private boolean nextMessages(SourceSequence seq,
