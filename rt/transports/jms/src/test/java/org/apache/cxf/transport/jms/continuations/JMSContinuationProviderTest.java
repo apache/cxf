@@ -27,13 +27,13 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 
 public class JMSContinuationProviderTest {
@@ -50,7 +50,7 @@ public class JMSContinuationProviderTest {
         exchange.setOneWay(true);
         Message m = new MessageImpl();
         m.setExchange(exchange);
-        Counter counter = EasyMock.createMock(Counter.class);
+        Counter counter = mock(Counter.class);
         JMSContinuationProvider provider =
             new JMSContinuationProvider(null, m, null, counter);
         assertNull(provider.getContinuation());
@@ -60,7 +60,7 @@ public class JMSContinuationProviderTest {
     public void testGetNewContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        Counter counter = EasyMock.createMock(Counter.class);
+        Counter counter = mock(Counter.class);
         JMSContinuationProvider provider =
             new JMSContinuationProvider(bus, m, null, counter);
         Continuation cw = provider.getContinuation();
@@ -72,7 +72,7 @@ public class JMSContinuationProviderTest {
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
-        Counter counter = EasyMock.createMock(Counter.class);
+        Counter counter = mock(Counter.class);
         JMSContinuation cw = new JMSContinuation(bus, m, null, counter);
         m.put(JMSContinuation.class, cw);
         JMSContinuationProvider provider = new JMSContinuationProvider(null, m, null, counter);
