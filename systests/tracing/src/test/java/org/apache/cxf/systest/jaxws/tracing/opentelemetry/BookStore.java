@@ -22,10 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
 import jakarta.annotation.Resource;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
@@ -33,6 +29,11 @@ import jakarta.xml.ws.WebServiceContext;
 import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
+
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {

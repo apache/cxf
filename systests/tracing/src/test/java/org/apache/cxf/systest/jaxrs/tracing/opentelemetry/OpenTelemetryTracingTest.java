@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -174,8 +175,8 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
     @Test
     public void testThatNewChildSpanIsCreatedWhenParentIsProvided() {
         final Response r = createWebClient("/bookstore/books",
-                                           new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"))
-            .get();
+            new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"))
+                .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(3));
@@ -423,14 +424,12 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
 
     private WebClient withTrace(final WebClient client) {
         GlobalOpenTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), client,
-                                                                           new TextMapSetter<WebClient>() {
-                                                                               @Override
-                                                                               public void set(WebClient carrier,
-                                                                                               String key,
-                                                                                               String value) {
-                                                                                   carrier.header(key, value);
-                                                                               }
-                                                                           });
+            new TextMapSetter<WebClient>() {
+                @Override
+                public void set(WebClient carrier, String key, String value) {
+                    carrier.header(key, value);
+                }
+            });
 
         return client;
     }

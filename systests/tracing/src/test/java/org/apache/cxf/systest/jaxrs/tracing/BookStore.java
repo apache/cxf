@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
