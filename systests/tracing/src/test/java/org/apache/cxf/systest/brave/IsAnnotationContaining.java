@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.tracing.brave;
+package org.apache.cxf.systest.brave;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
