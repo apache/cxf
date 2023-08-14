@@ -313,7 +313,7 @@ public class FormEncodingProviderTest {
 
     }
 
-    private static class CustomFormValidator implements FormValidator {
+    private static final class CustomFormValidator implements FormValidator {
 
         public void validate(MultivaluedMap<String, ? extends Object> params) {
             throw new WebApplicationException();

@@ -2976,7 +2976,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Provider
-    private static class TestClientResponseFilter implements ClientResponseFilter {
+    private static final class TestClientResponseFilter implements ClientResponseFilter {
         @Override
         public void filter(ClientRequestContext requestContext,
                 ClientResponseContext responseContext) throws IOException {

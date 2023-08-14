@@ -96,7 +96,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
         queue.add(bean);
         super.requestNext();
     }
-    private class StreamingResponseImpl implements StreamingResponse<T> {
+    private final class StreamingResponseImpl implements StreamingResponse<T> {
 
         @Override
         public void writeTo(Writer<T> writer) throws IOException {

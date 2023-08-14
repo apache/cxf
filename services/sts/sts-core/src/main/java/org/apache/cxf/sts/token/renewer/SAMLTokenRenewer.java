@@ -534,7 +534,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         return assertion.getSaml1().getConditions().getNotOnOrAfter();
     }
 
-    private static class ProofOfPossessionValidator {
+    private static final class ProofOfPossessionValidator {
 
         public boolean checkProofOfPossession(
             TokenRenewerParameters tokenParameters,

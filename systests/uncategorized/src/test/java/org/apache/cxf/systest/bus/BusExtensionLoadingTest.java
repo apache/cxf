@@ -85,7 +85,7 @@ public class BusExtensionLoadingTest {
         assertNotNull(bus.getExtension(HeaderManager.class));
     }
 
-    private static class TestClassLoader extends ClassLoader {
+    private static final class TestClassLoader extends ClassLoader {
         @Override
         public Class<?> loadClass(final String className) throws ClassNotFoundException {
             if (className.contains("cxf")) {

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.endpoint.Endpoint;
@@ -48,9 +48,6 @@ import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,33 +57,31 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RMEndpointTest {
 
-    private IMocksControl control;
     private RMManager manager;
     private Endpoint ae;
     private RMEndpoint rme;
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        manager = control.createMock(RMManager.class);
-        ae = control.createMock(Endpoint.class);
-        EasyMock.expect(ae.getEndpointInfo()).andReturn(new EndpointInfo()).anyTimes();
-        control.replay();
+        manager = mock(RMManager.class);
+        ae = mock(Endpoint.class);
+        EndpointInfo ei = new EndpointInfo();
+        ei.setBinding(new SoapBindingInfo(null, null, Soap12.getInstance()));
+        when(ae.getEndpointInfo()).thenReturn(ei);
         rme = new RMEndpoint(manager, ae);
-        control.reset();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
     }
 
     @Test
     public void testConstructor() {
-        control.replay();
         assertNotNull(rme);
         assertNull(rme.getEndpoint(ProtocolVariation.RM10WSA200408));
         assertNull(rme.getService(ProtocolVariation.RM10WSA200408));
@@ -96,32 +91,27 @@ public class RMEndpointTest {
 
     @Test
     public void testGetManager() {
-        control.replay();
         assertSame(manager, rme.getManager());
     }
 
     @Test
     public void testGetApplicationEndpoint() {
-        control.replay();
         assertSame(ae, rme.getApplicationEndpoint());
     }
 
     @Test
     public void testGetProxy() {
-        control.replay();
         assertSame(rme, rme.getProxy().getReliableEndpoint());
     }
 
     @Test
     public void testGetServant() {
-        control.replay();
         assertNotNull(rme.getServant());
     }
 
     @Test
     public void testGetSetDestination() {
-        Destination d = control.createMock(Destination.class);
-        control.replay();
+        Destination d = mock(Destination.class);
         assertSame(rme, rme.getDestination().getReliableEndpoint());
         rme.setDestination(d);
         assertSame(d, rme.getDestination());
@@ -129,8 +119,7 @@ public class RMEndpointTest {
 
     @Test
     public void testGetSetSource() {
-        Source s = control.createMock(Source.class);
-        control.replay();
+        Source s = mock(Source.class);
         assertSame(rme, rme.getSource().getReliableEndpoint());
         rme.setSource(s);
         assertSame(s, rme.getSource());
@@ -139,22 +128,17 @@ public class RMEndpointTest {
     @Test
     public void testInitialise() throws NoSuchMethodException {
         Message m = new MessageImpl();
-        Method m1 = RMEndpoint.class.getDeclaredMethod("createServices", new Class[] {});
-        Method m2 = RMEndpoint.class
-            .getDeclaredMethod("createEndpoints", new Class[] {org.apache.cxf.transport.Destination.class});
-        Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {Message.class});
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
 
-        rme = EasyMock.createMockBuilder(RMEndpoint.class)
-            .addMockedMethods(m1, m2, m3).createMock(control);
+        rme = spy(new RMEndpoint(manager, ae));
         rme.createServices();
-        EasyMock.expectLastCall();
         rme.createEndpoints(null);
-        EasyMock.expectLastCall();
         rme.setPolicies(m);
-        EasyMock.expectLastCall();
-        Conduit c = control.createMock(Conduit.class);
-        EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
-        control.replay();
+
+        Conduit c = mock(Conduit.class);
+        EndpointReferenceType epr = mock(EndpointReferenceType.class);
+
         rme.initialise(new RMConfiguration(), c, epr, null, m);
         assertSame(c, rme.getConduit());
         assertSame(epr, rme.getReplyTo());
@@ -162,9 +146,8 @@ public class RMEndpointTest {
 
     @Test
     public void testCreateService() {
-        Service as = control.createMock(Service.class);
-        EasyMock.expect(ae.getService()).andReturn(as);
-        control.replay();
+        Service as = mock(Service.class);
+        when(ae.getService()).thenReturn(as);
         rme.createServices();
         Service s = rme.getService(ProtocolVariation.RM10WSA200408);
         assertNotNull(s);
@@ -176,26 +159,24 @@ public class RMEndpointTest {
 
     @Test
     public void testCreateEndpoint() throws NoSuchMethodException, EndpointException {
-        Method m = RMEndpoint.class.getDeclaredMethod("getUsingAddressing", new Class[] {EndpointInfo.class});
-        Service as = control.createMock(Service.class);
+        Service as = mock(Service.class);
         EndpointInfo aei = new EndpointInfo();
         ae = new EndpointImpl(null, as, aei);
-        rme = EasyMock.createMockBuilder(RMEndpoint.class).withConstructor(manager, ae)
-            .addMockedMethod(m).createMock(control);
+        rme = spy(new RMEndpoint(manager, ae));
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
-        SoapBindingInfo bi = control.createMock(SoapBindingInfo.class);
+        SoapBindingInfo bi = mock(SoapBindingInfo.class);
         aei.setBinding(bi);
         SoapVersion sv = Soap11.getInstance();
-        EasyMock.expect(bi.getSoapVersion()).andReturn(sv);
+        when(bi.getSoapVersion()).thenReturn(sv);
         String ns = "http://schemas.xmlsoap.org/wsdl/soap/";
-        EasyMock.expect(bi.getBindingId()).andReturn(ns);
+        when(bi.getBindingId()).thenReturn(ns);
         aei.setTransportId(ns);
         String addr = "addr";
         aei.setAddress(addr);
         Object ua = new Object();
-        EasyMock.expect(rme.getUsingAddressing(aei)).andReturn(ua);
-        control.replay();
+        when(rme.getUsingAddressing(aei)).thenReturn(ua);
+
         rme.createServices();
         rme.createEndpoints(null);
         Endpoint e = rme.getEndpoint(ProtocolVariation.RM10WSA200408);
@@ -209,35 +190,33 @@ public class RMEndpointTest {
     @Test
     public void testGetUsingAddressing() {
         EndpointInfo ei = null;
-        control.replay();
         assertNull(rme.getUsingAddressing(ei));
-        control.verify();
 
-        control.reset();
-        ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
-        ei = control.createMock(EndpointInfo.class);
+        ExtensibilityElement ua = mock(ExtensibilityElement.class);
+        ei = mock(EndpointInfo.class);
         List<ExtensibilityElement> noExts = new ArrayList<>();
         List<ExtensibilityElement> exts = new ArrayList<>();
         exts.add(ua);
-        EasyMock.expect(ei.getExtensors(ExtensibilityElement.class)).andReturn(noExts);
-        BindingInfo bi = control.createMock(BindingInfo.class);
-        EasyMock.expect(ei.getBinding()).andReturn(bi).times(2);
-        EasyMock.expect(bi.getExtensors(ExtensibilityElement.class)).andReturn(noExts);
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(ei.getService()).andReturn(si).times(2);
-        EasyMock.expect(si.getExtensors(ExtensibilityElement.class)).andReturn(exts);
-        EasyMock.expect(ua.getElementType()).andReturn(Names.WSAW_USING_ADDRESSING_QNAME);
-        control.replay();
+        when(ei.getExtensors(ExtensibilityElement.class)).thenReturn(noExts);
+        BindingInfo bi = mock(BindingInfo.class);
+        when(ei.getBinding()).thenReturn(bi);
+        when(bi.getExtensors(ExtensibilityElement.class)).thenReturn(noExts);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(ei.getService()).thenReturn(si);
+        when(si.getExtensors(ExtensibilityElement.class)).thenReturn(exts);
+        when(ua.getElementType()).thenReturn(Names.WSAW_USING_ADDRESSING_QNAME);
+
         assertSame(ua, rme.getUsingAddressing(ei));
+        verify(ei, times(2)).getBinding();
+        verify(ei, times(2)).getService();
     }
 
     @Test
     public void testGetUsingAddressingFromExtensions() {
         List<ExtensibilityElement> exts = new ArrayList<>();
-        ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
+        ExtensibilityElement ua = mock(ExtensibilityElement.class);
         exts.add(ua);
-        EasyMock.expect(ua.getElementType()).andReturn(Names.WSAW_USING_ADDRESSING_QNAME);
-        control.replay();
+        when(ua.getElementType()).thenReturn(Names.WSAW_USING_ADDRESSING_QNAME);
         assertSame(ua, rme.getUsingAddressing(exts));
     }
 
@@ -251,61 +230,55 @@ public class RMEndpointTest {
         rme.receivedApplicationMessage();
         assertTrue(rme.getLastApplicationMessage() > 0);
         assertTrue(rme.getLastControlMessage() > 0);
-        control.replay();
     }
 
     @Test
     public void testSetPoliciesNoEngine() {
         Message m = new MessageImpl();
-        Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(manager.getBus()).andReturn(bus);
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(null);
-        control.replay();
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+        when(bus.getExtension(PolicyEngine.class)).thenReturn(null);
         rme.setPolicies(m);
     }
 
     @Test
     public void testSetPoliciesEngineDisabled() {
         Message m = new MessageImpl();
-        Bus bus = control.createMock(Bus.class);
-        EasyMock.expect(manager.getBus()).andReturn(bus);
-        PolicyEngineImpl pe = control.createMock(PolicyEngineImpl.class);
-        EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(pe);
-        EasyMock.expect(pe.isEnabled()).andReturn(false);
-        control.replay();
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+        PolicyEngineImpl pe = mock(PolicyEngineImpl.class);
+        when(bus.getExtension(PolicyEngine.class)).thenReturn(pe);
+        when(pe.isEnabled()).thenReturn(false);
         rme.setPolicies(m);
     }
 
     @Test
     public void testShutdown() {
-        DestinationSequence ds = control.createMock(DestinationSequence.class);
-        Identifier did = control.createMock(Identifier.class);
-        EasyMock.expect(ds.getIdentifier()).andReturn(did).anyTimes();
-        EasyMock.expect(ds.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        DestinationSequence ds = mock(DestinationSequence.class);
+        Identifier did = mock(Identifier.class);
+        when(ds.getIdentifier()).thenReturn(did);
+        when(ds.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
         String d = "d";
-        EasyMock.expect(did.getValue()).andReturn(d).anyTimes();
-        SourceSequence ss = control.createMock(SourceSequence.class);
-        Identifier sid = control.createMock(Identifier.class);
-        EasyMock.expect(ss.getIdentifier()).andReturn(sid).anyTimes();
-        EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
+        when(did.getValue()).thenReturn(d);
+        SourceSequence ss = mock(SourceSequence.class);
+        Identifier sid = mock(Identifier.class);
+        when(ss.getIdentifier()).thenReturn(sid);
+        when(ss.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
         String s = "s";
-        EasyMock.expect(sid.getValue()).andReturn(s).anyTimes();
-        ds.cancelDeferredAcknowledgments();
-        EasyMock.expectLastCall().anyTimes();
-        ds.cancelTermination();
-        EasyMock.expectLastCall().anyTimes();
-        RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
-        EasyMock.expect(manager.getRetransmissionQueue()).andReturn(queue).anyTimes();
-        queue.stop(ss);
-        EasyMock.expectLastCall().anyTimes();
-        RedeliveryQueue dqueue = control.createMock(RedeliveryQueue.class);
-        EasyMock.expect(manager.getRedeliveryQueue()).andReturn(dqueue).anyTimes();
-        dqueue.stop(ds);
-        EasyMock.expectLastCall().anyTimes();
-        control.replay();
+        when(sid.getValue()).thenReturn(s);
+        RetransmissionQueue queue = mock(RetransmissionQueue.class);
+        when(manager.getRetransmissionQueue()).thenReturn(queue);
+        RedeliveryQueue dqueue = mock(RedeliveryQueue.class);
+        when(manager.getRedeliveryQueue()).thenReturn(dqueue);
+
         rme.getDestination().addSequence(ds, false);
         rme.getSource().addSequence(ss, false);
         rme.shutdown();
+
+        verify(ds, atLeastOnce()).cancelDeferredAcknowledgments();
+        verify(ds, atLeastOnce()).cancelTermination();
+        verify(queue, atLeastOnce()).stop(ss);
+        verify(dqueue, atLeastOnce()).stop(ds);
     }
 
     private void verifyService() {

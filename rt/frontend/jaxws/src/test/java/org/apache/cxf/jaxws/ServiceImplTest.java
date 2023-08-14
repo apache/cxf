@@ -277,7 +277,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         assertEquals(SOAPBinding.SOAP12HTTP_BINDING, info.getBindingID());
     }
 
-    private static class TestHandlerResolver implements HandlerResolver {
+    private static final class TestHandlerResolver implements HandlerResolver {
         private PortInfo info;
 
         public PortInfo getPortInfo() {

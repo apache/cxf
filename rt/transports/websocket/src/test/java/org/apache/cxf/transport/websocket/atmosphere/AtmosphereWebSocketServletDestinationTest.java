@@ -154,8 +154,8 @@ public class AtmosphereWebSocketServletDestinationTest {
         }
     }
 
-    private static class CustomInterceptor1 extends DefaultProtocolInterceptor {
+    private static final class CustomInterceptor1 extends DefaultProtocolInterceptor {
     }
-    private static class CustomInterceptor2 extends DefaultProtocolInterceptor {
+    private static final class CustomInterceptor2 extends DefaultProtocolInterceptor {
     }
 }

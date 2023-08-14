@@ -32,27 +32,17 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.jetty11.Jetty11WebSocketDestination;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
+import static org.mockito.Mockito.mock;
 /**
  *
  */
 public class JettyWebSocketDestinationTest {
     private static final String ENDPOINT_ADDRESS = "ws://localhost:9001/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
 
     @Test
     public void testRegisteration() throws Exception {
@@ -61,9 +51,7 @@ public class JettyWebSocketDestinationTest {
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
-        JettyHTTPServerEngine engine = EasyMock.createMock(JettyHTTPServerEngine.class);
-
-        control.replay();
+        JettyHTTPServerEngine engine = mock(JettyHTTPServerEngine.class);
 
         TestJettyWebSocketDestination dest = new TestJettyWebSocketDestination(bus, registry, endpoint, null, engine);
 

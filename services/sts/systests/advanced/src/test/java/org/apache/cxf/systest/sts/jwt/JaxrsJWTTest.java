@@ -109,7 +109,7 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
         return stsClient;
     }
 
-    private static class JwtOutFilter implements ClientRequestFilter {
+    private static final class JwtOutFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext requestContext) throws IOException {

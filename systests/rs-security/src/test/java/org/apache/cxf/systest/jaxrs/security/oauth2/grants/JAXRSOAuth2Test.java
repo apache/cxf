@@ -617,7 +617,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         return wc;
     }
 
-    private static class CustomGrant implements AccessTokenGrant {
+    private static final class CustomGrant implements AccessTokenGrant {
 
         private static final long serialVersionUID = -4007538779198315873L;
 

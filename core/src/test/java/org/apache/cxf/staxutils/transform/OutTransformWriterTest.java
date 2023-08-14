@@ -141,7 +141,7 @@ public class OutTransformWriterTest {
         }
     }
 
-    private static class TestBean2 {
+    private static final class TestBean2 {
     }
 
     // additional test cases

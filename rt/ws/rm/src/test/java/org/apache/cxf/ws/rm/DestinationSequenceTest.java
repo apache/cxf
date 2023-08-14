@@ -23,12 +23,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.cxf.ws.addressing.WSAddressingFeature.WSAddressingFeatureApplier;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
@@ -39,8 +49,6 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,10 +60,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DestinationSequenceTest {
 
-    private IMocksControl control;
     private ObjectFactory factory;
     private Identifier id;
     private EndpointReferenceType ref;
@@ -68,10 +82,8 @@ public class DestinationSequenceTest {
 
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();
-        control.makeThreadSafe(true);
         factory = new ObjectFactory();
-        ref = control.createMock(EndpointReferenceType.class);
+        ref = mock(EndpointReferenceType.class);
         id = factory.createIdentifier();
         id.setValue("seq");
     }
@@ -130,7 +142,6 @@ public class DestinationSequenceTest {
 
     @Test
     public void testGetSetDestination() {
-        control.replay();
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
         seq.setDestination(destination);
@@ -141,22 +152,19 @@ public class DestinationSequenceTest {
     public void testGetEndpointIdentifier() {
         setUpDestination();
         String name = "abc";
-        EasyMock.expect(destination.getName()).andReturn(name);
-        control.replay();
+        when(destination.getName()).thenReturn(name);
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
         assertEquals("Unexpected endpoint identifier", name, seq.getEndpointIdentifier());
-        control.verify();
     }
 
     @Test
     public void testAcknowledgeBasic() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2");
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -174,19 +182,16 @@ public class DestinationSequenceTest {
         r1 = ranges.get(0);
         assertEquals(1, r1.getLower().intValue());
         assertEquals(2, r1.getUpper().intValue());
-
-        control.verify();
     }
 
 /*    @Test
     public void testAcknowledgeLastMessageNumberExceeded() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
-        RMEndpoint rme = EasyMock.createMock(RMEndpoint.class);
-        EasyMock.expect(rme.getEncoderDecoder()).andReturn(EncoderDecoder10Impl.INSTANCE).anyTimes();
+        Timer timer = mock(Timer.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
+        when(rme.getEncoderDecoder()).thenReturn(EncoderDecoder10Impl.INSTANCE);
         setUpDestination(timer, rme);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2", true);
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination);
 
@@ -198,13 +203,11 @@ public class DestinationSequenceTest {
         } catch (SequenceFault sf) {
             assertEquals("SequenceTerminated", sf.getSequenceFault().getFaultCode().getLocalPart());
         }
-
-        control.verify();
     }   */
 
     @Test
     public void testAcknowledgeAppendRange() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
         Message[] messages = new Message [] {
             setUpMessage("1"),
@@ -213,8 +216,6 @@ public class DestinationSequenceTest {
             setUpMessage("4"),
             setUpMessage("6")
         };
-
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -229,14 +230,16 @@ public class DestinationSequenceTest {
         r = ranges.get(1);
         assertEquals(4, r.getLower().intValue());
         assertEquals(6, r.getUpper().intValue());
-
-        control.verify();
     }
 
     @Test
     public void testAcknowledgeInsertRange() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
+
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+
         Message[] messages = new Message [] {
             setUpMessage("1"),
             setUpMessage("2"),
@@ -246,7 +249,6 @@ public class DestinationSequenceTest {
             setUpMessage("9"),
             setUpMessage("2")
         };
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -265,13 +267,11 @@ public class DestinationSequenceTest {
         r = ranges.get(2);
         assertEquals(9, r.getLower().intValue());
         assertEquals(10, r.getUpper().intValue());
-
-        control.verify();
     }
 
     @Test
     public void testAcknowledgePrependRange() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
         Message[] messages = new Message [] {
             setUpMessage("4"),
@@ -281,7 +281,6 @@ public class DestinationSequenceTest {
             setUpMessage("2"),
             setUpMessage("2")
         };
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -296,8 +295,6 @@ public class DestinationSequenceTest {
         r = ranges.get(1);
         assertEquals(4, r.getLower().intValue());
         assertEquals(6, r.getUpper().intValue());
-
-        control.verify();
     }
 
     @Test
@@ -347,13 +344,12 @@ public class DestinationSequenceTest {
 
     @Test
     public void testMonitor() throws SequenceFault, InterruptedException {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
         Message[] messages = new Message[15];
         for (int i = 0; i < messages.length; i++) {
             messages[i] = setUpMessage(Integer.toString(i + 1));
         }
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -377,16 +373,13 @@ public class DestinationSequenceTest {
         int mpm2 = monitor.getMPM();
         assertTrue(mpm2 > 0);
         assertTrue(mpm1 > mpm2);
-
-        control.verify();
     }
 
     @Test
     public void testAcknowledgeImmediate() throws SequenceFault {
-        Timer timer = control.createMock(Timer.class);
+        Timer timer = mock(Timer.class);
         setUpDestination(timer, null);
         Message message = setUpMessage("1");
-        control.replay();
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
@@ -397,29 +390,54 @@ public class DestinationSequenceTest {
         assertTrue(seq.sendAcknowledgement());
         seq.acknowledgmentSent();
         assertFalse(seq.sendAcknowledgement());
-
-        control.verify();
     }
 
     @Test
     public void testAcknowledgeDeferred() throws SequenceFault, RMException, InterruptedException {
         Timer timer = new Timer();
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         setUpDestination(timer, rme);
+
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+
+        when(bus.getExtension(WSAddressingFeatureApplier.class))
+        .thenReturn(new WSAddressingFeatureApplier() {
+            @Override
+            public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus) {
+            }
+        });
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        Proxy proxy = control.createMock(Proxy.class);
-        EasyMock.expect(rme.getProxy()).andReturn(proxy).anyTimes();
-        proxy.acknowledge(seq);
-        EasyMock.expectLastCall();
+        
+        AttributedURIType uri = mock(AttributedURIType.class);
+        when(ref.getAddress()).thenReturn(uri);
+
+        Proxy proxy = spy(new Proxy(rme));
+        when(rme.getProxy()).thenReturn(proxy);
+        doCallRealMethod().when(proxy).acknowledge(seq);
+        when(destination.getReliableEndpoint()).thenReturn(endpoint);
+
+        InterfaceInfo ii = mock(InterfaceInfo.class);
+        when(ii.getOperation(ProtocolVariation.RM10WSA200408.getConstants().getSequenceAckOperationName()))
+            .thenReturn(new OperationInfo());
+
+        ServiceInfo si = new ServiceInfo();
+        si.setInterface(ii);
+
+        BindingInfo bi = new BindingInfo(si, null);
+        Endpoint ae = mock(Endpoint.class);
+        when(ae.getEndpointInfo()).thenReturn(new EndpointInfo(si, RM10Constants.NAMESPACE_URI));
+        when(endpoint.getBindingInfo(ProtocolVariation.RM10WSA200408)).thenReturn(bi);
+        when(endpoint.getEndpoint(ProtocolVariation.RM10WSA200408)).thenReturn(ae);
+        when(endpoint.getManager()).thenReturn(manager);
 
         Message[] messages = new Message[] {
             setUpMessage("1"),
             setUpMessage("2"),
             setUpMessage("3")
         };
-        control.replay();
 
         ap.setIntraMessageThreshold(0);
         config.setAcknowledgementInterval(200L);
@@ -437,8 +455,6 @@ public class DestinationSequenceTest {
         assertTrue(seq.sendAcknowledgement());
         seq.acknowledgmentSent();
         assertFalse(seq.sendAcknowledgement());
-
-        control.verify();
     }
 
     @Test
@@ -459,34 +475,33 @@ public class DestinationSequenceTest {
         setUpDestination();
 
         long mn = 10;
-        SequenceAcknowledgement ack = control.createMock(SequenceAcknowledgement.class);
+        SequenceAcknowledgement ack = mock(SequenceAcknowledgement.class);
         List<AcknowledgementRange> ranges = new ArrayList<>();
-        AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
+        AcknowledgementRange r = mock(AcknowledgementRange.class);
+        when(ack.getAcknowledgementRange()).thenReturn(ranges);
         config.setDeliveryAssurance(DeliveryAssurance.AT_MOST_ONCE);
 
-        control.replay();
         DestinationSequence ds = new DestinationSequence(id, ref, 0, ack, ProtocolVariation.RM10WSA200408);
         ds.setDestination(destination);
         ds.applyDeliveryAssurance(mn, null);
-        control.verify();
 
-        control.reset();
         ranges.add(r);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(endpoint);
-        EasyMock.expect(endpoint.getConfiguration()).andReturn(config).anyTimes();
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        EasyMock.expect(r.getLower()).andReturn(Long.valueOf(5));
-        EasyMock.expect(r.getUpper()).andReturn(Long.valueOf(15));
-        control.replay();
-        ds.applyDeliveryAssurance(mn, null);
-        control.verify();
+        when(destination.getReliableEndpoint()).thenReturn(endpoint);
+        when(endpoint.getConfiguration()).thenReturn(config);
+        when(ack.getAcknowledgementRange()).thenReturn(ranges);
+        when(r.getLower()).thenReturn(Long.valueOf(5));
+        when(r.getUpper()).thenReturn(Long.valueOf(15));
 
+        ds.applyDeliveryAssurance(mn, null);
     }
 
     @Test
     public void testInOrderWait() throws InterruptedException {
         setUpDestination();
+        
+        Bus bus = mock(Bus.class);
+        when(manager.getBus()).thenReturn(bus);
+
         Message[] messages = new Message[5];
         for (int i = 0; i < messages.length; i++) {
             messages[i] = setUpMessage(Integer.toString(i + 1));
@@ -524,8 +539,6 @@ public class DestinationSequenceTest {
             }
         }
 
-        control.replay();
-
         Thread[] threads = new Thread[messages.length];
         for (int i = messages.length - 1; i >= 0; i--) {
             threads[i] = new Acknowledger(messages[i], i + 1);
@@ -542,149 +555,131 @@ public class DestinationSequenceTest {
             }
         }
         assertFalse("timed out waiting for messages to be processed in order", timedOut);
-
-        control.verify();
-
-
-
     }
 
     @Test
     public void testScheduleSequenceTermination() throws SequenceFault, InterruptedException {
         Timer timer = new Timer();
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(rme.getProxy()).andReturn(control.createMock(Proxy.class)).anyTimes();
+        RMEndpoint rme = mock(RMEndpoint.class);
+        when(rme.getProxy()).thenReturn(mock(Proxy.class));
         setUpDestination(timer, rme);
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        destination.terminateSequence(seq, true);
-        EasyMock.expectLastCall();
+        doCallRealMethod().when(destination).terminateSequence(seq, true);
 
         Message message = setUpMessage("1");
 
         long arrival = System.currentTimeMillis();
-        EasyMock.expect(rme.getLastApplicationMessage()).andReturn(arrival);
+        when(rme.getLastApplicationMessage()).thenReturn(arrival);
 
-        control.replay();
         config.setInactivityTimeout(200L);
 
         seq.acknowledge(message);
 
         Thread.sleep(250L);
-
-        control.verify();
     }
 
     @Test
     public void testSequenceTermination() {
-        destination = control.createMock(Destination.class);
+        destination = mock(Destination.class);
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
+        RMEndpoint rme = mock(RMEndpoint.class);
+        when(destination.getReliableEndpoint()).thenReturn(rme);
+        manager = mock(RMManager.class);
+        RMStore store = mock(RMStore.class);
+        when(manager.getStore()).thenReturn(store);
+        when(destination.getManager()).thenReturn(manager);
         DestinationSequence.SequenceTermination st = seq.new SequenceTermination();
         st.updateInactivityTimeout(30000L);
         long lastAppMessage = System.currentTimeMillis() - 30000L;
-        EasyMock.expect(rme.getLastControlMessage()).andReturn(0L);
-        EasyMock.expect(rme.getLastApplicationMessage()).andReturn(lastAppMessage);
-        destination.terminateSequence(seq, true);
-        EasyMock.expectLastCall();
-        control.replay();
+        when(rme.getLastControlMessage()).thenReturn(0L);
+        when(rme.getLastApplicationMessage()).thenReturn(lastAppMessage);
+        doCallRealMethod().when(destination).terminateSequence(seq, true);
+
         st.run();
-        control.verify();
     }
 
     @Test
     public void testSequenceTerminationNotNecessary() {
-        destination = control.createMock(Destination.class);
-        manager = control.createMock(RMManager.class);
-        EasyMock.expect(destination.getManager()).andReturn(manager);
+        destination = mock(Destination.class);
+        manager = mock(RMManager.class);
+        when(destination.getManager()).thenReturn(manager);
         Timer t = new Timer();
-        EasyMock.expect(manager.getTimer()).andReturn(t);
+        when(manager.getTimer()).thenReturn(t);
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).anyTimes();
+        RMEndpoint rme = mock(RMEndpoint.class);
+        when(destination.getReliableEndpoint()).thenReturn(rme);
         DestinationSequence.SequenceTermination st = seq.new SequenceTermination();
         st.updateInactivityTimeout(30000L);
         long lastAppMessage = System.currentTimeMillis() - 1000L;
-        EasyMock.expect(rme.getLastControlMessage()).andReturn(0L);
-        EasyMock.expect(rme.getLastApplicationMessage()).andReturn(lastAppMessage);
-        EasyMock.expectLastCall();
-        control.replay();
+        when(rme.getLastControlMessage()).thenReturn(0L);
+        when(rme.getLastApplicationMessage()).thenReturn(lastAppMessage);
+
         st.run();
-        control.verify();
     }
 
     @Test
     public void testCanPiggybackAckOnPartialResponse() {
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        AttributedURIType uri = control.createMock(AttributedURIType.class);
-        EasyMock.expect(ref.getAddress()).andReturn(uri);
+        AttributedURIType uri = mock(AttributedURIType.class);
+        when(ref.getAddress()).thenReturn(uri);
         String addr = "http://localhost:9999/reponses";
-        EasyMock.expect(uri.getValue()).andReturn(addr);
-        control.replay();
+        when(uri.getValue()).thenReturn(addr);
         assertFalse(seq.canPiggybackAckOnPartialResponse());
-        control.verify();
-        control.reset();
-        EasyMock.expect(ref.getAddress()).andReturn(uri);
-        EasyMock.expect(uri.getValue()).andReturn(Names.WSA_ANONYMOUS_ADDRESS);
-        control.replay();
+
+        when(ref.getAddress()).thenReturn(uri);
+        when(uri.getValue()).thenReturn(Names.WSA_ANONYMOUS_ADDRESS);
         assertTrue(seq.canPiggybackAckOnPartialResponse());
-        control.verify();
     }
 
     @Test
     public void testPurgeAcknowledged() {
-        destination = control.createMock(Destination.class);
+        destination = mock(Destination.class);
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        manager = control.createMock(RMManager.class);
-        EasyMock.expect(destination.getManager()).andReturn(manager);
-        RMStore store = control.createMock(RMStore.class);
-        EasyMock.expect(manager.getStore()).andReturn(store);
-        store.removeMessages(EasyMock.eq(id),
-            CastUtils.cast(EasyMock.isA(Collection.class), Long.class), EasyMock.eq(false));
-        EasyMock.expectLastCall();
-        control.replay();
+        manager = mock(RMManager.class);
+        when(destination.getManager()).thenReturn(manager);
+        RMStore store = mock(RMStore.class);
+        when(manager.getStore()).thenReturn(store);
+
         seq.purgeAcknowledged(1);
-        control.verify();
+        verify(store).removeMessages(eq(id),
+             CastUtils.cast(isA(Collection.class), Long.class), eq(false));
     }
 
     @Test
     public void testCancelDeferredAcknowledgements() {
-        destination = control.createMock(Destination.class);
-        manager = control.createMock(RMManager.class);
-        EasyMock.expect(destination.getManager()).andReturn(manager);
+        destination = mock(Destination.class);
+        manager = mock(RMManager.class);
+        when(destination.getManager()).thenReturn(manager);
         Timer t = new Timer();
-        EasyMock.expect(manager.getTimer()).andReturn(t);
+        when(manager.getTimer()).thenReturn(t);
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        control.replay();
+
         seq.scheduleDeferredAcknowledgement(30000L);
         seq.cancelDeferredAcknowledgments();
         seq.cancelDeferredAcknowledgments();
         t.cancel();
-        control.verify();
-
     }
 
     @Test
     public void testCancelTermination() {
-        destination = control.createMock(Destination.class);
-        manager = control.createMock(RMManager.class);
-        EasyMock.expect(destination.getManager()).andReturn(manager);
+        destination = mock(Destination.class);
+        manager = mock(RMManager.class);
+        when(destination.getManager()).thenReturn(manager);
         Timer t = new Timer();
-        EasyMock.expect(manager.getTimer()).andReturn(t);
+        when(manager.getTimer()).thenReturn(t);
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        control.replay();
+
         seq.scheduleSequenceTermination(30000L);
         seq.cancelTermination();
         t.cancel();
-        control.verify();
     }
 
     private void setUpDestination() {
@@ -693,7 +688,7 @@ public class DestinationSequenceTest {
 
     private void setUpDestination(Timer timer, RMEndpoint rme) {
 
-        manager = control.createMock(RMManager.class);
+        manager = mock(RMManager.class);
 
         org.apache.cxf.ws.rm.manager.ObjectFactory cfgFactory =
             new org.apache.cxf.ws.rm.manager.ObjectFactory();
@@ -703,22 +698,22 @@ public class DestinationSequenceTest {
 
         config = new RMConfiguration();
         config.setBaseRetransmissionInterval(3000L);
-        EasyMock.expect(manager.getConfiguration()).andReturn(config).anyTimes();
+        when(manager.getConfiguration()).thenReturn(config);
         endpoint = rme;
         if (endpoint == null) {
-            endpoint = control.createMock(RMEndpoint.class);
+            endpoint = mock(RMEndpoint.class);
         }
-        EasyMock.expect(endpoint.getConfiguration()).andReturn(config).anyTimes();
+        when(endpoint.getConfiguration()).thenReturn(config);
 
-        EasyMock.expect(manager.getDestinationPolicy()).andReturn(dp).anyTimes();
-        EasyMock.expect(manager.getStore()).andReturn(null).anyTimes();
+        when(manager.getDestinationPolicy()).thenReturn(dp);
+        when(manager.getStore()).thenReturn(null);
 
-        destination = control.createMock(Destination.class);
-        EasyMock.expect(destination.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(endpoint).anyTimes();
+        destination = mock(Destination.class);
+        when(destination.getManager()).thenReturn(manager);
+        when(destination.getReliableEndpoint()).thenReturn(endpoint);
 
         if (null != timer) {
-            EasyMock.expect(manager.getTimer()).andReturn(timer).anyTimes();
+            when(manager.getTimer()).thenReturn(timer);
         }
 
     }
@@ -728,19 +723,19 @@ public class DestinationSequenceTest {
     }
 
     private Message setUpMessage(String messageNr, boolean useuri) {
-        Message message = control.createMock(Message.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.getOutMessage()).andReturn(null);
-        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null);
-        RMProperties rmps = control.createMock(RMProperties.class);
-        EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
-        SequenceType st = control.createMock(SequenceType.class);
-        EasyMock.expect(rmps.getSequence()).andReturn(st);
+        Message message = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getOutMessage()).thenReturn(null);
+        when(exchange.getOutFaultMessage()).thenReturn(null);
+        RMProperties rmps = mock(RMProperties.class);
+        when(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).thenReturn(rmps);
+        SequenceType st = mock(SequenceType.class);
+        when(rmps.getSequence()).thenReturn(st);
         Long val = Long.valueOf(messageNr);
-        EasyMock.expect(st.getMessageNumber()).andReturn(val);
+        when(st.getMessageNumber()).thenReturn(val);
         if (useuri) {
-            EasyMock.expect(rmps.getNamespaceURI()).andReturn(RM10Constants.NAMESPACE_URI);
+            when(rmps.getNamespaceURI()).thenReturn(RM10Constants.NAMESPACE_URI);
         }
         return message;
     }

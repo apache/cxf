@@ -1718,7 +1718,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         return null;
     }
 
-    private static class RMMemoryStore implements RMStore {
+    private static final class RMMemoryStore implements RMStore {
         // during this particular test, the operations are expected to be invoked sequentially so use just HashMap
         Map<Identifier, SourceSequence> ssmap = new HashMap<>();
         Map<Identifier, DestinationSequence> dsmap = new HashMap<>();

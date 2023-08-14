@@ -137,7 +137,7 @@ public class UndertowHTTPServerEngineFactory {
             }
         }
     }
-    private class UndertowBusLifeCycleListener implements BusLifeCycleListener {
+    private final class UndertowBusLifeCycleListener implements BusLifeCycleListener {
         public void initComplete() {
             UndertowHTTPServerEngineFactory.this.initComplete();
         }

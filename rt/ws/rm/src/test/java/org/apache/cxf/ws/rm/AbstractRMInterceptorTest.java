@@ -33,10 +33,6 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,34 +40,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class AbstractRMInterceptorTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testAccessors() {
         RMInterceptor interceptor = new RMInterceptor();
         assertEquals(Phase.PRE_LOGICAL, interceptor.getPhase());
-        Bus bus = control.createMock(Bus.class);
-        RMManager busMgr = control.createMock(RMManager.class);
-        EasyMock.expect(bus.getExtension(RMManager.class)).andReturn(busMgr);
-        RMManager mgr = control.createMock(RMManager.class);
+        Bus bus = mock(Bus.class);
+        RMManager busMgr = mock(RMManager.class);
+        when(bus.getExtension(RMManager.class)).thenReturn(busMgr);
+        RMManager mgr = mock(RMManager.class);
 
-        control.replay();
         assertNull(interceptor.getBus());
         interceptor.setBus(bus);
         assertSame(bus, interceptor.getBus());
@@ -83,15 +69,15 @@ public class AbstractRMInterceptorTest {
     @Test
     public void testHandleMessageSequenceFaultNoBinding() {
         RMInterceptor interceptor = new RMInterceptor();
-        Message message = control.createMock(Message.class);
-        SequenceFault sf = control.createMock(SequenceFault.class);
+        Message message = mock(Message.class);
+        SequenceFault sf = mock(SequenceFault.class);
         interceptor.setSequenceFault(sf);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
-        Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(ex.getEndpoint()).andReturn(e);
-        EasyMock.expect(e.getBinding()).andReturn(null);
-        control.replay();
+        Exchange ex = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(ex);
+        Endpoint e = mock(Endpoint.class);
+        when(ex.getEndpoint()).thenReturn(e);
+        when(e.getBinding()).thenReturn(null);
+
         try {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
@@ -103,23 +89,23 @@ public class AbstractRMInterceptorTest {
     @Test
     public void testHandleMessageSequenceFault() {
         RMInterceptor interceptor = new RMInterceptor();
-        Message message = control.createMock(Message.class);
-        SequenceFault sf = control.createMock(SequenceFault.class);
+        Message message = mock(Message.class);
+        SequenceFault sf = mock(SequenceFault.class);
         interceptor.setSequenceFault(sf);
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
-        Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(ex.getEndpoint()).andReturn(e);
-        Binding b = control.createMock(Binding.class);
-        EasyMock.expect(e.getBinding()).andReturn(b);
-        RMManager mgr = control.createMock(RMManager.class);
+        Exchange ex = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(ex);
+        Endpoint e = mock(Endpoint.class);
+        when(ex.getEndpoint()).thenReturn(e);
+        Binding b = mock(Binding.class);
+        when(e.getBinding()).thenReturn(b);
+        RMManager mgr = mock(RMManager.class);
         interceptor.setManager(mgr);
-        BindingFaultFactory bff = control.createMock(BindingFaultFactory.class);
-        EasyMock.expect(mgr.getBindingFaultFactory(b)).andReturn(bff);
-        Fault fault = control.createMock(Fault.class);
-        EasyMock.expect(bff.createFault(sf, message)).andReturn(fault);
-        EasyMock.expect(bff.toString(fault)).andReturn("f");
-        control.replay();
+        BindingFaultFactory bff = mock(BindingFaultFactory.class);
+        when(mgr.getBindingFaultFactory(b)).thenReturn(bff);
+        Fault fault = mock(Fault.class);
+        when(bff.createFault(sf, message)).thenReturn(fault);
+        when(bff.toString(fault)).thenReturn("f");
+
         try {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
@@ -131,10 +117,10 @@ public class AbstractRMInterceptorTest {
     @Test
     public void testHandleMessageRMException() {
         RMInterceptor interceptor = new RMInterceptor();
-        Message message = control.createMock(Message.class);
-        RMException rme = control.createMock(RMException.class);
+        Message message = mock(Message.class);
+        RMException rme = mock(RMException.class);
         interceptor.setRMException(rme);
-        control.replay();
+
         try {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
@@ -146,23 +132,25 @@ public class AbstractRMInterceptorTest {
     @Test
     public void testAssertReliability() {
         RMInterceptor interceptor = new RMInterceptor();
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
-        AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
+        Message message = mock(Message.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(null);
+        AssertionInfoMap aim = mock(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = new ArrayList<>();
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim).times(2);
-        PolicyAssertion a = control.createMock(PolicyAssertion.class);
+        when(message.get(AssertionInfoMap.class)).thenReturn(aim);
+        PolicyAssertion a = mock(PolicyAssertion.class);
         AssertionInfo ai = new AssertionInfo(a);
-        EasyMock.expectLastCall();
-        control.replay();
+
         interceptor.assertReliability(message);
         assertFalse(ai.isAsserted());
         aim.put(RM10Constants.RMASSERTION_QNAME, ais);
         interceptor.assertReliability(message);
         assertFalse(ai.isAsserted());
+        verify(message, times(2)).get(AssertionInfoMap.class);
+
         ais.add(ai);
         interceptor.assertReliability(message);
 
+        verify(message, times(3)).get(AssertionInfoMap.class);
     }
 
     class RMInterceptor extends AbstractRMInterceptor<Message> {

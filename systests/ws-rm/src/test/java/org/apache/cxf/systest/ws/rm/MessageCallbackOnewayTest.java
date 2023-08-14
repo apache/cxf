@@ -300,7 +300,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private static class RecordingMessageCallback implements MessageCallback {
+    private static final class RecordingMessageCallback implements MessageCallback {
 
         private BlockingQueue<Callback> callbacks = new LinkedBlockingQueue<>();
 

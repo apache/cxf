@@ -51,10 +51,7 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -63,27 +60,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ManagedRMManagerTest {
     private static final String TEST_URI = "http://nowhere.com/bar/foo";
-    private IMocksControl control;
 
     private Bus bus;
     private InstrumentationManager im;
     private RMManager manager;
     private Endpoint endpoint;
 
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @After
     public void tearDown() throws Exception {
         if (bus != null) {
             bus.shutdown(true);
         }
-        control.verify();
     }
 
     @Test
@@ -183,7 +175,7 @@ public class ManagedRMManagerTest {
     @Test
     public void testRemoveSequence() throws Exception {
         manager = new RMManager();
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         EndpointReferenceType ref = RMUtils.createReference(TEST_URI);
         Source source = new Source(rme);
         Destination destination = new Destination(rme);
@@ -197,11 +189,10 @@ public class ManagedRMManagerTest {
         SourceSequence ss3 = createTestSourceSequence(source, "seq3", ref,
                                                      ProtocolVariation.RM10WSA200408, new long[]{1L, 5L});
 
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
+        when(rme.getManager()).thenReturn(manager);
+        when(rme.getSource()).thenReturn(source);
+        when(rme.getDestination()).thenReturn(destination);
 
-        control.replay();
         setCurrentMessageNumber(ss1, 5L);
         setCurrentMessageNumber(ss3, 5L);
         source.addSequence(ss1);
@@ -348,7 +339,7 @@ public class ManagedRMManagerTest {
 
     private ManagedRMEndpoint createTestManagedRMEndpoint() {
         manager = new RMManager();
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         EndpointReferenceType ref = RMUtils.createReference(TEST_URI);
         Source source = new Source(rme);
         Destination destination = new Destination(rme);
@@ -360,11 +351,10 @@ public class ManagedRMManagerTest {
         List<SourceSequence> sss = createTestSourceSequences(source, ref);
         List<DestinationSequence> dss = createTestDestinationSequences(destination, ref);
 
-        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
+        when(rme.getManager()).thenReturn(manager);
+        when(rme.getSource()).thenReturn(source);
+        when(rme.getDestination()).thenReturn(destination);
 
-        control.replay();
         setCurrentMessageNumber(sss.get(0), 5L);
         setCurrentMessageNumber(sss.get(1), 4L);
         source.addSequence(sss.get(0));
@@ -460,13 +450,12 @@ public class ManagedRMManagerTest {
     }
 
     private RMEndpoint createTestRMEndpoint() throws Exception {
-        Message message = control.createMock(Message.class);
-        Exchange exchange = control.createMock(Exchange.class);
+        Message message = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
 
-        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getEndpoint()).thenReturn(endpoint);
 
-        control.replay();
         return manager.getReliableEndpoint(message);
     }
 
@@ -549,7 +538,7 @@ public class ManagedRMManagerTest {
         }
     }
 
-    private static class TestRetransmissionStatus implements RetryStatus {
+    private static final class TestRetransmissionStatus implements RetryStatus {
         private long interval = 300000L;
         private Date next = new Date(System.currentTimeMillis() + interval / 2);
         private Date previous = new Date(next.getTime() - interval);

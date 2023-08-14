@@ -148,7 +148,7 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
                 .getContextualProperty(Configuration.class.getName());
     }
 
-    private class ResponseExceptionMapperComparator implements Comparator<ResponseExceptionMapper<?>> {
+    private final class ResponseExceptionMapperComparator implements Comparator<ResponseExceptionMapper<?>> {
 
         @Override
         public int compare(ResponseExceptionMapper<?> oLeft, ResponseExceptionMapper<?> oRight) {

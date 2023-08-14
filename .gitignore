@@ -21,3 +21,4 @@ derby.log
 .sts4-cache/
 **/.factorypath
 .vscode/
+*.xml.bak

@@ -37,7 +37,7 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
     public byte[] sign(JwsHeaders headers, byte[] content) {
         return EMPTY_BYTE_ARRAY;
     }
-    private static class NoneJwsSignature implements JwsSignature {
+    private static final class NoneJwsSignature implements JwsSignature {
 
         @Override
         public void update(byte[] src, int off, int len) {

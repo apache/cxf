@@ -34,15 +34,14 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NettyHttpServerEngineTest {
     private static final int PORT1
@@ -54,19 +53,14 @@ public class NettyHttpServerEngineTest {
 
 
     private Bus bus;
-    private IMocksControl control;
     private NettyHttpServerEngineFactory factory;
 
     @Before
     public void setUp() throws Exception {
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
+        bus = mock(Bus.class);
 
-        Configurer configurer = control.createMock(Configurer.class);
-        bus.getExtension(Configurer.class);
-        EasyMock.expectLastCall().andReturn(configurer).anyTimes();
-
-        control.replay();
+        Configurer configurer = mock(Configurer.class);
+        when(bus.getExtension(Configurer.class)).thenReturn(configurer);
 
         factory = new NettyHttpServerEngineFactory();
         factory.setBus(bus);

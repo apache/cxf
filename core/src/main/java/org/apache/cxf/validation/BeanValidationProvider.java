@@ -198,7 +198,7 @@ public class BeanValidationProvider implements AutoCloseable {
 
     // only created when there is a single validator/factory so it is safe to cache
     // note: the validator is passed as param to avoid to create useless ones
-    private static class RuntimeCache {
+    private static final class RuntimeCache {
         private final ConcurrentMap<Class<?>, Boolean> types = new ConcurrentHashMap<>();
         private final ConcurrentMap<Method, Boolean> params = new ConcurrentHashMap<>();
         private final ConcurrentMap<Method, Boolean> returnedValues = new ConcurrentHashMap<>();
