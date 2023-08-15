@@ -39,7 +39,7 @@ public class ObservationFeature extends DelegatingFeature<ObservationFeature.Por
     }
 
     public ObservationFeature(final ObservationRegistry observationRegistry, final @Nullable
-    MessageInObservationConvention convention) {
+            MessageInObservationConvention convention) {
         super(new Portable(observationRegistry, convention));
     }
 

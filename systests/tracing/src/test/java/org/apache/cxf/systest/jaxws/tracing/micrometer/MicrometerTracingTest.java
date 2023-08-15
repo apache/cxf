@@ -16,30 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.tracing.micrometer;
-
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+package org.apache.cxf.systest.jaxws.tracing.micrometer;
 
 import brave.Tracing;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.brave.TestSpanReporter;
-import org.apache.cxf.systest.brave.jaxrs.AbstractBraveTracingTest;
-import org.apache.cxf.systest.jaxrs.tracing.BookStore;
-import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
+import org.apache.cxf.systest.brave.jaxws.AbstractBraveTracingTest;
+import org.apache.cxf.systest.jaxws.tracing.brave.BookStore;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
-import org.apache.cxf.tracing.brave.TraceScope;
+import org.apache.cxf.tracing.micrometer.DefaultMessageInObservationConvention;
 import org.apache.cxf.tracing.micrometer.DefaultMessageOutObservationConvention;
+import org.apache.cxf.tracing.micrometer.MessageInContext;
 import org.apache.cxf.tracing.micrometer.MessageOutContext;
 import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
-import org.apache.cxf.tracing.micrometer.jaxrs.ContainerRequestReceiverContext;
-import org.apache.cxf.tracing.micrometer.jaxrs.ContainerRequestSenderObservationContext;
-import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestReceiverObservationConvention;
-import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestSenderObservationConvention;
-import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
-import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
+import org.apache.cxf.tracing.micrometer.ObservationFeature;
 
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
@@ -47,9 +39,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 
-import static org.apache.cxf.systest.micrometer.ObservationRegistrySupport.createObservationRegistry; 
+import static org.apache.cxf.systest.micrometer.ObservationRegistrySupport.createObservationRegistry;
 import static org.junit.Assert.assertTrue;
 
 public class MicrometerTracingTest extends AbstractBraveTracingTest {
@@ -57,42 +50,38 @@ public class MicrometerTracingTest extends AbstractBraveTracingTest {
 
     private static MeterRegistry meterRegistry;
 
-    public static class MicrometerServer extends AbstractTestServerBase {
+    public static class Server extends AbstractTestServerBase {
         private org.apache.cxf.endpoint.Server server;
 
         @Override
         protected void run() {
-            final Tracing brave = Tracing
-                .newBuilder()
+            final Tracing brave = Tracing.newBuilder()
+                .localServiceName("book-store")
                 .spanReporter(new TestSpanReporter())
                 .build();
 
             final ObservationRegistry observationRegistry = createObservationRegistry(meterRegistry, brave);
-            final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-            sf.setResourceClasses(BookStore.class);
-            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
+            final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
+            sf.setServiceClass(BookStore.class);
             sf.setAddress("http://localhost:" + PORT);
-            sf.setProvider(new JacksonJsonProvider());
-            sf.setProvider(new ObservationFeature(observationRegistry,
-                new DefaultContainerRequestReceiverObservationConvention() {
+            sf.getFeatures().add(new ObservationFeature(observationRegistry,
+                new DefaultMessageInObservationConvention() {
                     @Override
-                    public String getContextualName(ContainerRequestReceiverContext context) {
-                        return context.getRequestContext().getMethod() + " /"
-                                + context.getRequestContext().getUriInfo().getPath();
+                    public String getContextualName(MessageInContext context) {
+                        return context.getMessage().get(Message.HTTP_REQUEST_METHOD) + " " 
+                                + context.getUri().getPath();
                     }
-    
+                    
                     @Override
-                    public KeyValues getLowCardinalityKeyValues(ContainerRequestReceiverContext context) {
+                    public KeyValues getLowCardinalityKeyValues(MessageInContext context) {
                         KeyValues keyValues = super.getLowCardinalityKeyValues(context);
                         if (context.getResponse() != null) {
                             return keyValues.and(KeyValue.of("http.status_code",
-                                String.valueOf(context.getResponse().getStatus())));
+                                String.valueOf(context.getResponse().get(Message.RESPONSE_CODE))));
                         }
                         return keyValues;
                     }
-                }
-            ));
-            sf.setProvider(new NullPointerExceptionMapper());
+                }));
             server = sf.create();
         }
 
@@ -105,26 +94,20 @@ public class MicrometerTracingTest extends AbstractBraveTracingTest {
     @BeforeClass
     public static void startServers() throws Exception {
         meterRegistry = new SimpleMeterRegistry();
-
-        AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
-        assertTrue("server did not launch correctly",
-                   launchServer(MicrometerServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
+    @After
+    public void tearDown() {
+        TestSpanReporter.clear();
+    }
+    
     @Override
-    protected Object getClientProvider(Tracing tracing) {
-        return new ObservationClientProvider(createObservationRegistry(meterRegistry, tracing),
-            new DefaultContainerRequestSenderObservationConvention() {
-                @Override
-                public String getContextualName(ContainerRequestSenderObservationContext context) {
-                    // To align with Brave's defaults
-                    return context.getRequestContext().getMethod() + " "
-                        + context.getRequestContext().getUri().toString();
-                }
-            });
+    protected int getPort() {
+        return Integer.parseInt(PORT);
     }
-
+    
     @Override
     protected Feature getClientFeature(Tracing tracing) {
         return  new ObservationClientFeature(createObservationRegistry(meterRegistry, tracing),
@@ -132,14 +115,10 @@ public class MicrometerTracingTest extends AbstractBraveTracingTest {
                 // To align with Brave's defaults
                 @Override
                 public String getContextualName(MessageOutContext context) {
-                    return super.getContextualName(context) + " " + context.getUri().toString();
+                    return context.getMessage().get(Message.HTTP_REQUEST_METHOD)  + " "
+                            + context.getUri().toString();
                 }
             }
         );
-    }
-    
-    @Override
-    protected int getPort() {
-        return Integer.parseInt(PORT);
     }
 }

@@ -22,8 +22,6 @@ package org.apache.cxf.tracing.micrometer.jaxrs;
 import io.micrometer.observation.transport.RequestReplySenderContext;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientResponseContext;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerResponseContext;
 
 /**
  *

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.brave;
+package org.apache.cxf.systest.brave.jaxrs;
 
 import java.net.MalformedURLException;
 import java.time.Duration;
@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.brave.BraveTestSupport.SpanId;
+import org.apache.cxf.systest.brave.TestSpanReporter;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 

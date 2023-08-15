@@ -24,8 +24,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.tracing.micrometer.ObservationClientFeature;
-import org.apache.cxf.tracing.micrometer.ObservationFeature;
 import org.junit.jupiter.api.AfterEach;
 
 import io.micrometer.core.tck.MeterRegistryAssert;
