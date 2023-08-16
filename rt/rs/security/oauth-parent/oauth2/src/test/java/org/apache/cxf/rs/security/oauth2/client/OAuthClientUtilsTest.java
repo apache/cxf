@@ -36,14 +36,12 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.Test;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.mock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OAuthClientUtilsTest {
 
@@ -52,32 +50,26 @@ public class OAuthClientUtilsTest {
         WebClient accessTokenService = mock(WebClient.class);
         String tokenKey = "tokenKey";
         String response = "{\"" + OAuthConstants.ACCESS_TOKEN + "\":\"" + tokenKey + "\"}";
-        expect(accessTokenService.form(anyObject(Form.class))).andReturn(
+        when(accessTokenService.form(any(Form.class))).thenReturn(
                 Response.ok(new ByteArrayInputStream(response.getBytes()), MediaType.APPLICATION_JSON).build());
-        replay(accessTokenService);
 
         ClientAccessToken cat = OAuthClientUtils.getAccessToken(accessTokenService, null, new RefreshTokenGrant(""),
                 null, "defaultTokenType", false);
         assertEquals(tokenKey, cat.getTokenKey());
-
-        verify(accessTokenService);
     }
 
     @Test
     public void getAccessTokenInternalServerError() {
         WebClient accessTokenService = mock(WebClient.class);
-        expect(accessTokenService.form(anyObject(Form.class)))
-                .andReturn(Response.serverError().type(MediaType.TEXT_PLAIN)
+        when(accessTokenService.form(any(Form.class)))
+                .thenReturn(Response.serverError().type(MediaType.TEXT_PLAIN)
                         .entity(new ByteArrayInputStream("Unrecoverable error in the server.".getBytes())).build());
-        replay(accessTokenService);
 
         try {
             OAuthClientUtils.getAccessToken(accessTokenService, null, new RefreshTokenGrant(""), null, null, false);
             fail();
         } catch (OAuthServiceException e) {
             assertEquals(OAuthConstants.SERVER_ERROR, e.getMessage());
-        } finally {
-            verify(accessTokenService);
         }
     }
 
