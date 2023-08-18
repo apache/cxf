@@ -32,9 +32,14 @@ import org.apache.cxf.ws.transfer.Representation;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ResourceFactoryTest extends IntegrationBaseTest {
 
@@ -74,11 +79,9 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
     @Test
     public void createLocalResourceTest() {
         ReferenceParametersType refParams = createReferenceParameters();
-        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
-        EasyMock.expect(manager.create(EasyMock.isA(Representation.class)))
-                .andReturn(refParams);
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(manager);
+        ResourceManager manager = mock(ResourceManager.class);
+        when(manager.create(isA(Representation.class)))
+                .thenReturn(refParams);
 
         Server localResourceFactory = createLocalResourceFactory(manager);
         ResourceFactory client = createClient();
@@ -89,7 +92,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         createRequest.setRepresentation(representation);
 
         CreateResponse response = client.create(createRequest);
-        EasyMock.verify(manager);
+        verify(manager, times(1)).create(isA(Representation.class));
 
         Assert.assertEquals("ResourceAddress is other than expected.", RESOURCE_ADDRESS,
                 response.getResourceCreated().getAddress().getValue());
@@ -106,11 +109,9 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
     @Test
     public void createRemoteResourceTest() {
         ReferenceParametersType refParams = createReferenceParameters();
-        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
-        EasyMock.expect(manager.create(EasyMock.isA(Representation.class)))
-                .andReturn(refParams);
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(manager);
+        ResourceManager manager = mock(ResourceManager.class);
+        when(manager.create(isA(Representation.class)))
+                .thenReturn(refParams);
 
         Server remoteResourceFactory = createRemoteResourceFactory();
         Server remoteResource = createRemoteResource(manager);
@@ -122,7 +123,7 @@ public class ResourceFactoryTest extends IntegrationBaseTest {
         createRequest.setRepresentation(representation);
 
         CreateResponse response = client.create(createRequest);
-        EasyMock.verify(manager);
+        verify(manager, times(1)).create(isA(Representation.class));
 
         Assert.assertEquals("ResourceAddress is other than expected.", RESOURCE_REMOTE_ADDRESS,
                 response.getResourceCreated().getAddress().getValue());
