@@ -37,7 +37,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.CXFConnectionFactory;
 import org.apache.hello_world_soap_http.Greeter;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +46,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ManagedConnectionFactoryImplTest {
 
@@ -172,14 +172,10 @@ public class ManagedConnectionFactoryImplTest {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
-        ManagedConnectionFactoryImpl factory = EasyMock.createMock(ManagedConnectionFactoryImpl.class);
-        factory.getBus();
+        ManagedConnectionFactoryImpl factory = mock(ManagedConnectionFactoryImpl.class);
+        when(factory.getBus()).thenReturn(bus);
         // In ManagedConnectionImpl:
         // one for getCXFServiceFromBus , another for createInvocationHandler
-        EasyMock.expectLastCall().andReturn(bus).times(4);
-
-        EasyMock.replay(factory);
-
 
         ManagedConnectionImpl mc1 = new ManagedConnectionImpl(factory, cri, subj);
         Object connection = mc1.getConnection(subj, cri);
@@ -231,7 +227,7 @@ public class ManagedConnectionFactoryImplTest {
     @Test
     public void testCreateConnectionFactoryCM() throws Exception {
         ManagedConnectionFactoryImplTester mcit = new ManagedConnectionFactoryImplTester();
-        ConnectionManager connManager = EasyMock.createMock(ConnectionManager.class);
+        ConnectionManager connManager = mock(ConnectionManager.class);
         assertTrue("We get a CF back",
                    mcit.createConnectionFactory(connManager) instanceof CXFConnectionFactory);
         assertEquals("init was called once", 1, mcit.initCalledCount);

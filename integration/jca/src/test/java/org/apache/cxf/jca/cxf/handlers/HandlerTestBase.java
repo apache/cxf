@@ -26,24 +26,25 @@ import org.apache.cxf.jca.cxf.CXFManagedConnection;
 import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
 import org.apache.cxf.jca.cxf.ManagedConnectionImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HandlerTestBase {
-    protected Bus mockBus = EasyMock.createMock(Bus.class);
+    protected Bus mockBus = mock(Bus.class);
     protected CXFManagedConnection mockManagedConnection =
-                EasyMock.createMock(CXFManagedConnection.class);
+                mock(CXFManagedConnection.class);
 
     protected CXFInvocationHandler mockHandler =
-                EasyMock.createMock(CXFInvocationHandler.class);
+                mock(CXFInvocationHandler.class);
 
     protected ManagedConnectionFactoryImpl mcf =
-                EasyMock.createMock(ManagedConnectionFactoryImpl.class);
+                mock(ManagedConnectionFactoryImpl.class);
     protected ManagedConnectionImpl mci =
-                EasyMock.createMock(ManagedConnectionImpl.class);
+                mock(ManagedConnectionImpl.class);
     protected Method testMethod;
     protected TestTarget target = new TestTarget();
 
@@ -53,16 +54,9 @@ public class HandlerTestBase {
 
     @Before
     public void setUp() {
-        EasyMock.reset(mcf);
-        EasyMock.reset(mci);
+        when(mcf.getBus()).thenReturn(mockBus);
+        when(mci.getManagedConnectionFactory()).thenReturn(mcf);
 
-        mcf.getBus();
-        EasyMock.expectLastCall().andReturn(mockBus);
-        EasyMock.replay(mcf);
-
-        mci.getManagedConnectionFactory();
-        EasyMock.expectLastCall().andReturn(mcf);
-        EasyMock.replay(mci);
         try {
             testMethod = TestTarget.class.getMethod("testMethod", new Class[0]);
         } catch (NoSuchMethodException ex) {

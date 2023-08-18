@@ -31,9 +31,10 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.Greeter;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class ManagedConnectionTestBase {
     protected Subject subj;
@@ -44,11 +45,11 @@ public abstract class ManagedConnectionTestBase {
 
     protected ManagedConnectionImpl mci;
 
-    protected ManagedConnectionFactoryImpl factory = EasyMock.createMock(ManagedConnectionFactoryImpl.class);
+    protected ManagedConnectionFactoryImpl factory = mock(ManagedConnectionFactoryImpl.class);
 
     protected Bus bus;
 
-    protected ConnectionEventListener mockListener = EasyMock.createMock(ConnectionEventListener.class);
+    protected ConnectionEventListener mockListener = mock(ConnectionEventListener.class);
 
     public ManagedConnectionTestBase() {
 
@@ -78,12 +79,7 @@ public abstract class ManagedConnectionTestBase {
         BusFactory.setDefaultBus(bus);
 
 
-        EasyMock.reset(factory);
-
-        factory.getBus();
-
-        EasyMock.expectLastCall().andReturn(bus).anyTimes();
-        EasyMock.replay(factory);
+        when(factory.getBus()).thenReturn(bus);
 
         mci = new ManagedConnectionImpl(factory, cri, subj);
 

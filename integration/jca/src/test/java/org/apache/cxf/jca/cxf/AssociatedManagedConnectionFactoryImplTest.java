@@ -25,13 +25,13 @@ import javax.resource.spi.ResourceAdapter;
 
 import org.apache.cxf.Bus;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class AssociatedManagedConnectionFactoryImplTest {
 
@@ -49,7 +49,7 @@ public class AssociatedManagedConnectionFactoryImplTest {
     public void testSetWrongResourceAdapterThrowException() throws Exception {
         TestableAssociatedManagedConnectionFactoryImpl mci =
             new TestableAssociatedManagedConnectionFactoryImpl();
-        ResourceAdapter rai = EasyMock.createMock(ResourceAdapter.class);
+        ResourceAdapter rai = mock(ResourceAdapter.class);
         try {
             mci.setResourceAdapter(rai);
             fail("exception expected");

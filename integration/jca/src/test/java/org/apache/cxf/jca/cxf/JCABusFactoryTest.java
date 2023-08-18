@@ -29,13 +29,13 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 import org.apache.cxf.test.AbstractCXFTest;
 
-import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class JCABusFactoryTest extends AbstractCXFTest {
 
@@ -67,7 +67,7 @@ public class JCABusFactoryTest extends AbstractCXFTest {
         mcf.setMonitorEJBServiceProperties(Boolean.TRUE);
         JCABusFactory jcaBusFactory = new JCABusFactory(mcf);
         try {
-            Bus mockBus = EasyMock.createMock(Bus.class);
+            Bus mockBus = mock(Bus.class);
             jcaBusFactory.setBus(mockBus);
             jcaBusFactory.initializeServants();
             fail("exception expected");
@@ -85,7 +85,7 @@ public class JCABusFactoryTest extends AbstractCXFTest {
         URL propFile = getClass().getResource("resources/ejb_servants.properties");
         mcf.setEJBServicePropertiesURL(propFile.toString());
         JCABusFactory jcaBusFactory = new JCABusFactory(mcf);
-        Bus mockBus = EasyMock.createMock(Bus.class);
+        Bus mockBus = mock(Bus.class);
 
         jcaBusFactory.setBus(mockBus);
         jcaBusFactory.initializeServants();
