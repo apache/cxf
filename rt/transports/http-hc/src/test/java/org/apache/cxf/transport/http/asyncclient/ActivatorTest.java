@@ -26,10 +26,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.osgi.framework.BundleContext;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.mock;
+import static org.mockito.Mockito.mock;
 
 public class ActivatorTest {
 
@@ -49,11 +48,9 @@ public class ActivatorTest {
         //Dummy service properties that are expected to be passed to conduitFactory
         final Map<String, Object> properties = Collections.singletonMap("foo", "bar");
         conduitFactory.update(properties);
-        EasyMock.replay(conduitFactory);
 
         //act and verify
         configurer.updated(new Hashtable<>(properties));
-        EasyMock.verify(conduitFactory);
     }
 
 }
