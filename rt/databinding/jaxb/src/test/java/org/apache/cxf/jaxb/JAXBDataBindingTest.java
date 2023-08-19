@@ -71,8 +71,6 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,6 +80,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JAXBDataBindingTest {
 
@@ -90,7 +90,6 @@ public class JAXBDataBindingTest {
     private Definition def;
     private Service service;
 
-    private IMocksControl control;
     private Bus bus;
     private BindingFactoryManager bindingFactoryManager;
     private JAXBDataBinding jaxbDataBinding;
@@ -107,16 +106,13 @@ public class JAXBDataBindingTest {
         def = wsdlReader.readWSDL(wsdlUrl);
 
 
-        control = EasyMock.createNiceControl();
-        bus = control.createMock(Bus.class);
-        bindingFactoryManager = control.createMock(BindingFactoryManager.class);
-        destinationFactoryManager = control.createMock(DestinationFactoryManager.class);
+        bus = mock(Bus.class);
+        bindingFactoryManager = mock(BindingFactoryManager.class);
+        destinationFactoryManager = mock(DestinationFactoryManager.class);
 
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
-        EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
-            .andStubReturn(destinationFactoryManager);
-
-        control.replay();
+        when(bus.getExtension(BindingFactoryManager.class)).thenReturn(bindingFactoryManager);
+        when(bus.getExtension(DestinationFactoryManager.class))
+            .thenReturn(destinationFactoryManager);
 
         WSDLServiceBuilder wsdlServiceBuilder = new WSDLServiceBuilder(bus);
         for (Service serv : CastUtils.cast(def.getServices().values(), Service.class)) {

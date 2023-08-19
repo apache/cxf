@@ -55,15 +55,14 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.createNiceControl;
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BareInInterceptorTest {
 
@@ -83,14 +82,13 @@ public class BareInInterceptorTest {
 
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
 
-        IMocksControl control = createNiceControl();
-        BindingFactory bf = control.createMock(BindingFactory.class);
-        Binding binding = control.createMock(Binding.class);
-        expect(bf.createBinding(null)).andStubReturn(binding);
-        expect(binding.getInFaultInterceptors())
-            .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
-        expect(binding.getOutFaultInterceptors())
-            .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
+        BindingFactory bf = mock(BindingFactory.class);
+        Binding binding = mock(Binding.class);
+        when(bf.createBinding(null)).thenReturn(binding);
+        when(binding.getInFaultInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(binding.getOutFaultInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
 
         bfm.registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bf);
 
