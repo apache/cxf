@@ -42,12 +42,14 @@ import org.apache.cxf.microprofile.client.mock.MockConfigProviderResolver;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.eclipse.microprofile.rest.client.tck.interfaces.InterfaceWithoutProvidersDefined;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RestClientCdiTest {
 
@@ -62,15 +64,10 @@ public class RestClientCdiTest {
                          + LowPriorityClientReqFilter.class.getName() + "/priority", "3");
         ((MockConfigProviderResolver)ConfigProviderResolver.instance()).setConfigValues(configValues);
 
-        IMocksControl control = EasyMock.createNiceControl();
-        BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
-        mockedBeanMgr.isScope(Path.class);
-        EasyMock.expectLastCall().andReturn(false);
-        mockedBeanMgr.isScope(Produces.class);
-        EasyMock.expectLastCall().andReturn(false);
-        mockedBeanMgr.isScope(Consumes.class);
-        EasyMock.expectLastCall().andReturn(false);
-        control.replay();
+        BeanManager mockedBeanMgr = mock(BeanManager.class);
+        when(mockedBeanMgr.isScope(Path.class)).thenReturn(false);
+        when(mockedBeanMgr.isScope(Produces.class)).thenReturn(false);
+        when(mockedBeanMgr.isScope(Consumes.class)).thenReturn(false);
 
         RestClientBean bean = new RestClientBean(InterfaceWithoutProvidersDefined.class, mockedBeanMgr);
         List<Class<?>> registeredProviders = bean.getConfiguredProviders();
@@ -84,32 +81,26 @@ public class RestClientCdiTest {
         assertEquals(3, (int) priorities.get(LowPriorityClientReqFilter.class));
         assertEquals(10, (int) priorities.get(HighPriorityClientReqFilter.class));
         assertEquals(Priorities.USER, (int) priorities.get(InvokedMethodClientRequestFilter.class));
-
-        control.verify();
     }
 
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsReleasedOnClientClose() throws Exception {
-        IMocksControl control = EasyMock.createStrictControl();
-        BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
-        CreationalContext<?> mockedCreationalCtx = control.createMock(CreationalContext.class);
-        Bean<?> mockedBean = control.createMock(Bean.class);
+        BeanManager mockedBeanMgr = mock(BeanManager.class);
+        CreationalContext<?> mockedCreationalCtx = mock(CreationalContext.class);
+        Bean<?> mockedBean = mock(Bean.class);
         List<String> stringList = new ArrayList<>(Collections.singleton("abc"));
 
-        EasyMock.expect(mockedBeanMgr.getBeans(List.class))
-                .andReturn(Collections.singleton(mockedBean));
-        EasyMock.expect(mockedBeanMgr.createCreationalContext(mockedBean))
-                .andReturn((CreationalContext) mockedCreationalCtx);
-        EasyMock.expect(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
-                .andReturn(stringList);
-        EasyMock.expect(mockedBean.getScope())
-                .andReturn((Class) ApplicationScoped.class);
-        EasyMock.expect(mockedBeanMgr.isNormalScope(ApplicationScoped.class))
-                .andReturn(false);
-        mockedCreationalCtx.release();
-        EasyMock.expectLastCall().once();
-        control.replay();
+        when(mockedBeanMgr.getBeans(List.class))
+                .thenReturn(Collections.singleton(mockedBean));
+        when(mockedBeanMgr.createCreationalContext(mockedBean))
+                .thenReturn((CreationalContext) mockedCreationalCtx);
+        when(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
+                .thenReturn(stringList);
+        when(mockedBean.getScope())
+                .thenReturn((Class) ApplicationScoped.class);
+        when(mockedBeanMgr.isNormalScope(ApplicationScoped.class))
+                .thenReturn(false);
 
         Bus bus = new ExtensionManagerBus();
         bus.setExtension(mockedBeanMgr, BeanManager.class);
@@ -118,29 +109,27 @@ public class RestClientCdiTest {
         assertEquals(stringList, i.getValue());
         i.release();
 
-        control.verify();
+        verify(mockedCreationalCtx, times(1)).release();
     }
 
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void testCreationalContextsNotReleasedOnClientCloseUsingNormalScope() throws Exception {
-        IMocksControl control = EasyMock.createStrictControl();
-        BeanManager mockedBeanMgr = control.createMock(BeanManager.class);
-        CreationalContext<?> mockedCreationalCtx = control.createMock(CreationalContext.class);
-        Bean<?> mockedBean = control.createMock(Bean.class);
+        BeanManager mockedBeanMgr = mock(BeanManager.class);
+        CreationalContext<?> mockedCreationalCtx = mock(CreationalContext.class);
+        Bean<?> mockedBean = mock(Bean.class);
         List<String> stringList = new ArrayList<>(Collections.singleton("xyz"));
 
-        EasyMock.expect(mockedBeanMgr.getBeans(List.class))
-                .andReturn(Collections.singleton(mockedBean));
-        EasyMock.expect(mockedBeanMgr.createCreationalContext(mockedBean))
-                .andReturn((CreationalContext) mockedCreationalCtx);
-        EasyMock.expect(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
-                .andReturn(stringList);
-        EasyMock.expect(mockedBean.getScope())
-                .andReturn((Class) NormalScope.class);
-        EasyMock.expect(mockedBeanMgr.isNormalScope(NormalScope.class))
-                .andReturn(true);
-        control.replay();
+        when(mockedBeanMgr.getBeans(List.class))
+                .thenReturn(Collections.singleton(mockedBean));
+        when(mockedBeanMgr.createCreationalContext(mockedBean))
+                .thenReturn((CreationalContext) mockedCreationalCtx);
+        when(mockedBeanMgr.getReference(mockedBean, List.class, mockedCreationalCtx))
+                .thenReturn(stringList);
+        when(mockedBean.getScope())
+                .thenReturn((Class) NormalScope.class);
+        when(mockedBeanMgr.isNormalScope(NormalScope.class))
+                .thenReturn(true);
 
         Bus bus = new ExtensionManagerBus();
         bus.setExtension(mockedBeanMgr, BeanManager.class);
@@ -148,7 +137,5 @@ public class RestClientCdiTest {
         Instance<List> i = CDIUtils.getInstanceFromCDI(List.class, bus);
 
         i.release();
-
-        control.verify();
     }
 }
