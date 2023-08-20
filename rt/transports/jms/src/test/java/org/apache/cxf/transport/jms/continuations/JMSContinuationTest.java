@@ -30,7 +30,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +38,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class JMSContinuationTest {
 
@@ -51,16 +53,16 @@ public class JMSContinuationTest {
         m = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         m.setExchange(exchange);
-        m.setInterceptorChain(EasyMock.createMock(InterceptorChain.class));
+        m.setInterceptorChain(mock(InterceptorChain.class));
         exchange.setInMessage(m);
 
         b = BusFactory.getDefaultBus();
-        observer = EasyMock.createMock(MessageObserver.class);
+        observer = mock(MessageObserver.class);
     }
 
     @Test
     public void testInitialStatus() {
-        Counter continuations = EasyMock.createMock(Counter.class);
+        Counter continuations = mock(Counter.class);
         JMSContinuation cw = new JMSContinuation(b, m, observer, continuations);
         assertTrue(cw.isNew());
         assertFalse(cw.isPending());
@@ -83,17 +85,13 @@ public class JMSContinuationTest {
         assertFalse(cw.suspend(1000));
         Assert.assertEquals(1, continuations.counter.get());
 
-        observer.onMessage(m);
-        EasyMock.expectLastCall();
-        EasyMock.replay(observer);
-
         cw.resume();
         Assert.assertEquals(0, continuations.counter.get());
         assertFalse(cw.isNew());
         assertFalse(cw.isPending());
         assertTrue(cw.isResumed());
 
-        EasyMock.verify(observer);
+        verify(observer, times(1)).onMessage(m);
     }
 
     @Test
@@ -104,13 +102,9 @@ public class JMSContinuationTest {
         cw.suspend(5000);
         assertFalse(cw.suspend(1000));
 
-        observer.onMessage(m);
-        EasyMock.expectLastCall();
-        EasyMock.replay(observer);
-
         cw.resume();
 
-        EasyMock.verify(observer);
+        verify(observer, times(1)).onMessage(m);
     }
 
     @Test
