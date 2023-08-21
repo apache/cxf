@@ -46,8 +46,12 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
     protected final Tracer tracer;
 
     protected AbstractOpenTelemetryProvider(final OpenTelemetry openTelemetry, final String instrumentationName) {
+        this(openTelemetry, openTelemetry.getTracer(instrumentationName));
+    }
+
+    protected AbstractOpenTelemetryProvider(final OpenTelemetry openTelemetry, final Tracer tracer) {
         this.openTelemetry = openTelemetry;
-        this.tracer = openTelemetry.getTracer(instrumentationName);
+        this.tracer =tracer;
     }
 
     protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,

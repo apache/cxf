@@ -28,11 +28,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 @NoJSR250Annotations
 public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryInterceptor {
     public OpenTelemetryStartInterceptor(OpenTelemetry openTelemetry, String instrumentationName) {
         super(Phase.PRE_INVOKE, openTelemetry, instrumentationName);
+    }
+
+    public OpenTelemetryStartInterceptor(OpenTelemetry openTelemetry, Tracer tracer) {
+        super(Phase.PRE_INVOKE, openTelemetry, tracer);
     }
 
     @Override
@@ -41,8 +46,7 @@ public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryIntercep
             .cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
         final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(headers, getUri(message),
-                                                                         (String)message
-                                                                             .get(Message.HTTP_REQUEST_METHOD));
+             (String)message.get(Message.HTTP_REQUEST_METHOD));
 
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);

@@ -36,11 +36,11 @@ public class OpenTelemetrySetup {
         Resource resource = Resource.getDefault()
             .merge(Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, serviceName)));
 
-        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
+        final SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
             .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())
             .setResource(resource).build();
 
-        OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider)
+        final OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider)
             .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
             .buildAndRegisterGlobal();
 
