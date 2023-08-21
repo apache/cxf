@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 
 import demo.jaxrs.tracing.OpenTelemetrySetup;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.tracing.opentelemetry.OpenTelemetryFeature;
+import org.apache.cxf.tracing.opentelemetry.jaxrs.OpenTelemetryFeature;
 import org.apache.cxf.tracing.opentelemetry.jaxrs.OpenTelemetryClientProvider;
 
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -38,7 +38,7 @@ public final class Client {
     public static void main(final String[] args) throws Exception {
         try (OpenTelemetrySdk openTelemetry = OpenTelemetrySetup.setup(Client.class.getName())) {
             final OpenTelemetryClientProvider provider = new OpenTelemetryClientProvider(openTelemetry,
-                                                                                         OpenTelemetryFeature.DEFAULT_INSTRUMENTATION_NAME);
+                openTelemetry.getTracer(OpenTelemetryFeature.DEFAULT_INSTRUMENTATION_NAME));
 
             final Response response = WebClient
                 .create("http://localhost:9000/catalog", Arrays.asList(provider))

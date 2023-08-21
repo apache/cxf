@@ -28,6 +28,7 @@ import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Client)
@@ -40,9 +41,14 @@ public class OpenTelemetryClientFeature extends DelegatingFeature<OpenTelemetryC
         super(new Portable(openTelemetry, instrumentationName));
     }
 
+    public OpenTelemetryClientFeature(OpenTelemetry openTelemetry, Tracer tracer) {
+        super(new Portable(openTelemetry, tracer));
+    }
+
     public static class Portable implements AbstractPortableFeature {
-        private OpenTelemetryClientStartInterceptor out;
-        private OpenTelemetryClientStopInterceptor in;
+        private final OpenTelemetryClientStartInterceptor out;
+        private final OpenTelemetryClientStopInterceptor in;
+
         public Portable(OpenTelemetry openTelemetry) {
             this(openTelemetry, OpenTelemetryFeature.DEFAULT_INSTRUMENTATION_NAME);
         }
@@ -50,6 +56,11 @@ public class OpenTelemetryClientFeature extends DelegatingFeature<OpenTelemetryC
         public Portable(OpenTelemetry openTelemetry, String instrumentationName) {
             out = new OpenTelemetryClientStartInterceptor(openTelemetry, instrumentationName);
             in = new OpenTelemetryClientStopInterceptor(openTelemetry, instrumentationName);
+        }
+
+        public Portable(OpenTelemetry openTelemetry, Tracer tracer) {
+            out = new OpenTelemetryClientStartInterceptor(openTelemetry, tracer);
+            in = new OpenTelemetryClientStopInterceptor(openTelemetry, tracer);
         }
 
         @Override

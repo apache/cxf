@@ -30,6 +30,7 @@ import org.apache.cxf.tracing.opentelemetry.AbstractOpenTelemetryClientProvider;
 import org.apache.cxf.tracing.opentelemetry.TraceScope;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 @Provider
 public class OpenTelemetryClientProvider extends AbstractOpenTelemetryClientProvider
@@ -37,6 +38,10 @@ public class OpenTelemetryClientProvider extends AbstractOpenTelemetryClientProv
 
     public OpenTelemetryClientProvider(final OpenTelemetry openTelemetry, final String instrumentationName) {
         super(openTelemetry, instrumentationName);
+    }
+
+    public OpenTelemetryClientProvider(final OpenTelemetry openTelemetry, final Tracer tracer) {
+        super(openTelemetry, tracer);
     }
 
     @Override
