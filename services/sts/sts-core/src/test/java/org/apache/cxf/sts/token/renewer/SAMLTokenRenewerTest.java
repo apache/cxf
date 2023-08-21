@@ -61,7 +61,7 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import org.junit.BeforeClass;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -131,7 +131,7 @@ public class SAMLTokenRenewerTest {
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
         String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
-        assertFalse(oldId.equals(newId));
+        assertNotEquals(oldId, newId);
 
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -272,7 +272,7 @@ public class SAMLTokenRenewerTest {
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
         String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
-        assertFalse(oldId.equals(newId));
+        assertNotEquals(oldId, newId);
 
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -348,7 +348,7 @@ public class SAMLTokenRenewerTest {
 
         String oldId = new SamlAssertionWrapper(samlToken).getId();
         String newId = new SamlAssertionWrapper(renewerResponse.getToken()).getId();
-        assertFalse(oldId.equals(newId));
+        assertNotEquals(oldId, newId);
 
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());

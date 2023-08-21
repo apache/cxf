@@ -27,7 +27,7 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -60,7 +60,7 @@ public class ManagedConnectionImplTest {
 
         assertEquals(handle1, handle1);
         assertEquals(handle2, handle2);
-        assertFalse(handle1.equals(handle2));
+        assertNotEquals(handle1, handle2);
 
     }
 

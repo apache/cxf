@@ -21,7 +21,7 @@ package org.apache.cxf.version;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class VersionTest {
@@ -30,7 +30,7 @@ public class VersionTest {
     public void testLoadProperties() {
         String version = Version.getCurrentVersion();
         String token = "${product.version}";
-        assertFalse(token.equals(version));
+        assertNotEquals(version, token);
     }
 
     @Test

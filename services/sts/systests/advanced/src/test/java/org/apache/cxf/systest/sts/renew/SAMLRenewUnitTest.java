@@ -38,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -87,7 +88,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
-        assertFalse(token.equals(renewedToken));
+        assertNotEquals(token, renewedToken);
 
         // Try to validate old token -> fail.
         try {
@@ -117,7 +118,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
-        assertFalse(token.equals(renewedToken));
+        assertNotEquals(token, renewedToken);
 
         // Try to validate old token -> fail.
         try {
@@ -173,7 +174,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
-        assertFalse(token.equals(renewedToken));
+        assertNotEquals(token, renewedToken);
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
@@ -222,7 +223,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
-        assertFalse(token.equals(renewedToken));
+        assertNotEquals(token, renewedToken);
 
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
