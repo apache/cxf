@@ -24,11 +24,14 @@ import javax.ws.rs.ext.Provider;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 @Provider
 public class OpenTelemetryFeature implements Feature {
+    public static final String DEFAULT_INSTRUMENTATION_NAME = "org.apache.cxf";
+
     private final OpenTelemetry openTelemetry;
-    private final String instrumentationName;
+    private final Tracer tracer;
 
     public OpenTelemetryFeature() {
         this(GlobalOpenTelemetry.get());
@@ -39,19 +42,22 @@ public class OpenTelemetryFeature implements Feature {
     }
 
     public OpenTelemetryFeature(final OpenTelemetry openTelemetry) {
-        this(openTelemetry,
-             org.apache.cxf.tracing.opentelemetry.OpenTelemetryFeature.DEFAULT_INSTRUMENTATION_NAME);
+        this(openTelemetry, DEFAULT_INSTRUMENTATION_NAME);
     }
 
     public OpenTelemetryFeature(final OpenTelemetry openTelemetry, final String instrumentationName) {
+        this(openTelemetry, openTelemetry.getTracer(instrumentationName));
+    }
+
+    public OpenTelemetryFeature(final OpenTelemetry openTelemetry, final Tracer tracer) {
         this.openTelemetry = openTelemetry;
-        this.instrumentationName = instrumentationName;
+        this.tracer = tracer;
     }
 
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(new OpenTelemetryProvider(openTelemetry, instrumentationName));
-        context.register(new OpenTelemetryContextProvider(openTelemetry.getTracer(instrumentationName)));
+        context.register(new OpenTelemetryProvider(openTelemetry, tracer));
+        context.register(new OpenTelemetryContextProvider(tracer));
         return true;
     }
 }

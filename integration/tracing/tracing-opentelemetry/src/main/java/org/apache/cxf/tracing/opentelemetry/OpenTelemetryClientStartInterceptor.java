@@ -27,15 +27,25 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 public class OpenTelemetryClientStartInterceptor extends AbstractOpenTelemetryClientInterceptor {
     public OpenTelemetryClientStartInterceptor(final OpenTelemetry openTelemetry, final String instrumentationName) {
         this(Phase.PRE_STREAM, openTelemetry, instrumentationName);
     }
 
+    public OpenTelemetryClientStartInterceptor(final OpenTelemetry openTelemetry, final Tracer tracer) {
+        this(Phase.PRE_STREAM, openTelemetry, tracer);
+    }
+
     public OpenTelemetryClientStartInterceptor(final String phase, final OpenTelemetry openTelemetry, 
             final String instrumentationName) {
         super(phase, openTelemetry, instrumentationName);
+    }
+
+    public OpenTelemetryClientStartInterceptor(final String phase, final OpenTelemetry openTelemetry, 
+            final Tracer tracer) {
+        super(phase, openTelemetry, tracer);
     }
 
     @Override

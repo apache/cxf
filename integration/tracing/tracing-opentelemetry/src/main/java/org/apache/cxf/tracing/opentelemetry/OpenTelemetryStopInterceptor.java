@@ -29,10 +29,15 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 public class OpenTelemetryStopInterceptor extends AbstractOpenTelemetryInterceptor {
     public OpenTelemetryStopInterceptor(final OpenTelemetry openTelemetry, final String instrumentationName) {
         super(Phase.POST_MARSHAL, openTelemetry, instrumentationName);
+    }
+
+    public OpenTelemetryStopInterceptor(final OpenTelemetry openTelemetry, final Tracer tracer) {
+        super(Phase.POST_MARSHAL, openTelemetry, tracer);
     }
 
     @Override

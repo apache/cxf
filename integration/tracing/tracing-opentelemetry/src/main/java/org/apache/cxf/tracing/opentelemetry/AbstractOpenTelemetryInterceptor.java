@@ -26,15 +26,22 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Tracer;
 
 public abstract class AbstractOpenTelemetryInterceptor extends AbstractOpenTelemetryProvider
     implements PhaseInterceptor<Message> {
 
     private final String phase;
 
-    protected AbstractOpenTelemetryInterceptor(String phase, OpenTelemetry openTelemetry,
-                                               String instrumentationName) {
+    protected AbstractOpenTelemetryInterceptor(final String phase, final OpenTelemetry openTelemetry,
+            final String instrumentationName) {
         super(openTelemetry, instrumentationName);
+        this.phase = phase;
+    }
+
+    protected AbstractOpenTelemetryInterceptor(final String phase, final OpenTelemetry openTelemetry,
+            final Tracer tracer) {
+        super(openTelemetry, tracer);
         this.phase = phase;
     }
 
