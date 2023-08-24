@@ -29,17 +29,18 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HawkAccessTokenValidatorTest {
 
     private HawkAccessTokenValidator validator = new HawkAccessTokenValidator();
-    private OAuthDataProvider dataProvider = EasyMock.createMock(OAuthDataProvider.class);
-    private MessageContext messageContext = EasyMock.createMock(MessageContext.class);
+    private OAuthDataProvider dataProvider = mock(OAuthDataProvider.class);
+    private MessageContext messageContext = mock(MessageContext.class);
 
     @Before
     public void setUp() {
@@ -54,10 +55,9 @@ public class HawkAccessTokenValidatorTest {
         HttpServletRequest httpRequest = mockHttpRequest();
         UriInfo uriInfo = mockUriInfo();
 
-        EasyMock.expect(dataProvider.getAccessToken(macAccessToken.getTokenKey())).andReturn(macAccessToken);
-        EasyMock.expect(messageContext.getHttpServletRequest()).andReturn(httpRequest);
-        EasyMock.expect(messageContext.getUriInfo()).andReturn(uriInfo);
-        EasyMock.replay(dataProvider, messageContext, httpRequest, uriInfo);
+        when(dataProvider.getAccessToken(macAccessToken.getTokenKey())).thenReturn(macAccessToken);
+        when(messageContext.getHttpServletRequest()).thenReturn(httpRequest);
+        when(messageContext.getUriInfo()).thenReturn(uriInfo);
 
         String authData = getClientAuthHeader(macAccessToken);
         AccessTokenValidation tokenValidation = validator
@@ -66,7 +66,6 @@ public class HawkAccessTokenValidatorTest {
                                  authData.split(" ")[1],
                                  null);
         assertNotNull(tokenValidation);
-        EasyMock.verify(dataProvider, messageContext, httpRequest);
     }
 
     private static String getClientAuthHeader(HawkAccessToken macAccessToken) {
@@ -79,14 +78,14 @@ public class HawkAccessTokenValidatorTest {
     }
 
     private static HttpServletRequest mockHttpRequest() {
-        HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
-        EasyMock.expect(httpRequest.getMethod()).andReturn("GET");
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getMethod()).thenReturn("GET");
         return httpRequest;
     }
 
     private static UriInfo mockUriInfo() {
-        UriInfo ui = EasyMock.createMock(UriInfo.class);
-        EasyMock.expect(ui.getRequestUri()).andReturn(
+        UriInfo ui = mock(UriInfo.class);
+        when(ui.getRequestUri()).thenReturn(
             URI.create("http://localhost:8080/appContext/oauth2/testResource"));
         return ui;
     }

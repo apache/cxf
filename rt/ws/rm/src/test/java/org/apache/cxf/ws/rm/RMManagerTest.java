@@ -68,6 +68,7 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -698,7 +699,7 @@ public class RMManagerTest {
         assertNotNull(id1.getValue());
         Identifier id2 = generator.generateSequenceIdentifier();
         assertTrue(id1 != id2);
-        assertFalse(id1.getValue().equals(id2.getValue()));
+        assertNotEquals(id1.getValue(), id2.getValue());
     }
 
     // just read the begining of the input and compare it against the specified string

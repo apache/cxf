@@ -35,6 +35,7 @@
         <module>tracing/tracing-brave</module>
         <module>tracing/tracing-opentracing</module>
         <module>tracing/tracing-opentelemetry</module>
+        <module>tracing/tracing-micrometer</module>
         <module>spring-boot</module>
     </modules>
 </project>

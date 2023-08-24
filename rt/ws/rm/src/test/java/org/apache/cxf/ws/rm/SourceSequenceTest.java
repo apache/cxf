@@ -37,6 +37,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -157,14 +158,14 @@ public class SourceSequenceTest {
     public void testEqualsAndHashCode() {
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         SourceSequence otherSeq = null;
-        assertFalse(seq.equals(otherSeq));
+        assertNotEquals(seq, otherSeq);
         otherSeq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         assertEquals(seq, otherSeq);
         assertEquals(seq.hashCode(), otherSeq.hashCode());
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
         otherSeq = new SourceSequence(otherId, ProtocolVariation.RM10WSA200408);
-        assertFalse(seq.equals(otherSeq));
+        assertNotEquals(seq, otherSeq);
         assertTrue(seq.hashCode() != otherSeq.hashCode());
     }
 

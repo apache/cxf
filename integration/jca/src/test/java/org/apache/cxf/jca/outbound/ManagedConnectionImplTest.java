@@ -24,12 +24,11 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.Greeter;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit test for ManagedConnectionImpl
@@ -43,9 +42,7 @@ public class ManagedConnectionImplTest {
     public void testHandleEqualsMethod() throws Exception {
         BusFactory.setDefaultBus(null);
 
-        IMocksControl control = EasyMock.createNiceControl();
-
-        ManagedConnectionFactoryImpl mcf = control.createMock(ManagedConnectionFactoryImpl.class);
+        ManagedConnectionFactoryImpl mcf = mock(ManagedConnectionFactoryImpl.class);
 
         CXFConnectionSpec cxRequestInfo = new CXFConnectionSpec();
 
@@ -53,8 +50,6 @@ public class ManagedConnectionImplTest {
         cxRequestInfo.setServiceClass(Greeter.class);
         cxRequestInfo.setEndpointName(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
         cxRequestInfo.setServiceName(new QName("http://apache.org/hello_world_soap_http", "SOAPService"));
-
-        control.replay();
 
         Subject subject = new Subject();
 
@@ -65,7 +60,7 @@ public class ManagedConnectionImplTest {
 
         assertEquals(handle1, handle1);
         assertEquals(handle2, handle2);
-        assertFalse(handle1.equals(handle2));
+        assertNotEquals(handle1, handle2);
 
     }
 

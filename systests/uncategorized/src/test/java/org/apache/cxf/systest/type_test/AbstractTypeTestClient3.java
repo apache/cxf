@@ -2237,9 +2237,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             List<Short> ret = testDocLiteral ? docClient.testAnonEnumList(x, y, z) : xmlClient
                 .testAnonEnumList(x, y, z);
             if (!perfTestOnly) {
-                assertTrue("testAnonEnumList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testAnonEnumList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testAnonEnumList(): Incorrect return value", x.equals(ret));
+                Assert.assertEquals("testAnonEnumList(): Incorrect value for inout param", x, y.value);
+                Assert.assertEquals("testAnonEnumList(): Incorrect value for out param", yOrig, z.value);
+                Assert.assertEquals("testAnonEnumList(): Incorrect return value", x, ret);                
             }
         } else {
             Short[] x = {(short)10, (short)100};

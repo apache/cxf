@@ -37,15 +37,13 @@ import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
+import static org.mockito.Mockito.mock;
 
 public class BareOutInterceptorTest extends TestBase {
 
@@ -63,10 +61,8 @@ public class BareOutInterceptorTest extends TestBase {
         writer = getXMLStreamWriter(baos);
         message.setContent(XMLStreamWriter.class, writer);
         message.getExchange().put(BindingOperationInfo.class, operation);
-        IMocksControl control = EasyMock.createNiceControl();
-        InterceptorChain ic = control.createMock(InterceptorChain.class);
+        InterceptorChain ic = mock(InterceptorChain.class);
         message.setInterceptorChain(ic);
-        control.replay();
     }
 
     @After

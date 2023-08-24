@@ -203,7 +203,7 @@ public final class JAXRSUtils {
             "java.util.concurrent.CompletableFuture",
             "java.util.concurrent.CompletionStage"
         ));
-    private static final LazyLoadedClass DATA_SOURCE_CLASS = new LazyLoadedClass("javax.activation.DataSource");
+    private static final LazyLoadedClass DATA_SOURCE_CLASS = new LazyLoadedClass("jakarta.activation.DataSource");
 
     // Class to lazily call the ClassLoaderUtil.loadClass, but do it once
     // and cache the result.  Then use the class to create instances as needed.

@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class CXF7990Test extends AbstractClientServerTestBase {
@@ -78,7 +79,7 @@ public class CXF7990Test extends AbstractClientServerTestBase {
             echoService.echoException("test");
             fail("SOAPException is expected");
         } catch (SOAPFaultException e) {
-            assertTrue(e.getMessage().equals("TestSOAPFaultException"));
+            assertEquals(e.getMessage(), "TestSOAPFaultException");
         }
     }
 
@@ -95,7 +96,7 @@ public class CXF7990Test extends AbstractClientServerTestBase {
             echoService.echoProxy("http://localhost:" + PORT + "/echo/service?wsdl");
             fail("SOAPException is expected");
         } catch (SOAPFaultException e) {
-            assertTrue(e.getMessage(), e.getMessage().equals("SOAPFaultString"));
+            assertEquals(e.getMessage(), e.getMessage(), "SOAPFaultString");
         }
     }
 

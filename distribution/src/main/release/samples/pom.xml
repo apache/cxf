@@ -34,16 +34,16 @@
         <cxf.spring.boot.version>3.0.9</cxf.spring.boot.version>
         <cxf.spring.cloud.eureka.version>4.0.3</cxf.spring.cloud.eureka.version>
         <cxf.jetty11.version>11.0.15</cxf.jetty11.version>
-        <cxf.netty.version>4.1.96.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.97.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>5.3.1</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.4.2</cxf.swagger.ui.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.11</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.12</cxf.tomcat.version>
         <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
         <cxf.gson.version>2.10.1</cxf.gson.version>
         <cxf.lucene.version>9.7.0</cxf.lucene.version>
         <cxf.olingo.server.version>4.9.0</cxf.olingo.server.version>
-        <cxf.aspectj.version>1.9.19</cxf.aspectj.version>
+        <cxf.aspectj.version>1.9.20</cxf.aspectj.version>
         <cxf.brave.version>5.16.0</cxf.brave.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.activemq.artemis.version>2.27.1</cxf.activemq.artemis.version>

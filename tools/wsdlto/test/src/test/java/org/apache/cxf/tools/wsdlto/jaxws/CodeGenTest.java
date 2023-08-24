@@ -56,6 +56,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -1428,7 +1429,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.execute();
         Class<?> sei = classLoader.loadClass("org.apache.cxf.cxf1404.hello_world_soap_http.Greeter");
         assertEquals(1, sei.getMethods().length);
-        assertFalse(Void.TYPE.equals(sei.getMethods()[0].getReturnType()));
+        assertNotEquals(Void.TYPE, sei.getMethods()[0].getReturnType());
     }
     @Test
     public void testCXF1950()  throws Exception {

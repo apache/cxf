@@ -28,13 +28,16 @@ import jakarta.resource.spi.ConnectionEvent;
 import jakarta.resource.spi.ConnectionEventListener;
 import jakarta.resource.spi.ConnectionRequestInfo;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class ManagedConnectionImplTest {
     private DummyManagedConnectionImpl mc;
@@ -70,17 +73,13 @@ public class ManagedConnectionImplTest {
     public void testRemoveConnectionEventListener() throws Exception {
         ConnectionEvent event = new ConnectionEvent(mc, ConnectionEvent.CONNECTION_ERROR_OCCURRED);
 
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        listener.connectionErrorOccurred(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
         mc.sendEvent(event);
-        EasyMock.verify(listener);
+        verify(listener, times(1)).connectionErrorOccurred(isA(ConnectionEvent.class));
 
         mc.removeConnectionEventListener(listener);
         mc.sendEvent(event);
-
     }
 
     @Test
@@ -112,72 +111,63 @@ public class ManagedConnectionImplTest {
     @Test
     public void testClose() throws Exception {
         final Object o = new Object();
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
-        listener.connectionClosed(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
+
         mc.addConnectionEventListener(listener);
         mc.close(o);
-        EasyMock.verify(listener);
+
+        verify(listener, times(1)).connectionClosed(isA(ConnectionEvent.class));
     }
 
     @Test
     public void testError() throws Exception {
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        listener.connectionErrorOccurred(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+
         mc.setLogWriter(null);
         mc.error(new Exception());
-        EasyMock.verify(listener);
+
+        verify(listener, times(1)).connectionErrorOccurred(isA(ConnectionEvent.class));
     }
 
     @Test
     public void testSendEventError() throws Exception {
         ConnectionEvent event = new ConnectionEvent(mc, ConnectionEvent.CONNECTION_ERROR_OCCURRED);
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        listener.connectionErrorOccurred(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
         mc.sendEvent(event);
-        EasyMock.verify(listener);
+
+        verify(listener, times(1)).connectionErrorOccurred(isA(ConnectionEvent.class));
     }
 
     @Test
     public void testSendEventTxStarted() throws Exception {
         ConnectionEvent event = new ConnectionEvent(mc, ConnectionEvent.LOCAL_TRANSACTION_STARTED);
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        listener.localTransactionStarted(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+
         mc.sendEvent(event);
-        EasyMock.verify(listener);
+        verify(listener, times(1)).localTransactionStarted(isA(ConnectionEvent.class));
     }
 
     @Test
     public void testSendEventTxCommitted() throws Exception {
         ConnectionEvent event = new ConnectionEvent(mc, ConnectionEvent.LOCAL_TRANSACTION_COMMITTED);
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        listener.localTransactionCommitted(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+
         mc.sendEvent(event);
-        EasyMock.verify(listener);
+        verify(listener, times(1)).localTransactionCommitted(isA(ConnectionEvent.class));
     }
 
     @Test
     public void testSendEventTxRolledBack() throws Exception {
         ConnectionEvent event = new ConnectionEvent(mc, ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK);
-        ConnectionEventListener listener = EasyMock.createMock(ConnectionEventListener.class);
+        ConnectionEventListener listener = mock(ConnectionEventListener.class);
         mc.addConnectionEventListener(listener);
-        EasyMock.reset(listener);
-        listener.localTransactionRolledback(EasyMock.isA(ConnectionEvent.class));
-        EasyMock.expectLastCall();
-        EasyMock.replay(listener);
+
         mc.sendEvent(event);
+
+        verify(listener, times(1)).localTransactionRolledback(isA(ConnectionEvent.class));
     }
 }

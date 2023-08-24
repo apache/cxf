@@ -120,8 +120,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         }
 
         // main thread contextValues are un changed
-        assertTrue("address from existing context has not changed", address.equals(requestContext
-            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+        assertEquals("address from existing context has not changed", address, requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 
         // get the latest values
 
@@ -207,8 +207,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         }
 
         // main thread contextValues are un changed
-        assertTrue("address from existing context has not changed", address.equals(requestContext
-            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+        assertEquals("address from existing context has not changed", address, requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 
         // get the latest values
 

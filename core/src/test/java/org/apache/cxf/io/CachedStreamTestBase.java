@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -115,7 +116,7 @@ public abstract class CachedStreamTestBase {
         assertNotNull(tmpfile);
 
         final String enctext = readFromStream(new FileInputStream(tmpfile));
-        assertFalse("text is not encoded", text.equals(enctext));
+        assertNotEquals("text is not encoded", enctext, text);
 
         Object fin = getInputStreamObject(cache);
 
@@ -145,7 +146,7 @@ public abstract class CachedStreamTestBase {
         assertNotNull(tmpfile);
 
         final String enctext = readFromStream(new FileInputStream(tmpfile));
-        assertFalse("text is not encoded", text.equals(enctext));
+        assertNotEquals("text is not encoded", enctext, text);
 
         Object fin = getInputStreamObject(cache);
 
