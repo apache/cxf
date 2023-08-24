@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
@@ -43,14 +41,14 @@ import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 
 @Path("/bookstore/")
-public class BookStore<T extends Closeable> {
+public class BookStore<T extends AutoCloseable> {
     @Context private TracerContext tracer;
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     @GET
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Book> getBooks() throws IOException {
+    public Collection<Book> getBooks() throws Exception {
         try (T span = tracer.startSpan("Get Books")) {
             return books();
         }

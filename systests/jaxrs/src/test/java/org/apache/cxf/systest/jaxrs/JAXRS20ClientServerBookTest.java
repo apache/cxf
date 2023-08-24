@@ -980,7 +980,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             + "jakarta.ws.rs.ext.Provider,jakarta.ws.rs.Consumes}"));
     }
     
-    private static class ReplaceBodyFilter implements ClientRequestFilter {
+    private static final class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext rc) throws IOException {
@@ -1012,7 +1012,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
 
-    private static class ClientCacheRequestFilter implements ClientRequestFilter {
+    private static final class ClientCacheRequestFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
@@ -1020,7 +1020,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
     }
 
-    private static class ClientHeaderRequestFilter implements ClientRequestFilter {
+    private static final class ClientHeaderRequestFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
@@ -1092,7 +1092,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
 
-    private static class BookInfoInjectableReader implements MessageBodyReader<BookInfo> {
+    private static final class BookInfoInjectableReader implements MessageBodyReader<BookInfo> {
         @Context private ResourceContext resourceContext;
 
         @Override
@@ -1115,7 +1115,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
     
-    private static class BookInfoReader implements MessageBodyReader<BookInfo> {
+    private static final class BookInfoReader implements MessageBodyReader<BookInfo> {
         @Override
         public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
             return true;
@@ -1131,7 +1131,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
     }
 
-    private static class ClientTestFeature implements Feature {
+    private static final class ClientTestFeature implements Feature {
 
         @Override
         public boolean configure(FeatureContext context) {

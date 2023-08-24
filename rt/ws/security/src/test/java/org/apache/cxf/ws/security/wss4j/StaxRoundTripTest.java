@@ -1157,7 +1157,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         return (Echo)proxyFac.create();
     }
 
-    private static class UnknownUserPasswordCallbackHandler implements CallbackHandler {
+    private static final class UnknownUserPasswordCallbackHandler implements CallbackHandler {
 
         private static Map<String, String> passwords = new HashMap<>();
 

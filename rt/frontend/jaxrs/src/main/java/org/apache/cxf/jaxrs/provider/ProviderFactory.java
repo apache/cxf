@@ -868,7 +868,7 @@ public abstract class ProviderFactory {
         setProviders(true, false, userProviders.toArray());
     }
 
-    private static class MessageBodyReaderComparator
+    private static final class MessageBodyReaderComparator
         implements Comparator<ProviderInfo<MessageBodyReader<?>>> {
 
         public int compare(ProviderInfo<MessageBodyReader<?>> p1,
@@ -897,7 +897,7 @@ public abstract class ProviderFactory {
         }
     }
 
-    private static class MessageBodyWriterComparator
+    private static final class MessageBodyWriterComparator
         implements Comparator<ProviderInfo<MessageBodyWriter<?>>> {
 
         public int compare(ProviderInfo<MessageBodyWriter<?>> p1,
@@ -928,7 +928,8 @@ public abstract class ProviderFactory {
         }
     }
 
-    private static class ParamConverterProviderComparator implements Comparator<ProviderInfo<ParamConverterProvider>> {
+    private static final class ParamConverterProviderComparator
+            implements Comparator<ProviderInfo<ParamConverterProvider>> {
         private final Bus bus;
         
         ParamConverterProviderComparator(Bus bus) {
@@ -962,7 +963,7 @@ public abstract class ProviderFactory {
         return Integer.compare(AnnotationUtils.getBindingPriority(cl1), AnnotationUtils.getBindingPriority(cl2));
     }
 
-    private static class ContextResolverComparator
+    private static final class ContextResolverComparator
         implements Comparator<ProviderInfo<ContextResolver<?>>> {
 
         public int compare(ProviderInfo<ContextResolver<?>> p1,

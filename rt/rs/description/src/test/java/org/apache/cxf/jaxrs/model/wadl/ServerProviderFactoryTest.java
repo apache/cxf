@@ -90,7 +90,7 @@ public class ServerProviderFactoryTest {
     }
 
     @PreMatching
-    private static class TestHandler implements ContainerRequestFilter {
+    private static final class TestHandler implements ContainerRequestFilter {
 
         @Override
         public void filter(ContainerRequestContext context) {

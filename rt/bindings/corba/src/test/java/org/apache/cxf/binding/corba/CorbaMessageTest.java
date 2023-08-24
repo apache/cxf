@@ -29,13 +29,12 @@ import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class CorbaMessageTest {
 
@@ -49,8 +48,7 @@ public class CorbaMessageTest {
 
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
-        IMocksControl control = EasyMock.createNiceControl();
-        message = control.createMock(Message.class);
+        message = mock(Message.class);
     }
 
     @Test

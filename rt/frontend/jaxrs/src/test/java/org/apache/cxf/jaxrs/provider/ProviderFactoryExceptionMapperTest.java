@@ -63,21 +63,21 @@ public class ProviderFactoryExceptionMapperTest {
                      exceptionMapper.getClass());
     }
 
-    private static class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
+    private static final class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
         @Override
         public Response toResponse(RuntimeException ex) {
             return null;
         }
     }
 
-    private static class RuntimeExceptionMapper1 implements ExceptionMapper<RuntimeException1> {
+    private static final class RuntimeExceptionMapper1 implements ExceptionMapper<RuntimeException1> {
         @Override
         public Response toResponse(RuntimeException1 ex) {
             return null;
         }
     }
 
-    private static class RuntimeExceptionMapper2 implements ExceptionMapper<RuntimeException2> {
+    private static final class RuntimeExceptionMapper2 implements ExceptionMapper<RuntimeException2> {
         @Override
         public Response toResponse(RuntimeException2 ex) {
             return null;
@@ -90,7 +90,7 @@ public class ProviderFactoryExceptionMapperTest {
     }
 
     @SuppressWarnings("serial")
-    private static class RuntimeException2 extends RuntimeException1 {
+    private static final class RuntimeException2 extends RuntimeException1 {
 
     }
 }

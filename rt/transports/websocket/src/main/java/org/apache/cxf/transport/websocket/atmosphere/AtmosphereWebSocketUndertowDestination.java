@@ -278,7 +278,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
         }
     }
 
-    private class DestinationHandler extends AbstractReflectorAtmosphereHandler {
+    private final class DestinationHandler extends AbstractReflectorAtmosphereHandler {
 
         @Override
         public void onRequest(final AtmosphereResource resource) throws IOException {

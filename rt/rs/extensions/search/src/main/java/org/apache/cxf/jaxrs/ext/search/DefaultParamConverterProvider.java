@@ -40,7 +40,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     /**
      * Date type converter.
      */
-    private static class DateParamConverter implements ParamConverter< Date > {
+    private static final class DateParamConverter implements ParamConverter< Date > {
         @Override
         public Date fromString(final String value) {
             return SearchUtils.dateFromStringWithDefaultFormats(value);
@@ -55,7 +55,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     /**
      * Long type converter.
      */
-    private static class LongParamConverter implements ParamConverter< Long > {
+    private static final class LongParamConverter implements ParamConverter< Long > {
         @Override
         public Long fromString(final String value) {
             return Long.valueOf(value);
@@ -70,7 +70,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     /**
      * Double type converter.
      */
-    private static class DoubleParamConverter implements ParamConverter< Double > {
+    private static final class DoubleParamConverter implements ParamConverter< Double > {
         @Override
         public Double fromString(final String value) {
             return Double.valueOf(value);
@@ -85,7 +85,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     /**
      * Float type converter.
      */
-    private static class FloatParamConverter implements ParamConverter< Float > {
+    private static final class FloatParamConverter implements ParamConverter< Float > {
         @Override
         public Float fromString(final String value) {
             return Float.valueOf(value);
@@ -100,7 +100,7 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
     /**
      * Integer type converter.
      */
-    private static class IntegerParamConverter implements ParamConverter< Integer > {
+    private static final class IntegerParamConverter implements ParamConverter< Integer > {
         @Override
         public Integer fromString(final String value) {
             return Integer.valueOf(value);

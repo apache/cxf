@@ -27,94 +27,85 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
  */
 public class RMUtilsTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-
-        control = EasyMock.createNiceControl();
-    }
-
-    @After
-    public void tearDown() {
-        control.verify();
-    }
-
     @Test
     public void testGetName() {
         // no bus given
-        Endpoint e = control.createMock(Endpoint.class);
-        EndpointInfo ei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
+        Endpoint e = mock(Endpoint.class);
+        EndpointInfo ei = mock(EndpointInfo.class);
+        when(e.getEndpointInfo()).thenReturn(ei);
         QName eqn = new QName("ns2", "endpoint");
-        EasyMock.expect(ei.getName()).andReturn(eqn);
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        EasyMock.expect(ei.getService()).andReturn(si);
+        when(ei.getName()).thenReturn(eqn);
+        ServiceInfo si = mock(ServiceInfo.class);
+        when(ei.getService()).thenReturn(si);
         QName sqn = new QName("ns1", "service");
-        EasyMock.expect(si.getName()).andReturn(sqn);
-        control.replay();
+        when(si.getName()).thenReturn(sqn);
+
         assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e));
+        verify(e, times(2)).getEndpointInfo();
 
         // a named bus
-        control.reset();
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
-        EasyMock.expect(ei.getName()).andReturn(eqn);
-        EasyMock.expect(ei.getService()).andReturn(si);
-        EasyMock.expect(si.getName()).andReturn(sqn);
-        Bus b = control.createMock(Bus.class);
-        EasyMock.expect(b.getId()).andReturn("mybus");
-        control.replay();
+        reset(e);
+        when(e.getEndpointInfo()).thenReturn(ei);
+        when(ei.getName()).thenReturn(eqn);
+        when(ei.getService()).thenReturn(si);
+        when(si.getName()).thenReturn(sqn);
+        Bus b = mock(Bus.class);
+        when(b.getId()).thenReturn("mybus");
         assertEquals("{ns1}service.{ns2}endpoint@mybus", RMUtils.getEndpointIdentifier(e, b));
+        verify(e, times(2)).getEndpointInfo();
 
         // this test makes sure that an automatically generated id will be
         // mapped to the static default bus name "cxf".
         // System.out.println("bus: " + BusFactory.getThreadDefaultBus(false));
-        control.reset();
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
-        EasyMock.expect(ei.getName()).andReturn(eqn);
-        EasyMock.expect(ei.getService()).andReturn(si);
-        EasyMock.expect(si.getName()).andReturn(sqn);
-        control.replay();
+        reset(e);
+        when(e.getEndpointInfo()).thenReturn(ei);
+        when(ei.getName()).thenReturn(eqn);
+        when(ei.getService()).thenReturn(si);
+        when(si.getName()).thenReturn(sqn);
+
         Bus bus = BusFactory.getDefaultBus();
         assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e, bus));
         bus.shutdown(true);
+        verify(e, times(2)).getEndpointInfo();
 
         // a generated bundle artifact bus
-        control.reset();
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
-        EasyMock.expect(ei.getName()).andReturn(eqn);
-        EasyMock.expect(ei.getService()).andReturn(si);
-        EasyMock.expect(si.getName()).andReturn(sqn);
-        EasyMock.expect(b.getId()).andReturn("mybus-" + Bus.DEFAULT_BUS_ID + "12345");
-        control.replay();
+        reset(e);
+        when(e.getEndpointInfo()).thenReturn(ei);
+        when(ei.getName()).thenReturn(eqn);
+        when(ei.getService()).thenReturn(si);
+        when(si.getName()).thenReturn(sqn);
+        when(b.getId()).thenReturn("mybus-" + Bus.DEFAULT_BUS_ID + "12345");
+
         assertEquals("{ns1}service.{ns2}endpoint@mybus-" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e, b));
+        verify(e, times(2)).getEndpointInfo();
 
         // look like a generated bundle artifact bus but not
-        control.reset();
-        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
-        EasyMock.expect(ei.getName()).andReturn(eqn);
-        EasyMock.expect(ei.getService()).andReturn(si);
-        EasyMock.expect(si.getName()).andReturn(sqn);
-        EasyMock.expect(b.getId()).andReturn("mybus." + Bus.DEFAULT_BUS_ID + ".foo");
-        control.replay();
+        reset(e);
+        when(e.getEndpointInfo()).thenReturn(ei);
+        when(ei.getName()).thenReturn(eqn);
+        when(ei.getService()).thenReturn(si);
+        when(si.getName()).thenReturn(sqn);
+        when(b.getId()).thenReturn("mybus." + Bus.DEFAULT_BUS_ID + ".foo");
+
         assertEquals("{ns1}service.{ns2}endpoint@mybus." + Bus.DEFAULT_BUS_ID + ".foo",
                      RMUtils.getEndpointIdentifier(e, b));
 
+        verify(e, times(2)).getEndpointInfo();
     }
 }

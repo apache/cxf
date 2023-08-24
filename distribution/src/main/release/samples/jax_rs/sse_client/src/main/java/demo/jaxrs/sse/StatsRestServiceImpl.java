@@ -27,7 +27,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.sse.OutboundSseEvent;
-import jakarta.ws.rs.sse.OutboundSseEvent.Builder;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
 
@@ -48,7 +47,7 @@ public class StatsRestServiceImpl {
         new Thread() {
             public void run() {
                 try {
-                    final Builder builder = sse.newEventBuilder();
+                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
                     sink.send(createStatsEvent(builder.name("stats"), 1));
                     Thread.sleep(500);
                     sink.send(createStatsEvent(builder.name("stats"), 2));

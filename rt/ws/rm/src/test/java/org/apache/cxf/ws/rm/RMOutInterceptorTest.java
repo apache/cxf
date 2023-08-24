@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.lang.reflect.Method;
-
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
@@ -33,138 +31,106 @@ import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RMOutInterceptorTest {
-
-    private IMocksControl control;
-
-    @Before
-    public void setUp() {
-        control = EasyMock.createNiceControl();
-    }
-
     @Test
     public void testHandleRuntimeFault() throws NoSuchMethodException, SequenceFault, RMException {
-        Method[] mocked = new Method[] {
-            RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
-        };
-        RMOutInterceptor interceptor =
-            EasyMock.createMockBuilder(RMOutInterceptor.class)
-                .addMockedMethods(mocked).createMock(control);
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(true).anyTimes();
-        control.replay();
+        RMOutInterceptor interceptor = spy(new RMOutInterceptor());
+        Message message = mock(Message.class);
+        when(interceptor.isRuntimeFault(message)).thenReturn(true);
         interceptor.handle(message);
-        control.verify();
     }
 
     @Test
     public void testHandleNoMAPs() throws NoSuchMethodException, SequenceFault, RMException {
-        Method[] mocked = new Method[] {
-            RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class})
-        };
-        RMOutInterceptor interceptor =
-            EasyMock.createMockBuilder(RMOutInterceptor.class)
-                .addMockedMethods(mocked).createMock(control);
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(false).anyTimes();
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
-            .andReturn(null).anyTimes();
-        control.replay();
+        RMOutInterceptor interceptor = spy(new RMOutInterceptor());
+        Message message = mock(Message.class);
+        when(interceptor.isRuntimeFault(message)).thenReturn(false);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.FALSE);
+        when(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
+            .thenReturn(null);
         interceptor.handle(message);
-        control.verify();
     }
 
     @Test
     public void testHandleApplicationMessage() throws NoSuchMethodException, SequenceFault, RMException {
         AddressingProperties maps = createMAPs("greetMe", "localhost:9000/GreeterPort",
             org.apache.cxf.ws.addressing.Names.WSA_NONE_ADDRESS);
-        Method[] mocked = new Method[] {
-            AbstractRMInterceptor.class.getDeclaredMethod("getManager", new Class[]{}),
-            RMOutInterceptor.class.getDeclaredMethod("isRuntimeFault", new Class[] {Message.class}),
-            RMOutInterceptor.class.getDeclaredMethod("addAcknowledgements",
-                new Class[] {Destination.class, RMProperties.class, Identifier.class,
-                             AttributedURIType.class})
-        };
-        RMOutInterceptor interceptor =
-            EasyMock.createMockBuilder(RMOutInterceptor.class)
-                .addMockedMethods(mocked).createMock(control);
-        RMManager manager = control.createMock(RMManager.class);
-        EasyMock.expect(interceptor.getManager()).andReturn(manager).anyTimes();
+        RMOutInterceptor interceptor = spy(new RMOutInterceptor());
+        RMManager manager = mock(RMManager.class);
+        doReturn(manager).when(interceptor).getManager();
 
-        Message message = control.createMock(Message.class);
-        EasyMock.expect(interceptor.isRuntimeFault(message)).andReturn(false).anyTimes();
-        Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
-        EasyMock.expect(ex.getOutMessage()).andReturn(message).anyTimes();
-        EasyMock.expect(ex.put("defer.uncorrelated.message.abort", Boolean.TRUE)).andReturn(null).anyTimes();
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
-            .andReturn(maps).anyTimes();
+        Message message = mock(Message.class);
+        when(interceptor.isRuntimeFault(message)).thenReturn(false);
+        Exchange ex = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(ex);
+        when(ex.getOutMessage()).thenReturn(message);
+        when(ex.put("defer.uncorrelated.message.abort", Boolean.TRUE)).thenReturn(null);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
+            .thenReturn(maps);
         RMProperties rmpsOut = new RMProperties();
-        EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).
-            andReturn(rmpsOut).anyTimes();
-        InterceptorChain chain = control.createMock(InterceptorChain.class);
-        EasyMock.expect(message.getInterceptorChain()).andReturn(chain).anyTimes();
-        EasyMock.expectLastCall();
+        when(message.get(RMMessageConstants.RM_PROPERTIES_OUTBOUND)).
+            thenReturn(rmpsOut);
+        InterceptorChain chain = mock(InterceptorChain.class);
+        when(message.getInterceptorChain()).thenReturn(chain);
 
-        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMEndpoint rme = mock(RMEndpoint.class);
         RMConfiguration config = new RMConfiguration();
         config.setRMNamespace(RM10Constants.NAMESPACE_URI);
         config.setRM10AddressingNamespace(Names200408.WSA_NAMESPACE_NAME);
-        EasyMock.expect(rme.getConfiguration()).andReturn(config).anyTimes();
-        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
-        Source source = control.createMock(Source.class);
-        EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
-        EasyMock.expect(manager.getSource(message)).andReturn(source).anyTimes();
-        Destination destination = control.createMock(Destination.class);
-        EasyMock.expect(manager.getDestination(message)).andReturn(destination).anyTimes();
-        SourceSequence sseq = control.createMock(SourceSequence.class);
-        EasyMock.expect(sseq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
-        EasyMock.expect(manager.getSequence((Identifier)EasyMock.isNull(), EasyMock.same(message),
-                                        EasyMock.same(maps))).andReturn(sseq).anyTimes();
-        EasyMock.expect(sseq.nextMessageNumber((Identifier)EasyMock.isNull(),
-            (Long)EasyMock.eq(0L), EasyMock.eq(false))).andReturn(Long.valueOf(10)).anyTimes();
-        EasyMock.expect(sseq.isLastMessage()).andReturn(false).anyTimes();
-        interceptor.addAcknowledgements(EasyMock.same(destination), EasyMock.same(rmpsOut),
-            (Identifier)EasyMock.isNull(), EasyMock.isA(AttributedURIType.class));
-        EasyMock.expectLastCall();
-        Identifier sid = control.createMock(Identifier.class);
-        EasyMock.expect(sseq.getIdentifier()).andReturn(sid).anyTimes();
-        EasyMock.expect(sseq.getCurrentMessageNr()).andReturn(Long.valueOf(10)).anyTimes();
+        when(rme.getConfiguration()).thenReturn(config);
+        when(manager.getEffectiveConfiguration(message)).thenReturn(config);
+        Source source = mock(Source.class);
+        when(source.getReliableEndpoint()).thenReturn(rme);
+        when(manager.getSource(message)).thenReturn(source);
+        Destination destination = mock(Destination.class);
+        when(manager.getDestination(message)).thenReturn(destination);
+        SourceSequence sseq = mock(SourceSequence.class);
+        when(sseq.getProtocol()).thenReturn(ProtocolVariation.RM10WSA200408);
+        when(manager.getSequence(isNull(Identifier.class), same(message),
+                                        same(maps))).thenReturn(sseq);
+        when(sseq.nextMessageNumber(isNull(Identifier.class),
+            eq(0L), eq(false))).thenReturn(Long.valueOf(10));
+        when(sseq.isLastMessage()).thenReturn(false);
 
+        Identifier sid = mock(Identifier.class);
+        when(sseq.getIdentifier()).thenReturn(sid);
+        when(sseq.getCurrentMessageNr()).thenReturn(Long.valueOf(10));
 
-        control.replay();
         interceptor.handle(message);
-        control.verify();
+        verify(interceptor, times(1)).addAcknowledgements(same(destination), same(rmpsOut),
+            isNull(Identifier.class), isA(AttributedURIType.class));
     }
 
     @Test
     public void testIsRuntimeFault() {
-        Message message = control.createMock(Message.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(message).anyTimes();
-        EasyMock.expect(message.get(FaultMode.class)).andReturn(FaultMode.RUNTIME_FAULT).anyTimes();
-        control.replay();
+        Message message = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getOutFaultMessage()).thenReturn(message);
+        when(message.get(FaultMode.class)).thenReturn(FaultMode.RUNTIME_FAULT);
         RMOutInterceptor rmi = new RMOutInterceptor();
         assertTrue(rmi.isRuntimeFault(message));
-        control.verify();
-        control.reset();
-        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
-        control.replay();
+
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getOutFaultMessage()).thenReturn(null);
         assertFalse(rmi.isRuntimeFault(message));
-        control.verify();
     }
 
     @Test
@@ -188,26 +154,25 @@ public class RMOutInterceptorTest {
         throws RMException, SequenceFault {
         AddressingProperties maps = createMAPs(action, "localhost:9000/GreeterPort", breplyto);
 
-        Message message = control.createMock(Message.class);
-        Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
-        EasyMock.expect(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
-            .andReturn(maps).anyTimes();
-        RMManager manager = control.createMock(RMManager.class);
+        Message message = mock(Message.class);
+        Exchange exchange = mock(Exchange.class);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getOutMessage()).thenReturn(message);
+        when(message.get(Message.REQUESTOR_ROLE)).thenReturn(Boolean.TRUE);
+        when(message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND))
+            .thenReturn(maps);
+        RMManager manager = mock(RMManager.class);
         RMConfiguration config = new RMConfiguration();
         config.setRMNamespace(wsrmnsuri);
         config.setRM10AddressingNamespace(wsansuri);
-        EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
-        control.replay();
+        when(manager.getEffectiveConfiguration(message)).thenReturn(config);
+
         RMOutInterceptor rmi = new RMOutInterceptor();
         rmi.setManager(manager);
         rmi.handle(message);
 
         assertEquals(areplyto,
                      maps.getReplyTo().getAddress().getValue());
-        control.verify();
     }
 
     private AddressingProperties createMAPs(String action, String to, String replyTo) {

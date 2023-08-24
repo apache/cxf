@@ -142,7 +142,7 @@ public class JettyHTTPServerEngineFactory {
             }
         }
     }
-    private class JettyBusLifeCycleListener implements BusLifeCycleListener {
+    private final class JettyBusLifeCycleListener implements BusLifeCycleListener {
         public void initComplete() {
             JettyHTTPServerEngineFactory.this.initComplete();
         }

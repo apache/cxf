@@ -39,8 +39,6 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +46,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ColocMessageObserverTest {
-    private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;
     private Message msg;
     private Exchange ex;
@@ -60,9 +61,9 @@ public class ColocMessageObserverTest {
 
     @Before
     public void setUp() throws Exception {
-        ep = control.createMock(Endpoint.class);
-        bus = control.createMock(Bus.class);
-        srv = control.createMock(Service.class);
+        ep = mock(Endpoint.class);
+        bus = mock(Bus.class);
+        srv = mock(Service.class);
         BusFactory.setDefaultBus(bus);
         msg = new MessageImpl();
         ex = new ExchangeImpl();
@@ -78,20 +79,19 @@ public class ColocMessageObserverTest {
     public void testSetExchangeProperties() throws Exception {
         QName opName = new QName("A", "B");
         msg.put(Message.WSDL_OPERATION, opName);
-        EasyMock.expect(ep.getService()).andReturn(srv);
-        Binding binding = control.createMock(Binding.class);
-        EasyMock.expect(ep.getBinding()).andReturn(binding);
-        EndpointInfo ei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(ep.getEndpointInfo()).andReturn(ei);
-        BindingInfo bi = control.createMock(BindingInfo.class);
-        EasyMock.expect(ei.getBinding()).andReturn(bi);
-        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        EasyMock.expect(bi.getOperation(opName)).andReturn(boi);
-        EasyMock.expect(bus.getExtension(ClassLoader.class)).andReturn(this.getClass().getClassLoader());
-        control.replay();
+        when(ep.getService()).thenReturn(srv);
+        Binding binding = mock(Binding.class);
+        when(ep.getBinding()).thenReturn(binding);
+        EndpointInfo ei = mock(EndpointInfo.class);
+        when(ep.getEndpointInfo()).thenReturn(ei);
+        BindingInfo bi = mock(BindingInfo.class);
+        when(ei.getBinding()).thenReturn(bi);
+        BindingOperationInfo boi = mock(BindingOperationInfo.class);
+        when(bi.getOperation(opName)).thenReturn(boi);
+        when(bus.getExtension(ClassLoader.class)).thenReturn(this.getClass().getClassLoader());
+
         observer = new ColocMessageObserver(ep, bus);
         observer.setExchangeProperties(ex, msg);
-        control.verify();
 
         assertNotNull("Bus should be set",
                       ex.getBus());
@@ -109,24 +109,25 @@ public class ColocMessageObserverTest {
     public void testObserverOnMessage() throws Exception {
         msg.setExchange(ex);
 
-        Binding binding = control.createMock(Binding.class);
-        EasyMock.expect(ep.getBinding()).andReturn(binding);
+        Binding binding = mock(Binding.class);
+        when(ep.getBinding()).thenReturn(binding);
 
         Message inMsg = new MessageImpl();
-        EasyMock.expect(binding.createMessage()).andReturn(inMsg);
+        when(binding.createMessage()).thenReturn(inMsg);
 
-        EasyMock.expect(ep.getService()).andReturn(srv).anyTimes();
-        EasyMock.expect(
-            bus.getExtension(PhaseManager.class)).andReturn(
-                                      new PhaseManagerImpl()).times(2);
-        EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
-        EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
-        EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
-        EasyMock.expect(bus.getExtension(ClassLoader.class)).andReturn(this.getClass().getClassLoader());
-        control.replay();
+        when(ep.getService()).thenReturn(srv);
+        when(
+            bus.getExtension(PhaseManager.class)).thenReturn(
+                                      new PhaseManagerImpl());
+        when(bus.getInInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(ep.getInInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(srv.getInInterceptors()).thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(bus.getExtension(ClassLoader.class)).thenReturn(this.getClass().getClassLoader());
+
         observer = new TestColocMessageObserver(ep, bus);
         observer.onMessage(msg);
-        control.verify();
+
+        verify(bus, times(2)).getExtension(PhaseManager.class);
 
         Exchange inEx = inMsg.getExchange();
         assertNotNull("Should Have a valid Exchange", inEx);

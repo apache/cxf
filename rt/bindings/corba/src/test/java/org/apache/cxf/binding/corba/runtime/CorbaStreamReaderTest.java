@@ -22,11 +22,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.types.CorbaTypeEventProducer;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CorbaStreamReaderTest {
 
@@ -35,43 +36,38 @@ public class CorbaStreamReaderTest {
 
     @Before
     public void setUp() throws Exception {
-        mock = EasyMock.createMock(CorbaTypeEventProducer.class);
+        mock = mock(CorbaTypeEventProducer.class);
         reader = new CorbaStreamReader(mock);
     }
 
     @Test
     public void testGetName() throws Exception {
-        EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
-        EasyMock.replay(mock);
+        when(mock.getName()).thenReturn(new QName("http://foo.org", "test"));
         assertEquals("checking getName ", new QName("http://foo.org", "test"), reader.getName());
     }
 
     @Test
     public void testGetLocalName() throws Exception {
-        EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
-        EasyMock.replay(mock);
+        when(mock.getName()).thenReturn(new QName("http://foo.org", "test"));
         assertEquals("checking localName ", "test", reader.getLocalName());
     }
 
     @Test
     public void testGetNamespaceURI() throws Exception {
-        EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
-        EasyMock.replay(mock);
+        when(mock.getName()).thenReturn(new QName("http://foo.org", "test"));
         assertEquals("checking namespace ", "http://foo.org", reader.getNamespaceURI());
     }
 
     @Test
     public void testGetText() throws Exception {
-        EasyMock.expect(mock.getText()).andReturn("abcdef");
-        EasyMock.replay(mock);
+        when(mock.getText()).thenReturn("abcdef");
         assertEquals("checking getText", "abcdef", reader.getText());
     }
 
 
     @Test
     public void testGetTextCharacters() throws Exception {
-        EasyMock.expect(mock.getText()).andReturn("abcdef");
-        EasyMock.replay(mock);
+        when(mock.getText()).thenReturn("abcdef");
         assertEquals("checking getTextCharacters",
                     "abcdef",
                     new String(reader.getTextCharacters()));

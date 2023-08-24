@@ -269,7 +269,7 @@ public class JAXRSClientFactoryBeanTest {
     }
 
 
-    private class TestFeature extends AbstractFeature {
+    private final class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
 
         @Override

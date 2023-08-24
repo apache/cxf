@@ -2122,7 +2122,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     }
 
-    private class XMLNameQNameResolver implements ElementQNameResolver {
+    private final class XMLNameQNameResolver implements ElementQNameResolver {
 
         @Override
         public QName resolve(Class<?> type, Annotation[] annotations, Map<Class<?>, QName> clsMap) {
@@ -2142,7 +2142,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     }
 
-    private class SchemaQNameResolver implements ElementQNameResolver {
+    private final class SchemaQNameResolver implements ElementQNameResolver {
         private final Map<String, List<String>> map;
 
         SchemaQNameResolver(Map<String, List<String>> map) {
@@ -2332,7 +2332,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
 
-    private class ResourceIdGeneratorImpl implements ResourceIdGenerator {
+    private final class ResourceIdGeneratorImpl implements ResourceIdGenerator {
 
         @Override
         public String getClassResourceId(ClassResourceInfo cri) {

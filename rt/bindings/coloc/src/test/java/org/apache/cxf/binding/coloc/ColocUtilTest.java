@@ -45,8 +45,6 @@ import org.apache.headers.coloc.types.InHeaderT;
 import org.apache.headers.coloc.types.OutHeaderT;
 import org.apache.headers.rpc_lit.PingMeFault;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,14 +54,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ColocUtilTest {
-    private IMocksControl control = EasyMock.createNiceControl();
     private Bus bus;
 
     @Before
     public void setUp() throws Exception {
-        bus = control.createMock(Bus.class);
+        bus = mock(Bus.class);
         BusFactory.setDefaultBus(bus);
     }
 
@@ -114,25 +115,29 @@ public class ColocUtilTest {
         SortedSet<Phase> list = phaseMgr.getInPhases();
         ColocUtil.setPhases(list, Phase.SETUP, Phase.POST_LOGICAL);
 
-        Endpoint ep = control.createMock(Endpoint.class);
-        Service srv = control.createMock(Service.class);
+        Endpoint ep = mock(Endpoint.class);
+        Service srv = mock(Service.class);
         Exchange ex = new ExchangeImpl();
 
         ex.put(Bus.class, bus);
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
 
-        EasyMock.expect(ep.getOutInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
-        EasyMock.expect(srv.getOutInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        EasyMock.expect(bus.getOutInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
+        when(ep.getOutInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(ep.getService()).thenReturn(srv);
+        when(srv.getOutInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(bus.getOutInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
 
-        control.replay();
         InterceptorChain chain = ColocUtil.getOutInterceptorChain(ex, list);
-        control.verify();
+
+        verify(ep, atLeastOnce()).getOutInterceptors();
+        verify(ep, atLeastOnce()).getService();
+        verify(srv, atLeastOnce()).getOutInterceptors();
+        verify(bus, atLeastOnce()).getOutInterceptors();
+    
         assertNotNull("Should have chain instance", chain);
         Iterator<Interceptor<? extends Message>> iter = chain.iterator();
         assertFalse("Should not have interceptors in chain", iter.hasNext());
@@ -144,26 +149,31 @@ public class ColocUtilTest {
         SortedSet<Phase> list = phaseMgr.getInPhases();
         ColocUtil.setPhases(list, Phase.SETUP, Phase.POST_LOGICAL);
 
-        Endpoint ep = control.createMock(Endpoint.class);
-        Service srv = control.createMock(Service.class);
+        Endpoint ep = mock(Endpoint.class);
+        Service srv = mock(Service.class);
         Exchange ex = new ExchangeImpl();
 
         ex.put(Bus.class, bus);
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
 
-        EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(phaseMgr);
-        EasyMock.expect(ep.getInInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
-        EasyMock.expect(srv.getInInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        EasyMock.expect(bus.getInInterceptors())
-            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
+        when(bus.getExtension(PhaseManager.class)).thenReturn(phaseMgr);
+        when(ep.getInInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(ep.getService()).thenReturn(srv);
+        when(srv.getInInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
+        when(bus.getInInterceptors())
+            .thenReturn(new ArrayList<Interceptor<? extends Message>>());
 
-        control.replay();
         InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, list);
-        control.verify();
+
+        verify(bus, atLeastOnce()).getExtension(PhaseManager.class);
+        verify(ep, atLeastOnce()).getInInterceptors();
+        verify(ep, atLeastOnce()).getService();
+        verify(srv, atLeastOnce()).getInInterceptors();
+        verify(bus, atLeastOnce()).getInInterceptors();
+
         assertNotNull("Should have chain instance", chain);
         Iterator<Interceptor<? extends Message>> iter = chain.iterator();
         assertFalse("Should not have interceptors in chain", iter.hasNext());
@@ -172,7 +182,7 @@ public class ColocUtilTest {
 
     @Test
     public void testIsSameFaultInfo() {
-        OperationInfo oi = control.createMock(OperationInfo.class);
+        OperationInfo oi = mock(OperationInfo.class);
 
         boolean match = ColocUtil.isSameFaultInfo(null, null);
         assertTrue("Should return true", match);
@@ -206,7 +216,7 @@ public class ColocUtilTest {
 
     @Test
     public void testIsSameMessageInfo() {
-        OperationInfo oi = control.createMock(OperationInfo.class);
+        OperationInfo oi = mock(OperationInfo.class);
         boolean match = ColocUtil.isSameMessageInfo(null, null);
         assertTrue("Should return true", match);
         QName mn1 = new QName("A", "B");

@@ -62,7 +62,7 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
     /**
      * Create and capture only singleton instance of the Jsonb, if needed.
      */
-    private static class DefaultJsonbSupplier {
+    private static final class DefaultJsonbSupplier {
         private static final Jsonb INSTANCE = JsonbBuilder.create();
     }
      

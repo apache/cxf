@@ -115,7 +115,7 @@
         <cxf.el-api.version>3.0.3</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.hoverfly.version>0.14.4</cxf.hoverfly.version>
-        <cxf.hisrc.basicjaxb.version>2.1.0</cxf.hisrc.basicjaxb.version>
+        <cxf.hisrc.basicjaxb.version>2.1.1</cxf.hisrc.basicjaxb.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.openapi.version>1.0.15</cxf.geronimo.openapi.version>
         <cxf.glassfish.el.version>4.0.0</cxf.glassfish.el.version>
@@ -171,13 +171,13 @@
         <cxf.json.bind-api.version>2.0.0</cxf.json.bind-api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13.2</cxf.junit.version>
-        <cxf.junit5.version>5.9.3</cxf.junit5.version>
+        <cxf.junit5.version>5.10.0</cxf.junit5.version>
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
         <cxf.ldapsdk.version>6.0.9</cxf.ldapsdk.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
-        <cxf.logback.classic.version>1.4.8</cxf.logback.classic.version>
+        <cxf.logback.classic.version>1.4.11</cxf.logback.classic.version>
         <cxf.lucene.version>9.7.0</cxf.lucene.version>
-        <cxf.maven.core.version>3.9.3</cxf.maven.core.version>
+        <cxf.maven.core.version>3.9.4</cxf.maven.core.version>
         <cxf.micrometer.version>1.10.9</cxf.micrometer.version>
         <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
@@ -187,14 +187,16 @@
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.94.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.96.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
+        <cxf.opentelemetry.version>1.29.0</cxf.opentelemetry.version>
+        <cxf.opentelemetry.semconv.version>1.28.0-alpha</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.persistence-api.version>3.0.0</cxf.persistence-api.version>
-        <cxf.plexus-archiver.version>4.7.1</cxf.plexus-archiver.version>
+        <cxf.plexus-archiver.version>4.8.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.4</cxf.reactivestreams.version>
         <cxf.reactor.version>3.5.8</cxf.reactor.version>
@@ -207,15 +209,15 @@
         <cxf.servlet-api.group>jakarta.servlet</cxf.servlet-api.group>
         <cxf.servlet-api.version>5.0.0</cxf.servlet-api.version>
         <cxf.slf4j.version>2.0.7</cxf.slf4j.version>
-        <cxf.snakeyaml.version>2.0</cxf.snakeyaml.version>
+        <cxf.snakeyaml.version>2.1</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>3.0.8</cxf.spring.boot.version>
+        <cxf.spring.boot.version>3.0.9</cxf.spring.boot.version>
         <cxf.spring.ldap.version>3.0.4</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>6.0.4</cxf.spring.security.version>
+        <cxf.spring.security.version>6.0.5</cxf.spring.security.version>
         <cxf.spring.version>6.0.11</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>5.1.0</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.3.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.15</cxf.swagger.v3.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.11</cxf.tomcat.version>
@@ -228,12 +230,11 @@
         <cxf.validation.api.version>3.0.2</cxf.validation.api.version>
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wildfly.common.version>1.6.0.Final</cxf.wildfly.common.version>
-        <cxf.wiremock.version>3.0.0-beta-10</cxf.wiremock.version>
+        <cxf.wiremock.version>3.0.0-beta-15</cxf.wiremock.version>
         <cxf.woodstox.core.version>6.5.1</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.jakarta.wss4j.version>3.0.0</cxf.jakarta.wss4j.version>
-        <cxf.xerces.version>2.12.2</cxf.xerces.version>
+        <cxf.jakarta.wss4j.version>3.0.1</cxf.jakarta.wss4j.version>
         <cxf.xmlschema.version>2.3.0</cxf.xmlschema.version>
         <cxf.zest.version>2.1</cxf.zest.version>
 
@@ -269,7 +270,6 @@
         <cxf.servicemix.specs.jaxb.version>2.3_2</cxf.servicemix.specs.jaxb.version>
         <cxf.servicemix.specs.version>2.9.0</cxf.servicemix.specs.version>
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
-        <cxf.xerces.bundle.version>2.12.2_1</cxf.xerces.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.awaitility.version>4.2.0</cxf.awaitility.version>
@@ -391,7 +391,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.12.1</version>
+                            <version>10.12.2</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -1755,17 +1755,6 @@
                 <artifactId>jaxen</artifactId>
                 <version>${cxf.jaxen.version}</version>
             </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${cxf.xerces.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
             <!-- if we use the new woodstox artifact, we're using the new version -->
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
@@ -1869,6 +1858,23 @@
                 <artifactId>opentracing-mock</artifactId>
                 <version>${cxf.opentracing.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${cxf.opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${cxf.opentelemetry.semconv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-opentracing-shim</artifactId>
+                <version>${cxf.opentelemetry.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.jaegertracing</groupId>

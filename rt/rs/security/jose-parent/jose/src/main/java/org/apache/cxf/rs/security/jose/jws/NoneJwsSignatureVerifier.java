@@ -38,7 +38,7 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
         return new NoneJwsVerificationSignature();
     }
 
-    private static class NoneJwsVerificationSignature implements JwsVerificationSignature {
+    private static final class NoneJwsVerificationSignature implements JwsVerificationSignature {
 
         @Override
         public void update(byte[] src, int off, int len) {

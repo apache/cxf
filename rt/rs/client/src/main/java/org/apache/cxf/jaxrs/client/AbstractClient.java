@@ -1230,7 +1230,7 @@ public abstract class AbstractClient implements Client {
                                             OutputStream os) throws Fault;
     }
 
-    private class RetryableImpl implements Retryable {
+    private final class RetryableImpl implements Retryable {
 
         @Override
         public Object[] invoke(BindingOperationInfo oi, Object[] params, Map<String, Object> context,

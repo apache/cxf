@@ -234,7 +234,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         }
     }
     @PreMatching
-    private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
+    private static final class PreMatchContainerRequestFilter implements ContainerRequestFilter {
         public void filter(ContainerRequestContext context) throws IOException {
             String path = context.getUriInfo().getPath();
             if (path.endsWith("123")) {

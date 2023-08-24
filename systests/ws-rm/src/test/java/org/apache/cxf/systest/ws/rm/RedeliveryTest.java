@@ -165,7 +165,7 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
         assertTrue("redelivery running", serverManager.getRedeliveryQueue().isEmpty());
     }
 
-    private static class GreeterRecorderImpl extends GreeterImpl {
+    private static final class GreeterRecorderImpl extends GreeterImpl {
         private String value;
         private boolean ex;
 
