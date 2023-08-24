@@ -129,14 +129,14 @@ public class DestinationSequenceTest {
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
         DestinationSequence otherSeq = null;
-        assertFalse(seq.equals(otherSeq));
+        assertNotEquals(seq, otherSeq);
         otherSeq = new DestinationSequence(id, ref, destination, ProtocolVariation.RM10WSA200408);
         assertEquals(seq, otherSeq);
         assertEquals(seq.hashCode(), otherSeq.hashCode());
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
         otherSeq = new DestinationSequence(otherId, ref, destination, ProtocolVariation.RM10WSA200408);
-        assertFalse(seq.equals(otherSeq));
+        assertNotEquals(seq, otherSeq);
         assertNotEquals(seq.hashCode(), otherSeq.hashCode());
     }
 

@@ -22,7 +22,7 @@ package org.apache.cxf.helpers;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 public class NameSpaceTest {
@@ -64,7 +64,7 @@ public class NameSpaceTest {
         NSDecl nsDecl2 = new NSDecl("ns2", MY_URL2);
         NSDecl nsDecl3 = new NSDecl(MY_OWN_PREFIX, MY_CUSTOM_URL);
 
-        assertFalse(nsDecl2.equals(nsDecl1));
+        assertNotEquals(nsDecl1, nsDecl2);
         assertEquals(nsDecl3, nsDecl1);
 
     }

@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -255,7 +255,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 ex = error;
             }
             String currEndpoint = getCurrentEndpointAddress(bookStore);
-            assertFalse(currEndpoint.equals(inactiveReplica));
+            assertNotEquals(currEndpoint, inactiveReplica);
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
@@ -306,7 +306,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 ex = error;
             }
             String currEndpoint = getCurrentEndpointAddress(bookStore);
-            assertFalse(currEndpoint.equals(inactiveReplica));
+            assertNotEquals(currEndpoint, inactiveReplica);
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
