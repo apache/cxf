@@ -457,12 +457,12 @@ public final class JweUtils {
                     }
                 }
             } else if (props.getProperty(RSSEC_KEY_STORE_ALIAS).equals(JoseConstants.USE_REQ_SIG_CERT)) {
-                var certificate = ((Certificate)PhaseInterceptorChain.getCurrentMessage().getExchange().get("reqsigcert"));
-                if (certificate == null) {
+                var publicKey = PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
+                if (publicKey == null) {
                     throw new JweException(JweException.Error.NO_ENCRYPTOR);
                 }
                 keyEncryptionProvider = getPublicKeyEncryptionProvider(
-                        certificate.getPublicKey(),
+                        publicKey,
                         keyAlgo
                 );
 

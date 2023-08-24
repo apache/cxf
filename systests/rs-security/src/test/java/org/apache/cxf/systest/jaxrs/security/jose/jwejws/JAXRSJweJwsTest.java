@@ -500,8 +500,6 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
 
         bean.getProperties(true).put("jose.debug", true);
         bean.getProperties(true).put("rs.security.signature.include.cert", "true");
-//        bean.getProperties(true).put("rs.security.accept.public.key", "true");
-
 
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
