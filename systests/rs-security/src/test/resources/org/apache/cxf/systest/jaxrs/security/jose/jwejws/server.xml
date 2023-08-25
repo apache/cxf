@@ -296,6 +296,26 @@ under the License.
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsjwkreqsigcert">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.enc.in.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.sign.in.properties"/>
+            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.enc.out.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk.sign.out.properties"/>
+            <entry key="rs.security.accept.public.key" value="true"/>
+<!--            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>-->
+<!--            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>-->
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

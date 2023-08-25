@@ -451,9 +451,62 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         return bean.create(BookStore.class);
     }
 
+    @Test
+    public void testJweJwsJwkRsaUseReqSigCert(){
+        String address = "https://localhost:" + PORT + "/jwejwsjwkreqsigcert";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<>();
+
+        // writer
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        jwsWriter.setUseJwsOutputStream(true);
+        // reader
+        JweClientResponseFilter jweReader = new JweClientResponseFilter();
+        JwsClientResponseFilter jwsReader = new JwsClientResponseFilter();
+
+        providers.add(jweWriter);
+        providers.add(jwsWriter);
+
+        providers.add(jweReader);
+        providers.add(jwsReader);
+        bean.setProviders(providers);
+
+        //CLIENT == ALICE
+        bean.getProperties(true).put(
+                "rs.security.encryption.out.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.out.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.signature.out.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.out.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.encryption.in.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.in.properties"
+        );
+        bean.getProperties(true).put(
+                "rs.security.signature.in.properties",
+                "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.in.properties"
+        );
+
+        bean.getProperties(true).put("jose.debug", true);
+        bean.getProperties(true).put("rs.security.signature.include.public.key", "true");
+
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
 
     @Test
-    public void testJweJwsUseReqSigCert(){
+    public void testJweJwsRsaUseReqSigCert(){
         String address = "https://localhost:" + PORT + "/jwejwsreqsigcert";
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
@@ -468,7 +521,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
-//        jwsWriter.setUseJwsOutputStream(true);
+        jwsWriter.setUseJwsOutputStream(true);
         // reader
         JweClientResponseFilter jweReader = new JweClientResponseFilter();
         JwsClientResponseFilter jwsReader = new JwsClientResponseFilter();
@@ -504,8 +557,6 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);
-
-
     }
 
     @Test

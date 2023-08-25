@@ -430,7 +430,30 @@ public final class JweUtils {
             boolean includeKeyId =
                 JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID);
 
-            if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+            if (props.getProperty(RSSEC_KEY_STORE_ALIAS) != null && props.getProperty(RSSEC_KEY_STORE_ALIAS).equals(JoseConstants.USE_REQ_SIG_CERT)) {
+                var publicKey = PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
+                if (publicKey == null) {
+                    throw new JweException(JweException.Error.NO_ENCRYPTOR);
+                }
+                keyEncryptionProvider = getPublicKeyEncryptionProvider(
+                        publicKey,
+                        keyAlgo
+                );
+
+                if (includeCert) {
+                    headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
+                }
+                if (includeCertSha1) {
+                    KeyManagementUtils.setSha1DigestHeader(headers, m, props);
+                } else if (includeCertSha256) {
+                    KeyManagementUtils.setSha256DigestHeader(headers, m, props);
+                }
+                if (includeKeyId && props.containsKey(RSSEC_KEY_STORE_ALIAS)) {
+                    headers.setKeyId(props.getProperty(RSSEC_KEY_STORE_ALIAS));
+                }
+
+            }
+            else if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
                 if (jwk != null) {
                     keyAlgo = getKeyEncryptionAlgorithm(m, props,
@@ -456,29 +479,8 @@ public final class JweUtils {
                         headers.setKeyId(jwk.getKeyId());
                     }
                 }
-            } else if (props.getProperty(RSSEC_KEY_STORE_ALIAS).equals(JoseConstants.USE_REQ_SIG_CERT)) {
-                var publicKey = PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
-                if (publicKey == null) {
-                    throw new JweException(JweException.Error.NO_ENCRYPTOR);
-                }
-                keyEncryptionProvider = getPublicKeyEncryptionProvider(
-                        publicKey,
-                        keyAlgo
-                );
-
-                if (includeCert) {
-                    headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
-                }
-                if (includeCertSha1) {
-                    KeyManagementUtils.setSha1DigestHeader(headers, m, props);
-                } else if (includeCertSha256) {
-                    KeyManagementUtils.setSha256DigestHeader(headers, m, props);
-                }
-                if (includeKeyId && props.containsKey(RSSEC_KEY_STORE_ALIAS)) {
-                    headers.setKeyId(props.getProperty(RSSEC_KEY_STORE_ALIAS));
-                }
-
-            } else {
+            }
+            else {
                 keyEncryptionProvider = getPublicKeyEncryptionProvider(
                     KeyManagementUtils.loadPublicKey(m, props),
                     props,
