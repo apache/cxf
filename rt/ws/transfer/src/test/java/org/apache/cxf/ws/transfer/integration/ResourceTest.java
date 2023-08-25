@@ -40,9 +40,14 @@ import org.apache.cxf.ws.transfer.manager.MemoryResourceManager;
 import org.apache.cxf.ws.transfer.manager.ResourceManager;
 import org.apache.cxf.ws.transfer.resource.Resource;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ResourceTest extends IntegrationBaseTest {
 
@@ -80,10 +85,8 @@ public class ResourceTest extends IntegrationBaseTest {
         Representation representation = new Representation();
         representation.setAny(representationEl);
 
-        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
-        EasyMock.expect(manager.get(EasyMock.isA(ReferenceParametersType.class))).andReturn(representation);
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(manager);
+        ResourceManager manager = mock(ResourceManager.class);
+        when(manager.get(isA(ReferenceParametersType.class))).thenReturn(representation);
 
         ReferenceParametersType refParams = new ReferenceParametersType();
         Element uuid = DOMUtils.getEmptyDocument().createElementNS(
@@ -95,7 +98,7 @@ public class ResourceTest extends IntegrationBaseTest {
         Resource client = createClient(refParams);
 
         GetResponse response = client.get(new Get());
-        EasyMock.verify(manager);
+        verify(manager, times(1)).get(isA(ReferenceParametersType.class));
 
         representationEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("Namespace is other than expected.",
@@ -110,12 +113,8 @@ public class ResourceTest extends IntegrationBaseTest {
 
     @Test
     public void putRequestTest() {
-        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
-        EasyMock.expect(manager.get(EasyMock.isA(ReferenceParametersType.class))).andReturn(new Representation());
-        EasyMock.expectLastCall().once();
-        manager.put(EasyMock.isA(ReferenceParametersType.class), EasyMock.isA(Representation.class));
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(manager);
+        ResourceManager manager = mock(ResourceManager.class);
+        when(manager.get(isA(ReferenceParametersType.class))).thenReturn(new Representation());
 
         ReferenceParametersType refParams = new ReferenceParametersType();
         Element uuid = DOMUtils.getEmptyDocument().createElementNS(
@@ -136,7 +135,8 @@ public class ResourceTest extends IntegrationBaseTest {
         putRequest.setRepresentation(representation);
 
         PutResponse response = client.put(putRequest);
-        EasyMock.verify(manager);
+        verify(manager, times(1)).get(isA(ReferenceParametersType.class));
+        verify(manager, times(1)).put(isA(ReferenceParametersType.class), isA(Representation.class));
 
         representationEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("Namespace is other than expected.",
@@ -151,10 +151,7 @@ public class ResourceTest extends IntegrationBaseTest {
 
     @Test
     public void deleteRequestTest() {
-        ResourceManager manager = EasyMock.createMock(ResourceManager.class);
-        manager.delete(EasyMock.isA(ReferenceParametersType.class));
-        EasyMock.expectLastCall().once();
-        EasyMock.replay(manager);
+        ResourceManager manager = mock(ResourceManager.class);
 
         ReferenceParametersType refParams = new ReferenceParametersType();
         Element uuid = DOMUtils.getEmptyDocument().createElementNS(
@@ -166,7 +163,7 @@ public class ResourceTest extends IntegrationBaseTest {
         Resource client = createClient(refParams);
 
         client.delete(new Delete());
-        EasyMock.verify(manager);
+        verify(manager, times(1)).delete(isA(ReferenceParametersType.class));
 
         server.destroy();
     }
