@@ -78,25 +78,27 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             if (securityContext != null) {
                 JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
             }
-            JAXRSUtils.getCurrentMessage().getExchange().put(PublicKey.class, ((PublicKeyJwsSignatureVerifier) theSigVerifier).getPublicKey());
+
         }
     }
 
     protected SecurityContext configureSecurityContext(JwsSignatureVerifier sigVerifier) {
-        if (sigVerifier instanceof PublicKeyJwsSignatureVerifier
-            && ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate() != null) {
-            final Principal principal =
-                ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
-            return new SecurityContext() {
+        if (sigVerifier instanceof PublicKeyJwsSignatureVerifier) {
+            JAXRSUtils.getCurrentMessage().getExchange().put(PublicKey.class, ((PublicKeyJwsSignatureVerifier) sigVerifier).getPublicKey());
+            if (((PublicKeyJwsSignatureVerifier) sigVerifier).getX509Certificate() != null) {
+                final Principal principal =
+                        ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
+                return new SecurityContext() {
 
-                public Principal getUserPrincipal() {
-                    return principal;
-                }
+                    public Principal getUserPrincipal() {
+                        return principal;
+                    }
 
-                public boolean isUserInRole(String arg0) {
-                    return false;
-                }
-            };
+                    public boolean isUserInRole(String arg0) {
+                        return false;
+                    }
+                };
+            }
         }
         return null;
     }
