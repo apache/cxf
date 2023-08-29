@@ -40,12 +40,13 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DOM4JProviderTest {
 
@@ -214,18 +215,13 @@ public class DOM4JProviderTest {
         e.put(DOM4JProvider.SUPPRESS_XML_DECLARATION, suppress);
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getEndpointInfo()).thenReturn(null);
+        when(endpoint.get(Application.class.getName())).thenReturn(null);
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(factory);
+
         e.put(Endpoint.class, endpoint);
         return m;
     }
@@ -244,18 +240,12 @@ public class DOM4JProviderTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.getEndpointInfo()).thenReturn(null);
+        when(endpoint.get(Application.class.getName())).thenReturn(null);
+        when(endpoint.size()).thenReturn(0);
+        when(endpoint.isEmpty()).thenReturn(true);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(factory);
         e.put(Endpoint.class, endpoint);
         return m;
     }
