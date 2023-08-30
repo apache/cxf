@@ -90,10 +90,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     volatile HttpClient client;
     volatile int lastTlsHash = -1;
     volatile URI sslURL;
-    
-    public HttpClientHTTPConduit(Bus b, EndpointInfo ei) throws IOException {
-        super(b, ei);
-    }
 
     public HttpClientHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
@@ -115,7 +111,13 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * Close the conduit
      */
     public void close() {
-        if (client != null) {
+        if (client instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable)client).close();
+            } catch (Exception e) {
+                //ignore
+            }                
+        } else if (client != null) {
             String name = client.toString();
             client = null;
             tryToShutdownSelector(name);
@@ -398,6 +400,41 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }            
         }
         
+        private boolean isConnectionAttemptCompleted(HTTPClientPolicy csPolicy, PipedOutputStream out)
+            throws IOException {
+            if (!connectionComplete) {
+                // if we haven't connected yet, we'll see if an exception is the reason
+                // why we haven't connected.  Otherwise, wait for the connection
+                // to complete.
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+                try {
+                    out.wait(csPolicy.getConnectionTimeout());
+                } catch (InterruptedException e) {
+                    //ignore
+                }
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+        
         @Override
         protected void setProtocolHeaders() throws IOException {
             HttpClient cl = outMessage.get(HttpClient.class);
@@ -410,37 +447,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                                         ? 4096 : csPolicy.getChunkLength());
             pout = new PipedOutputStream(pin) {
                 synchronized boolean canWrite() throws IOException {
-                    if (!connectionComplete) {
-                        // if we haven't connected yet, we'll see if an exception is the reason 
-                        // why we haven't connected.  Otherwise, wait for the connection
-                        // to complete.
-                        if (future.isDone()) {
-                            try {
-                                future.get();
-                            } catch (InterruptedException | ExecutionException e) {
-                                if (e.getCause() instanceof IOException) {
-                                    throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
-                                }
-                            }
-                            return false;
-                        }                        
-                        try {
-                            wait(csPolicy.getConnectionTimeout());
-                        } catch (InterruptedException e) {
-                            //ignore
-                        }
-                        if (future.isDone()) {
-                            try {
-                                future.get();
-                            } catch (InterruptedException | ExecutionException e) {
-                                if (e.getCause() instanceof IOException) {
-                                    throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
-                                }
-                            }
-                            return false;
-                        }
-                    }                    
-                    return true;
+                    return isConnectionAttemptCompleted(csPolicy, this);
                 }
                 @Override
                 public void write(int b) throws IOException {
@@ -466,7 +473,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 @Override
                 public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
                     connectionComplete = true;
-                    synchronized(pout) {
+                    synchronized (pout) {
                         pout.notifyAll();
                     }
                     BodyPublishers.ofInputStream(new Supplier<InputStream>() {
