@@ -24,13 +24,15 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.junit.jupiter.api.AfterEach;
 
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.exporter.FinishedSpan;
 import io.micrometer.tracing.test.SampleTestRunner;
 import io.micrometer.tracing.test.simple.SpansAssert;
+
+import org.junit.jupiter.api.AfterEach;
+
 
 public class ObservationIntegrationTest extends SampleTestRunner {
 

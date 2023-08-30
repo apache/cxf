@@ -48,7 +48,9 @@ class AbstractJaxrsObservationConvention {
         return keyValues;
     }
 
-    KeyValues highCardinalityKeyValues(int requestLength, @Nullable Integer responseLength, @Nullable String userAgentHeader) {
+    KeyValues highCardinalityKeyValues(int requestLength,
+                                       @Nullable Integer responseLength,
+                                       @Nullable String userAgentHeader) {
         KeyValues keyValues = KeyValues.empty();
         KeyValue requestBody = requestLength != -1 ? CommonHighCardinalityKeys.REQUEST_BODY_SIZE.withValue(
                 String.valueOf(requestLength)) : null;

@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
 
+//CHECKSTYLE:OFF
+
 @Configuration
 @ConditionalOnClass({ Resource.class, WebServiceContext.class })
 public class CxfJaxwsAutoConfiguration {

@@ -214,7 +214,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             while (nodes.hasNext()) {
                 jakarta.xml.soap.Node nd = nodes.next();
                 if (nd instanceof SOAPElement) {
-                    SOAPElement se = ((SOAPElement)nd);
+                    SOAPElement se = (SOAPElement)nd;
                     for (int x = 0; x < 100; x++) {
                         se.addTextNode("TestSoapMessageTestSoapMessageTestSoapMessageTestSoapMessage");
                     }

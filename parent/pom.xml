@@ -398,7 +398,6 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <encoding>UTF-8</encoding>
                         <includeResources>false</includeResources>
                     </configuration>
                     <executions>
@@ -445,7 +444,6 @@
                         <rulesets>
                             <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
                         </rulesets>
-                        <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>11</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>
@@ -596,6 +594,23 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgument>${cxf.compile.flags}</compilerArgument>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.cxf.build-utils</groupId>
                 <artifactId>cxf-xml2fastinfoset-plugin</artifactId>
@@ -2037,34 +2052,6 @@
                 <pmd.skip>true</pmd.skip>
                 <checkstyle.skip>true</checkstyle.skip>
             </properties>
-        </profile>
-        <profile>
-            <!-- default profile enables checkstyle and Xlint stuff -->
-            <id>sourcecheck</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
-                            <showWarnings>true</showWarnings>
-                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <id>set.eclipse.output</id>

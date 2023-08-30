@@ -37,16 +37,16 @@ public class DefaultContainerRequestSenderObservationConvention extends Abstract
     public KeyValues getLowCardinalityKeyValues(ContainerRequestSenderObservationContext context) {
         return lowCardinalityKeyValues(context.getRequestContext().getMethod(),
                                        context.getRequestContext().getUri(),
-                                       context.getResponse() != null ? context.getResponse().getStatus() :
-                                       null);
+                                       context.getResponse() != null 
+                                           ? context.getResponse().getStatus() : null);
     }
 
     @Override
     public KeyValues getHighCardinalityKeyValues(ContainerRequestSenderObservationContext context) {
         String contentLength = context.getRequestContext().getHeaderString("Content-Length");
         int requestLength = StringUtils.isEmpty(contentLength) ? -1 : Integer.parseInt(contentLength);
-        Integer responseLength = context.getResponse() != null ?
-                                 context.getResponse().getLength() : null;
+        Integer responseLength = context.getResponse() != null
+                                 ? context.getResponse().getLength() : null;
         KeyValues keyValues = highCardinalityKeyValues(requestLength, responseLength,
                                                        context.getRequestContext()
                                                               .getHeaderString("User-Agent"));

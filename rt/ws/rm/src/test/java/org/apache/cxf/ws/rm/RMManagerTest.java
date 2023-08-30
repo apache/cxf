@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TimerTask;
 
 import javax.xml.namespace.QName;
@@ -384,7 +385,7 @@ public class RMManagerTest {
                              eq(false),
                              isA(ProtocolVariation.class),
                              isA(Exchange.class),
-                             CastUtils.cast(isA(HashMap.class), String.class, Object.class)))
+                             CastUtils.cast(isA(Map.class), String.class, Object.class)))
             .thenReturn(createResponse);
         Servant servant = mock(Servant.class);
         when(rme.getServant()).thenReturn(servant);

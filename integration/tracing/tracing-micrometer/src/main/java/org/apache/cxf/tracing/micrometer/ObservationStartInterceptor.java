@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.tracing.micrometer;
 
-import static org.apache.cxf.tracing.micrometer.CxfObservationDocumentation.IN_OBSERVATION;
-import static org.apache.cxf.tracing.micrometer.DefaultMessageInObservationConvention.INSTANCE;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.Nullable;
@@ -29,6 +26,10 @@ import org.apache.cxf.phase.Phase;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+
+import static org.apache.cxf.tracing.micrometer.CxfObservationDocumentation.IN_OBSERVATION;
+import static org.apache.cxf.tracing.micrometer.DefaultMessageInObservationConvention.INSTANCE;
+
 
 @NoJSR250Annotations
 public class ObservationStartInterceptor extends AbstractObservationInterceptor {

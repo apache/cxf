@@ -313,7 +313,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertEquals(1, claims.size());
         Claim claim = claims.get(0);
         String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-        assertNotEquals(role, claim.getClaimType().toString());
+        assertNotEquals(role, claim.getClaimType());
 
         // Now get another token specifying the role
         client.query("claim", role);
@@ -325,7 +325,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         claims = SAMLUtils.getClaims(assertion);
         assertEquals(1, claims.size());
         claim = claims.get(0);
-        assertEquals(role, claim.getClaimType().toString());
+        assertEquals(role, claim.getClaimType());
         assertEquals("ordinary-user", claim.getValues().get(0));
     }
 

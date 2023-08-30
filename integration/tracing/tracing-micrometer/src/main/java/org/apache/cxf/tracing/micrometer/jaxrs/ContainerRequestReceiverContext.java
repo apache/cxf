@@ -19,9 +19,10 @@
 
 package org.apache.cxf.tracing.micrometer.jaxrs;
 
-import io.micrometer.observation.transport.RequestReplyReceiverContext;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
+
+import io.micrometer.observation.transport.RequestReplyReceiverContext;
 
 /**
  *

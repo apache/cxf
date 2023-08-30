@@ -55,7 +55,7 @@ public class NettyHttpClientRequest {
         this.request  =
             new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
                                        HttpMethod.valueOf(method),
-                                       uri.getPath().toString(), content);
+                                       uri.getPath(), content);
         // setup the default headers
         request.headers().set("Connection", "keep-alive");
         request.headers().set("Host", uri.getHost() + ":"

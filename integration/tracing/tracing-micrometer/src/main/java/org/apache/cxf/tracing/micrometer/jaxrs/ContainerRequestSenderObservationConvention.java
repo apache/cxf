@@ -25,7 +25,8 @@ import io.micrometer.observation.ObservationConvention;
 /**
  *
  */
-public interface ContainerRequestSenderObservationConvention extends ObservationConvention<ContainerRequestSenderObservationContext> {
+public interface ContainerRequestSenderObservationConvention 
+    extends ObservationConvention<ContainerRequestSenderObservationContext> {
 
     @Override
     default boolean supportsContext(Context context) {

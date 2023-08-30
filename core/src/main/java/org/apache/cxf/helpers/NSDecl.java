@@ -31,7 +31,7 @@ public final class NSDecl {
             this.prefix = pfx.intern();
         }
         this.uri = ur.intern();
-        this.hashCode = (toString()).hashCode();
+        this.hashCode = toString().hashCode();
     }
 
     public String getPrefix() {
