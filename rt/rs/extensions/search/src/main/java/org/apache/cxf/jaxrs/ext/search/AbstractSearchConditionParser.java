@@ -194,6 +194,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
                 && (isPrimitive
                     ||
                     Date.class.isAssignableFrom(returnType)
+                    || Temporal.class.isAssignableFrom(returnType)
                     || returnCollection
                     || paramConverterAvailable(returnType));
 
@@ -207,8 +208,13 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
 
             if (lastTry) {
                 if (!returnCollection) {
-                    nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType)
-                        : convertToDate(returnType, value);
+                    if (isPrimitive) {
+                        nextObject = InjectionUtils.convertStringToPrimitive(value, returnType);
+                    } else if (Temporal.class.isAssignableFrom(returnType)) {
+                        nextObject = convertToTemporal((Class<? extends Temporal>)returnType, value);
+                    } else {
+                        nextObject = convertToDate(returnType, value);
+                    }
                 } else {
                     CollectionCheck collCheck = getCollectionCheck(originalPropName, true, actualReturnType);
                     if (collCheck == null) {
