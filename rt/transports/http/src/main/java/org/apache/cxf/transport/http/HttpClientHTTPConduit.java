@@ -90,10 +90,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     volatile HttpClient client;
     volatile int lastTlsHash = -1;
     volatile URI sslURL;
-    
-    public HttpClientHTTPConduit(Bus b, EndpointInfo ei) throws IOException {
-        super(b, ei);
-    }
 
     public HttpClientHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
@@ -115,7 +111,13 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * Close the conduit
      */
     public void close() {
-        if (client != null) {
+        if (client instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable)client).close();
+            } catch (Exception e) {
+                //ignore
+            }                
+        } else if (client != null) {
             String name = client.toString();
             client = null;
             tryToShutdownSelector(name);

@@ -76,13 +76,6 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
      */
     protected HttpsURLConnectionFactory connectionFactory;
 
-
-    public URLConnectionHTTPConduit(Bus b, EndpointInfo ei) throws IOException {
-        super(b, ei);
-        connectionFactory = new HttpsURLConnectionFactory();
-        CXFAuthenticator.addAuthenticator();
-    }
-
     public URLConnectionHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
         connectionFactory = new HttpsURLConnectionFactory();
