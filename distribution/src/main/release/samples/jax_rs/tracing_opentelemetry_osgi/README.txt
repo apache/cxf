@@ -1,4 +1,4 @@
-JAX-RS OpenTelemetry/Jaeger Demo in OSGi container
+JAX-RS OpenTelemetry Demo in OSGi container
 =================
 
 The demo shows a basic usage of OpenTelemetry API tracing capabilities 
