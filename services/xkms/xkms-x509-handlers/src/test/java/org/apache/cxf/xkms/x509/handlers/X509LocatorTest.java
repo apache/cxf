@@ -33,10 +33,12 @@ import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.repo.CertificateRepo;
 
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 /**
  * Test needs a real LDAP server.
  */
@@ -47,9 +49,8 @@ public class X509LocatorTest {
 
     @Test
     public void locate() throws CertificateException {
-        CertificateRepo certRepo = EasyMock.createMock(CertificateRepo.class);
-        EasyMock.expect(certRepo.findBySubjectDn(EasyMock.eq("alice"))).andReturn(getAliceCert());
-        EasyMock.replay(certRepo);
+        CertificateRepo certRepo = mock(CertificateRepo.class);
+        when(certRepo.findBySubjectDn(eq("alice"))).thenReturn(getAliceCert());
         X509Locator locator = new X509Locator(certRepo);
         LocateRequestType request = prepareLocateXKMSRequest();
         UnverifiedKeyBindingType result = locator.locate(request);
