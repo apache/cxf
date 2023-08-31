@@ -57,7 +57,6 @@
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
         <cxf.asm.version>9.5</cxf.asm.version>
-        <cxf.easymock.version>5.1.0</cxf.easymock.version>
 
         <!-- OSGi related properties -->
         <cxf.fragment.host />
@@ -1525,12 +1524,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>${cxf.easymock.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
                 <artifactId>jackson-jakarta-rs-json-provider</artifactId>
                 <version>${cxf.jackson.version}</version>
@@ -2257,7 +2250,6 @@
                 <jdk>[16,)</jdk>
             </activation>
             <properties>
-                <!-- EasyMock stills uses JDK Internal APIs: see please https://bugs.openjdk.java.net/browse/JDK-8255363 -->
                 <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
                 <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
