@@ -57,9 +57,11 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.eclipse.jetty.websocket.core.server.WebSocketServerComponents;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
 import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
@@ -115,6 +117,11 @@ public class Jetty10WebSocketDestination extends JettyHTTPDestination implements
         if (webSocketServerContainer == null) {
             webSocketServerContainer = JettyWebSocketServerContainer.getContainer(context);
             if (webSocketServerContainer == null) {
+                final ServletContextHandler handler = ServletContextHandler.getServletContextHandler(
+                    servletContext, "Javax Websocket");
+                if (handler != null && handler.getServer() != null) {
+                    WebSocketServerComponents.ensureWebSocketComponents(handler.getServer(), context);
+                }
                 webSocketServerContainer = JettyWebSocketServerContainer.ensureContainer(context);
             }
             return webSocketServerContainer;
