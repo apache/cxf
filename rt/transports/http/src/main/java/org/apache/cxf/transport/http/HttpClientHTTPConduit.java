@@ -107,6 +107,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 || lastURL.getPort() != url.getPort();
     }
     
+    @Override
+    public void close(Message msg) throws IOException {
+        super.close(msg);
+        msg.remove(HttpClient.class);
+    }
+    
     /**
      * Close the conduit
      */
