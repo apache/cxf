@@ -133,6 +133,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     });
                     c.prepare(message);
                     c.close(message);
+                    c.close();
                     InputStream ins = exch.get(InputStream.class);
                     resourceOpened.add(ins);
                     InputSource src = new InputSource(ins);
