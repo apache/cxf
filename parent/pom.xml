@@ -88,7 +88,7 @@
         <cxf.osgi.jakarta.transaction.version>[2,3)</cxf.osgi.jakarta.transaction.version>
 
         <!-- please maintain alphabetical order here -->
-        <cxf.activemq.artemis.version>2.28.0</cxf.activemq.artemis.version>
+        <cxf.activemq.artemis.version>2.30.0</cxf.activemq.artemis.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
         <cxf.arquillian.version>1.7.1.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>3.0.0.Final</cxf.arquillian.weld.container.version>
@@ -101,10 +101,10 @@
         <cxf.cdi.api.version>3.0.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
-        <cxf.commons-codec.version>1.15</cxf.commons-codec.version>
-        <cxf.commons-io.version>2.11.0</cxf.commons-io.version>
+        <cxf.commons-codec.version>1.16.0</cxf.commons-codec.version>
+        <cxf.commons-io.version>2.13.0</cxf.commons-io.version>
         <cxf.commons-jcs-jcache.version>2.2.1</cxf.commons-jcs-jcache.version>
-        <cxf.commons-lang3.version>3.12.0</cxf.commons-lang3.version>
+        <cxf.commons-lang3.version>3.13.0</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.2</cxf.commons-logging.version>
         <cxf.commons-text.version>1.10.0</cxf.commons-text.version>
         <cxf.derby.version>10.16.1.1</cxf.derby.version>
@@ -137,8 +137,8 @@
         <cxf.jackson.databind.version>2.15.2</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.1</cxf.jaeger.version>
-        <cxf.jakarta.activation.version>2.1.0</cxf.jakarta.activation.version>
-        <cxf.jakarta.mail.version>2.1.1</cxf.jakarta.mail.version>
+        <cxf.jakarta.activation.version>2.1.2</cxf.jakarta.activation.version>
+        <cxf.jakarta.mail.version>2.1.2</cxf.jakarta.mail.version>
         <cxf.jakarta.injectapi.version>2.0.1</cxf.jakarta.injectapi.version>
         <cxf.jakarta.jwsapi.version>3.0.0</cxf.jakarta.jwsapi.version>
         <cxf.jakarta.soapapi.version>2.0.1</cxf.jakarta.soapapi.version>
