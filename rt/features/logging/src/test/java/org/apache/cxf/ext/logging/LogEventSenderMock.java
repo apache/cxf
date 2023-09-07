@@ -18,20 +18,27 @@
  */
 package org.apache.cxf.ext.logging;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 
 public class LogEventSenderMock implements LogEventSender {
 
-    private LogEvent logEvent;
+    private List<LogEvent> logEvents = new ArrayList<>();
 
     @Override
     public void send(LogEvent event) {
-        logEvent = event;
+        logEvents.add(event);
     }
 
     public LogEvent getLogEvent() {
-        return logEvent;
+        return logEvents.isEmpty() ? null : logEvents.get(0);
+    }
+    
+    public List<LogEvent> getLogEvents() {
+        return logEvents;
     }
 
 }
