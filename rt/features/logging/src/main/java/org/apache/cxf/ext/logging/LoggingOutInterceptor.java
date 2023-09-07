@@ -61,6 +61,11 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     public void handleMessage(Message message) throws Fault {
         if (isLoggingDisabledNow(message)) {
             return;
+        } else {
+            //ensure only logging once for a certain message
+            //this can prevent message logging again when fault
+            //happen after PRE_STREAM phase(LoggingOutInterceptor is called both in out chain and fault out chain)
+            message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
         }
         createExchangeId(message);
         final OutputStream os = message.getContent(OutputStream.class);
