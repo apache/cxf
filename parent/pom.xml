@@ -221,7 +221,7 @@
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
         <cxf.undertow.xnio.osgi.version>[3.3,4.0)</cxf.undertow.xnio.osgi.version>
-        <cxf.undertow.version>2.2.24.Final</cxf.undertow.version>
+        <cxf.undertow.version>2.2.26.Final</cxf.undertow.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
              with a qualifier. We do want a range. -->
@@ -236,6 +236,7 @@
         <cxf.wss4j.version>2.4.2</cxf.wss4j.version>
         <cxf.xerces.version>2.12.2</cxf.xerces.version>
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
+        <cxf.xnio.version>3.8.9.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
 
         <!-- various OSGi related versions -->
@@ -1245,6 +1246,16 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${cxf.jboss.logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.xnio</groupId>
+                <artifactId>xnio-nio</artifactId>
+                <version>${cxf.xnio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.xnio</groupId>
+                <artifactId>xnio-api</artifactId>
+                <version>${cxf.xnio.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wildfly.common</groupId>
