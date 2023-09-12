@@ -20,7 +20,11 @@ package org.apache.cxf.systest.swa;
 
 import java.awt.Image;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -48,58 +52,107 @@ import org.apache.cxf.swa.types.OutputResponseAll;
 import org.apache.cxf.swa.types.VoidRequest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.util.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(value = Parameterized.class)
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     static String serverPort = TestUtil.getPortNumber(Server.class);
+    static String serverPortInvalid = TestUtil.getPortNumber(Server.class, 1);
+    
+    static class TestParam {
+        private final String port;
+        private final String exMessage;
+        TestParam(String port, String ex) {
+            this.port = port;
+            this.exMessage = ex;          
+        }
+        String getPort() {
+            return port;
+        }
+        String getExceptionMessage() {
+            return exMessage;
+        }     
+    }
+    
+    final TestParam test;
+    public ClientServerSwaTest(TestParam test) {
+        this.test = test;
+    }
 
+    @Parameterized.Parameters
+    public static Collection<TestParam> data() {
+        List<TestParam> parameters = new ArrayList<>();
+        parameters.add(new TestParam(serverPort, null));
+        parameters.add(new TestParam(serverPortInvalid, "java.net.ConnectException"));
+        parameters.add(new TestParam(serverPort + "/INVALID", "404: Not Found"));
+        return parameters;
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
+    private String getFullStackTrace(Exception ex) {
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new java.io.PrintWriter(sw));
+        return sw.toString();
+    }
+    
     @Test
     public void testSwaNoMimeCodeGen() throws Exception {
         org.apache.cxf.swa_nomime.SwAService service = new org.apache.cxf.swa_nomime.SwAService();
 
         org.apache.cxf.swa_nomime.SwAServiceInterface port = service.getSwAServiceHttpPort();
-        setAddress(port, "http://localhost:" + serverPort + "/swa-nomime");
+        setAddress(port, "http://localhost:" + test.getPort() + "/swa-nomime");
 
         Holder<String> textHolder = new Holder<>("Hi");
         Holder<byte[]> data = new Holder<>("foobar".getBytes());
 
-        port.echoData(textHolder, data);
-        String string = IOUtils.newStringFromBytes(data.value);
-        assertEquals("testfoobar", string);
-        assertEquals("Hi", textHolder.value);
-
-        URL url1 = this.getClass().getResource("resources/attach.text");
-        URL url2 = this.getClass().getResource("resources/attach.html");
-        URL url3 = this.getClass().getResource("resources/attach.xml");
-        URL url4 = this.getClass().getResource("resources/attach.jpeg1");
-        URL url5 = this.getClass().getResource("resources/attach.jpeg2");
-
-        Holder<String> attach1 = new Holder<>(IOUtils.toString(url1.openStream()));
-        Holder<String> attach2 = new Holder<>(IOUtils.toString(url2.openStream()));
-        Holder<String> attach3 = new Holder<>(IOUtils.toString(url3.openStream()));
-        Holder<byte[]> attach4 = new Holder<>(IOUtils.readBytesFromStream(url4.openStream()));
-        Holder<byte[]> attach5 = new Holder<>(IOUtils.readBytesFromStream(url5.openStream()));
-        org.apache.cxf.swa_nomime.types.VoidRequest request
-            = new org.apache.cxf.swa_nomime.types.VoidRequest();
-        org.apache.cxf.swa_nomime.types.OutputResponseAll response
-            = port.echoAllAttachmentTypes(request,
-                                          attach1,
-                                          attach2,
-                                          attach3,
-                                          attach4,
-                                          attach5);
-        assertNotNull(response);
+        try {
+            port.echoData(textHolder, data);
+            String string = IOUtils.newStringFromBytes(data.value);
+            assertEquals("testfoobar", string);
+            assertEquals("Hi", textHolder.value);
+    
+            URL url1 = this.getClass().getResource("resources/attach.text");
+            URL url2 = this.getClass().getResource("resources/attach.html");
+            URL url3 = this.getClass().getResource("resources/attach.xml");
+            URL url4 = this.getClass().getResource("resources/attach.jpeg1");
+            URL url5 = this.getClass().getResource("resources/attach.jpeg2");
+    
+            Holder<String> attach1 = new Holder<>(IOUtils.toString(url1.openStream()));
+            Holder<String> attach2 = new Holder<>(IOUtils.toString(url2.openStream()));
+            Holder<String> attach3 = new Holder<>(IOUtils.toString(url3.openStream()));
+            Holder<byte[]> attach4 = new Holder<>(IOUtils.readBytesFromStream(url4.openStream()));
+            Holder<byte[]> attach5 = new Holder<>(IOUtils.readBytesFromStream(url5.openStream()));
+            org.apache.cxf.swa_nomime.types.VoidRequest request
+                = new org.apache.cxf.swa_nomime.types.VoidRequest();
+        
+            org.apache.cxf.swa_nomime.types.OutputResponseAll response
+                = port.echoAllAttachmentTypes(request,
+                                              attach1,
+                                              attach2,
+                                              attach3,
+                                              attach4,
+                                              attach5);
+            assertNotNull(response);
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }
     }
 
     @Test
@@ -107,7 +160,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
 
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-        setAddress(port, "http://localhost:" + serverPort + "/swa");
+        setAddress(port, "http://localhost:" + test.getPort() + "/swa");
 
         Holder<String> textHolder = new Holder<>();
         Holder<DataHandler> data = new Holder<>();
@@ -119,14 +172,22 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
         textHolder.value = "Hi";
 
-        port.echoData(textHolder, data);
-        InputStream bis = null;
-        bis = data.value.getDataSource().getInputStream();
-        byte[] b = new byte[10];
-        bis.read(b, 0, 10);
-        String string = IOUtils.newStringFromBytes(b);
-        assertEquals("testfoobar", string);
-        assertEquals("Hi", textHolder.value);
+        try {
+            port.echoData(textHolder, data);
+            InputStream bis = null;
+            bis = data.value.getDataSource().getInputStream();
+            byte[] b = new byte[10];
+            bis.read(b, 0, 10);
+            String string = IOUtils.newStringFromBytes(b);
+            assertEquals("testfoobar", string);
+            assertEquals("Hi", textHolder.value);
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }
     }
 
     @Test
@@ -134,7 +195,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
 
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-        setAddress(port, "http://localhost:" + serverPort + "/swa");
+        setAddress(port, "http://localhost:" + test.getPort() + "/swa");
 
         Holder<String> textHolder = new Holder<>();
         Holder<String> headerHolder = new Holder<>();
@@ -148,15 +209,23 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         textHolder.value = "Hi";
         headerHolder.value = "Header";
 
-        port.echoDataWithHeader(textHolder, data, headerHolder);
-        InputStream bis = null;
-        bis = data.value.getDataSource().getInputStream();
-        byte[] b = new byte[10];
-        bis.read(b, 0, 10);
-        String string = IOUtils.newStringFromBytes(b);
-        assertEquals("testfoobar", string);
-        assertEquals("Hi", textHolder.value);
-        assertEquals("Header", headerHolder.value);
+        try {
+            port.echoDataWithHeader(textHolder, data, headerHolder);
+            InputStream bis = null;
+            bis = data.value.getDataSource().getInputStream();
+            byte[] b = new byte[10];
+            bis.read(b, 0, 10);
+            String string = IOUtils.newStringFromBytes(b);
+            assertEquals("testfoobar", string);
+            assertEquals("Hi", textHolder.value);
+            assertEquals("Header", headerHolder.value);
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }
     }
 
     @Test
@@ -164,7 +233,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
 
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-        setAddress(port, "http://localhost:" + serverPort + "/swa");
+        setAddress(port, "http://localhost:" + test.getPort() + "/swa");
 
         Holder<DataStruct> structHolder = new Holder<>();
 
@@ -175,15 +244,23 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         struct.setDataRef(handler);
         structHolder.value = struct;
 
-        port.echoDataRef(structHolder);
-
-        handler = structHolder.value.getDataRef();
-        InputStream bis = handler.getDataSource().getInputStream();
-        byte[] b = new byte[10];
-        bis.read(b, 0, 10);
-        String string = IOUtils.newStringFromBytes(b);
-        assertEquals("testfoobar", string);
-        bis.close();
+        try {
+            port.echoDataRef(structHolder);
+    
+            handler = structHolder.value.getDataRef();
+            InputStream bis = handler.getDataSource().getInputStream();
+            byte[] b = new byte[10];
+            bis.read(b, 0, 10);
+            String string = IOUtils.newStringFromBytes(b);
+            assertEquals("testfoobar", string);
+            bis.close();
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }
     }
 
     @Test
@@ -191,7 +268,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
 
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-        setAddress(port, "http://localhost:" + serverPort + "/swa");
+        setAddress(port, "http://localhost:" + test.getPort() + "/swa");
 
         URL url1 = this.getClass().getResource("resources/attach.text");
         URL url2 = this.getClass().getResource("resources/attach.html");
@@ -214,15 +291,24 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         Holder<Image> attach5 = new Holder<>();
         attach4.value = ImageIO.read(url4);
         attach5.value = ImageIO.read(url5);
-        VoidRequest request = new VoidRequest();
-        OutputResponseAll response = port.echoAllAttachmentTypes(request, attach1, attach2, attach3, attach4,
-                                                                 attach5);
-
-        assertNotNull(response);
-        Map<?, ?> map = CastUtils.cast((Map<?, ?>)((BindingProvider)port).getResponseContext()
-                                           .get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
-        assertNotNull(map);
-        assertEquals(5, map.size());
+        
+        try {
+            VoidRequest request = new VoidRequest();
+            OutputResponseAll response = port.echoAllAttachmentTypes(request, attach1, attach2, attach3, attach4,
+                                                                     attach5);
+    
+            assertNotNull(response);
+            Map<?, ?> map = CastUtils.cast((Map<?, ?>)((BindingProvider)port).getResponseContext()
+                                               .get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
+            assertNotNull(map);
+            assertEquals(5, map.size());
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }
     }
 
     @Test
@@ -234,9 +320,10 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         URL url5 = this.getClass().getResource("resources/attach.jpeg2");
 
 
+        int copyCount = 10000;
         byte[] bytes = IOUtils.readBytesFromStream(url1.openStream());
-        byte[] bigBytes = new byte[bytes.length * 50];
-        for (int x = 0; x < 50; x++) {
+        byte[] bigBytes = new byte[bytes.length * copyCount];
+        for (int x = 0; x < copyCount; x++) {
             System.arraycopy(bytes, 0, bigBytes, x * bytes.length, bytes.length);
         }
 
@@ -252,7 +339,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
             .createDispatch(SwAService.SwAServiceHttpPort,
                             SOAPMessage.class,
                             Service.Mode.MESSAGE);
-        setAddress(disp, "http://localhost:" + serverPort + "/swa");
+        setAddress(disp, "http://localhost:" + test.getPort() + "/swa");
 
 
         SOAPMessage msg = MessageFactory.newInstance().createMessage();
@@ -281,8 +368,16 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         msg.addAttachmentPart(att);
 
         //Test for CXF-
-        msg = disp.invoke(msg);
-        assertEquals(5, msg.countAttachments());
+        try {
+            msg = disp.invoke(msg);
+            assertEquals(5, msg.countAttachments());
+        } catch  (Exception ex) {
+            if (test.getExceptionMessage() != null) {
+                Assert.hasText(getFullStackTrace(ex), test.getExceptionMessage());
+                return;
+            }
+            throw ex;
+        }            
 
     }
 }
