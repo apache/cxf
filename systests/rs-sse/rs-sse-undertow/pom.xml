@@ -46,6 +46,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf.systests</groupId>
             <artifactId>cxf-systests-rs-sse-base</artifactId>
             <version>${project.version}</version>
