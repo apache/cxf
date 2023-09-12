@@ -77,7 +77,7 @@
         <cxf.osgi.javax.xml.ws.version>[0,3)</cxf.osgi.javax.xml.ws.version>
 
         <!-- please maintain alphabetical order here -->
-        <cxf.activemq.version>5.16.3</cxf.activemq.version>
+        <cxf.activemq.version>5.17.5</cxf.activemq.version>
         <cxf.ahc.version>2.12.3</cxf.ahc.version>
         <cxf.arquillian.version>1.6.0.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
@@ -1722,6 +1722,10 @@
                     <exclusion>
                         <groupId>com.google.guava</groupId>
                         <artifactId>guava</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.annotation</groupId>
+                        <artifactId>javax.annotation-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
