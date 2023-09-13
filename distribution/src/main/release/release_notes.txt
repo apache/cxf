@@ -1,4 +1,4 @@
-Apache CXF 4.0.2 Release Notes
+Apache CXF 4.0.3 Release Notes
 
 1. Overview
 
@@ -21,8 +21,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.2 fixes over 7 JIRA issues reported by users and the community.
-
+4.0.3 fixes over 54 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -65,48 +64,66 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Sub-task
-    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support (Netty & HttpClient 5)
+    * [CXF-8842] - Get rid of EasyMock in cxf-core
+    * [CXF-8843] - Get rid of EasyMock in cxf-integration-jca
+    * [CXF-8844] - Get rid of EasyMock in cxf-rt-bindings-coloc
+    * [CXF-8845] - Get rid of EasyMock in cxf-rt-bindings-corba
+    * [CXF-8846] - Get rid of EasyMock in cxf-rt-bindings-soap
+    * [CXF-8847] - Get rid of EasyMock in cxf-rt-databinding-aegis
+    * [CXF-8848] - Get rid of EasyMock in cxf-rt-databinding-jaxb
+    * [CXF-8849] - Get rid of EasyMock in cxf-rt-features-clustering
+    * [CXF-8850] - Get rid of EasyMock in cxf-rt-features-logging
+    * [CXF-8851] - Get rid of EasyMock in cxf-rt-features-throttling
+    * [CXF-8852] - Get rid of EasyMock in cxf-services-xkms-x509-repo-ldap
+    * [CXF-8853] - Get rid of EasyMock in cxf-services-xkms-x509-handlers
+    * [CXF-8854] - Get rid of EasyMock in cxf-rt-wsdl
+    * [CXF-8855] - Get rid of EasyMock in cxf-rt-ws-transfer
+    * [CXF-8856] - Get rid of EasyMock in cxf-rt-frontend-jaxrs
+    * [CXF-8857] - Get rid of EasyMock in cxf-rt-frontend-jaxws
+    * [CXF-8858] - Get rid of EasyMock in cxf-rt-frontend-js
+    * [CXF-8859] - Get rid of EasyMock in cxf-rt-ws-security
+    * [CXF-8860] - Get rid of EasyMock in cxf-rt-ws-rm
+    * [CXF-8861] - Get rid of EasyMock in cxf-rt-ws-policy
+    * [CXF-8862] - Get rid of EasyMock in cxf-rt-ws-addr
+    * [CXF-8863] - Get rid of EasyMock in cxf-rt-transports-websocket
+    * [CXF-8864] - Get rid of EasyMock in cxf-rt-transports-jms
+    * [CXF-8865] - Get rid of EasyMock in cxf-rt-management
+    * [CXF-8866] - Get rid of EasyMock in cxf-rt-rs-service-description
+    * [CXF-8867] - Get rid of EasyMock in cxf-rt-rs-client
+    * [CXF-8868] - Get rid of EasyMock in cxf-rt-rs-extension-providers
+    * [CXF-8869] - Get rid of EasyMock in cxf-rt-rs-extension-search
+    * [CXF-8870] - Get rid of EasyMock in cxf-rt-transports-http-undertow
+    * [CXF-8871] - Get rid of EasyMock in cxf-rt-rs-mp-client
+    * [CXF-8872] - Get rid of EasyMock in cxf-rt-rs-security-oauth2
+    * [CXF-8873] - Get rid of EasyMock in cxf-rt-rs-security-oauth2-saml
+    * [CXF-8874] - Get rid of EasyMock in cxf-rt-rs-security-sso-oidc
+    * [CXF-8876] - Get rid of EasyMock in cxf-rt-transports-http-jetty
+    * [CXF-8877] - Get rid of EasyMock in cxf-rt-transports-http-netty-client
+    * [CXF-8878] - Get rid of EasyMock in cxf-rt-transports-http-netty-server
+    * [CXF-8890] - Get rid of EasyMock in cxf-rt-transports-http
 
 ** Bug
-    * [CXF-8879] - OSGi bundle manifest are broken since version 4
-    * [CXF-8880] - Catch wrong XML binding file during parsing
-    * [CXF-8881] - WSDLValidator link doesn't work
-    * [CXF-8882] - Apache HttpClient 5 async conduit does not handle authentication
-    * [CXF-8884] - Update commons-jexl3 to 3.3
+    * [CXF-8885] - HttpClient SelectorManager threads run indefinitely causing OOM
+    * [CXF-8886] - JavaDocProvider does not work with JDK 17 and beyond
+    * [CXF-8889] - Compilation of CXF fails due to a "jakarta..." vs. "javax..." issue.
+    * [CXF-8892] - CXF build on Windows is broken (test failures)
+    * [CXF-8895] - Deadlock instead of timeout with new HttpClientHTTPConduit using large payloads
+    * [CXF-8896] - http client sends some strange HTTP/1.1 and HTTP/2 mix headers
+    * [CXF-8903] - Too many open files error in HttpClientHTTPConduit
+    * [CXF-8905] - TransportURIResolver doesn't honor the property setting in bus
+    * [CXF-8907] -  java.lang.NullPointerException at AsymmetricBindingHandler.java
+    * [CXF-8914] - No content-length header after upgrade CXF from 3.5.6 to 3.6.1
+    * [CXF-8919] - JAXRSUtils references javax.activation.Datasource
+    * [CXF-8920] - Can't filter when collection has attribute of type LocalDate or LocalDateTime
+    * [CXF-8925] - Logging twice in case of faults happening after pre-stream phase in out-chain
+
+** New Feature
+    * [CXF-8817] - Add support for Micrometer Observation
 
 ** Improvement
-    * [CXF-8802] - Update to Maven Remote Resources Plugin 3.1.0
+    * [CXF-8457] - Provide OpenTelemetry support
+    * [CXF-8901] - Update Guava to 32.1.1 (solving CVE-2023-2976)
+    * [CXF-8912] - Remove xerces dependency and use the JDK's JAXP impl
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+** Task
+    * [CXF-8549] - Get rid of EasyMock
