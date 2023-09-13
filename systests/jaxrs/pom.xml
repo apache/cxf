@@ -527,9 +527,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.specto</groupId>
-            <artifactId>hoverfly-java</artifactId>
-            <version>${cxf.hoverfly.version}</version>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-jre8-standalone</artifactId>
+            <version>${cxf.wiremock.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
