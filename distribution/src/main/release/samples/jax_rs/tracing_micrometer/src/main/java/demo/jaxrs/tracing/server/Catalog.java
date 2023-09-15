@@ -51,9 +51,8 @@ import org.apache.cxf.tracing.TracerContext;
 
 import demo.jaxrs.tracing.GoogleBooksApi;
 import feign.Feign;
-import feign.httpclient.ApacheHttpClient;
-import feign.opentracing.TracingClient;
-import io.opentracing.Tracer;
+import feign.micrometer.MicrometerObservationCapability;
+import io.micrometer.observation.ObservationRegistry;
 
 @Path("/catalog")
 public class Catalog {
@@ -146,7 +145,7 @@ public class Catalog {
     public JsonObject search(@QueryParam("q") final String query, @Context final TracerContext tracing) throws Exception {
         final GoogleBooksApi api = Feign
             .builder()
-            .client(new TracingClient(new ApacheHttpClient(), tracing.unwrap(Tracer.class)))
+            .addCapability(new MicrometerObservationCapability(tracing.unwrap(ObservationRegistry.class)))
             .target(GoogleBooksApi.class, "https://www.googleapis.com");
      
         final feign.Response response = api.search(query);
