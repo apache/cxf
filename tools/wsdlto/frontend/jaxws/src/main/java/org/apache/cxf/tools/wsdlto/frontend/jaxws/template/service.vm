@@ -68,17 +68,17 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public final static URL WSDL_LOCATION;
+    public static final URL WSDL_LOCATION;
 
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public final static QName SERVICE = new QName("$service.Namespace", "$service.ServiceName");
+    public static final QName SERVICE = new QName("$service.Namespace", "$service.ServiceName");
 #foreach ($port in ${service.Ports})
 #if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public final static QName $port.Name = new QName("$service.Namespace", "$port.PortName");
+    public static final QName $port.Name = new QName("$service.Namespace", "$port.PortName");
 #end
     static {
 #if ($wsdlLocation == "")
