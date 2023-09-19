@@ -38,7 +38,8 @@ public class EntityPartImpl implements EntityPart {
     private final MultivaluedMap<String, String> headers;
     private final MediaType mediaType;
 
-    EntityPartImpl(String name, String fileName, InputStream content, MultivaluedMap<String, String> headers, MediaType mediaType) {
+    EntityPartImpl(String name, String fileName, InputStream content,
+            MultivaluedMap<String, String> headers, MediaType mediaType) {
         this.name = name;
         this.fileName = fileName;
         this.content = content;
@@ -62,18 +63,25 @@ public class EntityPartImpl implements EntityPart {
     }
 
     @Override
-    public <T> T getContent(Class<T> type) throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
+    public <T> T getContent(Class<T> type) 
+            throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory.getInstance(null).createMessageBodyReader(type, null, null, mediaType, null);
+        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory
+            .getInstance(null)
+            .createMessageBodyReader(type, null, null, mediaType, null);
 
         return reader.readFrom(type, null, null, mediaType, headers, content);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getContent(GenericType<T> type) throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
+    public <T> T getContent(GenericType<T> type)
+            throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
         @SuppressWarnings("rawtypes")
-        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory.getInstance(null).createMessageBodyReader(type.getRawType(), type.getType(), null, mediaType, null);
+        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory
+            .getInstance(null)
+            .createMessageBodyReader(type.getRawType(), type.getType(), null, mediaType, null);
+
         return reader.readFrom((Class<T>) type.getRawType(), type.getType(), null, mediaType, headers, content);
     }
 

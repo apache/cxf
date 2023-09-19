@@ -62,8 +62,14 @@ public class RetryAfterHeaderProviderTest {
             new Object[] {"Sun, 03 Nov 2002 08:49:37 EST", Duration.ofSeconds(89646577)},
             new Object[] {"Sat, 01 Jan 2000 01:00:00 GMT", Duration.ofSeconds(3600)},
             new Object[] {"Sunday, 03-Nov-02 08:49:37 GMT", Duration.ofSeconds(89628577)},
-            new Object[] {"Sun Nov 3 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault().getOffset(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US).parse("Sun Nov 3 08:49:37 2002").getTime()) / 1000)},
-            new Object[] {"Sun Nov 03 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault().getOffset(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US).parse("Sun Nov 03 08:49:37 2002").getTime()) / 1000)},
+            new Object[] {"Sun Nov 3 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault()
+                .getOffset(
+                    new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US)
+                        .parse("Sun Nov 3 08:49:37 2002").getTime()) / 1000)},
+            new Object[] {"Sun Nov 03 08:49:37 2002", Duration.ofSeconds(89628577 - TimeZone.getDefault()
+                .getOffset(
+                    new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy", Locale.US)
+                        .parse("Sun Nov 03 08:49:37 2002").getTime()) / 1000)},
             new Object[] {"Sun, 06 Nov 1994 08:49:37 EST", Duration.ZERO}
         );
 

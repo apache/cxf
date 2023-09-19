@@ -40,7 +40,6 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -547,19 +546,13 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getRequestId() {
-        LOG.log(Level.FINE, "getRequestId");
-        return null;
+    public String getRealPath(String path) {
+        return path;
     }
 
     @Override
-    public String getProtocolRequestId() {
-        LOG.log(Level.FINE, "getProtocolRequestId");
-        return null;
-    }
-
-    @Override
-    public ServletConnection getServletConnection() {
-        throw new UnsupportedOperationException();
+    public boolean isRequestedSessionIdFromUrl() {
+        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
+        return false;
     }
 }

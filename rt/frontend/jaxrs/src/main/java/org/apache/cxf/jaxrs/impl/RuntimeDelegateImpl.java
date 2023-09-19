@@ -46,7 +46,6 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant.VariantListBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
-
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.endpoint.Server;

@@ -51,14 +51,14 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     }
 
     @Override
-    public Builder mediaType(MediaType mediaType) throws IllegalArgumentException {
-        this.mediaType = mediaType;
+    public Builder mediaType(MediaType mt) throws IllegalArgumentException {
+        this.mediaType = mt;
         return this;
     }
 
     @Override
-    public Builder mediaType(String mediaTypeString) throws IllegalArgumentException {
-        this.mediaType = MediaType.valueOf(mediaTypeString);
+    public Builder mediaType(String mts) throws IllegalArgumentException {
+        this.mediaType = MediaType.valueOf(mts);
         return this;
     }
 
@@ -76,29 +76,29 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     }
 
     @Override
-    public Builder fileName(String fileName) throws IllegalArgumentException {
-        this.fileName = fileName;
+    public Builder fileName(String fn) throws IllegalArgumentException {
+        this.fileName = fn;
         return this;
     }
 
     @Override
-    public Builder content(InputStream content) throws IllegalArgumentException {
-        this.content = content;
+    public Builder content(InputStream in) throws IllegalArgumentException {
+        this.content = in;
         return this;
     }
 
     @Override
-    public <T> Builder content(T content, Class<? extends T> type) throws IllegalArgumentException {
-        this.content = content;
-        this.type = type;
+    public <T> Builder content(T c, Class<? extends T> t) throws IllegalArgumentException {
+        this.content = c;
+        this.type = t;
         this.genericType = null;
         return this;
     }
 
     @Override
-    public <T> Builder content(T content, GenericType<T> type) throws IllegalArgumentException {
-        this.content = content;
-        this.genericType = type;
+    public <T> Builder content(T c, GenericType<T> t) throws IllegalArgumentException {
+        this.content = c;
+        this.genericType = t;
         this.type = null;
         return this;
     }
@@ -109,12 +109,12 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
         final Message message = JAXRSUtils.getCurrentMessage();
         
         if (genericType != null) {
-            try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 writeTo(genericType, mt, message, out);
                 return new EntityPartImpl(name, fileName, new ByteArrayInputStream(out.toByteArray()), headers, mt);
             }
         } else if (type != null) {
-            try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 writeTo(type, mt, message, out);
                 return new EntityPartImpl(name, fileName, new ByteArrayInputStream(out.toByteArray()), headers, mt);
             }
@@ -124,25 +124,25 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void writeTo(final GenericType<T> type, final MediaType mt, final Message message, 
+    private <T> void writeTo(final GenericType<T> t, final MediaType mt, final Message message, 
             final ByteArrayOutputStream out) throws IOException {
 
         final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) ProviderFactory
             .getInstance(message)
-            .createMessageBodyWriter(genericType.getRawType(), genericType.getType(), null, mt, message);
+            .createMessageBodyWriter(t.getRawType(), t.getType(), null, mt, message);
 
-        writer.writeTo((T) content, type.getRawType(), type.getType(), null, mt, cast(headers), out);
+        writer.writeTo((T) content, t.getRawType(), t.getType(), null, mt, cast(headers), out);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void writeTo(final Class<T> type, final MediaType mt, final Message message,
+    private <T> void writeTo(final Class<T> t, final MediaType mt, final Message message,
             final ByteArrayOutputStream out) throws IOException {
 
         final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) ProviderFactory
                 .getInstance(message)
-                .createMessageBodyWriter(type, null, null, mt, message);
+                .createMessageBodyWriter(t, null, null, mt, message);
 
-        writer.writeTo((T) content, type, null, null, mt, cast(headers), out);
+        writer.writeTo((T) content, t, null, null, mt, cast(headers), out);
     }
     
     private static <T, U> MultivaluedMap<T, U> cast(MultivaluedMap<?, ?> p) {
