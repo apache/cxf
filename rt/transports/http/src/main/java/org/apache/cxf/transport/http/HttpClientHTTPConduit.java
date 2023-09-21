@@ -46,8 +46,11 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.UnresolvedAddressException;
+import java.security.AccessController;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.security.cert.Certificate;
 import java.time.Duration;
 import java.util.Arrays;
@@ -327,7 +330,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (proxy !=  null) {
                 return Arrays.asList(proxy);
             }
-            return ProxySelector.getDefault().select(uri);
+            List<Proxy> listProxy;
+            if (System.getSecurityManager() != null) {
+                try {
+                    listProxy = AccessController.doPrivileged(new PrivilegedExceptionAction<List<Proxy>>() {
+                        @Override
+                        public List<Proxy> run() throws IOException {
+                            return ProxySelector.getDefault().select(uri);
+                        }
+                    });
+                } catch (PrivilegedActionException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                listProxy = ProxySelector.getDefault().select(uri);
+            }
+            return listProxy;
         }
 
         @Override
