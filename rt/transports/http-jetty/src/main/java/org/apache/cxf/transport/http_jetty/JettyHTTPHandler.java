@@ -43,6 +43,7 @@ public class JettyHTTPHandler extends AbstractHandler {
         contextMatchExact = cmExact;
         jettyHTTPDestination = jhd;
     }
+
     public JettyHTTPHandler(Bus bus) {
         this.bus = bus;
     }
@@ -84,7 +85,7 @@ public class JettyHTTPHandler extends AbstractHandler {
     }
     
     public ContextHandler createContextHandler() {
-        return new ContextHandler();
+        return new JettyContextHandler();
     }
 
     public Bus getBus() {
