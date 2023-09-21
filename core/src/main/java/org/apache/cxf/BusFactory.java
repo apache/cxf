@@ -66,7 +66,7 @@ public abstract class BusFactory {
 
     public static final String BUS_FACTORY_PROPERTY_NAME = "org.apache.cxf.bus.factory";
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
-
+    public static final String SPRING_BUS_FACTORY = "org.apache.cxf.bus.spring.SpringBusFactory";
     protected static Bus defaultBus;
 
     static class BusHolder {
@@ -379,6 +379,11 @@ public abstract class BusFactory {
                     busFactoryCondition = rd.readLine();
                 }
             }
+            if (SPRING_BUS_FACTORY.equalsIgnoreCase(busFactoryClass) && !isMinimalJdk17(Runtime.version().feature())) {
+                LogUtils.log(LOG, Level.WARNING, "BUS_FACTORY_DEFAULT_JDK");
+                busFactoryClass = DEFAULT_BUS_FACTORY;
+                busFactoryCondition = null;
+            }
             if (isValidBusFactoryClass(busFactoryClass)
                 && busFactoryCondition != null) {
                 try {
@@ -404,6 +409,11 @@ public abstract class BusFactory {
             LogUtils.log(LOG, Level.SEVERE, "FAILED_TO_DETERMINE_BUS_FACTORY_EXC", ex);
         }
         return busFactoryClass;
+    }
+
+    private static boolean isMinimalJdk17(Integer version) {
+        // this method checks that current running jdk version is 17+ (prerequisites for Spring usage)
+        return version != null && version.intValue() >= 17;
     }
 
     private static boolean isValidBusFactoryClass(String busFactoryClassName) {
