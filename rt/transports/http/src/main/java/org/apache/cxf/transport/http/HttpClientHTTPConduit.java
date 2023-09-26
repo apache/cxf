@@ -548,8 +548,21 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             
             
             final BodyHandler<InputStream> handler =  BodyHandlers.ofInputStream();
-
-            future = cl.sendAsync(request, handler);
+            if (System.getSecurityManager() != null) {
+                try {
+                    future = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<CompletableFuture<HttpResponse<InputStream>>>() {
+                                @Override
+                                public CompletableFuture<HttpResponse<InputStream>> run() throws IOException {
+                                    return cl.sendAsync(request, handler);
+                                }
+                            });
+                } catch (PrivilegedActionException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                future = cl.sendAsync(request, handler);
+            }
             future.exceptionally(ex -> {
                 if (pout != null) {
                     synchronized (pout) {
