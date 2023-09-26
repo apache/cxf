@@ -684,7 +684,6 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
             if (tlsServerParameters != null) {
-                connectionFactories.add(httpFactory);
                 httpConfig.addCustomizer(new SecureRequestCustomizer(tlsServerParameters.isSniHostCheck()));
 
                 if (isHttp2Enabled(bus)) {
@@ -704,10 +703,14 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                         }
                     }
                 }
-                if (connectionFactories.size() == 1) {
+                
+                if (connectionFactories.isEmpty()) {
                     final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());
                     connectionFactories.add(scf);
                 }
+                
+                // Ensure http/1.1 is last in the list so it is the lowest priority in ALPN
+                connectionFactories.add(httpFactory);
 
                 // Has to be set before the default protocol change
                 result.setConnectionFactories(connectionFactories);
