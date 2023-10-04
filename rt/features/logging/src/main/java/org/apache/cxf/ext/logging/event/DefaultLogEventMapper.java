@@ -153,13 +153,14 @@ public class DefaultLogEventMapper {
             return result;
         }
         for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                Object value = entry.getValue().get(0);
+            List<Object> list = entry.getValue() != null ? entry.getValue() : Collections.emptyList();
+            if (list.size() == 1) {
+                Object value = list.get(0);
                 if (value != null) {
                     result.put(entry.getKey(), value.toString());
                 }
             } else {
-                result.put(entry.getKey(), Arrays.deepToString(entry.getValue().toArray()));
+                result.put(entry.getKey(), Arrays.deepToString(list.toArray()));
             }
         }
         return result;
