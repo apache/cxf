@@ -31,7 +31,6 @@
     
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.camel.version>3.20.0</cxf.camel.version>
     </properties>
     
     <profiles>
