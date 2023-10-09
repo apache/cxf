@@ -61,8 +61,7 @@ public class OpenTelemetryClientStartInterceptor extends AbstractOpenTelemetryCl
 
         // STOP interceptor is not going to be invoked for oneWay calls. Need to close the span.
         if (message.getExchange().isOneWay()) {
-            // set response status = 200 as default since the actual one will never come to this interceptor
-            super.stopTraceSpan(holder, 200);
+            super.stopTraceSpan(holder);
         }
     }
 
