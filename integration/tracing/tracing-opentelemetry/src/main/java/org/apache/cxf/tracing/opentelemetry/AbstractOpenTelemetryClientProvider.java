@@ -58,11 +58,11 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
                                                           URI uri, String method) {
         Context parentContext = Context.current();
         Span activeSpan = tracer.spanBuilder(buildSpanDescription(uri.toString(), method))
-                .setParent(parentContext).setSpanKind(SpanKind.CLIENT)
-                .setAttribute(SemanticAttributes.HTTP_METHOD, method)
-                .setAttribute(SemanticAttributes.HTTP_URL, uri.toString())
-                // TODO: Enhance with semantics from request
-                .startSpan();
+            .setParent(parentContext).setSpanKind(SpanKind.CLIENT)  
+            .setAttribute(SemanticAttributes.HTTP_METHOD, method)
+            .setAttribute(SemanticAttributes.HTTP_URL, uri.toString())
+            // TODO: Enhance with semantics from request
+            .startSpan();
         Scope scope = activeSpan.makeCurrent();
 
         openTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), requestHeaders,
@@ -77,7 +77,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
         }
 
         return new TraceScopeHolder<TraceScope>(new TraceScope(activeSpan, scope, null),
-                span != null /* detached */);
+                                             span != null /* detached */);
     }
 
     private boolean isAsyncInvocation() {
