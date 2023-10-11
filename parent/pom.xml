@@ -162,7 +162,7 @@
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
         <cxf.jetty11.version>11.0.16</cxf.jetty11.version>
-        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
+        <cxf.jetty.version>11.0.17</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>1.2.20</cxf.johnzon.version>
@@ -187,7 +187,7 @@
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.99.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.100.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
@@ -237,7 +237,7 @@
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.jakarta.wss4j.version>3.0.1</cxf.jakarta.wss4j.version>
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
-        <cxf.xnio.version>3.8.10.Final</cxf.xnio.version>
+        <cxf.xnio.version>3.8.11.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.zipkin-reporter.version>2.16.4</cxf.zipkin-reporter.version>
 
