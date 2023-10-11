@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
@@ -67,5 +68,9 @@ public class BookStore implements BookStoreService {
     public void addBooks() {
         final MessageContext ctx = context.getMessageContext();
         ctx.put(MessageContext.HTTP_RESPONSE_CODE, 202);
+    }
+
+    @WebMethod @Oneway
+    public void orderBooks() {
     }
 }

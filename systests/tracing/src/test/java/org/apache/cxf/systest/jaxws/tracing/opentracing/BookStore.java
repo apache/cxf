@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
@@ -65,6 +66,10 @@ public class BookStore implements BookStoreService {
         throw new RuntimeException("Unable to remove books");
     }
     
+    @WebMethod @Oneway
+    public void orderBooks() {
+    }
+
     @WebMethod
     public void addBooks() {
         final MessageContext ctx = context.getMessageContext();
