@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.brave.jaxws;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SAMPLED_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.TRACE_ID_NAME;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -192,6 +194,21 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
             assertThat(TestSpanReporter.getAllSpans().get(0).tags(), hasEntry("http.status_code", "305"));
             assertThat(TestSpanReporter.getAllSpans().get(1).name(),
                     equalTo("post http://localhost:" + getPort() + "/bookstore"));
+        }
+    }
+
+    @Test
+    public void testThatNewInnerSpanIsCreatedOneway() throws Exception {
+        try (Tracing brave = createTracer()) {
+            final BookStoreService service = createJaxWsService(getClientFeature(brave));
+            service.orderBooks();
+    
+            // Await till flush happens, usually every second
+            await().atMost(Duration.ofSeconds(1L)).until(() -> TestSpanReporter.getAllSpans().size() == 2);
+
+            assertThat(TestSpanReporter.getAllSpans().get(0).name(), equalTo("post /bookstore"));
+            assertThat(TestSpanReporter.getAllSpans().get(1).name(),
+                equalTo("post http://localhost:" + getPort() + "/bookstore"));
         }
     }
 

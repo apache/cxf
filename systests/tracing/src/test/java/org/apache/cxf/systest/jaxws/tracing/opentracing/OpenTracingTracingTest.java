@@ -228,6 +228,19 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.HTTP_STATUS.getKey(), 202));
     }
 
+    @Test
+    public void testThatNewInnerSpanIsCreatedOneway() throws Exception {
+        final BookStoreService service = createJaxWsService(new OpenTracingClientFeature(tracer));
+        service.orderBooks();
+
+        // Await till flush happens, usually every second
+        await().atMost(Duration.ofSeconds(1L)).until(() -> REPORTER.getSpans().size() == 2);
+
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(),
+            equalTo("POST http://localhost:" + PORT + "/BookStore"));
+    }
+
     private static BookStoreService createJaxWsService() {
         return createJaxWsService(Collections.emptyMap());
     }

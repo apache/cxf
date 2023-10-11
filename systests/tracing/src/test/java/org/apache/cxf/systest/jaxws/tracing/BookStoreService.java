@@ -28,4 +28,5 @@ public interface BookStoreService {
     Collection< Book > getBooks();
     int removeBooks();
     void addBooks();
+    void orderBooks();
 }

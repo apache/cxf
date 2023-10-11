@@ -26,6 +26,7 @@ import brave.Span;
 import brave.Tracer.SpanInScope;
 import brave.Tracing;
 import jakarta.annotation.Resource;
+import jakarta.jws.Oneway;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceContext;
@@ -71,4 +72,9 @@ public class BookStore implements BookStoreService {
         final MessageContext ctx = context.getMessageContext();
         ctx.put(MessageContext.HTTP_RESPONSE_CODE, 305);
     }
+
+    @WebMethod @Oneway
+    public void orderBooks() {
+    }
+
 }
