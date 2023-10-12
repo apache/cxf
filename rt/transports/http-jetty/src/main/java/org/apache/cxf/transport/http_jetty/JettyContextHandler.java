@@ -26,7 +26,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
  */
 class JettyContextHandler extends ContextHandler {
     JettyContextHandler() {
-        super(null, null, null);
+        super(null, null);
         _scontext = new JettyContext();
     }
 
