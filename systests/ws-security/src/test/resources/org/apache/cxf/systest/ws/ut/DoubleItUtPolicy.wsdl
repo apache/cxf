@@ -50,6 +50,9 @@
         <wsdl:port name="DoubleItPlaintextPort3" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItPlaintext3"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItPlaintextPort4" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItPlaintext4"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItHashPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItHash"/>
         </wsdl:port>
