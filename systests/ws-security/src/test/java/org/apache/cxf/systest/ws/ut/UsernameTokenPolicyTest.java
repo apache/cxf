@@ -28,10 +28,21 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor.SoapOutEndingInterceptor;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
@@ -195,6 +206,33 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testOnlyHasUsernameTokenWithoutMustUnderstand() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort4");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+        Client client = ClientProxy.getClient(port);
+        client.getRequestContext().put(SecurityConstants.MUST_UNDERSTAND, false);
+        client.getOutInterceptors().add(new CheckMustUnderstandHeader());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        assertEquals(50, port.doubleIt(25));
+        client.getRequestContext().put(SecurityConstants.MUST_UNDERSTAND, true);
+        assertEquals(50, port.doubleIt(25));
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 
     @org.junit.Test
     public void testHashPassword() throws Exception {
@@ -346,5 +384,27 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-
+    
+    class CheckMustUnderstandHeader extends AbstractSoapInterceptor {
+        
+        CheckMustUnderstandHeader() {
+            super(Phase.WRITE_ENDING);
+            addBefore(SoapOutEndingInterceptor.class.getName());
+        }
+        
+        @Override
+        public void handleMessage(SoapMessage message) throws Fault {
+            SoapHeader securityHeader = (SoapHeader)message.getHeader(
+                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", 
+                          "Security"));
+            boolean mustUnderstand =
+                MessageUtils.getContextualBoolean(
+                    message, SecurityConstants.MUST_UNDERSTAND, true
+                );
+            assertEquals(securityHeader.isMustUnderstand(), mustUnderstand);
+        }
+    
+    }
+    
+    
 }
