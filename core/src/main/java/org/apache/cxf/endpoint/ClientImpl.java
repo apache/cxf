@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
@@ -55,6 +56,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.interceptor.OneWayInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -622,9 +624,14 @@ public class ClientImpl
             }
         }
 
-        // Wait for a response if we need to
-        if (oi != null && !oi.getOperationInfo().isOneWay()) {
-            waitResponse(exchange);
+        if (oi != null) { 
+            if (!oi.getOperationInfo().isOneWay()) {
+                // Wait for a response if we need to
+                waitResponse(exchange);
+            } else {
+                // Trigger the interceptors chain
+                onewayOnly(exchange);
+            }
         }
 
         // leave the input stream open for the caller
@@ -672,6 +679,101 @@ public class ClientImpl
 
         return null;
     }
+
+    protected void onewayOnly(Exchange exhange) {
+        if (bus == null) {
+            throw new IllegalStateException("Message received on a Client that has been closed or destroyed.");
+        }
+
+        Message original = exhange.getInMessage();
+        if (original == null) {
+            // This is one way call and we may not even have incoming message
+            original = exhange.getOutMessage();
+        }
+
+        if (original == null) {
+            original = new MessageImpl();
+        }
+
+        Endpoint endpoint = exhange.getEndpoint();
+        if (endpoint == null) {
+            // in this case correlation will occur outside the transport,
+            // however there's a possibility that the endpoint may have been
+            // rebased in the meantime, so that the response will be mediated
+            // via a set of in interceptors provided by a *different* endpoint
+            //
+            endpoint = getConduitSelector().getEndpoint();
+            original.getExchange().put(Endpoint.class, endpoint);
+        }
+
+        final Message message = endpoint.getBinding().createMessage(original);
+        message.getExchange().setInMessage(message);
+        message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+        message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
+        PhaseManager pm = bus.getExtension(PhaseManager.class);
+
+        List<Interceptor<? extends Message>> i1 = filterOneway(bus.getInInterceptors());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Oneway interceptors contributed by bus: " + i1);
+        }
+        List<Interceptor<? extends Message>> i2 = filterOneway(getInInterceptors());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Oneway interceptors contributed by client: " + i2);
+        }
+        List<Interceptor<? extends Message>> i3 = filterOneway(endpoint.getInInterceptors());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Oneway interceptors contributed by endpoint: " + i3);
+        }
+        List<Interceptor<? extends Message>> i4 = filterOneway(endpoint.getBinding().getInInterceptors());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Oneway interceptors contributed by binding: " + i4);
+        }
+
+        PhaseInterceptorChain chain;
+        if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
+            InterceptorProvider p = (InterceptorProvider)endpoint.getService().getDataBinding();
+            List<Interceptor<? extends Message>> interceptors = filterOneway(p.getInInterceptors());
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Oneway interceptors contributed by databinding: " + interceptors);
+            }
+            chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4, interceptors);
+        } else {
+            chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4);
+        }
+        message.setInterceptorChain(chain);
+
+        modifyOnewayChain(chain, message);
+        modifyOnewayChain(chain, message.getExchange().getOutMessage());
+
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
+
+        try {
+            String startingAfterInterceptorID = (String) message.get(
+                InterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
+            String startingInterceptorID = (String) message.get(
+                InterceptorChain.STARTING_AT_INTERCEPTOR_ID);
+            if (startingAfterInterceptorID != null) {
+                chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
+            } else if (startingInterceptorID != null) {
+                chain.doInterceptStartingAt(message, startingInterceptorID);
+            } else {
+                chain.doIntercept(message);
+            }
+
+        } finally {
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
+        }
+    }
+    
+    private List<Interceptor<? extends Message>> filterOneway(List<Interceptor<? extends Message>> interceptors) {
+        return interceptors
+            .stream()
+            .filter(OneWayInterceptor.class::isInstance)
+            .collect(Collectors.toList());
+    }
+
     protected Exception getException(Exchange exchange) {
         if (exchange.getInFaultMessage() != null) {
             return exchange.getInFaultMessage().getContent(Exception.class);
@@ -1010,6 +1112,24 @@ public class ClientImpl
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
         Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)ctx.get(key));
+        if (is != null) {
+            chain.add(is);
+        }
+    }
+
+    protected void modifyOnewayChain(InterceptorChain chain, Message ctx) {
+        if (ctx == null) {
+            return;
+        }
+        Collection<InterceptorProvider> providers
+            = CastUtils.cast((Collection<?>)ctx.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                chain.add(filterOneway(p.getInInterceptors()));
+            }
+        }
+        Collection<Interceptor<? extends Message>> is
+            = CastUtils.cast((Collection<?>)ctx.get(Message.IN_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }
