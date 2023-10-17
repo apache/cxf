@@ -63,8 +63,8 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
 
         SpanBuilder spanBuilder = tracer.spanBuilder(buildSpanDescription(uri.getPath(), method))
             .setSpanKind(SpanKind.SERVER)
-            .setAttribute(SemanticAttributes.HTTP_METHOD, method)
-            .setAttribute(SemanticAttributes.HTTP_URL, uri.toString());
+            .setAttribute(SemanticAttributes.HTTP_REQUEST_METHOD, method)
+            .setAttribute(SemanticAttributes.URL_FULL, uri.toString());
         Span activeSpan = spanBuilder.startSpan();
         Scope scope = activeSpan.makeCurrent();
 
@@ -104,7 +104,7 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
                 scope = span.makeCurrent();
             }
 
-            span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, responseStatus);
+            span.setAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, responseStatus);
             span.end();
 
             scope.close();
