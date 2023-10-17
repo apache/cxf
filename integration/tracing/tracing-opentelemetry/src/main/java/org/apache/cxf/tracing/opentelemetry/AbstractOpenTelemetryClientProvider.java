@@ -59,8 +59,8 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
         Context parentContext = Context.current();
         Span activeSpan = tracer.spanBuilder(buildSpanDescription(uri.toString(), method))
             .setParent(parentContext).setSpanKind(SpanKind.CLIENT)
-            .setAttribute(SemanticAttributes.HTTP_METHOD, method)
-            .setAttribute(SemanticAttributes.HTTP_URL, uri.toString())
+            .setAttribute(SemanticAttributes.HTTP_REQUEST_METHOD, method)
+            .setAttribute(SemanticAttributes.URL_FULL, uri.toString())
             // TODO: Enhance with semantics from request
             .startSpan();
         Scope scope = activeSpan.makeCurrent();
@@ -100,7 +100,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
                 scope = span.makeCurrent();
             }
 
-            span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE.getKey(), responseStatus);
+            span.setAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE.getKey(), responseStatus);
 
             span.end();
 
