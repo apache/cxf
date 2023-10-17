@@ -237,7 +237,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().size(), equalTo(2));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 500L));
         assertThat(otelRule.getSpans().get(1).getName(),
                    equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
@@ -252,7 +252,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().size(), equalTo(1));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 202L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 202L));
     }
 
     @Test

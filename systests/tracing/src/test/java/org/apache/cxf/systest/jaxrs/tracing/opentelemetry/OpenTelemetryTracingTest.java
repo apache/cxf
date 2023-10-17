@@ -125,7 +125,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("Get Books"));
         assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books"));
         assertThat(otelRule.getSpans().get(1).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 200L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 200L));
         assertThat(otelRule.getSpans().get(1).getInstrumentationScopeInfo().getName(),
             equalTo("jaxrs-server-test"));
     }
@@ -397,7 +397,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(1));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET /bookstore/books/exception"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 500L));
     }
 
     @Test
@@ -408,7 +408,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(1));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET /bookstore/books/error"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 503L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 503L));
     }
 
     @Test
@@ -419,7 +419,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(1));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET /bookstore/books/mapper"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 404L));
+                   hasAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, 404L));
     }
 
     private WebClient withTrace(final WebClient client) {
