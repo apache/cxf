@@ -688,6 +688,23 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>3.3.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.cyclonedx</groupId>
+                    <artifactId>cyclonedx-maven-plugin</artifactId>
+                    <version>2.7.9</version>
+                    <executions>
+                        <execution>
+                            <id>make-bom</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>makeAggregateBom</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <outputName>${project.artifactId}-${project.version}-bom</outputName>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -702,6 +719,10 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
