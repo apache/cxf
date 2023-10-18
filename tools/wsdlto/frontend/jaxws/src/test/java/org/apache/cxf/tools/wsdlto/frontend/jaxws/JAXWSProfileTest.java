@@ -65,7 +65,7 @@ public class JAXWSProfileTest {
 
         Map<String, FrontEnd> frontends = loader.getFrontEnds();
         assertNotNull(frontends);
-        assertEquals(3, frontends.size());
+        assertEquals(2, frontends.size());
 
         FrontEnd frontend = getFrontEnd(frontends, 0);
         assertEquals("jaxws", frontend.getName());
