@@ -111,6 +111,29 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
     }
 
     @Test
+    public void testEncryptEcWithECDH() throws Exception {
+        Document doc = readDocument("wsse-request-clean.xml");
+        SoapMessage msg = getSoapMessageForDom(doc);
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        msg.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        msg.put(ConfigurationConstants.ENC_PROP_FILE, "wss-ecdh.properties");
+        msg.put(ConfigurationConstants.USER, "secp256r1");
+
+        msg.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYWRAP_AES128);
+        msg.put(ConfigurationConstants.ENC_KEY_AGREEMENT_METHOD, WSS4JConstants.AGREEMENT_METHOD_ECDH_ES);
+
+        handler.handleMessage(msg);
+
+        doc = msg.getContent(SOAPMessage.class).getSOAPPart();
+        assertValid("//wsse:Security", doc);
+        assertValid("//s:Body/xenc:EncryptedData", doc);
+        assertValid("//xenc:AgreementMethod", doc);
+    }
+
+    @Test
     public void testSignature() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
         SoapMessage msg = getSoapMessageForDom(doc);

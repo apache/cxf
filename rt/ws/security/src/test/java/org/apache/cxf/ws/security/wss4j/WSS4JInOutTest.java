@@ -191,6 +191,58 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         );
     }
 
+
+    @Test
+    public void testEncryptionWithECDH() throws Exception {
+        Map<String, Object> outProperties = new HashMap<>();
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "wss-ecdh.properties");
+        outProperties.put(ConfigurationConstants.USER, "secp256r1");
+        outProperties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYWRAP_AES128);
+        outProperties.put(ConfigurationConstants.ENC_KEY_AGREEMENT_METHOD, WSS4JConstants.AGREEMENT_METHOD_ECDH_ES);
+
+        Map<String, Object> inProperties = new HashMap<>();
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "wss-ecdh.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
+        List<String> xpaths = new ArrayList<>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//s:Body/xenc:EncryptedData");
+        xpaths.add("//xenc:AgreementMethod");
+
+
+        List<WSHandlerResult> handlerResults =
+                getResults(makeInvocation(outProperties, xpaths, inProperties));
+
+        assertNotNull(handlerResults);
+        assertSame(handlerResults.size(), 1);
+        //
+        // This should contain exactly 1 protection result
+        //
+        final java.util.List<WSSecurityEngineResult> protectionResults =
+                handlerResults.get(0).getResults();
+        assertNotNull(protectionResults);
+        assertSame(protectionResults.size(), 1);
+        //
+        // This result should contain a reference to the decrypted element,
+        // which should contain the soap:Body Qname
+        //
+        final java.util.Map<String, Object> result =
+                protectionResults.get(0);
+        final java.util.List<WSDataRef> protectedElements =
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+        assertNotNull(protectedElements);
+        assertSame(protectedElements.size(), 1);
+        assertEquals(
+                protectedElements.get(0).getName(),
+                new javax.xml.namespace.QName(
+                        "http://schemas.xmlsoap.org/soap/envelope/",
+                        "Body"
+                )
+        );
+    }
+
     @Test
     public void testEncryptedUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<>();
