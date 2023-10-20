@@ -93,13 +93,18 @@ public final class HttpUtils {
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
-    
+
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
-    
-    private static final Pattern HTTP_SCHEME_PATTERN = Pattern.compile("^(?i)(http|https)$");
+
+    private static final Set<String> HTTP_SCHEMES = new HashSet<>();
+
+    static {
+        HTTP_SCHEMES.add("http");
+        HTTP_SCHEMES.add("https");
+    }
 
     private HttpUtils() {
     }
@@ -372,7 +377,7 @@ public final class HttpUtils {
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST));
         return URI.create(base + relativePath);
     }
-    
+
     public static void setHttpRequestURI(Message message, String uriTemplate) {
         HttpServletRequest request =
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
@@ -479,8 +484,8 @@ public final class HttpUtils {
             URI uri = new URI(endpointAddress);
             String path = uri.getRawPath();
             String scheme = uri.getScheme();
-            // RFC-3986: the scheme and host are case-insensitive and therefore should 
-            // be normalized to lowercase. 
+            // RFC-3986: the scheme and host are case-insensitive and therefore should
+            // be normalized to lowercase.
             if (scheme != null && !scheme.toLowerCase().startsWith(HttpUtils.HTTP_SCHEME)
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
@@ -493,7 +498,7 @@ public final class HttpUtils {
 
     public static String getEndpointUri(Message m) {
         final Object servletRequest = m.get(AbstractHTTPDestination.HTTP_REQUEST);
-        
+
         if (servletRequest != null) {
             final Object property = ((jakarta.servlet.http.HttpServletRequest)servletRequest)
                 .getAttribute("org.apache.cxf.transport.endpoint.uri");
@@ -501,7 +506,7 @@ public final class HttpUtils {
                 return property.toString();
             }
         }
-        
+
         return getEndpointAddress(m);
     }
 
@@ -618,7 +623,7 @@ public final class HttpUtils {
 
     public static String getMediaTypeCharsetParameter(MediaType mt) {
         String charset = mt.getParameters().get(CHARSET_PARAMETER);
-        if (charset != null && charset.startsWith(DOUBLE_QUOTE) 
+        if (charset != null && charset.startsWith(DOUBLE_QUOTE)
             && charset.endsWith(DOUBLE_QUOTE) && charset.length() > 1) {
             charset = charset.substring(1,  charset.length() - 1);
         }
@@ -699,7 +704,7 @@ public final class HttpUtils {
 
         return false;
     }
-    
+
     public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
 
         Object value = null;
@@ -721,12 +726,12 @@ public final class HttpUtils {
     public static boolean isMethodWithNoRequestContent(String method) {
         return KNOWN_HTTP_VERBS_WITH_NO_REQUEST_CONTENT.contains(method);
     }
-    
+
     public static boolean isMethodWithNoResponseContent(String method) {
         return KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT.contains(method);
     }
-    
+
     public static boolean isHttpScheme(final String scheme) {
-        return scheme != null && HTTP_SCHEME_PATTERN.matcher(scheme).matches();
+        return scheme != null && HTTP_SCHEMES.contains(scheme.toLowerCase());
     }
 }
