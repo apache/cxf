@@ -745,25 +745,16 @@ public class ClientImpl
         modifyOnewayChain(chain, message);
         modifyOnewayChain(chain, message.getExchange().getOutMessage());
 
-        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
-
-        try {
-            String startingAfterInterceptorID = (String) message.get(
-                InterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
-            String startingInterceptorID = (String) message.get(
-                InterceptorChain.STARTING_AT_INTERCEPTOR_ID);
-            if (startingAfterInterceptorID != null) {
-                chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
-            } else if (startingInterceptorID != null) {
-                chain.doInterceptStartingAt(message, startingInterceptorID);
-            } else {
-                chain.doIntercept(message);
-            }
-
-        } finally {
-            if (origBus != bus) {
-                BusFactory.setThreadDefaultBus(origBus);
-            }
+        final String startingAfterInterceptorID = (String) message.get(
+            InterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
+        final String startingInterceptorID = (String) message.get(
+            InterceptorChain.STARTING_AT_INTERCEPTOR_ID);
+        if (startingAfterInterceptorID != null) {
+            chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
+        } else if (startingInterceptorID != null) {
+            chain.doInterceptStartingAt(message, startingInterceptorID);
+        } else {
+            chain.doIntercept(message);
         }
     }
     
