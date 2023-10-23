@@ -535,6 +535,9 @@ public final class CustomizationParser {
             } else {
                 jaxbBindings.add(new InputSource(bindingFile));
             }
+        } else {
+            Message msg = new Message("INVALID_BINDING_FILE", LOG);
+            throw new ToolException(msg);
         }
     }
 
