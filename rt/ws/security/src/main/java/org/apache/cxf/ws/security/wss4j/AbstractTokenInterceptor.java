@@ -169,7 +169,11 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         el.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
 
         SoapHeader sh = new SoapHeader(new QName(WSS4JConstants.WSSE_NS, "Security"), el);
-        sh.setMustUnderstand(true);
+        boolean mustUnderstand =
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.MUST_UNDERSTAND, true
+            );
+        sh.setMustUnderstand(mustUnderstand);
         if (actor != null && actor.length() > 0) {
             sh.setActor(actor);
         }
