@@ -98,7 +98,7 @@ public class SamlOAuthValidator {
         for (AudienceRestriction ar : restrictions) {
             List<Audience> audiences = ar.getAudiences();
             for (Audience a : audiences) {
-                if (absoluteAddress.equals(a.getAudienceURI())) {
+                if (absoluteAddress.equals(a.getURI())) {
                     return;
                 }
             }

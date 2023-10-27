@@ -286,7 +286,9 @@ public class SAMLResponseValidatorTest {
             DOMUtils.findAllElementsByTagNameNS(policyElement, SAMLConstants.SAML20_NS, "Assertion");
         assertNotNull(assertions);
         assertTrue(assertions.size() == 1);
-        assertions.get(0).setAttributeNS(null, "newattr", "http://apache.org");
+        Thread.sleep(1000L);
+        Instant issueInstant = Instant.now();
+        assertions.get(0).setAttributeNS(null, "IssueInstant", issueInstant.toString());
 
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(policyElement);
 
@@ -395,7 +397,9 @@ public class SAMLResponseValidatorTest {
         doc.appendChild(policyElement);
         assertNotNull(policyElement);
 
-        policyElement.setAttributeNS(null, "newattr", "http://apache.org");
+        Thread.sleep(1000L);
+        Instant issueInstant = Instant.now();
+        policyElement.setAttributeNS(null, "IssueInstant", issueInstant.toString());
 
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(policyElement);
 

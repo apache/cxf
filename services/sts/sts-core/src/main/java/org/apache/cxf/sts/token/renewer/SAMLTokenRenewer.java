@@ -390,7 +390,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             for (AudienceRestrictionCondition restrCondition : restrConditions) {
                 if (restrCondition.getAudiences() != null) {
                     for (Audience audience : restrCondition.getAudiences()) {
-                        if (appliesTo.equals(audience.getUri())) {
+                        if (appliesTo.equals(audience.getURI())) {
                             return true;
                         }
                     }
@@ -409,7 +409,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             for (AudienceRestriction audienceRestriction : audienceRestrictions) {
                 if (audienceRestriction.getAudiences() != null) {
                     for (org.opensaml.saml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
-                        if (appliesTo.equals(audience.getAudienceURI())) {
+                        if (appliesTo.equals(audience.getURI())) {
                             return true;
                         }
                     }

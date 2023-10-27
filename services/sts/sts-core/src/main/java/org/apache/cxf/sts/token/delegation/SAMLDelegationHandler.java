@@ -124,14 +124,14 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
             for (AudienceRestrictionCondition restriction
                 : assertion.getSaml1().getConditions().getAudienceRestrictionConditions()) {
                 for (org.opensaml.saml.saml1.core.Audience audience : restriction.getAudiences()) {
-                    addresses.add(audience.getUri());
+                    addresses.add(audience.getURI());
                 }
             }
         } else if (assertion.getSaml2() != null) {
             for (org.opensaml.saml.saml2.core.AudienceRestriction restriction
                 : assertion.getSaml2().getConditions().getAudienceRestrictions()) {
                 for (org.opensaml.saml.saml2.core.Audience audience : restriction.getAudiences()) {
-                    addresses.add(audience.getAudienceURI());
+                    addresses.add(audience.getURI());
                 }
             }
         }
