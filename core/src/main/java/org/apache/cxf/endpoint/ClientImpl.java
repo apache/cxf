@@ -707,7 +707,6 @@ public class ClientImpl
         }
 
         final Message message = endpoint.getBinding().createMessage(original);
-        message.getExchange().setInMessage(message);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);
@@ -758,7 +757,7 @@ public class ClientImpl
         }
     }
     
-    private List<Interceptor<? extends Message>> filterOneway(List<Interceptor<? extends Message>> interceptors) {
+    private List<Interceptor<? extends Message>> filterOneway(Collection<Interceptor<? extends Message>> interceptors) {
         return interceptors
             .stream()
             .filter(OneWayInterceptor.class::isInstance)
@@ -1122,7 +1121,7 @@ public class ClientImpl
         Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)ctx.get(Message.IN_INTERCEPTORS));
         if (is != null) {
-            chain.add(is);
+            chain.add(filterOneway(is));
         }
     }
 
