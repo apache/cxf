@@ -28,9 +28,6 @@
         <version>3.6.3-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <properties>
-        <olingo.version>4.7.1</olingo.version>
-    </properties>
     <profiles>
         <profile>
             <id>server</id>
@@ -70,22 +67,22 @@
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-commons-api</artifactId>
-         <version>${olingo.version}</version>
+         <version>${cxf.olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-commons-core</artifactId>
-         <version>${olingo.version}</version>
+         <version>${cxf.olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-server-api</artifactId>
-         <version>${olingo.version}</version>
+         <version>${cxf.olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-server-core</artifactId>
-         <version>${olingo.version}</version>
+         <version>${cxf.olingo.version}</version>
         </dependency> 
     </dependencies>
 </project>
