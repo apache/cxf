@@ -52,6 +52,7 @@
         <dependency>
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
+            <version>${cxf.jakarta.injectapi.version}</version>
         </dependency> 
         <dependency>
             <groupId>junit</groupId>

@@ -348,6 +348,7 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
+            <version>${cxf.persistence-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

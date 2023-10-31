@@ -98,10 +98,12 @@
         <dependency>
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
+            <version>${cxf.jakarta.injectapi.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.interceptor</groupId>
             <artifactId>jakarta.interceptor-api</artifactId>
+            <version>${cxf.jakarta.interceptorapi.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.json</groupId>

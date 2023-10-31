@@ -122,6 +122,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${cxf.servlet-api.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
