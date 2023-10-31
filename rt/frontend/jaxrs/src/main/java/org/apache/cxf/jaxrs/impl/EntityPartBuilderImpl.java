@@ -34,6 +34,7 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -46,7 +47,7 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     private GenericType<?> genericType;
     private Class<?> type;
 
-    public EntityPartBuilderImpl(String name) {
+    public EntityPartBuilderImpl(final String name) {
         this.name = name;
     }
 
@@ -107,16 +108,19 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     public EntityPart build() throws IllegalStateException, IOException, WebApplicationException {
         final MediaType mt = Objects.requireNonNullElse(mediaType, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         final Message message = JAXRSUtils.getCurrentMessage();
-        
+        final ProviderFactory factory = ServerProviderFactory.getInstance(message);
+
         if (genericType != null) {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                writeTo(genericType, mt, message, out);
-                return new EntityPartImpl(name, fileName, new ByteArrayInputStream(out.toByteArray()), headers, mt);
+                writeTo(factory, genericType, mt, message, out);
+                return new EntityPartImpl(factory, name, fileName, new ByteArrayInputStream(out.toByteArray()),
+                    headers, mt);
             }
         } else if (type != null) {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                writeTo(type, mt, message, out);
-                return new EntityPartImpl(name, fileName, new ByteArrayInputStream(out.toByteArray()), headers, mt);
+                writeTo(factory, type, mt, message, out);
+                return new EntityPartImpl(factory, name, fileName, new ByteArrayInputStream(out.toByteArray()),
+                    headers, mt);
             }
         } else {
             throw new IllegalStateException("Either type or genericType is expected for the content");
@@ -124,27 +128,26 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void writeTo(final GenericType<T> t, final MediaType mt, final Message message, 
-            final ByteArrayOutputStream out) throws IOException {
+    private <T> void writeTo(final ProviderFactory providers, final GenericType<T> t, final MediaType mt,
+            final Message message, final ByteArrayOutputStream out) throws IOException {
 
-        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) ProviderFactory
-            .getInstance(message)
+        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) providers
             .createMessageBodyWriter(t.getRawType(), t.getType(), null, mt, message);
 
         writer.writeTo((T) content, t.getRawType(), t.getType(), null, mt, cast(headers), out);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void writeTo(final Class<T> t, final MediaType mt, final Message message,
-            final ByteArrayOutputStream out) throws IOException {
+    private <T> void writeTo(final ProviderFactory providers, final Class<T> t, final MediaType mt,
+            final Message message, final ByteArrayOutputStream out) throws IOException {
 
-        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) ProviderFactory
-                .getInstance(message)
+        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) providers
                 .createMessageBodyWriter(t, null, null, mt, message);
 
         writer.writeTo((T) content, t, null, null, mt, cast(headers), out);
     }
     
+    @SuppressWarnings("unchecked")
     private static <T, U> MultivaluedMap<T, U> cast(MultivaluedMap<?, ?> p) {
         return (MultivaluedMap<T, U>)p;
     }

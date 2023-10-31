@@ -30,6 +30,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 public class EntityPartImpl implements EntityPart {
     private final String name;
@@ -37,9 +39,11 @@ public class EntityPartImpl implements EntityPart {
     private final InputStream content;
     private final MultivaluedMap<String, String> headers;
     private final MediaType mediaType;
+    private final ProviderFactory providers;
 
-    EntityPartImpl(String name, String fileName, InputStream content,
+    EntityPartImpl(final ProviderFactory providers, String name, String fileName, InputStream content,
             MultivaluedMap<String, String> headers, MediaType mediaType) {
+        this.providers = providers;
         this.name = name;
         this.fileName = fileName;
         this.content = content;
@@ -65,10 +69,11 @@ public class EntityPartImpl implements EntityPart {
     @Override
     public <T> T getContent(Class<T> type) 
             throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
+        final Message message = JAXRSUtils.getCurrentMessage();
+
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory
-            .getInstance(null)
-            .createMessageBodyReader(type, null, null, mediaType, null);
+        final MessageBodyReader<T> reader = (MessageBodyReader) providers
+            .createMessageBodyReader(type, null, null, mediaType, message);
 
         return reader.readFrom(type, null, null, mediaType, headers, content);
     }
@@ -77,10 +82,11 @@ public class EntityPartImpl implements EntityPart {
     @Override
     public <T> T getContent(GenericType<T> type)
             throws IllegalArgumentException, IllegalStateException, IOException, WebApplicationException {
+        final Message message = JAXRSUtils.getCurrentMessage();
+        
         @SuppressWarnings("rawtypes")
-        final MessageBodyReader<T> reader = (MessageBodyReader) ProviderFactory
-            .getInstance(null)
-            .createMessageBodyReader(type.getRawType(), type.getType(), null, mediaType, null);
+        final MessageBodyReader<T> reader = (MessageBodyReader) providers
+            .createMessageBodyReader(type.getRawType(), type.getType(), null, mediaType, message);
 
         return reader.readFrom((Class<T>) type.getRawType(), type.getType(), null, mediaType, headers, content);
     }
