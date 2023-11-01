@@ -30,7 +30,6 @@
     <description>Apache CXF SSE Integration System Tests for Jetty</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jetty.version>11.0.18</cxf.jetty.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.jetty</cxf.module.name>
     </properties>
     <dependencies>
