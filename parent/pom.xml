@@ -182,7 +182,7 @@
         <cxf.micrometer-tracing.version>1.0.11</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
-        <cxf.microprofile.openapi.version>3.0</cxf.microprofile.openapi.version>
+        <cxf.microprofile.openapi.version>3.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
         <cxf.mockito.version>5.6.0</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
@@ -196,6 +196,7 @@
         <cxf.opentelemetry.semconv.version>1.22.0-alpha</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
+        <cxf.parsson.version>1.1.5</cxf.parsson.version>
         <cxf.persistence-api.version>3.1.0</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.8.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
@@ -224,6 +225,7 @@
         <cxf.tomcat.version>10.1.14</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.version>2.3.5.Final</cxf.undertow.version>
+        <cxf.yasson.version>3.0.3</cxf.yasson.version>
 
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
@@ -1079,6 +1081,16 @@
                 <artifactId>jakarta.json</artifactId>
                 <version>${cxf.glassfish.json.version}</version>
                 <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.parsson</groupId>
+                <artifactId>parsson</artifactId>
+                <version>${cxf.parsson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse</groupId>
+                <artifactId>yasson</artifactId>
+                <version>${cxf.yasson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.johnzon</groupId>
