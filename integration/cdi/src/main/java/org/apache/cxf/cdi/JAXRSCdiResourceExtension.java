@@ -43,7 +43,6 @@ import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
 import jakarta.enterprise.inject.spi.BeforeShutdown;
 import jakarta.enterprise.inject.spi.Extension;
-import jakarta.enterprise.inject.spi.InjectionTarget;
 import jakarta.enterprise.inject.spi.ProcessAnnotatedType;
 import jakarta.enterprise.inject.spi.ProcessBean;
 import jakarta.enterprise.inject.spi.ProcessProducerField;
@@ -268,9 +267,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             final AnnotatedType< ExtensionManagerBus > busAnnotatedType =
                 beanManager.createAnnotatedType(ExtensionManagerBus.class);
 
-            final InjectionTarget<ExtensionManagerBus> busInjectionTarget =
-                beanManager.getInjectionTargetFactory(busAnnotatedType).createInjectionTarget(null);
-            event.addBean(new CdiBusBean(busInjectionTarget));
+            event.addBean(new CdiBusBean(beanManager.getInjectionTargetFactory(busAnnotatedType)));
         }
 
         if (applicationBeans.isEmpty() && !serviceBeans.isEmpty()) {

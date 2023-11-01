@@ -24,6 +24,7 @@ import java.util.Set;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.enterprise.inject.spi.InjectionTarget;
+import jakarta.enterprise.inject.spi.InjectionTargetFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
@@ -35,8 +36,8 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
 
     private final InjectionTarget<ExtensionManagerBus> injectionTarget;
 
-    CdiBusBean(final InjectionTarget<ExtensionManagerBus> injectionTarget) {
-        this.injectionTarget = injectionTarget;
+    CdiBusBean(final InjectionTargetFactory<ExtensionManagerBus> injectionTargetFactory) {
+        this.injectionTarget = injectionTargetFactory.createInjectionTarget(this);
     }
 
     @Override
