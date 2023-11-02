@@ -24,7 +24,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,8 +77,6 @@ public class FileUtilsTest {
 
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 
-        Collections.sort(foundFiles);
-        Collections.sort(foundFiles2);
         assertEquals(foundFiles, foundFiles2);
     }
 }
