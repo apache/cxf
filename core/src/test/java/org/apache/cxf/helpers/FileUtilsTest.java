@@ -24,13 +24,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -78,8 +76,6 @@ public class FileUtilsTest {
 
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 
-        Collections.sort(foundFiles);
-        Collections.sort(foundFiles2);
-        assertEquals(foundFiles, foundFiles2);
+        assertTrue(foundFiles.containsAll(foundFiles2) && foundFiles2.containsAll(foundFiles));
     }
 }
