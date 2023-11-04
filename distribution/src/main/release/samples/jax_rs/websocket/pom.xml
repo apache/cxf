@@ -30,31 +30,13 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty8.version>8.1.22.v20160922</cxf.jetty8.version>
-        <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
     </properties>
     <profiles>
         <profile>
-            <id>jetty8</id>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
-            </properties>
-            <dependencies>
-                <!-- jetty8 websocket -->
-                <dependency>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-websocket</artifactId>
-                    <version>${cxf.jetty8.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jetty9</id>
+            <id>jetty10</id>
             <!-- activate it by default -->
             <activation>
-                <property>
-                    <name>!jetty8</name>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <cxf.jetty.version>${cxf.jetty10.version}</cxf.jetty.version>
