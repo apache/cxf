@@ -28,7 +28,13 @@ import jakarta.xml.bind.annotation.XmlType;
  *
  */
 @XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
-@XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
+@XmlType(namespace = "uri:org.apache.cxf.javascript.testns",
+        propOrder = {
+        "element1",
+        "attribute1",
+        "element2",
+        "attribute2"
+        })
 public class AttributeTestBean {
 
     //CHECKSTYLE:OFF
