@@ -1108,9 +1108,10 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 if (mBeanContainer != null) {
                     removeServerMBean();
                 }
-                //After upgrade Jetty to 11.0.8, server.destroy() will clear all MBeans from container
-                //The old version doesn't behavior like this and this w
-                //server.destroy();
+                // After upgrade Jetty to 11.0.8, server.destroy() will clear all MBeans from container
+                // The old version doesn't behave like this because MBeanContainer was shareable but
+                // is not anymore (the factory should create new a container for each server engine).
+                server.destroy();
                 server = null;
             }
         }

@@ -87,11 +87,6 @@ public class JettyHTTPServerEngineFactory {
      */
     private Bus bus;
 
-    /**
-     * The Jetty {@link MBeanContainer} to use when enabling JMX in Jetty.
-     */
-    private Container.Listener mBeanContainer;
-
     public JettyHTTPServerEngineFactory() {
         // Empty
     }
@@ -331,9 +326,7 @@ public class JettyHTTPServerEngineFactory {
     }
 
     public synchronized Container.Listener getMBeanContainer() {
-        if (this.mBeanContainer != null) {
-            return mBeanContainer;
-        }
+        Container.Listener mBeanContainer = null;
 
         MBeanServer mbs = getMBeanServer();
         if (mbs != null) {
@@ -374,7 +367,6 @@ public class JettyHTTPServerEngineFactory {
         // clean up the collections
         threadingParametersMap.clear();
         tlsParametersMap.clear();
-        mBeanContainer = null;
     }
 
     public void preShutdown() {
