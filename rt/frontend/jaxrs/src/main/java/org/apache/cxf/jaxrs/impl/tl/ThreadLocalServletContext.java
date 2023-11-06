@@ -110,32 +110,12 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
         return get().getServerInfo();
     }
 
-    @SuppressWarnings("deprecation")
-    public Servlet getServlet(String name) throws ServletException {
-        return get().getServlet(name);
-    }
-
     public String getServletContextName() {
         return get().getServletContextName();
     }
 
-    @SuppressWarnings("deprecation")
-    public Enumeration<String> getServletNames() {
-        return get().getServletNames();
-    }
-
-    @SuppressWarnings("deprecation")
-    public Enumeration<Servlet> getServlets() {
-        return get().getServlets();
-    }
-
     public void log(String msg) {
         get().log(msg);
-    }
-
-    @SuppressWarnings("deprecation")
-    public void log(Exception exception, String msg) {
-        get().log(exception, msg);
     }
 
     public void log(String message, Throwable throwable) {

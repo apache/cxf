@@ -238,12 +238,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath(String path) {
-        LOG.log(Level.FINE, "getRealPath");
-        return null;
-    }
-
-    @Override
     public String getRemoteAddr() {
         LOG.log(Level.FINE, "getRemoteAddr");
         return webSocketHolder.getRemoteAddr();
@@ -514,12 +508,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public boolean isRequestedSessionIdFromUrl() {
-        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
-        return false;
-    }
-
-    @Override
     public boolean isRequestedSessionIdValid() {
         LOG.log(Level.FINE, "isRequestedSessionIdValid");
         return false;
@@ -555,5 +543,16 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getRealPath(String path) {
+        return path;
+    }
+
+    @Override
+    public boolean isRequestedSessionIdFromUrl() {
+        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
+        return false;
     }
 }

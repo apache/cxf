@@ -96,9 +96,11 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     }
 
     private ServerAuthorizationCodeGrant removeCodeGrant(String code, EntityManager em) throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = em.getReference(ServerAuthorizationCodeGrant.class, code);
+        ServerAuthorizationCodeGrant grant = em.find(ServerAuthorizationCodeGrant.class, code);
         try {
-            em.remove(grant);
+            if (grant != null) {
+                em.remove(grant);
+            }
         } catch (EntityNotFoundException e) {
         }
         return grant;

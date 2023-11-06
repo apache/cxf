@@ -22,6 +22,7 @@ import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.InjectionTargetFactory;
 import jakarta.enterprise.inject.spi.ProcessBean;
 import jakarta.ws.rs.Path;
 import org.apache.cxf.Bus;
@@ -49,9 +50,12 @@ public class JAXRSCdiResourceExtensionTest {
     private ProcessBean<Bus> processBean;
     @Mock
     private Annotated annotated;
-
+    @Mock
+    private InjectionTargetFactory<Object> factory;
+    
     @Test
     public void shouldNotAddDefaultApplicationWhenNoResourcesDefined() {
+        when(beanManager.getInjectionTargetFactory(any())).thenReturn(factory);
         extension.injectBus(event, beanManager);
 
         verify(event).addBean(any(CdiBusBean.class));
@@ -80,6 +84,7 @@ public class JAXRSCdiResourceExtensionTest {
         when(annotated.isAnnotationPresent(Path.class)).thenReturn(true);
         extension.collect(processBean, beanManager);
 
+        when(beanManager.getInjectionTargetFactory(any())).thenReturn(factory);
         extension.injectBus(event, beanManager);
 
         verify(event).addBean(any(DefaultApplicationBean.class));

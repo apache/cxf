@@ -196,10 +196,10 @@
                     </execution>
                 </executions>
                 <dependencies>
-                   <dependency>
-                       <groupId>jakarta.xml.bind</groupId>
-                       <artifactId>jakarta.xml.bind-api</artifactId>
-                       <version>${cxf.jaxb.version}</version>
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>${cxf.jaxb.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

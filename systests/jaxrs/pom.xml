@@ -534,16 +534,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-jsonb</artifactId>
-            <classifier>jakarta</classifier>
+            <groupId>org.eclipse.parsson</groupId>
+            <artifactId>parsson</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-mapper</artifactId>
-            <version>${cxf.johnzon.version}</version>
-            <classifier>jakarta</classifier>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

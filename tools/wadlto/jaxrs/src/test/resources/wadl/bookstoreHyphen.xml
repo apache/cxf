@@ -17,10 +17,10 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<application xmlns="http://wadl.dev.java.net/2009/02" 
+<wadl:application xmlns:wadl="http://wadl.dev.java.net/2009/02" 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <doc title="My Application"/>
-    <grammars>
+    <wadl:doc title="My Application"/>
+    <wadl:grammars>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
         	<xs:element name="test" type="testCompositeObject"/>
             <xs:complexType name="testCompositeObject">
@@ -30,17 +30,17 @@
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-    </grammars>
-    <resources base="http://localhost:8080/baz">
-        <resource path="/book-store">
-            <method name="PUT">
-                <request>
-                    <representation mediaType="application/xml" element="test"/>
-                </request>
-                <response>
-                    <representation mediaType="application/xml" element="test"/>
-                </response>
-            </method>
-        </resource>
-    </resources>
-</application>
+    </wadl:grammars>
+    <wadl:resources base="http://localhost:8080/baz">
+        <wadl:resource path="/book-store">
+            <wadl:method name="PUT">
+                <wadl:request>
+                    <wadl:representation mediaType="application/xml" element="test"/>
+                </wadl:request>
+                <wadl:response>
+                    <wadl:representation mediaType="application/xml" element="test"/>
+                </wadl:response>
+            </wadl:method>
+        </wadl:resource>
+    </wadl:resources>
+</wadl:application>
