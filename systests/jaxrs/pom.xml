@@ -546,7 +546,6 @@
         <dependency>
             <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-core</artifactId>
-            <classifier>jakarta</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
