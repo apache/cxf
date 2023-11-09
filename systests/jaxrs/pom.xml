@@ -553,6 +553,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
             <artifactId>johnzon-jsonb</artifactId>
             <scope>test</scope>
         </dependency>
