@@ -66,6 +66,7 @@ import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitFactory.UseAsyncPolicy;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHttpResponseWrapperFactory.AsyncHttpResponseWrapper;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -105,6 +106,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
 
     private final AsyncHTTPConduitFactory factory;
+    private final AsyncHttpResponseWrapperFactory asyncHttpResponseWrapperFactory;
     private volatile int lastTlsHash = -1;
     private volatile Object sslState;
     private volatile URI sslURL;
@@ -116,6 +118,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             throws IOException {
         super(b, ei, t);
         this.factory = factory;
+        this.asyncHttpResponseWrapperFactory = bus.getExtension(AsyncHttpResponseWrapperFactory.class);
     }
 
     public synchronized CloseableHttpAsyncClient getHttpAsyncClient(final TlsStrategy tlsStrategy)
@@ -491,14 +494,28 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             if (connectionFuture != null) {
                 return;
             }
-
-            CXFResponseCallback responseCallback = new CXFResponseCallback() {
+            
+            final CXFResponseCallback delegate = new CXFResponseCallback() {
                 @Override
                 public void responseReceived(HttpResponse response) {
                     setHttpResponse(response);
                 }
 
             };
+
+            CXFResponseCallback responseCallback = delegate;
+            if (asyncHttpResponseWrapperFactory != null) {
+                final AsyncHttpResponseWrapper wrapper = asyncHttpResponseWrapperFactory.create();
+                if (wrapper != null) {
+                    responseCallback = new CXFResponseCallback() {
+                        @Override
+                        public void responseReceived(HttpResponse response) {
+                            wrapper.responseReceived(response, delegate::responseReceived);
+                        }
+                    };
+                }
+            }
+
 
             FutureCallback<Boolean> callback = new FutureCallback<Boolean>() {
 
