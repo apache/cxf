@@ -1095,8 +1095,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         DataHandler handler = new DataHandler(new InputStreamDataSource(is1, "application/octet-stream"));
 
         Attachment att = new Attachment(headers, handler, null);
-        Response response = client.post(att);
-        assertEquals(response.getStatus(), 200);
+        try (Response response = client.post(att)) {
+            assertEquals(response.getStatus(), 200);
+        }
 
         client.close();
     }
