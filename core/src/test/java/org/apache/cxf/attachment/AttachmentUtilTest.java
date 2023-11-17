@@ -269,6 +269,7 @@ public class AttachmentUtilTest {
     @Test
     public void bigIntAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         BigInteger bigInteger = new BigInteger(String.valueOf(Long.MAX_VALUE));
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, bigInteger, cos);
         verify(cos).setMaxSize(bigInteger.longValue());
@@ -277,6 +278,7 @@ public class AttachmentUtilTest {
         // Overflow long value
         bigInteger = bigInteger.add(BigInteger.ONE);
         cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, bigInteger, cos);
         verify(cos).setThreshold(102400L);
     }
@@ -284,6 +286,7 @@ public class AttachmentUtilTest {
     @Test
     public void longAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Long.MAX_VALUE, cos);
         verify(cos).setMaxSize(Long.MAX_VALUE);
         verify(cos).setThreshold(102400L);
@@ -292,6 +295,7 @@ public class AttachmentUtilTest {
     @Test
     public void integerAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Integer.MAX_VALUE, cos);
         verify(cos).setMaxSize(Integer.MAX_VALUE);
         verify(cos).setThreshold(102400L);
@@ -300,6 +304,7 @@ public class AttachmentUtilTest {
     @Test
     public void shortAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Short.MAX_VALUE, cos);
         verify(cos).setMaxSize(Short.MAX_VALUE);
         verify(cos).setThreshold(102400L);
@@ -308,6 +313,7 @@ public class AttachmentUtilTest {
     @Test
     public void byteAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, Byte.MAX_VALUE, cos);
         verify(cos).setMaxSize(Byte.MAX_VALUE);
         verify(cos).setThreshold(102400L);
@@ -316,6 +322,7 @@ public class AttachmentUtilTest {
     @Test
     public void numberStringAsAttachmentMaxSize() throws IOException {
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, "12345", cos);
         verify(cos).setMaxSize(12345);
         verify(cos).setThreshold(102400L);
@@ -341,6 +348,7 @@ public class AttachmentUtilTest {
     public void fileAsAttachmentDirectory() throws IOException {
         File attachmentDirectory = new File("/dev/null");
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDirectory,
                 cos);
         verify(cos).setOutputDir(attachmentDirectory);
@@ -351,6 +359,7 @@ public class AttachmentUtilTest {
     public void stringAsAttachmentDirectory() throws IOException {
         String attachmentDirectory = "/dev/null";
         CachedOutputStream cos = spy(CachedOutputStream.class);
+        cos.resetDefaultThreshold();
         cos = testSetStreamedAttachmentProperties(AttachmentDeserializer.ATTACHMENT_DIRECTORY, attachmentDirectory,
                 cos);
         verify(cos).setOutputDir(new File(attachmentDirectory));
