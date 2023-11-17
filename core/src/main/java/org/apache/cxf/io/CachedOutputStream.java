@@ -576,6 +576,10 @@ public class CachedOutputStream extends OutputStream {
         this.cipherTransformation = cipherTransformation;
     }
 
+    public void resetDefaultThreshold() {
+        thresholdSysPropSet = false;
+    }
+
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
             String s = SystemPropertyAction.getProperty(CachedConstants.MAX_SIZE_SYS_PROP, "-1");
