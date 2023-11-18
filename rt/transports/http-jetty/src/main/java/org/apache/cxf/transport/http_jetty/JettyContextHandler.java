@@ -25,6 +25,9 @@ import org.eclipse.jetty.server.handler.ContextHandler;
  * The Jetty-specific ContextHandler
  */
 class JettyContextHandler extends ContextHandler {
+    private String defaultRequestCharacterEncoding;
+    private String defaultResponseCharacterEncoding;
+
     JettyContextHandler() {
         super(null, null);
         _scontext = new JettyContext();
@@ -58,5 +61,25 @@ class JettyContextHandler extends ContextHandler {
 
             setDefaultResponseCharacterEncoding(encoding);
         }
+    }
+
+    @Override
+    public void setDefaultRequestCharacterEncoding(String encoding) {
+        defaultRequestCharacterEncoding = encoding;
+    }
+
+    @Override
+    public String getDefaultRequestCharacterEncoding() {
+        return defaultRequestCharacterEncoding;
+    }
+
+    @Override
+    public void setDefaultResponseCharacterEncoding(String encoding) {
+        defaultResponseCharacterEncoding = encoding;
+    }
+
+    @Override
+    public String getDefaultResponseCharacterEncoding() {
+        return defaultResponseCharacterEncoding;
     }
 }

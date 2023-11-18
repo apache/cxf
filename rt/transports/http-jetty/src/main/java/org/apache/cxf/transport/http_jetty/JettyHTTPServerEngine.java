@@ -23,11 +23,16 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -608,20 +613,30 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
 
         try {
             Container container = getContainer(server);
-            Method[] methods = ReflectionUtil.getDeclaredMethods(container.getClass());
-            for (Method m : methods) {
-                if ("addEventListener".equals(m.getName())) {
-                    ReflectionUtil.setAccessible(m).invoke(container, mBeanContainer);
-                }
-            }
-            //container.addEventListener(mBeanContainer);
+            // Attempt to support Jetty 9.x (Apache Karaf) and Jetty 10.x variations:
+            //    boolean addEventListener(EventListener listener);
+            //    void addEventListener(Container.Listener listener);
+            findAddEventListener(container).invoke(mBeanContainer);
             mBeanContainer.beanAdded(null, server);
         } catch (RuntimeException rex) {
             throw rex;
-        } catch (Exception r) {
+        } catch (Throwable r) {
             throw new RuntimeException(r);
         }
     }
+
+    private MethodHandle findAddEventListener(Container container) 
+            throws NoSuchMethodException, IllegalAccessException {
+        final Lookup lookup = MethodHandles.publicLookup();
+        try {
+            return lookup.findVirtual(container.getClass(), "addEventListener", 
+                MethodType.methodType(boolean.class, EventListener.class)).bindTo(container);
+        } catch (final IllegalAccessException | NoSuchMethodException ex) {
+            return lookup.findVirtual(container.getClass(), "addEventListener", 
+                MethodType.methodType(void.class, Container.Listener.class)).bindTo(container);
+        }
+    }
+
     private void removeServerMBean() {
         try {
             mBeanContainer.beanRemoved(null, server);
@@ -1118,8 +1133,9 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 if (mBeanContainer != null) {
                     removeServerMBean();
                 }
-                //After upgrade Jetty to 10.0.12, server.destroy() will clear all MBeans from container
-                //The old version doesn't behavior like this and this 
+                // After upgrade Jetty to 10.0.12, server.destroy() will clear all MBeans from container
+                // The old version doesn't behave like this because MBeanContainer was shareable but
+                // is not anymore (the factory should create new a container for each server engine).
                 server.destroy();
                 server = null;
             }
