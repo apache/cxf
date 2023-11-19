@@ -576,10 +576,6 @@ public class CachedOutputStream extends OutputStream {
         this.cipherTransformation = cipherTransformation;
     }
 
-    public void resetDefaultThreshold() {
-        thresholdSysPropSet = false;
-    }
-
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
             String s = SystemPropertyAction.getProperty(CachedConstants.MAX_SIZE_SYS_PROP, "-1");
@@ -593,9 +589,12 @@ public class CachedOutputStream extends OutputStream {
             i = SystemPropertyAction.getInteger(CachedConstants.THRESHOLD_SYS_PROP, -1);
             if (i <= 0) {
                 i = 128 * 1024;
+                thresholdSysPropSet = false; /* we not using system property value */
             } else {
                 thresholdSysPropSet = true;
             }
+        } else {
+            thresholdSysPropSet = false; /* we not consulting system properties at all */
         }
         defaultThreshold = i;
     }

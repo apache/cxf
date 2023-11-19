@@ -125,6 +125,8 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
             if (old != null) {
                 System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }
+            // Always restore the default properties
+            reloadDefaultProperties();
         }
     }
 }
