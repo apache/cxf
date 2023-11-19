@@ -30,7 +30,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty.version>11.0.17</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
     </properties>
     <profiles>
         <profile>
@@ -39,9 +39,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
-            </properties>
             <dependencies>
                 <!-- jetty11 websocket -->
                 <dependency>

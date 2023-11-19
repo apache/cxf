@@ -589,9 +589,12 @@ public class CachedOutputStream extends OutputStream {
             i = SystemPropertyAction.getInteger(CachedConstants.THRESHOLD_SYS_PROP, -1);
             if (i <= 0) {
                 i = 128 * 1024;
+                thresholdSysPropSet = false; /* we not using system property value */
             } else {
                 thresholdSysPropSet = true;
             }
+        } else {
+            thresholdSysPropSet = false; /* we not consulting system properties at all */
         }
         defaultThreshold = i;
     }

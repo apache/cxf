@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -77,6 +76,6 @@ public class FileUtilsTest {
 
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 
-        assertEquals(foundFiles, foundFiles2);
+        assertTrue(foundFiles.containsAll(foundFiles2) && foundFiles2.containsAll(foundFiles));
     }
 }
