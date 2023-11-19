@@ -217,6 +217,8 @@ public abstract class CachedStreamTestBase {
             if (old != null) {
                 System.setProperty(CachedConstants.THRESHOLD_SYS_PROP, old);
             }
+            // Always restore the default properties
+            reloadDefaultProperties();
         }
     }
 
