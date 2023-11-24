@@ -20,6 +20,8 @@ package org.apache.cxf.configuration.jsse;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.net.ssl.KeyManager;
@@ -33,6 +35,14 @@ import org.apache.cxf.configuration.security.FiltersType;
  * to both client and server sides.
  */
 public class TLSParameterBase {
+    protected static final Collection<String> DEFAULT_HTTPS_PROTOCOLS = 
+        Arrays.asList(
+            "TLSv1", 
+            "TLSv1.1", 
+            "TLSv1.2", 
+            "TLSv1.3" 
+        ); 
+
     protected KeyManager[]    keyManagers;
     protected TrustManager[]  trustManagers;
     protected String          provider;

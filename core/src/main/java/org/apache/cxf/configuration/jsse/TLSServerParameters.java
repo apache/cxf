@@ -29,7 +29,6 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
  *
  */
 public class TLSServerParameters extends TLSParameterBase {
-
     ClientAuthentication clientAuthentication;
     List<String> excludeProtocols = new ArrayList<>();
     List<String> includeProtocols = new ArrayList<>();
@@ -96,5 +95,9 @@ public class TLSServerParameters extends TLSParameterBase {
      */
     public void setSniHostCheck(boolean sniHostCheck) {
         this.sniHostCheck = sniHostCheck;
+    }
+
+    public static String[] getPreferredServerProtocols() {
+        return DEFAULT_HTTPS_PROTOCOLS.toArray(new String [0]);
     }
 }
