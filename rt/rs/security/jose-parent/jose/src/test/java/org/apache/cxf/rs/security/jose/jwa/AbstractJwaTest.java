@@ -21,27 +21,12 @@ package org.apache.cxf.rs.security.jose.jwa;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.Provider;
-import java.security.Security;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 
 public class AbstractJwaTest {
 
-    @BeforeClass
-    public static void installBouncyCastleProvider() throws Exception {
-        final String bcClassName = "org.bouncycastle.jce.provider.BouncyCastleProvider";
-        if (Security.getProvider(bcClassName) == null) {
-            Security.addProvider((Provider) Class.forName(bcClassName).getDeclaredConstructor().newInstance());
-        }
-    }
-
-    @AfterClass
-    public static void removeBouncyCastleProvider() {
-        Security.removeProvider("org.bouncycastle.jce.provider.BouncyCastleProvider");
-    }
+    
 
     protected String loadResource(String resource) {
         StringBuilder input = new StringBuilder();

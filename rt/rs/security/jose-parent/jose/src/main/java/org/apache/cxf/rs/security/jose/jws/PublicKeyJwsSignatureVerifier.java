@@ -22,6 +22,8 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -43,6 +45,27 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
         cert = null;
+        String javaAlgoName = supportedAlgo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = supportedAlgo.getJwaName().substring(2);
+            switch (size) {
+            case "256" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA256, 20, 1);
+                break;
+            case "384" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA384, 20, 1);
+                break;
+            case "512" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA512, 20, 1);
+                break;
+            default : 
+                spec = PSSParameterSpec.DEFAULT;
+            }
+            
+
+        }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
@@ -59,6 +82,27 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             this.key = null;
         }
         this.cert = cert;
+        String javaAlgoName = supportedAlgo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = supportedAlgo.getJwaName().substring(2);
+            switch (size) {
+            case "256" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA256, 20, 1);
+                break;
+            case "384" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA384, 20, 1);
+                break;
+            case "512" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA512, 20, 1);
+                break;
+            default : 
+                spec = PSSParameterSpec.DEFAULT;
+            }
+            
+
+        }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);

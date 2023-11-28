@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
-import java.security.Security;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,14 +51,13 @@ import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 
 public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwt.PORT;
@@ -73,17 +71,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerJwt.class, true));
-        registerBouncyCastleIfNeeded();
     }
 
-    private static void registerBouncyCastleIfNeeded() throws Exception {
-        // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
+   
 
     @Test
     public void testJweJwkPlainTextRSA() throws Exception {

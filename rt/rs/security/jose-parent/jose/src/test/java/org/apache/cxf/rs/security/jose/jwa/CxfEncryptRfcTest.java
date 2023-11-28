@@ -21,6 +21,9 @@ package org.apache.cxf.rs.security.jose.jwa;
 import org.apache.cxf.rs.security.jose.support.ApacheCXFProducer;
 import org.apache.cxf.rs.security.jose.support.Serialization;
 
+
+
+
 public class CxfEncryptRfcTest extends JwaEncryptRfcConformanceTest {
 
     private ApacheCXFProducer producer = new ApacheCXFProducer();

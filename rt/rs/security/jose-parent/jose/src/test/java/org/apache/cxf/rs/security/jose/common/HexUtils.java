@@ -16,16 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rt.security.crypto;
+package org.apache.cxf.rs.security.jose.common;
 
-/**
- * Simple helper for dynamically registering BouncyCastle inside a Blueprint or Spring context
- */
-public class BouncyCastleInstaller {
-    public void install() throws Exception {
-        CryptoUtils.installBouncyCastleProvider();
+
+public final class HexUtils {
+    
+    
+    
+    private HexUtils() {
+        
     }
-    public void uninstall() {
-        CryptoUtils.removeBouncyCastleProvider();
+
+
+    
+    public static byte[] decode(byte[] s) {
+        int len = s.length;
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s[i], 16) << 4)
+                                 + Character.digit(s[i + 1], 16));
+        }
+        return data;
     }
+
+    
+
 }

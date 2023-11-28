@@ -19,7 +19,6 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.KeyStore;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
@@ -52,7 +51,6 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -142,48 +140,44 @@ public class JWTTokenProviderTest {
 
     @org.junit.Test
     public void testCreateSignedPSJWT() throws Exception {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
 
-            TokenProvider jwtTokenProvider = new JWTTokenProvider();
-            ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
 
-            TokenProviderParameters providerParameters = createProviderParameters();
-            SignatureProperties sigProps = new SignatureProperties();
-            sigProps.setSignatureAlgorithm(SignatureAlgorithm.PS256.name());
-            providerParameters.getStsProperties().setSignatureProperties(sigProps);
+        TokenProviderParameters providerParameters = createProviderParameters();
+        SignatureProperties sigProps = new SignatureProperties();
+        sigProps.setSignatureAlgorithm(SignatureAlgorithm.PS256.name());
+        providerParameters.getStsProperties().setSignatureProperties(sigProps);
 
-            assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
-            TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-            assertNotNull(providerResponse);
-            assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-            String token = (String)providerResponse.getToken();
-            assertNotNull(token);
-            assertTrue(token.split("\\.").length == 3);
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 3);
 
-            // Validate the token
-            JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
-            JwtToken jwt = jwtConsumer.getJwtToken();
-            Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
-            Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-            Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
-                                jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-            Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
-                                jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
+        // Validate the token
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+        Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+        Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
+                            jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
+                            jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
 
-            // Verify Signature
-            Crypto crypto = providerParameters.getStsProperties().getSignatureCrypto();
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(providerParameters.getStsProperties().getSignatureUsername());
-            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-            assertNotNull(certs);
+        // Verify Signature
+        Crypto crypto = providerParameters.getStsProperties().getSignatureCrypto();
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(providerParameters.getStsProperties().getSignatureUsername());
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertNotNull(certs);
 
-            assertFalse(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
-            assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.PS256));
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        }
+        assertFalse(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
+        assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.PS256));
+
     }
 
     @org.junit.Test
@@ -261,58 +255,54 @@ public class JWTTokenProviderTest {
 
     @org.junit.Test
     public void testCreateUnsignedEncryptedCBCJWT() throws Exception {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
+        
 
-            TokenProvider jwtTokenProvider = new JWTTokenProvider();
-            ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
+        TokenProvider jwtTokenProvider = new JWTTokenProvider();
+        ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
 
-            TokenProviderParameters providerParameters = createProviderParameters();
-            providerParameters.setEncryptToken(true);
-            providerParameters.getEncryptionProperties().setEncryptionAlgorithm(
-                ContentAlgorithm.A128CBC_HS256.name()
-            );
+        TokenProviderParameters providerParameters = createProviderParameters();
+        providerParameters.setEncryptToken(true);
+        providerParameters.getEncryptionProperties()
+            .setEncryptionAlgorithm(ContentAlgorithm.A128CBC_HS256.name());
 
-            assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
-            TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-            assertNotNull(providerResponse);
-            assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
+        assertNotNull(providerResponse);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-            String token = (String)providerResponse.getToken();
-            assertNotNull(token);
-            assertTrue(token.split("\\.").length == 5);
+        String token = (String)providerResponse.getToken();
+        assertNotNull(token);
+        assertTrue(token.split("\\.").length == 5);
 
-            if (unrestrictedPoliciesInstalled) {
-                // Validate the token
-                JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
-                Properties decProperties = new Properties();
-                Crypto decryptionCrypto = CryptoFactory.getInstance(getDecryptionProperties());
-                KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
-                decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
-                decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
-                decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
-                decProperties.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM,
-                                  ContentAlgorithm.A128CBC_HS256.name());
+        if (unrestrictedPoliciesInstalled) {
+            // Validate the token
+            JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(token);
+            Properties decProperties = new Properties();
+            Crypto decryptionCrypto = CryptoFactory.getInstance(getDecryptionProperties());
+            KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+            decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            decProperties.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM,
+                              ContentAlgorithm.A128CBC_HS256.name());
 
-                JweDecryptionProvider decProvider =
-                    JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());
+            JweDecryptionProvider decProvider = JweUtils.loadDecryptionProvider(decProperties,
+                                                                                jwtConsumer.getHeaders());
 
-                JweDecryptionOutput decOutput = decProvider.decrypt(token);
-                String decToken = decOutput.getContentText();
+            JweDecryptionOutput decOutput = decProvider.decrypt(token);
+            String decToken = decOutput.getContentText();
 
-                JwsJwtCompactConsumer jwtJwsConsumer = new JwsJwtCompactConsumer(decToken);
-                JwtToken jwt = jwtJwsConsumer.getJwtToken();
+            JwsJwtCompactConsumer jwtJwsConsumer = new JwsJwtCompactConsumer(decToken);
+            JwtToken jwt = jwtJwsConsumer.getJwtToken();
 
-                Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
-                Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-                Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
-                                    jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-                Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
-                                    jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
-            }
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+            Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
+            Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
+            Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
+                                jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+            Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
+                                jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
         }
+
     }
 
     @org.junit.Test

@@ -21,9 +21,13 @@ package org.apache.cxf.rs.security.jose.jwe;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
@@ -32,12 +36,7 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
+
 
 public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(PbesHmacAesWrapKeyEncryptionAlgorithm.class);
@@ -129,19 +128,23 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
     }
     static byte[] createDerivedKey(String keyAlgoJwt, int keySize,
                                    byte[] password, byte[] saltInput, int pbesCount) {
-        byte[] saltValue = createSaltValue(keyAlgoJwt, saltInput);
-        final Digest digest;
-        int macSigSize = PBES_HMAC_MAP.get(keyAlgoJwt);
-        if (macSigSize == 256) {
-            digest = new SHA256Digest();
-        } else if (macSigSize == 384) {
-            digest = new SHA384Digest();
-        } else {
-            digest = new SHA512Digest();
+        try {
+            byte[] saltValue = createSaltValue(keyAlgoJwt, saltInput);
+            int macSigSize = PBES_HMAC_MAP.get(keyAlgoJwt);
+                
+            String algorithm = "PBKDF2WithHmacSHA" + macSigSize;
+            PBEKeySpec pbeSpec = new PBEKeySpec(new String(password).toCharArray(), saltValue, pbesCount, keySize * 8);
+            SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm); 
+            Key sKey = keyFact.generateSecret(pbeSpec);
+            byte[] ret = new byte[keySize];
+            byte[] key = sKey.getEncoded();
+            System.arraycopy(key, 0, ret, 0, keySize);
+            return ret;
+           
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
-        PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(digest);
-        gen.init(password, saltValue, pbesCount);
-        return ((KeyParameter) gen.generateDerivedParameters(keySize * 8)).getKey();
     }
 
 

@@ -195,6 +195,7 @@ public class JwkUtilsTest {
         String thumbprint = JwkUtils.getThumbprint(EC_521_KEY);
         assertEquals("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg", thumbprint);
     }
+    
     @Test
     public void testLoadPublicJwkSet() throws Exception {
         final Properties props = new Properties();

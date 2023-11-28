@@ -1768,11 +1768,6 @@
                 <version>${cxf.commons-text.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${cxf.bcprov.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${cxf.jaxen.version}</version>
@@ -1967,6 +1962,10 @@
                     <exclusion>
                         <groupId>org.ehcache</groupId>
                         <artifactId>ehcache</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

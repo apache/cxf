@@ -23,6 +23,8 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -44,6 +46,27 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         super(algo);
         this.key = key;
         this.random = random;
+        String javaAlgoName = algo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = algo.getJwaName().substring(2);
+            switch (size) {
+            case "256" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA256, 20, 1);
+                break;
+            case "384" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA384, 20, 1);
+                break;
+            case "512" : 
+                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA512, 20, 1);
+                break;
+            default : 
+                spec = PSSParameterSpec.DEFAULT;
+            }
+            
+
+        }
         this.signatureSpec = spec;
     }
     protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {

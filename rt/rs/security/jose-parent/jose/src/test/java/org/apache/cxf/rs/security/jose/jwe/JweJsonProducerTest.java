@@ -18,26 +18,20 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.security.Security;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.common.HexUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Hex;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -177,19 +171,7 @@ public class JweJsonProducerTest {
         + "\"tag\":\"nNSN9kYhubsQ9QELBmZIhA\""
         + "}";
     
-    @BeforeClass
-    public static void registerBouncyCastleIfNeeded() throws Exception {
-        try {
-            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
-        } catch (Throwable t) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
+   
 
     @Test
     public void testSingleRecipientGcm() throws Exception {
@@ -359,7 +341,7 @@ public class JweJsonProducerTest {
         KeyEncryptionProvider keyEncryption1 =
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey1, keyAlgo);
         
-        JweEncryptionProvider jwe1 = new AesCbcHmacJweEncryption(contentAlgo, Hex.decode(CEK_32_HEX), 
+        JweEncryptionProvider jwe1 = new AesCbcHmacJweEncryption(contentAlgo, HexUtils.decode(CEK_32_HEX.getBytes()), 
             JweCompactReaderWriterTest.INIT_VECTOR_A3, keyEncryption1);
         KeyEncryptionProvider keyEncryption2 =
             JweUtils.getSecretKeyEncryptionAlgorithm(wrapperKey2, keyAlgo);
