@@ -18,12 +18,19 @@
  */
 package org.apache.cxf.configuration.jsse;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+
+import org.apache.cxf.common.util.SystemPropertyAction;
 
 /**
  * This class extends {@link TLSParameterBase} with client-specific
@@ -31,6 +38,18 @@ import javax.net.ssl.SSLSocketFactory;
  *
  */
 public class TLSClientParameters extends TLSParameterBase {
+    /**
+     * Provide an option to ignore https.protocols setting, see please
+     * {@link https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https}
+     */
+    static final String IGNORE_CONFIGURED_HTTPS_PROTOCOLS = "https.protocols.ignore"; 
+
+    /**
+     * Consult https.protocols setting for preferred client HTTPs protocols, see please
+     * {@link https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https}
+     */
+    static final String CONFIGURED_HTTPS_PROTOCOLS = "https.protocols";
+
     private boolean disableCNCheck;
     private SSLSocketFactory sslSocketFactory;
     private int sslCacheTimeout = 86400;
@@ -255,4 +274,33 @@ public class TLSClientParameters extends TLSParameterBase {
     public void setSslContext(SSLContext sslContext) {
         this.sslContext = sslContext;
     }
+
+    public static String[] getPreferredClientProtocols() {
+        if (!shouldIgnoreConfiguredCLientProtocols()) {
+            final Collection<String> configured = getConfiguredCLientProtocols();
+            if (!configured.isEmpty()) {
+                return configured.toArray(new String [0]);
+            }
+        }
+        return DEFAULT_HTTPS_PROTOCOLS.toArray(new String [0]);
+    }
+    
+    private static Collection<String> getConfiguredCLientProtocols() {
+        final String protocols = SystemPropertyAction.getPropertyOrNull(CONFIGURED_HTTPS_PROTOCOLS);
+
+        if (protocols == null || protocols.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return Arrays
+            .stream(protocols.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+    
+    private static boolean shouldIgnoreConfiguredCLientProtocols() {
+        return Boolean.valueOf(SystemPropertyAction.getProperty(IGNORE_CONFIGURED_HTTPS_PROTOCOLS, "false"));
+    }
+
 }
