@@ -250,8 +250,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                             SSLParameters params = new SSLParameters(cipherSuites, new String[] {protocol});
                             cb.sslParameters(params);
                         } else {
-                            SSLParameters params = new SSLParameters(cipherSuites, 
-                                                             new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"});
+                            final SSLParameters params = new SSLParameters(cipherSuites, 
+                                TLSClientParameters.getPreferredClientProtocols());
                             cb.sslParameters(params);
                         }
                     }
