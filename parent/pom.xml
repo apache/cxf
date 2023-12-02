@@ -89,7 +89,7 @@
         <cxf.assertj.version>3.24.2</cxf.assertj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.6.1</cxf.atmosphere.version>
-        <cxf.bcprov.version>1.70</cxf.bcprov.version>
+        <cxf.bcprov.version>1.77</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.16.4</cxf.brave.reporter.version>
         <cxf.brave.version>5.16.0</cxf.brave.version>
         <cxf.brave.zipkin.version>2.24.2</cxf.brave.zipkin.version>
@@ -1753,7 +1753,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${cxf.bcprov.version}</version>
             </dependency>
             <dependency>
