@@ -1,0 +1,7 @@
+<ser:NullTestOperationRequest xmlns:ser="http://www.test.org/service/">
+
+    <inInt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    <inInteger xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    <inString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+
+</ser:NullTestOperationRequest>
