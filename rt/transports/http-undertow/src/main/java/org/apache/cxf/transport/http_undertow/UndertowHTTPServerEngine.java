@@ -286,20 +286,22 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     }
 
     private Builder disableSSLv3(Builder result) {
+        final List<String> defaultProtocols = Arrays.asList(TLSServerParameters.getPreferredServerProtocols());
         //SSLv3 isn't safe, disable it by default unless explicitly use it
         if (tlsServerParameters != null
             && ("SSLv3".equals(tlsServerParameters.getSecureSocketProtocol())
                 || !tlsServerParameters.getIncludeProtocols().isEmpty())) {
-            List<String> protocols = new LinkedList<>(Arrays.asList("TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"));
+            final List<String> protocols = new LinkedList<>(defaultProtocols);
+            protocols.add("SSLv3");
             for (String excludedProtocol : tlsServerParameters.getExcludeProtocols()) {
                 if (protocols.contains(excludedProtocol)) {
                     protocols.remove(excludedProtocol);
                 }
             }
-            Sequence<String> supportProtocols = Sequence.of(protocols);
+            final Sequence<String> supportProtocols = Sequence.of(protocols);
             return result.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, supportProtocols);
         }
-        Sequence<String> supportProtocols = Sequence.of("TLSv1", "TLSv1.1", "TLSv1.2");
+        final Sequence<String> supportProtocols = Sequence.of(defaultProtocols);
         return result.setSocketOption(Options.SSL_ENABLED_PROTOCOLS, supportProtocols);
     }
 

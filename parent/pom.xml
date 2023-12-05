@@ -96,7 +96,7 @@
         <cxf.assertj.version>3.24.2</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.3</cxf.atmosphere.version>
-        <cxf.bcprov.version>1.70</cxf.bcprov.version>
+        <cxf.bcprov.version>1.77</cxf.bcprov.version>
         <cxf.brave.version>5.16.0</cxf.brave.version>
         <cxf.cdi.api.version>4.0.1</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
@@ -131,7 +131,7 @@
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.httpcomponents.core.version>4.4.16</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.client5.version>5.2.1</cxf.httpcomponents.client5.version>
-        <cxf.httpcomponents.core5.version>5.2.3</cxf.httpcomponents.core5.version>
+        <cxf.httpcomponents.core5.version>5.2.4</cxf.httpcomponents.core5.version>
         <cxf.jackson.version>2.16.0</cxf.jackson.version>
         <cxf.jackson.databind.version>2.16.0</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
@@ -173,18 +173,18 @@
         <cxf.junit.version>4.13.2</cxf.junit.version>
         <cxf.junit5.version>5.10.1</cxf.junit5.version>
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
-        <cxf.ldapsdk.version>6.0.10</cxf.ldapsdk.version>
+        <cxf.ldapsdk.version>6.0.11</cxf.ldapsdk.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
-        <cxf.logback.classic.version>1.4.11</cxf.logback.classic.version>
-        <cxf.lucene.version>9.8.0</cxf.lucene.version>
-        <cxf.maven.core.version>3.9.5</cxf.maven.core.version>
+        <cxf.logback.classic.version>1.4.14</cxf.logback.classic.version>
+        <cxf.lucene.version>9.9.0</cxf.lucene.version>
+        <cxf.maven.core.version>3.9.6</cxf.maven.core.version>
         <cxf.micrometer.version>1.12.0</cxf.micrometer.version>
         <cxf.micrometer-tracing.version>1.2.0</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.0.3</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
-        <cxf.mockito.version>5.7.0</cxf.mockito.version>
+        <cxf.mockito.version>5.8.0</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
@@ -217,9 +217,9 @@
         <cxf.spring.ldap.version>3.2.0</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.security.version>6.2.0</cxf.spring.security.version>
-        <cxf.spring.version>6.1.0</cxf.spring.version>
+        <cxf.spring.version>6.1.1</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>5.9.0</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.10.3</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.19</cxf.swagger.v3.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.16</cxf.tomcat.version>
@@ -590,7 +590,7 @@
                         <dependency>
                             <groupId>org.apache.groovy</groupId>
                             <artifactId>groovy</artifactId>
-                            <version>4.0.15</version>
+                            <version>4.0.16</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1782,7 +1782,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${cxf.bcprov.version}</version>
             </dependency>
             <dependency>
