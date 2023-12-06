@@ -79,6 +79,21 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     }
 
     @Test
+    public void testBookEncodedWithHttp2() throws Exception {
+        final WebClient client = createWebClient("/web/bookstore/book%20names", true);
+        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        
+        final Response response = client
+            .accept("text/plain")
+            .get();
+        
+        assertThat(response.getStatus(), equalTo(200));
+        assertEquals("CXF in Action", response.readEntity(String.class));
+
+        client.close();
+    }
+
+    @Test
     public void testGetBookStreamHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/bookstream", true);
         assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
@@ -97,6 +112,18 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testBookWithHttp() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/booknames", false);
+        
+        try (Response resp = client.get()) {
+            assertThat(resp.getStatus(), equalTo(200));
+            assertEquals("CXF in Action", resp.readEntity(String.class));
+        }
+        
+        client.close();
+    }
+
+    @Test
+    public void testBookEncodedWithHttp() throws Exception {
+        final WebClient client = createWebClient("/web/bookstore/book%20names", false);
         
         try (Response resp = client.get()) {
             assertThat(resp.getStatus(), equalTo(200));
