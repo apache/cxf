@@ -45,8 +45,8 @@ public class JAXBUtilsTest {
     }
 
     private void correctValueType(Class<?> clazz) {
-        Field[] fields = clazz.getDeclaredFields();
-        Annotation[] paramAnns = fields[0].getDeclaredAnnotations();
+        Field field = clazz.getDeclaredFields()[0];
+        Annotation[] paramAnns = field.getDeclaredAnnotations();
         Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(LocalDate.class, LocalDate.class, paramAnns);
         Assert.assertEquals(String.class, valueType);
     }
