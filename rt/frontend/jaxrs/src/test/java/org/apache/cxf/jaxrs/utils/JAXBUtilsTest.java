@@ -51,7 +51,7 @@ public class JAXBUtilsTest {
         Assert.assertEquals(String.class, valueType);
     }
 
-    public class CustomerDetailsWithExtendedAdapter {
+    public static class CustomerDetailsWithExtendedAdapter {
         @NotNull
         @QueryParam("birthDate")
         @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
@@ -66,7 +66,7 @@ public class JAXBUtilsTest {
         }
     }
 
-    public class CustomerDetailsWithSimpleAdapter {
+    public static class CustomerDetailsWithSimpleAdapter {
         @NotNull
         @QueryParam("birthDate")
         @XmlJavaTypeAdapter(LocalDateAdapter.class)

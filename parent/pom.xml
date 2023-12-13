@@ -110,14 +110,14 @@
         <cxf.derby.version>10.16.1.1</cxf.derby.version>
         <cxf.dom4j.version>2.1.4</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
-        <cxf.dropwizard4.version>4.2.22</cxf.dropwizard4.version>
+        <cxf.dropwizard4.version>4.2.23</cxf.dropwizard4.version>
         <cxf.ehcache3.version>3.10.8</cxf.ehcache3.version>
         <cxf.el-api.version>5.0.1</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.hisrc.basicjaxb.version>2.1.1</cxf.hisrc.basicjaxb.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.openapi.version>1.0.15</cxf.geronimo.openapi.version>
-        <cxf.glassfish.el.version>4.0.0</cxf.glassfish.el.version>
+        <cxf.glassfish.el.version>4.0.2</cxf.glassfish.el.version>
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.guava.version>32.1.3-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
@@ -188,11 +188,11 @@
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.101.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.103.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
-        <cxf.opentelemetry.version>1.32.0</cxf.opentelemetry.version>
+        <cxf.opentelemetry.version>1.33.0</cxf.opentelemetry.version>
         <cxf.opentelemetry.semconv.version>1.23.1-alpha</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
@@ -201,7 +201,7 @@
         <cxf.plexus-archiver.version>4.9.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.4</cxf.reactivestreams.version>
-        <cxf.reactor.version>3.6.0</cxf.reactor.version>
+        <cxf.reactor.version>3.6.1</cxf.reactor.version>
         <cxf.rhino.version>1.7.14</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
         <cxf.rxjava2.version>2.2.21</cxf.rxjava2.version>
@@ -242,7 +242,7 @@
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
         <cxf.xnio.version>3.8.12.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
-        <cxf.zipkin-reporter.version>2.16.4</cxf.zipkin-reporter.version>
+        <cxf.zipkin-reporter.version>2.16.5</cxf.zipkin-reporter.version>
 
         <!-- various OSGi related versions -->
         <cxf.aries.api.version>1.0.1</cxf.aries.api.version>
@@ -2001,7 +2001,7 @@
             <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.3</version>
             </dependency>
             <dependency>
                 <groupId>org.ehcache</groupId>
