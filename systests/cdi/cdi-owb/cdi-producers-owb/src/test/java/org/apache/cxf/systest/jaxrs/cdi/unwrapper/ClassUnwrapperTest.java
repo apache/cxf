@@ -31,8 +31,8 @@ import org.apache.cxf.systests.cdi.base.BookStoreRequestFilter;
 import org.apache.webbeans.config.WebBeansContext;
 import org.apache.webbeans.spi.ContainerLifecycle;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -43,12 +43,12 @@ import static org.mockito.Mockito.mock;
 
 
 public class ClassUnwrapperTest {
-    private Bus bus;
-    private ContainerLifecycle lifecycle;
-    private ServletContextEvent event;
+    private static Bus bus;
+    private static ContainerLifecycle lifecycle;
+    private static ServletContextEvent event;
     
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         event = new ServletContextEvent(mock(ServletContext.class));
         lifecycle = WebBeansContext.currentInstance().getService(ContainerLifecycle.class);
         lifecycle.startApplication(event);
@@ -56,15 +56,15 @@ public class ClassUnwrapperTest {
     }
 
     @SuppressWarnings("unchecked")
-    private<T> T getBeanReference(Class<T> clazz) {
+    private static <T> T getBeanReference(Class<T> clazz) {
         final BeanManager beanManager = lifecycle.getBeanManager();
         final Set<Bean<?>> beans = beanManager.getBeans(clazz);
         final Bean<?> bean = beanManager.resolve(beans);
         return (T)beanManager.getReference(bean, clazz, beanManager.createCreationalContext(bean));
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         lifecycle.stopApplication(event);
     }
     
