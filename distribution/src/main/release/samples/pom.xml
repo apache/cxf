@@ -38,7 +38,7 @@
         <cxf.swagger.ui.version>5.10.3</cxf.swagger.ui.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>9.0.84</cxf.tomcat.version>
-        <cxf.lucene.version>9.9.0</cxf.lucene.version>
+        <cxf.lucene.version>9.9.1</cxf.lucene.version>
         <cxf.aspectj.version>1.9.21</cxf.aspectj.version>
         <cxf.brave.version>5.16.0</cxf.brave.version>
         <cxf.camel.version>3.21.1</cxf.camel.version>
