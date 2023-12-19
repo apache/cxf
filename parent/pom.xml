@@ -251,7 +251,7 @@
         <cxf.dom4j.bundle.version>2.1.3_1</cxf.dom4j.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.18_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
-        <cxf.istack.bundle.version>3.0.7</cxf.istack.bundle.version>
+        <cxf.istack.bundle.version>3.0.12</cxf.istack.bundle.version>
         <cxf.jakarta.mail.version>1.6.7</cxf.jakarta.mail.version>
         <cxf.jasypt.bundle.version>1.9.3_1</cxf.jasypt.bundle.version>
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
@@ -1632,7 +1632,7 @@
             <dependency>
                 <groupId>com.sun.istack</groupId>
                 <artifactId>istack-commons-tools</artifactId>
-                <version>3.0.11</version>
+                <version>${cxf.istack.bundle.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
