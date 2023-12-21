@@ -97,14 +97,14 @@
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.3</cxf.atmosphere.version>
         <cxf.bcprov.version>1.77</cxf.bcprov.version>
-        <cxf.brave.version>5.16.0</cxf.brave.version>
+        <cxf.brave.version>5.17.0</cxf.brave.version>
         <cxf.cdi.api.version>4.0.1</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
         <cxf.commons-codec.version>1.16.0</cxf.commons-codec.version>
         <cxf.commons-io.version>2.13.0</cxf.commons-io.version>
         <cxf.commons-jcs-jcache.version>2.2.1</cxf.commons-jcs-jcache.version>
-        <cxf.commons-lang3.version>3.13.0</cxf.commons-lang3.version>
+        <cxf.commons-lang3.version>3.14.0</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.2</cxf.commons-logging.version>
         <cxf.commons-text.version>1.10.0</cxf.commons-text.version>
         <cxf.derby.version>10.16.1.1</cxf.derby.version>
@@ -162,7 +162,7 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty11.version>11.0.18</cxf.jetty11.version>
+        <cxf.jetty11.version>11.0.19</cxf.jetty11.version>
         <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
@@ -220,7 +220,7 @@
         <cxf.spring.version>6.1.2</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.10.3</cxf.swagger.ui.version>
-        <cxf.swagger.v3.version>2.2.19</cxf.swagger.v3.version>
+        <cxf.swagger.v3.version>2.2.20</cxf.swagger.v3.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.17</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
@@ -254,7 +254,7 @@
         <cxf.dom4j.bundle.version>2.1.3_1</cxf.dom4j.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.18_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
-        <cxf.istack.bundle.version>4.2.0</cxf.istack.bundle.version>
+        <cxf.istack.version>4.2.0</cxf.istack.version>
         <cxf.jakarta.angus.mail.version>1.0.0</cxf.jakarta.angus.mail.version>
         <cxf.jakarta.angus.activation.version>2.0.1</cxf.jakarta.angus.activation.version>
         <cxf.jasypt.bundle.version>1.9.3_1</cxf.jasypt.bundle.version>
@@ -1633,7 +1633,7 @@
             <dependency>
                 <groupId>com.sun.istack</groupId>
                 <artifactId>istack-commons-tools</artifactId>
-                <version>${cxf.istack.bundle.version}</version>
+                <version>${cxf.istack.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
