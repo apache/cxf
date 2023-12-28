@@ -19,12 +19,21 @@
 
 package org.apache.cxf.ws.security.sts.provider;
 
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 public class SecurityTokenServiceImplTest {
-
     @Test
-    public void doTest() {
+    public void testCreateService() {
+        final JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setServiceBean(new SecurityTokenServiceImpl());
+        factory.setAddress("local://SecurityTokenService");
+        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
 
+        final Server server = factory.create();
+        server.destroy();
     }
 }
