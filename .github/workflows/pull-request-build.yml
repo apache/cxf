@@ -9,7 +9,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest] 
     permissions:
       contents: read  
       pull-requests: read
@@ -22,7 +25,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+      - name: Build with Apache Maven (Windows)
+        if: ${{ matrix.os == 'windows-latest' }} 
+        run: mvn -U clean install -fae -B -Peverything
       - name: Build with Apache Maven
+        if: ${{ matrix.os != 'windows-latest' }} 
         run: mvn -U clean install -Djava.awt.headless=true -fae -B -Peverything
     env: 
        MAVEN_OPTS: "-Xmx1024M"
