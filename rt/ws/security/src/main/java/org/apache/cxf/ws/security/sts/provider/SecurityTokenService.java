@@ -74,7 +74,7 @@ public interface SecurityTokenService {
               partName = "response")
     @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal")
-    @WebMethod(operationName = "Issue")
+    @WebMethod(operationName = "IssueSingle")
     RequestSecurityTokenResponseType issueSingle(
         @WebParam(partName = "request",
                   name = "RequestSecurityToken",
