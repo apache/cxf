@@ -97,7 +97,7 @@
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.3</cxf.atmosphere.version>
         <cxf.bcprov.version>1.77</cxf.bcprov.version>
-        <cxf.brave.version>5.17.0</cxf.brave.version>
+        <cxf.brave.version>5.17.1</cxf.brave.version>
         <cxf.cdi.api.version>3.0.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
