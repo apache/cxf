@@ -142,7 +142,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
             return ret;
            
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.warning("cannot create Derived Key");
             return null;
         }
     }
