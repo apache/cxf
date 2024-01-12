@@ -78,7 +78,6 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
             registeredProviders.add(new ProviderInfo<>(new DefaultResponseExceptionMapper(), getBus(), false));
         }
         registeredProviders.add(new ProviderInfo<>(new JsrJsonpProvider(), getBus(), false));
-        registeredProviders.add(new ProviderInfo<>(new JsrJsonbProvider(), getBus(), false));
         super.setProviders(registeredProviders);
     }
 
