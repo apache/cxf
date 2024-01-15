@@ -380,8 +380,8 @@ public abstract class AbstractHTTPDestination
         }
         String contentType = req.getContentType();
         inMessage.put(Message.CONTENT_TYPE, contentType);
-        setEncoding(inMessage, req, contentType);
 
+        setEncoding(inMessage, req, contentType);
         inMessage.put(Message.QUERY_STRING, req.getQueryString());
 
         inMessage.put(Message.ACCEPT_CONTENT_TYPE, req.getHeader("Accept"));

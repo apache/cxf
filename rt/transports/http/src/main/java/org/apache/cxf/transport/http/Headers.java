@@ -448,7 +448,12 @@ public class Headers {
             }
         }
         if (!headers.containsKey(Message.CONTENT_TYPE)) {
-            headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+            final String contentType = req.getContentType();
+            if (contentType != null) {
+                headers.put(Message.CONTENT_TYPE, Collections.singletonList(contentType));
+            } else {
+                headers.put(Message.CONTENT_TYPE, null);
+            }
         }
         if (LOG.isLoggable(Level.FINE)) {
             Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
