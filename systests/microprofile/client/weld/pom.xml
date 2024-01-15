@@ -181,14 +181,10 @@
                     </execution>
                 </executions>
                 <dependencies>
-                    <!-- 
-                    The end goal is to use wiremock 3.0.0 but sadly microprofile-rest-client-tck 
-                    still depends on javax.servlet (MyEventSourceServlet.java). 
-                    -->
                     <dependency>
-                        <groupId>com.github.tomakehurst</groupId>
-                        <artifactId>wiremock-jre8-standalone</artifactId>
-                        <version>3.0.1</version>
+                        <groupId>org.wiremock</groupId>
+                        <artifactId>wiremock-standalone</artifactId>
+                        <version>${cxf.wiremock.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

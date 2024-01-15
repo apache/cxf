@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.BufferOverflowException;
@@ -459,7 +458,6 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                             //then it need be on top of JettyHTTPHandler
                             //set JettyHTTPHandler as inner handler if
                             //inner handler is null
-                            //((SecurityHandler)h).setHandler(handler);
                             securityHandler = (SecurityHandler)h;
                         } else {
                             if (!(h instanceof JettyHTTPHandler)) {
@@ -1084,16 +1082,11 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                             contextHandler.getContext().destroy(servlet);
                             //need to remove path from ServletHandler._servletMappings
                             //and has to access the private field.
-                            
-                            Field privateField
-                                = ServletHandler.class.getDeclaredField("_servletMappings");
-              
-                            
-                            privateField.setAccessible(true);
-              
-                            List<ServletMapping> servletMappings  
-                                = (List<ServletMapping>)privateField.get(servletHandler);
-                            
+                            List<?> servletMappings  
+                                = ReflectionUtil.accessDeclaredField("_servletMappings",
+                                                                     ServletHandler.class, 
+                                                                     servletHandler,
+                                                                     List.class);
                             ServletMapping servletMapping = servletHandler.getServletMapping(smap);
                             servletMappings.remove(servletMapping);
                             boolean hasActiveServlet = false;
@@ -1337,7 +1330,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         this.sessionTimeout = sessionTimeout;
     }
     
-    class CxfJettyErrorHandler extends ErrorHandler {
+    private final class CxfJettyErrorHandler extends ErrorHandler {
         
         public boolean handle(Request request, Response response, Callback callback) {
             String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);

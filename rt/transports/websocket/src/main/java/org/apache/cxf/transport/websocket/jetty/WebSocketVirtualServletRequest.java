@@ -555,19 +555,16 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     }
 
     public String getRequestId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String getProtocolRequestId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ServletConnection getServletConnection() {
-        // TODO Auto-generated method stub
         return null;
     }
 }
