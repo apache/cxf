@@ -202,7 +202,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         if (uris.isEmpty()) {
             return true;
         }
-        String servletPath = request.getServletPath() + request.getPathInfo() == null ? "" : request.getPathInfo();
+        String servletPath = request.getServletPath();
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            if (servletPath != null) {
+                servletPath += "";
+            }
+        } else {
+            servletPath += pathInfo;
+        }
         if (servletPath == null) {
             servletPath = (String)m.get(Message.PATH_INFO);
         }
