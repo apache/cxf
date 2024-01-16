@@ -52,13 +52,16 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             String size = supportedAlgo.getJwaName().substring(2);
             switch (size) {
             case "256" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA256, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
+                                            "MGF1", MGF1ParameterSpec.SHA256, Integer.valueOf(size) / 8, 1);
                 break;
             case "384" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA384, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
+                                            "MGF1", MGF1ParameterSpec.SHA384, Integer.valueOf(size) / 8, 1);
                 break;
             case "512" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA512, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
+                                            "MGF1", MGF1ParameterSpec.SHA512, Integer.valueOf(size) / 8, 1);
                 break;
             default : 
                 spec = PSSParameterSpec.DEFAULT;
@@ -89,13 +92,16 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             String size = supportedAlgo.getJwaName().substring(2);
             switch (size) {
             case "256" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA256, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
+                                            "MGF1", MGF1ParameterSpec.SHA256, Integer.valueOf(size) / 8, 1);
                 break;
             case "384" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA384, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
+                                            "MGF1", MGF1ParameterSpec.SHA384, Integer.valueOf(size) / 8, 1);
                 break;
             case "512" : 
-                spec = new PSSParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA512, 20, 1);
+                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
+                                            "MGF1", MGF1ParameterSpec.SHA512, Integer.valueOf(size) / 8, 1);
                 break;
             default : 
                 spec = PSSParameterSpec.DEFAULT;
