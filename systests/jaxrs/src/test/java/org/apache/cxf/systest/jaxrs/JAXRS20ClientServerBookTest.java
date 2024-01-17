@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -81,7 +82,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -965,6 +968,22 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             
             assertEquals(expected, actual);
         }
+    }
+
+    @Test
+    public void testGetHeaders() throws Exception {
+        final WebTarget target = ClientBuilder
+            .newClient()
+            .register(JacksonXmlBindJsonProvider.class)
+            .target("http://localhost:" + PORT + "/bookstore/headers");
+
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> headers = target
+            .request().accept("application/json")
+            .get(Map.class);
+
+        assertThat(headers, hasKey("Accept"));
+        assertThat(headers, not(hasKey("Content-Type")));
     }
 
     @Test
