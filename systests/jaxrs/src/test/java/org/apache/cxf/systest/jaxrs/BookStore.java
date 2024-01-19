@@ -1837,6 +1837,13 @@ public class BookStore {
             AnnotatedClass.class.getAnnotations()).build();
     }
     
+    @GET
+    @Path("/headers")
+    @Produces("application/json")
+    public Map<String, List<String>> getHeaders() {
+        return httpHeaders.getRequestHeaders();
+    }
+    
     public final String init() {
         books.clear();
         cds.clear();

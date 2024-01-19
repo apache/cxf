@@ -41,9 +41,12 @@ import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class HttpHeadersImplTest {
@@ -197,6 +200,34 @@ public class HttpHeadersImplTest {
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("A");
         assertTrue(values.isEmpty());
+    }
+
+    @Test
+    public void testGetNullHeaderValue() throws Exception {
+
+        Message m = new MessageImpl();
+        // this is what happens at runtime and is tested in the system tests
+        Map<String, List<String>> headers =
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("A", Collections.<String>singletonList(null));
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("A");
+        assertThat(values, is(nullValue()));
+    }
+
+    @Test
+    public void testGetNullHeader() throws Exception {
+
+        Message m = new MessageImpl();
+        // this is what happens at runtime and is tested in the system tests
+        Map<String, List<String>> headers =
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("A", null);
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("A");
+        assertThat(values, is(nullValue()));
     }
 
     @Test

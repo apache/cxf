@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -87,9 +88,46 @@ public class HttpHeadersImpl implements HttpHeaders {
     private Map<String, List<String>> headers;
     public HttpHeadersImpl(Message message) {
         this.message = message;
-        this.headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        if (headers == null) {
-            headers = Collections.emptyMap();
+        this.headers = filter(CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS)));
+    }
+
+    /**
+     * Filters the protocol headers by excluding the headers that have {@code null} values.
+     * @param protocolHeaders protocol headers to filter
+     * @return filtered headers
+     */
+    private static Map<String, List<String>> filter(Map<String, List<String>> protocolHeaders) {
+        if (protocolHeaders == null) {
+            return Collections.emptyMap();
+        } else if (protocolHeaders.isEmpty()) { 
+            return protocolHeaders;
+        }
+
+        final Set<String> nullableHeader = protocolHeaders
+            .entrySet()
+            .stream()
+            .filter(e -> {
+                if (e.getValue() == null) {
+                    return true;
+                } else if (e.getValue().size() == 1) {
+                    return e.getValue().get(0) == null;
+                } else {
+                    return false;
+                }
+            })
+            .map(e -> e.getKey())
+            .collect(Collectors.toSet());
+
+        if (nullableHeader.isEmpty()) {
+            return protocolHeaders;
+        } else {
+            final Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            for (final Map.Entry<String, List<String>> entry: protocolHeaders.entrySet()) {
+                if (!nullableHeader.contains(entry.getKey())) {
+                    headers.put(entry.getKey(), entry.getValue());
+                }
+            }
+            return headers;
         }
     }
 
