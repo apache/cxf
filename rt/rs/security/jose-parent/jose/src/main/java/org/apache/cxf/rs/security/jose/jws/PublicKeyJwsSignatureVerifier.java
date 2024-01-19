@@ -22,12 +22,11 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.MGF1ParameterSpec;
-import java.security.spec.PSSParameterSpec;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -50,29 +49,13 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             && spec == null) {
             //must have spec in this case
             String size = supportedAlgo.getJwaName().substring(2);
-            switch (size) {
-            case "256" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA256, Integer.valueOf(size) / 8, 1);
-                break;
-            case "384" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
-                                            "MGF1", MGF1ParameterSpec.SHA384, Integer.valueOf(size) / 8, 1);
-                break;
-            case "512" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA512, Integer.valueOf(size) / 8, 1);
-                break;
-            default : 
-                spec = PSSParameterSpec.DEFAULT;
-            }
-            
-
+            spec = JoseUtils.createPSSParameterSpec(size);
         }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
     }
+    
     public PublicKeyJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgorithm) {
         this(cert, null, supportedAlgorithm);
     }
@@ -90,29 +73,13 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             && spec == null) {
             //must have spec in this case
             String size = supportedAlgo.getJwaName().substring(2);
-            switch (size) {
-            case "256" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA256, Integer.valueOf(size) / 8, 1);
-                break;
-            case "384" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
-                                            "MGF1", MGF1ParameterSpec.SHA384, Integer.valueOf(size) / 8, 1);
-                break;
-            case "512" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA512, Integer.valueOf(size) / 8, 1);
-                break;
-            default : 
-                spec = PSSParameterSpec.DEFAULT;
-            }
-            
-
+            spec = JoseUtils.createPSSParameterSpec(size);
         }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
     }
+    
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         try {

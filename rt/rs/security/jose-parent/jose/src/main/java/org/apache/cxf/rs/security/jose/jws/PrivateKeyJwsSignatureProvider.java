@@ -23,9 +23,8 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.MGF1ParameterSpec;
-import java.security.spec.PSSParameterSpec;
 
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -51,24 +50,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
             && spec == null) {
             //must have spec in this case
             String size = algo.getJwaName().substring(2);
-            switch (size) {
-            case "256" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA256, Integer.valueOf(size) / 8, 1);
-                break;
-            case "384" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
-                                            "MGF1", MGF1ParameterSpec.SHA384, Integer.valueOf(size) / 8, 1);
-                break;
-            case "512" : 
-                spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
-                                            "MGF1", MGF1ParameterSpec.SHA512, Integer.valueOf(size) / 8, 1);
-                break;
-            default : 
-                spec = PSSParameterSpec.DEFAULT;
-            }
-            
-
+            spec = JoseUtils.createPSSParameterSpec(size);
         }
         this.signatureSpec = spec;
     }

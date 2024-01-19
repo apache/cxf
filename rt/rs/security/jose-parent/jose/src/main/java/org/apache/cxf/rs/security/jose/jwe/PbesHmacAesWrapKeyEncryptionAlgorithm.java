@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKeyFactory;
@@ -142,7 +143,7 @@ public class PbesHmacAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvi
             return ret;
            
         } catch (Exception ex) {
-            LOG.warning("cannot create Derived Key");
+            LOG.log(Level.WARNING, "cannot create Derived Key", ex);
             return null;
         }
     }
