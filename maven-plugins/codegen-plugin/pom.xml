@@ -137,6 +137,7 @@
                 <configuration>
                     <!-- see https://issues.apache.org/jira/browse/MNG-5346 -->
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                    <goalPrefix>cxf-codegen</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
