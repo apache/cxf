@@ -58,6 +58,7 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
         assertTrue("FaultTo server did not launch correctly", launchServer(FaultToEndpointServer.class, true));
     }
 
+
     @Test
     public void testOneWayFaultTo() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");

@@ -42,6 +42,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -570,14 +571,28 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    
     public String getRealPath(String path) {
         return path;
     }
 
-    @Override
+
     public boolean isRequestedSessionIdFromUrl() {
         LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
         return false;
+    }
+
+    public String getRequestId() {
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return null;
     }
 }

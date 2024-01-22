@@ -25,14 +25,14 @@ import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+
 
 import static org.junit.Assert.fail;
 
@@ -73,9 +73,8 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             } else {
                 final WebAppContext context = new WebAppContext();
                 context.setContextPath(contextPath);
-                context.setBaseResource(Resource.newClassPathResource(resourcePath));
-
-                HandlerCollection handlers = new HandlerCollection();
+                context.setBaseResource(ResourceFactory.of(context).newClassPathResource(resourcePath));
+                Handler.Collection handlers = new Handler.Sequence();
                 handlers.setHandlers(new Handler[] {context, new DefaultHandler()});
                 server.setHandler(handlers);
             }

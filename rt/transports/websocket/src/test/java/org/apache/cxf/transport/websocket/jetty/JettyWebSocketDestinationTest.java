@@ -30,7 +30,8 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.apache.cxf.transport.websocket.jetty11.Jetty11WebSocketDestination;
+import org.apache.cxf.transport.websocket.jetty12.Jetty12WebSocketDestination;
+import org.eclipse.jetty.server.Server;
 
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class JettyWebSocketDestinationTest {
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
         JettyHTTPServerEngine engine = mock(JettyHTTPServerEngine.class);
-
+        engine.setServer(new Server());
         TestJettyWebSocketDestination dest = new TestJettyWebSocketDestination(bus, registry, endpoint, null, engine);
 
         dest.activate();
@@ -64,7 +65,7 @@ public class JettyWebSocketDestinationTest {
         assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
     }
 
-    private static class TestJettyWebSocketDestination extends Jetty11WebSocketDestination {
+    private static class TestJettyWebSocketDestination extends Jetty12WebSocketDestination {
         TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                       JettyHTTPServerEngineFactory serverEngineFactory,
                                       JettyHTTPServerEngine engine) throws IOException {
@@ -74,12 +75,16 @@ public class JettyWebSocketDestinationTest {
 
         @Override
         public void activate() {
-            super.activate();
+            synchronized (this) {
+                if (registry != null) {
+                    registry.addDestination(this);
+                }
+            }
         }
 
         @Override
         public void deactivate() {
-            super.deactivate();
+            super.deactivate();                
         }
     }
 }

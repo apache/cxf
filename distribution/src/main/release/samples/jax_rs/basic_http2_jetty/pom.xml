@@ -107,7 +107,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>http2-server</artifactId>
+            <artifactId>jetty-http2-server</artifactId>
             <version>${cxf.jetty11.version}</version>
         </dependency>
         <dependency>

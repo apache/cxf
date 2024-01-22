@@ -144,13 +144,17 @@
             </dependency>
             <dependency>
                 <groupId>org.wiremock</groupId>
-                <artifactId>wiremock</artifactId>
+                <artifactId>wiremock-standalone</artifactId>
                 <version>${cxf.wiremock.version}</version>
                 <scope>test</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>org.xmlunit</groupId>
                         <artifactId>xmlunit-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.*</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

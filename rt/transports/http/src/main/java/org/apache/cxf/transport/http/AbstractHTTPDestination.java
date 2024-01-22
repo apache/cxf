@@ -350,12 +350,26 @@ public abstract class AbstractHTTPDestination
         if (contextPath == null) {
             contextPath = "";
         }
-        String servletPath = req.getServletPath();
+        String servletPath = null;
+        try {
+            servletPath = req.getServletPath();
+        } catch (Exception ex) {
+            //could be AmbiguousURI per RFC
+            //and Jetty 12 can't handle it right now
+            servletPath = requestURI;
+        }
+        
         if (servletPath == null) {
             servletPath = "";
         }
         String contextServletPath = contextPath + servletPath;
-        String pathInfo = req.getPathInfo();
+        String pathInfo = null;
+        try {
+            pathInfo = req.getPathInfo();
+        } catch (Exception ex) {
+            //could be AmbiguousURI per RFC
+            //and Jetty 12 can't handle it right now
+        }
         if (pathInfo != null) {
             inMessage.put(Message.PATH_INFO, contextServletPath + pathInfo);
         } else {
@@ -394,7 +408,11 @@ public abstract class AbstractHTTPDestination
 
         SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
-                return req.getUserPrincipal();
+                try {
+                    return req.getUserPrincipal();
+                } catch (Exception ex) {
+                    return null;
+                }
             }
             public boolean isUserInRole(String role) {
                 return req.isUserInRole(role);

@@ -20,17 +20,17 @@
 package org.apache.cxf.systest.jaxrs;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
 
-    private org.eclipse.jetty.server.Server server;
-    private String resourcePath;
-    private String contextPath;
-    private int port;
+    protected org.eclipse.jetty.server.Server server;
+    protected String resourcePath;
+    protected String contextPath;
+    protected int port;
 
     protected AbstractSpringServer(String path, int portNumber) {
         this(path, "/", portNumber);
@@ -47,9 +47,9 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath(contextPath);
-        webappcontext.setBaseResource(Resource.newClassPathResource(resourcePath));
-
-        server.setHandler(new HandlerCollection(webappcontext, new DefaultHandler()));
+        webappcontext.setBaseResource(ResourceFactory.of(webappcontext).newClassPathResource(resourcePath));
+        webappcontext.setThrowUnavailableOnStartupException(true);
+        server.setHandler(new Handler.Sequence(webappcontext, new DefaultHandler()));
 
         try {
             configureServer(server);
@@ -71,4 +71,6 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
             server = null;
         }
     }
+    
+    
 }

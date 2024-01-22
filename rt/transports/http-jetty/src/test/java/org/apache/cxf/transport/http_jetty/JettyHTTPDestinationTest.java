@@ -70,9 +70,10 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.eclipse.jetty.ee10.servlet.ServletRequestHttpWrapper;
+import org.eclipse.jetty.ee10.servlet.ServletResponseHttpWrapper;
 import org.eclipse.jetty.http.HttpFields;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
+
 
 import org.junit.After;
 import org.junit.Test;
@@ -110,8 +111,8 @@ public class JettyHTTPDestinationTest {
     private JettyHTTPServerEngine engine;
     private HTTPServerPolicy policy;
     private JettyHTTPDestination destination;
-    private Request request;
-    private Response response;
+    private ServletRequestHttpWrapper request;
+    private ServletResponseHttpWrapper response;
     private Message inMessage;
     private Message outMessage;
     private MessageObserver observer;
@@ -620,8 +621,8 @@ public class JettyHTTPDestinationTest {
 
         is = mock(ServletInputStream.class);
         os = mock(ServletOutputStream.class);
-        request = mock(Request.class);
-        response = mock(Response.class);
+        request = mock(ServletRequestHttpWrapper.class);
+        response = mock(ServletResponseHttpWrapper.class);
         when(request.getMethod()).thenReturn(method);
         //request.getConnection();
         //whenLastCall().thenReturn(null).anyTimes();
@@ -631,7 +632,6 @@ public class JettyHTTPDestinationTest {
             policy.setRedirectURL(NOWHERE + "foo/bar");
             doNothing().when(response).sendRedirect(eq(NOWHERE + "foo/bar"));
             doNothing().when(response).flushBuffer();
-            doNothing().when(request).setHandled(true);
         } else {
             //getQueryString for if statement
             when(request.getQueryString()).thenReturn(query);
@@ -670,7 +670,6 @@ public class JettyHTTPDestinationTest {
                     httpFields.getValues(JettyHTTPDestinationTest.AUTH_HEADER));
 
                 when(request.getInputStream()).thenReturn(is);
-                doNothing().when(request).setHandled(true);
                 doNothing().when(response).flushBuffer();
                 if (sendResponse) {
                     doNothing().when(response).setStatus(status);
@@ -729,7 +728,6 @@ public class JettyHTTPDestinationTest {
         when(request.getQueryString()).thenReturn("wsdl");
         doNothing().when(response).setContentType("text/xml");
         doNothing().when(response).getOutputStream();
-        request.setHandled(true);
     }
 
     private void verifyDoService() throws Exception {

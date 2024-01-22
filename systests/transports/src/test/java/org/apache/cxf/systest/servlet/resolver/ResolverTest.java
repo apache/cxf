@@ -21,12 +21,12 @@ package org.apache.cxf.systest.servlet.resolver;
 
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+
 
 import org.junit.Test;
 
@@ -40,11 +40,8 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/resolver");
-        webappcontext.setBaseResource(Resource.newClassPathResource("/resolver"));
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-        server.setHandler(handlers);
+        webappcontext.setBaseResource(ResourceFactory.of(webappcontext).newClassPathResource("/resolver"));
+        server.setHandler(new Handler.Sequence(webappcontext, new DefaultHandler()));
         server.start();
         Throwable e = webappcontext.getUnavailableException();
         if (e != null) {

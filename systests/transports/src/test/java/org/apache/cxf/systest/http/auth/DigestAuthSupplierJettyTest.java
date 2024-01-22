@@ -30,15 +30,15 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 
 import org.junit.BeforeClass;
@@ -87,13 +87,13 @@ public class DigestAuthSupplierJettyTest extends AbstractClientServerTestBase {
             userStore.addUser(USER, Credential.getCredential(PWD), roles);
             loginService.setUserStore(userStore);
 
-            Constraint constraint = new Constraint();
-            constraint.setName(Constraint.__DIGEST_AUTH);
-            constraint.setRoles(roles);
-            constraint.setAuthenticate(true);
-
+            Constraint.Builder constraint = new Constraint.Builder();
+            constraint.name("DIGEST_AUTH");
+            constraint.roles(roles);
+            
+            
             ConstraintMapping cm = new ConstraintMapping();
-            cm.setConstraint(constraint);
+            cm.setConstraint(constraint.build());
             cm.setPathSpec("/*");
 
             ConstraintSecurityHandler csh = new ConstraintSecurityHandler();

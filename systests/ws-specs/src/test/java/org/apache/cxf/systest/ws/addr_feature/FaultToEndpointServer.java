@@ -19,13 +19,11 @@
 package org.apache.cxf.systest.ws.addr_feature;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Future;
 
 import jakarta.jws.WebService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.Endpoint;
@@ -46,8 +44,9 @@ import org.apache.hello_world_soap_http.types.GreetMeSometimeResponse;
 import org.apache.hello_world_soap_http.types.SayHiResponse;
 import org.apache.hello_world_soap_http.types.TestDocLitFaultResponse;
 import org.apache.hello_world_soap_http.types.TestNillableResponse;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.server.Handler;
+
 
 public class FaultToEndpointServer extends AbstractBusTestServerBase {
     static final String FAULT_PORT = allocatePort(FaultToEndpointServer.class);
@@ -58,7 +57,7 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
     private org.eclipse.jetty.server.Server faultToserver;
     protected void run()  {
         faultToserver = new org.eclipse.jetty.server.Server(Integer.parseInt(FAULT_PORT));
-        faultToserver.setHandler(new HelloHandler());
+        faultToserver.setDefaultHandler(new HelloHandler());
         try {
             faultToserver.start();
         } catch (Exception e) {
@@ -109,31 +108,32 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
 
 
 
-    public static class HelloHandler extends AbstractHandler {
+    public static class HelloHandler extends Handler.Abstract {
         private static String faultRequestPath;
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request,
-                           HttpServletResponse response) throws IOException, ServletException {
-            response.setContentType("text/html;charset=utf-8");
+        public boolean handle(org.eclipse.jetty.server.Request req,
+                           org.eclipse.jetty.server.Response resp,
+                           org.eclipse.jetty.util.Callback callback) throws IOException, ServletException {
+            
+            resp.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/html;charset=utf-8");
 
             //System.out.println("In handler: " + request.getContentLength());
 
             byte[] bytes = new byte[1024];
-            InputStream in = request.getInputStream();
-            while (in.read(bytes) > -1) {
+            
+            while (!req.consumeAvailable()) {
                 //nothing
             }
 
-            faultRequestPath = request.getPathInfo();
+            faultRequestPath = req.getContext().getPathInContext(req.getHttpURI().getCanonicalPath());
             if ("/faultTo".equals(faultRequestPath)) {
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
-            PrintWriter writer = response.getWriter();
-            writer.println("Received");
-            writer.close();
-            baseRequest.setHandled(true);
+            ByteBuffer buffer = ByteBuffer.wrap("Received".getBytes());
+            resp.write(true, buffer, callback);
+            return true;
         }
 
         public static String getFaultRequestPath() {

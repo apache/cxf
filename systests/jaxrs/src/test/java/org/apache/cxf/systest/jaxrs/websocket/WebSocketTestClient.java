@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -54,9 +55,10 @@ class WebSocketTestClient implements Closeable {
     private final AsyncHttpClient client = new DefaultAsyncHttpClient();
     private final WebSocket websocket;
 
-    WebSocketTestClient(String url) throws InterruptedException, ExecutionException {
+    WebSocketTestClient(String url) throws InterruptedException, ExecutionException, TimeoutException {
         websocket = Objects.requireNonNull(client.prepareGet(url).execute(
-            new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get());
+            new WebSocketUpgradeHandler.Builder().addWebSocketListener(
+                new WsSocketListener()).build()).get(1000, TimeUnit.SECONDS));
         reset(1);
     }
 
