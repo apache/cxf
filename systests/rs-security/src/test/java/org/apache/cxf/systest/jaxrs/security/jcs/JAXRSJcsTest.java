@@ -20,15 +20,12 @@
 package org.apache.cxf.systest.jaxrs.security.jcs;
 
 import java.net.URL;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
@@ -44,18 +41,9 @@ public class JAXRSJcsTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookJcsServer.class, true));
-        registerBouncyCastleIfNeeded();
     }
 
-    private static void registerBouncyCastleIfNeeded() throws Exception {
-        // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
+    
 
     @org.junit.Test
     public void testJcsString() throws Exception {

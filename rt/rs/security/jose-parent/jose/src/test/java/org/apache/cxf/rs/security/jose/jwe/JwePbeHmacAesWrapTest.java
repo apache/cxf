@@ -19,27 +19,16 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Security;
 
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class JwePbeHmacAesWrapTest {
-    @Before
-    public void registerBouncyCastleIfNeeded() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-    @After
-    public void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
+    
     @Test
     public void testEncryptDecryptPbesHmacAesWrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";

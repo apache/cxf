@@ -192,11 +192,6 @@
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
             <version>${cxf.ldapsdk.version}</version>

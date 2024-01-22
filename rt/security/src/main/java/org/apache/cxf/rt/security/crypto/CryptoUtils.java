@@ -29,10 +29,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -58,7 +56,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.DestroyFailedException;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
@@ -72,17 +69,6 @@ import org.apache.cxf.helpers.JavaUtils;
 public final class CryptoUtils {
 
     private CryptoUtils() {
-    }
-
-    public static void installBouncyCastleProvider() throws Exception {
-        final String bcClassName = "org.bouncycastle.jce.provider.BouncyCastleProvider";
-        if (Security.getProvider(bcClassName) == null) {
-            Security.addProvider((Provider)ClassLoaderUtils.loadClass(bcClassName, CryptoUtils.class)
-                                 .getDeclaredConstructor().newInstance());
-        }
-    }
-    public static void removeBouncyCastleProvider() {
-        Security.removeProvider("org.bouncycastle.jce.provider.BouncyCastleProvider");
     }
 
     public static String encodeSecretKey(SecretKey key) throws SecurityException {
@@ -592,6 +578,11 @@ public final class CryptoUtils {
         try {
             String algorithm = keyProps != null && keyProps.getKeyAlgo() != null
                 ? keyProps.getKeyAlgo() : secretKey.getAlgorithm();
+            if (algorithm.equals("AESWrap")) {
+                int keySize = secretKey.getEncoded().length;
+                algorithm = "AESWrap_" + keySize * 8;
+                secretKey = new SecretKeySpec(secretKey.getEncoded(), 0, keySize, "AES");
+            }
             Cipher c = Cipher.getInstance(algorithm);
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {
                 c.init(mode, secretKey);

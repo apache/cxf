@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jwk;
 
 import java.io.InputStream;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweCompactConsumer;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Test;
 
@@ -125,46 +123,38 @@ public class JsonWebKeyTest {
     @Test
     public void testEncryptDecryptPrivateSet() throws Exception {
         final String password = "Thus from my lips, by yours, my sin is purged.";
-        Security.addProvider(new BouncyCastleProvider());
-        try {
-            JsonWebKeys jwks = readKeySet("jwkPrivateSet.txt");
-            validatePrivateSet(jwks);
-            String encryptedKeySet = JwkUtils.encryptJwkSet(jwks, password.toCharArray());
-            JweCompactConsumer c = new JweCompactConsumer(encryptedKeySet);
-            assertEquals("jwk-set+json", c.getJweHeaders().getContentType());
-            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
-            assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
-            assertNotNull(c.getJweHeaders().getHeader("p2s"));
-            assertNotNull(c.getJweHeaders().getHeader("p2c"));
-            jwks = JwkUtils.decryptJwkSet(encryptedKeySet, password.toCharArray());
-            validatePrivateSet(jwks);
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        }
+
+        JsonWebKeys jwks = readKeySet("jwkPrivateSet.txt");
+        validatePrivateSet(jwks);
+        String encryptedKeySet = JwkUtils.encryptJwkSet(jwks, password.toCharArray());
+        JweCompactConsumer c = new JweCompactConsumer(encryptedKeySet);
+        assertEquals("jwk-set+json", c.getJweHeaders().getContentType());
+        assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
+        assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
+        assertNotNull(c.getJweHeaders().getHeader("p2s"));
+        assertNotNull(c.getJweHeaders().getHeader("p2c"));
+        jwks = JwkUtils.decryptJwkSet(encryptedKeySet, password.toCharArray());
+        validatePrivateSet(jwks);
+
     }
     @Test
     public void testEncryptDecryptPrivateKey() throws Exception {
         final String password = "Thus from my lips, by yours, my sin is purged.";
-        final String key = "{\"kty\":\"oct\","
-            + "\"alg\":\"A128KW\","
-            + "\"k\":\"GawgguFyGrWKav7AX4VKUg\","
-            + "\"kid\":\"AesWrapKey\"}";
-        Security.addProvider(new BouncyCastleProvider());
-        try {
-            JsonWebKey jwk = readKey(key);
-            validateSecretAesKey(jwk);
-            String encryptedKey = JwkUtils.encryptJwkKey(jwk, password.toCharArray());
-            JweCompactConsumer c = new JweCompactConsumer(encryptedKey);
-            assertEquals("jwk+json", c.getJweHeaders().getContentType());
-            assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
-            assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
-            assertNotNull(c.getJweHeaders().getHeader("p2s"));
-            assertNotNull(c.getJweHeaders().getHeader("p2c"));
-            jwk = JwkUtils.decryptJwkKey(encryptedKey, password.toCharArray());
-            validateSecretAesKey(jwk);
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        }
+        final String key = "{\"kty\":\"oct\"," + "\"alg\":\"A128KW\"," + "\"k\":\"GawgguFyGrWKav7AX4VKUg\","
+                           + "\"kid\":\"AesWrapKey\"}";
+
+        JsonWebKey jwk = readKey(key);
+        validateSecretAesKey(jwk);
+        String encryptedKey = JwkUtils.encryptJwkKey(jwk, password.toCharArray());
+        JweCompactConsumer c = new JweCompactConsumer(encryptedKey);
+        assertEquals("jwk+json", c.getJweHeaders().getContentType());
+        assertEquals(KeyAlgorithm.PBES2_HS256_A128KW, c.getJweHeaders().getKeyEncryptionAlgorithm());
+        assertEquals(ContentAlgorithm.A128CBC_HS256, c.getJweHeaders().getContentEncryptionAlgorithm());
+        assertNotNull(c.getJweHeaders().getHeader("p2s"));
+        assertNotNull(c.getJweHeaders().getHeader("p2c"));
+        jwk = JwkUtils.decryptJwkKey(encryptedKey, password.toCharArray());
+        validateSecretAesKey(jwk);
+
     }
 
     @Test

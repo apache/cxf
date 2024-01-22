@@ -18,24 +18,19 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.security.Security;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -60,20 +55,7 @@ public class JweJsonConsumerTest {
         + "\"tag\":\"oVUQGS9608D-INq61-vOaA\""
         + "}";
 
-    @BeforeClass
-    public static void registerBouncyCastleIfNeeded() throws Exception {
-        try {
-            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
-        } catch (Throwable t) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
-
+    
     @Test
     public void testSingleRecipientGcm() throws Exception {
         final String text = "The true sign of intelligence is not knowledge but imagination.";

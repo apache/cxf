@@ -49,12 +49,6 @@
             <artifactId>cxf-rt-rs-json-basic</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional> 
-        </dependency>
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>

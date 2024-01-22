@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -36,10 +35,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -86,19 +82,7 @@ public class JweCompactReaderWriterTest {
         + ".KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY"
         + ".U0m_YmjN04DJvceFICbCVQ";
 
-    @BeforeClass
-    public static void registerBouncyCastleIfNeeded() throws Exception {
-        try {
-            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
-        } catch (Throwable t) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
+    
 
     @Test
     public void testEncryptDecryptAesWrapA128CBCHS256() throws Exception {

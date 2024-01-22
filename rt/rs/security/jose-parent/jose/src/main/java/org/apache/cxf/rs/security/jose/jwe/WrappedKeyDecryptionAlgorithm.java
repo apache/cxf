@@ -54,7 +54,7 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
                                             getCekDecryptionKey(), keyProps);
         }
         return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
-                                           getContentEncryptionAlgorithm(jweDecryptionInput),
+                                           getKeyEncryptionAlgorithm(jweDecryptionInput),
                                            getCekDecryptionKey(),
                                            keyProps).getEncoded();
     }

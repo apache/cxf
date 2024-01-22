@@ -20,6 +20,8 @@ package org.apache.cxf.rs.security.jose.jwa;
 
 import org.apache.cxf.rs.security.jose.support.ApacheCXFConsumer;
 
+
+
 public class CxfDecryptRfcTest extends JwaDecryptRfcConformanceTest {
 
     private ApacheCXFConsumer consumer = new ApacheCXFConsumer();

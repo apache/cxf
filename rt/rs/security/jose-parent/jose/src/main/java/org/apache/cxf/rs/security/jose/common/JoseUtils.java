@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -214,6 +217,27 @@ public final class JoseUtils {
             props.load(is);
             return props;
         }
+    }
+    
+    public static AlgorithmParameterSpec createPSSParameterSpec(String size) {
+        AlgorithmParameterSpec spec;
+        switch (size) {
+        case "256" : 
+            spec = new PSSParameterSpec(MGF1ParameterSpec.SHA256.getDigestAlgorithm(), 
+                                        "MGF1", MGF1ParameterSpec.SHA256, Integer.parseInt(size) / 8, 1);
+            break;
+        case "384" : 
+            spec = new PSSParameterSpec(MGF1ParameterSpec.SHA384.getDigestAlgorithm(),  
+                                        "MGF1", MGF1ParameterSpec.SHA384, Integer.parseInt(size) / 8, 1);
+            break;
+        case "512" : 
+            spec = new PSSParameterSpec(MGF1ParameterSpec.SHA512.getDigestAlgorithm(), 
+                                        "MGF1", MGF1ParameterSpec.SHA512, Integer.parseInt(size) / 8, 1);
+            break;
+        default : 
+            spec = PSSParameterSpec.DEFAULT;
+        }
+        return spec;
     }
 
     //

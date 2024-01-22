@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
-import java.security.Security;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,9 +34,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartClientRespons
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -50,16 +47,6 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerJwsMultipart.class, true));
-        registerBouncyCastleIfNeeded();
-    }
-
-    private static void registerBouncyCastleIfNeeded() throws Exception {
-        // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
 
     @Test
