@@ -20,6 +20,7 @@ package org.apache.cxf.systest.ws.wssec11.server;
 
 import jakarta.jws.WebService;
 import jakarta.xml.ws.Endpoint;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.KeystorePasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -38,24 +39,60 @@ abstract class AbstractServer extends AbstractBusTestServerBase {
     }
 
     protected void run() {
-        doPublish(baseUrl + "/APingService", new APingService());
-        doPublish(baseUrl + "/A-NoTimestampPingService", new ANoTimestampPingService());
-        doPublish(baseUrl + "/ADPingService", new ADPingService());
-        doPublish(baseUrl + "/A-ESPingService", new AESPingService());
-        doPublish(baseUrl + "/AD-ESPingService", new ADESPingService());
-        doPublish(baseUrl + "/UXPingService", new UXPingService());
-        doPublish(baseUrl + "/UX-NoTimestampPingService", new UXNoTimestampPingService());
-        doPublish(baseUrl + "/UXDPingService", new UXDPingService());
-        doPublish(baseUrl + "/UX-SEESPingService", new UXSEESPingService());
-        doPublish(baseUrl + "/UXD-SEESPingService", new UXDSEESPingService());
-        doPublish(baseUrl + "/XPingService", new XPingService());
-        doPublish(baseUrl + "/X-NoTimestampPingService", new XNoTimestampPingService());
-        doPublish(baseUrl + "/X-AES128PingService", new XAES128PingService());
-        doPublish(baseUrl + "/X-AES256PingService", new XAES256PingService());
-        doPublish(baseUrl + "/X-TripleDESPingService", new XTripleDESPingService());
-        doPublish(baseUrl + "/XDPingService", new XDPingService());
-        doPublish(baseUrl + "/XD-ESPingService", new XDESPingService());
-        doPublish(baseUrl + "/XD-SEESPingService", new XDSEESPingService());
+        doPublish(baseUrl + "/APingService", JavaUtils.isFIPSEnabled()
+                  ? new APingServiceFips()
+                      : new APingService());
+        doPublish(baseUrl + "/A-NoTimestampPingService", JavaUtils.isFIPSEnabled()
+                  ? new ANoTimestampPingServiceFips()
+                      : new ANoTimestampPingService());
+        doPublish(baseUrl + "/ADPingService", JavaUtils.isFIPSEnabled()
+                  ? new ADPingServiceFips()
+                      : new ADPingService());
+        doPublish(baseUrl + "/A-ESPingService", JavaUtils.isFIPSEnabled()
+                  ? new AESPingServiceFips()
+                      : new AESPingService());
+        doPublish(baseUrl + "/AD-ESPingService", JavaUtils.isFIPSEnabled()
+                  ? new ADESPingServiceFips()
+                      : new ADESPingService());
+        doPublish(baseUrl + "/UXPingService", JavaUtils.isFIPSEnabled()
+                  ? new UXPingServiceFips()
+                      : new UXPingService());
+        doPublish(baseUrl + "/UX-NoTimestampPingService", JavaUtils.isFIPSEnabled()
+                  ? new UXNoTimestampPingServiceFips()
+                      : new UXNoTimestampPingService());
+        doPublish(baseUrl + "/UXDPingService", JavaUtils.isFIPSEnabled()
+                  ? new UXDPingServiceFips()
+                      : new UXDPingService());
+        doPublish(baseUrl + "/UX-SEESPingService", JavaUtils.isFIPSEnabled()
+                  ? new UXSEESPingServiceFips()
+                      : new UXSEESPingService());
+        doPublish(baseUrl + "/UXD-SEESPingService", JavaUtils.isFIPSEnabled()
+                  ? new UXDSEESPingServiceFips()
+                      : new UXDSEESPingService());
+        doPublish(baseUrl + "/XPingService", JavaUtils.isFIPSEnabled()
+                  ? new XPingServiceFips()
+                      : new XPingService());
+        doPublish(baseUrl + "/X-NoTimestampPingService", JavaUtils.isFIPSEnabled()
+                  ? new XNoTimestampPingServiceFips()
+                      : new XNoTimestampPingService());
+        doPublish(baseUrl + "/X-AES128PingService", JavaUtils.isFIPSEnabled()
+                  ? new XAES128PingServiceFips()
+                      : new XAES128PingService());
+        doPublish(baseUrl + "/X-AES256PingService", JavaUtils.isFIPSEnabled()
+                  ? new XAES256PingServiceFips()
+                      : new XAES256PingService());
+        doPublish(baseUrl + "/X-TripleDESPingService", JavaUtils.isFIPSEnabled()
+                  ? new XTripleDESPingServiceFips()
+                      : new XTripleDESPingService());
+        doPublish(baseUrl + "/XDPingService", JavaUtils.isFIPSEnabled()
+                  ? new XDPingServiceFips()
+                      : new XDPingService());
+        doPublish(baseUrl + "/XD-ESPingService", JavaUtils.isFIPSEnabled()
+                  ? new XDESPingServiceFips()
+                      : new XDESPingService());
+        doPublish(baseUrl + "/XD-SEESPingService", JavaUtils.isFIPSEnabled()
+                  ? new XDSEESPingServiceFips()
+                      : new XDSEESPingService());
     }
     private void doPublish(String url, Object obj) {
         Endpoint ep = Endpoint.create(obj);
@@ -203,6 +240,143 @@ abstract class AbstractServer extends AbstractBusTestServerBase {
                 endpointInterface = "wssec.wssec11.IPingService",
                 wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11.wsdl")
     public static class XTripleDESPingService extends PingService {
+    }
+    
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "A_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class APingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "A-NoTimestamp_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class ANoTimestampPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "AD_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class ADPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "A-ES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class AESPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "AD-ES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class ADESPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "UX_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class UXPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "UX-NoTimestamp_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class UXNoTimestampPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "UXD_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class UXDPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "UX-SEES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class UXSEESPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "UXD-SEES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class UXDSEESPingServiceFips extends PingService {
+    }
+
+
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "X_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "X-NoTimestamp_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XNoTimestampPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "XD_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XDPingServiceFips extends PingService {
+    }
+
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "XD-ES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XDESPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "XD-SEES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XDSEESPingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "X-AES128_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XAES128PingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "X-AES256_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XAES256PingServiceFips extends PingService {
+    }
+    @WebService(targetNamespace = "http://WSSec/wssec11",
+        serviceName = "PingService11",
+        portName = "X-TripleDES_IPingService",
+        endpointInterface = "wssec.wssec11.IPingService",
+        wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec11/WsSecurity11-fips.wsdl")
+    public static class XTripleDESPingServiceFips extends PingService {
     }
 
 }

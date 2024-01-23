@@ -25,6 +25,7 @@ import java.util.Collections;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -130,7 +131,9 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(accessToken.getTokenKey());
         JwsSignatureVerifier verifier = JwsUtils.loadSignatureVerifier(
-            "org/apache/cxf/systest/jaxrs/security/alice.rs.properties", null);
+            JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/alice.rs.properties", null);
         assertTrue(jwtConsumer.verifySignatureWith(verifier));
         JwtClaims claims = jwtConsumer.getJwtClaims();
         assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
@@ -161,13 +164,17 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
     public static class BookServerOAuth2FiltersJwt extends AbstractBusTestServerBase {
         @Override
         protected void run() {
-            setBus(new SpringBusFactory().createBus(getClass().getResource("filters-serverJwt.xml")));
+            setBus(new SpringBusFactory().createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                                                           ? "filters-serverJwt-fips.xml"
+                                                                               : "filters-serverJwt.xml")));
         }
     }
 
     public static class BookServerOAuth2ServiceJwt extends AbstractBusTestServerBase {
         protected void run() {
-            setBus(new SpringBusFactory().createBus(getClass().getResource("oauth20-serverJwt.xml")));
+            setBus(new SpringBusFactory().createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                                                           ? "oauth20-serverJwt-fips.xml"
+                                                                               : "oauth20-serverJwt.xml")));
         }
     }
 

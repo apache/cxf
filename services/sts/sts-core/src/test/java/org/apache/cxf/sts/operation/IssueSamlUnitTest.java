@@ -32,6 +32,7 @@ import org.w3c.dom.Text;
 
 import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -432,7 +433,9 @@ public class IssueSamlUnitTest {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(
+                JavaUtils.isFIPSEnabled() 
+                    ? WSS4JConstants.AES_128_GCM : WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -833,9 +836,14 @@ public class IssueSamlUnitTest {
         WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo("mystskey");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
+        builder.setKeyEncAlgo(
+                JavaUtils.isFIPSEnabled() 
+                    ? WSS4JConstants.KEYTRANSPORT_RSA15 
+                        : WSS4JConstants.KEYTRANSPORT_RSAOAEP);
 
-        KeyGenerator keyGen = KeyUtils.getKeyGenerator(WSConstants.AES_128);
+        KeyGenerator keyGen = KeyUtils.getKeyGenerator(
+                JavaUtils.isFIPSEnabled() 
+                    ? WSConstants.AES_128_GCM : WSConstants.AES_128);
         SecretKey symmetricKey = keyGen.generateKey();
 
         builder.prepare(stsProperties.getSignatureCrypto(), symmetricKey);

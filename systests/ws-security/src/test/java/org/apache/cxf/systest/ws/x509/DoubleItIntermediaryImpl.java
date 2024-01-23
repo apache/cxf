@@ -28,6 +28,7 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItFault;
@@ -47,7 +48,9 @@ public class DoubleItIntermediaryImpl extends AbstractBusClientServerTestBase im
 
     public int doubleIt(int numberToDouble) throws DoubleItFault {
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
         DoubleItPortType x509Port =

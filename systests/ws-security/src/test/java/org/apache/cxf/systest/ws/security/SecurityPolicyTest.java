@@ -51,6 +51,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
@@ -67,6 +68,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortTypeHeader;
 import org.example.schema.doubleit.DoubleIt;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -116,7 +118,10 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @BeforeClass
     public static void init() throws Exception {
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(
+                                                        JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
 
         createStaticBus(SecurityPolicyTest.class.getResource("https_config.xml").toString())
             .getExtension(PolicyEngine.class).setEnabled(true);
@@ -170,13 +175,17 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         setCryptoProperties(ei, "alice.properties", "bob.properties");
 
         ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_PROVIDER_ADDRESS,
-                                            new DoubleItProvider());
+                                            JavaUtils.isFIPSEnabled()
+                                            ? new DoubleItProviderFips()
+                                                : new DoubleItProvider());
 
         ei = ep.getServer().getEndpoint().getEndpointInfo();
         setCryptoProperties(ei, "bob.properties", "alice.properties");
 
         ep = (EndpointImpl)Endpoint.publish(POLICY_FAULT_SIGNENC_PROVIDER_ADDRESS,
-                                            new DoubleItFaultProvider());
+                                            JavaUtils.isFIPSEnabled()
+                                            ? new DoubleItFaultProviderFips()
+                                                : new DoubleItFaultProvider());
 
         ei = ep.getServer().getEndpoint().getEndpointInfo();
         setCryptoProperties(ei, "bob.properties", "alice.properties");
@@ -228,6 +237,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
     @Test
     public void testPolicy() throws Exception {
+        //fips : TripleDes not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         SpringBusFactory bf = new SpringBusFactory();
 
         URL busFile = SecurityPolicyTest.class.getResource("https_config_client.xml");
@@ -359,7 +370,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         DoubleItPortType pt;
@@ -414,6 +427,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
     @Test
     public void testDispatchClient() throws Exception {
+        //fips : TripleDes not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         SpringBusFactory bf = new SpringBusFactory();
 
         Bus bus = bf.createBus();
@@ -505,6 +520,61 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         }
 
     }
+    
+    @WebServiceProvider(targetNamespace = "http://www.example.org/contract/DoubleIt", 
+        portName = "DoubleItPortSignThenEncrypt", 
+        serviceName = "DoubleItService", 
+        wsdlLocation = "classpath:/org/apache/cxf/systest/ws/security/DoubleIt-fips.wsdl")
+    @ServiceMode(value = Mode.PAYLOAD)
+    public static class DoubleItProviderFips implements Provider<Source> {
+
+        public Source invoke(Source obj) {
+            //CHECK the incoming
+
+            Node el;
+            try {
+                el = StaxUtils.read(obj);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if (el instanceof Document) {
+                el = ((Document)el).getDocumentElement();
+            }
+            Map<String, String> ns = new HashMap<>();
+            ns.put("ns2", "http://www.example.org/schema/DoubleIt");
+            XPathUtils xp = new XPathUtils(ns);
+            String o = (String)xp.getValue("//ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);
+            int i = Integer.parseInt(o);
+
+            String req = "<ns2:DoubleItResponse xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
+                         + "<doubledNumber>" + Integer.toString(i * 2)
+                         + "</doubledNumber></ns2:DoubleItResponse>";
+            return new StreamSource(new StringReader(req));
+        }
+
+    }
+
+    @WebServiceProvider(targetNamespace = "http://www.example.org/contract/DoubleIt", 
+        portName = "DoubleItFaultPortSignThenEncrypt", 
+        serviceName = "DoubleItService", 
+        wsdlLocation = "classpath:/org/apache/cxf/systest/ws/security/DoubleIt-fips.wsdl")
+    @ServiceMode(value = Mode.MESSAGE)
+    public static class DoubleItFaultProviderFips implements Provider<SOAPMessage> {
+
+        public SOAPMessage invoke(SOAPMessage request) {
+            try {
+                MessageFactory messageFactory = MessageFactory.newInstance();
+                SOAPMessage msg = messageFactory.createMessage();
+                msg.getSOAPBody().addFault(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Server"),
+                                           "Foo");
+                return msg;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+    }
 
     @Test
     public void testCXF3041() throws Exception {
@@ -514,7 +584,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         DoubleItPortType pt;
@@ -549,7 +621,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         DoubleItPortType pt;
@@ -584,7 +658,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         DoubleItPortTypeHeader pt;
@@ -616,7 +692,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         DoubleItPortTypeHeader pt;
@@ -651,7 +729,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public void testCXF4122() throws Exception {
         Bus epBus = BusFactory.newInstance().createBus();
         BusFactory.setDefaultBus(epBus);
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         DoubleItPortTypeImpl implementor = new DoubleItPortTypeImpl();
         implementor.setEnforcePrincipal(false);
         EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
@@ -709,6 +789,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
     @Test
     public void testFault() throws Exception {
+        //fips : TripleDes not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         SpringBusFactory bf = new SpringBusFactory();
 
         URL busFile = SecurityPolicyTest.class.getResource("https_config_client.xml");
@@ -716,7 +798,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecurityPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "DoubleIt-fips.wsdl"
+                                                            : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         QName portQName = new QName(NAMESPACE, "DoubleItFaultPortSignThenEncrypt");

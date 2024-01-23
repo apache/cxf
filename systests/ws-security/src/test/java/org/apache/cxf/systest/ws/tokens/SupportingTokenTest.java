@@ -29,6 +29,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -109,7 +110,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = SupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "client-fips.xml"
+                                                                : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -173,7 +176,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = SupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "client-fips.xml"
+                                                                : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -237,7 +242,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testEncryptedSupportingOverTLS() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("tls-client.xml");
+        URL busFile = SupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "tls-client-fips.xml"
+                                                                : "tls-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -293,7 +300,9 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     public void testSignedEncryptedSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SupportingTokenTest.class.getResource("client.xml");
+        URL busFile = SupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "client-fips.xml"
+                                                                : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

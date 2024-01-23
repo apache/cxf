@@ -23,6 +23,7 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -50,17 +51,23 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            SecureConversationTest.class.getResource("cxf-service.xml")
+            SecureConversationTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                     ? "cxf-service-fips.xml"
+                                                         : "cxf-service.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            SecureConversationTest.class.getResource("cxf-sts.xml"))));
+            SecureConversationTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                     ? "cxf-sts-fips.xml"
+                                                         : "cxf-sts.xml"))));
     }
 
     @org.junit.Test
     public void testSecureConversation() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecureConversationTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "DoubleIt-fips.wsdl"
+                                                                : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSecureConvPort");
         DoubleItPortType transportPort =
@@ -74,7 +81,9 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
     public void testSecureConversationSymmetric() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SecureConversationTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "DoubleIt-fips.wsdl"
+                                                                : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSecureConvPort");
         DoubleItPortType symmetricPort =

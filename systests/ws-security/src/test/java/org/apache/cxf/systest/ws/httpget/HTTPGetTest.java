@@ -29,6 +29,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.test.TestUtilities;
@@ -80,7 +81,9 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = HTTPGetTest.class.getResource("DoubleItHTTPGet.wsdl");
+        URL wsdl = HTTPGetTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                 ? "DoubleItHTTPGet-fips.wsdl"
+                                                     : "DoubleItHTTPGet.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
         DoubleItPortType x509Port =
@@ -132,7 +135,9 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = HTTPGetTest.class.getResource("DoubleItHTTPGet.wsdl");
+        URL wsdl = HTTPGetTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                 ? "DoubleItHTTPGet-fips.wsdl"
+                                                     : "DoubleItHTTPGet.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignBodyPort");
         DoubleItPortType port =

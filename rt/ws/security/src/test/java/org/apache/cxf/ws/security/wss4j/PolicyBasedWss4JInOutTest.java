@@ -27,6 +27,7 @@ import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.policy.SP12Constants;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -181,6 +182,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_missing_enc_header.xml",
                 "encrypted_elements_policy.xml",
@@ -198,6 +201,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_elements_policy.xml",
@@ -244,6 +249,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testContentEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_element.xml",
                 "content_encrypted_elements_policy.xml",
@@ -254,6 +261,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testContentEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "content_encrypted_elements_policy.xml",
@@ -273,6 +282,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedPartsPolicyWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_missing_enc_body.xml",
                 "encrypted_parts_policy_body.xml",
@@ -304,6 +315,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedPartsPolicyWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_parts_policy_body.xml",
@@ -371,6 +384,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testSignedEncryptedPartsWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_encrypted_missing_enc_header.xml",
                 "signed_parts_policy_header_and_body_encrypted.xml",
@@ -382,6 +397,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
@@ -408,6 +425,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedSignedPartsWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_content_signed_missing_signed_header.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
@@ -418,6 +437,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedSignedPartsWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInInterceptorAndValidate(
                 "encrypted_body_content_signed.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",

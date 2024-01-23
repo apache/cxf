@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -75,16 +76,19 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            AsymmetricBindingTest.class.getResource("cxf-service.xml"),
-            AsymmetricBindingTest.class.getResource("cxf-stax-service.xml")))
+            AsymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-service-fips.xml" : "cxf-service.xml"),
+            AsymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-stax-service-fips.xml" : "cxf-stax-service.xml")))
         );
 
         assertTrue(launchServer(new STSServer(
-            "cxf-ut.xml",
-            "stax-cxf-ut.xml")));
+            JavaUtils.isFIPSEnabled() ? "cxf-ut-fips.xml" : "cxf-ut.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-ut-fips.xml" : "stax-cxf-ut.xml")));
         assertTrue(launchServer(new STSServer(
-            "cxf-ut-encrypted.xml",
-            "stax-cxf-ut-encrypted.xml")));
+            JavaUtils.isFIPSEnabled() ? "cxf-ut-encrypted-fips.xml" : "cxf-ut-encrypted.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-ut-encrypted-fips.xml" : "stax-cxf-ut-encrypted.xml")));
+        
     }
 
     @Parameters(name = "{0}")
@@ -105,7 +109,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML1() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = AsymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML1Port");
         DoubleItPortType asymmetricSaml1Port =
@@ -127,7 +132,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML2() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = AsymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
         DoubleItPortType asymmetricSaml2Port =
@@ -150,7 +156,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML2KeyValue() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = AsymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2KeyValuePort");
         DoubleItPortType asymmetricSaml2Port =
@@ -173,7 +180,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML1Encrypted() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = AsymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML1EncryptedPort");
         DoubleItPortType asymmetricSaml1EncryptedPort =

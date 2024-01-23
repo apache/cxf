@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -78,7 +79,9 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Policy. Useful if you want a simple way to avoid hardcoding the STS host/port in the client.
     @org.junit.Test
     public void testSAML1Issuer() throws Exception {
-        createBus(getClass().getResource("cxf-client.xml").toString());
+        createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                         ? "cxf-client-fips.xml"
+                                             : "cxf-client.xml").toString());
 
         URL wsdl = IssuerTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -95,7 +98,9 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Test getting the STS details via WS-MEX
     @org.junit.Test
     public void testSAML2MEX() throws Exception {
-        createBus(getClass().getResource("cxf-client.xml").toString());
+        createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                         ? "cxf-client-fips.xml"
+                                             : "cxf-client.xml").toString());
 
         URL wsdl = IssuerTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);
@@ -112,7 +117,9 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Test getting the STS details via WS-MEX + SOAP 1.2
     @org.junit.Test
     public void testSAML2MEXSoap12() throws Exception {
-        createBus(getClass().getResource("cxf-client.xml").toString());
+        createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                         ? "cxf-client-fips.xml"
+                                             : "cxf-client.xml").toString());
 
         URL wsdl = IssuerTest.class.getResource(WSDL_FILTERED);
         Service service = Service.create(wsdl, SERVICE_QNAME);

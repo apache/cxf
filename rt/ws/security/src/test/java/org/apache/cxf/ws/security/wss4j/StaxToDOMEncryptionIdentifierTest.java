@@ -29,6 +29,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -77,7 +78,9 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -116,7 +119,9 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
         );
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -155,7 +160,9 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
         );
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -195,7 +202,9 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier
         );
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -234,7 +243,9 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER
         );
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());

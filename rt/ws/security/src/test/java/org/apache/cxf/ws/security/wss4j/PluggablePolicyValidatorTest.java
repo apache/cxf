@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
@@ -42,6 +43,7 @@ import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -54,6 +56,8 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testEncryptedElementsPolicyValidator() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         // This should work (body content is encrypted)
         this.runInInterceptorAndValidate(
             "encrypted_body_content.xml",

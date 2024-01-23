@@ -135,8 +135,9 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String RSSEC_ENCRYPTION_CONTENT_ALGORITHM = "rs.security.encryption.content.algorithm";
 
     /**
-     * The encryption key algorithm to use. The default algorithm if not specified is 'RSA-OAEP' if the key is an
-     * RSA key, and 'A128GCMKW' if it is an octet sequence.
+     * The encryption key algorithm to use. The default algorithm if not specified is 'RSA-OAEP'
+     * (or RSA1_5 in FIPS mode) 
+     * if the key is an RSA key, and 'A128GCMKW' if it is an octet sequence.
      */
     public static final String RSSEC_ENCRYPTION_KEY_ALGORITHM = "rs.security.encryption.key.algorithm";
 

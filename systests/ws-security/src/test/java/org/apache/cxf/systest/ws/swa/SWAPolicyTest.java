@@ -30,6 +30,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -102,7 +103,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureContentPolicyPort");
         DoubleItSwaPortType port =
@@ -132,7 +135,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureCompletePolicyPort");
         DoubleItSwaPortType port =
@@ -162,7 +167,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWAEncryptionPolicyPort");
         DoubleItSwaPortType port =
@@ -192,7 +199,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWAEncryptionContentPolicyPort");
         DoubleItSwaPortType port =
@@ -222,7 +231,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedPolicyPort");
         DoubleItSwaPortType port =
@@ -252,7 +263,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedDerivedPolicyPort");
         DoubleItSwaPortType port =
@@ -282,7 +295,9 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SWAPolicyTest.class.getResource("DoubleItSwa.wsdl");
+        URL wsdl = SWAPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSwa-fips.wsdl"
+                                                       : "DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWACombinedAsymmetricPolicyPort");
         DoubleItSwaPortType port =

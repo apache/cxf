@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -71,11 +72,15 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            UsernameActAsTest.class.getResource("cxf-service2.xml")
+            UsernameActAsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                ? "cxf-service2-fips.xml"
+                                                    : "cxf-service2.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            "cxf-x509.xml",
-            "stax-cxf-x509.xml"
+            JavaUtils.isFIPSEnabled()
+                ? "cxf-x509-fips.xml" : "cxf-x509.xml",
+            JavaUtils.isFIPSEnabled()
+                ? "stax-cxf-x509-fips.xml" : "stax-cxf-x509.xml"
         )));
     }
 
@@ -92,7 +97,9 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
     public void testUsernameActAs() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameActAsTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameActAsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                       ? "DoubleIt-fips.wsdl"
+                                                           : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
         DoubleItPortType port =

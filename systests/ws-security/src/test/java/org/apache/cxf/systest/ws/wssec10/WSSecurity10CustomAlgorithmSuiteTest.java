@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec10.server.ServerCustomAlgorithmSuite;
 import org.apache.cxf.systest.ws.wssec10.server.StaxServer;
@@ -124,7 +125,9 @@ public class WSSecurity10CustomAlgorithmSuiteTest extends AbstractBusClientServe
                 launchServer(StaxServerCustomAlgorithmSuite.class, true)
         );
 
-        createStaticBus("org/apache/cxf/systest/ws/wssec10/client_customAlgorithmSuite.xml");
+        createStaticBus(JavaUtils.isFIPSEnabled() 
+                        ? "org/apache/cxf/systest/ws/wssec10/client_customAlgorithmSuite-fips.xml"
+                            : "org/apache/cxf/systest/ws/wssec10/client_customAlgorithmSuite.xml");
     }
 
     @org.junit.AfterClass

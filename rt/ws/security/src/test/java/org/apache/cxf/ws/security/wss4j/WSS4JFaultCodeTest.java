@@ -28,6 +28,7 @@ import jakarta.xml.soap.SOAPConstants;
 import jakarta.xml.soap.SOAPMessage;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
@@ -37,6 +38,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSS4JConstants;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -190,6 +192,8 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
     // See CXF-6900.
     @Test
     public void testSignedEncryptedSOAP12Fault() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         Document doc = readDocument("wsse-response-fault.xml");
 
         SoapMessage msg = getSoapMessageForDom(doc, SOAPConstants.SOAP_1_2_PROTOCOL);
@@ -211,6 +215,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
+        
         inHandler.setProperty(
             ConfigurationConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"

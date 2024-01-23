@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -54,10 +55,13 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            X509AsymmetricBindingTest.class.getResource("cxf-asymmetric-service.xml")
+            X509AsymmetricBindingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                        ? "cxf-asymmetric-service-fips.xml"
+                                                            : "cxf-asymmetric-service.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            "cxf-x509.xml"
+                                JavaUtils.isFIPSEnabled()
+                                ? "cxf-x509-fips.xml" : "cxf-x509.xml"
         )));
     }
 
@@ -65,7 +69,9 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testX509SAML2() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509AsymmetricBindingTest.class.getResource("DoubleItAsymmetric.wsdl");
+        URL wsdl = X509AsymmetricBindingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                               ? "DoubleItAsymmetric-fips.wsdl"
+                                                                   : "DoubleItAsymmetric.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
         DoubleItPortType port =

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jaxrs.JweJsonClientResponseFilter;
@@ -103,8 +104,12 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         bean.setProvider(new JweJsonWriterInterceptor());
 
         List<String> properties = new ArrayList<>();
-        properties.add("org/apache/cxf/systest/jaxrs/security/jwejson1.properties");
-        properties.add("org/apache/cxf/systest/jaxrs/security/jwejson2.properties");
+        properties.add(JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/jwejson1-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/jwejson1.properties");
+        properties.add(JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/jwejson2-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/jwejson2.properties");
         bean.getProperties(true).put(JoseConstants.RSSEC_ENCRYPTION_PROPS,
                                  properties);
         return bean.create(BookStore.class);

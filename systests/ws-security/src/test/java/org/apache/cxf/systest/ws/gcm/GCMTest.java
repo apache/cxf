@@ -29,6 +29,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.test.TestUtilities;
@@ -117,7 +118,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        URL wsdl = GCMTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                             ? "DoubleItGCM-fips.wsdl"
+                                                 : "DoubleItGCM.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItGCM128Port");
         DoubleItPortType gcmPort =
@@ -147,7 +150,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        URL wsdl = GCMTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                             ? "DoubleItGCM-fips.wsdl"
+                                                 : "DoubleItGCM.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItGCM192Port");
         DoubleItPortType gcmPort =
@@ -178,7 +183,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        URL wsdl = GCMTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                             ? "DoubleItGCM-fips.wsdl"
+                                                 : "DoubleItGCM.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItGCM256Port");
         DoubleItPortType gcmPort =
@@ -244,7 +251,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = GCMTest.class.getResource("DoubleItGCM.wsdl");
+        URL wsdl = GCMTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                             ? "DoubleItGCM-fips.wsdl"
+                                                 : "DoubleItGCM.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItGCM256MGFSHA256DigestPort");
         DoubleItPortType gcmPort =

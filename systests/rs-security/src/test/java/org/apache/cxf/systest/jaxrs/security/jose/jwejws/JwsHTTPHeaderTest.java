@@ -32,6 +32,7 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Message;
@@ -50,6 +51,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Some signature tests for signing HTTP Headers
  */
+
 public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerHTTPHeaders.PORT;
 
@@ -78,7 +80,9 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -114,7 +118,9 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -152,7 +158,9 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         WebClient.getConfig(client).getOutInterceptors().add(new CustomHeaderInterceptor(Phase.PRE_STREAM));
@@ -182,7 +190,9 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         WebClient.getConfig(client).getOutInterceptors().add(new CustomHeaderInterceptor(Phase.PRE_STREAM));
@@ -227,7 +237,9 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         CustomHeaderInterceptor customHeaderInterceptor = new CustomHeaderInterceptor(Phase.PRE_STREAM);

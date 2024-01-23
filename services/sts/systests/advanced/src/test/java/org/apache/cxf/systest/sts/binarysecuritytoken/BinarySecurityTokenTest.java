@@ -23,6 +23,7 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
@@ -66,8 +67,12 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            BinarySecurityTokenTest.class.getResource("cxf-service.xml"),
-            BinarySecurityTokenTest.class.getResource("stax-cxf-service.xml")
+            BinarySecurityTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "cxf-service-fips.xml"
+                                                          : "cxf-service.xml"),
+            BinarySecurityTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "stax-cxf-service-fips.xml"
+                                                          : "stax-cxf-service.xml")
         )));
         assertTrue(launchServer(new StaxSTSServer()));
     }
@@ -85,7 +90,9 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     public void testBinarySecurityToken() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = BinarySecurityTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                             ? "DoubleIt-fips.wsdl"
+                                                                 : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
         DoubleItPortType asymmetricBSTPort =
@@ -105,7 +112,9 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     public void testBadBinarySecurityToken() throws Exception {
         createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
-        URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = BinarySecurityTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                             ? "DoubleIt-fips.wsdl"
+                                                                 : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
         DoubleItPortType asymmetricBSTPort =

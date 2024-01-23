@@ -28,6 +28,7 @@ import java.util.Map;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
@@ -75,9 +76,15 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         properties.put("rs.security.encryption.include.public.key", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -106,7 +113,11 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         // First test that it fails without adding a cert (reference). This is because
@@ -143,7 +154,11 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         properties.put("rs.security.encryption.include.cert", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -173,7 +188,11 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         // First test that it fails without adding a cert (reference). This is because
@@ -210,7 +229,11 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         properties.put("rs.security.encryption.include.cert.sha1", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 

@@ -38,6 +38,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
@@ -145,8 +146,10 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
                 && (digestAlgo == null || !encProps.getEncryptionDigestAlgo().equals(digestAlgo))) {
                 throwFault("Digest Algorithm is not supported", null);
             }
-        } else if (!XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
-            // RSA OAEP is the required default Key Transport Algorithm
+        } else if ((JavaUtils.isFIPSEnabled() && !XMLCipher.RSA_v1dot5 .equals(keyEncAlgo))
+            || (!JavaUtils.isFIPSEnabled() && !XMLCipher.RSA_OAEP .equals(keyEncAlgo))) {
+            // RSA OAEP (while it's RSA1_5 in FIPS mode) is the 
+            // required default Key Transport Algorithm
             throwFault("Key Transport Algorithm is not supported", null);
         }
 

@@ -37,6 +37,7 @@ import jakarta.xml.ws.Service;
 import jakarta.xml.ws.soap.AddressingFeature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -87,16 +88,18 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            SymmetricBindingTest.class.getResource("cxf-service.xml"),
-            SymmetricBindingTest.class.getResource("cxf-stax-service.xml")))
+            SymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-service-fips.xml" : "cxf-service.xml"),
+            SymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-stax-service-fips.xml" : "cxf-stax-service.xml")))
         );
 
         assertTrue(launchServer(new STSServer(
-            "cxf-ut.xml",
-            "stax-cxf-ut.xml")));
+            JavaUtils.isFIPSEnabled() ? "cxf-ut-fips.xml" : "cxf-ut.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-ut-fips.xml" : "stax-cxf-ut.xml")));
         assertTrue(launchServer(new STSServer(
-            "cxf-ut-encrypted.xml",
-            "stax-cxf-ut-encrypted.xml")));
+            JavaUtils.isFIPSEnabled() ? "cxf-ut-encrypted-fips.xml" : "cxf-ut-encrypted.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-ut-encrypted-fips.xml" : "stax-cxf-ut-encrypted.xml")));
     }
 
     @Parameters(name = "{0}")
@@ -117,7 +120,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML1() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                       JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
         DoubleItPortType symmetricSaml1Port =
@@ -140,7 +144,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML2() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                       JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
         DoubleItPortType symmetricSaml2Port =
@@ -168,7 +173,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2ProtectTokensPort");
         DoubleItPortType symmetricSaml2Port =
@@ -191,7 +197,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML1Encrypted() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1EncryptedPort");
         DoubleItPortType symmetricSaml1Port =
@@ -213,7 +220,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML2SecureConversation() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SecureConversationPort");
         DoubleItPortType symmetricSaml2Port =
@@ -235,7 +243,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML2Dispatch() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
 
@@ -268,7 +277,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenSAML1Dispatch() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
 
