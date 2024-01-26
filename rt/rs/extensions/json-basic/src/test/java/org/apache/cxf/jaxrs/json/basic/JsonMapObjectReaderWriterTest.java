@@ -210,4 +210,19 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals("a\\", entry.getValue());
     }
 
+    @Test
+    public void testEscapingMetacharacter() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        Map<String, Object> content = new HashMap<>();
+        content.put("userInput", "GET\n\n\n\t\f\b\r \"\\");
+        String json = jsonMapObjectReaderWriter.toJson(content);
+        assertEquals("{\"userInput\":\"GET\\n\\n\\n\\t\\f\\b\\r \\\"\\\\\"}", json);
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
+        assertEquals(1, map.size());
+        Map.Entry<String, Object> entry = map.entrySet().iterator().next();
+        assertEquals("userInput", entry.getKey());
+        assertEquals("GET\\n\\n\\n\\t\\f\\b\\r \"\\", entry.getValue());
+    }
+
 }
