@@ -93,7 +93,7 @@
         <cxf.arquillian.version>1.8.0.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>3.0.2.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.21</cxf.aspectj.version>
-        <cxf.assertj.version>3.25.1</cxf.assertj.version>
+        <cxf.assertj.version>3.25.2</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.4</cxf.atmosphere.version>
         <cxf.bcprov.version>1.77</cxf.bcprov.version>
@@ -110,7 +110,7 @@
         <cxf.derby.version>10.16.1.1</cxf.derby.version>
         <cxf.dom4j.version>2.1.4</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
-        <cxf.dropwizard4.version>4.2.23</cxf.dropwizard4.version>
+        <cxf.dropwizard4.version>4.2.25</cxf.dropwizard4.version>
         <cxf.ehcache3.version>3.10.8</cxf.ehcache3.version>
         <cxf.el-api.version>5.0.1</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
@@ -162,8 +162,8 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty11.version>11.0.17</cxf.jetty11.version>
-        <cxf.jetty12.version>12.0.3</cxf.jetty12.version>
+        <cxf.jetty11.version>11.0.19</cxf.jetty11.version>
+        <cxf.jetty12.version>12.0.5</cxf.jetty12.version>
         <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
@@ -185,11 +185,11 @@
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
-        <cxf.mockito.version>5.9.0</cxf.mockito.version>
+        <cxf.mockito.version>5.10.0</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.105.Final</cxf.netty.version>
+        <cxf.netty.version>4.1.106.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.46.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.12</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
@@ -1791,11 +1791,6 @@
                 <version>${cxf.commons-text.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${cxf.bcprov.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${cxf.jaxen.version}</version>
@@ -1990,6 +1985,10 @@
                     <exclusion>
                         <groupId>org.ehcache</groupId>
                         <artifactId>ehcache</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

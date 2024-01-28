@@ -16,16 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rt.security.crypto;
+package org.apache.cxf.systest.http.timeout;
 
-/**
- * Simple helper for dynamically registering BouncyCastle inside a Blueprint or Spring context
- */
-public class BouncyCastleInstaller {
-    public void install() throws Exception {
-        CryptoUtils.installBouncyCastleProvider();
-    }
-    public void uninstall() {
-        CryptoUtils.removeBouncyCastleProvider();
-    }
+public interface DelayedService {
+    String delay(long delay);
 }

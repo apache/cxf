@@ -85,7 +85,7 @@
                 <dependency>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-alpn-java-server</artifactId>
-                    <version>${cxf.jetty11.version}</version>
+                    <version>${cxf.jetty12.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -108,12 +108,12 @@
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>jetty-http2-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
+            <version>${cxf.jetty12.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-alpn-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
+            <version>${cxf.jetty12.version}</version>
         </dependency>
     </dependencies>
 </project>

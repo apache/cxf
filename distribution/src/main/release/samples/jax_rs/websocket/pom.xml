@@ -30,11 +30,11 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty.version>${cxf.jetty11.version}</cxf.jetty.version>
+        <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
     </properties>
     <profiles>
         <profile>
-            <id>jetty11</id>
+            <id>jetty12</id>
             <!-- activate it by default -->
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -42,9 +42,9 @@
             <dependencies>
                 <!-- jetty11 websocket -->
                 <dependency>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-jakarta-server</artifactId>
-                    <version>${cxf.jetty11.version}</version>
+                    <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+                    <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
+                    <version>${cxf.jetty12.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>jakarta.servlet</groupId>

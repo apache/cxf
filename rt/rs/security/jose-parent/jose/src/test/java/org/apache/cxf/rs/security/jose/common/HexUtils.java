@@ -16,24 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwa;
+package org.apache.cxf.rs.security.jose.common;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.junit.Assert;
+public final class HexUtils {
+    
+    
+    
+    private HexUtils() {
+        
+    }
 
-public class AbstractJwaTest {
 
     
-
-    protected String loadResource(String resource) {
-        StringBuilder input = new StringBuilder();
-        InputStream stream = AbstractDecryptTest.class.getResourceAsStream(resource);
-        Assert.assertNotNull("Resource " + resource + " could not be loaded", stream);
-        new BufferedReader(new InputStreamReader(stream)).lines().forEach(line -> input.append(line));
-        return input.toString();
+    public static byte[] decode(byte[] s) {
+        int len = s.length;
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s[i], 16) << 4)
+                                 + Character.digit(s[i + 1], 16));
+        }
+        return data;
     }
+
+    
 
 }

@@ -459,11 +459,12 @@
             <artifactId>tika-parser-pdf-module</artifactId>
             <scope>test</scope>
             <version>${cxf.tika.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>            
         </dependency>
         <dependency>
            <groupId>org.yaml</groupId>

@@ -96,6 +96,12 @@
             <artifactId>tika-parser-pdf-module</artifactId>
             <version>${cxf.tika.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>  
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

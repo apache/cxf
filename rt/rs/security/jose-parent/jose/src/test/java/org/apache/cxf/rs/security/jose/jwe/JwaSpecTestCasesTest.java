@@ -19,23 +19,18 @@
 package org.apache.cxf.rs.security.jose.jwe;
 
 
-import java.security.Security;
 import java.util.Map;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.common.HexUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Hex;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -72,41 +67,27 @@ public class JwaSpecTestCasesTest {
         + "6a11a09ccf5370dc80bfecbad28c73f09b3a3b75e662a2594410ae496b2e2e6609e31e6e02cc837f053d21f37ff4"
         + "f51950bbe2638d09dd7a4930930806d0703b1f6";
 
-    @BeforeClass
-    public static void registerBouncyCastleIfNeeded() throws Exception {
-        try {
-            Cipher.getInstance(AlgorithmUtils.AES_GCM_ALGO_JAVA);
-            Cipher.getInstance(AlgorithmUtils.AES_CBC_ALGO_JAVA);
-        } catch (Throwable t) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
-
+    
     @Test
     public void testAes128CBCHMACSHA256() throws Exception {
-        doTestSingleRecipient(P, E, ContentAlgorithm.A128CBC_HS256,
-                              Hex.decode(IV.getBytes()), Hex.decode(K1.getBytes()));
+        doTestSingleRecipient(P, E.getBytes(), ContentAlgorithm.A128CBC_HS256,
+                              HexUtils.decode(IV.getBytes()), HexUtils.decode(K1.getBytes()));
     }
 
     @Test
     public void testAes182CBCHMACSHA384() throws Exception {
-        doTestSingleRecipient(P, E2, ContentAlgorithm.A192CBC_HS384,
-                              Hex.decode(IV.getBytes()), Hex.decode(K2.getBytes()));
+        doTestSingleRecipient(P, E2.getBytes(), ContentAlgorithm.A192CBC_HS384,
+                              HexUtils.decode(IV.getBytes()), HexUtils.decode(K2.getBytes()));
     }
 
     @Test
     public void testAes256CBCHMACSHA512() throws Exception {
-        doTestSingleRecipient(P, E3, ContentAlgorithm.A256CBC_HS512,
-                              Hex.decode(IV.getBytes()), Hex.decode(K3.getBytes()));
+        doTestSingleRecipient(P, E3.getBytes(), ContentAlgorithm.A256CBC_HS512,
+                              HexUtils.decode(IV.getBytes()), HexUtils.decode(K3.getBytes()));
     }
 
     private void doTestSingleRecipient(String text,
-                                         String expectedOutput,
+                                         byte[] expectedOutput,
                                          ContentAlgorithm contentEncryptionAlgo,
                                          final byte[] iv,
                                          final byte[] cek) throws Exception {
@@ -115,7 +96,7 @@ public class JwaSpecTestCasesTest {
         headers.asMap().remove("alg");
         SecretKey cekKey = CryptoUtils.createSecretKeySpec(cek, "AES");
         JweEncryptionProvider jwe = JweUtils.getDirectKeyJweEncryption(cekKey, contentEncryptionAlgo);
-        JweJsonProducer p = new JweJsonProducer(headers, Hex.decode(text.getBytes())) {
+        JweJsonProducer p = new JweJsonProducer(headers, HexUtils.decode(text.getBytes())) {
             protected JweEncryptionInput createEncryptionInput(JweHeaders jsonHeaders) {
                 JweEncryptionInput input = super.createEncryptionInput(jsonHeaders);
                 input.setCek(cek);
@@ -134,6 +115,6 @@ public class JwaSpecTestCasesTest {
 
         // Check CipherText matches
         byte[] cipherTextBytes = Base64UrlUtility.decode((String)json.get("ciphertext"));
-        assertArrayEquals(cipherTextBytes, Hex.decode(expectedOutput));
+        assertArrayEquals(cipherTextBytes, HexUtils.decode(expectedOutput));
     }
 }

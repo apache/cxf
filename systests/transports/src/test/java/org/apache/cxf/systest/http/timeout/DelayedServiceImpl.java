@@ -16,24 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jwa;
+package org.apache.cxf.systest.http.timeout;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.junit.Assert;
-
-public class AbstractJwaTest {
-
-    
-
-    protected String loadResource(String resource) {
-        StringBuilder input = new StringBuilder();
-        InputStream stream = AbstractDecryptTest.class.getResourceAsStream(resource);
-        Assert.assertNotNull("Resource " + resource + " could not be loaded", stream);
-        new BufferedReader(new InputStreamReader(stream)).lines().forEach(line -> input.append(line));
-        return input.toString();
+public class DelayedServiceImpl implements DelayedService {
+    public String delay(long delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException ex) {
+            /* do nothing */
+        }
+        return "Replied after " + delay + "ms";
     }
-
 }

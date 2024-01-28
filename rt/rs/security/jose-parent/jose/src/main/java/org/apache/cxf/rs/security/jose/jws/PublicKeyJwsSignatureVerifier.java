@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -43,10 +44,18 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     public PublicKeyJwsSignatureVerifier(PublicKey key, AlgorithmParameterSpec spec, SignatureAlgorithm supportedAlgo) {
         this.key = key;
         cert = null;
+        String javaAlgoName = supportedAlgo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = supportedAlgo.getJwaName().substring(2);
+            spec = JoseUtils.createPSSParameterSpec(size);
+        }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
     }
+    
     public PublicKeyJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgorithm) {
         this(cert, null, supportedAlgorithm);
     }
@@ -59,10 +68,18 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
             this.key = null;
         }
         this.cert = cert;
+        String javaAlgoName = supportedAlgo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = supportedAlgo.getJwaName().substring(2);
+            spec = JoseUtils.createPSSParameterSpec(size);
+        }
         this.signatureSpec = spec;
         this.supportedAlgo = supportedAlgo;
         JwsUtils.checkSignatureKeySize(key);
     }
+    
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         try {

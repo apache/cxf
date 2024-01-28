@@ -1332,7 +1332,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
     
     private final class CxfJettyErrorHandler extends ErrorHandler {
         
-        public boolean handle(Request request, Response response, Callback callback) {
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
             String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
             if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
                 msg = HttpStatus.getMessage(response.getStatus());
