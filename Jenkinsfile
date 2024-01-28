@@ -51,7 +51,7 @@ pipeline {
             stages {
               stage('Build & Test') {
                 steps {
-                  sh 'mvn -B clean install'
+                  sh 'mvn -B clean install -Peverything'
                   // step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
                 }
                 post {
