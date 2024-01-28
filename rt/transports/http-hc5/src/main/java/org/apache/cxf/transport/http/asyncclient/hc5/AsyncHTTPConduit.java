@@ -145,7 +145,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             return;
         }
 
-        propagateJaxwsSpecTimeoutSettings(message, csPolicy);
         propagateProtocolSettings(message, csPolicy);
 
         boolean addressChanged = false;
@@ -247,8 +246,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         final RequestConfig.Builder b = RequestConfig
             .custom()
-            .setConnectTimeout(Timeout.ofMilliseconds(csPolicy.getConnectionTimeout()))
-            .setResponseTimeout(Timeout.ofMilliseconds(csPolicy.getReceiveTimeout()))
+            .setConnectTimeout(Timeout.ofMilliseconds(determineConnectionTimeout(message, csPolicy)))
+            .setResponseTimeout(Timeout.ofMilliseconds(determineReceiveTimeout(message, csPolicy)))
             .setConnectionRequestTimeout(Timeout.ofMilliseconds(csPolicy.getConnectionRequestTimeout()));
         
         final Proxy p = proxyFactory.createProxy(csPolicy, uri);
@@ -268,17 +267,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             if (o != null) {
                 csPolicy.setVersion("2.0");
             }
-        }
-    }
-
-    private void propagateJaxwsSpecTimeoutSettings(Message message, HTTPClientPolicy csPolicy) {
-        int receiveTimeout = determineReceiveTimeout(message, csPolicy);
-        if (csPolicy.getReceiveTimeout() == 60000) {
-            csPolicy.setReceiveTimeout(receiveTimeout);
-        }
-        int connectionTimeout = determineConnectionTimeout(message, csPolicy);
-        if (csPolicy.getConnectionTimeout() == 30000) {
-            csPolicy.setConnectionTimeout(connectionTimeout);
         }
     }
 

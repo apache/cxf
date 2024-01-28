@@ -140,7 +140,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             super.setupConnection(message, address, csPolicy);
             return;
         }
-        propagateJaxwsSpecTimeoutSettings(message, csPolicy);
         boolean addressChanged = false;
         // need to do some clean up work on the URI address
         URI uri = address.getURI();
@@ -231,8 +230,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         e.setEntity(entity);
 
         RequestConfig.Builder b = RequestConfig.custom()
-                .setConnectTimeout((int) csPolicy.getConnectionTimeout())
-                .setSocketTimeout((int) csPolicy.getReceiveTimeout())
+                .setConnectTimeout(determineConnectionTimeout(message, csPolicy))
+                .setSocketTimeout(determineReceiveTimeout(message, csPolicy))
                 .setConnectionRequestTimeout((int) csPolicy.getConnectionRequestTimeout());
         Proxy p = proxyFactory.createProxy(csPolicy, uri);
         if (p != null && p.type() != Proxy.Type.DIRECT) {
@@ -244,18 +243,6 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         message.put(CXFHttpRequest.class, e);
     }
-
-    private void propagateJaxwsSpecTimeoutSettings(Message message, HTTPClientPolicy csPolicy) {
-        int receiveTimeout = determineReceiveTimeout(message, csPolicy);
-        if (csPolicy.getReceiveTimeout() == 60000) {
-            csPolicy.setReceiveTimeout(receiveTimeout);
-        }
-        int connectionTimeout = determineConnectionTimeout(message, csPolicy);
-        if (csPolicy.getConnectionTimeout() == 30000) {
-            csPolicy.setConnectionTimeout(connectionTimeout);
-        }
-    }
-
 
     protected OutputStream createOutputStream(Message message,
                                               boolean needToCacheRequest,
