@@ -2008,6 +2008,11 @@
                 <version>${cxf.jakarta.wss4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.wss4j</groupId>
+                <artifactId>wss4j-ws-security-common</artifactId>
+                <version>${cxf.jakarta.wss4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>

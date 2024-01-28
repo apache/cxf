@@ -134,6 +134,10 @@
             <artifactId>wss4j-ws-security-policy-stax</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <scope>test</scope>

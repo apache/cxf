@@ -49,7 +49,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  */
 public class Http2TestClient implements AutoCloseable {
     private final HTTP2Client client;
-    private final SslContextFactory sslContextFactory;
+    private final SslContextFactory.Client sslContextFactory;
     
     public Http2TestClient(boolean secure) throws Exception {
         client = new HTTP2Client();
