@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xmlns:interop="http://WSSec/wssec10"
+       xmlns:cxf="http://cxf.apache.org/core"
+       xmlns:p="http://cxf.apache.org/policy"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
+    <cxf:bus>
+        <cxf:features>
+            <p:policies/>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+    <!-- -->
+    <!-- Any services listening on port 9001 must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.wssec10.server.Server.1}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="pkcs12" password="password" resource="certs/bob.pkcs12"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="pkcs12" password="password" resource="certs/alice.pkcs12"/>
+                </sec:trustManagers>
+                <!--
+                <sec:clientAuthentication want="true" required="true"/>
+                -->
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    <!-- -->
+    <!-- Custom alg suite, test #01 see WSSecurity10CustomAlgorithmSuiteTest for more information -->
+    <!-- -->
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt01_IPingService" id="Customizable10SignEncrypt01" address="http://localhost:${testutil.ports.wssec10.server.Server}/Customizable10SignEncrypt01" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt01_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <!-- -->
+    <!-- Custom alg suite, test #02 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
+    <!-- -->
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt02_IPingService" id="Customizable10SignEncrypt02" address="http://localhost:${testutil.ports.wssec10.server.Server}/Customizable10SignEncrypt02" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt02_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.custom.alg.suite.digest.algorithm" value="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <entry key="ws-security.custom.alg.suite.asymmetric.key.encryption.algorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+            <entry key="ws-security.custom.alg.suite.encryption.key.derivation" value="http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1"/>
+            <entry key="ws-security.custom.alg.suite.signature.key.derivation" value="ttp://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <!-- -->
+    <!-- Custom alg suite, test #03 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
+    <!-- -->
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt03_IPingService" id="Customizable10SignEncrypt03" address="http://localhost:${testutil.ports.wssec10.server.Server}/Customizable10SignEncrypt03" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt03_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <!-- -->
+    <!-- Custom alg suite, test #04 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
+    <!-- -->
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt04_IPingService" id="Customizable10SignEncrypt04" address="http://localhost:${testutil.ports.wssec10.server.Server}/Customizable10SignEncrypt04" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt04_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
+            <entry key="security.encryption.username" value="useReqSigCert"/>
+            <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="ws-security.custom.alg.suite.digest.algorithm" value="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <entry key="ws-security.custom.alg.suite.encryption.algorithm" value="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+            <entry key="ws-security.custom.alg.suite.symmetric.key.encryption.algorithm" value="http://www.w3.org/2001/04/xmlenc#kw-aes256"/>
+            <entry key="ws-security.custom.alg.suite.asymmetric.key.encryption.algorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+            <entry key="ws-security.custom.alg.suite.encryption.key.derivation" value="http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1"/>
+            <entry key="ws-security.custom.alg.suite.signature.key.derivation" value="ttp://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+
+</beans>
