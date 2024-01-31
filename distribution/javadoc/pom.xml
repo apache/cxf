@@ -468,11 +468,6 @@
             <version>${cxf.jacorb.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jakarta-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
-        </dependency>
-        <dependency>
           <groupId>io.reactivex.rxjava3</groupId>
           <artifactId>rxjava</artifactId>
         </dependency>
