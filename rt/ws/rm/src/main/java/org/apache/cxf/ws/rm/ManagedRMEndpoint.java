@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.management.JMException;
 import javax.management.ObjectName;
@@ -118,7 +119,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
     }
 
     public ManagedRMEndpoint(RMEndpoint endpoint) {
-        this.endpoint = endpoint;
+        this.endpoint = Objects.requireNonNull(endpoint, "endpoint");
     }
 
     /* (non-Javadoc)
