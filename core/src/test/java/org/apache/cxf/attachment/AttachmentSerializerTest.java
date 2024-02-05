@@ -20,10 +20,13 @@ package org.apache.cxf.attachment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -197,6 +200,26 @@ public class AttachmentSerializerTest {
     @Test
     public void testMessageMTOMUrlDecodedCid() throws Exception {
         doTestMessageMTOM("cid:test+me.xml", "<test+me.xml>");
+    }
+    
+    @Test
+    public void testCxf8975() throws IOException {
+        final AttachmentImpl attachment = new AttachmentImpl("file");
+        attachment.setHeader(Message.CONTENT_TYPE, "application/json");
+        attachment.setDataHandler(new DataHandler(new ByteArrayDataSource("TEST", "text/plain")));
+
+        final MessageImpl msg = new MessageImpl();
+        msg.put(Message.CONTENT_TYPE, "multipart/form-data");
+        msg.setAttachments(Collections.singletonList(attachment));
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        msg.setContent(OutputStream.class, out);
+        
+        final AttachmentSerializer serializer = new AttachmentSerializer(msg);
+        serializer.writeProlog();
+        serializer.writeAttachments();
+
+        final String output = out.toString(StandardCharsets.UTF_8);
+        assertTrue(output.endsWith("--\r\n"));
     }
 
     private void doTestMessageMTOM(String contentId, String expectedContentId) throws Exception {

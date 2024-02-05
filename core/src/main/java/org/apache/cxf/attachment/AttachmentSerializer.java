@@ -327,7 +327,7 @@ public class AttachmentSerializer {
         StringWriter writer = new StringWriter();
         writer.write("\r\n--");
         writer.write(bodyBoundary);
-        writer.write("--");
+        writer.write("--\r\n");
         out.write(writer.getBuffer().toString().getBytes(encoding));
         out.flush();
     }
