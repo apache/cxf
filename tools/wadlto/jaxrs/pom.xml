@@ -60,9 +60,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.patrodyne.jvnet</groupId>
-            <artifactId>hisrc-basicjaxb-plugins</artifactId>
-            <version>${cxf.hisrc.basicjaxb.version}</version>
+            <groupId>org.jvnet.jaxb</groupId>
+            <artifactId>jaxb-plugins</artifactId>
+            <version>${cxf.jvnet.jaxb.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
