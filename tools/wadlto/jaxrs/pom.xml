@@ -60,9 +60,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <groupId>org.jvnet.jaxb</groupId>
             <artifactId>jaxb2-basics</artifactId>
-            <version>0.12.0</version>
+            <version>${cxf.jvnet.jaxb.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
