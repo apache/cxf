@@ -63,6 +63,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.springmvc.SpringWebUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
@@ -378,9 +379,8 @@ public final class HttpUtils {
     public static void setHttpRequestURI(Message message, String uriTemplate) {
         HttpServletRequest request =
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-        request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", uriTemplate);
+        SpringWebUtils.setHttpRequestURI(request, uriTemplate);
     }
-
 
     public static URI toAbsoluteUri(URI u, Message message) {
         HttpServletRequest request =
