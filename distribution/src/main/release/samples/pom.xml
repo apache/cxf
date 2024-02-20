@@ -50,7 +50,7 @@
         <cxf.h2.version>2.2.224</cxf.h2.version>
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
-        <cxf.camel.version>4.0.2</cxf.camel.version>
+        <cxf.camel.version>4.4.0</cxf.camel.version>
     </properties>
     <dependencies>
         <dependency>
