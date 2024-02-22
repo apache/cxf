@@ -239,7 +239,7 @@
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.jakarta.wss4j.version>3.0.2</cxf.jakarta.wss4j.version>
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
-        <cxf.xnio.version>3.8.12.Final</cxf.xnio.version>
+        <cxf.xnio.version>3.8.13.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.zipkin-reporter.version>2.17.2</cxf.zipkin-reporter.version>
 
