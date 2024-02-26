@@ -20,15 +20,21 @@ package org.apache.cxf.ws.security.policy.custom;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
@@ -53,6 +59,8 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             assertions.put(qName, new PrimitiveAssertion(qName));
             qName = new QName(ns, "Basic256GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
+            qName = new QName(ns, "CustomAlgorithmSuite");
+            assertions.put(qName, new PrimitiveAssertion(qName));
 
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
@@ -68,6 +76,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
 
+ 
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
 
         static {
@@ -112,6 +121,21 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     256, 192, 256, 256, 1024, 4096
                 )
             );
+
+
+            ALGORITHM_SUITE_TYPES.put(
+                    "CustomAlgorithmSuite",
+                    new AlgorithmSuiteType(
+                            "CustomAlgorithmSuite",
+                            SPConstants.SHA256,
+                            "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                            SPConstants.KW_AES256,
+                            SPConstants.KW_RSA15,
+                            SPConstants.P_SHA1_L256,
+                            SPConstants.P_SHA1_L192,
+                            256, 192, 256, 256, 1024, 4096
+                    )
+            );
         }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
@@ -140,9 +164,113 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             } else if ("Basic256GCM".equals(assertionName)) {
                 setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("CustomAlgorithmSuite".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("CustomAlgorithmSuite"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }
     }
+
+
+    public static AlgorithmSuite.AlgorithmSuiteType customize(AlgorithmSuite.AlgorithmSuiteType suiteType,
+                                                              Message message) {
+
+        Map<String, Object> values = message.getContextualPropertyKeys()
+                .stream()
+                .filter(k -> k.startsWith(SecurityConstants.CUSTOM_ALG_SUITE_PREFIX))
+                .collect(Collectors.toMap(Function.identity(), k -> message.getContextualProperty(k)));
+
+        return customize(suiteType, values);
+
+    }
+
+    public static AlgorithmSuite.AlgorithmSuiteType customize(AlgorithmSuite.AlgorithmSuiteType suiteType,
+                                                              Map<String, Object> values) {
+
+        //customization happens only for CustomAlgorithmSuite
+        if (suiteType == null
+                || (suiteType != null && !"CustomAlgorithmSuite".equals(suiteType.getName()))) {
+            return suiteType;
+        }
+
+        
+        AlgorithmSuite.AlgorithmSuiteType retVal = suiteType;
+
+        //if there is no custom values, return without customization
+        if (values == null || values.isEmpty()) {
+            return retVal;
+        }
+        //apply customization
+        customizeAlgSuiteType(retVal, suiteType, values);
+        
+        return retVal;
+    }
+
+    private static void customizeAlgSuiteType(AlgorithmSuite.AlgorithmSuiteType suiteType,
+                                              AlgorithmSuite.AlgorithmSuiteType defValue,
+                                              Map<String, Object> values) {
+
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_DIGEST_ALGORITHM, values,
+                suiteType::setDigest,
+                defValue != null ? defValue::getDigest : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_ENCRYPTION_ALGORITHM, values,
+                suiteType::setEncryption,
+                defValue != null ? defValue::getEncryption : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_SYMMETRIC_KEY_ENCRYPTION_ALGORITHM, values,
+                suiteType::setSymmetricKeyWrap,
+                defValue != null ? defValue::getSymmetricKeyWrap : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_ASYMMETRIC_KEY_ENCRYPTION_ALGORITHM, values,
+                suiteType::setAsymmetricKeyWrap,
+                defValue != null ? defValue::getAsymmetricKeyWrap : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_ENCRYPTION_KEY_DERIVATION, values,
+                suiteType::setEncryptionKeyDerivation,
+                defValue != null ? defValue::getEncryptionKeyDerivation : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_SIGNATURE_KEY_DERIVATION, values,
+                suiteType::setSignatureKeyDerivation,
+                defValue != null ? defValue::getSignatureKeyDerivation : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_SYMMETRIC_SIGNATURE, values,
+                suiteType::setSymmetricSignature,
+                defValue != null ? defValue::getSymmetricSignature : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_ASYMMETRIC_SIGNATURE, values,
+                suiteType::setAsymmetricSignature,
+                defValue != null ? defValue::getAsymmetricSignature : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_ENCRYPTION_DERIVED_KEY_LENGTH, values,
+                suiteType::getEncryptionDerivedKeyLength,
+                defValue != null ? defValue::getEncryptionDerivedKeyLength : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_SIGNATURE_DERIVED_KEY_LENGTH, values,
+                suiteType::setSignatureDerivedKeyLength,
+                defValue != null ? defValue::getSignatureDerivedKeyLength : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_MINIMUM_SYMMETRIC_KEY_LENGTH, values,
+                suiteType::setMinimumSymmetricKeyLength,
+                defValue != null ? defValue::getMinimumSymmetricKeyLength : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_MAXIMUM_SYMMETRIC_KEY_LENGTH, values,
+                suiteType::setMaximumSymmetricKeyLength,
+                defValue != null ? defValue::getMaximumSymmetricKeyLength : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_MINIMUM_ASYMMETRIC_KEY_LENGTH, values,
+                suiteType::setMinimumAsymmetricKeyLength,
+                defValue != null ? defValue::getMinimumAsymmetricKeyLength : null);
+        setValue(SecurityConstants.CUSTOM_ALG_SUITE_MAXIMUM_ASYMMETRIC_KEY_LENGTH, values,
+                suiteType::setMaximumAsymmetricKeyLength,
+                defValue != null ? defValue::getMaximumAsymmetricKeyLength : null);
+    }
+
+    private static <T> void setValue(String key, Map<String, Object> values,
+                                     Consumer<T> customValueSetter,
+                                     Supplier<T> defaultValueGetter) {
+
+        //get custom value
+        T value = (T)values.get(key);
+        //use default value if null
+        if (value == null && defaultValueGetter != null) {
+            value = defaultValueGetter.get();
+        }
+        //set value
+        if (value != null) {
+            customValueSetter.accept(value);
+        }
+    }
+
+
 
 
 }

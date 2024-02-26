@@ -114,6 +114,7 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-policy</artifactId>
+            <version>3.0.3-SNAPSHOT</version>
             <exclusions>
                  <exclusion>
                      <groupId>org.codehaus.woodstox</groupId>

@@ -33,6 +33,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.custom.DefaultAlgorithmSuiteLoader;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.cxf.ws.security.wss4j.TokenStoreCallbackHandler;
@@ -84,6 +85,10 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
         AssertionInfoMap aim = getMessage().get(AssertionInfoMap.class);
         configureTimestamp(aim);
         assertPolicy(abinding.getName());
+
+        //apply custom parameters (if needed)
+        DefaultAlgorithmSuiteLoader.customize(abinding.getAlgorithmSuite().getAlgorithmSuiteType(),
+                getMessage());
 
         String asymSignatureAlgorithm =
             (String)getMessage().getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
