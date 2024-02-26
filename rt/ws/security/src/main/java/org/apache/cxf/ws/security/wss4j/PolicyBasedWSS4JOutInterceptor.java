@@ -21,8 +21,11 @@ package org.apache.cxf.ws.security.wss4j;
 import java.security.Provider;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Element;
 
@@ -42,6 +45,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.cxf.ws.security.policy.custom.DefaultAlgorithmSuiteLoader;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
@@ -160,6 +164,17 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     config = WSSConfig.getNewInstance();
                 }
                 translateProperties(message);
+
+                if (binding.getAlgorithmSuite() != null) {
+                    //filter custom alg suite properties:
+                    Map<String, Object> customAlgSuiteParameters = message.getContextualPropertyKeys()
+                            .stream()
+                            .filter(k -> k.startsWith(SecurityConstants.CUSTOM_ALG_SUITE_PREFIX))
+                            .collect(Collectors.toMap(Function.identity(), k -> message.getContextualProperty(k)));
+
+                    DefaultAlgorithmSuiteLoader.customize(binding.getAlgorithmSuite().getAlgorithmSuiteType(),
+                            customAlgSuiteParameters);
+                }
 
                 String asymSignatureAlgorithm =
                     (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);

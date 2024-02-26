@@ -308,7 +308,7 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:binding name="MutualCertificate10SignEncryptRsa15TripleDes_IPingService" type="wssec10test:IPingService">
+     <wsdl:binding name="MutualCertificate10SignEncryptRsa15TripleDes_IPingService" type="wssec10test:IPingService">
         <wsp:PolicyReference URI="#MutualCertificate10SignEncryptRsa15TripleDes_IPingService_policy"/>
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="echo">
