@@ -55,6 +55,8 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.EncryptionConstants;
 
 import org.junit.Test;
 
@@ -70,6 +72,9 @@ import static org.junit.Assert.fail;
 public class WSS4JInOutTest extends AbstractSecurityTest {
 
     public WSS4JInOutTest() {
+        // add xenc11 and dsig11 namespaces
+        testUtilities.addNamespace("xenc11", EncryptionConstants.EncryptionSpec11NS);
+        testUtilities.addNamespace("dsig11", Constants.SignatureSpec11NS);
     }
 
     @Test
@@ -188,6 +193,84 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
                 "http://schemas.xmlsoap.org/soap/envelope/",
                 "Body"
             )
+        );
+    }
+
+    @Test
+    public void testEncryptionWithAgreementMethodsX448() throws Exception {
+        testEncryptionWithAgreementMethod("x448", "//dsig11:DEREncodedKeyValue");
+    }
+
+    @Test
+    public void testEncryptionWithAgreementMethodsX25519() throws Exception {
+        testEncryptionWithAgreementMethod("x25519", "//dsig11:DEREncodedKeyValue");
+    }
+
+    @Test
+    public void testEncryptionWithAgreementMethodsECP256r1() throws Exception {
+        testEncryptionWithAgreementMethod("secp256r1", "//dsig11:ECKeyValue");
+    }
+
+    @Test
+    public void testEncryptionWithAgreementMethodsECP521r1() throws Exception {
+        testEncryptionWithAgreementMethod("secp521r1", "//dsig11:ECKeyValue");
+    }
+
+    /**
+     * Helper method to Test encryption using the specified agreement method with various keys
+     */
+    public void testEncryptionWithAgreementMethod(String alias, String keyElement) throws Exception {
+
+        Map<String, Object> outProperties = new HashMap<>();
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "wss-ecdh.properties");
+        outProperties.put(ConfigurationConstants.USER, alias);
+        outProperties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYWRAP_AES128);
+        outProperties.put(ConfigurationConstants.ENC_KEY_AGREEMENT_METHOD, WSS4JConstants.AGREEMENT_METHOD_ECDH_ES);
+
+        Map<String, Object> inProperties = new HashMap<>();
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "wss-ecdh.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        // assertion of existence of elements
+        List<String> xpaths = new ArrayList<>();
+        xpaths.add(keyElement);
+        xpaths.add("//wsse:Security");
+        xpaths.add("//s:Body/xenc:EncryptedData");
+        xpaths.add("//xenc:AgreementMethod");
+        xpaths.add("//xenc11:KeyDerivationMethod");
+        xpaths.add("//xenc11:ConcatKDFParams");
+        xpaths.add("//xenc:OriginatorKeyInfo");
+        xpaths.add("//xenc:RecipientKeyInfo");
+
+        List<WSHandlerResult> handlerResults =
+                getResults(makeInvocation(outProperties, xpaths, inProperties));
+
+        assertNotNull(handlerResults);
+        assertSame(handlerResults.size(), 1);
+        //
+        // This should contain exactly 1 protection result
+        //
+        final java.util.List<WSSecurityEngineResult> protectionResults =
+                handlerResults.get(0).getResults();
+        assertNotNull(protectionResults);
+        assertSame(protectionResults.size(), 1);
+        //
+        // This result should contain a reference to the decrypted element,
+        // which should contain the soap:Body Qname
+        //
+        final java.util.Map<String, Object> result =
+                protectionResults.get(0);
+        final java.util.List<WSDataRef> protectedElements =
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+        assertNotNull(protectedElements);
+        assertSame(protectedElements.size(), 1);
+        assertEquals(
+                protectedElements.get(0).getName(),
+                new javax.xml.namespace.QName(
+                        "http://schemas.xmlsoap.org/soap/envelope/",
+                        "Body"
+                )
         );
     }
 
