@@ -59,11 +59,13 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Ensures that the WSS4J with attachment is working as expected.
@@ -76,10 +78,33 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         testUtilities.addNamespace("dsig11", Constants.SignatureSpec11NS);
     }
 
+    /**
+     * Test security headers for signing, encryption with ED25519 and X25519 keys. The test
+     * assumes that the Java version is 17 or higher, because the ED25519 is supported from Java 16+ and   .
+     * and the X25519 PKCS8 -parsing error is fixed from Java 12+ by java provided JCE.
+     *
+     * @throws Exception if something goes wrong
+     */
     @Test
-    public void testEncryptEcWithECDHSandBox() throws Exception {
-        String encAlias = "x25519";
-        String signAlias = "ed25519";
+    public void testEncryptWithAgreementMethodWithXECAndEDKeys() throws Exception {
+        Assume.assumeTrue(getJDKVersion() >= 16);
+        testEncryptWithAgreementMethod("ed25519", "x25519");
+    }
+
+    @Test
+    public void testEncryptWithAgreementMethodWithECKeys() throws Exception {
+        testEncryptWithAgreementMethod("secp256r1", "secp256r1");
+    }
+
+    /**
+     * Generic method for testing security headers of the SOAP with Attachment for signing and encryption with
+     * agreement method using various key types configured in the keystore: wss-ecdh.properties.
+     *
+     * @param signAlias the alias of the signature key
+     * @param encAlias the alias of the encryption key
+     * @throws Exception if something goes wrong.
+     */
+    public void testEncryptWithAgreementMethod(String signAlias, String encAlias) throws Exception {
 
         Map<String, Object> outProperties = new HashMap<>();
         // Signature configuration (sign before encrypt)
@@ -151,49 +176,43 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         Document doc = readDocument("edeliver-as4-clean.xml");
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        // ------------------------------------------
         // Configure message
-        SoapMessage msg = getSoapMessageForDom(doc, SOAPConstants.SOAP_1_2_PROTOCOL);
-        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        SoapMessage outMsg = getSoapMessageForDom(doc, SOAPConstants.SOAP_1_2_PROTOCOL);
+        outMsg.put(Message.CONTENT_TYPE, "multipart/related");
         // disable xop:Include where CipherData is serialized as payload in multipart/related
-        msg.put(Message.MTOM_ENABLED, "false");
-        msg.put(Message.ENCODING, StandardCharsets.UTF_8.name());
-        msg.setContent(OutputStream.class, outputStream);
+        outMsg.put(Message.MTOM_ENABLED, "false");
+        outMsg.put(Message.ENCODING, StandardCharsets.UTF_8.name());
+        outMsg.setContent(OutputStream.class, outputStream);
 
         // add attachments
-        msg.setAttachments(new ArrayList<>());
+        outMsg.setAttachments(new ArrayList<>());
         DataHandler dataHandler = new DataHandler(attachmentContent1, "text/plain");
         AttachmentImpl attachment001 = new AttachmentImpl("attachment_id_001", dataHandler);
-        msg.getAttachments().add(attachment001);
+        outMsg.getAttachments().add(attachment001);
         DataHandler dataHandler2 = new DataHandler(attachmentContent2, "text/plain");
-        msg.getAttachments().add(new AttachmentImpl("attachment_id_002", dataHandler2));
+        outMsg.getAttachments().add(new AttachmentImpl("attachment_id_002", dataHandler2));
 
         // add or overwrite properties
         for (String key : outProperties.keySet()) {
-            msg.put(key, outProperties.get(key));
+            outMsg.put(key, outProperties.get(key));
         }
 
-        // ------------------------------------------
-        // Configure Out message bus
-        List<Interceptor<? extends Message>> outInterceptorList = new ArrayList<>();
-        outInterceptorList.add(new AttachmentOutInterceptor());
-        outInterceptorList.add(new WSS4JOutInterceptor());
-        outInterceptorList.add(new StaxOutInterceptor());
-        outInterceptorList.add(new SAAJOutInterceptor());
-        PhaseManagerImpl pmOut = new PhaseManagerImpl();
-        PhaseInterceptorChain outPhaseInterceptorChain = new PhaseInterceptorChain(pmOut.getOutPhases());
-        msg.setInterceptorChain(outPhaseInterceptorChain);
-        outPhaseInterceptorChain.add(outInterceptorList);
+        // Configure OUT message bus
+        PhaseInterceptorChain outPhaseInterceptorChain = buildSimpleOutInterceptorChain();
+        outMsg.setInterceptorChain(outPhaseInterceptorChain);
 
-        // ------------------------------------------
         // process message
-        outPhaseInterceptorChain.doIntercept(msg);
-        // validated
-        SOAPMessage soapMessage = msg.getContent(SOAPMessage.class);
+        outPhaseInterceptorChain.doIntercept(outMsg);
+        // xpath validation in output message (SOAPMessage)
+        SOAPMessage soapMessage = outMsg.getContent(SOAPMessage.class);
         doc = soapMessage.getSOAPPart();
         for (String xpath : xpaths) {
             assertValid(xpath, doc);
         }
+        // mime message bytes
+        byte [] mimeMessageBytes = outputStream.toByteArray();
+        // the output stream must not be empty
+        assertTrue(mimeMessageBytes.length > 0);
 
         // build input message
         MessageImpl inMessage = new MessageImpl();
@@ -202,23 +221,12 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(inMsg);
         // set input multipart stream
-        inMsg.setContent(InputStream.class, new ByteArrayInputStream(outputStream.toByteArray()));
+        inMsg.setContent(InputStream.class, new ByteArrayInputStream(mimeMessageBytes));
         inMsg.setExchange(ex);
 
-        // ------------------------------------------
-        // Configure message bus
-        List<Interceptor<? extends Message>> inInterceptorList = new ArrayList<>();
-        inInterceptorList.add(new AttachmentInInterceptor());
-        inInterceptorList.add(new StaxInInterceptor());
-        inInterceptorList.add(new SAAJInInterceptor());
-        inInterceptorList.add(new WSS4JInInterceptor(inProperties));
-
-        PhaseManagerImpl pmIn = new PhaseManagerImpl();
-        PhaseInterceptorChain inPhaseInterceptorChain = new PhaseInterceptorChain(pmIn.getInPhases());
+        // Configure IN message bus
+        PhaseInterceptorChain inPhaseInterceptorChain = buildSimpleInInterceptorChain(inProperties);
         inMsg.setInterceptorChain(inPhaseInterceptorChain);
-        inPhaseInterceptorChain.add(inInterceptorList);
-
-        // ------------------------------------------
         // process message
         inPhaseInterceptorChain.doIntercept(inMsg);
 
@@ -229,10 +237,8 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         SOAPMessage inSoapMessage = inMsg.getContent(SOAPMessage.class);
         doc = inSoapMessage.getSOAPPart();
         assertNotNull(doc);
-        // test attachments
+        // test attachments - processed in message must have 2 attachments with decrypted content
         assertNotNull(inSoapMessage.getAttachments());
-        assertEquals(2, inMsg.getAttachments().size());
-
         Iterator<Attachment> iteAtt = inMsg.getAttachments().iterator();
         assertEquals(2, inMsg.getAttachments().size());
         assertEquals(attachmentContent1, iteAtt.next().getDataHandler().getContent());
@@ -240,5 +246,52 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         assertNotNull(inSoapMessage.getSOAPHeader());
 
         return inMsg;
+    }
+
+    /**
+     * Method builds and configures the OUT PhaseInterceptorChain with all necessary interceptors to handle the
+     * security headers for soap with attachments: AttachmentOutInterceptor, WSS4JOutInterceptor, StaxOutInterceptor,
+     * SAAJOutInterceptor.
+     * @return outPhaseInterceptorChain - configured out PhaseInterceptorChain
+     */
+    protected PhaseInterceptorChain buildSimpleOutInterceptorChain() {
+        List<Interceptor<? extends Message>> outInterceptorList = new ArrayList<>();
+        outInterceptorList.add(new AttachmentOutInterceptor());
+        outInterceptorList.add(new WSS4JOutInterceptor());
+        outInterceptorList.add(new StaxOutInterceptor());
+        outInterceptorList.add(new SAAJOutInterceptor());
+        PhaseManagerImpl pmOut = new PhaseManagerImpl();
+        PhaseInterceptorChain outPhaseInterceptorChain = new PhaseInterceptorChain(pmOut.getOutPhases());
+        outPhaseInterceptorChain.add(outInterceptorList);
+        return outPhaseInterceptorChain;
+    }
+
+    /**
+     * Method builds and configures the IN PhaseInterceptorChain with all necessary interceptors to handle the
+     * security headers for soap with attachments: AttachmentInInterceptor, StaxInInterceptor, SAAJInInterceptor,
+     * WSS4JInInterceptor.
+     * @param inProperties - properties for in WSS4JInInterceptor
+     * @return inPhaseInterceptorChain - configured in PhaseInterceptorChain
+     */
+    protected PhaseInterceptorChain buildSimpleInInterceptorChain(Map<String, Object> inProperties) {
+        List<Interceptor<? extends Message>> inInterceptorList = new ArrayList<>();
+        inInterceptorList.add(new AttachmentInInterceptor());
+        inInterceptorList.add(new StaxInInterceptor());
+        inInterceptorList.add(new SAAJInInterceptor());
+        inInterceptorList.add(new WSS4JInInterceptor(inProperties));
+
+        PhaseManagerImpl pmIn = new PhaseManagerImpl();
+        PhaseInterceptorChain inPhaseInterceptorChain = new PhaseInterceptorChain(pmIn.getInPhases());
+        inPhaseInterceptorChain.add(inInterceptorList);
+        return inPhaseInterceptorChain;
+    }
+
+    public static int getJDKVersion() {
+        try {
+            return Integer.getInteger("java.specification.version", 0);
+        } catch (NumberFormatException ex) {
+            // ignore
+        }
+        return 0;
     }
 }
