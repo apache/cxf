@@ -58,6 +58,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -198,11 +199,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptionWithAgreementMethodsX448() throws Exception {
+        Assume.assumeTrue(getJDKVersion() >= 16);
         testEncryptionWithAgreementMethod("x448", "//dsig11:DEREncodedKeyValue");
     }
 
     @Test
     public void testEncryptionWithAgreementMethodsX25519() throws Exception {
+        Assume.assumeTrue(getJDKVersion() >= 16);
         testEncryptionWithAgreementMethod("x25519", "//dsig11:DEREncodedKeyValue");
     }
 

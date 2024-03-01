@@ -286,12 +286,4 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
         return inPhaseInterceptorChain;
     }
 
-    public static int getJDKVersion() {
-        try {
-            return Integer.getInteger("java.specification.version", 0);
-        } catch (NumberFormatException ex) {
-            // ignore
-        }
-        return 0;
-    }
 }
