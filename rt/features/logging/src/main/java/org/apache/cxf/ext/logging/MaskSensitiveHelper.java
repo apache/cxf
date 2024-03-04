@@ -27,8 +27,8 @@ import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
-    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<-ELEMENT_NAME-.*?>)(.*?)(</-ELEMENT_NAME->)";
-    private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$3";
+    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<(\\w+:)?-ELEMENT_NAME-.*?>)(.*?)(</(\\w+:)?-ELEMENT_NAME->)";
+    private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$4";
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
     private static final String MASKED_HEADER_VALUE = "XXX";
@@ -55,7 +55,7 @@ public class MaskSensitiveHelper {
         replacementsJSON.clear();
         addSensitiveElementNames(inSensitiveElementNames);
     }
-    
+
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         for (final String sensitiveName : inSensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE, sensitiveName, replacementsXML);
