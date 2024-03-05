@@ -67,7 +67,7 @@ public class Headers {
     public static final String HTTP_HEADERS_LINK = "Link";
     public static final String EMPTY_REQUEST_PROPERTY = "org.apache.cxf.empty.request";
     public static final String USER_AGENT = initUserAgent();
-    private static final String SET_EMPTY_REQUEST_CT_PROPERTY = "set.content.type.for.empty.request";
+    public static final String SET_EMPTY_REQUEST_CT_PROPERTY = "set.content.type.for.empty.request";
     private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
 
