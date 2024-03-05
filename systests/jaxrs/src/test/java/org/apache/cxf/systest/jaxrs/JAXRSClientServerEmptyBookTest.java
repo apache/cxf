@@ -19,7 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
