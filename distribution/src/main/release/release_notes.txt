@@ -1,4 +1,4 @@
-Apache CXF 4.0.3 Release Notes
+Apache CXF 4.0.4 Release Notes
 
 1. Overview
 
@@ -21,7 +21,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.3 fixes over 54 JIRA issues reported by users and the community.
+4.0.4 fixes over 28 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -63,67 +63,48 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-8842] - Get rid of EasyMock in cxf-core
-    * [CXF-8843] - Get rid of EasyMock in cxf-integration-jca
-    * [CXF-8844] - Get rid of EasyMock in cxf-rt-bindings-coloc
-    * [CXF-8845] - Get rid of EasyMock in cxf-rt-bindings-corba
-    * [CXF-8846] - Get rid of EasyMock in cxf-rt-bindings-soap
-    * [CXF-8847] - Get rid of EasyMock in cxf-rt-databinding-aegis
-    * [CXF-8848] - Get rid of EasyMock in cxf-rt-databinding-jaxb
-    * [CXF-8849] - Get rid of EasyMock in cxf-rt-features-clustering
-    * [CXF-8850] - Get rid of EasyMock in cxf-rt-features-logging
-    * [CXF-8851] - Get rid of EasyMock in cxf-rt-features-throttling
-    * [CXF-8852] - Get rid of EasyMock in cxf-services-xkms-x509-repo-ldap
-    * [CXF-8853] - Get rid of EasyMock in cxf-services-xkms-x509-handlers
-    * [CXF-8854] - Get rid of EasyMock in cxf-rt-wsdl
-    * [CXF-8855] - Get rid of EasyMock in cxf-rt-ws-transfer
-    * [CXF-8856] - Get rid of EasyMock in cxf-rt-frontend-jaxrs
-    * [CXF-8857] - Get rid of EasyMock in cxf-rt-frontend-jaxws
-    * [CXF-8858] - Get rid of EasyMock in cxf-rt-frontend-js
-    * [CXF-8859] - Get rid of EasyMock in cxf-rt-ws-security
-    * [CXF-8860] - Get rid of EasyMock in cxf-rt-ws-rm
-    * [CXF-8861] - Get rid of EasyMock in cxf-rt-ws-policy
-    * [CXF-8862] - Get rid of EasyMock in cxf-rt-ws-addr
-    * [CXF-8863] - Get rid of EasyMock in cxf-rt-transports-websocket
-    * [CXF-8864] - Get rid of EasyMock in cxf-rt-transports-jms
-    * [CXF-8865] - Get rid of EasyMock in cxf-rt-management
-    * [CXF-8866] - Get rid of EasyMock in cxf-rt-rs-service-description
-    * [CXF-8867] - Get rid of EasyMock in cxf-rt-rs-client
-    * [CXF-8868] - Get rid of EasyMock in cxf-rt-rs-extension-providers
-    * [CXF-8869] - Get rid of EasyMock in cxf-rt-rs-extension-search
-    * [CXF-8870] - Get rid of EasyMock in cxf-rt-transports-http-undertow
-    * [CXF-8871] - Get rid of EasyMock in cxf-rt-rs-mp-client
-    * [CXF-8872] - Get rid of EasyMock in cxf-rt-rs-security-oauth2
-    * [CXF-8873] - Get rid of EasyMock in cxf-rt-rs-security-oauth2-saml
-    * [CXF-8874] - Get rid of EasyMock in cxf-rt-rs-security-sso-oidc
-    * [CXF-8876] - Get rid of EasyMock in cxf-rt-transports-http-jetty
-    * [CXF-8877] - Get rid of EasyMock in cxf-rt-transports-http-netty-client
-    * [CXF-8878] - Get rid of EasyMock in cxf-rt-transports-http-netty-server
-    * [CXF-8890] - Get rid of EasyMock in cxf-rt-transports-http
 
 ** Bug
-    * [CXF-8885] - HttpClient SelectorManager threads run indefinitely causing OOM
-    * [CXF-8886] - JavaDocProvider does not work with JDK 17 and beyond
-    * [CXF-8889] - Compilation of CXF fails due to a "jakarta..." vs. "javax..." issue.
-    * [CXF-8892] - CXF build on Windows is broken (test failures)
-    * [CXF-8895] - Deadlock instead of timeout with new HttpClientHTTPConduit using large payloads
-    * [CXF-8896] - http client sends some strange HTTP/1.1 and HTTP/2 mix headers
-    * [CXF-8903] - Too many open files error in HttpClientHTTPConduit
-    * [CXF-8905] - TransportURIResolver doesn't honor the property setting in bus
-    * [CXF-8907] -  java.lang.NullPointerException at AsymmetricBindingHandler.java
-    * [CXF-8914] - No content-length header after upgrade CXF from 3.5.6 to 3.6.1
-    * [CXF-8919] - JAXRSUtils references javax.activation.Datasource
-    * [CXF-8920] - Can't filter when collection has attribute of type LocalDate or LocalDateTime
-    * [CXF-8925] - Logging twice in case of faults happening after pre-stream phase in out-chain
+    * [CXF-8812] - Content-Type header created with collection containing "null" value
+    * [CXF-8834] - "Operation [{.../wsdl}Issue] already exists" when calling JaxWsServerFactoryBean.create() for SecurityTokenService
+    * [CXF-8932] - [WSDL2JAVA] Not working on JDK11
+    * [CXF-8936] - Fix h2 protocol negotiation in Jetty Transport
+    * [CXF-8939] - java.lang.NullPointerException: Cannot invoke "java.util.List.size()" because the return value of "java.util.Map$Entry.getValue()" is null
+    * [CXF-8940] - ws-security.must-understand works only if security.enable.streaming is true
+    * [CXF-8944] - wsdl2java frontend jaxws21 doesn't work
+    * [CXF-8945] - [JAX-WS] The client out interceptor chain is not called in case of oneway operation
+    * [CXF-8946] - HttpClient in CXF causing memory leak
+    * [CXF-8952] - HttpClientHTTPConduit in CXF doesn't support TLSv1.3 along with other protocols
+    * [CXF-8955] - Custom timeout with Message.RECEIVE_TIMEOUT not working with hc5 / hc
+    * [CXF-8957] - The org.apache.cxf.systest.jaxrs.JAXRSMultipartTest randomly hangs under JDK-21
+    * [CXF-8959] - Detect order dependent flakiness in AttachmentUtilTest.java in core module
+    * [CXF-8962] - HttpClientHTTPConduit sets Content-Type Header for DELETE requests with empty body
+    * [CXF-8963] - URI is always unknown in server request metrics 
+    * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
+    * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
+    * [CXF-8978] - Codegen plugin fails with IBM JDK
+
 
 ** New Feature
-    * [CXF-8817] - Add support for Micrometer Observation
+    * [CXF-8911] - Allow creating a custom CXFHttpAsyncResponseConsumer
+    * [CXF-8970] - ensure we can build and run without bouncycastle dependencies
+
 
 ** Improvement
-    * [CXF-8457] - Provide OpenTelemetry support
-    * [CXF-8901] - Update Guava to 32.1.1 (solving CVE-2023-2976)
-    * [CXF-8912] - Remove xerces dependency and use the JDK's JAXP impl
+    * [CXF-8894] - ContextHandler - Unimplemented getRequestCharacterEncoding() - use org.eclipse.jetty.servlet.ServletContextHandler
+    * [CXF-8928] - Reduce code quality warnings in generated code
+    * [CXF-8933] - Add doPrivileged block to ProxyFactoryProxySelector.select() in  HttpClientHTTPConduit
+    * [CXF-8937] - Add `cxf-integration-tracing-micrometer` to bom
+    * [CXF-8948] - wsdlto tool should throw exception when bindingFiles is invalid
+    * [CXF-8953] - Better support of the HTTPS protocol versions used by client/server conduits
+    * [CXF-8954] - Always create MBeanServer instance per Jetty Server instance and destroy server properly at shutdown
+    * [CXF-8968] - OpenTelemetryClientFeature cannot be used as a CDI bean unless it has a no-args constructor
+
+
+** Test
+    * [CXF-8981] - WSS4J  Encyption using the Key Agreement Method with the apache-CXF
+
 
 ** Task
-    * [CXF-8549] - Get rid of EasyMock
+    * [CXF-8935] - Add doPrivileged block to httpclient.sendAsync() in HttpClientHTTPConduit
+
