@@ -104,6 +104,8 @@ public class SourceType extends AegisType {
     protected XMLReader createXMLReader() throws SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
+        // Disable DTDs
+        spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         return spf.newSAXParser().getXMLReader();
     }
 
