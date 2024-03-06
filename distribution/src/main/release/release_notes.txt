@@ -83,6 +83,7 @@ for caveats when upgrading.
     * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
     * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
     * [CXF-8978] - Codegen plugin fails with IBM JDK
+    * [CXF-8983] - cxf-services-sts-core should depend on cxf-rt-rs-security-jose instead of cxf-rt-rs-security-jose-jaxrs
 
 
 ** New Feature
