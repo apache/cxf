@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
-            <version>4.0.4-SNAPSHOT</version>
+            <version>4.0.5-SNAPSHOT</version>
             <exclusions><!-- CXF uses java.util.logging by default -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-metrics</artifactId>
-            <version>4.0.4-SNAPSHOT</version>
+            <version>4.0.5-SNAPSHOT</version>
         </dependency>
         <!-- Eureka Service Discovery Client -->
         <dependency>
