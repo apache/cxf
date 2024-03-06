@@ -817,7 +817,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         @Override
         protected void closeInputStream() throws IOException {
-            getInputStream().close();
+            InputStream is = getInputStream();
+            if (is != null) {
+                is.close();
+            }
         }
 
         @Override
