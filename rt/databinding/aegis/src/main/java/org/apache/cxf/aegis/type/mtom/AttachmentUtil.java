@@ -31,9 +31,14 @@ import javax.activation.URLDataSource;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.util.UID;
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.message.Attachment;
 
 public final class AttachmentUtil {
+    // The xop:include "href" attribute (https://www.w3.org/TR/xop10/#xop_href) may include 
+    // arbitrary URL which we should never follow (unless explicitly allowed).
+    public static final String ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY = "org.apache.cxf.attachment.xop.follow.urls";
+
     private AttachmentUtil() {
         //utility class
     }
@@ -52,13 +57,14 @@ public final class AttachmentUtil {
         if (id == null) {
             throw new DatabindingException("Cannot get attachment: null id");
         }
+        if (attachments == null) {
+            return null;
+        }
+
+
         int i = id.indexOf("cid:");
         if (i != -1) {
             id = id.substring(4).trim();
-        }
-
-        if (attachments == null) {
-            return null;
         }
 
         for (Iterator<Attachment> iter = attachments.iterator(); iter.hasNext();) {
@@ -68,12 +74,17 @@ public final class AttachmentUtil {
             }
         }
 
-        // Try loading the URL remotely
-        try {
-            URLDataSource source = new URLDataSource(new URL(id));
-            return new AttachmentImpl(id, new DataHandler(source));
-        } catch (MalformedURLException e) {
-            return null;
+        final boolean followUrls = Boolean.valueOf(SystemPropertyAction
+                        .getProperty(ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "false"));
+        if (followUrls) {
+            // Try loading the URL remotely
+            try {
+                URLDataSource source = new URLDataSource(new URL(id));
+                return new AttachmentImpl(id, new DataHandler(source));
+            } catch (MalformedURLException e) {
+                return null;
+            }
         }
+        return null;
     }
 }
