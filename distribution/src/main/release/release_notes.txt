@@ -1,4 +1,4 @@
-Apache CXF 3.5.7 Release Notes
+Apache CXF 3.5.8 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.7 fixes over 12 JIRA issues reported by users and the community.
+3.5.8 fixes over 13 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -73,24 +73,27 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-8606] - Introduce HTTP/2 Transport: client-side support (Netty & HttpClient 5)
-    * [CXF-8877] - Get rid of EasyMock in cxf-rt-transports-http-netty-client
-
 ** Bug
-    * [CXF-8881] - WSDLValidator link doesn't work
-    * [CXF-8882] - Apache HttpClient 5 async conduit does not handle authentication
-    * [CXF-8884] - Update commons-jexl3 to 3.3
-    * [CXF-8886] - JavaDocProvider does not work with JDK 17 and beyond
-    * [CXF-8907] -  java.lang.NullPointerException at AsymmetricBindingHandler.java
-    * [CXF-8918] - Upgrade xnio-nio jar to latest version (3.8.8+) to get rid of CVE-2022-0084
-    * [CXF-8920] - Can't filter when collection has attribute of type LocalDate or LocalDateTime
-    * [CXF-8925] - Logging twice in case of faults happening after pre-stream phase in out-chain
+    * [CXF-8812] - Content-Type header created with collection containing "null" value
+    * [CXF-8834] - "Operation [{.../wsdl}Issue] already exists" when calling JaxWsServerFactoryBean.create() for SecurityTokenService
+    * [CXF-8939] - java.lang.NullPointerException: Cannot invoke "java.util.List.size()" because the return value of "java.util.Map$Entry.getValue()" is null
+    * [CXF-8940] - ws-security.must-understand works only if security.enable.streaming is true
+    * [CXF-8945] - [JAX-WS] The client out interceptor chain is not called in case of oneway operation
+    * [CXF-8955] - Custom timeout with Message.RECEIVE_TIMEOUT not working with hc5 / hc
+    * [CXF-8959] - Detect order dependent flakiness in AttachmentUtilTest.java in core module
+    * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
+    * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
+
+
+** New Feature
+    * [CXF-8911] - Allow creating a custom CXFHttpAsyncResponseConsumer
+
 
 ** Improvement
-    * [CXF-8457] - Provide OpenTelemetry support
-    * [CXF-8802] - Update to Maven Remote Resources Plugin 3.1.0
-    * [CXF-8901] - Update Guava to 32.1.1 (solving CVE-2023-2976)
+    * [CXF-8928] - Reduce code quality warnings in generated code
+    * [CXF-8953] - Better support of the HTTPS protocol versions used by client/server conduits
+    * [CXF-8968] - OpenTelemetryClientFeature cannot be used as a CDI bean unless it has a no-args constructor
+
 
 
 
