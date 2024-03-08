@@ -153,7 +153,7 @@
         <cxf.jakarta.ws.rs.version>3.0.0</cxf.jakarta.ws.rs.version>
         <cxf.jaxb.runtime.version>3.0.2</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>3.0.1</cxf.jaxb.version>
-        <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
+        <cxf.jaxb.xjc.version>4.0.5</cxf.jaxb.xjc.version>
         <cxf.jaxen.version>2.0.0</cxf.jaxen.version>
         <cxf.jboss.logging.version>3.5.3.Final</cxf.jboss.logging.version>
         <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
