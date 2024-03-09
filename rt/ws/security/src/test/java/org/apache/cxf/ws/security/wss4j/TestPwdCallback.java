@@ -36,6 +36,11 @@ public class TestPwdCallback implements CallbackHandler {
         passwords.put("myalias", "myAliasPassword");
         passwords.put("alice", "alicePassword");
         passwords.put("username", "myAliasPassword");
+        passwords.put("x448", "security");
+        passwords.put("x25519", "security");
+        passwords.put("secp256r1", "security");
+        passwords.put("secp384r1", "security");
+        passwords.put("secp521r1", "security");
     }
 
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {

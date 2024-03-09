@@ -171,4 +171,13 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
             }
         }
     }
+
+    protected int getJDKVersion() {
+        try {
+            return Integer.getInteger("java.specification.version", 0);
+        } catch (NumberFormatException ex) {
+            // ignore
+        }
+        return 0;
+    }
 }

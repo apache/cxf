@@ -67,7 +67,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
+            <artifactId>cxf-rt-rs-security-jose</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

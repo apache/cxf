@@ -567,9 +567,26 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }
             if (!h.headerMap().containsKey("User-Agent")) {
                 rb.header("User-Agent", Headers.USER_AGENT);
-            }   
+            }
+
             if (hasCT || !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(outMessage.get(Message.HTTP_REQUEST_METHOD))) {
-                rb.header(HttpHeaderHelper.CONTENT_TYPE, h.determineContentType());
+                boolean dropContentType = false;
+                boolean emptyRequest = PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY));
+
+                // If it is an empty request (without a request body) then check further if CT still needs be set
+                if (emptyRequest) {
+                    final Object setCtForEmptyRequestProp = outMessage
+                        .getContextualProperty(Headers.SET_EMPTY_REQUEST_CT_PROPERTY);
+                    if (setCtForEmptyRequestProp != null) {
+                        // If SET_EMPTY_REQUEST_CT_PROPERTY is set then do as a user prefers.
+                        // CT will be dropped if setting CT for empty requests was explicitly disabled
+                        dropContentType = PropertyUtils.isFalse(setCtForEmptyRequestProp);
+                    }
+                }
+
+                if (!dropContentType) {
+                    rb.header(HttpHeaderHelper.CONTENT_TYPE, h.determineContentType());
+                }
             }            
         }
         
@@ -800,7 +817,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         @Override
         protected void closeInputStream() throws IOException {
-            getInputStream().close();
+            InputStream is = getInputStream();
+            if (is != null) {
+                is.close();
+            }
         }
 
         @Override

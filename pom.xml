@@ -46,6 +46,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
         <maven-owasp-plugin-version>9.0.9</maven-owasp-plugin-version>
+        <preparationGoals>clean install</preparationGoals>
     </properties>
     <distributionManagement>
         <repository>
@@ -456,7 +457,7 @@
                     <version>3.0.1</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
-                        <preparationGoals>clean install</preparationGoals>
+                        <preparationGoals>${preparationGoals}</preparationGoals>
                         <goals>deploy</goals>
                         <arguments>-Prelease,deploy</arguments>
                         <autoVersionSubmodules>true</autoVersionSubmodules>

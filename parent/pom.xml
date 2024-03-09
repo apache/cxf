@@ -136,8 +136,8 @@
         <cxf.jackson.databind.version>2.16.1</cxf.jackson.databind.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.1</cxf.jaeger.version>
-        <cxf.jakarta.activation.version>2.1.2</cxf.jakarta.activation.version>
-        <cxf.jakarta.mail.version>2.1.2</cxf.jakarta.mail.version>
+        <cxf.jakarta.activation.version>2.1.3</cxf.jakarta.activation.version>
+        <cxf.jakarta.mail.version>2.1.3</cxf.jakarta.mail.version>
         <cxf.jakarta.injectapi.version>2.0.1</cxf.jakarta.injectapi.version>
         <cxf.jakarta.interceptorapi.version>2.1.0</cxf.jakarta.interceptorapi.version>
         <cxf.jakarta.jwsapi.version>3.0.0</cxf.jakarta.jwsapi.version>
@@ -162,7 +162,7 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty12.version>12.0.6</cxf.jetty12.version>
+        <cxf.jetty12.version>12.0.7</cxf.jetty12.version>
         <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
@@ -175,7 +175,7 @@
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
         <cxf.ldapsdk.version>6.0.11</cxf.ldapsdk.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
-        <cxf.logback.classic.version>1.5.0</cxf.logback.classic.version>
+        <cxf.logback.classic.version>1.5.3</cxf.logback.classic.version>
         <cxf.lucene.version>9.10.0</cxf.lucene.version>
         <cxf.maven.core.version>3.9.6</cxf.maven.core.version>
         <cxf.micrometer.version>1.12.3</cxf.micrometer.version>
@@ -184,7 +184,7 @@
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.1</cxf.mina.version>
-        <cxf.mockito.version>5.10.0</cxf.mockito.version>
+        <cxf.mockito.version>5.11.0</cxf.mockito.version>
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.0</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
@@ -219,7 +219,7 @@
         <cxf.spring.security.version>6.2.1</cxf.spring.security.version>
         <cxf.spring.version>6.1.4</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>5.10.3</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.11.8</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.20</cxf.swagger.v3.version>
         <cxf.tika.version>2.7.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.18</cxf.tomcat.version>
@@ -234,10 +234,10 @@
         <cxf.velocity.version>2.3</cxf.velocity.version>
         <cxf.wildfly.common.version>1.7.0.Final</cxf.wildfly.common.version>
         <cxf.wiremock.version>3.4.2</cxf.wiremock.version>
-        <cxf.woodstox.core.version>6.6.0</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>6.6.1</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.jakarta.wss4j.version>3.0.3-SNAPSHOT</cxf.jakarta.wss4j.version>
+        <cxf.jakarta.wss4j.version>3.0.3</cxf.jakarta.wss4j.version>
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
         <cxf.xnio.version>3.8.13.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
@@ -254,8 +254,8 @@
         <cxf.fastinfoset.bundle.version>1.2.18_1</cxf.fastinfoset.bundle.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.istack.version>4.2.0</cxf.istack.version>
-        <cxf.jakarta.angus.mail.version>1.0.0</cxf.jakarta.angus.mail.version>
-        <cxf.jakarta.angus.activation.version>2.0.1</cxf.jakarta.angus.activation.version>
+        <cxf.jakarta.angus.mail.version>2.0.3</cxf.jakarta.angus.mail.version>
+        <cxf.jakarta.angus.activation.version>2.0.2</cxf.jakarta.angus.activation.version>
         <cxf.jasypt.bundle.version>1.9.3_1</cxf.jasypt.bundle.version>
         <cxf.jaxb.bundle.version>2.3.2_1</cxf.jaxb.bundle.version>
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -396,7 +396,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.13.0</version>
+                            <version>10.14.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
