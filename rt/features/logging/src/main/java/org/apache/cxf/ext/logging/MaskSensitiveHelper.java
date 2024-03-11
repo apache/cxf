@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,7 +27,12 @@ import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
-    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<(\\w+:)?-ELEMENT_NAME-.*?>)(.*?)(</(\\w+:)?-ELEMENT_NAME->)";
+    // see https://www.w3.org/TR/REC-xml-names/#NT-NCName for allowed chars in namespace prefix
+    private static final String PATTERN_XML_NAMESPACE_PREFIX = "[\\w.\\-\\u00B7\\u00C0-\\u00D6\\u00D8-\\u00F6" +
+            "\\u00F8-\\u02FF\\u0300-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u203F-\\u2040\\u2070-\\u218F" +
+            "\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD]+";
+    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<(" + PATTERN_XML_NAMESPACE_PREFIX
+            + ":)?-ELEMENT_NAME-.*?>)(.*?)(</(" + PATTERN_XML_NAMESPACE_PREFIX + ":)?-ELEMENT_NAME->)";
     private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$4";
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
@@ -64,9 +69,9 @@ public class MaskSensitiveHelper {
     }
 
     private void addReplacementPair(final String matchPatternTemplate,
-                                    final String replacementTemplate,
-                                    final String sensitiveName,
-                                    final Set<ReplacementPair> replacements) {
+            final String replacementTemplate,
+            final String sensitiveName,
+            final Set<ReplacementPair> replacements) {
         final String matchPatternXML = matchPatternTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
         final String replacementXML = replacementTemplate.replaceAll(ELEMENT_NAME_TEMPLATE, sensitiveName);
         replacements.add(new ReplacementPair(matchPatternXML, replacementXML));
