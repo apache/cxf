@@ -242,9 +242,17 @@ public class WadlGenerator implements ContainerRequestFilter {
                 if (path.startsWith("/") && !path.isEmpty()) {
                     path = path.substring(1);
                 }
-                if (stylesheetReference != null && path.endsWith(".xsl")
-                    || docLocationMap.containsKey(path)) {
+
+                if (docLocationMap.containsKey(path)) {
                     context.abortWith(getExistingResource(m, ui, path));
+                } else if (stylesheetReference != null) {
+                    String theStylesheetReference = stylesheetReference;
+                    if (theStylesheetReference.startsWith("/")) {
+                        theStylesheetReference = theStylesheetReference.substring(1);
+                    }
+                    if (path.endsWith(theStylesheetReference)) {
+                        context.abortWith(getExistingResource(m, ui, stylesheetReference));
+                    }
                 }
             }
             return;
