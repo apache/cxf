@@ -198,7 +198,7 @@
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
         <cxf.parsson.version>1.1.5</cxf.parsson.version>
         <cxf.persistence-api.version>3.1.0</cxf.persistence-api.version>
-        <cxf.plexus-archiver.version>4.9.1</cxf.plexus-archiver.version>
+        <cxf.plexus-archiver.version>4.9.2</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.4</cxf.reactivestreams.version>
         <cxf.reactor.version>3.6.4</cxf.reactor.version>
@@ -216,7 +216,7 @@
         <cxf.spring.boot.version>3.2.3</cxf.spring.boot.version>
         <cxf.spring.ldap.version>3.2.2</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>6.2.1</cxf.spring.security.version>
+        <cxf.spring.security.version>6.2.3</cxf.spring.security.version>
         <cxf.spring.version>6.1.5</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.11.10</cxf.swagger.ui.version>
@@ -277,7 +277,7 @@
         <cxf.wsdl4j.bundle.version>1.6.3_1</cxf.wsdl4j.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_5</cxf.xmlresolver.bundle.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
-        <cxf.awaitility.version>4.2.0</cxf.awaitility.version>
+        <cxf.awaitility.version>4.2.1</cxf.awaitility.version>
     </properties>
     <build>
         <resources>
@@ -396,7 +396,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.14.1</version>
+                            <version>10.14.2</version>
                         </dependency>
                     </dependencies>
                     <configuration>
