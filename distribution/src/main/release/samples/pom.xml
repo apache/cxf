@@ -39,7 +39,7 @@
         <cxf.tika.version>2.9.1</cxf.tika.version>
         <cxf.tomcat.version>9.0.87</cxf.tomcat.version>
         <graalvm.version>21.1.0</graalvm.version>
-        <cxf.aspectj.version>1.9.21.2</cxf.aspectj.version>
+        <cxf.aspectj.version>1.9.22</cxf.aspectj.version>
         <cxf.brave.version>5.17.0</cxf.brave.version>
         <cxf.olingo.version>4.10.0</cxf.olingo.version>
     </properties>
