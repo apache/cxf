@@ -61,7 +61,7 @@ public class HeadersTest {
         when(req.getHeaderNames()).thenReturn(Collections.enumeration(inmap.keySet()));
         for (int i = 0; i < headerNames.length; i++) {
             when(req.getHeaders(headerNames[i])).
-                thenReturn(Collections.enumeration(inmap.get(headerNames[i])));
+                    thenReturn(Collections.enumeration(inmap.get(headerNames[i])));
         }
         when(req.getContentType()).thenReturn(headerValues[0]);
 
@@ -72,7 +72,7 @@ public class HeadersTest {
         headers.copyFromRequest(req);
 
         Map<String, List<String>> protocolHeaders =
-            CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+                CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
         assertTrue("unexpected size", protocolHeaders.size() == headerNames.length);
 
@@ -103,10 +103,10 @@ public class HeadersTest {
         String loggedString = Headers.toString(headerMap, false);
         assertFalse("The value of a sensitive header could be logged: " + loggedString, loggedString.contains("FAIL"));
         assertTrue("The value of a non-sensitive header would not be logged: " + loggedString,
-                   loggedString.contains("application/xml") && loggedString.contains("text/plain"));
+                loggedString.contains("application/xml") && loggedString.contains("text/plain"));
         assertTrue("Expected header keys were not logged: " + loggedString,
-                   loggedString.contains("Authorization") && loggedString.contains("Proxy-Authorization")
-                   && loggedString.contains("Accept") && loggedString.contains("Content-Type"));
+                loggedString.contains("Authorization") && loggedString.contains("Proxy-Authorization")
+                        && loggedString.contains("Accept") && loggedString.contains("Content-Type"));
     }
 
     @Test
@@ -132,17 +132,17 @@ public class HeadersTest {
                 String msg = record.getMessage();
                 if (msg.startsWith("Normal-Header")) {
                     assertTrue("Unexpected output for normal header - expected Normal-Header: normal, received " + msg,
-                               "Normal-Header: normal".equals(msg));
+                            "Normal-Header: normal".equals(msg));
                 } else if (msg.startsWith("Multivalue-Header")) {
                     assertTrue("Unexpected output for multi-value header - expected Multivalue-Header: first or "
-                        + "Multivalue-Header: second, received: " + msg,
-                        "Multivalue-Header: first".equals(msg) || "Multivalue-Header: second".equals(msg));
+                                    + "Multivalue-Header: second, received: " + msg,
+                            "Multivalue-Header: first".equals(msg) || "Multivalue-Header: second".equals(msg));
                 } else if (msg.startsWith("Authorization")) {
                     assertTrue("Unexpected output for sensitive header - expected Authorization: ***, received " + msg,
-                               "Authorization: ***".equals(msg));
+                            "Authorization: ***".equals(msg));
                 } else if (msg.startsWith("Null-Header")) {
                     assertTrue("Unexpected output for null header - expected Null-Header: <null>, received " + msg,
-                               "Null-Header: <null>".equals(msg));
+                            "Null-Header: <null>".equals(msg));
                 } else {
                     fail("Unexpected header logged: " + msg);
                 }
@@ -171,7 +171,7 @@ public class HeadersTest {
         message.put(Message.CONTENT_TYPE, null);
         Headers headers = new Headers(message);
         assertEquals("Unexpected content-type determined - expected text/xml", "text/xml",
-                     headers.determineContentType());
+                headers.determineContentType());
 
         // second check - null specified in request, valid content-type specified in message
         // expect that determineContentType returns the content-type specified in the message
@@ -184,7 +184,7 @@ public class HeadersTest {
         headers = new Headers(message);
         headers.copyFromRequest(req);
         assertEquals("Unexpected content-type determined - expected application/json", "application/json",
-                     headers.determineContentType());
+                headers.determineContentType());
 
         // third check - content-type==null in message, null in request
         // expect that determineContentType returns the default value of text/xml
@@ -197,9 +197,46 @@ public class HeadersTest {
         headers = new Headers(message);
         headers.copyFromRequest(req);
         assertEquals("Unexpected content-type determined - expected text/xml", "text/xml",
-                     headers.determineContentType());
+                headers.determineContentType());
     }
-    
+
+
+    @Test
+    public void shouldDefaultToTextXmlForEmptyRequests() {
+        Message message = new MessageImpl();
+        Headers headers = new Headers(message);
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(Headers.EMPTY_REQUEST_PROPERTY, true);
+
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+        when(req.getContentType()).thenReturn(null);
+        headers.copyFromRequest(req);
+
+        String determinedContentType = headers.determineContentType();
+
+        assertEquals("Content-Type should default text/xml for empty requests",
+                "text/xml", determinedContentType);
+    }
+
+    @Test
+    public void shouldRespectExplicitlySetApplicationJsonContentType() {
+        Message message = new MessageImpl();
+        Headers headers = new Headers(message);
+        message.put(Message.CONTENT_TYPE, "application/json");
+
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
+        when(req.getContentType()).thenReturn("application/json");
+        headers.copyFromRequest(req);
+
+        String determinedContentType = headers.determineContentType();
+
+        assertEquals("Explicitly set application/json Content-Type should be respected",
+                "application/json", determinedContentType);
+    }
+
     @Test
     public void httpLanguage() {
         Locale locale = new Locale("en", "US");

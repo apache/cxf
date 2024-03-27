@@ -203,27 +203,27 @@ public class Headers {
     void setFromServerPolicy(HTTPServerPolicy policy) {
         if (policy.isSetCacheControl()) {
             headers.put("Cache-Control",
-                        createMutableList(policy.getCacheControl()));
+                    createMutableList(policy.getCacheControl()));
         }
         if (policy.isSetContentLocation()) {
             headers.put("Content-Location",
-                        createMutableList(policy.getContentLocation()));
+                    createMutableList(policy.getContentLocation()));
         }
         if (policy.isSetContentEncoding()) {
             headers.put("Content-Encoding",
-                        createMutableList(policy.getContentEncoding()));
+                    createMutableList(policy.getContentEncoding()));
         }
         if (policy.isSetContentType()) {
             headers.put(HttpHeaderHelper.CONTENT_TYPE,
-                        createMutableList(policy.getContentType()));
+                    createMutableList(policy.getContentType()));
         }
         if (policy.isSetServerType()) {
             headers.put("Server",
-                        createMutableList(policy.getServerType()));
+                    createMutableList(policy.getServerType()));
         }
         if (policy.isSetHonorKeepAlive() && !policy.isHonorKeepAlive()) {
             headers.put("Connection",
-                        createMutableList("close"));
+                    createMutableList("close"));
         } else if (policy.isSetKeepAliveParameters()) {
             headers.put("Keep-Alive", createMutableList(policy.getKeepAliveParameters()));
         }
@@ -263,12 +263,12 @@ public class Headers {
      */
     public static Map<String, List<String>> getSetProtocolHeaders(final Message message) {
         Map<String, List<String>> headers =
-            CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+                CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (null == headers) {
             headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         } else if (headers instanceof HashMap) {
             Map<String, List<String>> headers2
-                = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+                    = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             headers2.putAll(headers);
             headers = headers2;
         }
@@ -319,7 +319,7 @@ public class Headers {
                 List<Object> headerList = sensitive ? SENSITIVE_HEADER_MARKER : entry.getValue();
                 for (Object value : headerList) {
                     logger.log(level, key + ": "
-                        + (value == null ? "<null>" : value.toString()));
+                            + (value == null ? "<null>" : value.toString()));
                 }
             }
         }
@@ -376,22 +376,34 @@ public class Headers {
         if (ctList != null && ctList.size() == 1 && ctList.get(0) != null) {
             ct = ctList.get(0).toString();
         } else {
-            ct = (String)message.get(Message.CONTENT_TYPE);
+            ct = (String) message.get(Message.CONTENT_TYPE);
         }
 
-        String enc = (String)message.get(Message.ENCODING);
+        String enc = (String) message.get(Message.ENCODING);
 
         if (null != ct) {
             if (enc != null
-                && ct.indexOf("charset=") == -1
-                && !ct.toLowerCase().contains("multipart/related")) {
+                    && !ct.contains("charset=")
+                    && !ct.toLowerCase().contains("multipart/related")) {
                 ct = ct + "; charset=" + enc;
             }
-        } else if (enc != null) {
-            ct = "text/xml; charset=" + enc;
         } else {
-            ct = "text/xml";
+            if (enc != null) {
+                ct = "text/xml; charset=" + enc;
+            } else {
+                ct = "text/xml";
+            }
         }
+
+        if (ct.equalsIgnoreCase("application/json")
+                || (ctList != null && ctList.contains("application/json"))) {
+            if (enc != null) {
+                ct = "application/json; charset=" + enc;
+            } else {
+                ct = "application/json";
+            }
+        }
+
         return ct;
     }
 
@@ -453,7 +465,7 @@ public class Headers {
         if (LOG.isLoggable(Level.FINE)) {
             Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
             LOG.log(Level.FINE, "Request Headers: " + toString(theHeaders,
-                                                               logSensitiveHeaders()));
+                    logSensitiveHeaders()));
         }
     }
 
@@ -467,9 +479,9 @@ public class Headers {
         final String enc = (String)message.get(Message.ENCODING);
 
         if (null != ct
-            && null != enc
-            && ct.indexOf("charset=") == -1
-            && !ct.toLowerCase().contains("multipart/related")) {
+                && null != enc
+                && ct.indexOf("charset=") == -1
+                && !ct.toLowerCase().contains("multipart/related")) {
             return ct + "; charset=" + enc;
         }
         return ct;
@@ -505,7 +517,7 @@ public class Headers {
         String contentType = getContentTypeFromMessage();
 
         if (!headers.containsKey(Message.CONTENT_TYPE) && contentType != null
-            && isResponseBodyAvailable()) {
+                && isResponseBodyAvailable()) {
             response.setContentType(contentType);
         }
 
