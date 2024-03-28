@@ -25,6 +25,8 @@ public final class MetadataConstants {
     public static final QName MTOM_ASSERTION_QNAME =
             new QName("http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization",
                     "OptimizedMimeSerialization");
+    public static final QName MTOM11_ASSERTION_QNAME =
+            new QName("http://www.w3.org/2007/08/soap12-mtom-policy", "MTOM");
 
 
     private MetadataConstants() {
