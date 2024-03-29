@@ -431,6 +431,10 @@
             <artifactId>opentelemetry-semconv</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.opentelemetry.semconv</groupId>
+            <artifactId>opentelemetry-semconv-incubating</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.opentracing</groupId>
             <artifactId>opentracing-util</artifactId>
         </dependency>
