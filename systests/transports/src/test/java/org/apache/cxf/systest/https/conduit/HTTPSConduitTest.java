@@ -376,6 +376,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(bethal);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
+
         HTTPConduit http =
             (HTTPConduit) client.getConduit();
 
@@ -419,6 +421,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(poltim);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
+
         HTTPConduit http =
             (HTTPConduit) client.getConduit();
 
@@ -507,6 +511,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(bethal);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
+
         HTTPConduit http =
             (HTTPConduit) client.getConduit();
 
@@ -568,6 +574,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(tarpin);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
+
         HTTPConduit http =
             (HTTPConduit) client.getConduit();
 
@@ -713,6 +721,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(gordy);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
 
         HTTPConduit http =
             (HTTPConduit) client.getConduit();

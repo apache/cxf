@@ -22,16 +22,27 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.LockSupport;
+import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
@@ -82,9 +93,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -136,6 +150,57 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         Book book = echoEndpointTarget.request().accept("text/xml").get(Book.class);
         assertEquals(1023L, book.getId());
+    }
+
+    @Test
+    public void testGetGenericBookParallel() throws InterruptedException {
+        final ExecutorService pool = Executors.newFixedThreadPool(100);
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        final AtomicLong httpClientThreads = new AtomicLong(); 
+
+        final Supplier<Long> captureHttpClientThreads = () ->
+            Arrays
+                .stream(threadMXBean.getAllThreadIds())
+                .mapToObj(id -> threadMXBean.getThreadInfo(id))
+                .filter(Objects::nonNull)
+                .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .count();
+
+        final Collection<WebClient> clients = new ArrayList<>();
+        try {
+            final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
+
+            for (int i = 0; i < 1000; ++i) {
+                final WebClient client = WebClient.create(target, true);
+                clients.add(client);
+
+                // We are not checking the future completion, but the fact we were able 
+                // to execute this amount of requests without blowing live threads set 
+                pool.submit(() -> {
+                    Book book = client.sync().get(Book.class);
+                    assertEquals(124L, book.getId());
+
+                    // Capture all "HttpClient-" selector threads
+                    httpClientThreads.accumulateAndGet(captureHttpClientThreads.get(),
+                        (x1, x2) -> x1 > x2 ? x1 : x2);
+                });
+
+                LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(5));
+            }
+        } finally {
+            pool.shutdown();
+            assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
+            assertThat(captureHttpClientThreads.get(), greaterThan(0L));
+            assertThat(httpClientThreads.get(), greaterThan(0L));
+            assertThat(httpClientThreads.get(), lessThan(150L)); /* a bit higher that pool size */
+        }
+
+        clients.forEach(WebClient::close);
+    
+        // Since JDK-21, HttpClient Implements AutoCloseable
+        if (Runtime.version().feature() > 21) { 
+            assertThat(httpClientThreads.get(), equalTo(0L));
+        }
     }
 
     @Test
