@@ -316,7 +316,8 @@
         <feature version="${project.version}">cxf-core</feature>
         <bundle start-level="35">wrap:mvn:io.opentelemetry/opentelemetry-api/${cxf.opentelemetry.version}</bundle>
         <bundle start-level="35">wrap:mvn:io.opentelemetry/opentelemetry-context/${cxf.opentelemetry.version}</bundle>
-        <bundle start-level="35">wrap:mvn:io.opentelemetry/opentelemetry-semconv/${cxf.opentelemetry.semconv.version}</bundle>
+        <bundle start-level="35">wrap:mvn:io.opentelemetry.semconv/opentelemetry-semconv/${cxf.opentelemetry.semconv.version}</bundle>
+        <bundle start-level="35">wrap:mvn:io.opentelemetry.semconv/opentelemetry-semconv-incubating/${cxf.opentelemetry.semconv.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-opentelemetry/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-description-swagger2" version="${project.version}">

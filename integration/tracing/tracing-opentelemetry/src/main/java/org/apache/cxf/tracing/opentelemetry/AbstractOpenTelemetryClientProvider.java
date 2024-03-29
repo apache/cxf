@@ -36,7 +36,9 @@ import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.semconv.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.UrlAttributes;
+import io.opentelemetry.semconv.incubating.ExceptionIncubatingAttributes;
 
 public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTelemetryClientProvider.class);
@@ -59,8 +61,8 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
         Context parentContext = Context.current();
         Span activeSpan = tracer.spanBuilder(buildSpanDescription(uri.toString(), method))
             .setParent(parentContext).setSpanKind(SpanKind.CLIENT)
-            .setAttribute(SemanticAttributes.HTTP_REQUEST_METHOD, method)
-            .setAttribute(SemanticAttributes.URL_FULL, uri.toString())
+            .setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, method)
+            .setAttribute(UrlAttributes.URL_FULL, uri.toString())
             // TODO: Enhance with semantics from request
             .startSpan();
         Scope scope = activeSpan.makeCurrent();
@@ -100,7 +102,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
                 scope = span.makeCurrent();
             }
 
-            span.setAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE.getKey(), responseStatus);
+            span.setAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE.getKey(), responseStatus);
 
             span.end();
 
@@ -126,7 +128,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
 
             span.setStatus(StatusCode.ERROR);
             if (ex != null) {
-                span.recordException(ex, Attributes.of(SemanticAttributes.EXCEPTION_ESCAPED, true));
+                span.recordException(ex, Attributes.of(ExceptionIncubatingAttributes.EXCEPTION_ESCAPED, true));
             }
             span.end();
 
