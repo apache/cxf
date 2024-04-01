@@ -27,10 +27,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.Client;
+import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -75,6 +78,18 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/booksecho");
         client.type("text/plain").accept("text/plain").header("CustomHeader", "CustomValue");
         runWebClients(client, 10, true, false);
+    }
+
+    @Test
+    public void testWebTargetGC() throws Exception {
+        WebTarget target = ClientBuilder.newClient().target("http://localhost:" + PORT + "/bookstore/booksecho")
+            .property(ClientProperties.THREAD_SAFE_CLIENT_PROP, true);
+
+        target.request().get().getStatus();
+
+        System.gc();
+
+        target.request().get().getStatus();
     }
 
     @Test
