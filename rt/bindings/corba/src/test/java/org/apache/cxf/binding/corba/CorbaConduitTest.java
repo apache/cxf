@@ -127,13 +127,6 @@ public class CorbaConduitTest {
                          "SimpleCORBAPort");
 
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
-
-        if (System.getProperty("java.vendor").contains("IBM")) {
-            //IBM requires it to activate to resolve it, but cannot
-            //activate on sun without more config
-            destination.activate();
-        }
-
         CorbaConduit conduit = new CorbaConduit(endpointInfo, destination.getAddress(), orbConfig);
         CorbaMessage message = new CorbaMessage(new MessageImpl());
         try {
