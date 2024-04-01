@@ -133,11 +133,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>jakarta.management.j2ee</groupId>
             <artifactId>jakarta.management.j2ee-api</artifactId>
             <scope>test</scope>

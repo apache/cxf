@@ -47,7 +47,7 @@
             com.sun.xml*;resolution:=optional,
             com.sun.codemodel.writer;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
-            net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
+            org.springframework.cglib*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.springframework.aop*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.springframework.beans*;resolution:=optional;version="${cxf.osgi.spring.version}",
             org.springframework.context*;resolution:=optional;version="${cxf.osgi.spring.version}",
@@ -121,11 +121,6 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <optional>true</optional>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
