@@ -116,13 +116,6 @@ public class CorbaConduitTest {
                          "SimpleCORBAPort");
 
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
-
-        if (System.getProperty("java.vendor").contains("IBM")) {
-            //IBM requires it to activate to resolve it, but cannot
-            //activate on sun without more config
-            destination.activate();
-        }
-
         CorbaConduit conduit = new CorbaConduit(endpointInfo, destination.getAddress(), orbConfig);
         CorbaMessage message = new CorbaMessage(new MessageImpl());
         try {
@@ -352,7 +345,7 @@ public class CorbaConduitTest {
 
         org.omg.CORBA.Object obj = mock(org.omg.CORBA.Object.class);
         when(message.get(CorbaConstants.CORBA_ENDPOINT_OBJECT)).thenReturn(obj);
-        
+
         //msg.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, obj);
         Request r = mock(Request.class);
         NVList nvList = orb.create_list(0);
