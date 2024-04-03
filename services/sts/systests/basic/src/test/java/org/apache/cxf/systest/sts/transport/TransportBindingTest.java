@@ -302,11 +302,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML2Dispatch() throws Exception {
 
-        // Needed to prevent test failure using IBM JDK
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            System.setProperty("https.protocols", "TLSv1");
-        }
-
         createBus(getClass().getResource("cxf-client.xml").toString());
 
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
@@ -341,11 +336,6 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSAML2DispatchLocation() throws Exception {
-
-        // Needed to prevent test failure using IBM JDK
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            System.setProperty("https.protocols", "TLSv1");
-        }
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
