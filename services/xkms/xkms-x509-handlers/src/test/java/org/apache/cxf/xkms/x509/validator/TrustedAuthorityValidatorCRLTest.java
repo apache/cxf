@@ -91,7 +91,7 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
                           validator.isCertificateChainValid(Arrays.asList(certificateRoot)));
         Assert.assertTrue("wss40rev should not be valid",
                           !validator.isCertificateChainValid(Arrays.asList(certificateWss40Rev)));
-        Assert.assertTrue("wss40 should be valid",
+        Assert.assertTrue("wss40 should not be valid",
                           validator.isCertificateChainValid(Arrays.asList(certificateWss40)));
     }
 
