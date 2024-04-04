@@ -1939,16 +1939,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.opentelemetry.semconv</groupId>
-                <artifactId>opentelemetry-semconv</artifactId>
-                <version>${cxf.opentelemetry.semconv.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry.semconv</groupId>
-                <artifactId>opentelemetry-semconv-incubating</artifactId>
-                <version>${cxf.opentelemetry.semconv.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-opentracing-shim</artifactId>
                 <version>${cxf.opentelemetry.version}</version>

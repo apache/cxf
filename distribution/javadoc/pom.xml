@@ -389,10 +389,12 @@
         <dependency>
             <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv-incubating</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
         </dependency>
         <dependency>
             <groupId>io.opentracing</groupId>
