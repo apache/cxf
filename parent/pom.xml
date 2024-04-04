@@ -74,7 +74,6 @@
         <cxf.osgi.jakarta.mail.version>[2,3)</cxf.osgi.jakarta.mail.version>
         <cxf.osgi.jakarta.servlet.version>[5,6)</cxf.osgi.jakarta.servlet.version>
         <cxf.osgi.jakarta.xml.ws.version>[3,4)</cxf.osgi.jakarta.xml.ws.version>
-        <cxf.cglib.osgi.version>[3.3,3.4)</cxf.cglib.osgi.version>
         <cxf.osgi.cdi.version>[3,4)</cxf.osgi.cdi.version>
         <cxf.osgi.jakarta.jwsapi.version>[3,4)</cxf.osgi.jakarta.jwsapi.version>
         <cxf.osgi.saaj.version>[2,3)</cxf.osgi.saaj.version>
@@ -267,7 +266,6 @@
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7.13_1</cxf.rhino.bundle.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
-        <cxf.servicemix.cglib.version>3.3.0_1</cxf.servicemix.cglib.version>
         <cxf.servicemix.jakarta.el.version>3.0.0_1</cxf.servicemix.jakarta.el.version>
         <cxf.servicemix.jaxrs.specs.version>2.9.1</cxf.servicemix.jaxrs.specs.version>
         <cxf.servicemix.jodatime.version>2.3_1</cxf.servicemix.jodatime.version>
@@ -788,11 +786,6 @@
                         <artifactId>jakarta.activation</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib-nodep</artifactId>
-                <version>3.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.fastinfoset</groupId>

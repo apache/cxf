@@ -23,9 +23,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 
 
 /**
@@ -33,9 +33,9 @@ import net.sf.cglib.proxy.MethodProxy;
  */
 class CglibProxyHelper extends ProxyHelper {
     CglibProxyHelper() throws Exception {
-        Class.forName("net.sf.cglib.proxy.Enhancer");
-        Class.forName("net.sf.cglib.proxy.MethodInterceptor");
-        Class.forName("net.sf.cglib.proxy.MethodProxy");
+        Class.forName("org.springframework.cglib.proxy.Enhancer");
+        Class.forName("org.springframework.cglib.proxy.MethodInterceptor");
+        Class.forName("org.springframework.cglib.proxy.MethodProxy");
     }
 
     @Override
