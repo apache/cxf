@@ -161,11 +161,6 @@ public abstract class AbstractSTSTokenTest extends AbstractClientServerTestBase 
 
         SSLContext sc = SSLUtils.getSSLContext(TLSClientParametersUtils.getTLSClientParameters());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        // Needed to prevent test failure using IBM JDK
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            System.setProperty("https.protocols", "TLSv1");
-        }
     }
 
     static void validateSecurityToken(SecurityToken token) {
