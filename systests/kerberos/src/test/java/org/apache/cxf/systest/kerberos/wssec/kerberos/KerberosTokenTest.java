@@ -396,6 +396,10 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKerberosViaCustomTokenAction() throws Exception {
+        if (!runTests) {
+            return;
+        }
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = KerberosTokenTest.class.getResource("client.xml");
 
