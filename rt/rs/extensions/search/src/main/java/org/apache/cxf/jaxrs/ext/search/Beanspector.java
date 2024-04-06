@@ -91,7 +91,6 @@ public class Beanspector<T> {
                 }
             } else if (isSetter(m)) {
                 String pname = getPropertyName(m);
-                System.out.println(m);
                 if (!setters.containsKey(pname)) {
                     setters.put(getPropertyName(m), m);
                 } else {
