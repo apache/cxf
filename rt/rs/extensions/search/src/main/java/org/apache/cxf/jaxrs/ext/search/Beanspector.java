@@ -22,10 +22,12 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,49 +60,62 @@ public class Beanspector<T> {
         init();
     }
 
-    @SuppressWarnings("unchecked") 
-    private void init() { 
-        if (tclass == null) { 
-            tclass = (Class<T>)tobj.getClass(); 
-        } 
-        for (Method m : tclass.getMethods()) { 
-            if (isGetter(m)) { 
-                String pname = getPropertyName(m); 
-                if (!getters.containsKey(pname)) { 
-                    getters.put(getPropertyName(m), m); 
-                } else { 
-                    // Prefer the getter that has the most specialized class as a return type 
-                    Method met = getters.get(pname); 
-                    if (met.getReturnType().isAssignableFrom(m.getReturnType())) { 
-                        getters.put(pname, m); 
-                    } 
-                } 
-            } else if (isSetter(m)) { 
-                String pname = getPropertyName(m); 
-                if (!setters.containsKey(pname)) { 
-                    setters.put(getPropertyName(m), m); 
-                } else { 
-                    // Prefer the setter that has the most specialized class as a parameter 
-                    Method met = setters.get(pname); 
-                    if (met.getParameterTypes()[0].isAssignableFrom(m.getParameterTypes()[0])) { 
-                        setters.put(pname, m); 
-                    } 
-                } 
-            } 
-        } 
-        // check type equality for getter-setter pairs 
-        Set<String> pairs = new HashSet<>(getters.keySet()); 
-        pairs.retainAll(setters.keySet()); 
-        for (String accessor : pairs) { 
-            Class<?> getterClass = getters.get(accessor).getReturnType(); 
-            Class<?> setterClass = setters.get(accessor).getParameterTypes()[0]; 
-            if (!setterClass.isAssignableFrom(getterClass)) { 
-                throw new IllegalArgumentException(String 
-                        .format("Accessor '%s' type mismatch, getter type is %s while setter type is %s", 
-                                accessor, getterClass.getName(), setterClass.getName())); 
-            } 
-        } 
-    } 
+    @SuppressWarnings("unchecked")
+    private void init() {
+        if (tclass == null) {
+            tclass = (Class<T>)tobj.getClass();
+        }
+
+        List<Method> methods = Arrays.asList(tclass.getMethods());
+        Collections.sort(methods, (m1, m2) -> {
+            if (m1.getDeclaringClass().equals(m2.getDeclaringClass())) {
+                return 0;
+            } else if (m1.getDeclaringClass().equals(tclass)) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+
+        for (Method m : methods) {
+            if (isGetter(m)) {
+                String pname = getPropertyName(m);
+                if (!getters.containsKey(pname)) {
+                    getters.put(getPropertyName(m), m);
+                } else {
+                    // Prefer the getter that has the most specialized class as a return type
+                    Method met = getters.get(pname);
+                    if (met.getReturnType().isAssignableFrom(m.getReturnType())) {
+                        getters.put(pname, m);
+                    }
+                }
+            } else if (isSetter(m)) {
+                String pname = getPropertyName(m);
+                if (!setters.containsKey(pname)) {
+                    setters.put(getPropertyName(m), m);
+                } else {
+                    // Prefer the setter that has the most specialized class as a parameter
+                    Method met = setters.get(pname);
+                    if (met.getParameterTypes()[0].isAssignableFrom(m.getParameterTypes()[0])) {
+                        setters.put(pname, m);
+                    }
+                }
+            }
+        }
+
+        // check type equality for getter-setter pairs
+        Set<String> pairs = new HashSet<>(getters.keySet());
+        pairs.retainAll(setters.keySet());
+        for (String accessor : pairs) {
+            Class<?> getterClass = getters.get(accessor).getReturnType();
+            Class<?> setterClass = setters.get(accessor).getParameterTypes()[0];
+            if (!setterClass.isAssignableFrom(getterClass)) {
+                throw new IllegalArgumentException(String
+                        .format("Accessor '%s' type mismatch, getter type is %s while setter type is %s",
+                                accessor, getterClass.getName(), setterClass.getName()));
+            }
+        }
+    }
 
     public T getBean() {
         return tobj;
