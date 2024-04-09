@@ -82,15 +82,16 @@ public class JAXRSCdiResourceExtension implements Extension {
     private boolean hasBus;
     private Bus bus;
 
-    private final Set< Bean< ? > > applicationBeans = new LinkedHashSet< Bean< ? > >();
-    private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
-    private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
-    private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
+    private Set< Bean< ? > > applicationBeans = new LinkedHashSet< Bean< ? > >();
+    private Set< Bean< ? > > serviceBeans = new HashSet< Bean< ? > >();
+    private Set< Bean< ? > > providerBeans = new HashSet< Bean< ? > >();
+    private Set< Bean< ? extends Feature > > featureBeans = new HashSet< Bean< ? extends Feature > >();
+    private Set< Type > contextTypes = new LinkedHashSet<>();
+
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList<>();
     private final List< Lifecycle > disposableLifecycles =
         new ArrayList<>();
-    private final Set< Type > contextTypes = new LinkedHashSet<>();
 
     private final Collection< String > existingStandardClasses = new HashSet<>();
 
@@ -262,6 +263,8 @@ public class JAXRSCdiResourceExtension implements Extension {
                 factory.init();
             }
         }
+
+        cleanStartupData();
     }
 
     public void injectBus(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
@@ -293,6 +296,15 @@ public class JAXRSCdiResourceExtension implements Extension {
         // register all of the context types
         contextTypes.forEach(
             t -> event.addBean(new ContextProducerBean(t, !existingStandardClasses.contains(t.getTypeName()))));
+    }
+
+    private void cleanStartupData() { // enable gc
+        Stream.of(serviceBeans, providerBeans, featureBeans, applicationBeans, contextTypes).forEach(Collection::clear);
+        serviceBeans = null;
+        providerBeans = null;
+        featureBeans = null;
+        applicationBeans = null;
+        contextTypes = null;
     }
 
     /**
@@ -473,8 +485,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private List< Object > loadBeans(final BeanManager beanManager, Collection<Class<?>> limitedClasses,
                                      Collection<Bean<?>> beans) {
-        // Use set to account for singletons and application scoped beans
-        final Set< Object > instances = new LinkedHashSet<>();
+        final List< Object > instances = new ArrayList<>();
 
         for (final Bean< ? > bean: beans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
@@ -488,7 +499,7 @@ public class JAXRSCdiResourceExtension implements Extension {
             }
         }
 
-        return new ArrayList<>(instances);
+        return instances;
     }
 
     /**
