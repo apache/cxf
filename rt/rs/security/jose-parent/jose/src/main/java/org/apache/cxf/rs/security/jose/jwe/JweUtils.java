@@ -568,7 +568,10 @@ public final class JweUtils {
                 if (password == null) {
                     throw new JweException(JweException.Error.KEY_DECRYPTION_FAILURE);
                 }
-                keyDecryptionProvider = new PbesHmacAesWrapKeyDecryptionAlgorithm(new String(password));
+                int pbes2Count = MessageUtils.getContextualInteger(m, 
+                    JoseConstants.RSSEC_DECRYPTION_MAX_PBES2_COUNT, 1_000_000);
+
+                keyDecryptionProvider = new PbesHmacAesWrapKeyDecryptionAlgorithm(new String(password), pbes2Count);
             } else {
                 PrivateKey privateKey = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.DECRYPT);
                 if (keyAlgo == null) {

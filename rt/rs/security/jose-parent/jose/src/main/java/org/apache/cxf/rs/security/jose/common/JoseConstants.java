@@ -192,6 +192,11 @@ public final class JoseConstants extends RSSecurityConstants {
      */
     public static final String RSSEC_ENCRYPTION_PBES2_COUNT = "rs.security.encryption.pbes2.count";
 
+    /**
+     * The max value for the "p2c" (PBES2 count) Header Parameter used for decryption. The default is 1_000_000.
+     */
+    public static final String RSSEC_DECRYPTION_MAX_PBES2_COUNT = "rs.security.decryption.max.pbes2.count";
+
     //
     // JWT specific configuration
     //
