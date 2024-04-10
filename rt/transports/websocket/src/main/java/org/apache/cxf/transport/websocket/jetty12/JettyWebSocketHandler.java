@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.websocket.jetty11;
+package org.apache.cxf.transport.websocket.jetty12;
 
 import java.io.IOException;
 
@@ -25,49 +25,51 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
-import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
+import org.eclipse.jetty.ee10.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.websocket.core.WebSocketComponents;
+import org.eclipse.jetty.websocket.core.server.WebSocketServerComponents;
 
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
 class JettyWebSocketHandler extends JettyHTTPHandler {
-    final Jetty11WebSocketDestination webSocketDestination;
+    final Jetty12WebSocketDestination webSocketDestination;
     JettyWebSocketServerContainer webSocketContainer;
 
     JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
-                          Jetty11WebSocketDestination wsd) {
+                          Jetty12WebSocketDestination wsd) {
         super(jhd, cmExact);
         this.webSocketDestination = wsd;
+        
     }
     
-    @Override
-    public void doStart() throws Exception {
+    
+    public void initHandler(Server server) {
+        ServletContextHandler servletContextHandler = createContextHandler();
+        servletContextHandler.setServer(server);
+        setServletContext(servletContextHandler.getServletContext());
         webSocketContainer = webSocketDestination.getWebSocketContainer(getServletContext());
-        super.doStart();
     }
 
+   
+    
     @Override
-    public void handle(String target,
-                       Request baseRequest,
-                       HttpServletRequest request,
-                       HttpServletResponse response)
-        throws IOException, ServletException {
-
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
         if (webSocketContainer.upgrade(webSocketDestination.getCreator(), request, response)) {
-            baseRequest.setHandled(true);
             return;
         }
-        super.handle(target, baseRequest, request, response);
+        super.service(request, response);
     }
 
     @Override
-    public ContextHandler createContextHandler() {
+    public ServletContextHandler createContextHandler() {
         final ServletContextHandler handler = new ServletContextHandler();
         JettyWebSocketServletContainerInitializer.configure(handler, null);
+        handler.setAttribute(WebSocketServerComponents.WEBSOCKET_COMPONENTS_ATTRIBUTE, new WebSocketComponents());
         return handler;
     }
 }

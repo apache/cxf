@@ -131,11 +131,6 @@ public class NettyServletContext implements ServletContext {
     }
 
     @Override
-    public void log(Exception exception, String msg) {
-        LOG.log(Level.SEVERE, msg, exception);
-    }
-
-    @Override
     public void log(String message, Throwable throwable) {
         LOG.log(Level.SEVERE, message, throwable);
     }
@@ -162,26 +157,6 @@ public class NettyServletContext implements ServletContext {
 
     void setServletContextName(String servletContextName) {
         this.servletContextName = servletContextName;
-    }
-
-    @Override
-    public Servlet getServlet(String name) throws ServletException {
-        throw new IllegalStateException(
-                "Deprecated as of Java Servlet API 2.1, with no direct replacement!");
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Enumeration getServletNames() {
-        throw new IllegalStateException(
-                "Method 'getServletNames' deprecated as of Java Servlet API 2.0, with no replacement.");
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Enumeration getServlets() {
-        throw new IllegalStateException(
-                "Method 'getServlets' deprecated as of Java Servlet API 2.0, with no replacement.");
     }
 
     @Override

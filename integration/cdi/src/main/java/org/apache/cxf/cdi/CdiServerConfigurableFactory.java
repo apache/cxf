@@ -67,7 +67,7 @@ public class CdiServerConfigurableFactory implements ServerConfigurableFactory {
                 final CreationalContext<?> context = beanManager.createCreationalContext(bean);
                 
                 if (!beanManager.isNormalScope(bean.getScope())) {
-                    beanManager.fireEvent(new DisposableCreationalContext(context));
+                    beanManager.getEvent().fire(new DisposableCreationalContext(context));
                 }
 
                 return beanManager.getReference(bean, cls, context);

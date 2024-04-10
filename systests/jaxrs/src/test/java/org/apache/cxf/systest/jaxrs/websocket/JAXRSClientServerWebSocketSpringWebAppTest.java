@@ -22,10 +22,9 @@ package org.apache.cxf.systest.jaxrs.websocket;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.Book;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -56,7 +55,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends AbstractJAXRSCli
         webappcontext.setContextPath("/webapp");
 
         webappcontext.setWar(contextPath);
-        HandlerCollection handlers = new HandlerCollection();
+        Handler.Collection handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
         server.setHandler(handlers);
         server.start();

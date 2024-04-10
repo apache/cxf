@@ -40,6 +40,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -191,7 +192,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return webSocketHolder.getLocale();
     }
 
-    @Override
     public Enumeration<Locale> getLocales() {
         LOG.log(Level.FINE, "getLocales()");
         return webSocketHolder.getLocales();
@@ -235,12 +235,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     public BufferedReader getReader() throws IOException {
         LOG.log(Level.FINE, "getReader");
         return new BufferedReader(new InputStreamReader(in, UTF_8));
-    }
-
-    @Override
-    public String getRealPath(String path) {
-        LOG.log(Level.FINE, "getRealPath");
-        return null;
     }
 
     @Override
@@ -290,7 +284,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return webSocketHolder.getServletContext();
     }
 
-    @Override
     public boolean isAsyncStarted() {
         LOG.log(Level.FINE, "isAsyncStarted");
         return false;
@@ -302,7 +295,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         return false;
     }
 
-    @Override
     public boolean isSecure() {
         LOG.log(Level.FINE, "isSecure");
         return webSocketHolder.isSecure();
@@ -514,12 +506,6 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public boolean isRequestedSessionIdFromUrl() {
-        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
-        return false;
-    }
-
-    @Override
     public boolean isRequestedSessionIdValid() {
         LOG.log(Level.FINE, "isRequestedSessionIdValid");
         return false;
@@ -555,5 +541,30 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
         throw new UnsupportedOperationException();
+    }
+
+
+    public String getRealPath(String path) {
+        return path;
+    }
+
+    
+    public boolean isRequestedSessionIdFromUrl() {
+        LOG.log(Level.FINE, "isRequestedSessionIdFromUrl");
+        return false;
+    }
+
+    public String getRequestId() {
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return null;
     }
 }

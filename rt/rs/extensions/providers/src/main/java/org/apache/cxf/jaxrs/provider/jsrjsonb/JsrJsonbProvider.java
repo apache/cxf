@@ -29,6 +29,7 @@ import jakarta.annotation.Nullable;
 import jakarta.json.JsonException;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
@@ -101,7 +102,7 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
             } else {
                 return jsonbFor(type).fromJson(entityStream, genericType);
             }
-        } catch (JsonException ex) {
+        } catch (JsonException | JsonbException ex) {
             throw ExceptionUtils.toBadRequestException(ex, null);
         }
     }

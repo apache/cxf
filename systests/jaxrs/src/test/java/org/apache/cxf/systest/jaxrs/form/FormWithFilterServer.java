@@ -25,11 +25,12 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
+import org.eclipse.jetty.ee10.servlet.FilterHolder;
+import org.eclipse.jetty.ee10.servlet.FilterMapping;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
 public class FormWithFilterServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(FormWithFilterServer.class);
@@ -53,9 +54,12 @@ public class FormWithFilterServer extends AbstractBusTestServerBase {
     }
 
     private Server httpServer(CXFNonSpringServlet cxf) {
+        ServletContextHandler servletContextHandler = new ServletContextHandler();
         Server server = new Server(Integer.parseInt(PORT));
         ServletHandler handler = new ServletHandler();
-        server.setHandler(handler);
+        servletContextHandler.setHandler(handler);
+        server.setHandler(servletContextHandler);
+
         handler.addServletWithMapping(new ServletHolder(cxf), "/*");
         handler.addFilterWithMapping(new FilterHolder(new FormReaderFilter()), "/*", FilterMapping.ALL);
         return server;

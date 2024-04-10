@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.5-SNAPSHOT</version>
+    <version>4.1.0-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
@@ -31,9 +31,9 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.spring.boot.version>3.0.13</cxf.spring.boot.version>
-        <cxf.spring.cloud.eureka.version>4.0.3</cxf.spring.cloud.eureka.version>
-        <cxf.jetty11.version>11.0.20</cxf.jetty11.version>
+        <cxf.spring.boot.version>3.2.4</cxf.spring.boot.version>
+        <cxf.spring.cloud.eureka.version>4.1.1</cxf.spring.cloud.eureka.version>
+        <cxf.jetty12.version>12.0.8</cxf.jetty12.version>
         <cxf.netty.version>4.1.108.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>5.13.0</cxf.swagger.ui.version>
@@ -42,7 +42,7 @@
         <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
         <cxf.gson.version>2.10.1</cxf.gson.version>
         <cxf.lucene.version>9.10.0</cxf.lucene.version>
-        <cxf.olingo.server.version>4.10.0</cxf.olingo.server.version>
+        <cxf.olingo.server.version>5.0.0</cxf.olingo.server.version>
         <cxf.aspectj.version>1.9.22</cxf.aspectj.version>
         <cxf.brave.version>5.17.0</cxf.brave.version>
         <cxf.zest.version>2.1</cxf.zest.version>
@@ -50,7 +50,7 @@
         <cxf.h2.version>2.2.224</cxf.h2.version>
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
-        <cxf.camel.version>4.0.2</cxf.camel.version>
+        <cxf.camel.version>4.5.0</cxf.camel.version>
     </properties>
     <dependencies>
         <dependency>
@@ -164,14 +164,14 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>4.0.5-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>4.0.5-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -213,7 +213,7 @@
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>${cxf.jetty11.version}</version>
+                    <version>${cxf.jetty12.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

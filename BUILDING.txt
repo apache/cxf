@@ -29,7 +29,7 @@ Building
 	$> mvn
    This will compile Apache CXF and run all of the tests in the Apache CXF source
    distribution. Alternatively, you can run
-    $> mvn -Pfastinstall.
+    $> mvn -Pfastinstall
    This will compile Apache CXF without running the tests and takes less
    time to build.
    Depending on the load of remote Maven repositories, you may have 

@@ -49,7 +49,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  */
 public class Http2TestClient implements AutoCloseable {
     private final HTTP2Client client;
-    private final SslContextFactory sslContextFactory;
+    private final SslContextFactory.Client sslContextFactory;
     
     public Http2TestClient(boolean secure) throws Exception {
         client = new HTTP2Client();
@@ -135,7 +135,7 @@ public class Http2TestClient implements AutoCloseable {
         final FuturePromise<Session> sessionPromise = new FuturePromise<>();
 
         client.connect(sslContextFactory, new InetSocketAddress(uri.getHost(), uri.getPort()), 
-            new ServerSessionListener.Adapter(), sessionPromise);
+            new ServerSessionListener() { }, sessionPromise);
         final Session session = sessionPromise.get();
 
         final HttpFields.Mutable requestFields = HttpFields.build();
@@ -158,7 +158,7 @@ public class Http2TestClient implements AutoCloseable {
         client.stop();
     }
     
-    private final class ResponseListener extends Stream.Listener.Adapter {
+    private final class ResponseListener implements Stream.Listener {
         private final ClientResponse response = new ClientResponse();
         private final CompletableFuture<ClientResponse> future;
         
@@ -166,7 +166,7 @@ public class Http2TestClient implements AutoCloseable {
             this.future = f;
         }
         
-        @Override
+        
         public void onHeaders(Stream stream, HeadersFrame frame) {
             final MetaData metaData = frame.getMetaData();
             response.setProtocol(metaData.getHttpVersion());
@@ -178,28 +178,36 @@ public class Http2TestClient implements AutoCloseable {
                     future.complete(response);
                 }
             }
-            super.onHeaders(stream, frame);
+            stream.demand();
         }
         
-        @Override
         public void onData(Stream stream, DataFrame frame, Callback callback) {
-            byte[] bytes = new byte[frame.getData().remaining()];
-            frame.getData().get(bytes);
+            byte[] bytes = new byte[frame.getByteBuffer().remaining()];
+            frame.getByteBuffer().get(bytes);
             response.setBody(new String(bytes));
             future.complete(response);
-            super.onData(stream, frame, callback);
+            callback.succeeded();
         }
         
-        @Override
+        public void onDataAvailable(Stream stream) {
+            Stream.Data data = stream.readData();
+            DataFrame frame = data.frame();
+            byte[] bytes = new byte[frame.getByteBuffer().remaining()];
+            frame.getByteBuffer().get(bytes);
+            response.setBody(new String(bytes));
+            future.complete(response);
+            
+        }
+        
         public boolean onIdleTimeout(Stream stream, Throwable x) {
             future.completeExceptionally(x);
-            return super.onIdleTimeout(stream, x);
+            return true;
         }
         
-        @Override
+        
         public void onFailure(Stream stream, int error, String reason, Throwable failure, Callback callback) {
             future.completeExceptionally(new ClientErrorException(reason, error));
-            super.onFailure(stream, error, reason, failure, callback);
+            callback.succeeded();
         }
     }
 }

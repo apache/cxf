@@ -44,7 +44,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean UNDERTOW_AVAILABLE = 
         probeClass("org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory");
     private static final Constructor<?> JETTY11_WEBSOCKET_DESTINATION_CTR =
-        probeConstructor("org.apache.cxf.transport.websocket.jetty11.Jetty11WebSocketDestination");
+        probeConstructor("org.apache.cxf.transport.websocket.jetty12.Jetty12WebSocketDestination");
     private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR =
         probeUndertowConstructor("org.apache.cxf.transport.websocket.undertow.UndertowWebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =

@@ -42,6 +42,7 @@ import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -287,7 +288,15 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             && (redirectList != null && matchPath(redirectQueryCheck, redirectList, request)
                 || redirectList == null)) {
             // if no redirectList is provided then this servlet is redirecting only
-            redirect(request, response, request.getPathInfo());
+            String path = request.getPathInfo();
+            if (path == null 
+                && request instanceof ServletRequestWrapper) {
+                path = ((HttpServletRequest)((ServletRequestWrapper)request).getRequest()).getPathInfo();
+            }
+            if (path == null) {
+                path = "/";
+            }
+            redirect(request, response, path);
             return;
         }
         boolean staticResourcesMatch = staticResourcesList != null
@@ -330,6 +339,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
 
     private static boolean matchPath(boolean checkRedirect, List<Pattern> values, HttpServletRequest request) {
         String path = request.getPathInfo();
+        if (path == null 
+            && request instanceof ServletRequestWrapper) {
+            path = ((HttpServletRequest)((ServletRequestWrapper)request).getRequest()).getPathInfo();
+        }
         if (path == null) {
             path = "/";
         }

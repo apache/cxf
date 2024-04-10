@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -278,6 +280,30 @@ public class RequestDispatcherProvider extends AbstractResponseViewProvider {
         @Override
         public Map<String, String[]> getParameterMap() {
             return params;
+        }
+        
+        @Override
+        public Enumeration<String> getParameterNames() {
+            
+            final Iterator<String> it = params.keySet().iterator();
+            return new Enumeration<String>() {
+
+                @Override
+                public boolean hasMoreElements() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public String nextElement() {
+                    return it.next();
+                }
+
+            };
+        }
+        
+        @Override
+        public String[] getParameterValues(String name) {
+            return params.get(name);
         }
 
     }

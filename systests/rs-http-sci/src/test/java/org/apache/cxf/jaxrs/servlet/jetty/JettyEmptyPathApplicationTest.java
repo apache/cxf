@@ -23,8 +23,10 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -40,11 +42,14 @@ public class JettyEmptyPathApplicationTest extends AbstractSciTest {
             super("/",
                 new Resource[] {
                     // Limit the classpath scanning to org.apache.demo.resources package
-                    Resource.newClassPathResource("/org/apache/demo/resources"),
+                    ResourceFactory.of(new ContextHandler()).
+                        newClassPathResource("/org/apache/demo/resources"),
                     // Include JAX-RS application from org.apache.applications.empty package
-                    Resource.newClassPathResource("/org/apache/demo/applications/emptypath"),
+                    ResourceFactory.of(new ContextHandler()).
+                        newClassPathResource("/org/apache/demo/applications/emptypath"),
                     // Include Jackson @Providers into classpath scanning
-                    Resource.newResource(JacksonJsonProvider.class.getProtectionDomain().getCodeSource().getLocation())
+                    ResourceFactory.of(new ContextHandler()).
+                        newResource(JacksonJsonProvider.class.getProtectionDomain().getCodeSource().getLocation())
                 }, PORT);
         }
 

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.servicelisting;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -28,7 +29,10 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JAXWSServicesListingTest extends AbstractBusClientServerTestBase {
@@ -78,10 +82,14 @@ public class JAXWSServicesListingTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/service_listing/services/<script>alert(1)</script>/../../";
 
         URL url = new URL(endpointAddress);
-        try (InputStream input = url.openStream()) {
-            String result = IOUtils.readStringFromStream(input);
-            assertFalse(result.contains("<script>"));
-        }
+        // Changes sinceJetty 12.0.8+ see please https://github.com/jetty/jetty.project/pull/11496
+        final IOException ex = assertThrows(IOException.class, () -> {
+            try (InputStream input = url.openStream()) {
+                String result = IOUtils.readStringFromStream(input);
+                assertFalse(result.contains("<script>"));
+            }
+        });
+        assertThat(ex.getMessage(), containsString("400 for URL: " + endpointAddress));
     }
 
     @Test
@@ -91,10 +99,14 @@ public class JAXWSServicesListingTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/service_listing/services/<script>alert(1)</script>/../../?formatted=false";
 
         URL url = new URL(endpointAddress);
-        try (InputStream input = url.openStream()) {
-            String result = IOUtils.readStringFromStream(input);
-            assertFalse(result.contains("<script>"));
-        }
+        // Changes sinceJetty 12.0.8+ see please https://github.com/jetty/jetty.project/pull/11496
+        final IOException ex = assertThrows(IOException.class, () -> {
+            try (InputStream input = url.openStream()) {
+                String result = IOUtils.readStringFromStream(input);
+                assertFalse(result.contains("<script>"));
+            }
+        });
+        assertThat(ex.getMessage(), containsString("400 for URL: " + endpointAddress));
     }
 
 }

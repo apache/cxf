@@ -26,9 +26,9 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
 public class Server {
 
@@ -43,7 +43,7 @@ public class Server {
         context.setContextPath("/");
         context.addServlet(staticHolder, "/static/*");
         context.addServlet(servletHolder, "/*");
-        context.setResourceBase(getClass().getResource("/browser").toURI().toString());
+        context.setBaseResourceAsString(getClass().getResource("/browser").toURI().toString());
 
         servletHolder.setInitParameter("redirects-list",
             "/ /index.html /js/fileinput.min.js /css/fileinput.min.css");

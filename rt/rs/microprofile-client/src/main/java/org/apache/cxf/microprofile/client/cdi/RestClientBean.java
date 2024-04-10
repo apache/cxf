@@ -108,11 +108,6 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     }
 
     @Override
-    public boolean isNullable() {
-        return false;
-    }
-
-    @Override
     public Object create(CreationalContext<Object> creationalContext) {
         CxfTypeSafeClientBuilder builder = new CxfTypeSafeClientBuilder();
         String baseUri = getBaseUri();

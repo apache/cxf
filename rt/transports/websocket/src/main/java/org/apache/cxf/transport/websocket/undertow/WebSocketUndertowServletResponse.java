@@ -22,7 +22,9 @@ package org.apache.cxf.transport.websocket.undertow;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -188,37 +190,7 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
         return responseHeaders.containsKey(name);
     }
 
-    @Override
-    public String encodeRedirectURL(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeRedirectURL({0})", url);
-        }
-        return null;
-    }
-
-    @Override
-    public String encodeRedirectUrl(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeRedirectUrl({0})", url);
-        }
-        return null;
-    }
-
-    @Override
-    public String encodeURL(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeURL({0})", url);
-        }
-        return null;
-    }
-
-    @Override
-    public String encodeUrl(String url) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "encodeUrl({0})", url);
-        }
-        return null;
-    }
+    
 
     @Override
     public String getHeader(String name) {
@@ -307,14 +279,6 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
 
-    @Override
-    public void setStatus(int sc, String sm) {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "setStatus({0}, {1})", new Object[]{sc, sm});
-        }
-        responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
-    }
-
     private ServletOutputStream createOutputStream() {
         //REVISIT
         // This output buffering is needed as the server side websocket does
@@ -387,5 +351,23 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
     public void setContentLengthLong(long arg0) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public String encodeURL(String url) {
+        return URLEncoder.encode(url, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String encodeRedirectURL(String url) {
+        return URLEncoder.encode(url, StandardCharsets.UTF_8);
+    }
+
+
+    public void setStatus(int sc, String sm) {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "setStatus({0})", sc);
+        }
+        responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
 }
