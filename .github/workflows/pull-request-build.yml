@@ -2,7 +2,7 @@ name: "Build and Test"
 
 on:
   pull_request:
-    branches: ['main', '3.6.x-fixes', '3.5.x-fixes', '3.4.x-fixes']
+    branches: ['main', '4.0.x-fixes', '3.6.x-fixes', '3.5.x-fixes', '3.4.x-fixes']
 
 permissions:
   contents: read
