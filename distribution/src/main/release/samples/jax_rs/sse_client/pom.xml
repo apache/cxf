@@ -15,19 +15,19 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
  
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-sse</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -44,13 +44,13 @@
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
         </dependency>
-	
+
         <dependency>
             <groupId>io.undertow</groupId>
-	    <artifactId>undertow-servlet</artifactId>
-	</dependency>
+            <artifactId>undertow-servlet</artifactId>
+        </dependency>
     </dependencies>
-    
+
     <profiles>
         <profile>
             <id>server</id>

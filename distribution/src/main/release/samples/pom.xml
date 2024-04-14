@@ -164,14 +164,14 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

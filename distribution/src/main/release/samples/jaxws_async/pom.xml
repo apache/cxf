@@ -37,7 +37,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -92,7 +92,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                    <version>${project.version}</version>
+                    <version>4.1.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
