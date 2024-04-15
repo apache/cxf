@@ -19,11 +19,11 @@
 
 package org.apache.cxf.systest.aegis;
 
+
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 
 public class AegisServer extends AbstractBusTestServerBase {
@@ -34,15 +34,17 @@ public class AegisServer extends AbstractBusTestServerBase {
     protected void run() {
         //System.out.println("Starting Server");
 
-        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
-
-        WebAppContext webappcontext = new WebAppContext();
-        webappcontext.setContextPath("/");
-        webappcontext.setBaseResource(Resource.newClassPathResource("/webapp"));
-
-        server.setHandler(new HandlerCollection(webappcontext, new DefaultHandler()));
+        
         try {
+            server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
+
+            WebAppContext webappcontext = new WebAppContext();
+            webappcontext.setContextPath("/");
+            webappcontext.setBaseResourceAsString(this.getClass().getResource("/webapp").toString());
+            
+            server.setHandler(new Handler.Sequence(webappcontext, new DefaultHandler()));
             server.start();
+            
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

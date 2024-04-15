@@ -28,9 +28,11 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -134,11 +136,6 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         return get().isRequestedSessionIdFromURL();
     }
 
-    @SuppressWarnings("deprecation")
-    public boolean isRequestedSessionIdFromUrl() {
-        return get().isRequestedSessionIdFromUrl();
-    }
-
     public boolean isRequestedSessionIdValid() {
         return get().isRequestedSessionIdValid();
     }
@@ -213,11 +210,6 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
 
     public BufferedReader getReader() throws IOException {
         return get().getReader();
-    }
-
-    @SuppressWarnings("deprecation")
-    public String getRealPath(String path) {
-        return get().getRealPath(path);
     }
 
     public String getRemoteAddr() {
@@ -326,4 +318,19 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         ServletException {
         return get().upgrade(handlerClass);
     }
+    @Override
+    public String getRequestId() {
+        return get().getRequestId();
+    }
+    
+    @Override
+    public ServletConnection getServletConnection() {
+        return get().getServletConnection();
+    }
+    
+    @Override
+    public String getProtocolRequestId() {
+        return get().getProtocolRequestId();
+    }
+    
 }

@@ -25,9 +25,9 @@
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.JettyDigestAuthTest}">
             <httpj:handlers>
-                <bean class="org.eclipse.jetty.security.ConstraintSecurityHandler">
+                <bean class="org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler">
+                    <property name="authenticationType" value="DIGEST"/>
                     <property name="loginService" ref="securityLoginService"/>
-                    <property name="authMethod" value="DIGEST"/>
                     <property name="constraintMappings">
                         <list>
                             <ref bean="securityConstraintMapping"/>
@@ -37,17 +37,53 @@
             </httpj:handlers>
         </httpj:engine>
     </httpj:engine-factory>
+    <bean id="resourceFactory" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="org.eclipse.jetty.util.resource.ResourceFactory" />
+        <property name="targetMethod" value="root" />
+    </bean>
+
+    <bean id="config" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="resourceFactory" />
+        <property name="targetMethod" value="newClassPathResource"/>
+        <property name="arguments">
+            <list>
+                <value>/org/apache/cxf/systest/http_jetty/jetty-realm.properties</value>
+            </list>
+        </property>
+    </bean>
+ 
     <bean id="securityLoginService" class="org.eclipse.jetty.security.HashLoginService">
         <property name="name" value="WSRealm"/>
-        <property name="config" value="src/test/resources/org/apache/cxf/systest/http_jetty/jetty-realm.properties"/>
+        <property name="config" ref="config"/>
     </bean>
-    <bean id="securityConstraint" class="org.eclipse.jetty.util.security.Constraint">
-        <property name="name" value="DIGEST"/>
-        <property name="roles" value="admin"/>
-        <property name="authenticate" value="true"/>
+    <bean id="securityConstraint.builder" class="org.eclipse.jetty.security.Constraint.Builder"/>
+    <bean id="securityConstraint.builder2" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="securityConstraint.builder" />
+        <property name="targetMethod" value="name"/>
+        <property name="arguments">
+            <list>
+                <value>DIGEST</value>
+            </list>
+        </property>
     </bean>
-    <bean id="securityConstraintMapping" class="org.eclipse.jetty.security.ConstraintMapping">
+    <bean id="securityConstraint.builder3" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="securityConstraint.builder2" />
+        <property name="targetMethod" value="roles"/>
+        <property name="arguments">
+            <list>
+                <value>admin</value>
+            </list>
+        </property>
+    </bean>
+    
+
+    <bean id="securityConstraint" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="securityConstraint.builder3" />
+        <property name="targetMethod" value="build"/>
+    </bean>
+    <bean id="securityConstraintMapping" class="org.eclipse.jetty.ee10.servlet.security.ConstraintMapping">
         <property name="constraint" ref="securityConstraint"/>
         <property name="pathSpec" value="/*"/>
     </bean>
+
 </beans>

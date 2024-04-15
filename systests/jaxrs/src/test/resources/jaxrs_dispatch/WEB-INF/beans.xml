@@ -45,7 +45,7 @@
     </bean>
     <bean id="dispatchProvider4" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
         <property name="resourcePath" value="/book.html"/>
-        <property name="dispatcherName" value="default"/>
+        <property name="dispatcherName" value="DefaultCXFServlet"/>
     </bean>
     <bean id="dispatchProvider5" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
         <property name="resourcePath" value="/book_include.html"/>

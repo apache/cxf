@@ -19,13 +19,25 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.net.URI;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
+import javax.net.ssl.SSLContext;
+
+import jakarta.ws.rs.SeBootstrap.Configuration;
+import jakarta.ws.rs.SeBootstrap.Configuration.Builder;
+import jakarta.ws.rs.SeBootstrap.Configuration.SSLClientAuthentication;
+import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
@@ -34,15 +46,16 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant.VariantListBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.bootstrap.ConfigurationBuilderImpl;
+import org.apache.cxf.jaxrs.bootstrap.InstanceImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-
-
 public class RuntimeDelegateImpl extends RuntimeDelegate {
-    protected Map<Class<?>, HeaderDelegate<?>> headerProviders
-        = new HashMap<>();
+    protected Map<Class<?>, HeaderDelegate<?>> headerProviders = new HashMap<>();
 
     public RuntimeDelegateImpl() {
         headerProviders.put(MediaType.class, new MediaTypeHeaderProvider());
@@ -118,12 +131,71 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         return endpointType.cast(server);
     }
 
-
-
     @Override
     public Link.Builder createLinkBuilder() {
         return new LinkBuilderImpl();
     }
 
+    @Override
+    public Builder createConfigurationBuilder() {
+        return new ConfigurationBuilderImpl();
+    }
 
+    @Override
+    public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
+        final JAXRSServerFactoryBean factory = ResourceUtils.createApplication(application, false, false, false, null);
+        final URI address = configuration.baseUriBuilder().path(factory.getAddress()).build();
+        factory.setAddress(address.toString());
+        factory.setStart(true);
+        
+        if ("https".equalsIgnoreCase(configuration.protocol())) {
+            final TLSServerParameters parameters = new TLSServerParameters();
+
+            final SSLClientAuthentication sslClientAuthentication = configuration.sslClientAuthentication();
+            if (sslClientAuthentication != null) {
+                final ClientAuthentication clientAuthentication = new ClientAuthentication();
+
+                if (sslClientAuthentication == SSLClientAuthentication.OPTIONAL) {
+                    clientAuthentication.setWant(true);
+                } else if (sslClientAuthentication == SSLClientAuthentication.MANDATORY) {
+                    clientAuthentication.setRequired(true);
+                }
+
+                parameters.setClientAuthentication(clientAuthentication);
+            }
+
+            final SSLContext sslContext = configuration.sslContext();
+            if (sslContext != null) {
+                parameters.setSecureSocketProtocol(sslContext.getProtocol());
+            }
+
+            // TODO: Support SSL context propagation down to HTTP engine
+        }
+
+        return CompletableFuture
+            .supplyAsync(() -> factory.create())
+            .thenApply(s -> new InstanceImpl(s, configuration));
+    }
+
+    @Override
+    public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
+        try {
+            final Application application = AccessController.doPrivileged(
+                new PrivilegedExceptionAction<Application>() {
+                    @Override
+                    public Application run() throws Exception {
+                        return clazz.getDeclaredConstructor().newInstance();
+                    }
+                }
+            );
+            return bootstrap(application, configuration);
+        } catch (final Exception ex) {
+            return CompletableFuture.failedStage(ex);
+        }
+    }
+
+    @Override
+    public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+        return new EntityPartBuilderImpl(partName);
+    }
 }

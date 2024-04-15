@@ -23,12 +23,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.function.Function;
 
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -83,7 +83,7 @@ public class ClassHelperTest {
 
         springAopObject = proxyFactory.getProxy();
         
-        final Callback callback = new net.sf.cglib.proxy.InvocationHandler() {
+        final Callback callback = new org.springframework.cglib.proxy.InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;

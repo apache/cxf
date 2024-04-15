@@ -18,10 +18,9 @@
  */
 package demo.spring.service;
 
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Server {
 
@@ -42,9 +41,7 @@ public class Server {
 
         webappcontext.setWar("target/RubySpringSupport.war");
 
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
+        Handler.Collection handlers = new Handler.Sequence(webappcontext, new DefaultHandler());
         server.setHandler(handlers);
         server.start();
         System.out.println("Server ready...");

@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-microprofile-tck</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -144,13 +144,17 @@
             </dependency>
             <dependency>
                 <groupId>org.wiremock</groupId>
-                <artifactId>wiremock</artifactId>
+                <artifactId>wiremock-jetty12</artifactId>
                 <version>${cxf.wiremock.version}</version>
                 <scope>test</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>org.xmlunit</groupId>
                         <artifactId>xmlunit-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.*</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -80,10 +80,12 @@
         <dependency>
             <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv-incubating</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

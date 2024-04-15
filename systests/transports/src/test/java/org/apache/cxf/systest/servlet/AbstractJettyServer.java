@@ -20,12 +20,13 @@
 package org.apache.cxf.systest.servlet;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+
 
 import static org.junit.Assert.fail;
 
@@ -50,10 +51,12 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
         try {
             final WebAppContext context = new WebAppContext();
             context.setContextPath(contextPath);
-            context.setBaseResource(Resource.newClassPathResource(resourcePath));
-            context.setDescriptor(Resource.newClassPathResource(descriptor).getURI().toString());
+            context.setBaseResource(ResourceFactory.of(new ContextHandler()).
+                                    newClassPathResource(resourcePath));
+            context.setDescriptor(ResourceFactory.of(new ContextHandler()).
+                                  newClassPathResource(descriptor).getURI().toString());
 
-            HandlerCollection handlers = new HandlerCollection();
+            Handler.Collection handlers = new Handler.Sequence();
             handlers.setHandlers(new Handler[] {context, new DefaultHandler()});
             server.setHandler(handlers);
             server.start();

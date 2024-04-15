@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -37,7 +37,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${cxf.jetty11.version}</version>
+                <version>${cxf.jetty12.version}</version>
                 <configuration>
                     <webAppSourceDirectory>${project.build.directory}/${project.name}</webAppSourceDirectory>
                     <scanIntervalSeconds>1</scanIntervalSeconds>
