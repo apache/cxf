@@ -95,7 +95,7 @@
         <cxf.aspectj.version>1.9.22</cxf.aspectj.version>
         <cxf.assertj.version>3.25.3</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
-        <cxf.atmosphere.version>3.0.5</cxf.atmosphere.version>
+        <cxf.atmosphere.version>3.0.8</cxf.atmosphere.version>
         <cxf.bcprov.version>1.77</cxf.bcprov.version>
         <cxf.brave.version>5.17.1</cxf.brave.version>
         <cxf.cdi.api.version>3.0.0</cxf.cdi.api.version>
