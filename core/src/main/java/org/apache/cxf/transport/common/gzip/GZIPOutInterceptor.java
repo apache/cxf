@@ -337,7 +337,10 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (header.isEmpty()) {
             header.add(value);
         } else {
-            header.set(0, header.get(0) + "," + value);
+            String existingValue = header.get(0);
+            if (!existingValue.contains(value)) {
+                header.set(0, existingValue + "," + value);
+            }
         }
     }
     public void setForce(boolean force) {
