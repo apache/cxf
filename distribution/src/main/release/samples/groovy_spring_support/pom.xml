@@ -109,9 +109,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>3.0.21</version>
+            <version>4.0.21</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
