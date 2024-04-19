@@ -408,14 +408,22 @@ public abstract class AbstractHTTPDestination
 
         SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
-                try {
-                    return req.getUserPrincipal();
-                } catch (Exception ex) {
-                    return null;
-                }
+                //ensure we use req from the one saved in inMessage
+                //as this could be the cachedInput one in oneway and 
+                //ReplyTo is specified when ws-addressing is used
+                //which means we need to switch thread context
+                //and underlying transport might discard any data on the original stream
+                HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
+                return reqFromInMessage.getUserPrincipal();
             }
             public boolean isUserInRole(String role) {
-                return req.isUserInRole(role);
+                //ensure we use req from the one saved in inMessage
+                //as this could be the cachedInput one in oneway and 
+                //ReplyTo is specified when ws-addressing is used
+                //which means we need to switch thread context
+                //and underlying transport might discard any data on the original stream
+                HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
+                return reqFromInMessage.isUserInRole(role);
             }
         };
 
