@@ -408,11 +408,7 @@ public abstract class AbstractHTTPDestination
 
         SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
-                try {
-                    return req.getUserPrincipal();
-                } catch (Exception ex) {
-                    return null;
-                }
+                return req.getUserPrincipal();
             }
             public boolean isUserInRole(String role) {
                 return req.isUserInRole(role);
