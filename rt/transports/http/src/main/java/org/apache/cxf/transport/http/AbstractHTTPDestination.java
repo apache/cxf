@@ -408,7 +408,15 @@ public abstract class AbstractHTTPDestination
 
         SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
-                return req.getUserPrincipal();
+                try {
+                    return req.getUserPrincipal();
+                } catch (Exception e) {
+                    if (e instanceof NullPointerException) {
+                        //jetty 12 related
+                        return null;
+                    }
+                    throw e;
+                }
             }
             public boolean isUserInRole(String role) {
                 return req.isUserInRole(role);
