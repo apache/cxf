@@ -323,21 +323,14 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @param value the value to add
      */
     private static void addHeader(Message message, String name, String value) {
-        Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
-            .get(Message.PROTOCOL_HEADERS));
-        if (protocolHeaders == null) {
-            protocolHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
+        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        if (headers == null) {
+            headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            message.put(Message.PROTOCOL_HEADERS, headers);
         }
-        List<String> header = CastUtils.cast((List<?>)protocolHeaders.get(name));
-        if (header == null) {
-            header = new ArrayList<>();
-            protocolHeaders.put(name, header);
-        }
-        if (header.isEmpty()) {
+        List<String> header = headers.computeIfAbsent(name, k -> new ArrayList<>());
+        if (header.isEmpty() || !header.contains(value)) {
             header.add(value);
-        } else {
-            header.set(0, header.get(0) + "," + value);
         }
     }
     public void setForce(boolean force) {
