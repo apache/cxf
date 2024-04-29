@@ -92,7 +92,7 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
         Assert.assertTrue("wss40rev should not be valid",
                           !validator.isCertificateChainValid(Arrays.asList(certificateWss40Rev)));
         Assert.assertTrue("wss40 should be valid",
-                validator.isCertificateChainValid(Arrays.asList(certificateWss40)));
+                          validator.isCertificateChainValid(Arrays.asList(certificateWss40)));
     }
 
     private static X509Certificate readCertificate(String path) throws CertificateException {
