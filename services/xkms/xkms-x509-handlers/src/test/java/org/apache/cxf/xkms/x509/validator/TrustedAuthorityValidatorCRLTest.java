@@ -91,12 +91,8 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
                           validator.isCertificateChainValid(Arrays.asList(certificateRoot)));
         Assert.assertTrue("wss40rev should not be valid",
                           !validator.isCertificateChainValid(Arrays.asList(certificateWss40Rev)));
-        //Red Hat OpenJDK must have RSA keySize 2048 or greater.
-        //see jdk.certpath.disabledAlgorithms=MD2, SHA1, MD5, DSA, RSA keySize < 2048
-        if (!"Red Hat, Inc.".equals(System.getProperty("java.vendor"))) {
-            Assert.assertTrue("wss40 should be valid",
-                    validator.isCertificateChainValid(Arrays.asList(certificateWss40)));
-        }
+        Assert.assertTrue("wss40 should be valid",
+                validator.isCertificateChainValid(Arrays.asList(certificateWss40)));
     }
 
     private static X509Certificate readCertificate(String path) throws CertificateException {
