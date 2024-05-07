@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PushbackInputStream;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -129,6 +131,28 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
                 if (client instanceof AutoCloseable) {
                     try {
+                        // The HttpClient::close may hang during the termination.
+                        try {
+                            // Try to call shutdownNow() first
+                            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+                                try {
+                                    MethodHandles.publicLookup()
+                                        .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
+                                        .bindTo(client)
+                                        .invokeExact();
+                                    return null;
+                                } catch (final Throwable ex) {
+                                    if (ex instanceof Error) {
+                                        throw (Error) ex;
+                                    } else {
+                                        throw (Exception) ex;
+                                    }
+                                }
+                            });
+                        } catch (final PrivilegedActionException e) {
+                            //ignore
+                        }
+
                         ((AutoCloseable)client).close();
                     } catch (Exception e) {
                         //ignore
