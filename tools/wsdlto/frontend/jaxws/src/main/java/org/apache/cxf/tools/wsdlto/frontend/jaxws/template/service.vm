@@ -24,6 +24,7 @@ package $service.PackageName;
 #if ($wsdlLocation != "" && not($useGetResource) && not($wsdlLocation.startsWith("classpath:")))
 import java.net.MalformedURLException;
 #end
+import java.net.URI;
 import java.net.URL;
 #if ($markGenerated == "true")
 import javax.annotation.Generated;
@@ -120,7 +121,7 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #else
         URL url = null;
         try {
-            url = new URL("$wsdlLocation");
+            url = URI.create("$wsdlLocation").toURL();
         } catch (MalformedURLException e) {
 #if ($serviceTarget == "cxf")
             LogUtils.getL7dLogger(${service.Name}.class)
