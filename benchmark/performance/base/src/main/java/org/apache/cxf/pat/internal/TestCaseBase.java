@@ -94,7 +94,6 @@ public abstract class TestCaseBase<T> {
     public void processArgs() {
         int count = 0;
         int argc = args.length;
-        System.out.println("Count: " + count + " Argc: " + argc);
         while (count < argc) {
             if ("-WSDL".equals(args[count])) {
                 wsdlPath = args[count + 1];
@@ -138,7 +137,11 @@ public abstract class TestCaseBase<T> {
     }
 
     private boolean validateRS() {
-        System.out.println("Validate JAX-RS options here...");
+        if (operationName == null || operationName.trim().isEmpty()) {
+            System.out.println("Operation is not specified");
+            faultReason = "Missing REST verb";
+            return false;
+        }
         return true;
     }
 
