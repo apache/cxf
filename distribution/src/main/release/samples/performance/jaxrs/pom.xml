@@ -19,19 +19,18 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.benchmark</groupId>
+
+    <parent>
+        <groupId>org.apache.cxf.samples</groupId>
+        <artifactId>cxf-samples</artifactId>
+        <version>4.1.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
     <artifactId>cxf-benchmark-jaxrs-basic-https</artifactId>
     <name>JAX-RS Basic With HTTPS communications</name>
     <description>Apache CXF Benchmark JAX-RS Basic HTTPS communications</description>
-    <version>1.0-SNAPSHOT</version>
     <url>https://cxf.apache.org</url>
-
-    <properties>
-        <cxf.version>4.1.0-SNAPSHOT</cxf.version>
-        <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.spring.version>6.1.6</cxf.spring.version>
-        <maven.exec.plugin.version>3.2.0</maven.exec.plugin.version>
-    </properties>
 
     <profiles>
         <profile>
@@ -42,7 +41,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>${maven.exec.plugin.version}</version>
                         <executions>
                             <execution>
                                 <phase>test</phase>
@@ -138,24 +136,24 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.cxf.benchmark</groupId>
+            <groupId>org.apache.cxf.samples</groupId>
             <artifactId>cxf-benchmark-base</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -165,7 +163,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${cxf.spring.version}</version>
         </dependency>
     </dependencies>
 </project>
