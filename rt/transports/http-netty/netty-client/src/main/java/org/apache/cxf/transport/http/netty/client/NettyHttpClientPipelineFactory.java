@@ -69,8 +69,11 @@ import io.netty.handler.ssl.util.SimpleKeyManagerFactory;
 import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.AttributeKey;
 
 public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> {
+    private static final String WHEN_READY_KEY = "WhenReady-Key";
+    private static final AttributeKey<ChannelFuture> WHEN_READY = AttributeKey.valueOf(WHEN_READY_KEY);
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpClientPipelineFactory.class);
@@ -79,7 +82,6 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
     private final int readTimeout;
     private final int maxContentLength;
     private final boolean enableHttp2;
-    private ChannelPromise readyFuture;
 
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters) {
         this(clientParameters, 0);
@@ -115,8 +117,9 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
         }
 
         final NettyHttpClientHandler responseHandler = new NettyHttpClientHandler();
-        readyFuture = ch.newPromise();
-        
+        final ChannelPromise readyFuture = ch.newPromise();
+        ch.attr(WHEN_READY).set(readyFuture);
+
         if (enableHttp2) {
             final Http2Connection connection = new DefaultHttp2Connection(false);
             final Http2SettingsHandler settingsHandler = new Http2SettingsHandler(readyFuture);
@@ -188,8 +191,8 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
         }
     }
 
-    public ChannelFuture whenReady() {
-        return readyFuture; 
+    ChannelFuture whenReady(Channel channel) {
+        return channel.attr(NettyHttpClientPipelineFactory.WHEN_READY).get();
     }
 
     private SslHandler configureClientSSLOnDemand(Channel channel) throws Exception {
