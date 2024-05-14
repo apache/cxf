@@ -121,7 +121,7 @@
         <cxf.guava.version>32.1.3-jre</cxf.guava.version>
         <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
         <cxf.hazelcast.version>5.4.0</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>6.5.0.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.em.version>6.5.1.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>7.0.5.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.2</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -177,7 +177,7 @@
         <cxf.logback.classic.version>1.5.6</cxf.logback.classic.version>
         <cxf.lucene.version>9.10.0</cxf.lucene.version>
         <cxf.maven.core.version>3.9.6</cxf.maven.core.version>
-        <cxf.micrometer.version>1.12.6</cxf.micrometer.version>
+        <cxf.micrometer.version>1.13.0</cxf.micrometer.version>
         <cxf.micrometer-tracing.version>1.3.0</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.1</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
