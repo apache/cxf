@@ -49,6 +49,7 @@ public class JsonMapObjectReaderWriter {
         chars.add('/');
         chars.add('b');
         chars.add('f');
+        chars.add('n');
         chars.add('r');
         chars.add('t');
         ESCAPED_CHARS = Collections.unmodifiableSet(chars);
