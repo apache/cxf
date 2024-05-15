@@ -20,6 +20,8 @@ package org.apache.cxf.pat.internal;
 
 import java.util.*;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 
@@ -134,6 +136,15 @@ public abstract class TestCaseBase<T> {
         }
     }
 
+    private boolean validateRS() {
+        if (operationName == null || operationName.trim().isEmpty()) {
+            System.out.println("Operation is not specified");
+            faultReason = "Missing REST verb";
+            return false;
+        }
+        return true;
+    }
+
     private boolean validate() {
         if (wsdlNameSpace == null || wsdlNameSpace.trim().isEmpty()) {
             System.out.println("WSDL name space is not specified");
@@ -176,9 +187,16 @@ public abstract class TestCaseBase<T> {
         printTitle();
         printSetting("Default Setting: ");
         processArgs();
-        if (!validate()) {
-            System.out.println("Configure Exception!" + faultReason);
-            System.exit(1);
+        if (getPort() instanceof WebClient) {
+            if (!validateRS()) {
+                System.out.println("Configure Exception!" + faultReason);
+                System.exit(1);
+            }
+        } else {
+            if (!validate()) {
+                System.out.println("Configure Exception!" + faultReason);
+                System.exit(1);
+            }
         }
         init();
         printSetting("Runtime Setting: ");
@@ -345,12 +363,15 @@ public abstract class TestCaseBase<T> {
     public abstract void printUsage();
 
     public void printSetting(String settingType) {
-        System.out.println(settingType + "  [Service] -- > " + serviceName);
-        System.out.println(settingType + "  [Port] -- > " + portName);
+        if (!(getPort() instanceof WebClient)) {
+            System.out.println(settingType + "  [Service] -- > " + serviceName);
+            System.out.println(settingType + "  [Port] -- > " + portName);
+        }
         System.out.println(settingType + "  [Operation] -- > " + operationName);
         System.out.println(settingType + "  [Threads] -- > " + numberOfThreads);
-        System.out.println(settingType + "  [Packet Size] -- > " + packetSize
-                           + " packet(s) ");
+        if (!(getPort() instanceof WebClient)) {
+            System.out.println(settingType + "  [Packet Size] -- > " + packetSize + " packet(s) ");
+        }
         if (usingTime) {
             System.out.println(settingType + "  [Running] -->  " + amount + " (secs)");
         } else {

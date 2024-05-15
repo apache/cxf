@@ -22,50 +22,50 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.benchmark</groupId>
+
+    <parent>
+        <groupId>org.apache.cxf.samples</groupId>
+        <artifactId>cxf-samples</artifactId>
+        <version>4.1.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
     <artifactId>cxf-benchmark-soapdoclit</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
     <name>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</name>
     <description>Apache CXF Benchmark SOAP/HTTP/Doc/Lit</description>
     <url>https://cxf.apache.org</url>
 
-    <properties>
-        <cxf.version>4.1.0-SNAPSHOT</cxf.version>
-        <cxf.slf4j.version>2.0.13</cxf.slf4j.version>
-        <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>org.apache.cxf.benchmark</groupId>
+            <groupId>org.apache.cxf.samples</groupId>
             <artifactId>cxf-benchmark-base</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.ehcache</groupId>
@@ -76,7 +76,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>${cxf.slf4j.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -85,7 +84,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -106,7 +105,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>${maven.war.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -217,7 +215,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                    <version>${cxf.version}</version>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
             <properties>
