@@ -22,7 +22,9 @@ package org.apache.cxf.jaxws.spi;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
@@ -35,6 +37,7 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Before;
 
 import static org.junit.Assert.assertTrue;

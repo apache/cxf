@@ -23,7 +23,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
@@ -41,6 +43,7 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+
 import org.junit.Before;
 import org.mockito.Mockito;
 
@@ -145,10 +148,10 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
         //Setup Input and Output
         MessageInfo inputInfo = new MessageInfo(operationInfo, MessageInfo.Type.INPUT, sayHi);
         inputInfo.addMessagePart(sayHi);
-        operationInfo.setInput( "sayHi", inputInfo);
+        operationInfo.setInput("sayHi", inputInfo);
         MessageInfo outputInfo = new MessageInfo(operationInfo, MessageInfo.Type.OUTPUT, sayHi);
         outputInfo.addMessagePart(sayHi);
-        operationInfo.setOutput( "sayHi", outputInfo);
+        operationInfo.setOutput("sayHi", outputInfo);
 
         Set<Class<?>> result = wrapperClassLoader.generate(factory, interfaceInfo, false);
 

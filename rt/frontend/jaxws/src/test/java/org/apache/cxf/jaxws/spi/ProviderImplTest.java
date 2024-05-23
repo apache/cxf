@@ -19,9 +19,6 @@
 
 package org.apache.cxf.jaxws.spi;
 
-import jakarta.xml.ws.EndpointReference;
-import jakarta.xml.ws.WebServiceContext;
-import jakarta.xml.ws.spi.Invoker;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -36,30 +33,33 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Element;
+
+import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.EndpointReference;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceFeature;
+import jakarta.xml.ws.spi.Invoker;
+import jakarta.xml.ws.spi.ServiceDelegate;
+import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hello_world_soap_http.GreeterImpl;
-import org.junit.Before;
-import org.w3c.dom.Element;
-
-import jakarta.xml.ws.Endpoint;
-import jakarta.xml.ws.WebServiceException;
-import jakarta.xml.ws.WebServiceFeature;
-import jakarta.xml.ws.spi.ServiceDelegate;
-import jakarta.xml.ws.wsaddressing.W3CEndpointReference;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.jaxws.ServiceImpl;
 
 import org.junit.After;
+import org.junit.Before;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -71,6 +71,34 @@ import static org.junit.Assert.fail;
 public class ProviderImplTest extends AbstractCXFTest {
 
     protected LocalTransportFactory localTransport;
+
+    private final Invoker validInvoker = new Invoker() {
+        @Override
+        public void inject(WebServiceContext webServiceContext)
+                throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+
+        }
+
+        @Override
+        public Object invoke(Method method, Object... objects)
+                throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            return null;
+        }
+    };
+
+    private final Invoker invalidInvoker = new Invoker() {
+        @Override
+        public void inject(WebServiceContext webServiceContext)
+                throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            throw new WebServiceException("Oops");
+        }
+
+        @Override
+        public Object invoke(Method method, Object... objects)
+                throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+            return null;
+        }
+    };
 
     @Before
     public void setUpBus() throws Exception {
@@ -348,36 +376,12 @@ public class ProviderImplTest extends AbstractCXFTest {
         BusFactory.setDefaultBus(null);
     }
 
-    private class InvalidImplementor implements jakarta.xml.ws.Provider {
+    private final class InvalidImplementor implements jakarta.xml.ws.Provider {
         @Override
         public Object invoke(Object o) {
             return null;
         }
 
     }
-
-    private Invoker validInvoker = new Invoker() {
-        @Override
-        public void inject(WebServiceContext webServiceContext) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-        }
-
-        @Override
-        public Object invoke(Method method, Object... objects) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-            return null;
-        }
-    };
-
-    private Invoker invalidInvoker = new Invoker() {
-        @Override
-        public void inject(WebServiceContext webServiceContext) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-            throw new WebServiceException("Oops");
-        }
-
-        @Override
-        public Object invoke(Method method, Object... objects) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-            return null;
-        }
-    };
 
 }
