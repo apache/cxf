@@ -16,27 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.brave;
+package org.apache.cxf.tracing.brave;
 
-import java.util.ArrayList;
-import java.util.List;
+import brave.http.HttpRequest;
+import brave.http.HttpRequestParser;
+import brave.propagation.TraceContext;
+import org.apache.cxf.common.util.StringUtils;
 
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
-
-public class TestSpanReporter implements Reporter<Span> {
-    private static final List<Span> SPANS = new ArrayList<>(12);
-
+public class HttpClientRequestParser extends HttpRequestParser.Default {
     @Override
-    public void report(Span span) {
-        SPANS.add(span);
-    }
-
-    public static List<Span> getAllSpans() {
-        return SPANS;
-    }
-
-    public static void clear() {
-        SPANS.clear();
+    protected String spanName(HttpRequest req, TraceContext context) {
+        if (StringUtils.isEmpty(req.url())) {
+            return req.method();
+        }
+        return req.method() + " " + req.url();
     }
 }
