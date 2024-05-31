@@ -184,6 +184,12 @@
             </modules>
         </profile>
         <profile>
+            <id>coverage</id>
+            <modules>
+                <module>coverage</module>
+            </modules>
+        </profile>
+        <profile>
             <!-- default profile enables checkstyle and Xlint stuff -->
             <id>rat</id>
             <build>
@@ -713,6 +719,11 @@
                     <configuration>
                         <outputName>${project.artifactId}-${project.version}-bom</outputName>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.12</version>
                 </plugin>
             </plugins>
         </pluginManagement>

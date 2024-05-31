@@ -53,6 +53,7 @@
         <cxf.xjc.jvmArgs />
         <cxf.xjcplugin.forkmode>false</cxf.xjcplugin.forkmode>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
+        <cxf.jacoco.argLine></cxf.jacoco.argLine>
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
@@ -482,7 +483,7 @@
                         <useFile>${cxf.surefire.usefile}</useFile>
                         <forkCount>${cxf.surefire.fork.count}</forkCount>
                         <childDelegation>false</childDelegation>
-                        <argLine>${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
+                        <argLine>${cxf.jacoco.argLine} ${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
                         <enableAssertions>${cxf.surefire.enable.assertions}</enableAssertions>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
@@ -2289,6 +2290,27 @@
                 <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
                 <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <propertyName>cxf.jacoco.argLine</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
