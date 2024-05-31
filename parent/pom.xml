@@ -2009,6 +2009,12 @@
                 <artifactId>ehcache</artifactId>
                 <version>${cxf.ehcache3.version}</version>
                 <classifier>jakarta</classifier>
+                <exclusions>
+                     <exclusion>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>*</artifactId>
+                     </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
