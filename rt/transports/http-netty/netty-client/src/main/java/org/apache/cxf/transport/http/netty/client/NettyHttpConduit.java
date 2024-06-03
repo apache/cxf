@@ -458,15 +458,17 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception {
                             if (future.isSuccess()) {
-                                handler.whenReady().addListener(new ChannelFutureListener() {
-                                    @Override
-                                    public void operationComplete(ChannelFuture future) throws Exception {
-                                        if (future.isSuccess()) {
-                                            ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
-                                            channelFuture.addListener(writeFailureListener);
+                                handler.whenReady(future.channel())
+                                    .addListener(new ChannelFutureListener() {
+                                        @Override
+                                        public void operationComplete(ChannelFuture future) throws Exception {
+                                            if (future.isSuccess()) {
+                                                ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
+                                                channelFuture.addListener(writeFailureListener);
+                                            }
                                         }
                                     }
-                                });
+                                );
                             }
                         }
                     });
