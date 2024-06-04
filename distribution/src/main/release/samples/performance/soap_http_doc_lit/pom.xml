@@ -124,7 +124,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                    <version>${cxf.version}</version>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
             <properties>
