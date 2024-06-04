@@ -23,6 +23,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class STSServer extends AbstractBusTestServerBase {
@@ -32,7 +33,9 @@ public class STSServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = STSServer.class.getResource("cxf-symmetric.xml");
+        URL busFile = STSServer.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "cxf-symmetric-fips.xml"
+                                                      : "cxf-symmetric.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

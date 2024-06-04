@@ -43,6 +43,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -186,7 +187,7 @@ public final class JweUtils {
     }
     private static KeyAlgorithm getDefaultPublicKeyAlgorithm(PublicKey key) {
         if (key instanceof RSAPublicKey) {
-            return KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
         } else if (key instanceof ECPublicKey) {
             return KeyAlgorithm.ECDH_ES_A128KW;
         } else {
@@ -195,7 +196,7 @@ public final class JweUtils {
     }
     private static KeyAlgorithm getDefaultPrivateKeyAlgorithm(PrivateKey key) {
         if (key instanceof RSAPrivateKey) {
-            return KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
         } else if (key instanceof ECPrivateKey) {
             return KeyAlgorithm.ECDH_ES_A128KW;
         } else {
@@ -937,7 +938,7 @@ public final class JweUtils {
         if (KeyType.OCTET == keyType) {
             return KeyAlgorithm.A128GCMKW;
         } else if (KeyType.RSA == keyType) {
-            return KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
         } else {
             return KeyAlgorithm.ECDH_ES_A128KW;
         }

@@ -36,6 +36,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.WSS4JConstants;
@@ -88,13 +89,18 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = ModifiedRequestTest.class.getResource(
+                   JavaUtils.isFIPSEnabled()
+                   ? "DoubleItFault-fips.wsdl"
+                       : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =
@@ -130,13 +136,17 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = ModifiedRequestTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                         ? "DoubleItFault-fips.wsdl"
+                                                             : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =
@@ -172,13 +182,17 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client-untrusted.xml");
+        URL busFile = ModifiedRequestTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-untrusted-fips.xml" : "client-untrusted.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = ModifiedRequestTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                         ? "DoubleItFault-fips.wsdl"
+                                                             : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =
@@ -205,13 +219,18 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        
+        URL busFile = ModifiedRequestTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = ModifiedRequestTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                         ? "DoubleItFault-fips.wsdl"
+                                                             : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =
@@ -247,13 +266,18 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ModifiedRequestTest.class.getResource("client.xml");
+        URL busFile = ModifiedRequestTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
+
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = ModifiedRequestTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                         ? "DoubleItFault-fips.wsdl"
+                                                             : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =

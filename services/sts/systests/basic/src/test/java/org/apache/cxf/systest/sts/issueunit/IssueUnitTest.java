@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
@@ -97,7 +98,10 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(launchServer(new STSServer("cxf-transport.xml")));
+        assertTrue(launchServer(new STSServer(
+             JavaUtils.isFIPSEnabled() 
+                 ? "cxf-transport-fips.xml" 
+                 : "cxf-transport.xml")));
     }
 
     @org.junit.Test

@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -69,12 +70,14 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            X509SymmetricBindingTest.class.getResource("cxf-service.xml"),
-            X509SymmetricBindingTest.class.getResource("cxf-stax-service.xml")
+            X509SymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-service-fips.xml" : "cxf-service.xml"),
+            X509SymmetricBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-stax-service-fips.xml" : "cxf-stax-service.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            "cxf-x509.xml",
-            "stax-cxf-x509.xml"
+            JavaUtils.isFIPSEnabled() ? "cxf-x509-fips.xml" : "cxf-x509.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-x509-fips.xml" : "stax-cxf-x509.xml"
         )));
     }
 
@@ -96,7 +99,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testX509SAML1() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = X509SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
         DoubleItPortType symmetricSaml1Port =
@@ -118,7 +122,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testX509SAML2() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = X509SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
         DoubleItPortType symmetricSaml2Port =
@@ -141,7 +146,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testX509SAML2Endorsing() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = X509SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2EndorsingPort");
         DoubleItPortType symmetricSaml2Port =
@@ -166,7 +172,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     public void testX509SAML2Supporting() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = X509SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
         DoubleItPortType symmetricSaml2Port =
@@ -196,7 +203,8 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = X509SymmetricBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
         DoubleItPortType symmetricSaml2Port =

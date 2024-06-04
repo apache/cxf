@@ -39,6 +39,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -62,6 +63,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
@@ -105,9 +107,12 @@ public class ActionTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void test3DESEncryptionGivenKey() throws Exception {
-
+        //fips: no 3DES support
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -129,7 +134,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -173,7 +180,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -208,7 +217,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testUsernameTokenNoValidation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -236,7 +247,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -258,7 +271,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignedTimestampReplay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -294,7 +309,10 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricActionToPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
+                
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -320,7 +338,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricActionToPolicyServerFactory() throws Exception {
 
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        URL serviceWSDL = ActionTest.class.getResource("DoubleItActionPolicy.wsdl");
+        URL serviceWSDL = JavaUtils.isFIPSEnabled() 
+            ? ActionTest.class.getResource("DoubleItActionPolicy-fips.wsdl")
+                : ActionTest.class.getResource("DoubleItActionPolicy.wsdl");
         svrFactory.setWsdlLocation(serviceWSDL.toString());
         String address = "http://localhost:" + PORT2 + "/DoubleItAsymmetric";
         svrFactory.setAddress(address);
@@ -340,7 +360,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         org.apache.cxf.endpoint.Server server = svrFactory.create();
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -365,7 +387,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptBeforeSigningActionToPolicy() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -389,7 +413,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -413,7 +439,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureNegativeClient() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -441,7 +469,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureNegativeClientStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -469,7 +499,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureNegativeServer() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -497,7 +529,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureNegativeServerStreaming() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -525,7 +559,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignedSAML() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -547,7 +583,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureProgrammatic() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -582,7 +620,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureProgrammaticStAX() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -620,7 +660,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureProgrammaticMultipleActors() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -666,7 +708,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureDispatchPayload() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -708,7 +752,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureDispatchMessage() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -753,7 +799,9 @@ public class ActionTest extends AbstractBusClientServerTestBase {
     public void testSignatureHandlerActions() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource("client.xml");
+        URL busFile = ActionTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                          ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

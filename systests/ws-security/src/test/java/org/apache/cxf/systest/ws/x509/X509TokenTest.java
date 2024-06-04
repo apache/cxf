@@ -51,6 +51,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -65,6 +66,7 @@ import org.example.contract.doubleit.DoubleItOneWayPortType;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortType2;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -137,13 +139,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricErrorMessage() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricErrorMessagePort");
         DoubleItPortType x509Port =
@@ -173,13 +179,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifier() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
         DoubleItPortType x509Port =
@@ -200,13 +210,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierDerived() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierDerivedPort");
         DoubleItPortType x509Port =
@@ -227,13 +241,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierEncryptBeforeSigning() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierEncryptBeforeSigningPort");
         DoubleItPortType x509Port =
@@ -254,13 +272,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierEncryptBeforeSigningDerived() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierEncryptBeforeSigningDerivedPort");
         DoubleItPortType x509Port =
@@ -281,13 +303,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierJaxwsClient() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("jaxws-client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "jaxws-client-fips.xml"
+                                                          : "jaxws-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
         DoubleItPortType x509Port =
@@ -312,13 +338,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testKeyIdentifierInclusivePrefixes() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
         DoubleItPortType x509Port =
@@ -368,13 +398,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testIssuerSerial() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItIssuerSerialPort");
         DoubleItPortType x509Port =
@@ -395,13 +429,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testThumbprint() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItThumbprintPort");
         DoubleItPortType x509Port =
@@ -422,13 +460,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricThumbprintEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricThumbprintEndorsingPort");
         DoubleItPortType x509Port =
@@ -447,13 +489,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingEncryptedPort");
         DoubleItPortType x509Port =
@@ -472,13 +518,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testContentEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort");
         DoubleItPortType x509Port =
@@ -499,13 +549,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetric256() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetric256Port");
         DoubleItPortType x509Port =
@@ -524,13 +578,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricIssuerSerial() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricIssuerSerialPort");
         DoubleItPortType x509Port =
@@ -551,13 +609,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricIssuerSerialDispatch() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricIssuerSerialOperationPort");
 
@@ -593,13 +655,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricIssuerSerialDispatchMessage() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricIssuerSerialOperationPort");
 
@@ -651,13 +717,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSHA512() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSHA512Port");
         DoubleItPortType x509Port =
@@ -678,13 +748,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricOldConfig() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricOldConfigPort");
         DoubleItPortType x509Port =
@@ -706,13 +780,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricNoInitiatorTokenReference() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricNoInitiatorReferencePort");
         DoubleItPortType x509Port =
@@ -733,13 +811,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSP11Port");
         DoubleItPortType x509Port =
@@ -764,13 +846,18 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(
+                      JavaUtils.isFIPSEnabled() 
+                      ? "client-fips.xml"
+                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptedPasswordPort");
         DoubleItPortType x509Port =
@@ -791,13 +878,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSHA256() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSHA256Port");
         DoubleItPortType x509Port =
@@ -818,13 +909,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricThumbprint() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricThumbprintPort");
         DoubleItPortType x509Port =
@@ -845,13 +940,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricPKIPath() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPKIPathPort");
         DoubleItPortType x509Port =
@@ -872,13 +971,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptBeforeSigning() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptBeforeSigningPort");
         DoubleItPortType x509Port =
@@ -899,13 +1002,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptBeforeSigningNoEnc() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptBeforeSigningNoEncPort");
         DoubleItPortType x509Port =
@@ -926,13 +1033,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryptSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptSignaturePort");
         DoubleItPortType x509Port =
@@ -953,13 +1064,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
         DoubleItPortType x509Port =
@@ -980,13 +1095,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricUsernameTokenPort");
         DoubleItPortType x509Port =
@@ -1007,13 +1126,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEndorsingPort");
         DoubleItPortType x509Port =
@@ -1036,13 +1159,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricUsernameToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricUsernameTokenPort");
         DoubleItPortType x509Port =
@@ -1063,13 +1190,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricProtectTokens() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectTokensPort");
         DoubleItPortType x509Port =
@@ -1093,13 +1224,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
         DoubleItPortType x509Port =
@@ -1124,13 +1259,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsingSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingSP11Port");
         DoubleItPortType x509Port =
@@ -1155,13 +1294,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSignedEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSignedEndorsingPort");
         DoubleItPortType x509Port =
@@ -1186,13 +1329,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingEncryptedPort");
         DoubleItPortType x509Port =
@@ -1217,13 +1364,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSignedEndorsingEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSignedEndorsingEncryptedPort");
         DoubleItPortType x509Port =
@@ -1248,13 +1399,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignaturePort");
         DoubleItPortType x509Port =
@@ -1275,13 +1430,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignatureSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignatureSP11Port");
         DoubleItPortType x509Port =
@@ -1302,13 +1461,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptionPort");
         DoubleItPortType x509Port =
@@ -1329,13 +1492,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSignatureEncryption() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignatureEncryptionPort");
         DoubleItPortType x509Port =
@@ -1359,13 +1526,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignaturePort");
         DoubleItPortType x509Port =
@@ -1394,13 +1565,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSupportingSigned() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingSignedPort");
         DoubleItPortType x509Port =
@@ -1425,13 +1600,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportSupportingSignedCertConstraints() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingSignedCertConstraintsPort");
         DoubleItPortType x509Port =
@@ -1474,13 +1653,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testTransportKVT() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportKVTPort");
         DoubleItPortType x509Port =
@@ -1509,13 +1692,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItOperations.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItOperations-fips.wsdl"
+                                                       : "DoubleItOperations.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort2");
         DoubleItPortType2 x509Port =
@@ -1546,13 +1733,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         // Successful invocation
@@ -1596,13 +1787,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testNegativeEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
 
         // Successful invocation
@@ -1646,13 +1841,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricSignature() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Signature-fips.wsdl"
+                                                       : "DoubleItX509Signature.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignaturePort");
         DoubleItPortType x509Port =
@@ -1673,13 +1872,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricProperties() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPropertiesPort");
         DoubleItPortType x509Port =
@@ -1700,13 +1903,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     public void testSymmetricWithOptionalAddressing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Addressing.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509Addressing-fips.wsdl"
+                                                       : "DoubleItX509Addressing.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricAddressingPort");
         DoubleItPortType x509Port =
@@ -1725,15 +1932,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSymmetricAddressingOneWay() throws Exception {
-
+        //fips: not work
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource("client.xml");
+        URL busFile = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricAddressingOneWayPort");
         DoubleItOneWayPortType port =

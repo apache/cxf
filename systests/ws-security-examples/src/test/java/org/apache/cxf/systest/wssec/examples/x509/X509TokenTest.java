@@ -29,6 +29,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -102,7 +103,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignEncryptPort");
         DoubleItPortType x509Port =
@@ -132,7 +135,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
         DoubleItPortType x509Port =
@@ -162,7 +167,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignEncryptPort");
         DoubleItPortType x509Port =
@@ -192,7 +199,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItX509-fips.wsdl"
+                                                       : "DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingPort");
         DoubleItPortType x509Port =

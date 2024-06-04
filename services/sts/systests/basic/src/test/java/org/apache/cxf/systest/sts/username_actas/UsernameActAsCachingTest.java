@@ -26,6 +26,7 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.EndpointException;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -63,9 +64,12 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            UsernameActAsCachingTest.class.getResource("cxf-service.xml")
+            UsernameActAsCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                       ? "cxf-service-fips.xml"
+                                                           : "cxf-service.xml")
             )));
-        assertTrue(launchServer(new STSServer("cxf-x509.xml")));
+        assertTrue(launchServer(new STSServer(JavaUtils.isFIPSEnabled()
+                                              ? "cxf-x509-fips.xml" : "cxf-x509.xml")));
     }
 
     /**
@@ -75,7 +79,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     public void testUsernameActAsCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameActAsCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameActAsCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort2");
 
@@ -154,7 +160,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     public void testDifferentUsersCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameActAsCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameActAsCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort3");
 
@@ -237,7 +245,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     public void testAppliesToCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameActAsCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameActAsCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort4");
 
@@ -321,7 +331,9 @@ public class UsernameActAsCachingTest extends AbstractBusClientServerTestBase {
     public void testNoAppliesToCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameActAsCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameActAsCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort5");
 

@@ -21,6 +21,7 @@ package org.apache.cxf.sts.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.WSConstants;
 
@@ -30,8 +31,10 @@ import org.apache.wss4j.dom.WSConstants;
  * certificate from a KeyStore) - everything else is optional.
  */
 public class EncryptionProperties {
-    private String encryptionAlgorithm = WSConstants.AES_256;
-    private String keyWrapAlgorithm = WSConstants.KEYTRANSPORT_RSAOAEP;
+    private String encryptionAlgorithm = 
+        JavaUtils.isFIPSEnabled() ? WSConstants.AES_256_GCM : WSConstants.AES_256;
+    private String keyWrapAlgorithm = 
+        JavaUtils.isFIPSEnabled() ? WSConstants.KEYTRANSPORT_RSA15 : WSConstants.KEYTRANSPORT_RSAOAEP;
     private int keyIdentifierType = WSConstants.ISSUER_SERIAL;
     private List<String> acceptedEncryptionAlgorithms = new ArrayList<>();
     private List<String> acceptedKeyWrapAlgorithms = new ArrayList<>();
@@ -39,17 +42,21 @@ public class EncryptionProperties {
 
     public EncryptionProperties() {
         // Default symmetric encryption algorithms
-        acceptedEncryptionAlgorithms.add(WSS4JConstants.TRIPLE_DES);
-        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_128);
-        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_192);
-        acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_256);
+        if (!JavaUtils.isFIPSEnabled()) {
+            acceptedEncryptionAlgorithms.add(WSS4JConstants.TRIPLE_DES);
+            acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_128);
+            acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_192);
+            acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_256);
+        }
         acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_128_GCM);
         acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_192_GCM);
         acceptedEncryptionAlgorithms.add(WSS4JConstants.AES_256_GCM);
 
         // Default key wrap algorithms
         acceptedKeyWrapAlgorithms.add(WSS4JConstants.KEYTRANSPORT_RSA15);
-        acceptedKeyWrapAlgorithms.add(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
+        if (!JavaUtils.isFIPSEnabled()) {
+            acceptedKeyWrapAlgorithms.add(WSS4JConstants.KEYTRANSPORT_RSAOAEP);
+        }
     }
 
     /**

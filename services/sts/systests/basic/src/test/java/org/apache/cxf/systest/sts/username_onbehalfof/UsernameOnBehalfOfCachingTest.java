@@ -26,6 +26,7 @@ import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import org.apache.cxf.BusException;
 import org.apache.cxf.endpoint.EndpointException;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -62,10 +63,13 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            UsernameOnBehalfOfCachingTest.class.getResource("cxf-service.xml")
+            UsernameOnBehalfOfCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "cxf-service-fips.xml"
+                                                                : "cxf-service.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            "cxf-x509.xml"
+                                        JavaUtils.isFIPSEnabled()
+                                        ? "cxf-x509-fips.xml" : "cxf-x509.xml"
         )));
     }
 
@@ -76,7 +80,9 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     public void testUsernameOnBehalfOfCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort2");
 
@@ -156,7 +162,9 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     public void testDifferentUsersCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort3");
 
@@ -239,7 +247,9 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     public void testAppliesToCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort4");
 
@@ -323,7 +333,9 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
     public void testNoAppliesToCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort5");
 

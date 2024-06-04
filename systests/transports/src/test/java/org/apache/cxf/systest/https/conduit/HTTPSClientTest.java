@@ -31,6 +31,7 @@ import org.apache.cxf.configuration.jsse.TLSParameterJaxBUtils;
 import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.TrustManagersType;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -168,18 +169,24 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public final void testPKCS12Endpoint() throws Exception {
-        testSuccessfulCall("pkcs12.xml",
+        testSuccessfulCall(JavaUtils.isFIPSEnabled()
+                           ? "pkcs12-fips.xml"
+                               : "pkcs12.xml",
                            "https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
     }
 
     @Test
     public final void testResourceKeySpecEndpoint() throws Exception {
-        testSuccessfulCall("resource-key-spec.xml",
+        testSuccessfulCall(JavaUtils.isFIPSEnabled()
+                           ? "resource-key-spec-fips.xml"
+                               : "resource-key-spec.xml",
                            "https://localhost:" + BusServer.getPort(4) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
-        testSuccessfulCall("resource-key-spec-url.xml",
+        testSuccessfulCall(JavaUtils.isFIPSEnabled()
+                           ? "resource-key-spec-url-fips.xml"
+                               : "resource-key-spec-url.xml",
                            "https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort",
                            new URL("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
                            true);

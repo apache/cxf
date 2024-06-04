@@ -27,6 +27,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -75,7 +76,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectionSigPort");
         DoubleItPortType utPort =
@@ -102,7 +105,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectionSigDKPort");
         DoubleItPortType utPort =
@@ -129,7 +134,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricProtectionEncPort");
         DoubleItPortType utPort =
@@ -156,7 +163,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
         DoubleItPortType utPort =
@@ -183,7 +192,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignedEndorsingPort");
         DoubleItPortType utPort =
@@ -210,7 +221,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingEncryptedPort");
         DoubleItPortType utPort =
@@ -237,7 +250,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = UsernameTokenDerivedTest.class.getResource("DoubleItUtDerived.wsdl");
+        URL wsdl = UsernameTokenDerivedTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleItUtDerived-fips.wsdl"
+                                                                  : "DoubleItUtDerived.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignedEndorsingEncryptedPort");
         DoubleItPortType utPort =

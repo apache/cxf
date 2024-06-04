@@ -37,6 +37,7 @@ import org.w3c.dom.Text;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -102,7 +103,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         throws Exception {
 
         String symEncAlgo = encProps.getEncryptionSymmetricKeyAlgo() == null
-            ? XMLCipher.AES_256 : encProps.getEncryptionSymmetricKeyAlgo();
+            ? JavaUtils.isFIPSEnabled() ? XMLCipher.AES_256_GCM : XMLCipher.AES_256
+                : encProps.getEncryptionSymmetricKeyAlgo();
 
         byte[] secretKey = getSymmetricKey(symEncAlgo);
 
@@ -140,7 +142,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             }
 
             String keyEncAlgo = encProps.getEncryptionKeyTransportAlgo() == null
-                ? XMLCipher.RSA_OAEP : encProps.getEncryptionKeyTransportAlgo();
+                ? JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_v1dot5 : XMLCipher.RSA_OAEP
+                    : encProps.getEncryptionKeyTransportAlgo();
             String digestAlgo = encProps.getEncryptionDigestAlgo();
 
             byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, receiverCert,

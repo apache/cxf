@@ -36,6 +36,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -150,7 +151,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testPlaintextPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -211,7 +214,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testOnlyHasUsernameTokenWithoutMustUnderstand() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -238,7 +243,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testHashPassword() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -299,7 +306,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testCreated() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -344,7 +353,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     public void testNonce() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

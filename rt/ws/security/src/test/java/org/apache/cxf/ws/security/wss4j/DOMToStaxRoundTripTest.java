@@ -29,6 +29,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -205,14 +206,18 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         properties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(ConfigurationConstants.USER, "myalias");
         properties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYTRANSPORT_RSA15);
-        properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSS4JConstants.TRIPLE_DES);
-
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSS4JConstants.AES_128_GCM);
+            inProperties.setAllowRSA15KeyTransportAlgorithm(false);
+        } else {
+            properties.put(ConfigurationConstants.ENC_SYM_ALGO, WSS4JConstants.TRIPLE_DES);
+        }
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         try {
             echo.echo("test");
-            fail("Failure expected as RSA v1.5 is not allowed by default");
+            fail("Failure expected as RSA v1.5 is not allowed by configuration");
         } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }

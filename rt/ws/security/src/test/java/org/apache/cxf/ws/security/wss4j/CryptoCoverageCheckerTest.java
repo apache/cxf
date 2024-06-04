@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
@@ -43,6 +44,8 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.common.ConfigurationConstants;
 
+
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -111,6 +114,8 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptedWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInterceptorAndValidate(
                 "encrypted_missing_enc_header.xml",
                 this.getPrefixes(),
@@ -135,6 +140,8 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptedWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 this.getPrefixes(),
@@ -159,6 +166,8 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptedSignedWithIncompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInterceptorAndValidate(
                 "encrypted_body_content_signed_missing_signed_header.xml",
                 this.getPrefixes(),
@@ -169,6 +178,8 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptedSignedWithCompleteCoverage() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         this.runInterceptorAndValidate(
                 "encrypted_body_content_signed.xml",
                 this.getPrefixes(),
@@ -250,5 +261,6 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         inHandler.setProperty(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
 
         return inHandler;
+
     }
 }

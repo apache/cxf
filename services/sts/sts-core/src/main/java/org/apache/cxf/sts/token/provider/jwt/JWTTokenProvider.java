@@ -32,6 +32,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -303,7 +304,8 @@ public class JWTTokenProvider implements TokenProvider {
         try {
             KeyAlgorithm.getAlgorithm(keyWrapAlgorithm);
         } catch (IllegalArgumentException ex) {
-            keyWrapAlgorithm = KeyAlgorithm.RSA_OAEP.name();
+            keyWrapAlgorithm = JavaUtils.isFIPSEnabled()
+                ? KeyAlgorithm.RSA1_5.name() : KeyAlgorithm.RSA_OAEP.name();
         }
         encProperties.put(JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM, keyWrapAlgorithm);
 

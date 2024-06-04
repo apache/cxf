@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -46,7 +47,9 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new STSServer(
-            SecurityContextTokenCancelTest.class.getResource("cxf-sts.xml"))));
+            SecurityContextTokenCancelTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                             ? "cxf-sts-fips.xml"
+                                                                 : "cxf-sts.xml"))));
     }
 
     @org.junit.Test

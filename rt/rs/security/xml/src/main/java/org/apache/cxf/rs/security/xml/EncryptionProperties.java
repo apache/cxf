@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.rs.security.xml;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.xml.security.encryption.XMLCipher;
 
 public class EncryptionProperties {
-    private String encryptionKeyTransportAlgo = XMLCipher.RSA_OAEP;
+    private String encryptionKeyTransportAlgo = 
+        JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_v1dot5 : XMLCipher.RSA_OAEP;
     private String encryptionSymmetricKeyAlgo;
     private String encryptionDigestAlgo;
     private String encryptionKeyIdType;

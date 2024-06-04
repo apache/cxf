@@ -31,6 +31,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -92,7 +93,9 @@ public class PasswordPropertiesTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = PasswordPropertiesTest.class.getResource("DoubleItPassword.wsdl");
+        URL wsdl = PasswordPropertiesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "DoubleItPassword-fips.wsdl"
+                                                                : "DoubleItPassword.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUTPort");
 
@@ -123,7 +126,9 @@ public class PasswordPropertiesTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = PasswordPropertiesTest.class.getResource("DoubleItPassword.wsdl");
+        URL wsdl = PasswordPropertiesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "DoubleItPassword-fips.wsdl"
+                                                                : "DoubleItPassword.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUTSignedPort");
 
@@ -156,7 +161,9 @@ public class PasswordPropertiesTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = PasswordPropertiesTest.class.getResource("DoubleItPassword.wsdl");
+        URL wsdl = PasswordPropertiesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                            ? "DoubleItPassword-fips.wsdl"
+                                                                : "DoubleItPassword.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
 

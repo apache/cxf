@@ -51,10 +51,13 @@ public final class JavaUtils {
     private static boolean isJava11Compatible;
     private static boolean isJava9Compatible;
     private static boolean isJava8Before161;
+    private static boolean isFIPSEnabled;
     private static Integer javaMajorVersion;
+    private static final String FIPS_ENABLED = "fips.enabled";
 
     static {
         String version = SystemPropertyAction.getProperty("java.version");
+        isFIPSEnabled = Boolean.valueOf(SystemPropertyAction.getProperty(FIPS_ENABLED));
         try {
             isJava8Before161 = version.startsWith("1.8.0_")
                 && Integer.parseInt(version.substring(6)) < 161;
@@ -113,6 +116,10 @@ public final class JavaUtils {
 
     public static boolean isJava8Before161() {
         return isJava8Before161;
+    }
+    
+    public static boolean isFIPSEnabled() {
+        return isFIPSEnabled;
     }
 
     public static void setJavaMajorVersion(Integer javaMajorVersion) {

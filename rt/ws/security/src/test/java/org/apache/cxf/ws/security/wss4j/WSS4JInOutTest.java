@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -156,12 +157,12 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         outProperties.put(ConfigurationConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
-
+        
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
-
+        
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//s:Body/xenc:EncryptedData");
@@ -199,12 +200,16 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
     @Test
     public void testEncryptionWithAgreementMethodsX448() throws Exception {
+        //X448 isn't compliant in FIPS mode
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         Assume.assumeTrue(getJDKVersion() >= 16);
         testEncryptionWithAgreementMethod("x448", "//dsig11:DEREncodedKeyValue");
     }
 
     @Test
     public void testEncryptionWithAgreementMethodsX25519() throws Exception {
+        //X25519 isn't compliant in FIPS mode
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         Assume.assumeTrue(getJDKVersion() >= 16);
         testEncryptionWithAgreementMethod("x25519", "//dsig11:DEREncodedKeyValue");
     }
@@ -292,7 +297,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             ConfigurationConstants.ENCRYPTION_PARTS,
             "{Content}{" + WSS4JConstants.WSSE_NS + "}UsernameToken"
         );
-
+        
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             ConfigurationConstants.ACTION,
@@ -300,6 +305,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         );
         inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        
 
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");

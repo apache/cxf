@@ -24,13 +24,16 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class BookServerJwtAuthnAuthz extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-jwt-authn-authz");
     private static final URL SERVER_CONFIG_FILE =
-        BookServerJwtAuthnAuthz.class.getResource("authn-authz-server.xml");
+        BookServerJwtAuthnAuthz.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "authn-authz-server-fips.xml"
+                                                      : "authn-authz-server.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

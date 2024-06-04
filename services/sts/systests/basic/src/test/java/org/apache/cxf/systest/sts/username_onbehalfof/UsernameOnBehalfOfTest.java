@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -70,11 +71,15 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            UsernameOnBehalfOfTest.class.getResource("cxf-service2.xml")
+            UsernameOnBehalfOfTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                     ? "cxf-service2-fips.xml"
+                                                         : "cxf-service2.xml")
         )));
         assertTrue(launchServer(new STSServer(
-            "cxf-x509.xml",
-            "stax-cxf-x509.xml"
+                                JavaUtils.isFIPSEnabled()
+                                    ? "cxf-x509-fips.xml" : "cxf-x509.xml",
+                                JavaUtils.isFIPSEnabled()
+                                    ? "stax-cxf-x509-fips.xml" : "stax-cxf-x509.xml"
         )));
     }
 
@@ -92,7 +97,9 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
     public void testUsernameOnBehalfOf() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = UsernameOnBehalfOfTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                              ? "DoubleIt-fips.wsdl"
+                                                                  : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         DoubleItPortType port =

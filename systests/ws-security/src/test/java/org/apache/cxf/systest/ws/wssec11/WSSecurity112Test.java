@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.wssec11.server.Server12;
 import org.apache.cxf.systest.ws.wssec11.server.Server12Restricted;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer12;
@@ -103,40 +104,78 @@ public class WSSecurity112Test extends WSSecurity11Common {
 
     @Parameters(name = "{0}")
     public static Collection<TestParam> data() {
-        if (unrestrictedPoliciesInstalled) {
-            return Arrays.asList(new TestParam[] {
-                new TestParam("X", Server12.PORT, false),
-                new TestParam("X-NoTimestamp", Server12.PORT, false),
-                new TestParam("X-AES128", Server12.PORT, false),
-                new TestParam("X-AES256", Server12.PORT, false),
-                new TestParam("X-TripleDES", Server12.PORT, false),
-                new TestParam("XD", Server12.PORT, false),
-                new TestParam("XD-ES", Server12.PORT, false),
-                new TestParam("XD-SEES", Server12.PORT, false),
+        if (JavaUtils.isFIPSEnabled()) {
+            //TripleDES isn't allowed in FIPS mode
+            if (unrestrictedPoliciesInstalled) {
+                return Arrays.asList(new TestParam[] {
+                    new TestParam("X", Server12.PORT, false),
+                    new TestParam("X-NoTimestamp", Server12.PORT, false),
+                    new TestParam("X-AES128", Server12.PORT, false),
+                    new TestParam("X-AES256", Server12.PORT, false),
+                    new TestParam("XD", Server12.PORT, false),
+                    new TestParam("XD-ES", Server12.PORT, false),
+                    new TestParam("XD-SEES", Server12.PORT, false),
 
-                new TestParam("X", StaxServer12.PORT, false),
-                new TestParam("X-NoTimestamp", StaxServer12.PORT, false),
-                new TestParam("X-AES128", StaxServer12.PORT, false),
-                new TestParam("X-AES256", StaxServer12.PORT, false),
-                new TestParam("X-TripleDES", StaxServer12.PORT, false),
-                new TestParam("XD", StaxServer12.PORT, false),
-                new TestParam("XD-ES", StaxServer12.PORT, false),
-                new TestParam("XD-SEES", StaxServer12.PORT, false),
+                    new TestParam("X", StaxServer12.PORT, false),
+                    new TestParam("X-NoTimestamp", StaxServer12.PORT, false),
+                    new TestParam("X-AES128", StaxServer12.PORT, false),
+                    new TestParam("X-AES256", StaxServer12.PORT, false),
+                
+                    new TestParam("XD", StaxServer12.PORT, false),
+                    new TestParam("XD-ES", StaxServer12.PORT, false),
+                    new TestParam("XD-SEES", StaxServer12.PORT, false),
+                });
+            }
+            return Arrays.asList(new TestParam[] {
+                new TestParam("X", Server12Restricted.PORT, false),
+                new TestParam("X-NoTimestamp", Server12Restricted.PORT, false),
+                new TestParam("XD", Server12Restricted.PORT, false),
+                new TestParam("XD-ES", Server12Restricted.PORT, false),
+                new TestParam("XD-SEES", Server12Restricted.PORT, false),
+
+                new TestParam("X", StaxServer12Restricted.PORT, false),
+                new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false),
+                new TestParam("XD", StaxServer12Restricted.PORT, false),
+                new TestParam("XD-ES", StaxServer12Restricted.PORT, false),
+                new TestParam("XD-SEES", StaxServer12Restricted.PORT, false),
+            });
+        } else {
+            if (unrestrictedPoliciesInstalled) {
+                return Arrays.asList(new TestParam[] {
+                    new TestParam("X", Server12.PORT, false),
+                    new TestParam("X-NoTimestamp", Server12.PORT, false),
+                    new TestParam("X-AES128", Server12.PORT, false),
+                    new TestParam("X-AES256", Server12.PORT, false),
+                    new TestParam("X-TripleDES", Server12.PORT, false),
+                    new TestParam("XD", Server12.PORT, false),
+                    new TestParam("XD-ES", Server12.PORT, false),
+                    new TestParam("XD-SEES", Server12.PORT, false),
+
+                    new TestParam("X", StaxServer12.PORT, false),
+                    new TestParam("X-NoTimestamp", StaxServer12.PORT, false),
+                    new TestParam("X-AES128", StaxServer12.PORT, false),
+                    new TestParam("X-AES256", StaxServer12.PORT, false),
+                    new TestParam("X-TripleDES", StaxServer12.PORT, false),
+                    new TestParam("XD", StaxServer12.PORT, false),
+                    new TestParam("XD-ES", StaxServer12.PORT, false),
+                    new TestParam("XD-SEES", StaxServer12.PORT, false),
+                });
+            }
+            return Arrays.asList(new TestParam[] {
+                new TestParam("X", Server12Restricted.PORT, false),
+                new TestParam("X-NoTimestamp", Server12Restricted.PORT, false),
+                new TestParam("XD", Server12Restricted.PORT, false),
+                new TestParam("XD-ES", Server12Restricted.PORT, false),
+                new TestParam("XD-SEES", Server12Restricted.PORT, false),
+
+                new TestParam("X", StaxServer12Restricted.PORT, false),
+                new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false),
+                new TestParam("XD", StaxServer12Restricted.PORT, false),
+                new TestParam("XD-ES", StaxServer12Restricted.PORT, false),
+                new TestParam("XD-SEES", StaxServer12Restricted.PORT, false),
             });
         }
-        return Arrays.asList(new TestParam[] {
-            new TestParam("X", Server12Restricted.PORT, false),
-            new TestParam("X-NoTimestamp", Server12Restricted.PORT, false),
-            new TestParam("XD", Server12Restricted.PORT, false),
-            new TestParam("XD-ES", Server12Restricted.PORT, false),
-            new TestParam("XD-SEES", Server12Restricted.PORT, false),
-
-            new TestParam("X", StaxServer12Restricted.PORT, false),
-            new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false),
-            new TestParam("XD", StaxServer12Restricted.PORT, false),
-            new TestParam("XD-ES", StaxServer12Restricted.PORT, false),
-            new TestParam("XD-SEES", StaxServer12Restricted.PORT, false),
-        });
+        
     }
 
     @org.junit.AfterClass

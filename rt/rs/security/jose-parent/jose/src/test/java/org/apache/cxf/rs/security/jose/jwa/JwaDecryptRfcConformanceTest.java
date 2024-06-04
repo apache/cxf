@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.jose.jwa;
 
+import org.apache.cxf.helpers.JavaUtils;
+
+import org.junit.Assume;
 import org.junit.Test;
 
 public abstract class JwaDecryptRfcConformanceTest extends AbstractDecryptTest {
@@ -39,16 +42,22 @@ public abstract class JwaDecryptRfcConformanceTest extends AbstractDecryptTest {
 
     @Test
     public void testRsaOaepA128GcmJweCompact() throws Exception {
+        //fips: no RSA-OAEP support
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa-oaep.a128gcm.compact.jwe");
     }
 
     @Test
     public void testRsaOaepA128GcmJweJsonFlattened() throws Exception {
+        //fips: no RSA-OAEP support
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa-oaep.a128gcm.json.flattened.jwe");
     }
 
     @Test
     public void testRsaOaepA128GcmJweJson() throws Exception {
+        //fips: no RSA-OAEP support
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa-oaep.a128gcm.json.jwe");
     }
 

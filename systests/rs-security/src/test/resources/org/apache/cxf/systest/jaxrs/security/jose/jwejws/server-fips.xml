@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+    <httpj:engine-factory id="port-9095-tls-config">
+        <httpj:engine port="${testutil.ports.jaxrs-jwt}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="true"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
+    <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+    <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
+    
+    <bean id="aesWrapEncryptionAlgo" class="org.apache.cxf.rs.security.jose.jwe.AesWrapKeyEncryptionAlgorithm">
+        <constructor-arg type="java.lang.String" value="GawgguFyGrWKav7AX4VKUg"/>
+        <constructor-arg value="A128KW"/>
+    </bean>
+    <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption">
+        <constructor-arg value="A128CBC_HS256"/>
+        <constructor-arg ref="aesWrapEncryptionAlgo"/>
+    </bean>
+    
+    <bean id="aesWrapDecryptionAlgo" class="org.apache.cxf.rs.security.jose.jwe.AesWrapKeyDecryptionAlgorithm">
+        <constructor-arg value="GawgguFyGrWKav7AX4VKUg"/>
+    </bean>
+    <bean id="aesCbcHmacDecryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweDecryption">
+        <constructor-arg ref="aesWrapDecryptionAlgo"/>
+    </bean>
+    
+    <bean id="jweInAesCbcHmacFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter">
+        <property name="decryptionProvider" ref="aesCbcHmacDecryption"/>
+    </bean>
+    <bean id="jweOutAesCbcHmacFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor">
+        <property name="encryptionProvider" ref="aesCbcHmacEncryption"/>
+    </bean>
+    
+    <bean id="hmacSigVerifier" class="org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier">
+        <constructor-arg type="java.lang.String" value="AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"/>
+        <constructor-arg value="HS256"/>
+    </bean>
+    <bean id="jwsHmacInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
+       <property name="signatureVerifier" ref="hmacSigVerifier"/>
+    </bean>
+    <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
+    <bean id="jwsInFilterHttpHeaders" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
+        <property name="validateHttpHeaders" value="true"/>
+    </bean>
+    <bean id="httpHeaderFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.HttpHeaderModifyingFilter"/>
+    <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
+    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
+    <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl">
+         <constructor-arg value="Thus from my lips, by yours, my sin is purged."/>
+    </bean>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsa">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <bean id="encrSignJwsInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJwsContainerRequestFilter"/>
+    <bean id="encrSignJweInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJweContainerRequestFilter"/>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaencrsign">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="encrSignJweInFilter"/>
+            <ref bean="encrSignJwsInFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsacert">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.keystore.file" value="org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"/>
+            <entry key="rs.security.keystore.alias.jwe.out" value="BobCert"/>
+            <entry key="rs.security.keystore.alias.jws.in" value="BobCert"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaCertInHeaders">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.storeonly.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.storeonly.properties"/>
+            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkrsa">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"/>
+            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkaeswrap">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkaescbchmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.aescbchmac-fips.properties"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider2"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwshmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+            <ref bean="jwsHmacInFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkhmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkhmacHttpHeaders">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilterHttpHeaders"/>
+            <ref bean="httpHeaderFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkec">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/jws.ec.public-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/jws.ec.private-fips.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkrsa">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"/>
+            <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"/>
+            <entry key="rs.security.accept.public.key" value="true"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaescbchmac">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInAesCbcHmacFilter"/>
+            <ref bean="jweOutAesCbcHmacFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaesgcmdirect">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/jwe.direct-fips.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+</beans>

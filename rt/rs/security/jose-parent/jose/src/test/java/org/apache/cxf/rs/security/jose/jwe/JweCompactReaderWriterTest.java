@@ -28,6 +28,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
@@ -36,6 +37,7 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -48,12 +50,13 @@ public class JweCompactReaderWriterTest {
         115, 63, (byte)180, 3, (byte)255, 107, (byte)154, (byte)212, (byte)246,
         (byte)138, 7, 110, 91, 112, 46, 34, 105, 47,
         (byte)130, (byte)203, 46, 122, (byte)234, 64, (byte)252};
+    
     static final String RSA_MODULUS_ENCODED_A1 = "oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUW"
-           + "cJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3S"
-           + "psk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2a"
-           + "sbOenSZeyaxziK72UwxrrKoExv6kc5twXTq4h-QChLOln0_mtUZwfsRaMS"
-           + "tPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2dj"
-           + "YgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw";
+        + "cJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3S"
+        + "psk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2a"
+        + "sbOenSZeyaxziK72UwxrrKoExv6kc5twXTq4h-QChLOln0_mtUZwfsRaMS"
+        + "tPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2dj"
+        + "YgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw";
     static final String RSA_PUBLIC_EXPONENT_ENCODED_A1 = "AQAB";
     static final String RSA_PRIVATE_EXPONENT_ENCODED_A1 =
         "kLdtIj6GbDks_ApCSTYQtelcNttlKiOyPzMrXHeI-yk1F7-kpDxY4-WY5N"
@@ -62,7 +65,43 @@ public class JweCompactReaderWriterTest {
         + "qDp0Vqj3kbSCz1XyfCs6_LehBwtxHIyh8Ripy40p24moOAbgxVw3rxT_vl"
         + "t3UVe4WO3JkJOzlpUf-KTVI2Ptgm-dARxTEtE-id-4OJr0h-K-VFs3VSnd"
         + "VTIznSxfyrj8ILL6MG_Uv8YAu7VILSB3lOW085-4qE3DzgrTjgyQ";
-
+    
+    static final String RSA_MODULUS_ENCODED_A1_FIPS = 
+        "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtV"
+        + "T86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn6"
+        + "4tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_F"
+        + "DW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1"
+        + "n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPks"
+        + "INHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw";
+    static final String RSA_PUBLIC_EXPONENT_ENCODED_A1_FIPS = "AQAB";
+    static final String RSA_PRIVATE_EXPONENT_ENCODED_A1_FIPS =
+        "X4cTteJY_gn4FYPsXB8rdXix5vwsg1FLN5E3EaG6RJoVH-HLLKD9M7dx5oo"
+        + "7GURknchnrRweUkC7hT5fJLM0WbFAKNLWY2vv7B6NqXSzUvxT0_YSfqij"
+        + "wp3RTzlBaCxWp4doFk5N2o8Gy_nHNKroADIkJ46pRUohsXywbReAdYaMw"
+        + "Fs9tv8d_cPVY3i07a3t8MN6TNwm0dSawm9v47UiCl3Sk5ZiG7xojPLu4s"
+        + "bg1U2jx4IBTNBznbJSzFHK66jT8bgkuqsk0GjskDJk19Z4qwjwbsnn4j2"
+        + "WBii3RL-Us2lGVkY8fkFzme1z0HbIkfz0Y6mqnOYtqc0X4jfcKoAC8Q";
+    static final String RSA_PRIVATE_FIRST_PRIME_FACTOR_A1_FIPS = 
+        "83i-7IvMGXoMXCskv73TKr8637FiO7Z27zv8oj6pbWUQyLPQBQxtPVnwD"
+        + "20R-60eTDmD2ujnMt5PoqMrm8RfmNhVWDtjjMmCMjOpSXicFHj7XOuV"
+        + "IYQyqVWlWEh6dN36GVZYk93N8Bc9vY41xy8B9RzzOGVQzXvNEvn7O0nVbfs";
+    static final String RSA_PRIVATE_SECOND_PRIME_FACTOR_A1_FIPS =
+        "3dfOR9cuYq-0S-mkFLzgItgMEfFzB2q3hWehMuG0oCuqnb3vobLyumqjVZQO1"
+        + "dIrdwgTnCdpYzBcOfW5r370AFXjiWft_NGEiovonizhKpo9VVS78TzFgxkI"
+        + "drecRezsZ-1kYd_s1qDbxtkDEgfAITAG9LUnADun4vIcb6yelxk";
+    static final String RSA_PRIVATE_FIRST_PRIME_CRT_A1_FIPS =
+        "G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2em"
+        + "TAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc"
+        + "3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0";
+    static final String RSA_PRIVATE_SECOND_PRIME_CRT_A1_FIPS =
+        "s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn"
+        + "8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4"
+        + "Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk";
+    static final String RSA_PRIVATE_FIRST_CRT_COEFFICIENT_A1_FIPS =
+        "GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEc"
+        + "OqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8"
+        + "O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU";
+    
     static final byte[] INIT_VECTOR_A1 = {(byte)227, (byte)197, 117, (byte)252, 2, (byte)219,
         (byte)233, 68, (byte)180, (byte)225, 77, (byte)219};
 
@@ -186,8 +225,12 @@ public class JweCompactReaderWriterTest {
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
         final String specPlainText = "Live long and prosper.";
 
-        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1,
-                                                             RSA_PUBLIC_EXPONENT_ENCODED_A1);
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(JavaUtils.isFIPSEnabled()
+                                                             ? RSA_MODULUS_ENCODED_A1_FIPS
+                                                                 : RSA_MODULUS_ENCODED_A1,
+                                                                 JavaUtils.isFIPSEnabled()
+                                                                 ? RSA_PUBLIC_EXPONENT_ENCODED_A1_FIPS
+                                                                     : RSA_PUBLIC_EXPONENT_ENCODED_A1);
 
         KeyEncryptionProvider keyEncryption = new RSAKeyEncryptionAlgorithm(publicKey,
                                                                              KeyAlgorithm.RSA1_5);
@@ -198,8 +241,20 @@ public class JweCompactReaderWriterTest {
                                                            keyEncryption);
         String jweContent = encryption.encrypt(specPlainText.getBytes(StandardCharsets.UTF_8), null);
 
-        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1,
-                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        RSAPrivateKey privateKey = null;
+        if (JavaUtils.isFIPSEnabled()) {
+            privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1_FIPS,
+                                                                RSA_PUBLIC_EXPONENT_ENCODED_A1_FIPS,
+                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_PRIME_FACTOR_A1_FIPS,
+                                                                RSA_PRIVATE_SECOND_PRIME_FACTOR_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_PRIME_CRT_A1_FIPS,
+                                                                RSA_PRIVATE_SECOND_PRIME_CRT_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_CRT_COEFFICIENT_A1_FIPS);
+        } else {
+            privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1,
+                                                      RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        }
         KeyDecryptionProvider keyDecryption = new RSAKeyDecryptionAlgorithm(privateKey,
                                                                              KeyAlgorithm.RSA1_5);
         JweDecryptionProvider decryption = new AesCbcHmacJweDecryption(keyDecryption);
@@ -208,6 +263,8 @@ public class JweCompactReaderWriterTest {
     }
     @Test
     public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         //
         // This test fails with the IBM JDK
         //
@@ -231,7 +288,7 @@ public class JweCompactReaderWriterTest {
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);
     }
-
+    
     @Test
     public void testEncryptDecryptSpecExample() throws Exception {
         final String specPlainText = "The true sign of intelligence is not knowledge but imagination.";
@@ -256,8 +313,13 @@ public class JweCompactReaderWriterTest {
     }
 
     private String encryptContent(String content, boolean createIfException) throws Exception {
-        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1,
-                                                             RSA_PUBLIC_EXPONENT_ENCODED_A1);
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(JavaUtils.isFIPSEnabled()
+                                                             ? RSA_MODULUS_ENCODED_A1_FIPS
+                                                                 : RSA_MODULUS_ENCODED_A1,
+                                                                 JavaUtils.isFIPSEnabled()
+                                                                 ? RSA_PUBLIC_EXPONENT_ENCODED_A1_FIPS
+                                                                     : RSA_PUBLIC_EXPONENT_ENCODED_A1);
+
         SecretKey key = createSecretKey(createIfException);
         final String jwtKeyName;
         if (key == null) {
@@ -267,7 +329,9 @@ public class JweCompactReaderWriterTest {
             jwtKeyName = AlgorithmUtils.toJwaName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
         KeyEncryptionProvider keyEncryptionAlgo = new RSAKeyEncryptionAlgorithm(publicKey,
-                                                                                 KeyAlgorithm.RSA_OAEP);
+                                                                                 JavaUtils.isFIPSEnabled()  
+                                                                                     ? KeyAlgorithm.RSA1_5 
+                                                                                         : KeyAlgorithm.RSA_OAEP);
         ContentEncryptionProvider contentEncryptionAlgo =
             new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1,
                 ContentAlgorithm.getAlgorithm(jwtKeyName));
@@ -280,8 +344,20 @@ public class JweCompactReaderWriterTest {
         return encryptor.encrypt(content.getBytes(StandardCharsets.UTF_8), null);
     }
     private void decrypt(String jweContent, String plainContent, boolean unwrap) throws Exception {
-        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1,
-                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        RSAPrivateKey privateKey = null;
+        if (JavaUtils.isFIPSEnabled()) {
+            privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1_FIPS,
+                                                                RSA_PUBLIC_EXPONENT_ENCODED_A1_FIPS,
+                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_PRIME_FACTOR_A1_FIPS,
+                                                                RSA_PRIVATE_SECOND_PRIME_FACTOR_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_PRIME_CRT_A1_FIPS,
+                                                                RSA_PRIVATE_SECOND_PRIME_CRT_A1_FIPS,
+                                                                RSA_PRIVATE_FIRST_CRT_COEFFICIENT_A1_FIPS);
+        } else {
+            privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1,
+                                                      RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        }
         ContentAlgorithm algo = Cipher.getMaxAllowedKeyLength("AES") > 128
             ? ContentAlgorithm.A256GCM : ContentAlgorithm.A128GCM;
         JweDecryptionProvider decryptor = new JweDecryption(new RSAKeyDecryptionAlgorithm(privateKey),

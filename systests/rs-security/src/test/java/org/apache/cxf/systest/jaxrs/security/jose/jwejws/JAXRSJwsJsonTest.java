@@ -33,6 +33,7 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
@@ -118,11 +119,15 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
         List<String> properties = new ArrayList<>();
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
-        properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
+        properties.add(JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         Map<String, Object> map = new HashMap<>();
         map.put(JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, properties);
         map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
-                "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
+                JavaUtils.isFIPSEnabled()
+                ? "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac-fips.properties"
+                    : "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         BookStore bs = createBookStore(address, map, null);
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());

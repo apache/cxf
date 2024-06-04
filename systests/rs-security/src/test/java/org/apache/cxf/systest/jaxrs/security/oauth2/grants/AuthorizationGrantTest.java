@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -80,7 +81,9 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         TestUtil.getPortNumber("grants-server-jcache-jwt-non-persist.2");
 
     private static final SpringBusTestServer JCACHE_SERVER_SESSION =
-            new SpringBusTestServer("grants-server-jcache-session") { };
+            new SpringBusTestServer(JavaUtils.isFIPSEnabled()
+            ? "grants-server-jcache-session-fips"
+                : "grants-server-jcache-session") { };
     private static final String JCACHE_PORT3 = TestUtil.getPortNumber("grants-server-jcache-session.2");
 
     private static final String ISSUER = "OIDC IdP";
