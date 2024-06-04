@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.http2.netty.jaxws;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -138,7 +139,7 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
         Greeter proxy = factory.create(Greeter.class);
 
         final Callable<Object> callable = () -> proxy.greetMeAsync("cxf", resp -> { }).get(5, TimeUnit.SECONDS);
-        final List<Future<Object>> futures = executor.invokeAll(List.of(callable, callable, callable));
+        final List<Future<Object>> futures = executor.invokeAll(Arrays.asList(callable, callable, callable));
 
         for (final Future<?> response: futures) {
             int waitCount = 0;
