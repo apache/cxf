@@ -105,6 +105,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     volatile RefCount<HttpClient> clientRef;
     volatile int lastTlsHash = -1;
     volatile URI sslURL;
+    private final ReentrantLock initializationLock = new ReentrantLock();
     
     private static final class RefCount<T extends HttpClient> {
         private final AtomicLong count = new AtomicLong();
@@ -404,31 +405,43 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 cb.version(Version.HTTP_1_1);  
             }
 
-            final boolean shareHttpClient = MessageUtils.getContextualBoolean(message, SHARE_HTTPCLIENT_CONDUIT, true);
-            cl = CLIENTS_CACHE.computeIfAbsent(shareHttpClient, csPolicy, clientParameters, () -> cb.build());
-            if (!"https".equals(uri.getScheme()) 
-                && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
-                && cl.client().version() == Version.HTTP_2
-                && ("2".equals(verc) || ("auto".equals(verc) && "2".equals(HTTP_VERSION)))) {
-                try {
-                    // We specifically want HTTP2, but we're using a request
-                    // that won't trigger an upgrade to HTTP/2 so we'll
-                    // call OPTIONS on the URI which may trigger HTTP/2 upgrade.
-                    // Not needed for methods that don't have a body (GET/HEAD/etc...) 
-                    // or for https (negotiated at the TLS level)
-                    HttpRequest.Builder rb = HttpRequest.newBuilder()
-                        .uri(uri)
-                        .method("OPTIONS", BodyPublishers.noBody());
-                    cl.client().send(rb.build(), BodyHandlers.ofByteArray());
-                } catch (IOException | InterruptedException e) {
-                    //
+            // make sure the conduit is not yet initialized
+            initializationLock.lock();
+            try {
+                cl = clientRef;
+                if (cl == null) {
+                    final boolean shareHttpClient = MessageUtils.getContextualBoolean(message,
+                        SHARE_HTTPCLIENT_CONDUIT, true);
+                    cl = CLIENTS_CACHE.computeIfAbsent(shareHttpClient, csPolicy, clientParameters, () -> cb.build());
+    
+                    if (!"https".equals(uri.getScheme()) 
+                        && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
+                        && cl.client().version() == Version.HTTP_2
+                        && ("2".equals(verc) || ("auto".equals(verc) && "2".equals(HTTP_VERSION)))) {
+                        try {
+                            // We specifically want HTTP2, but we're using a request
+                            // that won't trigger an upgrade to HTTP/2 so we'll
+                            // call OPTIONS on the URI which may trigger HTTP/2 upgrade.
+                            // Not needed for methods that don't have a body (GET/HEAD/etc...) 
+                            // or for https (negotiated at the TLS level)
+                            HttpRequest.Builder rb = HttpRequest.newBuilder()
+                                .uri(uri)
+                                .method("OPTIONS", BodyPublishers.noBody());
+                            cl.client().send(rb.build(), BodyHandlers.ofByteArray());
+                        } catch (IOException | InterruptedException e) {
+                            //
+                        }
+                    } 
+
+                    clientRef = cl;
                 }
-            } 
-            clientRef = cl;
+            } finally {
+                initializationLock.unlock();
+            }
         }
         message.put(HttpClient.class, cl.client());
         
-        message.put(KEY_HTTP_CONNECTION_ADDRESS, address);        
+        message.put(KEY_HTTP_CONNECTION_ADDRESS, address);
     }
 
     @Override
