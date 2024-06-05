@@ -153,7 +153,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
 
     @Test
-    public void testGetGenericBookParallel() throws InterruptedException {
+    public void testGetGenericBookManyClientsInParallel() throws InterruptedException {
         final ExecutorService pool = Executors.newFixedThreadPool(100);
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
         final AtomicLong httpClientThreads = new AtomicLong(); 
@@ -201,6 +201,50 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         if (Runtime.version().feature() > 21) { 
             assertThat(httpClientThreads.get(), equalTo(0L));
         }
+    }
+
+    @Test
+    public void testGetGenericBookSingleClientInParallel() throws InterruptedException {
+        final ExecutorService pool = Executors.newFixedThreadPool(100);
+        final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
+        final WebClient client = WebClient.create(target, true);
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
+        final Supplier<Long> captureHttpClientThreads = () ->
+            Arrays
+                .stream(threadMXBean.getAllThreadIds())
+                .mapToObj(id -> threadMXBean.getThreadInfo(id))
+                .filter(Objects::nonNull)
+                .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .count();
+
+        try {
+            final Collection<Future<?>> futures = new ArrayList<>(); 
+            for (int i = 0; i < 100; ++i) {
+                // We are not checking the future completion, but the fact we were able 
+                // to execute this amount of requests without blowing live threads set 
+                futures.add(
+                    pool.submit(() -> {
+                        Book b1 = client.sync().get(Book.class);
+                        assertEquals(124L, b1.getId());
+                    })
+                );
+            }
+
+            // Find any completed future to make sure conduit was initialized
+            while (true) {
+                if (futures.stream().anyMatch(Future::isDone)) {
+                    break;
+                }
+            }
+        } finally {
+            client.close();
+        }
+
+        pool.shutdown();
+        assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
+
+        assertThat(captureHttpClientThreads.get(), equalTo(0L));
     }
 
     @Test
