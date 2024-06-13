@@ -53,7 +53,6 @@
         <cxf.xjc.jvmArgs />
         <cxf.xjcplugin.forkmode>false</cxf.xjcplugin.forkmode>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
-        <cxf.jacoco.argLine></cxf.jacoco.argLine>
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
@@ -2300,6 +2299,7 @@
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>prepare</id>
                                 <goals>
                                     <goal>prepare-agent</goal>
                                 </goals>
@@ -2318,6 +2318,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>no-coverage</id>
+            <properties>
+                <cxf.jacoco.argLine />
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 </project>
