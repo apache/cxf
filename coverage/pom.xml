@@ -28,6 +28,10 @@
     <description>Apache CXF coverage report</description>
     <packaging>pom</packaging>
 
+    <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
