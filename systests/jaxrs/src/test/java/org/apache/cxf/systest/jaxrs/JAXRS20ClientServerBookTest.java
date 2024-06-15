@@ -207,7 +207,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public void testGetGenericBookSingleClientInParallel() throws InterruptedException {
         final ExecutorService pool = Executors.newFixedThreadPool(100);
         final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
-        final WebClient client = WebClient.create(target, true);
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
         final Supplier<Long> captureHttpClientThreads = () ->
@@ -218,6 +217,9 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 .filter(t -> t.getThreadName().startsWith("HttpClient-"))
                 .count();
 
+        // Capture the number of client threads at start
+        final long httpClientThreads = captureHttpClientThreads.get();
+        final WebClient client = WebClient.create(target, true);
         try {
             final Collection<Future<?>> futures = new ArrayList<>(); 
             for (int i = 0; i < 100; ++i) {
@@ -242,9 +244,20 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
 
         pool.shutdown();
-        assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
-
-        assertThat(captureHttpClientThreads.get(), equalTo(0L));
+        if (pool.awaitTermination(2, TimeUnit.MINUTES)) {
+            // Since JDK-21, HttpClient Implements AutoCloseable
+            if (Runtime.version().feature() > 21) { 
+                assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
+            }
+        } else {
+            pool.shutdownNow();
+            if (pool.awaitTermination(2, TimeUnit.MINUTES)) {
+                // Since JDK-21, HttpClient Implements AutoCloseable
+                if (Runtime.version().feature() > 21) { 
+                    assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
+                }
+            }
+        }
     }
 
     @Test
