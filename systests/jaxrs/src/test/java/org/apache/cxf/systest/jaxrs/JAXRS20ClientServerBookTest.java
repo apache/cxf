@@ -244,18 +244,14 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         }
 
         pool.shutdown();
-        if (pool.awaitTermination(2, TimeUnit.MINUTES)) {
-            // Since JDK-21, HttpClient Implements AutoCloseable
-            if (Runtime.version().feature() > 21) { 
-                assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
-            }
+        // Since JDK-21, HttpClient Implements AutoCloseable
+        if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() > 21) {
+            assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
         } else {
             pool.shutdownNow();
-            if (pool.awaitTermination(2, TimeUnit.MINUTES)) {
-                // Since JDK-21, HttpClient Implements AutoCloseable
-                if (Runtime.version().feature() > 21) { 
-                    assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
-                }
+            // Since JDK-21, HttpClient Implements AutoCloseable
+            if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() > 21) {
+                assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
             }
         }
     }
