@@ -52,6 +52,6 @@ public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor 
             (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
         
         final Exception ex = message.getContent(Exception.class);
-        super.stopTraceSpan(holder, ex);
+        super.stopTraceSpan(holder, (String) message.get(Message.HTTP_REQUEST_METHOD), getUri(message), ex);
     }
 }

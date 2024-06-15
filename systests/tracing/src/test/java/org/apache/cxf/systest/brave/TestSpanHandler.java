@@ -16,22 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tracing.brave;
+package org.apache.cxf.systest.brave;
 
-import brave.http.HttpAdapter;
-import brave.http.HttpClientParser;
-import org.apache.cxf.common.util.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-public class HttpClientSpanParser extends HttpClientParser {
+import brave.handler.MutableSpan;
+import brave.handler.SpanHandler;
+import brave.propagation.TraceContext;
+
+public class TestSpanHandler extends SpanHandler {
+    private static final List<MutableSpan> SPANS = new ArrayList<>(12);
+
     @Override
-    protected <Req> String spanName(HttpAdapter<Req, ?> adapter, Req request) {
-        return buildSpanDescription(adapter.url(request), adapter.method(request));
+    public boolean end(TraceContext context, MutableSpan span, Cause cause) {
+        return SPANS.add(span);
     }
 
-    private String buildSpanDescription(final String path, final String method) {
-        if (StringUtils.isEmpty(method)) {
-            return path;
-        }
-        return method + " " + path;
+    public static List<MutableSpan> getAllSpans() {
+        return SPANS;
+    }
+
+    public static void clear() {
+        SPANS.clear();
     }
 }

@@ -23,6 +23,7 @@ import java.time.Duration;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import brave.handler.SpanHandler;
 import brave.sampler.Sampler;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
@@ -34,7 +35,6 @@ import org.apache.cxf.systest.jaxrs.resources.Library;
 import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
 import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.web.servlet.WebMvcObservationAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,8 +43,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -60,10 +58,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasSize;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsObservabiityTest.TestConfig.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsWebObservabilityTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
 @AutoConfigureObservability
-public class SpringJaxrsObservabiityTest {
+public class SpringJaxrsWebObservabilityTest {
 
     @Autowired
     private MeterRegistry registry;
@@ -77,7 +75,7 @@ public class SpringJaxrsObservabiityTest {
     @LocalServerPort
     private int port;
 
-    @EnableAutoConfiguration(exclude = WebMvcObservationAutoConfiguration.class)
+    @EnableAutoConfiguration
     @ComponentScan(basePackageClasses = Library.class)
     static class TestConfig {
         @Bean
@@ -101,8 +99,8 @@ public class SpringJaxrsObservabiityTest {
         }
 
         @Bean
-        Reporter<Span> reporter() {
-            return Reporter.CONSOLE;
+        SpanHandler spanHandler() {
+            return SpanHandler.NOOP;
         }
     }
 
@@ -128,7 +126,7 @@ public class SpringJaxrsObservabiityTest {
         
         await()
             .atMost(Duration.ofSeconds(1))
-            .until(() -> arrayListSpanReporter.getSpans(), hasSize(2));
+            .until(() -> arrayListSpanReporter.getSpans(), hasSize(3));
 
         // Micrometer Observation with Micrometer Tracing
         SpansAssert.assertThat(arrayListSpanReporter.getSpans())
@@ -167,7 +165,11 @@ public class SpringJaxrsObservabiityTest {
             .hasTimerWithNameAndTags("http.server.duration", Tags.of("error", "none",
                 "http.request.method", "GET", "http.response.status_code", "200",
                 "http.route", "/api/library", "network.protocol.name", "http",
-                "server.address", "localhost", "server.port", String.valueOf(port)));
+                "server.address", "localhost", "server.port", String.valueOf(port)))
+            .hasTimerWithNameAndTags("http.server.requests", Tags.of("error", "none",
+                "method", "GET", "status", "200",
+                "uri", "/api/library", "outcome", "SUCCESS",
+                "exception", "none"));
     }
 
     private WebTarget createWebTarget() {

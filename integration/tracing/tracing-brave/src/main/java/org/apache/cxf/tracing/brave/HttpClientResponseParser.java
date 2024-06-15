@@ -18,20 +18,17 @@
  */
 package org.apache.cxf.tracing.brave;
 
-import brave.http.HttpAdapter;
-import brave.http.HttpServerParser;
-import org.apache.cxf.common.util.StringUtils;
+import brave.SpanCustomizer;
+import brave.Tags;
+import brave.http.HttpResponseParser;
 
-public class HttpServerSpanParser extends HttpServerParser {
+public class HttpClientResponseParser extends HttpResponseParser.Default {
     @Override
-    protected <Req> String spanName(HttpAdapter<Req, ?> adapter, Req request) {
-        return buildSpanDescription(adapter.path(request), adapter.method(request));
-    }
-
-    private String buildSpanDescription(final String path, final String method) {
-        if (StringUtils.isEmpty(method)) {
-            return path;
+    protected void error(int httpStatus, Throwable error, SpanCustomizer span) {
+        if (error != null) {
+            span.tag(Tags.ERROR.key(), error.getMessage());
+        } else {
+            super.error(httpStatus, error, span);
         }
-        return method + " " + path;
     }
 }

@@ -25,7 +25,7 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.brave.TestSpanHandler;
 import org.apache.cxf.systest.brave.jaxrs.AbstractBraveTracingTest;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
@@ -64,7 +64,7 @@ public class MicrometerTracingTest extends AbstractBraveTracingTest {
         protected void run() {
             final Tracing brave = Tracing
                 .newBuilder()
-                .spanReporter(new TestSpanReporter())
+                .addSpanHandler(new TestSpanHandler())
                 .build();
 
             final ObservationRegistry observationRegistry = createObservationRegistry(meterRegistry, brave);

@@ -48,10 +48,22 @@ public interface HttpAdapterFactory {
     }
     
     final class Response {
+        private final String method;
+        private final String path;
         private final Integer status;
         
-        Response(Integer status) {
+        Response(String method, String path, Integer status) {
+            this.method = method;
+            this.path = path;
             this.status = status;
+        }
+        
+        String path() {
+            return path;
+        }
+        
+        String method() {
+            return method;
         }
         
         Integer status() {
@@ -63,7 +75,7 @@ public interface HttpAdapterFactory {
         return new Request(headers, uri, method);
     }
     
-    static Response response(Integer status) {
-        return new Response(status);
+    static Response response(String method, String path, Integer status) {
+        return new Response(method, path, status);
     }
 }
