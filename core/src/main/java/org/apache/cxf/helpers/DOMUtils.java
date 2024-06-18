@@ -790,7 +790,10 @@ public final class DOMUtils {
             //java9 plus hack
             Field f = GET_DOCUMENT_FRAGMENT_FIELDS.get(fragment.getClass());
             if (f != null) {
-                return ReflectionUtil.accessDeclaredField(f, fragment, DocumentFragment.class);
+                final DocumentFragment inner = ReflectionUtil.accessDeclaredField(f, fragment, DocumentFragment.class);
+                if (inner != null) {
+                    return inner;
+                }
             }
         }
         return fragment;
