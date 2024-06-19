@@ -19,12 +19,15 @@
 
 package org.apache.cxf.bus.managers;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.DummyServer;
 import org.apache.cxf.endpoint.Server;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ServerRegistryImpTest {
 
@@ -40,6 +43,19 @@ public class ServerRegistryImpTest {
         assertEquals("The serverList should be clear ", serverRegistryImpl.serversList.size(), 0);
     }
 
+    @Test
+    public void testServerRegistry() {
+        ServerRegistryImpl serverRegistryImpl = new ServerRegistryImpl();
+        assertEquals(0, serverRegistryImpl.getServers().size());
+    }
 
-
+    @Test
+    public void testBus() {
+        ServerRegistryImpl serverRegistryImpl = new ServerRegistryImpl();
+        Bus bus = serverRegistryImpl.getBus();
+        Bus differentBus = BusFactory.getDefaultBus();
+        serverRegistryImpl.setBus(differentBus);
+        assertNotEquals(bus, differentBus);
+        assertEquals(differentBus, serverRegistryImpl.getBus());
+    }
 }
