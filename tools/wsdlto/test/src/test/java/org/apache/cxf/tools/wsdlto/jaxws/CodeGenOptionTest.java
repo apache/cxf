@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.sun.codemodel.CodeWriter;
 
