@@ -328,10 +328,13 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
 
         String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir, "Greeter.java")));
         assertFalse(currentDatePresent(str));
+        assertFalse(currentDateInGeneratedAnnotationPresent(str));
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
         assertFalse(currentDatePresent(str));
+        assertFalse(currentDateInGeneratedAnnotationPresent(str));
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
         assertFalse(currentDatePresent(str));
+        assertFalse(currentDateInGeneratedAnnotationPresent(str));
     }
 
     /**
@@ -365,10 +368,10 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         assertTrue(currentDateInGeneratedAnnotationPresent(str));
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
         assertFalse(currentDatePresent(str));
-        assertFalse(currentDateInGeneratedAnnotationPresent(str));
+        assertTrue(currentDateInGeneratedAnnotationPresent(str));
         str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
         assertFalse(currentDatePresent(str));
-        assertFalse(currentDateInGeneratedAnnotationPresent(str));
+        assertTrue(currentDateInGeneratedAnnotationPresent(str));
     }
 
     private boolean currentDatePresent(String str) {
