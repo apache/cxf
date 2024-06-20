@@ -27,7 +27,7 @@
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jdk.version>11</cxf.jdk.version>
+        <cxf.jdk.version>17</cxf.jdk.version>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
