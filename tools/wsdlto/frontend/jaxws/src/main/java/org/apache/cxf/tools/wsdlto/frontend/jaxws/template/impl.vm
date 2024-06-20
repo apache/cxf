@@ -55,12 +55,12 @@ import ${import};
                       endpointInterface = "$intf.PackageName.$intf.Name")
 
 #if ($markGenerated == "true")
-@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end, comments = "$fullversion")
 #end
 public class ${implName} implements $intf.Name {
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     private static final Logger LOG = Logger.getLogger(${implName}.class.getName());
 
@@ -69,7 +69,7 @@ public class ${implName} implements $intf.Name {
      * @see $intf.PackageName.$intf.Name#${method.Name}(#foreach ($parameter in $method.Parameters)$parameter.ClassName $parameter.Name#if ($foreach.count != $method.getParameters().size()), #end#end)*
      */
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public $method.return.ClassName ${method.Name}(#if($method.ParameterListWithoutAnnotation.size() == 0))#end#if($method.ParameterListWithoutAnnotation.size() != 0)#foreach($param in ${method.ParameterListWithoutAnnotation})$param#if($foreach.count != $method.ParameterListWithoutAnnotation.size()) #end#end)#end#if($method.Exceptions.size() > 0) throws #foreach($exception in $method.Exceptions)$exception.ClassName#if($foreach.count != $method.Exceptions.size()), #end #end #end {
 #if ($method.Async)

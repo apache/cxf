@@ -61,22 +61,22 @@ $service.classJavaDoc
 $annotation
 #end
 #if ($markGenerated == "true")
-@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end, comments = "$fullversion")
 #end
 public class ${service.Name} extends ${serviceSuperclass} {
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public static final URL WSDL_LOCATION;
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public static final QName SERVICE = new QName("$service.Namespace", "$service.ServiceName");
 #foreach ($port in ${service.Ports})
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public static final QName $port.Name = new QName("$service.Namespace", "$port.PortName");
 #end
@@ -136,42 +136,42 @@ public class ${service.Name} extends ${serviceSuperclass} {
 
 #if ($serviceTarget == "cxf")
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(Bus bus, WebServiceFeature ... features) {
         super(bus, WSDL_LOCATION, SERVICE, features);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(Bus bus, URL wsdlLocation, WebServiceFeature ... features) {
         super(bus, wsdlLocation, SERVICE, features);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(Bus bus, URL wsdlLocation, QName serviceName, WebServiceFeature ... features) {
         super(bus, wsdlLocation, serviceName, features);
     }
 #else
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(URL wsdlLocation) {
         super(wsdlLocation, SERVICE);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}() {
         super(WSDL_LOCATION, SERVICE);
@@ -180,21 +180,21 @@ public class ${service.Name} extends ${serviceSuperclass} {
 
 #if ($jaxws22 || $serviceTarget == "cxf")
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(WebServiceFeature ... features) {
         super(WSDL_LOCATION, SERVICE, features);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(URL wsdlLocation, WebServiceFeature ... features) {
         super(wsdlLocation, SERVICE, features);
     }
 
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${service.Name}(URL wsdlLocation, QName serviceName, WebServiceFeature ... features) {
         super(wsdlLocation, serviceName, features);
@@ -208,7 +208,7 @@ public class ${service.Name} extends ${serviceSuperclass} {
      * without having to cast to the appropriate interface.
      */
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public interface ${portClassName}Proxy extends ${portClassName}, AutoCloseable, BindingProvider, Client {
     }
@@ -235,7 +235,7 @@ $port.javaDoc
      */
     @WebEndpoint(name = "${port.PortName}")
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${portClassName} ${port.MethodName}() {
         return super.getPort($port.Name, ${portClassName}.class);
@@ -253,7 +253,7 @@ $port.javaDoc
      */
     @WebEndpoint(name = "${port.PortName}")
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public ${portClassName} ${port.MethodName}(WebServiceFeature... features) {
         return super.getPort($port.Name, ${portClassName}.class, features);
