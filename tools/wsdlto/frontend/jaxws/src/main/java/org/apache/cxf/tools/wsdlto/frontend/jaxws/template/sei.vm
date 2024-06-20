@@ -44,7 +44,7 @@ $intf.classJavaDoc
 $annotation
 #end
 #if ($markGenerated == "true")
-@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end, comments = "$fullversion")
 #end
 public interface $intf.Name ${seiSuperinterfaceString}{
 #foreach ($method in $intf.Methods)
@@ -58,7 +58,7 @@ ${method.JavaDoc}
     $annotation
 #end
 #if ($markGenerated == "true")
-    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava"#if ($suppressGeneratedDate != "true"), date = "$currentdate"#end)
 #end
     public $method.returnValue ${method.Name}(#if($method.ParameterList.size() == 0))#end
 #if($method.ParameterList.size() != 0)
