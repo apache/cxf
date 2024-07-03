@@ -22,6 +22,7 @@ package demo.jaxrs.tracing.server;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -149,7 +150,7 @@ public class Catalog {
             .target(GoogleBooksApi.class, "https://www.googleapis.com");
      
         final feign.Response response = api.search(query);
-        try (final Reader reader = response.body().asReader()) {
+        try (final Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
             return Json.createReader(reader).readObject();
         }
     }

@@ -112,7 +112,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     // set the endpointInfo name which could be used for configuration
                     info.setName(new QName("http://cxf.apache.org", "TransportURIResolver"));
                     info.setAddress(base.toString());
-                    final Conduit c = ci.getConduit(info, bus);
+                    Conduit c = ci.getConduit(info, bus);
                     Message message = new MessageImpl();
                     Exchange exch = new ExchangeImpl();
                     exch.put(Bus.class, bus);
@@ -123,9 +123,8 @@ public class TransportURIResolver extends ExtendedURIResolver {
                         public void onMessage(Message message) {
                             LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
                             try {
-                                IOUtils.copy(message.getContent(InputStream.class), bout);
+                                IOUtils.copyAndCloseInput(message.getContent(InputStream.class), bout);
                                 message.getExchange().put(InputStream.class, bout.createInputStream());
-                                c.close(message);
                             } catch (IOException e) {
                                 //ignore
                             }
@@ -133,6 +132,13 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     });
                     c.prepare(message);
                     c.close(message);
+                    if (exch.getInMessage() != null) {
+                        c.close(exch.getInMessage());
+                    }
+                    if (exch.getInFaultMessage() != null) {
+                        c.close(exch.getInFaultMessage());
+                    }
+                    c.close();
                     InputStream ins = exch.get(InputStream.class);
                     resourceOpened.add(ins);
                     InputSource src = new InputSource(ins);
@@ -149,6 +155,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
             } catch (Exception e) {
                 //ignore
                 LOG.log(Level.FINEST, "Conduit initiator could not resolve " + baseUri + " " + curUri, e);
+                e.printStackTrace();
             }
         }
         if (is == null

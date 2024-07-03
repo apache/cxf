@@ -19,11 +19,11 @@
 package demo.jaxrs.sse;
 
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
@@ -38,7 +38,7 @@ public final class StatsServer {
         final ServletContextHandler staticContext = new ServletContextHandler();
         staticContext.setContextPath("/static");
         staticContext.addServlet(staticHolder, "/*");
-        staticContext.setResourceBase(StatsServer.class.getResource("/web-ui").toURI().toString());
+        staticContext.setBaseResourceAsString(StatsServer.class.getResource("/web-ui").toURI().toString());
 
          // Register and map the dispatcher servlet
         final ServletHolder cxfServletHolder = new ServletHolder(new CXFServlet());
@@ -49,10 +49,7 @@ public final class StatsServer {
         context.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
         context.setInitParameter("contextConfigLocation", StatsConfig.class.getName());
 
-        HandlerList handlers = new HandlerList();
-        handlers.addHandler(staticContext);
-        handlers.addHandler(context);
-
+        Handler.Collection handlers = new Handler.Sequence(staticContext, context);
         server.setHandler(handlers);
         server.start();
         server.join();

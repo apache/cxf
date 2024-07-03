@@ -18,17 +18,9 @@
  */
 package org.apache.cxf.tracing.micrometer.jaxrs;
 
-import static org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestReceiverObservationConvention.INSTANCE;
-import static org.apache.cxf.tracing.micrometer.jaxrs.JaxrsObservationDocumentation.IN_OBSERVATION;
-
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import org.apache.cxf.tracing.micrometer.AbstractObservationProvider;
-import org.apache.cxf.tracing.micrometer.ObservationScope;
-
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ContainerResponseContext;
@@ -37,6 +29,15 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.ext.Provider;
+import org.apache.cxf.tracing.micrometer.AbstractObservationProvider;
+import org.apache.cxf.tracing.micrometer.ObservationScope;
+
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+
+import static org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestReceiverObservationConvention.INSTANCE;
+import static org.apache.cxf.tracing.micrometer.jaxrs.JaxrsObservationDocumentation.IN_OBSERVATION;
+
 
 @Provider
 public class ObservationProvider extends AbstractObservationProvider

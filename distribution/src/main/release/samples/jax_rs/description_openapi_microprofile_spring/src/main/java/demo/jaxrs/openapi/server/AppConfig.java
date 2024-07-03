@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.microprofile.openapi.OpenApiFeature;
-import org.apache.johnzon.jaxrs.jsonb.jaxrs.JsonbJaxrsProvider;
+import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +29,7 @@ public class AppConfig {
         factory.setFeatures(Arrays.asList(openApiFeature()));
         factory.setServiceBean(sampleResource());
         factory.setAddress("http://localhost:9000/");
-        factory.setProvider(new JsonbJaxrsProvider<>());
+        factory.setProvider(new JsrJsonbProvider());
         return factory.create();
     }
 }

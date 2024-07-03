@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -83,33 +83,33 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>    
+            <version>4.1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-integration-tracing-opentelemetry</artifactId>
-            <version>${cxf.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>${cxf.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>jakarta.json</groupId>
@@ -124,18 +124,19 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
+            <version>${cxf.jetty12.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-core</artifactId>
-            <version>12.4</version>
+            <version>13.3</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
-            <version>12.4</version>
+            <version>13.3</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign.opentracing</groupId>
@@ -149,10 +150,6 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-semconv</artifactId>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>

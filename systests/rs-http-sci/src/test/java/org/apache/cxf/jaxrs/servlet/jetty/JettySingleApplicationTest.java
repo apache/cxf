@@ -21,7 +21,9 @@ package org.apache.cxf.jaxrs.servlet.jetty;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -37,9 +39,11 @@ public class JettySingleApplicationTest extends AbstractSciTest {
             super("/",
                 new Resource[] {
                     // Limit the classpath scanning to org.apache.demo.resources package
-                    Resource.newClassPathResource("/org/apache/demo/resources"),
+                    ResourceFactory.of(new ContextHandler()).
+                        newClassPathResource("/org/apache/demo/resources"),
                     // Limit the classpath scanning to org.apache.demo.complete package
-                    Resource.newClassPathResource("/org/apache/demo/applications/complete")
+                    ResourceFactory.of(new ContextHandler()).
+                        newClassPathResource("/org/apache/demo/applications/complete")
                 }, PORT);
         }
     }

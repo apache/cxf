@@ -27,8 +27,13 @@ import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
-    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<-ELEMENT_NAME-.*?>)(.*?)(</-ELEMENT_NAME->)";
-    private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$3";
+    // see https://www.w3.org/TR/REC-xml-names/#NT-NCName for allowed chars in namespace prefix
+    private static final String PATTERN_XML_NAMESPACE_PREFIX = "[\\w.\\-\\u00B7\\u00C0-\\u00D6\\u00D8-\\u00F6"
+            + "\\u00F8-\\u02FF\\u0300-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u203F-\\u2040\\u2070-\\u218F"
+            + "\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD]+";
+    private static final String MATCH_PATTERN_XML_TEMPLATE = "(<(" + PATTERN_XML_NAMESPACE_PREFIX
+            + ":)?-ELEMENT_NAME-.*?>)(.*?)(</(" + PATTERN_XML_NAMESPACE_PREFIX + ":)?-ELEMENT_NAME->)";
+    private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$4";
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
     private static final String MASKED_HEADER_VALUE = "XXX";
@@ -55,7 +60,7 @@ public class MaskSensitiveHelper {
         replacementsJSON.clear();
         addSensitiveElementNames(inSensitiveElementNames);
     }
-    
+
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         for (final String sensitiveName : inSensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE, sensitiveName, replacementsXML);

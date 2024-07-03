@@ -19,12 +19,12 @@
 
 package org.apache.cxf.tracing.micrometer.jaxrs;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.tracing.micrometer.jaxrs.JaxrsObservationDocumentation.ServerLowCardinalityKeys;
 
 import io.micrometer.common.KeyValues;
-import jakarta.ws.rs.container.ContainerRequestContext;
 
 /**
  *
@@ -39,8 +39,8 @@ public class DefaultContainerRequestReceiverObservationConvention extends Abstra
     public KeyValues getLowCardinalityKeyValues(ContainerRequestReceiverContext context) {
         KeyValues keyValues = lowCardinalityKeyValues(context.getRequestContext().getMethod(),
                                                       context.getRequestContext().getUriInfo().getBaseUri(),
-                                                      context.getResponse() != null ?
-                                                      context.getResponse().getStatus() : null);
+                                                      context.getResponse() != null 
+                                                          ? context.getResponse().getStatus() : null);
         String pathTemplate = pathTemplate(context.getRequestContext());
         if (pathTemplate != null) {
             keyValues = keyValues.and(ServerLowCardinalityKeys.HTTP_ROUTE.withValue(pathTemplate));
@@ -51,8 +51,9 @@ public class DefaultContainerRequestReceiverObservationConvention extends Abstra
     @Override
     public KeyValues getHighCardinalityKeyValues(ContainerRequestReceiverContext context) {
         return highCardinalityKeyValues(context.getRequestContext().getLength(),
-                                        context.getResponse() != null ? context.getResponse().getLength() :
-                                        null, context.getRequestContext().getHeaderString("User-Agent"));
+                                        context.getResponse() != null 
+                                            ? context.getResponse().getLength() : null, 
+                                        context.getRequestContext().getHeaderString("User-Agent"));
     }
 
     @Override

@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -84,6 +85,9 @@ public class HTTPTransportFactory
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock r = lock.readLock();
     private final Lock w = lock.writeLock();
+    
+    private boolean forceURLConnectionConduit 
+        = Boolean.valueOf(SystemPropertyAction.getProperty("org.apache.cxf.transport.http.forceURLConnection"));
 
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
@@ -233,8 +237,11 @@ public class HTTPTransportFactory
             conduit = factory.createConduit(this, bus, endpointInfo, target);
         }
         if (conduit == null) {
-            //conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
-            conduit = new HttpClientHTTPConduit(bus, endpointInfo, target);
+            if (forceURLConnectionConduit) {
+                conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
+            } else {
+                conduit = new HttpClientHTTPConduit(bus, endpointInfo, target);
+            }
         }
 
         // Spring configure the conduit.

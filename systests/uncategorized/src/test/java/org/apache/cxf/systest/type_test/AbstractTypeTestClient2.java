@@ -162,7 +162,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         return (Double.compare(x.getVarFloat(), y.getVarFloat()) == 0)
             && (x.getVarInt().compareTo(y.getVarInt()) == 0)
             && (x.getVarString().equals(y.getVarString()))
-            && (equalsNilable(x.getVarAttrString(), y.getVarAttrString()));
+            && equalsNilable(x.getVarAttrString(), y.getVarAttrString());
     }
     @Test
     public void testSimpleStruct() throws Exception {

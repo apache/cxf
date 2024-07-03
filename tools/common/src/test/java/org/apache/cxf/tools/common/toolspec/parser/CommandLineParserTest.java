@@ -296,7 +296,7 @@ public class CommandLineParserTest {
         String lineSeparator = System.getProperty("line.separator");
         StringTokenizer st1 = new StringTokenizer(parser.getDetailedUsage(), lineSeparator);
         while (st1.hasMoreTokens()) {
-            assertEquals("Failed at line " + index, expected[index++], st1.nextToken().toString().trim());
+            assertEquals("Failed at line " + index, expected[index++], st1.nextToken().trim());
         }
     }
 

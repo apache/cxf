@@ -116,14 +116,14 @@ public class EventMapper implements STSEventListener {
         if (params.getRequestedPrimaryClaims() != null) {
             List<String> claims = new ArrayList<>();
             for (Claim claim : params.getRequestedPrimaryClaims()) {
-                claims.add(claim.getClaimType().toString());
+                claims.add(claim.getClaimType());
             }
             map.put(KEYS.CLAIMS_PRIMARY.name(), claims.toString());
         }
         if (params.getRequestedSecondaryClaims() != null) {
             List<String> claims = new ArrayList<>();
             for (Claim claim : params.getRequestedSecondaryClaims()) {
-                claims.add(claim.getClaimType().toString());
+                claims.add(claim.getClaimType());
             }
             map.put(KEYS.CLAIMS_SECONDARY.name(), claims.toString());
         }

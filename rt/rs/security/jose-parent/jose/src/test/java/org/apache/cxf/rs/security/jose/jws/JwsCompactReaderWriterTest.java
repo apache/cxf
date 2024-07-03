@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -41,7 +40,6 @@ import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.junit.Test;
 
@@ -264,26 +262,21 @@ public class JwsCompactReaderWriterTest {
     }
     @Test
     public void testJwsPsSha() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-        try {
-            JwsHeaders outHeaders = new JwsHeaders();
-            outHeaders.setSignatureAlgorithm(SignatureAlgorithm.PS256);
-            JwsCompactProducer producer = initSpecJwtTokenWriter(outHeaders);
-            PrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
-            String signed = producer.signWith(
-                new PrivateKeyJwsSignatureProvider(privateKey, SignatureAlgorithm.PS256));
+        JwsHeaders outHeaders = new JwsHeaders();
+        outHeaders.setSignatureAlgorithm(SignatureAlgorithm.PS256);
+        JwsCompactProducer producer = initSpecJwtTokenWriter(outHeaders);
+        PrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED, RSA_PRIVATE_EXPONENT_ENCODED);
+        String signed = producer.signWith(
+            new PrivateKeyJwsSignatureProvider(privateKey, SignatureAlgorithm.PS256));
 
-            JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(signed);
-            RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
-            assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.PS256)));
-            JwtToken token = jws.getJwtToken();
-            JwsHeaders inHeaders = new JwsHeaders(token.getJwsHeaders());
-            assertEquals(SignatureAlgorithm.PS256,
-                         inHeaders.getSignatureAlgorithm());
-            validateSpecClaim(token.getClaims());
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        }
+        JwsJwtCompactConsumer jws = new JwsJwtCompactConsumer(signed);
+        RSAPublicKey key = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED, RSA_PUBLIC_EXPONENT_ENCODED);
+        assertTrue(jws.verifySignatureWith(new PublicKeyJwsSignatureVerifier(key, SignatureAlgorithm.PS256)));
+        JwtToken token = jws.getJwtToken();
+        JwsHeaders inHeaders = new JwsHeaders(token.getJwsHeaders());
+        assertEquals(SignatureAlgorithm.PS256,
+                     inHeaders.getSignatureAlgorithm());
+        validateSpecClaim(token.getClaims());
     }
 
     @Test

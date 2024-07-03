@@ -336,6 +336,13 @@ public abstract class AbstractClient implements Client {
         return this;
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
+    }
+    
     @Override
     public void close() {
         if (closed.compareAndSet(false, true)) {

@@ -66,6 +66,7 @@ import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.HttpClientHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitFactory.UseAsyncPolicy;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHttpResponseWrapperFactory.AsyncHttpResponseWrapper;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -105,6 +106,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
 
     private final AsyncHTTPConduitFactory factory;
+    private final AsyncHttpResponseWrapperFactory asyncHttpResponseWrapperFactory;
     private volatile int lastTlsHash = -1;
     private volatile Object sslState;
     private volatile URI sslURL;
@@ -116,6 +118,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             throws IOException {
         super(b, ei, t);
         this.factory = factory;
+        this.asyncHttpResponseWrapperFactory = bus.getExtension(AsyncHttpResponseWrapperFactory.class);
     }
 
     public synchronized CloseableHttpAsyncClient getHttpAsyncClient(final TlsStrategy tlsStrategy)
@@ -142,7 +145,6 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             return;
         }
 
-        propagateJaxwsSpecTimeoutSettings(message, csPolicy);
         propagateProtocolSettings(message, csPolicy);
 
         boolean addressChanged = false;
@@ -244,8 +246,8 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
         final RequestConfig.Builder b = RequestConfig
             .custom()
-            .setConnectTimeout(Timeout.ofMilliseconds(csPolicy.getConnectionTimeout()))
-            .setResponseTimeout(Timeout.ofMilliseconds(csPolicy.getReceiveTimeout()))
+            .setConnectTimeout(Timeout.ofMilliseconds(determineConnectionTimeout(message, csPolicy)))
+            .setResponseTimeout(Timeout.ofMilliseconds(determineReceiveTimeout(message, csPolicy)))
             .setConnectionRequestTimeout(Timeout.ofMilliseconds(csPolicy.getConnectionRequestTimeout()));
         
         final Proxy p = proxyFactory.createProxy(csPolicy, uri);
@@ -265,17 +267,6 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             if (o != null) {
                 csPolicy.setVersion("2.0");
             }
-        }
-    }
-
-    private void propagateJaxwsSpecTimeoutSettings(Message message, HTTPClientPolicy csPolicy) {
-        int receiveTimeout = determineReceiveTimeout(message, csPolicy);
-        if (csPolicy.getReceiveTimeout() == 60000) {
-            csPolicy.setReceiveTimeout(receiveTimeout);
-        }
-        int connectionTimeout = determineConnectionTimeout(message, csPolicy);
-        if (csPolicy.getConnectionTimeout() == 30000) {
-            csPolicy.setConnectionTimeout(connectionTimeout);
         }
     }
 
@@ -491,14 +482,28 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             if (connectionFuture != null) {
                 return;
             }
-
-            CXFResponseCallback responseCallback = new CXFResponseCallback() {
+            
+            final CXFResponseCallback delegate = new CXFResponseCallback() {
                 @Override
                 public void responseReceived(HttpResponse response) {
                     setHttpResponse(response);
                 }
 
             };
+
+            CXFResponseCallback responseCallback = delegate;
+            if (asyncHttpResponseWrapperFactory != null) {
+                final AsyncHttpResponseWrapper wrapper = asyncHttpResponseWrapperFactory.create();
+                if (wrapper != null) {
+                    responseCallback = new CXFResponseCallback() {
+                        @Override
+                        public void responseReceived(HttpResponse response) {
+                            wrapper.responseReceived(response, delegate::responseReceived);
+                        }
+                    };
+                }
+            }
+
 
             FutureCallback<Boolean> callback = new FutureCallback<Boolean>() {
 

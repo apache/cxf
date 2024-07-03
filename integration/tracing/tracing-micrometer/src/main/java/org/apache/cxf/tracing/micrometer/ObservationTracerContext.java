@@ -24,6 +24,7 @@ import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 
 import io.micrometer.observation.Observation;
+import io.micrometer.observation.Observation.Event;
 import io.micrometer.observation.ObservationRegistry;
 
 public class ObservationTracerContext implements TracerContext {
@@ -93,7 +94,7 @@ public class ObservationTracerContext implements TracerContext {
     public void timeline(String message) {
         final Observation current = observationRegistry.getCurrentObservation();
         if (current != null) {
-            current.event(() -> message);
+            current.event(Event.of(message));
         }
     }
 

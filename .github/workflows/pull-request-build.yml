@@ -9,20 +9,27 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest] 
     permissions:
       contents: read  
       pull-requests: read
     timeout-minutes: 130
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v3.6.0
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+      - name: Build with Apache Maven (Windows)
+        if: ${{ matrix.os == 'windows-latest' }} 
+        run: mvn -U clean install -fae -B -Peverything
       - name: Build with Apache Maven
+        if: ${{ matrix.os != 'windows-latest' }} 
         run: mvn -U clean install -Djava.awt.headless=true -fae -B -Peverything
     env: 
        MAVEN_OPTS: "-Xmx1024M"

@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-bom</artifactId>
@@ -66,6 +66,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-integration-tracing-micrometer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-integration-tracing-opentracing</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -86,11 +91,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-bindings-object</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-bindings-soap</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -107,16 +107,6 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-databinding-jaxb</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-databinding-jibx</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-databinding-sdo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -256,27 +246,22 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-rs-security-xml</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-security-saml</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-security-sso-oidc</artifactId>
+                <artifactId>cxf-rt-rs-security-sso-oidc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-security-sso-saml</artifactId>
+                <artifactId>cxf-rt-rs-security-sso-saml</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-security-xml</artifactId>
+                <artifactId>cxf-rt-rs-security-xml</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -401,11 +386,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-security-oauth2</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -494,8 +474,6 @@
                 <artifactId>cxf-jaxws-wsdlfirst</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
-
             <dependency>
                 <groupId>org.apache.cxf.benchmark</groupId>
                 <artifactId>cxf-benchmark-base</artifactId>
@@ -504,16 +482,6 @@
             <dependency>
                 <groupId>org.apache.cxf.benchmark</groupId>
                 <artifactId>cxf-benchmark-soapdoclit</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.karaf</groupId>
-                <artifactId>apache-cxf</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.karaf</groupId>
-                <artifactId>cxf-karaf-commands</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -554,16 +522,6 @@
             <dependency>
                 <groupId>org.apache.cxf.services.xkms</groupId>
                 <artifactId>cxf-services-xkms-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.services.xkms</groupId>
-                <artifactId>cxf-services-xkms-features</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.services.xkms</groupId>
-                <artifactId>cxf-services-xkms-osgi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

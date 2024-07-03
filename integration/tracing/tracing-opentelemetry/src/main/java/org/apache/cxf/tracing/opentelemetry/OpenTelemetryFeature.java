@@ -40,7 +40,9 @@ public class OpenTelemetryFeature extends DelegatingFeature<OpenTelemetryFeature
         super(new Portable());
     }
 
-    public OpenTelemetryFeature(final String instrumentationName) { super(new Portable(instrumentationName)); }
+    public OpenTelemetryFeature(final String instrumentationName) { 
+        super(new Portable(instrumentationName)); 
+    }
 
     public OpenTelemetryFeature(final OpenTelemetry openTelemetry) {
         super(new Portable(openTelemetry));

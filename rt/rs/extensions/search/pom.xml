@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -96,6 +96,12 @@
             <artifactId>tika-parser-pdf-module</artifactId>
             <version>${cxf.tika.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>  
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

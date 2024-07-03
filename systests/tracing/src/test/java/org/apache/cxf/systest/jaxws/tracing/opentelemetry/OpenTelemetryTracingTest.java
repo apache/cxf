@@ -52,7 +52,7 @@ import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.testing.junit4.OpenTelemetryRule;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -237,7 +237,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().size(), equalTo(2));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 500L));
+                   hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 500L));
         assertThat(otelRule.getSpans().get(1).getName(),
                    equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
@@ -252,7 +252,21 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().size(), equalTo(1));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(SemanticAttributes.HTTP_STATUS_CODE, 202L));
+                   hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 202L));
+    }
+
+    @Test
+    public void testThatNewInnerSpanIsCreatedOneway() throws Exception {
+        final BookStoreService service = createJaxWsService(new OpenTelemetryClientFeature(otelRule
+                .getOpenTelemetry(), "jaxws-client-test"));
+        service.orderBooks();
+
+        // Await till flush happens, usually every second
+        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+
+        assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
+        assertThat(otelRule.getSpans().get(1).getName(),
+                equalTo("POST http://localhost:" + PORT + "/BookStore"));
     }
 
     private BookStoreService createJaxWsService(final Feature feature) {

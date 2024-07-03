@@ -1453,8 +1453,7 @@ public class JAXBElementProviderTest {
             return props;
         }
 
-        @SuppressWarnings("rawtypes")
-        public <A extends XmlAdapter> A getAdapter(Class<A> type) {
+        public <A extends XmlAdapter<?, ?>> A getAdapter(Class<A> type) {
             return null;
         }
 
@@ -1513,13 +1512,11 @@ public class JAXBElementProviderTest {
 
         }
 
-        @SuppressWarnings("rawtypes")
-        public void setAdapter(XmlAdapter adapter) {
+        public <A extends XmlAdapter<?, ?>> void setAdapter(A adapter) {
 
         }
 
-        @SuppressWarnings("rawtypes")
-        public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
+        public <A extends XmlAdapter<?, ?>> void setAdapter(Class<A> type, A adapter) {
 
         }
 

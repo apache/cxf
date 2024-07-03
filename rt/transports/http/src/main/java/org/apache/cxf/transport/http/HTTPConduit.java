@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.ref.WeakReference;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -298,6 +299,27 @@ public abstract class HTTPConduit
 
     private volatile boolean clientSidePolicyCalced;
 
+    private final PropertyChangeListener weakRefListener = new WeakPropertyChangeListenerAdapter(this);
+
+    /**
+     * Change listener that propagates events to this conduit as long as it is alive without holding a hard reference.
+     */
+    private static final class WeakPropertyChangeListenerAdapter implements PropertyChangeListener {
+        /** Weak reference so the listener can be garbage collected even if it is still registered somewhere. */
+        private final WeakReference<PropertyChangeListener> reference;
+
+        WeakPropertyChangeListenerAdapter(PropertyChangeListener inner) {
+            reference = new WeakReference<>(inner);
+        }
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            PropertyChangeListener inner = reference.get();
+            if (inner != null) {
+                inner.propertyChange(evt);
+            }
+        }
+    }
 
     /**
      * Constructor
@@ -352,8 +374,8 @@ public abstract class HTTPConduit
                                                                         this,
                                                                         new ClientPolicyCalculator());
                 if (clientSidePolicy != null) {
-                    clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
-                    clientSidePolicy.addPropertyChangeListener(this);
+                    clientSidePolicy.removePropertyChangeListener(weakRefListener); //make sure we aren't added twice
+                    clientSidePolicy.addPropertyChangeListener(weakRefListener);
                 }
             }
         }
@@ -749,7 +771,7 @@ public abstract class HTTPConduit
      */
     public void close() {
         if (clientSidePolicy != null) {
-            clientSidePolicy.removePropertyChangeListener(this);
+            clientSidePolicy.removePropertyChangeListener(weakRefListener);
         }
     }
 
@@ -927,8 +949,8 @@ public abstract class HTTPConduit
         }
         this.clientSidePolicyCalced = true;
         this.clientSidePolicy = client;
-        clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
-        clientSidePolicy.addPropertyChangeListener(this);
+        clientSidePolicy.removePropertyChangeListener(weakRefListener); //make sure we aren't added twice
+        clientSidePolicy.addPropertyChangeListener(weakRefListener);
         endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto", client.getDecoupledEndpoint());
     }
 

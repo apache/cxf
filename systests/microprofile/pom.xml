@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -40,7 +40,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.8.0</version>
+                <version>7.10.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -54,11 +54,6 @@
                 <artifactId>commons-logging</artifactId>
                 <version>${cxf.commons-logging.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${cxf.jakarta.ws.rs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
@@ -83,12 +78,6 @@
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
                 <classifier>jakarta</classifier>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-                <version>${cxf.json.api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

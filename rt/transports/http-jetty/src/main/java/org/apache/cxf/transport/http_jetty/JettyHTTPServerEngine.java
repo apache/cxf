@@ -21,13 +21,19 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.BufferOverflowException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,10 +43,9 @@ import javax.net.ssl.SSLContext;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -56,13 +61,26 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.http.HttpServerEngineSupport;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler.Default404Servlet;
+import org.eclipse.jetty.ee10.servlet.ServletHandler.MappedServlet;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletMapping;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.http.BadMessageException;
 import org.eclipse.jetty.http.HttpFields.Mutable;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.eclipse.jetty.http.UriCompliance;
+import org.eclipse.jetty.http.pathmap.MatchedResource;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
+import org.eclipse.jetty.io.ByteBufferOutputStream;
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
+import org.eclipse.jetty.io.Retainable;
+import org.eclipse.jetty.io.RetainableByteBuffer;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -76,12 +94,10 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.ErrorHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.component.Container;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -125,6 +141,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
     private Server server;
     private Connector connector;
     private List<Handler> handlers;
+    private Map<String, ServletContextHandler> contextHandlerMap = new HashMap<String, ServletContextHandler>();
     private ContextHandlerCollection contexts;
     private Container.Listener mBeanContainer;
     private SessionHandler sessionHandler;
@@ -361,36 +378,21 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
 
         // need an error handler that won't leak information about the exception
         // back to the client.
-        ErrorHandler eh = new ErrorHandler() {
-            public void handle(String target, Request baseRequest, HttpServletRequest request,
-                               HttpServletResponse response) throws IOException, ServletException {
-                String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-                if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
-                    msg = HttpStatus.getMessage(response.getStatus());
-                    request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
-                }
-                if (response instanceof Response) {
-                    ((Response)response).setStatusWithReason(response.getStatus(), msg);
-                }
-                super.handle(target, baseRequest, request, response);
-            }
-
-            protected void writeErrorPage(HttpServletRequest request, Writer writer, int code, String message,
-                                          boolean showStacks) throws IOException {
-                super.writeErrorPage(request, writer, code, message, false);
-            }
-        };
-        s.addBean(eh);
+        ErrorHandler eh = new CxfJettyErrorHandler();
+        s.setErrorHandler(eh);
         return s;
     }
 
+   
     /**
      * Register a servant.
      *
      * @param url the URL associated with the servant
      * @param handler notified on incoming HTTP requests
      */
+    //CHECKSTYLE:OFF
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
+    //CHECKSTYLE:ON
         if (shouldCheckUrl(handler.getBus())) {
             checkRegistedContext(url);
         }
@@ -422,16 +424,16 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             }
             Handler existingHandler = server.getHandler();
 
-            HandlerCollection handlerCollection = null;
-            boolean existingHandlerCollection = existingHandler instanceof HandlerCollection;
+            Handler.Collection handlerCollection = null;
+            boolean existingHandlerCollection = existingHandler instanceof Handler.Collection;
             if (existingHandlerCollection) {
-                handlerCollection = (HandlerCollection) existingHandler;
+                handlerCollection = (Handler.Collection) existingHandler;
             }
 
             if (!existingHandlerCollection
                 &&
                 (existingHandler != null || numberOfHandlers > 1)) {
-                handlerCollection = new HandlerCollection();
+                handlerCollection = new Handler.Sequence(new ArrayList<Handler>());
                 if (existingHandler != null) {
                     handlerCollection.addHandler(existingHandler);
                 }
@@ -456,10 +458,22 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                             //then it need be on top of JettyHTTPHandler
                             //set JettyHTTPHandler as inner handler if
                             //inner handler is null
-                            ((SecurityHandler)h).setHandler(handler);
                             securityHandler = (SecurityHandler)h;
                         } else {
-                            handlerCollection.addHandler(h);
+                            if (!(h instanceof JettyHTTPHandler)) {
+                                //JettyHTTPHandler is a ServletHandler
+                                //and must be added with ServletContext Handler later
+                                handlerCollection.addHandler(h);
+                            } else {
+                                String contextName = HttpUriMapper.getContextName(url.getPath());
+                                                                  
+                                ServletContextHandler context = null;
+                                context = ((JettyHTTPHandler)h).createContextHandler();
+                                context.setContextPath(contextName);
+                                context.setHandler(h);
+                                contexts.addHandler(context);
+                                
+                            }
                         }
                     }
                 }
@@ -469,7 +483,6 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
              * Which in turn implies that there can't be a 'defaultHander' to deal with.
              */
             if (handlerCollection != null) {
-                handlerCollection.addHandler(contexts);
                 if (defaultHandler != null) {
                     handlerCollection.addHandler(defaultHandler);
                 }
@@ -494,37 +507,113 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         }
 
         String contextName = HttpUriMapper.getContextName(url.getPath());
-        ContextHandler context = handler.createContextHandler();
-        context.setContextPath(contextName);
-        // bind the jetty http handler with the context handler
-        if (isSessionSupport) {
-            SessionHandler sh = configureSession();
-
-            if (securityHandler != null) {
-                //use the securityHander which already wrap the jetty http handler
-                sh.setHandler(securityHandler);
-            } else {
-                sh.setHandler(handler);
+        if (contextName.length() == 0) {
+            contextName = "/"; //ensure it is mapped as root context,
+        }
+        String path = HttpUriMapper.getResourceBase(url.getPath());
+        if (!path.equals("/")) {
+            //add /* to enable wild match
+            path = path + "/*";
+        }
+        if (contextName.endsWith("/*")) {
+            //This is how Jetty ServletContextHandler handle the contextName
+            //without suffix "/", the "*" suffix will be removed
+            contextName = contextName + "/";
+        }
+        ServletContextHandler context = null;
+        
+        if (this.contextHandlerMap.containsKey(contextName)
+            && this.contextHandlerMap.get(contextName).getServletHandler().getMatchedServlet(path) != null) {
+            context = this.contextHandlerMap.get(contextName);
+            ServletHandler servletHandler = context.getServletHandler();
+            MatchedResource<MappedServlet> mappedServlet = servletHandler.getMatchedServlet(path);
+            ServletHolder servletHolder = mappedServlet.getResource().getServletHolder();
+            Servlet servlet = null;
+            try {
+                servlet = servletHolder.getServlet();
+            } catch (ServletException ex) {
+                LOG.log(Level.WARNING, "ADD_HANDLER_FAILED_MSG", new Object[] {
+                                                                               ex.getMessage()
+                });
             }
-            context.setHandler(sh);
-        } else {
-            // otherwise, just the one.
-            if (securityHandler != null) {
-                //use the securityHander which already wrap the jetty http handler
-                context.setHandler(securityHandler);
+            if (servlet != null && servlet instanceof JettyHTTPHandler && servletHolder.isStarted()) {
+                try {
+
+                    // the servlet exist with the same path
+                    // just update the servlet
+                    context.stop();
+
+                    servletHolder.setServlet(handler);
+                    servletHolder.stop();
+                    servletHolder.start();
+                    servletHolder.initialize();
+                    context.start();
+
+                } catch (Exception ex) {
+                    
+                    LOG.log(Level.WARNING, "ADD_HANDLER_FAILED_MSG", new Object[] {
+                         ex.getMessage()
+                    });
+                }
+
             } else {
-                context.setHandler(handler);
+                try {
+
+                    context.addServlet(handler, path);
+                } catch (Exception ex) {
+                    LOG.log(Level.WARNING, "ADD_HANDLER_FAILED_MSG", new Object[] {
+                        ex.getMessage()
+                                                                              
+                    });
+                }
+            }
+
+        } else {
+            context = handler.createContextHandler();
+            context.setContextPath(contextName);
+            context.addServlet(handler, path);
+            contexts.addHandler(context);
+            this.contextHandlerMap.put(contextName, context);
+            // bind the jetty http handler with the context handler
+            if (isSessionSupport) {
+                SessionHandler sh = configureSession();
+
+                if (securityHandler != null) {
+                    //use the securityHander which already wrap the jetty http handler
+                    sh.setHandler(securityHandler);
+                } 
+                context.setSessionHandler(sh);
+            } else {
+                // otherwise, just the one.
+                if (securityHandler != null) {
+                    //use the securityHander which already wrap the jetty http handler
+                    context.setSecurityHandler(securityHandler);
+                } 
+            }
+            
+        }
+        
+        
+        if (server.getHandler() != contexts) {
+            for (Handler h : contexts.getHandlers()) {
+                ((Handler.Collection)server.getHandler()).addHandler(h);
+                try {
+                    h.start();
+                } catch (Exception ex) {
+                    LOG.log(Level.WARNING, "ADD_HANDLER_FAILED_MSG", new Object[] {ex.getMessage()});
+                }
             }
         }
-        contexts.addHandler(context);
 
         ServletContext sc = context.getServletContext();
         handler.setServletContext(sc);
 
-        final String smap = getHandlerName(url, context);
+        String smap = getHandlerName(url, context);
+        
         handler.setName(smap);
+        
 
-        if (contexts.isStarted()) {
+        if (contexts.isStarted() && context != null && !context.isStarted()) {
             try {
                 context.start();
             } catch (Exception ex) {
@@ -535,6 +624,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         registedPaths.add(url.getPath());
         ++servantCount;
     }
+
 
     private SessionHandler configureSession() {
         // If we have sessions, we need two handlers.
@@ -575,7 +665,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         return sh;
     }
 
-    private String getHandlerName(URL url, ContextHandler context) {
+    private String getHandlerName(URL url, ServletContextHandler context) {
         String contextPath = context.getContextPath();
         String path = url.getPath();
         if (path.startsWith(contextPath)) {
@@ -662,6 +752,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 result.setHost(hosto);
             }
             result.setReuseAddress(isReuseAddress());
+            
         } catch (RuntimeException rex) {
             throw rex;
         } catch (Exception ex) {
@@ -676,6 +767,14 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         final AbstractConnector result;
         try {
             HttpConfiguration httpConfig = new HttpConfiguration();
+            /**
+             * LEGACY compliance mode that models Jetty-9.4 behavior 
+             * by allowing {@link Violation#AMBIGUOUS_PATH_SEGMENT},
+             * {@link Violation#AMBIGUOUS_EMPTY_SEGMENT}, {@link Violation#AMBIGUOUS_PATH_SEPARATOR}, 
+             * {@link Violation#AMBIGUOUS_PATH_ENCODING}
+             * and {@link Violation#UTF16_ENCODINGS}.
+             */
+            httpConfig.setUriCompliance(UriCompliance.LEGACY);
             httpConfig.setSendServerVersion(getSendServerVersion());
             HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
 
@@ -684,7 +783,6 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             result = new org.eclipse.jetty.server.ServerConnector(server);
 
             if (tlsServerParameters != null) {
-                connectionFactories.add(httpFactory);
                 httpConfig.addCustomizer(new SecureRequestCustomizer(tlsServerParameters.isSniHostCheck()));
 
                 if (isHttp2Enabled(bus)) {
@@ -704,10 +802,14 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                         }
                     }
                 }
-                if (connectionFactories.size() == 1) {
+                
+                if (connectionFactories.isEmpty()) {
                     final SslConnectionFactory scf = new SslConnectionFactory(sslcf, httpFactory.getProtocol());
                     connectionFactories.add(scf);
                 }
+                
+                // Ensure http/1.1 is last in the list so it is the lowest priority in ALPN
+                connectionFactories.add(httpFactory);
 
                 // Has to be set before the default protocol change
                 result.setConnectionFactories(connectionFactories);
@@ -725,7 +827,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                                                             Mutable response101)
                             throws BadMessageException {
                             if (request.getContentLength() > 0 
-                                || request.getFields().contains("Transfer-Encoding")) {
+                                || request.getHttpFields().contains("Transfer-Encoding")) {
                                 // if there is a body, we cannot upgrade
                                 return null;
                             }
@@ -931,25 +1033,76 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
      */
     public synchronized void removeServant(URL url) {
 
-        final String contextName = HttpUriMapper.getContextName(url.getPath());
-        final String smap = HttpUriMapper.getResourceBase(url.getPath());
+        String contextName = HttpUriMapper.getContextName(url.getPath());
+        if (contextName.length() == 0) {
+            contextName = "/"; //ensure it is mapped as root context,
+        }
+        String smap = HttpUriMapper.getResourceBase(url.getPath());
+        if (!smap.equals("/")) {
+            //add /* to enable wild match
+            smap = smap + "/*";
+        }
+        
+        if (contextName.endsWith("/*")) {
+            //This is how Jetty ServletContextHandler handle the contextName
+            //without suffix "/", the "*" suffix will be removed
+            contextName = contextName + "/";
+        }
 
         boolean found = false;
 
         if (server != null && server.isRunning()) {
-            for (Handler handler : contexts.getChildHandlersByClass(ContextHandler.class)) {
-                if (handler instanceof ContextHandler) {
-                    ContextHandler contextHandler = (ContextHandler) handler;
-                    Handler jh = contextHandler.getHandler();
-                    if (jh instanceof JettyHTTPHandler
+            for (Handler handler : contexts.getHandlers()) {
+                if (handler instanceof ServletContextHandler) {
+                    ServletContextHandler contextHandler = (ServletContextHandler) handler;
+                    ServletHandler servletHandler = contextHandler.getServletHandler();
+                    
+                    MatchedResource<MappedServlet> mappedServlet = servletHandler.getMatchedServlet(smap);
+                    if (mappedServlet == null) {
+                        continue;
+                    }
+                    ServletHolder servletHolder = mappedServlet.getResource().getServletHolder();
+                    Servlet servlet = null;
+                    
+                    try {
+                        servlet = servletHolder.getServlet();
+                    } catch (ServletException ex) {
+                        LOG.log(Level.WARNING, "REMOVE_HANDLER_FAILED_MSG", new Object[] {
+                                                                                       ex.getMessage()
+                        });
+                        continue;
+                    }
+                    if (servlet != null && servlet instanceof JettyHTTPHandler
                         && (contextName.equals(contextHandler.getContextPath())
                             || (StringUtils.isEmpty(contextName)
                                 && "/".equals(contextHandler.getContextPath())))
-                        && ((JettyHTTPHandler)jh).getName().equals(smap)) {
+                        && smap.startsWith(((JettyHTTPHandler)servlet).getName())) {
                         try {
-                            contexts.removeHandler(handler);
-                            handler.stop();
-                            handler.destroy();
+                            servletHolder.stop();
+                            contextHandler.getContext().destroy(servlet);
+                            //need to remove path from ServletHandler._servletMappings
+                            //and has to access the private field.
+                            List<?> servletMappings  
+                                = ReflectionUtil.accessDeclaredField("_servletMappings",
+                                                                     ServletHandler.class, 
+                                                                     servletHandler,
+                                                                     List.class);
+                            ServletMapping servletMapping = servletHandler.getServletMapping(smap);
+                            servletMappings.remove(servletMapping);
+                            boolean hasActiveServlet = false;
+                            for (ServletHolder myHolder : servletHandler.getServlets()) {
+                                if (myHolder.getServlet() != null 
+                                    && !(myHolder.getServlet() instanceof Default404Servlet)) {
+                                    hasActiveServlet = true;
+                                    break;
+                                }
+                            }
+                            if (!hasActiveServlet) {
+                                contexts.removeHandler(handler);
+                                handler.stop();
+                                handler.destroy();
+                                this.contextHandlerMap.remove(contextName);
+                            }
                         } catch (Exception ex) {
                             LOG.log(Level.WARNING, "REMOVE_HANDLER_FAILED_MSG",
                                     new Object[] {ex.getMessage()});
@@ -982,10 +1135,11 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         Handler ret = null;
         // After a stop(), the server is null, and therefore this
         // operation should return null.
+        
         if (server != null) {
-            for (Handler handler : server.getChildHandlersByClass(ContextHandler.class)) {
-                if (handler instanceof ContextHandler) {
-                    ContextHandler contextHandler = (ContextHandler) handler;
+            for (Handler handler : server.getDescendants(ServletContextHandler.class)) {
+                if (handler instanceof ServletContextHandler) {
+                    ServletContextHandler contextHandler = (ServletContextHandler) handler;
                     if (contextName.equals(contextHandler.getContextPath())) {
                         ret = contextHandler.getHandler();
                         break;
@@ -1002,15 +1156,15 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
      * @param url the associated URL
      * @return the HttpHandler if registered
      */
-    public synchronized ContextHandler getContextHandler(URL url) {
+    public synchronized ServletContextHandler getContextHandler(URL url) {
         String contextName = HttpUriMapper.getContextName(url.getPath());
-        ContextHandler ret = null;
+        ServletContextHandler ret = null;
         // After a stop(), the server is null, and therefore this
         // operation should return null.
         if (server != null) {
-            for (Handler handler : server.getChildHandlersByClass(ContextHandler.class)) {
-                if (handler instanceof ContextHandler) {
-                    ContextHandler contextHandler = (ContextHandler) handler;
+            for (Handler handler : server.getDescendants(ServletContextHandler.class)) {
+                if (handler instanceof ServletContextHandler) {
+                    ServletContextHandler contextHandler = (ServletContextHandler) handler;
                     if (contextName.equals(contextHandler.getContextPath())) {
                         ret = contextHandler;
                         break;
@@ -1019,6 +1173,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
             }
         }
         return ret;
+
     }
 
     private boolean isSsl() {
@@ -1102,9 +1257,10 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 if (mBeanContainer != null) {
                     removeServerMBean();
                 }
-                //After upgrade Jetty to 11.0.8, server.destroy() will clear all MBeans from container
-                //The old version doesn't behavior like this and this w
-                //server.destroy();
+                // After upgrade Jetty to 11.0.8, server.destroy() will clear all MBeans from container
+                // The old version doesn't behave like this because MBeanContainer was shareable but
+                // is not anymore (the factory should create new a container for each server engine).
+                server.destroy();
                 server = null;
             }
         }
@@ -1173,5 +1329,137 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
     public void setSessionTimeout(int sessionTimeout) {
         this.sessionTimeout = sessionTimeout;
     }
+    
+    private final class CxfJettyErrorHandler extends ErrorHandler {
+        
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            String msg = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+            if (StringUtils.isEmpty(msg) || msg.contains("org.apache.cxf.interceptor.Fault")) {
+                msg = HttpStatus.getMessage(response.getStatus());
+                request.setAttribute(RequestDispatcher.ERROR_MESSAGE, msg);
+            }
+            if (response instanceof Response) {
+                ((Response)response).setStatus(response.getStatus());
+            }
+            return super.handle(request, response, callback);
+        }
 
+        //CHECKSTYLE:OFF
+        protected boolean generateAcceptableResponse(Request request, Response response,
+                                                     Callback callback, String contentType,
+                                                     List<Charset> charsets, int code, String message,
+                                                     Throwable cause)
+        //CHECKSTYLE:ON
+            throws IOException {
+            Type type;
+            Charset charset;
+            switch (contentType) {
+            case "text/html":
+            case "text/*":
+            case "*/*":
+                type = Type.TEXT_HTML;
+                charset = charsets.stream().findFirst().orElse(StandardCharsets.ISO_8859_1);
+                break;
+
+            case "text/json":
+            case "application/json":
+                if (charsets.contains(StandardCharsets.UTF_8)) {
+                    charset = StandardCharsets.UTF_8;
+                } else if (charsets.contains(StandardCharsets.ISO_8859_1)) {
+                    charset = StandardCharsets.ISO_8859_1;
+                } else {
+                    return false;
+                }
+                type = Type.TEXT_JSON.is(contentType) ? Type.TEXT_JSON : Type.APPLICATION_JSON;
+                break;
+
+            case "text/plain":
+                type = Type.TEXT_PLAIN;
+                charset = charsets.stream().findFirst().orElse(StandardCharsets.ISO_8859_1);
+                break;
+
+            default:
+                return false;
+            }
+
+            int bufferSize = request.getConnectionMetaData().getHttpConfiguration().getOutputBufferSize();
+            bufferSize = Math.min(8192, bufferSize); // TODO ?
+            RetainableByteBuffer buffer = request.getComponents().getByteBufferPool().acquire(bufferSize,
+                                                                                              false);
+
+            try {
+                // write into the response aggregate buffer and flush it asynchronously.
+                // Looping to reduce size if buffer overflows
+                boolean showStacks = isShowStacks();
+                while (true) {
+                    try {
+                        buffer.clear();
+                        ByteBufferOutputStream out = new ByteBufferOutputStream(buffer.getByteBuffer());
+                        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, charset));
+
+                        switch (type) {
+                        case TEXT_HTML:
+                            writeErrorHtml(request, writer, charset, code, message, cause, showStacks);
+                            break;
+                        case TEXT_JSON:
+                            
+                        case APPLICATION_JSON:
+                            writeErrorJson(request, writer, code, message, cause, showStacks);
+                            break;
+                        case TEXT_PLAIN:
+                            writeErrorPlain(request, writer, code, message, cause, showStacks);
+                            break;
+                        default:
+                            throw new IllegalStateException();
+                        }
+
+                        writer.flush();
+                        break;
+
+                    } catch (BufferOverflowException e) {
+                        if (showStacks) {
+                            if (LOG.isLoggable(Level.FINER)) {
+                                LOG.log(Level.FINER, "Disable stacks for " + e.toString());
+                            }
+                            showStacks = false;
+                            continue;
+                        }
+                        
+                        LOG.log(Level.WARNING,
+                                "Error page too large:" + message);
+                         
+                        break;
+                    }
+                }
+
+                if (!buffer.hasRemaining()) {
+                    buffer.release();
+                    callback.succeeded();
+                    return true;
+                }
+
+                response.getHeaders().put(type.getContentTypeField(charset));
+                response.write(true, buffer.getByteBuffer(), new WriteErrorCallback(callback, buffer));
+
+                return true;
+            } catch (Throwable x) {
+                buffer.release();
+                throw x;
+            }
+        }
+
+        class WriteErrorCallback extends Callback.Nested {
+            private final Retainable retainable;
+
+            WriteErrorCallback(Callback callback, Retainable retainable) {
+                super(callback);
+                this.retainable = retainable;
+            }
+
+            @Override
+            public void completed() {
+                this.retainable.release();
+            }
+        }
+    }
 }

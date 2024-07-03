@@ -65,7 +65,7 @@ public final class AlgorithmUtils {
     public static final String A256GCM_ALGO = "A256GCM";
     // Java
     public static final String AES_GCM_ALGO_JAVA = AES + "/GCM/NoPadding";
-    public static final String AES_CBC_ALGO_JAVA = AES + "/CBC/PKCS7Padding";
+    public static final String AES_CBC_ALGO_JAVA = AES + "/CBC/PKCS5Padding";
     // Signature
     // JWA
     public static final String HMAC_SHA_256_ALGO = "HS256";
@@ -88,9 +88,7 @@ public final class AlgorithmUtils {
     public static final String RS_SHA_256_JAVA = "SHA256withRSA";
     public static final String RS_SHA_384_JAVA = "SHA384withRSA";
     public static final String RS_SHA_512_JAVA = "SHA512withRSA";
-    public static final String PS_SHA_256_JAVA = "SHA256withRSAandMGF1";
-    public static final String PS_SHA_384_JAVA = "SHA384withRSAandMGF1";
-    public static final String PS_SHA_512_JAVA = "SHA512withRSAandMGF1";
+    public static final String PS_SHA_JAVA = "RSASSA-PSS";
     public static final String ES_SHA_256_JAVA = "SHA256withECDSA";
     public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
     public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
@@ -159,9 +157,9 @@ public final class AlgorithmUtils {
         putAlgo(RS_SHA_256_JAVA, RS_SHA_256_ALGO);
         putAlgo(RS_SHA_384_JAVA, RS_SHA_384_ALGO);
         putAlgo(RS_SHA_512_JAVA, RS_SHA_512_ALGO);
-        putAlgo(PS_SHA_256_JAVA, PS_SHA_256_ALGO);
-        putAlgo(PS_SHA_384_JAVA, PS_SHA_384_ALGO);
-        putAlgo(PS_SHA_512_JAVA, PS_SHA_512_ALGO);
+        putAlgo(PS_SHA_JAVA, PS_SHA_256_ALGO);
+        putAlgo(PS_SHA_JAVA, PS_SHA_384_ALGO);
+        putAlgo(PS_SHA_JAVA, PS_SHA_512_ALGO);
         putAlgo(ES_SHA_256_JAVA, ES_SHA_256_ALGO);
         putAlgo(ES_SHA_384_JAVA, ES_SHA_384_ALGO);
         putAlgo(ES_SHA_512_JAVA, ES_SHA_512_ALGO);

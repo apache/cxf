@@ -24,6 +24,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -44,6 +45,13 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
         super(algo);
         this.key = key;
         this.random = random;
+        String javaAlgoName = algo.getJavaName();
+        if (javaAlgoName.equals(AlgorithmUtils.PS_SHA_JAVA)
+            && spec == null) {
+            //must have spec in this case
+            String size = algo.getJwaName().substring(2);
+            spec = JoseUtils.createPSSParameterSpec(size);
+        }
         this.signatureSpec = spec;
     }
     protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {

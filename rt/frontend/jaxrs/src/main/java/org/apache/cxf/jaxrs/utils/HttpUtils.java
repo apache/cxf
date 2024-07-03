@@ -63,6 +63,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.springmvc.SpringWebUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
@@ -79,6 +80,8 @@ public final class HttpUtils {
     private static final String REQUEST_PATH_TO_MATCH_SLASH = "path_to_match_slash";
 
     private static final String HTTP_SCHEME = "http";
+    private static final String WS_SCHEME = "ws";
+    private static final String WSS_SCHEME = "wss";
     private static final String LOCAL_HOST_IP_ADDRESS = "127.0.0.1";
     private static final String REPLACE_LOOPBACK_PROPERTY = "replace.loopback.address.with.localhost";
     private static final String LOCAL_HOST_IP_ADDRESS_SCHEME = "://" + LOCAL_HOST_IP_ADDRESS;
@@ -376,9 +379,8 @@ public final class HttpUtils {
     public static void setHttpRequestURI(Message message, String uriTemplate) {
         HttpServletRequest request =
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-        request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", uriTemplate);
+        SpringWebUtils.setHttpRequestURI(request, uriTemplate);
     }
-
 
     public static URI toAbsoluteUri(URI u, Message message) {
         HttpServletRequest request =
@@ -482,6 +484,8 @@ public final class HttpUtils {
             // RFC-3986: the scheme and host are case-insensitive and therefore should 
             // be normalized to lowercase. 
             if (scheme != null && !scheme.toLowerCase().startsWith(HttpUtils.HTTP_SCHEME)
+                && !scheme.toLowerCase().startsWith(HttpUtils.WS_SCHEME)
+                && !scheme.toLowerCase().startsWith(HttpUtils.WSS_SCHEME)
                 && HttpUtils.isHttpRequest(m)) {
                 path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
             }
@@ -553,6 +557,7 @@ public final class HttpUtils {
         if (ind == 0) {
             path = path.substring(address.length());
         }
+        
         if (addSlash && !path.startsWith("/")) {
             path = "/" + path;
         }

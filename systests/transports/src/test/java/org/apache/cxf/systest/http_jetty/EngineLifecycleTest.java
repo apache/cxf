@@ -33,8 +33,8 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -66,10 +66,10 @@ public class EngineLifecycleTest {
         JettyHTTPServerEngine e = (JettyHTTPServerEngine) jhd.getEngine();
         org.eclipse.jetty.server.Server jettyServer = e.getServer();
 
-        for (Handler h : jettyServer.getChildHandlersByClass(WebAppContext.class)) {
+        for (Handler h : jettyServer.getDescendants(WebAppContext.class)) {
             WebAppContext wac = (WebAppContext) h;
             if ("/jsunit".equals(wac.getContextPath())) {
-                wac.addServlet("org.eclipse.jetty.servlet.DefaultServlet", "/bloop");
+                wac.addServlet("org.eclipse.jetty.ee10.servlet.DefaultServlet", "/bloop");
                 break;
             }
         }
@@ -102,7 +102,9 @@ public class EngineLifecycleTest {
 
         applicationContext = new GenericApplicationContext();
 
-        System.setProperty("jetty.staticResourceURL", getClass().getPackage().getName().replace('.', '/'));
+        System.setProperty("jetty.staticResourceURL", 
+                           "src/test/resources/"  
+                           + getClass().getPackage().getName().replace('.', '/'));
 
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
         reader.loadBeanDefinitions(

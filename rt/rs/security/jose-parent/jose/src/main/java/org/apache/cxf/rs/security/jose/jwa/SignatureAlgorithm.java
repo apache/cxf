@@ -31,9 +31,9 @@ public enum SignatureAlgorithm {
     RS384(AlgorithmUtils.RS_SHA_384_ALGO, AlgorithmUtils.RS_SHA_384_JAVA, -1),
     RS512(AlgorithmUtils.RS_SHA_512_ALGO, AlgorithmUtils.RS_SHA_512_JAVA, -1),
 
-    PS256(AlgorithmUtils.PS_SHA_256_ALGO, AlgorithmUtils.PS_SHA_256_JAVA, -1),
-    PS384(AlgorithmUtils.PS_SHA_384_ALGO, AlgorithmUtils.PS_SHA_384_JAVA, -1),
-    PS512(AlgorithmUtils.PS_SHA_512_ALGO, AlgorithmUtils.PS_SHA_512_JAVA, -1),
+    PS256(AlgorithmUtils.PS_SHA_256_ALGO, AlgorithmUtils.PS_SHA_JAVA, -1),
+    PS384(AlgorithmUtils.PS_SHA_384_ALGO, AlgorithmUtils.PS_SHA_JAVA, -1),
+    PS512(AlgorithmUtils.PS_SHA_512_ALGO, AlgorithmUtils.PS_SHA_JAVA, -1),
 
     ES256(AlgorithmUtils.ES_SHA_256_ALGO, AlgorithmUtils.ES_SHA_256_JAVA, -1),
     ES384(AlgorithmUtils.ES_SHA_384_ALGO, AlgorithmUtils.ES_SHA_384_JAVA, -1),

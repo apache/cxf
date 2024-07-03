@@ -668,7 +668,8 @@ public class NettyHttpDestinationTest {
 
                 when(request.getHeaderNames()).thenReturn(Utils.enumeration(headerNames));
                 when(request.getHeaders("content-type")).thenReturn(Utils.enumeration(contentType));
-                when(request.getHeaders(NettyHttpDestinationTest.AUTH_HEADER)).thenReturn(Utils.enumeration(authHeader));
+                when(request.getHeaders(NettyHttpDestinationTest.AUTH_HEADER))
+                    .thenReturn(Utils.enumeration(authHeader));
 
                 when(request.getInputStream()).thenReturn(is);
 

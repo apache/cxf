@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
+    <env:Header>
+        <eb:Messaging xmlns:eb="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/"
+                      xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                      env:mustUnderstand="true" wsu:Id="messaging_id_210bca51-e9b3-4ee1-81e7-226949ab6ff6">
+            <eb:UserMessage
+                    mpc="http://docs.oasis-open.org/ebxml-msg/ebms/v3.0/ns/core/200704/defaultMPC">
+                <eb:MessageInfo>
+                    <eb:Timestamp>2017-10-24T09:07:36.000Z</eb:Timestamp>
+                    <eb:MessageId>8196c8e2-820f-4aec-a1ca-288a4d1d4020@seller.eu</eb:MessageId>
+                </eb:MessageInfo>
+                <eb:PartyInfo>
+                    <eb:From>
+                        <eb:PartyId type="urn:oasis:names:tc:ebcore:partyid-type:iso6523:0088"
+                        >1234567890
+                        </eb:PartyId>
+                        <eb:Role>Seller</eb:Role>
+                    </eb:From>
+                    <eb:To>
+                        <eb:PartyId type="urn:oasis:names:tc:ebcore:partyid-type:iso6523:0088"
+                        >0987654321
+                        </eb:PartyId>
+                        <eb:Role>Buyer</eb:Role>
+                    </eb:To>
+                </eb:PartyInfo>
+                <eb:CollaborationInfo>
+                    <eb:Service>http://edelivery.tech.ec.europa.eu/services/eprocurement/1.0</eb:Service>
+                    <eb:Action>ConfirmOrder</eb:Action>
+                    <eb:ConversationId>E5D7CFEE-E6A9-4855-A67E-6C24403E35E6</eb:ConversationId>
+                </eb:CollaborationInfo>
+                <eb:MessageProperties>
+                    <eb:Property name="originalSender"
+                                 type="urn:oasis:names:tc:ebcore:partyid-type:iso6523:0088"
+                    >5209999001264
+                    </eb:Property>
+                    <eb:Property name="finalRecipient"
+                                 type="urn:oasis:names:tc:ebcore:partyid-type:iso6523:0088"
+                    >5209999001295
+                    </eb:Property>
+                </eb:MessageProperties>
+                <eb:PayloadInfo>
+                    <eb:PartInfo href="cid:attachment_id_001">
+                        <eb:PartProperties>
+                            <eb:Property name="MimeType">text/plain</eb:Property>
+                            <eb:Property name="CompressionType">application/gzip</eb:Property>
+                        </eb:PartProperties>
+                    </eb:PartInfo>
+                    <eb:PartInfo href="cid:attachment_id_002">
+                        <eb:PartProperties>
+                            <eb:Property name="MimeType">text/plain</eb:Property>
+                            <eb:Property name="CompressionType">application/gzip</eb:Property>
+                        </eb:PartProperties>
+                    </eb:PartInfo>
+                </eb:PayloadInfo>
+            </eb:UserMessage>
+        </eb:Messaging>
+    </env:Header>
+    <env:Body
+            xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+            wsu:Id="body_id_840b593a-a40f-40d8-a8fd-89591478e5df"/>
+</env:Envelope>

@@ -25,19 +25,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.transport.http.HttpUrlUtil;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.eclipse.jetty.server.Request;
 
 public class JettyHTTPTestHandler extends JettyHTTPHandler {
     private boolean contextMatchExact;
-    private String response;
-
+    private String ret;
+    
     public JettyHTTPTestHandler(String s, boolean cmExact) {
         super(null, cmExact);
         contextMatchExact = cmExact;
-        response = s;
+        ret = s;
     }
-
-    @Override
+    
+       
     public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
@@ -45,17 +46,37 @@ public class JettyHTTPTestHandler extends JettyHTTPHandler {
 
         if (contextMatchExact) {
             // just return the response for testing
-            resp.getOutputStream().write(response.getBytes());
+            resp.getOutputStream().write(this.ret.getBytes());
             resp.flushBuffer();
 
         } else {
             if (target.equals(getName()) || HttpUrlUtil.checkContextPath(getName(), target)) {
-                resp.getOutputStream().write(response.getBytes());
+                resp.getOutputStream().write(this.ret.getBytes());
                 resp.flushBuffer();
             }
         }
     }
+    
+    
+        
+   
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+        String target = ServletContextRequest.getServletContextRequest(req).getDecodedPathInContext();
+        if (contextMatchExact) {
+            // just return the response for testing
+            resp.getOutputStream().write(ret.getBytes());
+            resp.flushBuffer();
 
+        } else {
+            if (target.equals(getName()) || HttpUrlUtil.checkContextPath(getName(), target)) {
+                resp.getOutputStream().write(ret.getBytes());
+                resp.flushBuffer();
+            }
+        }
+
+    }
 
 
 }

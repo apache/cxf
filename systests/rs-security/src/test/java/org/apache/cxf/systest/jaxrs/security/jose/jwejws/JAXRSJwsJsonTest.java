@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,9 +43,7 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,17 +58,9 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerJwsJson.class, true));
-        registerBouncyCastle();
     }
 
-    private static void registerBouncyCastle() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-    }
-
+   
     @Test
     public void testJwsJsonPlainTextHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
@@ -102,6 +91,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
+
     @Test
     public void testJweCompactJwsJsonBookBeanHmac() throws Exception {
         if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {

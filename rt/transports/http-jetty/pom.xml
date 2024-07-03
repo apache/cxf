@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -71,6 +71,14 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
@@ -96,7 +104,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>http2-server</artifactId>
+            <artifactId>jetty-http2-server</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -113,6 +121,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

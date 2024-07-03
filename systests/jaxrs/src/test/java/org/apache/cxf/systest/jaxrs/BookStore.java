@@ -858,8 +858,8 @@ public class BookStore {
             throw new RuntimeException();
         }
         MultivaluedMap<String, String> map = segment.getMatrixParameters();
-        String s1 = map.getFirst("first").toString();
-        String s2 = map.getFirst("second").toString();
+        String s1 = map.getFirst("first");
+        String s2 = map.getFirst("second");
         return doGetBook(s1 + s2);
     }
 
@@ -1835,6 +1835,13 @@ public class BookStore {
         
         return Response.ok().entity(new GregorianCalendar(2020, 00, 01),
             AnnotatedClass.class.getAnnotations()).build();
+    }
+    
+    @GET
+    @Path("/headers")
+    @Produces("application/json")
+    public Map<String, List<String>> getHeaders() {
+        return httpHeaders.getRequestHeaders();
     }
     
     public final String init() {

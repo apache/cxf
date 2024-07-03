@@ -35,7 +35,14 @@ public class BookStore {
     @GET
     @Path("/booknames")
     @Produces("text/plain")
-    public byte[] getBookName() {
+    public byte[] getBookNames() {
+        return "CXF in Action".getBytes();
+    }
+
+    @GET
+    @Path("/book names")
+    @Produces("text/plain")
+    public byte[] getBookNamesEncoded() {
         return "CXF in Action".getBytes();
     }
 

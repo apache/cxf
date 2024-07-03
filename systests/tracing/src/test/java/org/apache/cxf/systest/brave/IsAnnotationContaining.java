@@ -21,11 +21,10 @@ package org.apache.cxf.systest.brave;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsIterableContaining;
-import zipkin2.Annotation;
 
-public class IsAnnotationContaining extends IsIterableContaining<Annotation> {
+public class IsAnnotationContaining extends IsIterableContaining<String> {
     public IsAnnotationContaining(final String value) {
-        super(new TypeSafeMatcher<Annotation>() {
+        super(new TypeSafeMatcher<String>() {
             @Override
             public void describeTo(Description description) {
                 description
@@ -34,8 +33,8 @@ public class IsAnnotationContaining extends IsIterableContaining<Annotation> {
             }
 
             @Override
-            protected boolean matchesSafely(Annotation item) {
-                return value.equals(item.value());
+            protected boolean matchesSafely(String item) {
+                return value.equals(item);
             }
         });
     }

@@ -28,7 +28,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,13 +42,12 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler.MappedServlet;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.http.pathmap.MatchedResource;
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -72,9 +70,7 @@ public class JettyHTTPServerEngineTest {
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 2));
     private static final int PORT3
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 3));
-    private static final int PORT4
-        = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 4));
-
+    
 
     private Bus bus;
     private JettyHTTPServerEngineFactory factory;
@@ -317,41 +313,21 @@ public class JettyHTTPServerEngineTest {
         JettyHTTPServerEngineFactory.destroyForPort(PORT2);
     }
 
-    @Test
-    public void testSetHandlers() throws Exception {
-        URL url = new URL("http://localhost:" + PORT2 + "/hello/test");
-        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
-        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
-
-        JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
-        engine.setPort(PORT2);
-
-        List<Handler> handlers = new ArrayList<>();
-        handlers.add(handler1);
-        engine.setHandlers(handlers);
-        engine.finalizeConfig();
-
-        engine.addServant(url, handler2);
-
-        String response = getResponse(url.toString());
-        assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
-
-        engine.stop();
-        JettyHTTPServerEngineFactory.destroyForPort(PORT2);
-    }
+   
 
     @Test
     public void testGetContextHandler() throws Exception {
         String urlStr = "http://localhost:" + PORT1 + "/hello/test";
         JettyHTTPServerEngine engine =
             factory.createJettyHTTPServerEngine(PORT1, "http");
-        ContextHandler contextHandler = engine.getContextHandler(new URL(urlStr));
+        ServletContextHandler contextHandler = engine.getContextHandler(new URL(urlStr));
         // can't find the context handler here
         assertNull(contextHandler);
         JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
         JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
         engine.addServant(new URL(urlStr), handler1);
-
+        String response = getResponse(urlStr);
+        assertEquals("the jetty http handler1 did not take effect", response, "string1");
         // Note: There appears to be an internal issue in Jetty that does not
         // unregister the MBean for handler1 during this setHandler operation.
         // This scenario may create a warning message in the logs
@@ -359,12 +335,23 @@ public class JettyHTTPServerEngineTest {
         //         transport.http_jetty:type=jettyhttptesthandler,id=0)
         // when running subsequent tests.
         contextHandler = engine.getContextHandler(new URL(urlStr));
-        contextHandler.stop();
-        contextHandler.setHandler(handler2);
-        contextHandler.start();
+        //contextHandler.stop();
+        ServletHandler servletHandler = contextHandler.getServletHandler();
+        MatchedResource<MappedServlet> mappedServlet = servletHandler.getMatchedServlet("/test");
+        if (mappedServlet != null) {
+            ServletHolder servletHolder = mappedServlet.getResource().getServletHolder();
+            if (servletHolder != null) {
+                // the servlet exist with the same path
+                // just update the servlet
+                servletHolder.doStop();
+                servletHolder.setServlet(handler2);
+                servletHolder.initialize();
+            } 
+        }
+        
 
-        String response = getResponse(urlStr);
-        assertEquals("the jetty http handler did not take effect", response, "string2");
+        response = getResponse(urlStr);
+        assertEquals("the jetty http handler2 did not take effect", response, "string2");
 
         JettyHTTPServerEngineFactory.destroyForPort(PORT1);
     }
@@ -381,7 +368,7 @@ public class JettyHTTPServerEngineTest {
         JettyHTTPHandler handler1 = new JettyHTTPTestHandler("test", false);
         JettyHTTPHandler handler2 = new JettyHTTPTestHandler("test2", false);
         engine.addServant(new URL(urlStr1), handler1);
-
+        
         contextHandler = engine.getContextHandler(new URL(urlStr1));
         assertNotNull(contextHandler);
 
@@ -389,46 +376,16 @@ public class JettyHTTPServerEngineTest {
         contextHandler = engine.getContextHandler(new URL(urlStr2));
         assertNotNull(contextHandler);
 
-        String response = getResponse(urlStr1 + "/test");
-        assertEquals("the jetty http handler did not take effect", response, "test");
+        String response = getResponse(urlStr1);
+        assertEquals("the jetty http handler1 did not take effect", response, "test");
 
-        response = getResponse(urlStr2 + "/test");
-        assertEquals("the jetty http handler did not take effect", response, "test2");
+        response = getResponse(urlStr2);
+        assertEquals("the jetty http handler2 did not take effect", response, "test2");
 
         JettyHTTPServerEngineFactory.destroyForPort(PORT3);
     }
 
-    @Test
-    public void testSetConnector() throws Exception {
-        URL url = new URL("http://localhost:" + PORT4 + "/hello/test");
-        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
-        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
-
-        JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
-        engine.setPort(PORT4);
-        Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(PORT4);
-        HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
-        HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
-        Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
-        connectionFactories.add(httpFactory);
-        connector.setConnectionFactories(connectionFactories);
-        engine.setConnector(connector);
-        List<Handler> handlers = new ArrayList<>();
-        handlers.add(handler1);
-        engine.setHandlers(handlers);
-        engine.finalizeConfig();
-
-        engine.addServant(url, handler2);
-
-        String response = getResponse(url.toString());
-        assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
-
-        engine.stop();
-        JettyHTTPServerEngineFactory.destroyForPort(PORT4);
-    }
+   
 
     private static String getResponse(String target) throws Exception {
         URL url = new URL(target);

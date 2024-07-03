@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.lang.reflect.Field;
 
-import org.eclipse.jetty.jaas.JAASLoginService;
+import org.eclipse.jetty.security.jaas.JAASLoginService;
 
 /**
  * Since BookLoginModule delegates to PropertyFileLoginModule, the access to JAASLoginService.INSTANCE 

@@ -61,11 +61,6 @@ abstract class AbstractCXFBean<T> implements Bean<T> {
     }
 
     @Override
-    public boolean isNullable() {
-        return false;
-    }
-
-    @Override
     public Set<InjectionPoint> getInjectionPoints() {
         return Collections.emptySet();
     }

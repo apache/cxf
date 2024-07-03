@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.fiql;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -42,6 +43,14 @@ public class FiqlCollectionsTest {
         FiqlParser<Room> roomParser = new FiqlParser<>(Room.class);
         SearchCondition<Room> roomCondition = roomParser
                 .parse("furniture.spec.features.description==description");
+        Room room = roomCondition.getCondition();
+        assertNotNull(room);
+    }
+
+    @Test
+    public void testTemporalUsedOnCollection() throws SearchParseException {
+        FiqlParser<Room> roomParser = new FiqlParser<>(Room.class);
+        SearchCondition<Room> roomCondition = roomParser.parse("furniture.spec.features.localDate==2023-08-24");
         Room room = roomCondition.getCondition();
         assertNotNull(room);
     }
@@ -88,11 +97,20 @@ public class FiqlCollectionsTest {
 
     public static class Feature {
         String description;
+        LocalDate localDate;
         public String getDescription() {
             return description;
         }
         public void setDescription(String description) {
             this.description = description;
+        }
+
+        public LocalDate getLocalDate() {
+            return localDate;
+        }
+
+        public void setLocalDate(LocalDate localDate) {
+            this.localDate = localDate;
         }
     }
 }

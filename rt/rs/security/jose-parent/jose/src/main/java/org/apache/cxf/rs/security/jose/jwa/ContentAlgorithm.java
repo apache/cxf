@@ -28,9 +28,9 @@ public enum ContentAlgorithm {
     A256GCM(AlgorithmUtils.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
     //TODO: default to "AES/CBC/PKCS5Padding" if Cipher "AES/CBC/PKCS7Padding"
     // can not be initialized, apparently Java 8 has decided to settle on PKCS5Padding only
-    A128CBC_HS256(AlgorithmUtils.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
-    A192CBC_HS384(AlgorithmUtils.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
-    A256CBC_HS512(AlgorithmUtils.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
+    A128CBC_HS256(AlgorithmUtils.A128CBC_HS256_ALGO, "AES/CBC/PKCS5Padding", 128),
+    A192CBC_HS384(AlgorithmUtils.A192CBC_HS384_ALGO, "AES/CBC/PKCS5Padding", 192),
+    A256CBC_HS512(AlgorithmUtils.A256CBC_HS512_ALGO, "AES/CBC/PKCS5Padding", 256);
 
     private final String jwaName;
     private final String javaName;

@@ -18,12 +18,12 @@
  */
 package org.apache.cxf.tracing.micrometer.jaxrs;
 
-import org.apache.cxf.jaxrs.ext.Nullable;
-
-import io.micrometer.observation.ObservationRegistry;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
+import org.apache.cxf.jaxrs.ext.Nullable;
+
+import io.micrometer.observation.ObservationRegistry;
 
 @Provider
 public class ObservationFeature implements Feature {

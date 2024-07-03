@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import brave.handler.SpanHandler;
 import brave.sampler.Sampler;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Endpoint;
@@ -50,8 +51,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -139,8 +138,8 @@ public class SpringJaxwsObservabilityTest {
         }
 
         @Bean
-        Reporter<Span> reporter() {
-            return Reporter.CONSOLE;
+        SpanHandler spanHandler() {
+            return SpanHandler.NOOP;
         }
     }
 

@@ -176,7 +176,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
         } else {
             List<String> searchAttributeList = new ArrayList<>();
             for (Claim claim : claims) {
-                String claimType = claim.getClaimType().toString();
+                String claimType = claim.getClaimType();
                 if (getClaimsLdapAttributeMapping().keySet().contains(claimType)) {
                     searchAttributeList.add(
                         getClaimsLdapAttributeMapping().get(claimType)

@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PushbackInputStream;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -46,11 +48,17 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.UnresolvedAddressException;
+import java.security.AccessController;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.security.cert.Certificate;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +71,8 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
@@ -79,6 +89,7 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -86,13 +97,135 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 
 public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
+    private static final String FORCE_URLCONNECTION_HTTP_CONDUIT = "force.urlconnection.http.conduit";
+    private static final String SHARE_HTTPCLIENT_CONDUIT = "share.httpclient.http.conduit";
+
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
-    volatile HttpClient client;
+    private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
+    volatile RefCount<HttpClient> clientRef;
     volatile int lastTlsHash = -1;
     volatile URI sslURL;
+    private final ReentrantLock initializationLock = new ReentrantLock();
     
-    public HttpClientHTTPConduit(Bus b, EndpointInfo ei) throws IOException {
-        super(b, ei);
+    private static final class RefCount<T extends HttpClient> {
+        private final AtomicLong count = new AtomicLong();
+        private final TLSClientParameters clientParameters;
+        private final HTTPClientPolicy policy;
+        private final T client;
+        private final Runnable finalizer;
+
+        RefCount(T client, HTTPClientPolicy policy, TLSClientParameters clientParameters, Runnable finalizer) {
+            this.client = client;
+            this.policy = policy;
+            this.clientParameters = clientParameters;
+            this.finalizer = finalizer;
+        }
+        
+        RefCount<T> acquire() {
+            count.incrementAndGet();
+            return this;
+        }
+        
+        void release() {
+            if (count.decrementAndGet() == 0) {
+                finalizer.run();
+
+                if (client instanceof AutoCloseable) {
+                    try {
+                        // The HttpClient::close may hang during the termination.
+                        try {
+                            // Try to call shutdownNow() first
+                            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+                                try {
+                                    MethodHandles.publicLookup()
+                                        .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
+                                        .bindTo(client)
+                                        .invokeExact();
+                                    return null;
+                                } catch (final Throwable ex) {
+                                    if (ex instanceof Error) {
+                                        throw (Error) ex;
+                                    } else {
+                                        throw (Exception) ex;
+                                    }
+                                }
+                            });
+                        } catch (final PrivilegedActionException e) {
+                            //ignore
+                        }
+
+                        ((AutoCloseable)client).close();
+                    } catch (Exception e) {
+                        //ignore
+                    }                
+                } else if (client != null) {
+                    tryToShutdownSelector(client);
+                }
+            }
+        }
+
+        HttpClient client() {
+            return client;
+        }
+
+        HTTPClientPolicy policy() {
+            return policy;
+        }
+
+        public TLSClientParameters clientParameters() {
+            return clientParameters;
+        }
+    }
+    
+    private static final class HttpClientCache {
+        private static final int MAX_SIZE = 100; // Keeping at most 100 clients
+
+        private final List<RefCount<HttpClient>> clients = new ArrayList<>();
+        private final ClientPolicyCalculator cpc = new ClientPolicyCalculator();
+        private final ReentrantLock lock = new ReentrantLock();
+
+        RefCount<HttpClient> computeIfAbsent(final boolean shareHttpClient, final HTTPClientPolicy policy, 
+                final TLSClientParameters clientParameters, final Supplier<HttpClient> supplier) {
+            
+            // Do not share if it is not allowed for the conduit or cache capacity is exceeded
+            if (!shareHttpClient || clients.size() >= MAX_SIZE) {
+                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { }).acquire();
+            }
+
+            lock.lock();
+            try {
+                for (final RefCount<HttpClient> p: clients) {
+                    if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                        return p.acquire();
+                    }
+                }
+
+                final HttpClient client = supplier.get();
+                final RefCount<HttpClient> clientRef = new RefCount<HttpClient>(client, policy, clientParameters,
+                        () -> this.remove(policy, clientParameters));
+                clients.add(clientRef);
+
+                return clientRef.acquire();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        void remove(final HTTPClientPolicy policy, final TLSClientParameters clientParameters) {
+            lock.lock();
+            try {
+                final Iterator<RefCount<HttpClient>> iterator = clients.iterator();
+                while (iterator.hasNext()) {
+                    final RefCount<HttpClient> p = iterator.next();
+                    if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                        iterator.remove();
+                        break;
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 
     public HttpClientHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
@@ -111,40 +244,53 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 || lastURL.getPort() != url.getPort();
     }
     
+    @Override
+    public void close(Message msg) throws IOException {
+        super.close(msg);
+        msg.remove(HttpClient.class);
+    }
+    
     /**
      * Close the conduit
      */
     public void close() {
-        if (client != null) {
-            String name = client.toString();
-            client = null;
-            tryToShutdownSelector(name);
+        if (clientRef != null) {
+            clientRef.release();
+            clientRef = null;
         }
         defaultAddress = null;
         super.close();
     }
-    private synchronized void tryToShutdownSelector(String n) {
-        // it can take three seconds (or more) for the JVM to determine the client
-        // is unreferenced and then shutdown the selector thread, we'll try and speed that
-        // up.  This is somewhat of a complete hack.   
-        int idx = n.lastIndexOf('(');
-        if (idx > 0) {
-            n = n.substring(idx + 1);
-            n = n.substring(0, n.length() - 1);
-            n = "HttpClient-" + n + "-SelectorManager";
-        }
-        try {        
-            ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
-            Thread[] threads = new Thread[rootGroup.activeCount()];
-            int cnt = rootGroup.enumerate(threads);
-            for (int x = 0; x < cnt; x++) {
-                if (threads[x].getName().contains(n)) {
-                    threads[x].interrupt();
-                }            
+    private static void tryToShutdownSelector(HttpClient client) {
+        synchronized (client) {
+            String n = client.toString();
+    
+            // it can take three seconds (or more) for the JVM to determine the client
+            // is unreferenced and then shutdown the selector thread, we'll try and speed that
+            // up.  This is somewhat of a complete hack.   
+            int idx = n.lastIndexOf('(');
+            if (idx > 0) {
+                n = n.substring(idx + 1);
+                n = n.substring(0, n.length() - 1);
+                n = "HttpClient-" + n + "-SelectorManager";
             }
-        } catch (Throwable t) {
-            //ignore, nothing we can do except wait for the garbage collection
-            //and then the three seconds for the timeout
+            try {        
+                ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+                Thread[] threads = new Thread[rootGroup.activeCount()];
+                int cnt = rootGroup.enumerate(threads);
+                for (int x = 0; x < cnt; x++) {
+                    if (threads[x].getName().contains(n)) {
+                        final int index = x;
+                        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                            threads[index].interrupt();
+                            return null;
+                        });
+                    }
+                }
+            } catch (Throwable t) {
+                //ignore, nothing we can do except wait for the garbage collection
+                //and then the three seconds for the timeout
+            }
         }
     }
     
@@ -160,7 +306,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         if (clientParameters == null) {
             clientParameters = new TLSClientParameters();
         }
-        Object o = message.getContextualProperty("force.urlconnection.http.conduit");
+        Object o = message.getContextualProperty(FORCE_URLCONNECTION_HTTP_CONDUIT);
         if (o == null) {
             o = message.get("USING_URLCONNECTION");
         }
@@ -193,7 +339,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         
         if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
             sslURL = null;
-            client = null;
+            if (clientRef != null) {
+                clientRef.release();
+                clientRef = null;
+            }
         }
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
@@ -203,11 +352,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             message.put(Message.HTTP_REQUEST_METHOD, "POST");
         }
 
-        HttpClient cl = client;
+        RefCount<HttpClient> cl = clientRef;
         if (cl == null) {
-            int ctimeout = determineConnectionTimeout(message, csPolicy);        
+            int ctimeout = determineConnectionTimeout(message, csPolicy);
             ProxySelector ps = new ProxyFactoryProxySelector(proxyFactory, csPolicy);
-            
+
             HttpClient.Builder cb = HttpClient.newBuilder()
                 .proxy(ps)
                 .followRedirects(Redirect.NEVER);
@@ -239,8 +388,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                             SSLParameters params = new SSLParameters(cipherSuites, new String[] {protocol});
                             cb.sslParameters(params);
                         } else {
-                            SSLParameters params = new SSLParameters(cipherSuites, 
-                                                                     new String[] {"TLSv1", "TLSv1.1", "TLSv1.2"});
+                            final SSLParameters params = new SSLParameters(cipherSuites, 
+                                TLSClientParameters.getPreferredClientProtocols());
                             cb.sslParameters(params);
                         }
                     }
@@ -256,30 +405,43 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 cb.version(Version.HTTP_1_1);  
             }
 
-            cl = cb.build();
-            if (!"https".equals(uri.getScheme()) 
-                && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
-                && cl.version() == Version.HTTP_2
-                && ("2".equals(verc) || ("auto".equals(verc) && "2".equals(HTTP_VERSION)))) {
-                try {
-                    // We specifically want HTTP2, but we're using a request
-                    // that won't trigger an upgrade to HTTP/2 so we'll
-                    // call OPTIONS on the URI which may trigger HTTP/2 upgrade.
-                    // Not needed for methods that don't have a body (GET/HEAD/etc...) 
-                    // or for https (negotiated at the TLS level)
-                    HttpRequest.Builder rb = HttpRequest.newBuilder()
-                        .uri(uri)
-                        .method("OPTIONS", BodyPublishers.noBody());
-                    cl.send(rb.build(), BodyHandlers.ofByteArray());
-                } catch (IOException | InterruptedException e) {
-                    //
+            // make sure the conduit is not yet initialized
+            initializationLock.lock();
+            try {
+                cl = clientRef;
+                if (cl == null) {
+                    final boolean shareHttpClient = MessageUtils.getContextualBoolean(message,
+                        SHARE_HTTPCLIENT_CONDUIT, true);
+                    cl = CLIENTS_CACHE.computeIfAbsent(shareHttpClient, csPolicy, clientParameters, () -> cb.build());
+    
+                    if (!"https".equals(uri.getScheme()) 
+                        && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
+                        && cl.client().version() == Version.HTTP_2
+                        && ("2".equals(verc) || ("auto".equals(verc) && "2".equals(HTTP_VERSION)))) {
+                        try {
+                            // We specifically want HTTP2, but we're using a request
+                            // that won't trigger an upgrade to HTTP/2 so we'll
+                            // call OPTIONS on the URI which may trigger HTTP/2 upgrade.
+                            // Not needed for methods that don't have a body (GET/HEAD/etc...) 
+                            // or for https (negotiated at the TLS level)
+                            HttpRequest.Builder rb = HttpRequest.newBuilder()
+                                .uri(uri)
+                                .method("OPTIONS", BodyPublishers.noBody());
+                            cl.client().send(rb.build(), BodyHandlers.ofByteArray());
+                        } catch (IOException | InterruptedException e) {
+                            //
+                        }
+                    } 
+
+                    clientRef = cl;
                 }
-            } 
-            client = cl;
-        }        
-        message.put(HttpClient.class, cl);
+            } finally {
+                initializationLock.unlock();
+            }
+        }
+        message.put(HttpClient.class, cl.client());
         
-        message.put(KEY_HTTP_CONNECTION_ADDRESS, address);        
+        message.put(KEY_HTTP_CONNECTION_ADDRESS, address);
     }
 
     @Override
@@ -319,7 +481,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (proxy !=  null) {
                 return Arrays.asList(proxy);
             }
-            return ProxySelector.getDefault().select(uri);
+            List<Proxy> listProxy;
+            if (System.getSecurityManager() != null) {
+                try {
+                    listProxy = AccessController.doPrivileged(new PrivilegedExceptionAction<List<Proxy>>() {
+                        @Override
+                        public List<Proxy> run() throws IOException {
+                            return ProxySelector.getDefault().select(uri);
+                        }
+                    });
+                } catch (PrivilegedActionException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                listProxy = ProxySelector.getDefault().select(uri);
+            }
+            return listProxy;
         }
 
         @Override
@@ -327,15 +504,149 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         }
     }
 
-    class HttpClientWrappedOutputStream extends WrappedOutputStream {
+    static class HttpClientPipedOutputStream extends PipedOutputStream {
+        HttpClientWrappedOutputStream stream;
+        HTTPClientPolicy csPolicy;
+        HttpClientBodyPublisher publisher;
+        HttpClientPipedOutputStream(HttpClientWrappedOutputStream s, 
+                                    PipedInputStream pin,
+                                    HTTPClientPolicy cp,
+                                    HttpClientBodyPublisher bp) throws IOException {
+            super(pin);
+            stream = s;
+            csPolicy = cp;
+            publisher = bp;
+        }
+        public void close() throws IOException {
+            super.close();
+            csPolicy = null;
+            stream = null;  
+            if (publisher != null) {
+                publisher.close();
+                publisher = null;
+            }
+        }
+        synchronized boolean canWrite() throws IOException {
+            return stream.isConnectionAttemptCompleted(csPolicy, this);
+        }
+        @Override
+        public void write(int b) throws IOException {
+            if (stream != null && (stream.connectionComplete || canWrite())) {
+                super.write(b);
+            }
+        }
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            if (stream != null && (stream.connectionComplete || canWrite())) {
+                super.write(b, off, len);
+            }
+        }
+
+    };
+    private static final class HttpClientFilteredInputStream extends FilterInputStream {
+        boolean closed;
+
+        private HttpClientFilteredInputStream(InputStream in) {
+            super(in);
+        }
+        @Override
+        public int read() throws IOException {
+            if (closed) {
+                throw new IOException("stream is closed");
+            }
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            if (closed) {
+                throw new IOException("stream is closed");
+            }
+            return super.read(b);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (closed) {
+                throw new IOException("stream is closed");
+            }
+            return super.read(b, off, len);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (!closed) {
+                closed = true;
+                super.close();
+                in = null;
+            }
+        }
+    }
+    private static final class InputStreamSupplier implements Supplier<InputStream> {
+        final InputStream in;
+        InputStreamSupplier(InputStream i) {
+            in = i;
+        }
+        
+        public InputStream get() {
+            return in;
+        }
+    }
+    private static final class HttpClientBodyPublisher implements BodyPublisher {
+        PipedInputStream pin;
+        HttpClientWrappedOutputStream  stream;
+        long contentLen;
+
+        private HttpClientBodyPublisher(HttpClientWrappedOutputStream s, PipedInputStream pin) {
+            this.stream = s;
+            this.pin = pin;
+        }
+        synchronized void close() {
+            if (stream != null) {
+                contentLen = stream.contentLen;
+                stream = null;
+            }
+        }
+        
+        @Override
+        public synchronized void subscribe(Subscriber<? super ByteBuffer> subscriber) {
+            if (stream != null) {
+                stream.connectionComplete = true;
+                contentLen = stream.contentLen;
+                if (stream.pout != null) {
+                    synchronized (stream.pout) {
+                        stream.pout.notifyAll();                       
+                    }
+                    if (stream != null) {
+                        contentLen = stream.contentLen;
+                    }
+                    BodyPublishers.ofInputStream(new InputStreamSupplier(pin)).subscribe(subscriber);
+                    stream = null;
+                    pin = null;
+                    return;
+                }
+            }
+            BodyPublishers.noBody().subscribe(subscriber);
+        }
+
+        @Override
+        public long contentLength() {
+            if (stream != null) {
+                contentLen = stream.contentLen;
+            }
+            return contentLen;
+        }
+    }
+    class HttpClientWrappedOutputStream extends WrappedOutputStream {  
+
         List<Flow.Subscriber<? super ByteBuffer>> subscribers = new LinkedList<>();
         CompletableFuture<HttpResponse<InputStream>> future;
         long contentLen = -1;
         int rtimeout;
         volatile Throwable exception;
         volatile boolean connectionComplete;
-        PipedInputStream pin;
         PipedOutputStream pout;
+        HttpClientBodyPublisher publisher;
         HttpRequest request;
         
         
@@ -346,7 +657,20 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                   chunkThreshold, conduitName, ((Address)message.get(KEY_HTTP_CONNECTION_ADDRESS)).getURI());
         }
 
-        
+        @Override
+        public void close() throws IOException {
+            super.close();
+            if (pout != null) {
+                pout.close();
+                pout = null;
+            }
+            if (publisher != null) {
+                publisher.close();
+                publisher = null;
+            }
+            request = null;
+            subscribers = null;            
+        }
         void addSubscriber(Flow.Subscriber<? super ByteBuffer> subscriber) {
             subscribers.add(subscriber);
         }
@@ -359,7 +683,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         @Override
         protected void handleNoOutput() throws IOException {
             contentLen = 0;
-            pout.close();
+            if (pout != null) {
+                pout.close();
+            }
             if (exception != null) {
                 if (exception instanceof IOException) {
                     throw (IOException)exception;
@@ -392,11 +718,64 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }
             if (!h.headerMap().containsKey("User-Agent")) {
                 rb.header("User-Agent", Headers.USER_AGENT);
-            }   
+            }
+
             if (hasCT || !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(outMessage.get(Message.HTTP_REQUEST_METHOD))) {
-                rb.header(HttpHeaderHelper.CONTENT_TYPE, h.determineContentType());
+                boolean dropContentType = false;
+                boolean emptyRequest = PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY));
+
+                // If it is an empty request (without a request body) then check further if CT still needs be set
+                if (emptyRequest) {
+                    final Object setCtForEmptyRequestProp = outMessage
+                        .getContextualProperty(Headers.SET_EMPTY_REQUEST_CT_PROPERTY);
+                    if (setCtForEmptyRequestProp != null) {
+                        // If SET_EMPTY_REQUEST_CT_PROPERTY is set then do as a user prefers.
+                        // CT will be dropped if setting CT for empty requests was explicitly disabled
+                        dropContentType = PropertyUtils.isFalse(setCtForEmptyRequestProp);
+                    }
+                }
+
+                if (!dropContentType) {
+                    rb.header(HttpHeaderHelper.CONTENT_TYPE, h.determineContentType());
+                }
             }            
         }
+        
+        private boolean isConnectionAttemptCompleted(HTTPClientPolicy csPolicy, PipedOutputStream out)
+            throws IOException {
+            if (!connectionComplete) {
+                // if we haven't connected yet, we'll see if an exception is the reason
+                // why we haven't connected.  Otherwise, wait for the connection
+                // to complete.
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+                try {
+                    out.wait(csPolicy.getConnectionTimeout());
+                } catch (InterruptedException e) {
+                    //ignore
+                }
+                if (future.isDone()) {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+        
         
         @Override
         protected void setProtocolHeaders() throws IOException {
@@ -406,84 +785,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             String httpRequestMethod =
                 (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
 
-            pin = new PipedInputStream(csPolicy.getChunkLength() <= 0
-                                        ? 4096 : csPolicy.getChunkLength());
-            pout = new PipedOutputStream(pin) {
-                synchronized boolean canWrite() throws IOException {
-                    if (!connectionComplete) {
-                        // if we haven't connected yet, we'll see if an exception is the reason 
-                        // why we haven't connected.  Otherwise, wait for the connection
-                        // to complete.
-                        if (future.isDone()) {
-                            try {
-                                future.get();
-                            } catch (InterruptedException | ExecutionException e) {
-                                if (e.getCause() instanceof IOException) {
-                                    throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
-                                }
-                            }
-                            return false;
-                        }                        
-                        try {
-                            wait(csPolicy.getConnectionTimeout());
-                        } catch (InterruptedException e) {
-                            //ignore
-                        }
-                        if (future.isDone()) {
-                            try {
-                                future.get();
-                            } catch (InterruptedException | ExecutionException e) {
-                                if (e.getCause() instanceof IOException) {
-                                    throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
-                                }
-                            }
-                            return false;
-                        }
-                    }                    
-                    return true;
-                }
-                @Override
-                public void write(int b) throws IOException {
-                    if (connectionComplete || canWrite()) {
-                        super.write(b);
-                    }
-                }
-                @Override
-                public void write(byte[] b, int off, int len) throws IOException {
-                    if (connectionComplete || canWrite()) {
-                        super.write(b, off, len);
-                    }
-                }
-                
-            };
             
             if (KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)
                 || PropertyUtils.isTrue(outMessage.get(Headers.EMPTY_REQUEST_PROPERTY))) {
                 contentLen = 0;
             }
 
-            BodyPublisher bp = new BodyPublisher() {
-                @Override
-                public void subscribe(Subscriber<? super ByteBuffer> subscriber) {
-                    connectionComplete = true;
-                    synchronized(pout) {
-                        pout.notifyAll();
-                    }
-                    BodyPublishers.ofInputStream(new Supplier<InputStream>() {
-                        public InputStream get() {
-                            return pin;
-                        }                
-                    }).subscribe(subscriber);
-                }
-
-                @Override
-                public long contentLength() {
-                    return contentLen;
-                }                
-            };
+            final PipedInputStream pin = new PipedInputStream(csPolicy.getChunkLength() <= 0
+                ? 4096 : csPolicy.getChunkLength());
+            
+            this.publisher = new HttpClientBodyPublisher(this, pin);
+            if (contentLen != 0) {
+                pout = new HttpClientPipedOutputStream(this, pin, csPolicy, publisher);
+            }
 
             HttpRequest.Builder rb = HttpRequest.newBuilder()
-                .method(httpRequestMethod, bp);  
+                .method(httpRequestMethod, publisher);  
             String verc = (String)outMessage.getContextualProperty(FORCE_HTTP_VERSION);
             if (verc == null) {
                 verc = csPolicy.getVersion();
@@ -510,11 +827,26 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             
             
             final BodyHandler<InputStream> handler =  BodyHandlers.ofInputStream();
-
-            future = cl.sendAsync(request, handler);
+            if (System.getSecurityManager() != null) {
+                try {
+                    future = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<CompletableFuture<HttpResponse<InputStream>>>() {
+                                @Override
+                                public CompletableFuture<HttpResponse<InputStream>> run() throws IOException {
+                                    return cl.sendAsync(request, handler);
+                                }
+                            });
+                } catch (PrivilegedActionException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                future = cl.sendAsync(request, handler);
+            }
             future.exceptionally(ex -> {
-                synchronized (pout) {
-                    pout.notifyAll();
+                if (pout != null) {
+                    synchronized (pout) {
+                        pout.notifyAll();
+                    }
                 }
                 return null;
             });
@@ -598,7 +930,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             String method = (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
             int sc = resp.statusCode();
             if ("HEAD".equals(method)) {
-                return null;
+                try (InputStream in = resp.body()) {
+                    return null;
+                }
             }
             if (sc == 204) {
                 //no content
@@ -610,56 +944,34 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 if (f.isPresent()) {
                     long l = Long.parseLong(f.get());
                     if (l == 0) {
-                        return null;
+                        try (InputStream in = resp.body()) {
+                            return null;
+                        }
                     }
                 } else if (!fChunk.isPresent() || !"chunked".equals(fChunk.get())) {
                     if (resp.version() == Version.HTTP_2) {
                         InputStream in = resp.body();
                         if (in.available() <= 0) {
-                            return null;
+                            try (in) {
+                                return null;
+                            }
                         }
                     } else {
-                        return null;
+                        try (InputStream in = resp.body()) {
+                            return null;
+                        }
                     }
                 }
             }
-            return new FilterInputStream(resp.body()) {
-                boolean closed;
-                @Override
-                public int read() throws IOException {
-                    if (closed) {
-                        throw new IOException("stream is closed");
-                    }
-                    return super.read();
-                }
-
-                @Override
-                public int read(byte[] b) throws IOException {
-                    if (closed) {
-                        throw new IOException("stream is closed");
-                    }
-                    return super.read(b);
-                }
-
-                @Override
-                public int read(byte[] b, int off, int len) throws IOException {
-                    if (closed) {
-                        throw new IOException("stream is closed");
-                    }
-                    return super.read(b, off, len);
-                }
-
-                @Override
-                public void close() throws IOException {
-                    closed = true;
-                    super.close();
-                }
-            };
+            return new HttpClientFilteredInputStream(resp.body());
         }
 
         @Override
         protected void closeInputStream() throws IOException {
-            getInputStream().close();
+            InputStream is = getInputStream();
+            if (is != null) {
+                is.close();
+            }
         }
 
         @Override
@@ -785,7 +1097,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         @Override
         protected void retransmitStream() throws IOException {
             cachedStream.writeCacheTo(pout);
-            pout.close();
+            if (pout != null) {
+                pout.close();
+            }
         }
 
         @Override

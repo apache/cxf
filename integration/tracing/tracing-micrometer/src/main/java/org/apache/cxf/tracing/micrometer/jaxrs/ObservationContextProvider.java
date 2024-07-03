@@ -20,8 +20,8 @@ package org.apache.cxf.tracing.micrometer.jaxrs;
 
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.tracing.micrometer.ObservationTracerContext;
 import org.apache.cxf.tracing.TracerContext;
+import org.apache.cxf.tracing.micrometer.ObservationTracerContext;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;

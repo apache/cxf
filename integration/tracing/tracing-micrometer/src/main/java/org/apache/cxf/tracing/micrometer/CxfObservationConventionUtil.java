@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.tracing.micrometer.CxfObservationDocumentation.LowCardinalityKeys;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.tracing.micrometer.CxfObservationDocumentation.LowCardinalityKeys;
 
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
@@ -45,11 +45,13 @@ final class CxfObservationConventionUtil {
 
     static KeyValues getLowCardinalityKeyValues(Message msg) {
         KeyValue rpcSystem = LowCardinalityKeys.RPC_SYSTEM.withValue("cxf");
-        KeyValue rpcService = LowCardinalityKeys.RPC_SERVICE.withValue(msg.getExchange().getService().getName().getLocalPart());
+        KeyValue rpcService = LowCardinalityKeys.RPC_SERVICE
+                .withValue(msg.getExchange().getService().getName().getLocalPart());
         KeyValues keyValues = KeyValues.of(rpcSystem, rpcService);
         BindingOperationInfo bindingOperationInfo = msg.getExchange().getBindingOperationInfo();
         if (bindingOperationInfo != null) {
-            keyValues = keyValues.and(LowCardinalityKeys.RPC_METHOD.withValue(bindingOperationInfo.getName().getLocalPart()));
+            keyValues = keyValues.and(LowCardinalityKeys.RPC_METHOD
+                                          .withValue(bindingOperationInfo.getName().getLocalPart()));
         }
         String endpointAdress = url(msg);
         if (endpointAdress != null) {
@@ -59,7 +61,8 @@ final class CxfObservationConventionUtil {
                 KeyValue serverPort = LowCardinalityKeys.SERVER_PORT.withValue(String.valueOf(uri.getPort()));
                 return keyValues.and(serverAddress, serverPort);
             } catch (Exception ex) {
-                LOG.log(Level.FINE, ex, () -> "Exception occurred while trying to parse the URI from [" + endpointAdress + "] address");
+                LOG.log(Level.FINE, ex, () 
+                        -> "Exception occurred while trying to parse the URI from [" + endpointAdress + "] address");
                 return keyValues;
             }
         }

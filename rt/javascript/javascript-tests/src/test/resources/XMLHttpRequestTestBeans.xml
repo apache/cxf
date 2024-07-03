@@ -37,19 +37,11 @@
                             </property>
                             <property name="mimeTypes">
                                 <bean class="org.eclipse.jetty.http.MimeTypes">
-                                    <property name="mimeMap">
-                                        <map>
-                                            <entry key="html">
-                                                <value>text/html; charset="utf-8"</value>
-                                            </entry>
-                                        </map>
-                                    </property>
                                 </bean>
                             </property>
                         </bean>
                     </property>
                 </bean>
-                <bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>
             </httpj:handlers>
         </httpj:engine>
     </httpj:engine-factory>

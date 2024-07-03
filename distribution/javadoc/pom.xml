@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../parent</relativePath>
     </parent>
     <properties>
@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-bom</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -48,107 +48,107 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-security</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-http-signature</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-jose</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-jose-jaxrs</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-oauth2</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-oauth2-saml</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-security-saml</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-service-description-microprofile-openapi</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-mp-client</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-reactor</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-search</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-clustering</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-transfer</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-websocket</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -261,10 +261,6 @@
             <artifactId>wsdl4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-        </dependency>
-        <dependency>
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>${cxf.jdom.version}</version>
@@ -292,10 +288,6 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-policy-stax</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ehcache</groupId>
@@ -395,8 +387,14 @@
             <artifactId>opentelemetry-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.opentelemetry</groupId>
+            <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.semconv</groupId>
+            <artifactId>opentelemetry-semconv-incubating</artifactId>
+            <version>${cxf.opentelemetry.semconv.version}</version>
         </dependency>
         <dependency>
             <groupId>io.opentracing</groupId>
@@ -420,19 +418,23 @@
         </dependency>
         <dependency>
              <groupId>io.undertow</groupId>
-             <artifactId>undertow-servlet-jakarta</artifactId>
+             <artifactId>undertow-servlet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+            <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -455,12 +457,8 @@
             <artifactId>jetty-http</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-plus</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>http2-server</artifactId>
+            <artifactId>jetty-http2-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -470,11 +468,6 @@
             <groupId>org.jacorb</groupId>
             <artifactId>jacorb</artifactId>
             <version>${cxf.jacorb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jakarta-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
         </dependency>
         <dependency>
           <groupId>io.reactivex.rxjava3</groupId>

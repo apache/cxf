@@ -68,13 +68,12 @@ public class JexlClaimsMapperTest {
 
         assertNotNull(result);
         assertTrue(result.size() >= 2);
-        assertEquals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", result.get(1).getClaimType()
-            .toString());
+        assertEquals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", result.get(1).getClaimType());
         assertEquals(1, result.get(1).getValues().size());
         assertEquals("Jan Bernhardt", result.get(1).getValues().get(0));
 
         for (ProcessedClaim c : result) {
-            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType().toString())) {
+            if ("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname".equals(c.getClaimType())) {
                 fail("Only merged claim should be in result set, but not the individual claims");
             }
         }
@@ -254,7 +253,7 @@ public class JexlClaimsMapperTest {
             return null;
         }
         for (ProcessedClaim c : claims) {
-            if (c.getClaimType() != null && claimType.equals(c.getClaimType().toString())) {
+            if (c.getClaimType() != null && claimType.equals(c.getClaimType())) {
                 return c;
             }
         }

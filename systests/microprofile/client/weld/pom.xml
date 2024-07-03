@@ -22,7 +22,7 @@
     <parent>
         <artifactId>cxf-microprofile-tck</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
@@ -124,7 +124,17 @@
                     <groupId>org.xmlunit</groupId>
                     <artifactId>xmlunit-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -171,14 +181,10 @@
                     </execution>
                 </executions>
                 <dependencies>
-                    <!-- 
-                    The end goal is to use wiremock 3.0.0 but sadly microprofile-rest-client-tck 
-                    still depends on javax.servlet (MyEventSourceServlet.java). 
-                    -->
                     <dependency>
-                        <groupId>com.github.tomakehurst</groupId>
-                        <artifactId>wiremock-jre8-standalone</artifactId>
-                        <version>2.35.0</version>
+                        <groupId>org.wiremock</groupId>
+                        <artifactId>wiremock-standalone</artifactId>
+                        <version>${cxf.wiremock.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

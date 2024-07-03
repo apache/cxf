@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
     <packaging>pom</packaging>
     <properties>
@@ -45,12 +45,12 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-logging</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
             <artifactId>jbossws-cxf-client</artifactId>
-            <version>6.2.0.Final</version>
+            <version>7.1.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>

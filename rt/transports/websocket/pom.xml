@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -103,21 +103,15 @@
                     <groupId>org.eclipse.jetty.orbit</groupId>
                     <artifactId>jakarta.servlet</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.toolchain</groupId>
+                    <artifactId>jetty-jakarta-servlet-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -142,20 +136,19 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jetty-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jakarta-server</artifactId>
-            <version>${cxf.jetty11.version}</version>
-            <optional>true</optional>
+            <artifactId>jetty-websocket-jetty-server</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>jakarta.servlet</groupId>
-                    <artifactId>jakarta.servlet-api</artifactId>
+                    <groupId>org.eclipse.jetty.toolchain</groupId>
+                    <artifactId>jetty-jakarta-servlet-api</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+            <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.atmosphere</groupId>

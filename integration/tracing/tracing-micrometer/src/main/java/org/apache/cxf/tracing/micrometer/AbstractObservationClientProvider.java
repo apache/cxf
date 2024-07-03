@@ -60,7 +60,9 @@ public abstract class AbstractObservationClientProvider extends AbstractTracingP
 
     }
 
-    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, @Nullable Exception ex, Consumer<Observation> addResponse) {
+    protected void stopTraceSpan(final TraceScopeHolder<ObservationScope> holder, 
+                                 @Nullable Exception ex, 
+                                 Consumer<Observation> addResponse) {
         if (holder == null) {
             return;
         }

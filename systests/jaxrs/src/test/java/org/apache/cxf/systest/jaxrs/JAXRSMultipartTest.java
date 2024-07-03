@@ -75,6 +75,7 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,6 +90,7 @@ import static org.junit.Assert.assertTrue;
 
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = MultipartServer.PORT;
+    public static final String PORTINV = allocatePort(JAXRSMultipartTest.class, 1);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -181,7 +183,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/books/attachments";
         InputStream is =
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData");
-        //create a stream that sticks a bunch of data for the attachement to cause the
+        //create a stream that sticks a bunch of data for the attachment to cause the
         //server to buffer the attachment to disk.
         PushbackInputStream buf = new PushbackInputStream(is, 1024 * 20) {
             int bcount = -1;
@@ -211,6 +213,83 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         };
         doAddBook("multipart/related", address, buf, 413);
         assertEquals(orig, countTempFiles());
+    }    
+    @Test
+    public void testBookAsMassiveAttachmentInvalidPath() throws Exception {
+        int orig = countTempFiles();
+        String address = "http://localhost:" + PORT + "/INVALID/bookstore/books/attachments";
+        InputStream is =
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData");
+        //create a stream that sticks a bunch of data for the attachment to cause the
+        //server to buffer the attachment to disk.
+        PushbackInputStream buf = new PushbackInputStream(is, 1024 * 20) {
+            int bcount = -1;
+            @Override
+            public int read(byte[] b, int offset, int len) throws IOException {
+                if (bcount >= 0 && bcount < 1024 * 5000) {
+                    for (int x = 0; x < len; x++) {
+                        b[offset + x] = (byte)x;
+                    }
+                    bcount += len;
+                    return len;
+                }
+                int i = super.read(b, offset, len);
+                for (int x = 0; x < i - 5; x++) {
+                    if (b[x + offset] == '*'
+                        && b[x + offset + 1] == '*'
+                        && b[x + offset + 2] == 'D'
+                        && b[x + offset + 3] == '*'
+                        && b[x + offset + 4] == '*') {
+                        super.unread(b, x + offset + 5, i - x - 5);
+                        i = x;
+                        bcount = 0;
+                    }
+                }
+                return i;
+            }
+        };
+        doAddBook("multipart/related", address, buf, 404);
+        assertEquals(orig, countTempFiles());
+    }
+    @Test
+    public void testBookAsMassiveAttachmentInvalidPort() throws Exception {
+        String address = "http://localhost:" + PORTINV + "/bookstore/books/attachments";
+        InputStream is =
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData");
+        //create a stream that sticks a bunch of data for the attachment to cause the
+        //server to buffer the attachment to disk.
+        PushbackInputStream buf = new PushbackInputStream(is, 1024 * 20) {
+            int bcount = -1;
+            @Override
+            public int read(byte[] b, int offset, int len) throws IOException {
+                if (bcount >= 0 && bcount < 1024 * 5000) {
+                    for (int x = 0; x < len; x++) {
+                        b[offset + x] = (byte)x;
+                    }
+                    bcount += len;
+                    return len;
+                }
+                int i = super.read(b, offset, len);
+                for (int x = 0; x < i - 5; x++) {
+                    if (b[x + offset] == '*'
+                        && b[x + offset + 1] == '*'
+                        && b[x + offset + 2] == 'D'
+                        && b[x + offset + 3] == '*'
+                        && b[x + offset + 4] == '*') {
+                        super.unread(b, x + offset + 5, i - x - 5);
+                        i = x;
+                        bcount = 0;
+                    }
+                }
+                return i;
+            }
+        };
+        try {
+            doAddBook("multipart/related", address, buf, 404);
+            org.junit.Assert.fail("Should have thrown an exception");
+        } catch (Exception ex) {
+            Assert.hasText(ex.getMessage(), "Connection refused");
+        }
     }
 
     @Test
@@ -1016,8 +1095,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         DataHandler handler = new DataHandler(new InputStreamDataSource(is1, "application/octet-stream"));
 
         Attachment att = new Attachment(headers, handler, null);
-        Response response = client.post(att);
-        assertEquals(response.getStatus(), 200);
+        try (Response response = client.post(att)) {
+            assertEquals(response.getStatus(), 200);
+        }
 
         client.close();
     }

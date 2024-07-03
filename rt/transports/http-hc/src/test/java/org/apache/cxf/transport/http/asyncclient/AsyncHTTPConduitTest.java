@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.Endpoint;
@@ -43,6 +44,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
+import org.apache.cxf.transport.http.asyncclient.AsyncHttpResponseWrapperFactory.AsyncHttpResponseWrapper;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -50,12 +52,15 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+import org.apache.http.HttpResponse;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -242,7 +247,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testInovationWithHCAddress() throws Exception {
+    public void testInvocationWithHCAddress() throws Exception {
         String address = "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
@@ -263,6 +268,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
+
     @Test
     public void testCall() throws Exception {
         updateAddressPort(g, PORT);
@@ -273,6 +279,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         c.setClient(cp);
         assertEquals("Hello " + request, g.greetMe(request));
     }
+
     @Test
     public void testCallAsync() throws Exception {
         updateAddressPort(g, PORT);
@@ -291,6 +298,35 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             public void handleResponse(Response<GreetMeLaterResponse> res) {
             }
         }).get();
+    }
+
+    @Test
+    public void testCallAsyncWithResponseWrapper() throws Exception {
+        try {
+            final CountDownLatch latch = new CountDownLatch(1);
+            final AsyncHttpResponseWrapper wrapper = new AsyncHttpResponseWrapper() {
+                @Override
+                public void responseReceived(HttpResponse response, Consumer<HttpResponse> delegate) {
+                    delegate.accept(response);
+                    latch.countDown();
+                }
+            };
+
+            getStaticBus().setExtension(() -> wrapper, AsyncHttpResponseWrapperFactory.class);
+    
+            final String address = "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
+            final Greeter greeter = new SOAPService().getSoapPort();
+            setAddress(greeter, address);
+
+            greeter.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
+                public void handleResponse(Response<GreetMeLaterResponse> res) {
+                }
+            }).get();
+
+            assertThat(latch.await(5, TimeUnit.SECONDS), is(true));
+        } finally {
+            getStaticBus().setExtension(null, AsyncHttpResponseWrapperFactory.class);
+        }
     }
 
     @Test

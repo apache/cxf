@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.plugin.codegen</cxf.module.name>
@@ -108,16 +108,19 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.sonatype.plexus</groupId>
@@ -134,6 +137,7 @@
                 <configuration>
                     <!-- see https://issues.apache.org/jira/browse/MNG-5346 -->
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                    <goalPrefix>cxf-codegen</goalPrefix>
                 </configuration>
                 <executions>
                     <execution>
@@ -193,30 +197,13 @@
                     </execution>
                 </executions>
                 <dependencies>
-                   <dependency>
-                       <groupId>jakarta.xml.bind</groupId>
-                       <artifactId>jakarta.xml.bind-api</artifactId>
-                       <version>${cxf.jaxb.version}</version>
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>${cxf.jaxb.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>ibmjdk</id>
-            <activation>
-                <property>
-                    <name>java.vendor</name>
-                    <value>IBM Corporation</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

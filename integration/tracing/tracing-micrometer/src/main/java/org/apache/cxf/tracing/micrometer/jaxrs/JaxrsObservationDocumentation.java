@@ -159,7 +159,9 @@ enum JaxrsObservationDocumentation implements ObservationDocumentation {
 
     enum CommonHighCardinalityKeys implements KeyName {
         /**
-         * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+         * The size of the request payload body in bytes. This is the number of bytes transferred 
+         * excluding headers and is often, but not always, present as the Content-Length header. 
+         * For requests using transport encoding, this should be the compressed size.
          */
         REQUEST_BODY_SIZE {
             @Override
@@ -174,7 +176,10 @@ enum JaxrsObservationDocumentation implements ObservationDocumentation {
         },
 
         /**
-         * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the Content-Length header. For requests using transport encoding, this should be the compressed size.
+         * The size of the response payload body in bytes. This is the number of bytes 
+         * transferred excluding headers and is often, but not always, present as the 
+         * Content-Length header. For requests using transport encoding, this should be 
+         * the compressed size.
          */
         RESPONSE_BODY_SIZE {
             @Override

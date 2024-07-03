@@ -46,9 +46,12 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.workqueue.WorkQueueManager;
+import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
+import org.springframework.context.ApplicationContext;
 
 import org.junit.After;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -58,6 +61,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class SpringBusFactoryTest {
 
@@ -95,9 +99,38 @@ public class SpringBusFactoryTest {
     }
 
     @Test
+    public void testNamespaceHandlerResolver() {
+        NamespaceHandlerResolver r = Mockito.mock(NamespaceHandlerResolver.class);
+        SpringBusFactory factory = new SpringBusFactory(r);
+        Bus bus = factory.createBus();
+        bus.shutdown(true);
+        verifyNoInteractions(r);
+
+        NamespaceHandlerResolver differentResolver = Mockito.mock(NamespaceHandlerResolver.class);
+        factory.setNamespaceHandlerResolver(differentResolver);
+        verifyNoInteractions(differentResolver);
+    }
+
+    @Test
+    public void testApplicationContext() {
+        ApplicationContext context = Mockito.mock(ApplicationContext.class);
+        SpringBusFactory factory = new SpringBusFactory(context);
+        assertEquals(context, factory.getApplicationContext());
+    }
+
+    @Test
     public void testCustomFileName() {
         String cfgFile = "org/apache/cxf/bus/spring/resources/bus-overwrite.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
+        checkCustomerConfiguration(bus);
+    }
+
+    @Test
+    public void testCustomFileNames() {
+        String cfgFile = "org/apache/cxf/bus/spring/resources/bus-overwrite.xml";
+        String[] cfgFiles = new String[1];
+        cfgFiles[0] = cfgFile;
+        Bus bus = new SpringBusFactory().createBus(cfgFiles);
         checkCustomerConfiguration(bus);
     }
 
@@ -149,7 +182,7 @@ public class SpringBusFactoryTest {
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         lifeCycleManager.registerLifeCycleListener(bl);
         bus.shutdown(true);
-        
+
         verify(bl).preShutdown();
         verify(bl).postShutdown();
     }

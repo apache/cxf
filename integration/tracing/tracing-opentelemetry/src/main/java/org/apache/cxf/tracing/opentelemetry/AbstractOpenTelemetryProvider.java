@@ -35,7 +35,8 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.UrlAttributes;
 
 public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTelemetryProvider.class);
@@ -51,7 +52,7 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
 
     protected AbstractOpenTelemetryProvider(final OpenTelemetry openTelemetry, final Tracer tracer) {
         this.openTelemetry = openTelemetry;
-        this.tracer =tracer;
+        this.tracer = tracer;
     }
 
     protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
@@ -63,8 +64,8 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
 
         SpanBuilder spanBuilder = tracer.spanBuilder(buildSpanDescription(uri.getPath(), method))
             .setSpanKind(SpanKind.SERVER)
-            .setAttribute(SemanticAttributes.HTTP_METHOD, method)
-            .setAttribute(SemanticAttributes.HTTP_URL, uri.toString());
+            .setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, method)
+            .setAttribute(UrlAttributes.URL_FULL, uri.toString());
         Span activeSpan = spanBuilder.startSpan();
         Scope scope = activeSpan.makeCurrent();
 
@@ -104,7 +105,7 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
                 scope = span.makeCurrent();
             }
 
-            span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, responseStatus);
+            span.setAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, responseStatus);
             span.end();
 
             scope.close();

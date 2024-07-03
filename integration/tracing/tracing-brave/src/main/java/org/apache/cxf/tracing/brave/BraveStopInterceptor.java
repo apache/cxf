@@ -60,6 +60,7 @@ public class BraveStopInterceptor extends AbstractBraveInterceptor {
             responseCode = 200;
         }
 
-        super.stopTraceSpan(requestHeaders, responseHeaders, responseCode, holder);
+        super.stopTraceSpan(requestHeaders, responseHeaders, (String)requestMessage.get(Message.HTTP_REQUEST_METHOD), 
+            getUri(requestMessage), responseCode, holder);
     }
 }

@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-java2wadl-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.0.3-SNAPSHOT</version>
+    <version>4.1.0-SNAPSHOT</version>
     <name>Apache CXF Java2WADL Maven2 Plugin</name>
     <description>Apache CXF Java2WADL Maven2 Plugin</description>
     <url>https://cxf.apache.org</url>
@@ -31,7 +31,7 @@
     <parent>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-maven-plugins</artifactId>
-      <version>4.0.3-SNAPSHOT</version>
+      <version>4.1.0-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.plugin.java2wadl</cxf.module.name>
@@ -89,16 +89,19 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -130,6 +133,18 @@
             <version>0.13.1</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <configuration>
+                    <goalPrefix>cxf-java2wadl</goalPrefix>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

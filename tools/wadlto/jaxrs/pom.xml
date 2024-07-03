@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.3-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -60,9 +60,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.patrodyne.jvnet</groupId>
-            <artifactId>hisrc-basicjaxb-plugins</artifactId>
-            <version>${cxf.hisrc.basicjaxb.version}</version>
+            <groupId>org.jvnet.jaxb</groupId>
+            <artifactId>jaxb-plugins</artifactId>
+            <version>${cxf.jvnet.jaxb.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

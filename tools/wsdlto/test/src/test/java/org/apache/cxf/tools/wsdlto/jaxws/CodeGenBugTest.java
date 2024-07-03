@@ -532,7 +532,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         Server server = new Server(0);
         try {
             ResourceHandler reshandler = new ResourceHandler();
-            reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
+            reshandler.setBaseResourceAsString(getLocation("/wsdl2java_wsdl/"));
             // this is the only handler we're supposed to need, so we don't need to
             // 'add' it.
             server.setHandler(reshandler);

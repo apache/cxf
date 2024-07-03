@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -43,9 +44,12 @@ import org.w3c.dom.Document;
 
 import jakarta.activation.DataSource;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.SeBootstrap.Configuration;
+import jakarta.ws.rs.SeBootstrap.Instance;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ResponseProcessingException;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -67,6 +71,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.bootstrap.ConfigurationBuilderImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -843,6 +848,26 @@ public class ResponseImplTest {
         @Override
         public Builder createLinkBuilder() {
             return original.createLinkBuilder();
+        }
+
+        @Override
+        public jakarta.ws.rs.SeBootstrap.Configuration.Builder createConfigurationBuilder() {
+            return new ConfigurationBuilderImpl();
+        }
+
+        @Override
+        public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
+            return original.bootstrap(application, configuration);
+        }
+
+        @Override
+        public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
+            return original.bootstrap(clazz, configuration);
+        }
+
+        @Override
+        public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
+            return original.createEntityPartBuilder(partName);
         }
     }
 

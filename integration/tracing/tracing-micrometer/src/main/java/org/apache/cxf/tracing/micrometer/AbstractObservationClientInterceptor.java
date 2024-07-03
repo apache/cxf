@@ -22,13 +22,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.cxf.interceptor.OneWayInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 import io.micrometer.observation.ObservationRegistry;
 
 public abstract class AbstractObservationClientInterceptor extends AbstractObservationClientProvider
-        implements PhaseInterceptor<Message> {
+        implements PhaseInterceptor<Message>, OneWayInterceptor<Message> {
 
     private String phase;
 

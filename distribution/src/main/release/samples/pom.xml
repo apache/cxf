@@ -7,9 +7,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License. You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,34 +22,36 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.3-SNAPSHOT</version>
+    <version>4.1.0-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jdk.version>11</cxf.jdk.version>
+        <cxf.jdk.version>17</cxf.jdk.version>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.spring.boot.version>3.0.10</cxf.spring.boot.version>
-        <cxf.spring.cloud.eureka.version>4.0.3</cxf.spring.cloud.eureka.version>
-        <cxf.jetty11.version>11.0.15</cxf.jetty11.version>
-        <cxf.netty.version>4.1.97.Final</cxf.netty.version>
+        <cxf.spring.boot.version>3.3.1</cxf.spring.boot.version>
+        <cxf.spring.cloud.eureka.version>4.1.2</cxf.spring.cloud.eureka.version>
+        <cxf.jetty12.version>12.0.10</cxf.jetty12.version>
+        <cxf.netty.version>4.1.111.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>5.4.2</cxf.swagger.ui.version>
-        <cxf.tika.version>2.7.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.12</cxf.tomcat.version>
+        <cxf.swagger.ui.version>5.17.14</cxf.swagger.ui.version>
+        <cxf.tika.version>2.9.1</cxf.tika.version>
+        <cxf.tomcat.version>10.1.25</cxf.tomcat.version>
         <cxf.jboss.weld.version>4.0.3.Final</cxf.jboss.weld.version>
-        <cxf.gson.version>2.10.1</cxf.gson.version>
-        <cxf.lucene.version>9.7.0</cxf.lucene.version>
-        <cxf.olingo.server.version>4.9.0</cxf.olingo.server.version>
-        <cxf.aspectj.version>1.9.20</cxf.aspectj.version>
-        <cxf.brave.version>5.16.0</cxf.brave.version>
+        <cxf.gson.version>2.11.0</cxf.gson.version>
+        <cxf.lucene.version>9.11.1</cxf.lucene.version>
+        <cxf.olingo.server.version>5.0.0</cxf.olingo.server.version>
+        <cxf.aspectj.version>1.9.22.1</cxf.aspectj.version>
+        <cxf.brave.version>6.0.3</cxf.brave.version>
+        <cxf.zipkin-reporter.version>3.4.0</cxf.zipkin-reporter.version>
         <cxf.zest.version>2.1</cxf.zest.version>
-        <cxf.activemq.artemis.version>2.27.1</cxf.activemq.artemis.version>
-        <cxf.h2.version>2.2.220</cxf.h2.version>
+        <cxf.activemq.artemis.version>2.31.0</cxf.activemq.artemis.version>
+        <cxf.h2.version>2.2.224</cxf.h2.version>
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
+        <cxf.camel.version>4.6.0</cxf.camel.version>
     </properties>
     <dependencies>
         <dependency>
@@ -102,6 +104,8 @@
         <module>jax_rs/tracing_brave</module>
         <module>jax_rs/tracing_opentracing</module>
         <module>jax_rs/tracing_opentelemetry</module>
+        <module>jax_rs/tracing_opentelemetry_camel</module>
+        <module>jax_rs/tracing_micrometer</module>
         <module>jax_rs/websocket</module>
         <module>jax_rs/websocket_web</module>
         <module>jax_server_aegis_client</module>
@@ -118,6 +122,9 @@
         <module>js_client</module>
         <module>js_provider</module>
         <module>mtom</module>
+        <module>performance/base</module>
+        <module>performance/jaxrs</module>
+        <module>performance/soap_http_doc_lit</module>
         <module>restful_dispatch</module>
         <module>ruby_spring_support</module>
         <module>soap_header</module>
@@ -152,7 +159,7 @@
     </modules>
     <dependencyManagement>
         <dependencies>
-            <!-- 
+            <!--
             Pull in the cxf-parents as import scope to re-use the dependencyManagement
             sections of those poms.   Those sections define the versions of various third
             party deps that CXF used to build with and test with and we would like
@@ -161,21 +168,21 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>${project.version}</version>
+                <version>4.1.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.corba</groupId>
                 <artifactId>glassfish-corba-orb</artifactId>
-                <version>4.2.4</version>
+                <version>4.2.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -186,7 +193,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.13.0</version>
                     <configuration>
                         <source>${cxf.jdk.version}</source>
                         <target>${cxf.jdk.version}</target>
@@ -195,37 +202,37 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>5.1.8</version>
+                    <version>5.1.9</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-maven-plugin</artifactId>
-                    <version>${cxf.jetty11.version}</version>
+                    <version>${cxf.jetty12.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <goals>

@@ -66,6 +66,7 @@ import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.HttpClientHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
+import org.apache.cxf.transport.http.asyncclient.AsyncHttpResponseWrapperFactory.AsyncHttpResponseWrapper;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
@@ -99,13 +100,15 @@ import org.apache.http.nio.util.HeapByteBufferAllocator;
 public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     public static final String USE_ASYNC = "use.async.http.conduit";
 
-    final AsyncHTTPConduitFactory factory;
-    volatile int lastTlsHash = -1;
-    volatile Object sslState;
-    volatile URI sslURL;
-    volatile SSLContext sslContext;
-    volatile SSLSession session;
-    volatile CloseableHttpAsyncClient client;
+    private final AsyncHTTPConduitFactory factory;
+    private final AsyncHttpResponseWrapperFactory asyncHttpResponseWrapperFactory;
+
+    private volatile int lastTlsHash = -1;
+    private volatile Object sslState;
+    private volatile URI sslURL;
+    private volatile SSLContext sslContext;
+    private volatile SSLSession session;
+    private volatile CloseableHttpAsyncClient client;
 
 
     public AsyncHTTPConduit(Bus b,
@@ -114,6 +117,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                             AsyncHTTPConduitFactory factory) throws IOException {
         super(b, ei, t);
         this.factory = factory;
+        this.asyncHttpResponseWrapperFactory = bus.getExtension(AsyncHttpResponseWrapperFactory.class);
     }
 
     public synchronized CloseableHttpAsyncClient getHttpAsyncClient() throws IOException {
@@ -136,7 +140,6 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             super.setupConnection(message, address, csPolicy);
             return;
         }
-        propagateJaxwsSpecTimeoutSettings(message, csPolicy);
         boolean addressChanged = false;
         // need to do some clean up work on the URI address
         URI uri = address.getURI();
@@ -227,8 +230,8 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         e.setEntity(entity);
 
         RequestConfig.Builder b = RequestConfig.custom()
-                .setConnectTimeout((int) csPolicy.getConnectionTimeout())
-                .setSocketTimeout((int) csPolicy.getReceiveTimeout())
+                .setConnectTimeout(determineConnectionTimeout(message, csPolicy))
+                .setSocketTimeout(determineReceiveTimeout(message, csPolicy))
                 .setConnectionRequestTimeout((int) csPolicy.getConnectionRequestTimeout());
         Proxy p = proxyFactory.createProxy(csPolicy, uri);
         if (p != null && p.type() != Proxy.Type.DIRECT) {
@@ -240,18 +243,6 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
         message.put(CXFHttpRequest.class, e);
     }
-
-    private void propagateJaxwsSpecTimeoutSettings(Message message, HTTPClientPolicy csPolicy) {
-        int receiveTimeout = determineReceiveTimeout(message, csPolicy);
-        if (csPolicy.getReceiveTimeout() == 60000) {
-            csPolicy.setReceiveTimeout(receiveTimeout);
-        }
-        int connectionTimeout = determineConnectionTimeout(message, csPolicy);
-        if (csPolicy.getConnectionTimeout() == 30000) {
-            csPolicy.setConnectionTimeout(connectionTimeout);
-        }
-    }
-
 
     protected OutputStream createOutputStream(Message message,
                                               boolean needToCacheRequest,
@@ -478,7 +469,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                 return;
             }
 
-            CXFResponseCallback responseCallback = new CXFResponseCallback() {
+            CXFResponseCallback delegate = new CXFResponseCallback() {
                 @Override
                 public void responseReceived(HttpResponse response) {
                     setHttpResponse(response);
@@ -486,6 +477,18 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
             };
 
+            CXFResponseCallback responseCallback = delegate;
+            if (asyncHttpResponseWrapperFactory != null) {
+                final AsyncHttpResponseWrapper wrapper = asyncHttpResponseWrapperFactory.create();
+                if (wrapper != null) {
+                    responseCallback = new CXFResponseCallback() {
+                        @Override
+                        public void responseReceived(HttpResponse response) {
+                            wrapper.responseReceived(response, delegate::responseReceived);
+                        }
+                    };
+                }
+            }
             FutureCallback<Boolean> callback = new FutureCallback<Boolean>() {
 
                 public void completed(Boolean result) {

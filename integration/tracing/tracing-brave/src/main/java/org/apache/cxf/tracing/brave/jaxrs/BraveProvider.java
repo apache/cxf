@@ -58,7 +58,8 @@ public class BraveProvider extends AbstractBraveProvider
     public void filter(final ContainerRequestContext requestContext,
             final ContainerResponseContext responseContext) throws IOException {
         super.stopTraceSpan(requestContext.getHeaders(), responseContext.getHeaders(),
-            responseContext.getStatus(), (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));
+            requestContext.getMethod(), requestContext.getUriInfo().getRequestUri(),
+                responseContext.getStatus(), (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));
     }
 
     @Override
