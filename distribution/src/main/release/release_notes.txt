@@ -1,4 +1,4 @@
-Apache CXF 4.0.4 Release Notes
+Apache CXF 4.0.5 Release Notes
 
 1. Overview
 
@@ -21,7 +21,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.4 fixes over 28 JIRA issues reported by users and the community.
+4.0.5 fixes over 19 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -63,50 +63,34 @@ for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
-    * [CXF-8812] - Content-Type header created with collection containing "null" value
-    * [CXF-8834] - "Operation [{.../wsdl}Issue] already exists" when calling JaxWsServerFactoryBean.create() for SecurityTokenService
-    * [CXF-8932] - [WSDL2JAVA] Not working on JDK11
-    * [CXF-8936] - Fix h2 protocol negotiation in Jetty Transport
-    * [CXF-8939] - java.lang.NullPointerException: Cannot invoke "java.util.List.size()" because the return value of "java.util.Map$Entry.getValue()" is null
-    * [CXF-8940] - ws-security.must-understand works only if security.enable.streaming is true
-    * [CXF-8944] - wsdl2java frontend jaxws21 doesn't work
-    * [CXF-8945] - [JAX-WS] The client out interceptor chain is not called in case of oneway operation
-    * [CXF-8946] - HttpClient in CXF causing memory leak
-    * [CXF-8952] - HttpClientHTTPConduit in CXF doesn't support TLSv1.3 along with other protocols
-    * [CXF-8955] - Custom timeout with Message.RECEIVE_TIMEOUT not working with hc5 / hc
-    * [CXF-8957] - The org.apache.cxf.systest.jaxrs.JAXRSMultipartTest randomly hangs under JDK-21
-    * [CXF-8959] - Detect order dependent flakiness in AttachmentUtilTest.java in core module
-    * [CXF-8962] - HttpClientHTTPConduit sets Content-Type Header for DELETE requests with empty body
-    * [CXF-8963] - URI is always unknown in server request metrics 
-    * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
-    * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
-    * [CXF-8978] - Codegen plugin fails with IBM JDK
-    * [CXF-8983] - cxf-services-sts-core should depend on cxf-rt-rs-security-jose instead of cxf-rt-rs-security-jose-jaxrs
-    * [CXF-8984] - HttpClientHTTPConduit.HttpClientWrappedOutputStream throws NPE in closeInputStream()
+    * [CXF-8951] - Concurrent WebClient usage causes massive thread overhead
+    * [CXF-8980] - JaxRS client - receive timeout not working since CXF 4.0.1
+    * [CXF-8987] - Java 21 - HttpClientHTTPConduit thread locked during shutdown 
+    * [CXF-9007] - NullPointerException in XMLStreamDataWriter.writeNode
+    * [CXF-9009] - Async operations fail in concurrent calls
+    * [CXF-9011] - WSDLTo JAXWS Frontend service.vm Velocity template uses deprecated URL constructor
+    * [CXF-9015] - Typo in JsonMapObjectReaderWriter treats \h as a special character instead of \n
+    * [CXF-9030] - "-suppress-generated-date" does not omit timestamps from @Generated
 
 
-** New Feature
-    * [CXF-8911] - Allow creating a custom CXFHttpAsyncResponseConsumer
-    * [CXF-8970] - ensure we can build and run without bouncycastle dependencies
 
 
 ** Improvement
-    * [CXF-8894] - ContextHandler - Unimplemented getRequestCharacterEncoding() - use org.eclipse.jetty.servlet.ServletContextHandler
-    * [CXF-8928] - Reduce code quality warnings in generated code
-    * [CXF-8933] - Add doPrivileged block to ProxyFactoryProxySelector.select() in  HttpClientHTTPConduit
-    * [CXF-8937] - Add `cxf-integration-tracing-micrometer` to bom
-    * [CXF-8948] - wsdlto tool should throw exception when bindingFiles is invalid
-    * [CXF-8953] - Better support of the HTTPS protocol versions used by client/server conduits
-    * [CXF-8954] - Always create MBeanServer instance per Jetty Server instance and destroy server properly at shutdown
-    * [CXF-8968] - OpenTelemetryClientFeature cannot be used as a CDI bean unless it has a no-args constructor
-
+    * [CXF-8971] - Introduce a customerizedAlgorithmSuite and make all parameters of it configurable
+    * [CXF-8982] - LoggingFeature does not hide sensitive xml elements with namespace prefix
+    * [CXF-8988] - Update to Spring Security 6.1.x release line
+    * [CXF-8996] - JAXRS Bean introspection utility Beanspector relies on Class.getMethods natural order
+    * [CXF-9016] - Upgrade Spring-Framework to 5.3.34 in Apache-cxf
 
 ** Test
-    * [CXF-8981] - WSS4J  Encyption using the Key Agreement Method with the apache-CXF
+    * [CXF-8994] - CorbaConduitTest no longer requires IBM JDK destination activation routine.
+    * [CXF-8997] - AbstractSTSTokenTest and TransportBindingTests no longer need to set https protocol to TLSv1 on IBM Java
+    * [CXF-8999] - KerberosTokenTest testKerberosViaCustomTokenAction should not run on IBM Java
+    * [CXF-9006] - TrustedAuthorityValidatorCRLTest#testIsCertChainValid fails when using Red Hat OpenJDK on PPC64LE
+    * [CXF-9019] - Increase unit test coverage on cxf-rt-frontend-jaxws jaxws spi package.
 
 
 ** Task
-    * [CXF-8935] - Add doPrivileged block to httpclient.sendAsync() in HttpClientHTTPConduit
+    * [CXF-9001] - CDI extension not comptible with IBM Semeru
 
