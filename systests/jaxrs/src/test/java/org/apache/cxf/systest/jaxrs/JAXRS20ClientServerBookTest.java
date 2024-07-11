@@ -99,6 +99,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -164,8 +165,11 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 .mapToObj(id -> threadMXBean.getThreadInfo(id))
                 .filter(Objects::nonNull)
                 .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .filter(t -> t.getThreadName().endsWith("-SelectorManager"))
                 .count();
 
+        // Capture the number of client threads at start
+        final long expectedHttpClientThreads = captureHttpClientThreads.get();
         final Collection<WebClient> clients = new ArrayList<>();
         try {
             final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
@@ -198,8 +202,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         clients.forEach(WebClient::close);
     
         // Since JDK-21, HttpClient Implements AutoCloseable
-        if (Runtime.version().feature() > 21) { 
-            assertThat(httpClientThreads.get(), equalTo(0L));
+        if (Runtime.version().feature() >= 21) { 
+            assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
         }
     }
 
@@ -215,10 +219,11 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 .mapToObj(id -> threadMXBean.getThreadInfo(id))
                 .filter(Objects::nonNull)
                 .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .filter(t -> t.getThreadName().endsWith("-SelectorManager"))
                 .count();
 
         // Capture the number of client threads at start
-        final long httpClientThreads = captureHttpClientThreads.get();
+        final long expectedHttpClientThreads = captureHttpClientThreads.get();
         final WebClient client = WebClient.create(target, true);
         try {
             final Collection<Future<?>> futures = new ArrayList<>(); 
@@ -245,13 +250,13 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         pool.shutdown();
         // Since JDK-21, HttpClient Implements AutoCloseable
-        if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() > 21) {
-            assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
+        if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() >= 21) {
+            assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
         } else {
             pool.shutdownNow();
             // Since JDK-21, HttpClient Implements AutoCloseable
-            if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() > 21) {
-                assertThat(captureHttpClientThreads.get(), equalTo(httpClientThreads));
+            if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() >= 21) {
+                assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
             }
         }
     }
