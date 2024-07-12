@@ -1,4 +1,4 @@
-Apache CXF 3.5.8 Release Notes
+Apache CXF 3.5.9 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.8 fixes over 13 JIRA issues reported by users and the community.
+3.5.9 fixes over 11 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -74,25 +74,25 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8812] - Content-Type header created with collection containing "null" value
-    * [CXF-8834] - "Operation [{.../wsdl}Issue] already exists" when calling JaxWsServerFactoryBean.create() for SecurityTokenService
-    * [CXF-8939] - java.lang.NullPointerException: Cannot invoke "java.util.List.size()" because the return value of "java.util.Map$Entry.getValue()" is null
-    * [CXF-8940] - ws-security.must-understand works only if security.enable.streaming is true
-    * [CXF-8945] - [JAX-WS] The client out interceptor chain is not called in case of oneway operation
-    * [CXF-8955] - Custom timeout with Message.RECEIVE_TIMEOUT not working with hc5 / hc
-    * [CXF-8959] - Detect order dependent flakiness in AttachmentUtilTest.java in core module
-    * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
-    * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
+    * [CXF-8980] - JaxRS client - receive timeout not working since CXF 4.0.1
+    * [CXF-9009] - Async operations fail in concurrent calls
+    * [CXF-9015] - Typo in JsonMapObjectReaderWriter treats \h as a special character instead of \n
+    * [CXF-9030] - "-suppress-generated-date" does not omit timestamps from @Generated
 
 
-** New Feature
-    * [CXF-8911] - Allow creating a custom CXFHttpAsyncResponseConsumer
 
 
 ** Improvement
-    * [CXF-8928] - Reduce code quality warnings in generated code
-    * [CXF-8953] - Better support of the HTTPS protocol versions used by client/server conduits
-    * [CXF-8968] - OpenTelemetryClientFeature cannot be used as a CDI bean unless it has a no-args constructor
+    * [CXF-8982] - LoggingFeature does not hide sensitive xml elements with namespace prefix
+    * [CXF-8989] - Update to Spring Security 5.7.x release line
+    * [CXF-8996] - JAXRS Bean introspection utility Beanspector relies on Class.getMethods natural order
+    * [CXF-9016] - Upgrade Spring-Framework to 5.3.34 in Apache-cxf
+
+** Test
+    * [CXF-8994] - CorbaConduitTest no longer requires IBM JDK destination activation routine.
+    * [CXF-8997] - AbstractSTSTokenTest and TransportBindingTests no longer need to set https protocol to TLSv1 on IBM Java
+    * [CXF-8999] - KerberosTokenTest testKerberosViaCustomTokenAction should not run on IBM Java
+
 
 
 
