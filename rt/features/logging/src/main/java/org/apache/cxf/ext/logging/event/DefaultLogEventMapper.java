@@ -141,9 +141,16 @@ public class DefaultLogEventMapper {
     }
 
     private Iterator<? extends Object> getJAASPrincipals() {
-        Subject subject = Subject.getSubject(AccessController.getContext());
-        return subject != null && subject.getPrincipals() != null
-            ? subject.getPrincipals().iterator() : Collections.emptyIterator();
+        try {
+            Subject subject = Subject.getSubject(AccessController.getContext());
+            return subject != null && subject.getPrincipals() != null
+                    ? subject.getPrincipals().iterator() : Collections.emptyIterator();
+        } catch (UnsupportedOperationException e) {
+            // JDK 23: The terminally deprecated method Subject.getSubject(AccessControlContext) has been re-specified
+            // to throw UnsupportedOperationException if invoked when a Security Manager is not allowed.
+            // see https://jdk.java.net/23/release-notes#JDK-8296244
+            return Collections.emptyIterator();
+        }
     }
 
     private Map<String, String> getHeaders(Message message) {
