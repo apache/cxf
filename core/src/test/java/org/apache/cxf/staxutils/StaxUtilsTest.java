@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,11 +48,14 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import com.ctc.wstx.stax.WstxInputFactory;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -240,6 +244,39 @@ public class StaxUtilsTest {
             + "abc</s1><s2 xmlns=\"\">def</s2></ns1:a>";
 
         cycleString(testString);
+    }
+
+    
+    @Test
+    public void testNullForDefaultNamespace() throws Exception {
+        final String bodyXml = "<?xml version=\"1.0\"?>\n"
+            + "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+            + "  <soap:Body>\n"
+            + "    <testReq xmlns=\"http://test.com/test\">\n"
+            + "        <reqBody>&lt;&lt;&lt;&lt;&lt;</reqBody>\n"
+            + "    </testReq>\n"
+            + "  </soap:Body>\n"
+            + "</soap:Envelope>\n";
+
+        try (ByteArrayInputStream in = new ByteArrayInputStream(bodyXml.getBytes(StandardCharsets.UTF_8))) {
+            final WstxInputFactory factory = new WstxInputFactory();
+            factory.setProperty("com.ctc.wstx.returnNullForDefaultNamespace", "true");
+
+            final Source beforeSource = new StaxSource(factory.createXMLStreamReader(in));
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+    
+            TransformerFactory tf = TransformerFactory.newInstance();
+    
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+            transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, "Q{http://test.com/test}reqBody");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+    
+            transformer.transform(beforeSource, result);
+            assertThat(writer.toString(), startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"));
+        }
     }
 
     private void cycleString(String s) throws Exception {
