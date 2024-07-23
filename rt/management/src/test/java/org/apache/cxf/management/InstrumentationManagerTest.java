@@ -105,6 +105,11 @@ public class InstrumentationManagerTest {
             }
         }
 
+        // Unregister MBeans at the end of the test
+        Iterator<ObjectName> it2 = s.iterator();
+        while (it2.hasNext()) {
+            mbs.unregisterMBean(it2.next());
+        }
         bus.shutdown(true);
     }
 
