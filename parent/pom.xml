@@ -195,7 +195,7 @@
         <cxf.opentelemetry.semconv.version>1.26.0-alpha</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>2.0.27</cxf.openwebbeans.version>
-        <cxf.parsson.version>1.1.6</cxf.parsson.version>
+        <cxf.parsson.version>1.1.7</cxf.parsson.version>
         <cxf.persistence-api.version>3.1.0</cxf.persistence-api.version>
         <cxf.plexus-archiver.version>4.10.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.5.1</cxf.plexus-utils.version>
