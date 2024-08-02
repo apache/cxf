@@ -119,7 +119,7 @@
         <cxf.glassfish.el.version>4.0.2</cxf.glassfish.el.version>
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.guava.version>32.1.3-jre</cxf.guava.version>
-        <cxf.hamcrest.version>2.2</cxf.hamcrest.version>
+        <cxf.hamcrest.version>3.0</cxf.hamcrest.version>
         <cxf.hazelcast.version>5.5.0</cxf.hazelcast.version>
         <cxf.hibernate.em.version>6.5.2.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>8.0.1.Final</cxf.hibernate.validator.version>
