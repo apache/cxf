@@ -659,6 +659,11 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJAXBObjectPAYLOADWithFeature() throws Exception {
+        // Save initial counts
+        int initialCount = TestDispatchFeature.getCount();
+        int initialInInterceptorCount = TestDispatchFeature.getInInterceptorCount();
+        int initialOutInterceptorCount = TestDispatchFeature.getOutInterceptorCount();
+
         createBus("org/apache/cxf/systest/dispatch/client-config.xml");
         BusFactory.setThreadDefaultBus(bus);
 
@@ -688,15 +693,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String responseValue = ((GreetMeResponse)response).getResponseType();
         assertEquals("Expected string, " + expected, expected, responseValue);
 
-        assertEquals("Feature should be applied", 1, TestDispatchFeature.getCount());
+        assertEquals("Feature should be applied", initialCount + 1, TestDispatchFeature.getCount());
         assertEquals("Feature based interceptors should be added",
-                     1, TestDispatchFeature.getCount());
-
+                    initialCount + 1, TestDispatchFeature.getCount());
         assertEquals("Feature based In interceptors has be added to in chain.",
-                     1, TestDispatchFeature.getInInterceptorCount());
-
+                    initialInInterceptorCount + 1, TestDispatchFeature.getInInterceptorCount());
         assertEquals("Feature based interceptors has to be added to out chain.",
-                     1, TestDispatchFeature.getOutInterceptorCount());
+                    initialOutInterceptorCount + 1, TestDispatchFeature.getOutInterceptorCount());
         bus.shutdown(true);
     }
 
