@@ -206,9 +206,7 @@ public class ValidateJWTTransformationTest {
         TokenProviderResponse providerResponse = createJWT();
         Element wrapper = createTokenWrapper((String)providerResponse.getToken());
         Document doc = wrapper.getOwnerDocument();
-        if (doc.getDocumentElement() == null) {
-            wrapper = (Element)doc.appendChild(wrapper);
-        }
+        wrapper = (Element)doc.appendChild(wrapper);
 
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(wrapper);
@@ -340,7 +338,7 @@ public class ValidateJWTTransformationTest {
     }
 
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.getEmptyDocument();
+        Document doc = DOMUtils.createDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;
