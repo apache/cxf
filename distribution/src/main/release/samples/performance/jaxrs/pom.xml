@@ -35,6 +35,10 @@
     <profiles>
         <profile>
             <id>server</id>
+            <properties>
+                <host>localhost</host>
+                <protocol>https</protocol>
+            </properties>
             <build>
                 <defaultGoal>test</defaultGoal>
                 <plugins>
@@ -49,6 +53,12 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>org.apache.cxf.performance.https.server.Server</mainClass>
+                                    <arguments>
+                                        <argument>-host</argument>
+                                        <argument>${host}</argument>
+                                        <argument>-protocol</argument>
+                                        <argument>${protocol}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -59,6 +69,8 @@
         <profile>
             <id>client</id>
             <properties>
+                <host>localhost</host>
+                <protocol>https</protocol>
                 <operation>get</operation>
                 <threads>4</threads>
                 <time>30</time>
@@ -78,6 +90,10 @@
                                 <configuration>
                                     <mainClass>org.apache.cxf.performance.https.client.Client</mainClass>
                                     <arguments>
+                                        <argument>-host</argument>
+                                        <argument>${host}</argument>
+                                        <argument>-protocol</argument>
+                                        <argument>${protocol}</argument>
                                         <argument>-Operation</argument>
                                         <argument>${operation}</argument>
                                         <argument>-Threads</argument>
