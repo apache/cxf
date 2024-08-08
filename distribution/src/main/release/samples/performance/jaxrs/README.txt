@@ -55,7 +55,13 @@ Alternatively, client and server may be executed from one window.
 
 To remove the target dir, run "mvn clean".
 
+The JAX-RS Server takes the following arguments:
+     -protocol  Connection protocol (http, https)
+     -host      Allow server to bind to address (localhost, 0.0.0.0, etc)
+
 The JAX-RS Client takes the following arguments:
+     -protocol  Connection protocol (http, https)
+     -host      Host address client will connect to (localhost, 0.0.0.0, etc)
      -Operation The rest verb to execute (get, post, put, delete)
      -Time      define the amount of time to spend making invocations in seconds
      -Threads   define the number of threads to run the performance client
