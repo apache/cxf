@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -69,6 +70,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContextFactory;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -119,6 +121,7 @@ public final class JAXBUtils {
     };
 
     private static final String XML_NAME_PUNCTUATION_STRING = new String(XML_NAME_PUNCTUATION_CHARS);
+    private static final String DEFAULT_FACTORY_CLASS = "org.glassfish.jaxb.runtime.v2.ContextFactory";
 
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
@@ -1176,18 +1179,48 @@ public final class JAXBUtils {
         }
         return null;
     }
+    
+    @SuppressWarnings({ "deprecation", "removal" })
     public static JAXBContext createContext(final Set<Class<?>> classes,
                                             final Map<String, Object> map) throws JAXBException {
         JAXBContext ctx = null;
         try {
             ctx = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                 public JAXBContext run() throws Exception {
-                    //This is a workaround for CXF-8675
-                    Class<?> factoryClass = ClassLoaderUtils.loadClass("org.glassfish.jaxb.runtime.v2.ContextFactory",
-                            JAXBContextCache.class);
-                    Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
-                    Object context = m.invoke(null, classes.toArray(new Class<?>[0]), map);
-                    return (JAXBContext) context;
+                    final String factoryClassName = System.getProperty(JAXBContext.JAXB_CONTEXT_FACTORY);
+                    if (factoryClassName != null) {
+                        final Class<?> factoryClass = ClassLoaderUtils.loadClass(factoryClassName,
+                                JAXBContextCache.class);
+
+                        JAXBContextFactory factory = null;
+                        if (JAXBContextFactory.class.isAssignableFrom(factoryClass)) {
+                            try {
+                                factory = (JAXBContextFactory) factoryClass.getConstructor().newInstance();
+                            } catch (final ReflectiveOperationException ex) {
+                                throw new JAXBException("Unable to instantiate factory class " + factoryClassName 
+                                    + " using no-arg constructor.");
+                            }
+                        } 
+
+                        final Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                        final Object context = m.invoke(factory, classes.toArray(new Class<?>[0]), map);
+                        return (JAXBContext) context;
+                    }
+
+                    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                    final JAXBContextFactory factory = ServiceLoader.load(JAXBContextFactory.class, classLoader)
+                        .findFirst()
+                        .orElse(null);
+
+                    if (factory != null) {
+                        return (JAXBContext) factory.createContext(classes.toArray(new Class<?>[0]), map);
+                    } else { /* fallback to default */
+                        final Class<?> factoryClass = ClassLoaderUtils.loadClass(DEFAULT_FACTORY_CLASS,
+                                JAXBContextCache.class);
+                        final Method m = factoryClass.getMethod("createContext", Class[].class, Map.class);
+                        final Object context = m.invoke(null, classes.toArray(new Class<?>[0]), map);
+                        return (JAXBContext) context;
+                    }
                 }
             });
         } catch (PrivilegedActionException e2) {
