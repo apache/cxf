@@ -83,9 +83,9 @@ public final class Client extends TestCaseBase<WebClient> {
             switch (opid) {
                 case 0:
                     //GET
-                    Response respGet = webClient.get();
-                    Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
-                    respGet.close();
+                    try (Response respGet = webClient.get()) {
+                        Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
+                    }
                     break;
                 case 1:
                     //POST
@@ -104,7 +104,6 @@ public final class Client extends TestCaseBase<WebClient> {
                     customerPut.setName("Mary");
                     try (Response respPut = webClient.put(customerPut)) {
                         Asserts.check(respPut.getStatus() == 200, "Put should have been OK");
-                        respPut.close();
                     } catch (Exception ex) {
                         System.out.println(ex);
                     }
@@ -113,7 +112,6 @@ public final class Client extends TestCaseBase<WebClient> {
                     //DELETE
                     try (Response respDel = webClient.delete()) {
                         Asserts.check(respDel.getStatus() == 200 || respDel.getStatus() == 304, "Delete should have been OK");
-                        respDel.close();
                     } catch (Exception ex) {
                         System.out.println(ex);
                     }
