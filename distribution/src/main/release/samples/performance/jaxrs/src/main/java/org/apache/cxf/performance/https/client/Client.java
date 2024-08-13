@@ -83,8 +83,9 @@ public final class Client extends TestCaseBase<WebClient> {
             switch (opid) {
                 case 0:
                     //GET
-                    Response respGet = webClient.get();
-                    Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
+                    try (Response respGet = webClient.get()) {
+                        Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
+                    }
                     break;
                 case 1:
                     //POST
