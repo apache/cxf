@@ -93,7 +93,6 @@ public final class Client extends TestCaseBase<WebClient> {
                     customerPost.setName("Jack");
                     try (Response respPost = webClient.post(customerPost)) {
                         Asserts.check(respPost.getStatus() == 200, "Post should have been OK");
-                        respPost.close();
                     } catch (Exception ex) {
                         System.out.println(ex);
                     }
