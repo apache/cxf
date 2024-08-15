@@ -40,6 +40,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
@@ -129,6 +130,8 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     private org.apache.cxf.transport.http_undertow.ThreadingParameters threadingParameters;
 
     private List<CXFUndertowHttpHandler> handlers;
+    
+    private String[] includedCipherSuites;
 
     public UndertowHTTPServerEngine(String host, int port) {
         this.host = host;
@@ -177,7 +180,12 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
             if (handler.isContextMatchExact()) {
                 path.addExactPath(url.getPath(), handler);
             } else {
-                path.addPrefixPath(url.getPath(), handler);
+                String urlPath = url.getPath();
+                if (urlPath.isEmpty()) {
+                    urlPath = "/";
+                }
+                
+                path.addPrefixPath(urlPath, handler);
             }
 
         }
@@ -312,9 +320,14 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
             builder = builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, SslClientAuthMode.REQUIRED);
         }
         if (this.tlsServerParameters != null && this.tlsServerParameters.getClientAuthentication() != null
+            && this.tlsServerParameters.getClientAuthentication().isSetWant()
             && this.tlsServerParameters.getClientAuthentication().isWant()
             && !this.tlsServerParameters.getClientAuthentication().isRequired()) {
             builder = builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, SslClientAuthMode.REQUESTED);
+        }
+        if (includedCipherSuites != null) {
+            builder = builder.setSocketOption(Options.SSL_ENABLED_CIPHER_SUITES, 
+                                              Sequence.of(includedCipherSuites));
         }
         return builder;
     }
@@ -513,6 +526,18 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
         context.init(keyManagers,
                      tlsServerParameters.getTrustManagers(),
                      tlsServerParameters.getSecureRandom());
+        
+        // Set the CipherSuites
+        final String[] supportedCipherSuites =
+            SSLUtils.getServerSupportedCipherSuites(context);
+
+        
+        includedCipherSuites =
+            SSLUtils.getCiphersuitesToInclude(tlsServerParameters.getCipherSuites(),
+                                              tlsServerParameters.getCipherSuitesFilter(),
+                                              context.getServerSocketFactory().getDefaultCipherSuites(),
+                                              supportedCipherSuites,
+                                              LOG);
 
         return context;
     }

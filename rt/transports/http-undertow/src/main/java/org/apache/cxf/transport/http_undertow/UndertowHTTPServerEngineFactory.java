@@ -39,6 +39,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.management.InstrumentationManager;
 
 
+
 /**
  * This Bus Extension handles the configuration of network port
  * numbers for use with "http" or "https". This factory
@@ -250,14 +251,19 @@ public class UndertowHTTPServerEngineFactory {
      *        server will listen on all local addresses.
      * @param port listen port for server
      * @param protocol "http" or "https"
+     * @param id The key to reference into the tlsParametersMap. Can be null.
      * @return
      * @throws GeneralSecurityException
      * @throws IOException
      */
     public synchronized UndertowHTTPServerEngine createUndertowHTTPServerEngine(String host, int port,
-        String protocol) throws GeneralSecurityException, IOException {
+        String protocol, String id) throws GeneralSecurityException, IOException {
         LOG.fine("Creating Undertow HTTP Server Engine for port " + port + ".");
-        UndertowHTTPServerEngine ref = getOrCreate(this, host, port, null);
+        TLSServerParameters tlsParameters = null;
+        if (id != null && tlsParametersMap != null && tlsParametersMap.containsKey(id)) {
+            tlsParameters = tlsParametersMap.get(id);
+        }
+        UndertowHTTPServerEngine ref = getOrCreate(this, host, port, tlsParameters);
         // checking the protocol
         if (!protocol.equals(ref.getProtocol())) {
             throw new IOException("Protocol mismatch for port " + port + ": "
@@ -287,6 +293,13 @@ public class UndertowHTTPServerEngineFactory {
     public synchronized UndertowHTTPServerEngine createUndertowHTTPServerEngine(int port,
         String protocol) throws GeneralSecurityException, IOException {
         return createUndertowHTTPServerEngine(null, port, protocol);
+    }
+    
+    
+    public synchronized UndertowHTTPServerEngine createUndertowHTTPServerEngine(String host, int port,
+                                                                          String protocol)
+        throws GeneralSecurityException, IOException {
+        return createUndertowHTTPServerEngine(host, port, protocol, null);
     }
 
     /**
