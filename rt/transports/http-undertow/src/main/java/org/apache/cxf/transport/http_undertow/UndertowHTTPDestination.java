@@ -34,9 +34,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 
@@ -103,7 +106,15 @@ public class UndertowHTTPDestination extends ServletDestination {
             engine = serverEngineFactory.
                 createUndertowHTTPServerEngine(nurl.getHost(), nurl.getPort(), nurl.getProtocol());
         }
-
+        assert engine != null;
+        TLSServerParameters serverParameters = engine.getTlsServerParameters();
+        if (serverParameters != null && serverParameters.getCertConstraints() != null) {
+            CertificateConstraintsType constraints = serverParameters.getCertConstraints();
+            if (constraints != null) {
+                certConstraints = CertConstraintsJaxBUtils.createCertConstraints(constraints);
+            }
+        }
+        
         // When configuring for "http", however, it is still possible that
         // Spring configuration has configured the port for https.
         if (!nurl.getProtocol().equals(engine.getProtocol())) {
