@@ -215,7 +215,7 @@
         <cxf.spring.boot.version>3.3.2</cxf.spring.boot.version>
         <cxf.spring.ldap.version>3.2.6</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>6.3.1</cxf.spring.security.version>
+        <cxf.spring.security.version>6.3.2</cxf.spring.security.version>
         <cxf.spring.version>6.1.12</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.17.14</cxf.swagger.ui.version>
