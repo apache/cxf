@@ -103,8 +103,8 @@ public final class WSDiscoveryClientTest {
         int count = 0;
         if (interfaces != null) {
             while (interfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = interfaces.nextElement();
-                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                NetworkInterface ni = interfaces.nextElement();
+                if (!ni.isUp() || ni.isLoopback() || !ni.supportsMulticast()) {
                     continue;
                 }
                 count++;
