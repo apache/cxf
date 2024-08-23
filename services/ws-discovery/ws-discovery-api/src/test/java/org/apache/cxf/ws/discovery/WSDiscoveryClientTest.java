@@ -73,6 +73,7 @@ public final class WSDiscoveryClientTest {
                         if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
                                 && !ni.getDisplayName().startsWith("vnic")) {
                             possibles.add(ni);
+                            System.out.println("Found possible network interface:" + ni.getDisplayName());
                         }
                     }
                 }
@@ -80,10 +81,17 @@ public final class WSDiscoveryClientTest {
         }
         for (NetworkInterface p : possibles) {
             if (p.isPointToPoint()) {
+                System.out.println("Using p2p network interface:" + p.getDisplayName());
                 return p;
             }
         }
-        return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
+        if (possibles.isEmpty())  {
+            return null;
+        } else {
+            final NetworkInterface ni = possibles.get(possibles.size() - 1);
+            System.out.println("Using network interface:" + ni.getDisplayName());
+            return ni;
+        }
     }
 
     @Test
