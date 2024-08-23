@@ -80,8 +80,8 @@ public final class WSDiscoveryClientTest {
             }
         }
         for (NetworkInterface p : possibles) {
-            if (p.isPointToPoint()) {
-                System.out.println("Using p2p network interface:" + p.getDisplayName());
+            if (!p.isPointToPoint()) {
+                System.out.println("Using non-p2p network interface:" + p.getDisplayName());
                 return p;
             }
         }
