@@ -67,14 +67,28 @@ public final class WSDiscoveryClientTest {
                 if (ni.supportsMulticast() && ni.isUp()) {
                     for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
                         if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
-                                && !ni.getDisplayName().startsWith("vnic")) {
+                                && !ni.getDisplayName().startsWith("vnic") 
+                                && !ni.getDisplayName().startsWith("tailscale")) {
                             possibles.add(ni);
                         }
                     }
                 }
             }
         }
-        return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
+
+        for (NetworkInterface p : possibles) {
+            if (p.isPointToPoint()) {
+                System.out.println("Using p2p network interface:" + p.getDisplayName());
+                return p;
+            }
+        }
+        if (possibles.isEmpty())  {
+            return null;
+        } else {
+            final NetworkInterface ni = possibles.get(possibles.size() - 1);
+            System.out.println("Using network interface:" + ni.getDisplayName());
+            return ni;
+        }
     }
 
     @Test
