@@ -71,7 +71,8 @@ public final class WSDiscoveryClientTest {
                 if (ni.supportsMulticast() && ni.isUp()) {
                     for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
                         if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
-                                && !ni.getDisplayName().startsWith("vnic")) {
+                                && !ni.getDisplayName().startsWith("vnic") 
+                                && !ni.getDisplayName().startsWith("tailscale")) {
                             possibles.add(ni);
                             System.out.println("Found possible network interface:" + ni.getDisplayName());
                         }
@@ -80,8 +81,8 @@ public final class WSDiscoveryClientTest {
             }
         }
         for (NetworkInterface p : possibles) {
-            if (!p.isPointToPoint()) {
-                System.out.println("Using non-p2p network interface:" + p.getDisplayName());
+            if (p.isPointToPoint()) {
+                System.out.println("Using p2p network interface:" + p.getDisplayName());
                 return p;
             }
         }
