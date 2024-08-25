@@ -401,5 +401,15 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>jdk22</id>
+            <activation>
+                <jdk>[22,)</jdk>
+            </activation>
+            <properties>
+                <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
+                <cxf.surefire.fork.vmargs>--add-opens java.xml/javax.xml.namespace=ALL-UNNAMED</cxf.surefire.fork.vmargs>
+            </properties>
+        </profile>
     </profiles>
 </project>
