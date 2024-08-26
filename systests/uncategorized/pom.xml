@@ -402,9 +402,9 @@
             </dependencies>
         </profile>
         <profile>
-            <id>jdk22</id>
+            <id>jdk17</id>
             <activation>
-                <jdk>[22,)</jdk>
+                <jdk>[17,)</jdk>
             </activation>
             <properties>
                 <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
