@@ -151,7 +151,7 @@
         <cxf.javassist.version>3.29.2-GA</cxf.javassist.version>
         <cxf.jakarta.annotation-api.version>2.1.1</cxf.jakarta.annotation-api.version>
         <cxf.jakarta.ws.rs.version>3.1.0</cxf.jakarta.ws.rs.version>
-        <cxf.jaxb.runtime.version>4.0.4</cxf.jaxb.runtime.version>
+        <cxf.jaxb.runtime.version>4.0.5</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>4.0.1</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
         <cxf.jaxen.version>2.0.0</cxf.jaxen.version>
