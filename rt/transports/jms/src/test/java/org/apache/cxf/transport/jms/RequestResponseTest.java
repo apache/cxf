@@ -63,15 +63,8 @@ public class RequestResponseTest extends AbstractJMSTester {
     public void testRequestTopicResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequestQueueResponse");
-        System.out.println("Starting test with topic request and static queue response");
-    
         sendAndReceiveMessages(ei, true);
-        
-        System.out.println("First send and receive completed. Starting second test with queue request and response");
-        
         sendAndReceiveMessages(ei, false);
-        
-        System.out.println("Test completed successfully");
     }
 
     private void sendAndReceiveMessages(EndpointInfo ei, boolean synchronous)
