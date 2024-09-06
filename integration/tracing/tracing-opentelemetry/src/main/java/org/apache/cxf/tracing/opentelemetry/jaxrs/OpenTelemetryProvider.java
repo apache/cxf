@@ -64,8 +64,7 @@ public class OpenTelemetryProvider extends AbstractOpenTelemetryProvider
     @SuppressWarnings("unchecked")
     @Override
     public void filter(final ContainerRequestContext requestContext,
-                       final ContainerResponseContext responseContext)
-        throws IOException {
+                       final ContainerResponseContext responseContext) {
         super.stopTraceSpan(requestContext.getHeaders(), responseContext.getHeaders(),
                             responseContext.getStatus(),
                             (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));

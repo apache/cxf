@@ -28,7 +28,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.semconv.NetworkAttributes;
+import jakarta.servlet.http.HttpServletRequest;
 
 @NoJSR250Annotations
 public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryInterceptor {
@@ -50,6 +53,13 @@ public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryIntercep
 
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
+        }
+
+        HttpServletRequest request = (HttpServletRequest)message.getContextualProperty("HTTP.REQUEST");
+        String protocol = request.getProtocol();
+        if (protocol != null && protocol.contains("/")) {
+            String protocolVersion = protocol.split("/")[1];
+            Span.current().setAttribute(NetworkAttributes.NETWORK_PROTOCOL_VERSION, protocolVersion);
         }
     }
 }

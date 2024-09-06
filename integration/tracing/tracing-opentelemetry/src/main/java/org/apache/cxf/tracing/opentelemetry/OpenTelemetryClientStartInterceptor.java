@@ -27,7 +27,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.semconv.NetworkAttributes;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class OpenTelemetryClientStartInterceptor extends AbstractOpenTelemetryClientInterceptor {
     public OpenTelemetryClientStartInterceptor(final OpenTelemetry openTelemetry, final String instrumentationName) {
@@ -50,14 +53,22 @@ public class OpenTelemetryClientStartInterceptor extends AbstractOpenTelemetryCl
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        final Map<String, List<String>> headers = CastUtils
-            .cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        final Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(headers, getUri(message),
                                                                          (String)message
                                                                              .get(Message.HTTP_REQUEST_METHOD));
 
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
+        }
+
+        HttpServletRequest request = (HttpServletRequest)message.getContextualProperty("HTTP.REQUEST");
+        if (request != null) {
+            String protocol = request.getProtocol();
+            if (protocol != null && protocol.contains("/")) {
+                String protocolVersion = protocol.split("/")[1];
+                Span.current().setAttribute(NetworkAttributes.NETWORK_PROTOCOL_VERSION, protocolVersion);
+            }
         }
     }
 

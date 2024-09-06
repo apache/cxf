@@ -31,6 +31,12 @@ import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.sdk.trace.data.SpanData;
+import io.opentelemetry.semconv.ErrorAttributes;
+import io.opentelemetry.semconv.NetworkAttributes;
+import io.opentelemetry.semconv.ServerAttributes;
+import io.opentelemetry.semconv.UrlAttributes;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -92,7 +98,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
     public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
-    public static void startServers() throws Exception {
+    public static void startServers() {
         AbstractResourceInfo.clearAllMaps();
         // keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(OpenTelemetryServer.class, true));
@@ -124,10 +130,14 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().size(), equalTo(2));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("Get Books"));
         assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books"));
-        assertThat(otelRule.getSpans().get(1).getAttributes(),
-                   hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L));
-        assertThat(otelRule.getSpans().get(1).getInstrumentationScopeInfo().getName(),
-            equalTo("jaxrs-server-test"));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 200L));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET"));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(UrlAttributes.URL_PATH, "/bookstore/books"));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(ServerAttributes.SERVER_ADDRESS, "localhost"));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(PORT)));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, "localhost"));
+        assertThat(otelRule.getSpans().get(1).getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_PORT,  Long.valueOf(PORT)));
+        assertThat(otelRule.getSpans().get(1).getInstrumentationScopeInfo().getName(), equalTo("jaxrs-server-test"));
     }
 
     @Test
@@ -188,6 +198,34 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
     }
 
     @Test
+    public void spanShouldHasRequiredAttributes() {
+        final Response r = createWebClient("/bookstore/books",
+                new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"))
+                .get();
+        assertEquals(Status.OK.getStatusCode(), r.getStatus());
+
+        assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(3));
+
+        SpanData clientSpan = otelRule.getSpans().get(2);
+        assertThat(clientSpan.getName(), equalTo("GET /bookstore/books"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(UrlAttributes.URL_FULL, "http://localhost:" + PORT + "/bookstore/books"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_ADDRESS, "localhost"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(PORT)));
+        assertThat(clientSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, "localhost"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_PORT, Long.valueOf(PORT)));
+
+        SpanData serverSpan = otelRule.getSpans().get(1);
+        assertThat(serverSpan.getName(), equalTo("GET /bookstore/books"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(UrlAttributes.URL_PATH, "/bookstore/books"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_ADDRESS, "localhost"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(PORT)));
+        assertThat(serverSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, "localhost"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_PORT, Long.valueOf(PORT)));
+}
+
+    @Test
     public void testThatNewInnerSpanIsCreatedUsingAsyncInvocation() throws InterruptedException {
         final Context parentContext = fromRandom();
 
@@ -245,7 +283,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("Get Books"));
         assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books"));
         assertThat(otelRule.getSpans().get(1).getKind(), equalTo(SpanKind.SERVER));
-        assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET " + client.getCurrentURI()));
+        assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET /bookstore/books"));
         assertThat(otelRule.getSpans().get(2).getKind(), equalTo(SpanKind.CLIENT));
     }
 
@@ -254,7 +292,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         final WebClient client = createWebClient("/bookstore/books",
             new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"));
 
-        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // The intention is to make multiple calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         IntStream.range(0, 4).mapToObj(index -> client.async().get()).map(this::get)
             .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
@@ -264,8 +302,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         IntStream.range(0, 4).map(index -> index * 3).forEach(index -> {
             assertThat(otelRule.getSpans().get(index).getName(), equalTo("Get Books"));
             assertThat(otelRule.getSpans().get(index + 1).getName(), equalTo("GET /bookstore/books"));
-            assertThat(otelRule.getSpans().get(index + 2).getName(),
-                       equalTo("GET " + client.getCurrentURI()));
+            assertThat(otelRule.getSpans().get(index + 2).getName(), equalTo("GET /bookstore/books"));
         });
     }
 
@@ -274,7 +311,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         final WebClient client = createWebClient("/bookstore/books",
             new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"));
 
-        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // The intention is to make multiple calls one after another, not in parallel, to ensure the
         // thread have trace contexts cleared out.
         IntStream.range(0, 4).mapToObj(index -> client.get())
             .forEach(r -> assertEquals(Status.OK.getStatusCode(), r.getStatus()));
@@ -284,8 +321,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         IntStream.range(0, 4).map(index -> index * 3).forEach(index -> {
             assertThat(otelRule.getSpans().get(index).getName(), equalTo("Get Books"));
             assertThat(otelRule.getSpans().get(index + 1).getName(), equalTo("GET /bookstore/books"));
-            assertThat(otelRule.getSpans().get(index + 2).getName(),
-                       equalTo("GET " + client.getCurrentURI()));
+            assertThat(otelRule.getSpans().get(index + 2).getName(), equalTo("GET /bookstore/books"));
         });
     }
 
@@ -304,7 +340,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             assertThat(otelRule.getSpans().get(0).getParentSpanContext().isValid(), equalTo(true));
             assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books"));
             assertThat(otelRule.getSpans().get(1).getParentSpanContext().isValid(), equalTo(true));
-            assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET /bookstore/books"));
             assertThat(otelRule.getSpans().get(2).getParentSpanContext().isValid(), equalTo(true));
         } finally {
             span.end();
@@ -337,7 +373,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             assertThat(otelRule.getSpans().get(0).getParentSpanContext(), notNullValue());
             assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books"));
             assertThat(otelRule.getSpans().get(1).getParentSpanContext().isValid(), equalTo(true));
-            assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(otelRule.getSpans().get(2).getName(), equalTo("GET /bookstore/books"));
             assertThat(otelRule.getSpans().get(2).getParentSpanContext(), notNullValue());
         } finally {
             span.end();
@@ -383,7 +419,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         } finally {
             await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
             assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(2));
-            assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET " + client.getCurrentURI()));
+            assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET /bookstore/books/long"));
             assertThat(otelRule.getSpans().get(0).getStatus().getStatusCode(), equalTo(StatusCode.ERROR));
             assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books/long"));
         }
@@ -395,9 +431,38 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
 
         assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(1));
-        assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET /bookstore/books/exception"));
-        assertThat(otelRule.getSpans().get(0).getAttributes(),
-                   hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 500L));
+        SpanData serverSpan = otelRule.getSpans().get(0);
+
+        assertThat(serverSpan.getName(), equalTo("GET /bookstore/books/exception"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, 500L));
+        assertThat(serverSpan.getAttributes(), hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(UrlAttributes.URL_PATH, "/bookstore/books/exception"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_ADDRESS, "localhost"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(PORT)));
+        assertThat(serverSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, "localhost"));
+        assertThat(serverSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_PORT,  Long.valueOf(PORT)));
+        assertThat(serverSpan.getAttributes(), hasAttribute(ErrorAttributes.ERROR_TYPE,  String.valueOf(500)));
+    }
+
+    @Test
+    public void testClientSpanAttributesOnException() {
+        final Response r = createWebClient("/bookstore/books/exception",
+                new OpenTelemetryClientProvider(otelRule.getOpenTelemetry(), "jaxrs-client-test"))
+                .get();
+
+        assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
+
+        assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(2));
+
+        SpanData clientSpan = otelRule.getSpans().get(1);
+        assertThat(clientSpan.getName(), equalTo("GET /bookstore/books/exception"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(HttpAttributes.HTTP_REQUEST_METHOD, "GET"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(UrlAttributes.URL_FULL, "http://localhost:" + PORT + "/bookstore/books/exception"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_ADDRESS, "localhost"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(PORT)));
+        assertThat(clientSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, "localhost"));
+        assertThat(clientSpan.getAttributes(), hasAttribute(NetworkAttributes.NETWORK_PEER_PORT, Long.valueOf(PORT)));
+        assertThat(clientSpan.getAttributes(), hasAttribute(ErrorAttributes.ERROR_TYPE,  String.valueOf(500)));
     }
 
     @Test
