@@ -40,28 +40,110 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public final class DelayedCachedOutputStreamCleaner implements CachedOutputStreamCleaner, BusLifeCycleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(DelayedCachedOutputStreamCleaner.class);
+    private static final long MIN_DELAY = 2000; /* 2 seconds */
+    private static final DelayedCleaner NOOP_CLEANER = new DelayedCleaner() {
+        // NOOP
+    };
 
-    private long delay; /* default is 30 minutes, in milliseconds */
-    private final DelayQueue<DelayedCloseable> queue = new DelayQueue<>();
-    private Timer timer;
+    private DelayedCleaner cleaner = NOOP_CLEANER;
+
+    private interface DelayedCleaner extends CachedOutputStreamCleaner, Closeable {
+        @Override
+        default void register(Closeable closeable) {
+        }
+        
+        @Override
+        default void unregister(Closeable closeable) {
+        }
+        
+        @Override
+        default void close() {
+        }
+        
+        @Override
+        default void clean() {
+        }
+        
+        default void forceClean() {
+        }
+    }
+
+    private static final class DelayedCleanerImpl implements DelayedCleaner {
+        private final long delay; /* default is 30 minutes, in milliseconds */
+        private final DelayQueue<DelayedCloseable> queue = new DelayQueue<>();
+        private final Timer timer;
+        
+        DelayedCleanerImpl(final long delay) {
+            this.delay = delay;
+            this.timer = new Timer("DelayedCachedOutputStreamCleaner", true);
+            this.timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    clean();
+                }
+            }, 0, Math.max(MIN_DELAY, delay >> 1));
+        }
+
+        @Override
+        public void register(Closeable closeable) {
+            queue.put(new DelayedCloseable(closeable, delay));
+        }
+
+        @Override
+        public void unregister(Closeable closeable) {
+            queue.remove(new DelayedCloseable(closeable, delay));
+        }
+
+        @Override
+        public void clean() {
+            final Collection<DelayedCloseable> closeables = new ArrayList<>();
+            queue.drainTo(closeables);
+            clean(closeables);
+        }
+        
+        @Override
+        public void forceClean() {
+            clean(queue);
+        }
+        
+        @Override
+        public void close()  {
+            timer.cancel();
+            queue.clear();
+        }
+        
+        private void clean(Collection<DelayedCloseable> closeables) {
+            final Iterator<DelayedCloseable> iterator = closeables.iterator();
+            while (iterator.hasNext()) {
+                final DelayedCloseable next = iterator.next();
+                try {
+                    iterator.remove();
+                    LOG.warning("Unclosed (leaked?) stream detected: " + next.closeable);
+                    next.closeable.close();
+                } catch (final IOException | RuntimeException ex) {
+                    LOG.warning("Unable to close (leaked?) stream: " + ex.getMessage());
+                }
+            }
+        }
+    }
 
     private static final class DelayedCloseable implements Delayed {
         private final Closeable closeable;
-        private final long expiredAt;
+        private final long expireAt;
         
         DelayedCloseable(final Closeable closeable, final long delay) {
             this.closeable = closeable;
-            this.expiredAt = System.nanoTime() + delay;
+            this.expireAt = System.nanoTime() + delay;
         }
 
         @Override
         public int compareTo(Delayed o) {
-            return Long.compare(getDelay(TimeUnit.NANOSECONDS), o.getDelay(TimeUnit.NANOSECONDS));
+            return Long.compare(expireAt, ((DelayedCloseable) o).expireAt);
         }
 
         @Override
         public long getDelay(TimeUnit unit) {
-            return unit.convert(expiredAt - System.nanoTime(), TimeUnit.NANOSECONDS);
+            return unit.convert(expireAt - System.nanoTime(), TimeUnit.NANOSECONDS);
         }
 
         @Override
@@ -97,52 +179,45 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             delayValue = (Number) bus.getProperty(CachedConstants.CLEANER_DELAY_BUS_PROP);
             busLifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         }
-        
+
+        if (cleaner != null) {
+            cleaner.close();
+        }
+
         if (delayValue == null) {
-            delay = TimeUnit.MILLISECONDS.convert(30, TimeUnit.MINUTES);
+            // Default delay is set to 30 mins
+            cleaner = new DelayedCleanerImpl(TimeUnit.MILLISECONDS.convert(30, TimeUnit.MINUTES));
         } else {
             final long value = delayValue.longValue();
-            if (value > 0) {
-                delay = value; /* already in milliseconds */
+            if (value > 0 && value >= MIN_DELAY) {
+                cleaner = new DelayedCleanerImpl(value); /* already in milliseconds */
+            } else {
+                cleaner = NOOP_CLEANER;
+                if (value != 0) {
+                    throw new IllegalArgumentException("The value of " + CachedConstants.CLEANER_DELAY_BUS_PROP 
+                        + " property is invalid: " + value + " (should be >= " + MIN_DELAY + ", 0 to deactivate)");
+                }
             }
         }
 
         if (busLifeCycleManager != null) {
             busLifeCycleManager.registerLifeCycleListener(this);
         }
-        
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-
-        if (delay > 0) {
-            timer = new Timer("DelayedCachedOutputStreamCleaner", true);
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    clean();
-                }
-            }, 0, Math.max(1, delay >> 1));
-        }
-
     }
-    
+
     @Override
     public void register(Closeable closeable) {
-        queue.put(new DelayedCloseable(closeable, delay));
+        cleaner.register(closeable);
     }
 
     @Override
     public void unregister(Closeable closeable) {
-        queue.remove(new DelayedCloseable(closeable, delay));
+        cleaner.unregister(closeable);
     }
 
     @Override
     public void clean() {
-        final Collection<DelayedCloseable> closeables = new ArrayList<>();
-        queue.drainTo(closeables);
-        clean(closeables);
+        cleaner.clean();
     }
     
     @Override
@@ -155,26 +230,10 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     
     @Override
     public void preShutdown() {
-        if (timer != null) {
-            timer.cancel();
-        }
+        cleaner.close();
     }
 
     public void forceClean() {
-        clean(queue);
-    }
-
-    private void clean(Collection<DelayedCloseable> closeables) {
-        final Iterator<DelayedCloseable> iterator = closeables.iterator();
-        while (iterator.hasNext()) {
-            final DelayedCloseable next = iterator.next();
-            try {
-                iterator.remove();
-                LOG.warning("Unclosed (leaked?) stream detected: " + next.closeable);
-                next.closeable.close();
-            } catch (final IOException | RuntimeException ex) {
-                LOG.warning("Unable to close (leaked?) stream: " + ex.getMessage());
-            }
-        }
+        cleaner.forceClean();
     }
 }

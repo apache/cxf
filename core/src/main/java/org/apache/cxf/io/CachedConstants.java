@@ -73,8 +73,8 @@ public final class CachedConstants {
 
     /**
      * The delay (in ms) for cleaning up unclosed {@code CachedOutputStream} instances. 30 minutes
-     * is specified by default. If the value of the delay is set to 0 (or is negative), the cleaner
-     * will be disabled.
+     * is specified by default, the minimum value is 2 seconds. If the value of the delay is set to
+     * 0 (or is negative), the cleaner will be deactivated.
      */
     public static final String CLEANER_DELAY_BUS_PROP =
         "bus.io.CachedOutputStreamCleaner.Delay";

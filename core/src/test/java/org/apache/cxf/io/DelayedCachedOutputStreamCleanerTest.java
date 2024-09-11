@@ -45,8 +45,10 @@ public class DelayedCachedOutputStreamCleanerTest {
 
     @After
     public void tearDown() {
-        bus.shutdown(true);
-        bus = null;
+        if (bus != null) {
+            bus.shutdown(true);
+            bus = null;
+        }
     }
     
     @Test
@@ -56,6 +58,8 @@ public class DelayedCachedOutputStreamCleanerTest {
         
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
+        
+        assertNoopCleaner(cleaner);
     }
     
     @Test
@@ -161,4 +165,37 @@ public class DelayedCachedOutputStreamCleanerTest {
         await().during(3, TimeUnit.SECONDS).untilAtomic(latch, is(false));
     }
 
+    @Test
+    public void testNegativeDelay() throws InterruptedException {
+        final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, -1);
+        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+
+        final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+        assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
+
+        assertNoopCleaner(cleaner);
+    }
+
+    @Test
+    public void testTooSmallDelay() throws InterruptedException {
+        final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 1500);
+        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+
+        final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+        assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
+
+        assertNoopCleaner(cleaner);
+    }
+
+    private void assertNoopCleaner(final CachedOutputStreamCleaner cleaner) {
+        final AtomicBoolean latch = new AtomicBoolean(false);
+        final Closeable closeable = () -> latch.compareAndSet(false, true);
+        cleaner.register(closeable);
+        
+        final DelayedCachedOutputStreamCleaner delayedCleaner = (DelayedCachedOutputStreamCleaner) cleaner;
+        delayedCleaner.forceClean();
+
+        // Noop, Closeable::close should not be called
+        assertThat(latch.get(), is(false));
+    }
 }
