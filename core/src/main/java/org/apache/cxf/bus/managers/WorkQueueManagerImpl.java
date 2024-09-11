@@ -74,7 +74,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             imanager = bus.getExtension(InstrumentationManager.class);
             if (null != imanager) {
                 try {
-                    imanager.register(new WorkQueueManagerImplMBeanWrapper(this));
+                    imanager.register(createManagedBeanWrapper());
                 } catch (JMException jmex) {
                     LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                 }
@@ -99,6 +99,10 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             bus.getExtension(BusLifeCycleManager.class)
                 .registerLifeCycleListener(new WQLifecycleListener());
         }
+    }
+
+    protected WorkQueueManagerImplMBeanWrapper createManagedBeanWrapper() {
+        return new WorkQueueManagerImplMBeanWrapper(this);
     }
 
     public synchronized AutomaticWorkQueue getAutomaticWorkQueue() {
@@ -171,15 +175,14 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     }
     public final void addNamedWorkQueue(String name, AutomaticWorkQueue q) {
         namedQueues.put(name, q);
-        if (q instanceof AutomaticWorkQueueImpl) {
-            AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
+        if (q instanceof AutomaticWorkQueueImpl impl) {
             if (impl.isShared()) {
                 synchronized (impl) {
                     if (impl.getShareCount() == 0
                         && imanager != null
                         && imanager.getMBeanServer() != null) {
                         try {
-                            imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
+                            imanager.register(new WorkQueueImplMBeanWrapper(impl, this));
                         } catch (JMException jmex) {
                             LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                         }
@@ -188,7 +191,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                 }
             } else if (imanager != null) {
                 try {
-                    imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
+                    imanager.register(new WorkQueueImplMBeanWrapper(impl, this));
                 } catch (JMException jmex) {
                     LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                 }
@@ -196,12 +199,11 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         }
     }
 
-    private AutomaticWorkQueue createAutomaticWorkQueue() {
+    protected AutomaticWorkQueue createAutomaticWorkQueue() {
         AutomaticWorkQueue q = new AutomaticWorkQueueImpl(DEFAULT_QUEUE_NAME);
         addNamedWorkQueue(DEFAULT_QUEUE_NAME, q);
         return q;
     }
-
 
     class WQLifecycleListener implements BusLifeCycleListener {
         public void initComplete() {
