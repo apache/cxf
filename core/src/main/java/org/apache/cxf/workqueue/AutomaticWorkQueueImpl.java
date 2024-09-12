@@ -281,7 +281,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
     }
 
-    class WatchDog extends Thread {
+    protected class WatchDog extends Thread {
         DelayQueue<DelayedTaskWrapper> delayQueue;
         AtomicBoolean shutdown = new AtomicBoolean(false);
 
@@ -318,7 +318,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
 
     }
-    class AWQThreadFactory implements ThreadFactory {
+
+    protected class AWQThreadFactory implements ThreadFactory {
         final AtomicInteger threadNumber = new AtomicInteger(1);
         ThreadGroup group;
         String name;
@@ -382,6 +383,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             threadFactory.setName(s);
         }
     }
+
     public String getName() {
         return name;
     }
@@ -483,7 +485,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
     }
 
-
     /**
      * Gets the maximum size (capacity) of the backing queue.
      * @return the maximum size (capacity) of the backing queue.
@@ -499,7 +500,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public long getSize() {
         return executor == null ? 0 : executor.getQueue().size();
     }
-
 
     public boolean isEmpty() {
         return executor == null || executor.getQueue().isEmpty();
@@ -562,24 +562,28 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
         return executor.isShutdown();
     }
+
     public int getLargestPoolSize() {
         if (executor == null) {
             return 0;
         }
         return executor.getLargestPoolSize();
     }
+
     public int getPoolSize() {
         if (executor == null) {
             return 0;
         }
         return executor.getPoolSize();
     }
+
     public int getActiveCount() {
         if (executor == null) {
             return 0;
         }
         return executor.getActiveCount();
     }
+
     public void update(Dictionary<String, String> config) {
         String s = config.get("highWaterMark");
         if (s != null) {
@@ -602,6 +606,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             this.maxQueueSize = Integer.parseInt(s);
         }
     }
+
     public Dictionary<String, String> getProperties() {
         Dictionary<String, String> properties = new Hashtable<>();
         NumberFormat nf = NumberFormat.getIntegerInstance();

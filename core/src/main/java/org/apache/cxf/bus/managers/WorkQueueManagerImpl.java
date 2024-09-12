@@ -74,7 +74,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             imanager = bus.getExtension(InstrumentationManager.class);
             if (null != imanager) {
                 try {
-                    imanager.register(createManagedBeanWrapper());
+                    imanager.register(new WorkQueueManagerImplMBeanWrapper(this));
                 } catch (JMException jmex) {
                     LOG.log(Level.WARNING, jmex.getMessage(), jmex);
                 }
@@ -101,10 +101,6 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         }
     }
 
-    protected WorkQueueManagerImplMBeanWrapper createManagedBeanWrapper() {
-        return new WorkQueueManagerImplMBeanWrapper(this);
-    }
-
     public synchronized AutomaticWorkQueue getAutomaticWorkQueue() {
         AutomaticWorkQueue defaultQueue = getNamedWorkQueue(DEFAULT_QUEUE_NAME);
         if (defaultQueue == null) {
@@ -116,8 +112,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     public synchronized void shutdown(boolean processRemainingTasks) {
         inShutdown = true;
         for (AutomaticWorkQueue q : namedQueues.values()) {
-            if (q instanceof AutomaticWorkQueueImpl) {
-                AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
+            if (q instanceof AutomaticWorkQueueImpl impl) {
                 if (impl.isShared()) {
                     synchronized (impl) {
                         impl.removeSharedUser();
