@@ -71,8 +71,9 @@ public class OpenTelemetryStartInterceptor extends AbstractOpenTelemetryIntercep
                 span.setAttribute(NetworkAttributes.NETWORK_PROTOCOL_VERSION, protocolVersion);
             }
 
-            if (request.getHeader("User-Agent") != null) {
-                span.setAttribute(UserAgentAttributes.USER_AGENT_ORIGINAL, request.getHeader("User-Agent"));
+            final String userAgent = request.getHeader("User-Agent");
+            if (userAgent != null) {
+                span.setAttribute(UserAgentAttributes.USER_AGENT_ORIGINAL, userAgent);
             }
         }
     }

@@ -76,7 +76,11 @@ public class OpenTelemetryProvider extends AbstractOpenTelemetryProvider
                 String protocolVersion = protocol.split("/")[1];
                 span.setAttribute(NetworkAttributes.NETWORK_PROTOCOL_VERSION, protocolVersion);
             }
-            span.setAttribute(UserAgentAttributes.USER_AGENT_ORIGINAL, request.getHeader("User-Agent"));
+            
+            final String userAgent = request.getHeader("User-Agent");
+            if (userAgent != null) {
+                span.setAttribute(UserAgentAttributes.USER_AGENT_ORIGINAL, userAgent);
+            }
         }
 
         if (holder != null) {
