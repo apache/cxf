@@ -36,9 +36,12 @@ import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.semconv.ErrorAttributes;
+import io.opentelemetry.semconv.ExceptionAttributes;
 import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.NetworkAttributes;
+import io.opentelemetry.semconv.ServerAttributes;
 import io.opentelemetry.semconv.UrlAttributes;
-import io.opentelemetry.semconv.incubating.ExceptionIncubatingAttributes;
 
 public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractOpenTelemetryClientProvider.class);
@@ -60,11 +63,14 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
                                                           URI uri, String method) {
         Context parentContext = Context.current();
         Span activeSpan = tracer.spanBuilder(buildSpanDescription(uri.toString(), method))
-            .setParent(parentContext).setSpanKind(SpanKind.CLIENT)
-            .setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, method)
-            .setAttribute(UrlAttributes.URL_FULL, uri.toString())
-            // TODO: Enhance with semantics from request
-            .startSpan();
+                .setParent(parentContext).setSpanKind(SpanKind.CLIENT)
+                .setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, method)
+                .setAttribute(ServerAttributes.SERVER_ADDRESS, uri.getHost())
+                .setAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(uri.getPort()))
+                .setAttribute(UrlAttributes.URL_FULL, uri.toString())
+                .setAttribute(NetworkAttributes.NETWORK_PEER_ADDRESS, uri.getHost())
+                .setAttribute(NetworkAttributes.NETWORK_PEER_PORT, Long.valueOf(uri.getPort()))
+                .startSpan();
         Scope scope = activeSpan.makeCurrent();
 
         openTelemetry.getPropagators().getTextMapPropagator().inject(Context.current(), requestHeaders,
@@ -96,10 +102,17 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
             Span span = traceScope.getSpan();
             Scope scope = traceScope.getScope();
 
-            // If the client invocation was asynchronous , the trace span has been created
+            // If the client invocation was asynchronous, the trace span has been created
             // in another thread and should be re-attached to the current one.
             if (holder.isDetached()) {
                 scope = span.makeCurrent();
+            }
+
+            // Check if the response status code starts with 3, 4, or 5 (indicating redirection,
+            // client error, or server error)
+            // If true, set the error type attribute on the span with the response status code
+            if (responseStatus >= 300) {
+                span.setAttribute(ErrorAttributes.ERROR_TYPE, String.valueOf(responseStatus));
             }
 
             span.setAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE.getKey(), responseStatus);
@@ -120,7 +133,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
             Span span = traceScope.getSpan();
             Scope scope = traceScope.getScope();
 
-            // If the client invocation was asynchronous , the trace span has been created
+            // If the client invocation was asynchronous, the trace span has been created
             // in another thread and should be re-attached to the current one.
             if (holder.isDetached()) {
                 scope = span.makeCurrent();
@@ -128,7 +141,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
 
             span.setStatus(StatusCode.ERROR);
             if (ex != null) {
-                span.recordException(ex, Attributes.of(ExceptionIncubatingAttributes.EXCEPTION_ESCAPED, true));
+                span.recordException(ex, Attributes.of(ExceptionAttributes.EXCEPTION_ESCAPED, true));
             }
             span.end();
 
