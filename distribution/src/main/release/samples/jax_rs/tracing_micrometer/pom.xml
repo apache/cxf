@@ -131,17 +131,17 @@
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-core</artifactId>
-            <version>13.3</version>
+            <version>${cxf.openfeign.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
-            <version>13.3</version>
+            <version>${cxf.openfeign.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-micrometer</artifactId>
-            <version>13.3</version>
+            <version>${cxf.openfeign.version}</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
