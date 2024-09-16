@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -168,29 +169,29 @@ public abstract class HTTPConduit
     public static final String NO_IO_EXCEPTIONS = "org.apache.cxf.transport.no_io_exceptions";
     public static final String FORCE_HTTP_VERSION = "org.apache.cxf.transport.http.forceVersion";
 
-    /** 
-     * The HTTP status codes as contextual property (comma-separated integers as String) 
-     * on the outgoing {@link Message} which lead to setting {@code org.apache.cxf.transport.service_not_available} 
-     * for all responses with those status codes. This is used e.g. by the 
+    /**
+     * The HTTP status codes as contextual property (comma-separated integers as String)
+     * on the outgoing {@link Message} which lead to setting {@code org.apache.cxf.transport.service_not_available}
+     * for all responses with those status codes. This is used e.g. by the
      * {@code org.apache.cxf.clustering.FailoverTargetSelector} to determine if it should do the fail-over.
      * Default: {@code 404,429,503} as per {@code DEFAULT_SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES}
      */
-    public static final String SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES = 
+    public static final String SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES =
         "org.apache.cxf.transport.service_not_available_on_http_status_codes";
 
-    
-    
+
+
     /**
      * The Logger for this class.
      */
     protected static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
-    
+
     protected static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"GET", "HEAD", "OPTIONS", "TRACE"}));
 
     protected static final String HTTP_VERSION = SystemPropertyAction.getPropertyOrNull(FORCE_HTTP_VERSION);
 
-    private static final Collection<Integer> DEFAULT_SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES = 
+    private static final Collection<Integer> DEFAULT_SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES =
             Arrays.asList(404, 429, 503);
 
     private static boolean hasLoggedAsyncWarning;
@@ -714,6 +715,11 @@ public abstract class HTTPConduit
                 }
             }
         } finally {
+            OutputStream os = msg.getContent(OutputStream.class);
+            // Java 21 may hang on close, we flush stream to help close them out.
+            if (os != null && AutoCloseable.class.isAssignableFrom(HttpClient.class)) {
+                os.flush();
+            }
             super.close(msg);
         }
     }
@@ -1657,7 +1663,7 @@ public abstract class HTTPConduit
             if (exchange != null) {
                 exchange.put(Message.RESPONSE_CODE, rc);
                 final Collection<Integer> serviceNotAvailableOnHttpStatusCodes = MessageUtils
-                    .getContextualIntegers(outMessage, SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES, 
+                    .getContextualIntegers(outMessage, SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES,
                         DEFAULT_SERVICE_NOT_AVAILABLE_ON_HTTP_STATUS_CODES);
                 if (serviceNotAvailableOnHttpStatusCodes.contains(rc)) {
                     exchange.put("org.apache.cxf.transport.service_not_available", true);
@@ -1697,7 +1703,7 @@ public abstract class HTTPConduit
 
             if ((!doProcessResponse(outMessage, responseCode)
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode)
-                && MessageUtils.getContextualBoolean(outMessage, 
+                && MessageUtils.getContextualBoolean(outMessage,
                     Message.PROCESS_202_RESPONSE_ONEWAY_OR_PARTIAL, true)) {
                 in = getPartialResponse();
                 if (in == null
@@ -1721,7 +1727,7 @@ public abstract class HTTPConduit
                     exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
 
                     exchange.setInMessage(inMessage);
-                    if (MessageUtils.getContextualBoolean(outMessage, 
+                    if (MessageUtils.getContextualBoolean(outMessage,
                             Message.PROPAGATE_202_RESPONSE_ONEWAY_OR_PARTIAL, false)) {
                         incomingObserver.onMessage(inMessage);
                     }
