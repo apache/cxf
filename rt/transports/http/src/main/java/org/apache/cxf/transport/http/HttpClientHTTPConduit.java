@@ -246,10 +246,14 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     @Override
     public void close(Message msg) throws IOException {
-        OutputStream os = msg.getContent(OutputStream.class);
-        // Java 21 may hang on close, we flush stream to help close them out.
-        if (os != null && AutoCloseable.class.isAssignableFrom(HttpClient.class)) {
-            os.flush();
+        try {
+            OutputStream os = msg.getContent(OutputStream.class);
+            // Java 21 may hang on close, we flush stream to help close them out.
+            if (os != null && AutoCloseable.class.isAssignableFrom(HttpClient.class)) {
+                os.flush();
+            }
+        } catch (IOException ioException) {
+            // ignore
         }
         super.close(msg);
         msg.remove(HttpClient.class);
