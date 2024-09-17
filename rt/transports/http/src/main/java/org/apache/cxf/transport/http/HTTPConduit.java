@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -715,11 +714,6 @@ public abstract class HTTPConduit
                 }
             }
         } finally {
-            OutputStream os = msg.getContent(OutputStream.class);
-            // Java 21 may hang on close, we flush stream to help close them out.
-            if (os != null && AutoCloseable.class.isAssignableFrom(HttpClient.class)) {
-                os.flush();
-            }
             super.close(msg);
         }
     }
