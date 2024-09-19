@@ -4,20 +4,15 @@ pipeline {
    }
    
     tools { 
-        ant 'ant_1.10.10'
         maven 'maven_3.6.3' 
-        jdk 'jdk_1.8_latest' 
+        jdk 'jdk_11_latest' 
     }
-    
-    environment {
-        ANT_OPTS = "-Djavax.xml.accessExternalSchema=all"
-    }
-    
+
     stages {
         stage("Initialization") {
             steps {
                 script {
-                    currentBuild.displayName = "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 2.1 TCK"
+                    currentBuild.displayName = "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 3.1 TCK"
                 }
             }
         }
@@ -34,151 +29,60 @@ pipeline {
                     echo "PATH = ${PATH}"
                     echo "M2_HOME = ${M2_HOME}"
                     echo "JAVA_HOME = ${JAVA_HOME}"
-                    echo "ANT_HOME = ${ANT_HOME}"
                     echo "WORKSPACE = ${PWD}"
                 '''
             }
         }
        
-       stage('Download JakartaEE TCK') {
+       stage('Download JakartaEE Restful Services TCK') {
            steps {
                checkout([$class: 'GitSCM',
-	               branches: [[name: 'refs/tags/8.0.2']],
-                   userRemoteConfigs: [[url: 'https://github.com/eclipse-ee4j/jakartaee-tck']],
-                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jakartaee-tck']]
+	               branches: [[name: 'refs/tags/3.1.0']],
+                   userRemoteConfigs: [[url: 'https://github.com/jakartaee/rest/']],
+                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'rest']]
                ])
-           }
-       }
-       
-       stage('Download Glassfish 5.1.0') { // for display purposes
-           steps {
-               sh 'wget https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip'
-               sh 'unzip glassfish-5.1.0.zip'
-               sh 'rm glassfish-5.1.0.zip'
-           }
-       }
-       
-       stage('Download Apache CXF bits') {
-           steps {
-               echo "Using Apache CXF version: " + params.Version
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-core:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-frontend-jaxrs:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-client:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-rs-sse:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-rt-transports-http:${params.Version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-
-               echo "Including additional dependencies (woodstox, stax2, ...)"
-               sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.apache.cxf:cxf-parent:${params.Version}:pom -Dtransitive=false -Ddest=."
-
-               script {
-                   echo "Detect additional dependencies (woodstox, stax2, ...) versions"
-
-                   woodstox_version = sh(returnStdout: true, script: "grep '<cxf.woodstox.core.version>' cxf-parent-${params.Version}.pom").replaceAll("[\n\r]", "").replaceAll(".+[>](.+)[<].+", '$1')
-                   staxapi_version = sh(returnStdout: true, script: "grep '<cxf.woodstox.stax2-api.version>' cxf-parent-${params.Version}.pom").replaceAll("[\n\r]", "").replaceAll(".+[>](.+)[<].+", '$1')
-
-                   sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=com.fasterxml.woodstox:woodstox-core:${woodstox_version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-                   sh "mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -DremoteRepositories=https://repository.apache.org/snapshots,https://repository.apache.org -Dartifact=org.codehaus.woodstox:stax2-api:${staxapi_version}:jar -Dtransitive=false -Ddest=glassfish5/glassfish/lib"
-               }
-
-               sh "rm cxf-parent-${params.Version}.pom"
-           }
-       }
-       
-       stage('Prepare JAX-RS TCK build configuration') {
-           steps {
-              withEnv(["WORKSPACE = ${PWD}"]) {
-                sh "wget https://raw.githubusercontent.com/apache/cxf/main/tck/ts.jte.template"
-                sh "sed -i '" + 's/${version}/' + params.Version + "/g' ts.jte.template"
-                sh "sed -i '" + 's/${woodstox_version}/' + woodstox_version + "/g' ts.jte.template"
-                sh "sed -i '" + 's/${staxapi_version}/' + staxapi_version + "/g' ts.jte.template"
-                sh "sed -i '" + 's#${GF_HOME}#' + "${WORKSPACE}/glassfish5/glassfish" + "#g' ts.jte.template"
-                sh "cp jakartaee-tck/bin/xml/impl/glassfish/jersey.xml jakartaee-tck/bin/xml/impl/glassfish/cxf.xml"
-              }
            }
        }
        
        stage('Build JAX-RS TCK') {
            steps {
-                withEnv([
-                    "WORKSPACE=${pwd()}",
-                    "TS_HOME=${WORKSPACE}/jakartaee-tck",
-                    "javaee_home=${WORKSPACE}/glassfish5",
-                    "GF_HOME=${WORKSPACE}/glassfish5/glassfish",
-                    "AS_JAVA=$JAVA_HOME",
-                    "deliverabledir=jaxrs"
-                ]) {
-                    sh 'yes | cp -vr ts.jte.template jakartaee-tck/install/jaxrs/bin/ts.jte'
-                    
-                    dir("${TS_HOME}/install/${deliverabledir}/bin") {
-                        sh "ant build.all"
-                        sh "ant update.jaxrs.wars"
-                    }
-                    
-                    dir("${TS_HOME}/release/tools/") {
-                        sh "ant jaxrs"
-                    }
-                }
+               echo "Using Apache CXF version: " + params.Version
+               sh "mvn clean install -f rest"
+           }
+       }
+
+      stage('Checkout Apache CXF') {
+           steps {
+               checkout([$class: 'GitSCM',
+                   branches: [[name: 'main']],
+                   userRemoteConfigs: [[url: 'https://github.com/apache/cxf/']],
+                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'cxf'], [$class: 'CloneOption', shallow: true]]
+               ])
            }
        }
        
        stage('Run JAX-RS TCK') {
+           tools { 
+                jdk 'jdk_17_latest' 
+           }
+
            steps {
-                withEnv([
-                    "WORKSPACE=${pwd()}",
-                    "TS_HOME=${WORKSPACE}/restful-ws-tck",
-                    "javaee_home=${WORKSPACE}/glassfish5",
-                    "GF_HOME=${WORKSPACE}/glassfish5/glassfish",
-                    "AS_JAVA=$JAVA_HOME",
-                    "deliverabledir=jaxrs"
-                ]) {
-                    sh "cp -r jakartaee-tck/release/JAXRS_BUILD/latest/restful-ws-tck ${WORKSPACE}"
-                    sh "yes | cp -vr ts.jte.template ${TS_HOME}/bin/ts.jte"
-
-                    // It seems to be impossible to exclude Jersey from the Glassfish deployment but it 
-                    // interferes with Apache CXF, as such some tests cases are failing. Modifying the Jersey 
-                    // manifest to exclude 'javax.ws.rs.ext.RuntimeDelegate' from Jersey so the Apache CXF
-                    // implementation will be used reliably all the time.
-                    sh 'zip -d ${WORKSPACE}/glassfish5/glassfish/modules/jersey-server.jar META-INF/services/javax.ws.rs.ext.RuntimeDelegate'
-
-                    dir("${TS_HOME}/bin") {
-                        sh "ant config.vi"
-                        sh "ant deploy.all"
-                        script {
-                            try {
-                                echo 'Running all TCK tests ...'
-                                sh "ant run.all"
-                            } catch (exc) {
-                                echo 'Some TCK tests have failed, marking build as unstable'
-                                currentBuild.result = 'UNSTABLE'
-                            }
-                        }
-                    }
+                dir("${WORKSPACE}/cxf/tck/cxf-tck") {
+                    sh "mvn clean verify -Dcxf.version=${params.Version}"
                 }
            }
            
-           post {
-               always {
-                   withEnv([
-                    "WORKSPACE=${pwd()}",
-                    "TS_HOME=${WORKSPACE}/restful-ws-tck",
-                   ]) {
-                      dir("${TS_HOME}/bin") {
-                        sh "ant stop-server -f xml/impl/glassfish/config.vi.xml"
-                      }
-                      
-                      sh "mv /tmp/JT* ${WORKSPACE}"
-                   }
-               }
+           post { 
+                always {
+                    junit allowEmptyResults: true, testResults: '**/failsafe-reports/*.xml'
+                }
            }
        }
    }
    
    post { 
-        always { 
-            archiveArtifacts artifacts: 'jakartaee-tck/release/JAXRS_BUILD/latest/restful*.zip', fingerprint: true
-            archiveArtifacts artifacts: 'JTwork/**', fingerprint: true
-            archiveArtifacts artifacts: 'JTreport/**', fingerprint: true
+        always {
             cleanWs()
         }
-    }
+   }
 }
