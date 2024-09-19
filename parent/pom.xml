@@ -137,7 +137,7 @@
         <cxf.jaeger.version>1.8.1</cxf.jaeger.version>
         <cxf.jakarta.activation.version>2.1.3</cxf.jakarta.activation.version>
         <cxf.jakarta.mail.version>2.1.3</cxf.jakarta.mail.version>
-        <cxf.jakarta.injectapi.version>2.0.1</cxf.jakarta.injectapi.version>
+        <cxf.jakarta.injectapi.version>2.0.1.MR</cxf.jakarta.injectapi.version>
         <cxf.jakarta.interceptorapi.version>2.1.0</cxf.jakarta.interceptorapi.version>
         <cxf.jakarta.jwsapi.version>3.0.0</cxf.jakarta.jwsapi.version>
         <cxf.jakarta.soapapi.version>3.0.2</cxf.jakarta.soapapi.version>
