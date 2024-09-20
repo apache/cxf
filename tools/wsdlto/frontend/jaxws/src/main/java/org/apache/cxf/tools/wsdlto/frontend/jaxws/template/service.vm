@@ -23,8 +23,8 @@ package $service.PackageName;
 
 #if ($wsdlLocation != "" && not($useGetResource) && not($wsdlLocation.startsWith("classpath:")))
 import java.net.MalformedURLException;
-#end
 import java.net.URI;
+#end
 import java.net.URL;
 #if ($markGenerated == "true")
 import jakarta.annotation.Generated;
