@@ -45,7 +45,7 @@
         <cxf.olingo.server.version>5.0.0</cxf.olingo.server.version>
         <cxf.aspectj.version>1.9.22.1</cxf.aspectj.version>
         <cxf.brave.version>6.0.3</cxf.brave.version>
-        <cxf.zipkin-reporter.version>3.4.1</cxf.zipkin-reporter.version>
+        <cxf.zipkin-reporter.version>3.4.2</cxf.zipkin-reporter.version>
         <cxf.zest.version>2.1</cxf.zest.version>
         <cxf.activemq.artemis.version>2.31.0</cxf.activemq.artemis.version>
         <cxf.h2.version>2.3.232</cxf.h2.version>
