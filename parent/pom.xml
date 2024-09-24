@@ -219,7 +219,7 @@
         <cxf.spring.version>6.1.13</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.17.14</cxf.swagger.ui.version>
-        <cxf.swagger.v3.version>2.2.23</cxf.swagger.v3.version>
+        <cxf.swagger.v3.version>2.2.24</cxf.swagger.v3.version>
         <cxf.tika.version>2.9.1</cxf.tika.version>
         <cxf.tomcat.version>10.1.30</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
