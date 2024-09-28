@@ -19,7 +19,6 @@
 
 package org.apache.cxf.io;
 
-import javax.annotation.Resource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +31,8 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
