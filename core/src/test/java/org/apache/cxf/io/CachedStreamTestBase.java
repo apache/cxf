@@ -240,6 +240,7 @@ public abstract class CachedStreamTestBase {
             EasyMock.expect(b.getProperty(CachedConstants.CIPHER_TRANSFORMATION_BUS_PROP)).andReturn(null);
             Path tmpDirPath = Files.createTempDirectory("temp-dir");
             EasyMock.expect(b.getProperty(CachedConstants.OUTPUT_DIRECTORY_BUS_PROP)).andReturn(tmpDirPath.toString());
+            EasyMock.expect(b.getExtension(CachedOutputStreamCleaner.class)).andReturn(null).anyTimes();
 
             BusFactory.setThreadDefaultBus(b);
 
