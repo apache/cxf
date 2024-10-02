@@ -175,7 +175,7 @@
         <cxf.ldapsdk.version>7.0.1</cxf.ldapsdk.version>
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.5.6</cxf.logback.classic.version>
-        <cxf.lucene.version>9.11.1</cxf.lucene.version>
+        <cxf.lucene.version>9.12.0</cxf.lucene.version>
         <cxf.maven.core.version>3.9.8</cxf.maven.core.version>
         <cxf.micrometer.version>1.10.13</cxf.micrometer.version>
         <cxf.micrometer-tracing.version>1.0.12</cxf.micrometer-tracing.version>
