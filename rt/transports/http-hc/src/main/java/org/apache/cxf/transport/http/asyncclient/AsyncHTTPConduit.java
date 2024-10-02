@@ -31,7 +31,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -58,7 +57,6 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -265,7 +263,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
 
     public class AsyncWrappedOutputStream extends WrappedOutputStream
-        implements CopyingOutputStream, WritableByteChannel {
+        implements AsyncWrappedOutputStreamBase {
         final HTTPClientPolicy csPolicy;
 
         CXFHttpRequest entity;
@@ -618,7 +616,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     || lastURL.getPort() != url.getPort();
         }
 
-        protected boolean retrySetHttpResponse(HttpResponse r) {
+        public boolean retrySetHttpResponse(HttpResponse r) {
             if (isAsync) {
                 setHttpResponse(r);
             }

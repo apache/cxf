@@ -118,7 +118,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         client.setReceiveTimeout(600000);
         cond.setClient(client);
         if (async) {
-            if (cond instanceof AsyncHTTPConduit) {
+            if (cond.getClass().getName().endsWith("AsyncHTTPConduit")) {
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
                 bp.getRequestContext().put(Credentials.class.getName(), creds);
                 bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
