@@ -73,7 +73,8 @@ public final class WSDiscoveryClientTest {
                     for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
                         if (ia.getAddress() instanceof java.net.Inet4Address && !ia.getAddress().isLoopbackAddress()
                                 && !ni.getDisplayName().startsWith("vnic") 
-                                && !ni.getDisplayName().startsWith("tailscale")) {
+                                && !ni.getDisplayName().startsWith("tailscale")
+                                && !ni.getDisplayName().startsWith("docker")) {
                             possibles.add(ni);
                             System.out.println("Found possible network interface:" + ni.getDisplayName());
                         }
@@ -87,12 +88,10 @@ public final class WSDiscoveryClientTest {
                 return p;
             }
         }
-        for (NetworkInterface p : possibles) {
-            if (p.getDisplayName().startsWith("docker")) {
-                System.out.println("Using docker network interface:" + p.getDisplayName());
-                return p;
-            }
-        }
+
+        // Sort interfaces predictably, in reverse order
+        possibles.sort((left, right) -> right.getDisplayName().compareTo(left.getDisplayName()));
+
         if (possibles.isEmpty())  {
             return null;
         } else {
