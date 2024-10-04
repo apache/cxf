@@ -82,6 +82,12 @@ public final class WSDiscoveryClientTest {
                 return p;
             }
         }
+        for (NetworkInterface p : possibles) {
+            if (p.getDisplayName().startsWith("docker")) {
+                System.out.println("Using docker network interface:" + p.getDisplayName());
+                return p;
+            }
+        }
         if (possibles.isEmpty())  {
             return null;
         } else {
