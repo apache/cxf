@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -78,7 +80,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     boolean shared;
     int sharedCount;
 
-    private List<PropertyChangeListener> changeListenerList;
+    private final List<PropertyChangeListener> changeListenerList;
 
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -104,6 +106,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                                   long dequeueTimeout) {
         this(mqs, initialThreads, highWaterMark, lowWaterMark, dequeueTimeout, "default");
     }
+
     public AutomaticWorkQueueImpl(int mqs,
                                   int initialThreads,
                                   int highWaterMark,
@@ -152,24 +155,13 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     protected synchronized ThreadPoolExecutor getExecutor() {
         if (executor == null) {
             threadFactory = createThreadFactory(name);
-            executor = new ThreadPoolExecutor(lowWaterMark,
+            executor = createThreadPoolExecutor(lowWaterMark,
                                               highWaterMark,
                                               TimeUnit.MILLISECONDS.toMillis(dequeueTimeout),
                                               TimeUnit.MILLISECONDS,
-                                              new LinkedBlockingQueue<Runnable>(maxQueueSize),
-                                              threadFactory) {
-                @Override
-                protected void terminated() {
-                    ThreadFactory f = executor.getThreadFactory();
-                    if (f instanceof AWQThreadFactory) {
-                        ((AWQThreadFactory)f).shutdown();
-                    }
-                    if (watchDog != null) {
-                        watchDog.shutdown();
-                    }
-                }
-            };
-
+                                              new LinkedBlockingQueue<>(maxQueueSize),
+                                              threadFactory,
+                                              watchDog);
 
             if (LOG.isLoggable(Level.FINE)) {
                 StringBuilder buf = new StringBuilder(128).append("Constructing automatic work queue with:\n")
@@ -262,11 +254,13 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             trigger = System.currentTimeMillis() + delay;
         }
 
+        @Override
         public long getDelay(TimeUnit unit) {
             long n = trigger - System.currentTimeMillis();
             return unit.convert(n, TimeUnit.MILLISECONDS);
         }
 
+        @Override
         public int compareTo(Delayed delayed) {
             long other = ((DelayedTaskWrapper)delayed).trigger;
             int returnValue;
@@ -280,13 +274,14 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             return returnValue;
         }
 
+        @Override
         public void run() {
             work.run();
         }
 
     }
 
-    class WatchDog extends Thread {
+    protected class WatchDog extends Thread {
         DelayQueue<DelayedTaskWrapper> delayQueue;
         AtomicBoolean shutdown = new AtomicBoolean(false);
 
@@ -300,6 +295,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             interrupt();
         }
 
+        @Override
         public void run() {
             DelayedTaskWrapper task;
             try {
@@ -322,7 +318,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
 
     }
-    class AWQThreadFactory implements ThreadFactory {
+
+    protected class AWQThreadFactory implements ThreadFactory {
         final AtomicInteger threadNumber = new AtomicInteger(1);
         ThreadGroup group;
         String name;
@@ -386,6 +383,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             threadFactory.setName(s);
         }
     }
+
     public String getName() {
         return name;
     }
@@ -421,7 +419,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         //The ThreadPoolExecutor in the JDK doesn't expand the number
         //of threads until the queue is full.   However, we would
         //prefer the number of threads to expand immediately and
-        //only uses the queue if we've reached the maximum number
+        //only use the queue if we've reached the maximum number
         //of threads.
         ThreadPoolExecutor ex = getExecutor();
         ex.execute(r);
@@ -487,7 +485,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
     }
 
-
     /**
      * Gets the maximum size (capacity) of the backing queue.
      * @return the maximum size (capacity) of the backing queue.
@@ -503,7 +500,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public long getSize() {
         return executor == null ? 0 : executor.getQueue().size();
     }
-
 
     public boolean isEmpty() {
         return executor == null || executor.getQueue().isEmpty();
@@ -566,24 +562,28 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
         return executor.isShutdown();
     }
+
     public int getLargestPoolSize() {
         if (executor == null) {
             return 0;
         }
         return executor.getLargestPoolSize();
     }
+
     public int getPoolSize() {
         if (executor == null) {
             return 0;
         }
         return executor.getPoolSize();
     }
+
     public int getActiveCount() {
         if (executor == null) {
             return 0;
         }
         return executor.getActiveCount();
     }
+
     public void update(Dictionary<String, String> config) {
         String s = config.get("highWaterMark");
         if (s != null) {
@@ -606,6 +606,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             this.maxQueueSize = Integer.parseInt(s);
         }
     }
+
     public Dictionary<String, String> getProperties() {
         Dictionary<String, String> properties = new Hashtable<>();
         NumberFormat nf = NumberFormat.getIntegerInstance();
@@ -616,5 +617,34 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         properties.put("dequeueTimeout", nf.format(getLowWaterMark()));
         properties.put("queueSize", nf.format(getLowWaterMark()));
         return properties;
+    }
+
+    protected ThreadPoolExecutor createThreadPoolExecutor(
+            int corePoolSize,
+            int maximumPoolSize,
+            long keepAliveTime,
+            TimeUnit unit,
+            BlockingQueue<Runnable> workQueue,
+            ThreadFactory threadFactory,
+            WatchDog watchDog
+    ) {
+        return new ThreadPoolExecutor(corePoolSize,
+                maximumPoolSize,
+                unit.toMillis(keepAliveTime),
+                unit,
+                workQueue,
+                threadFactory) {
+
+            @Override
+            protected void terminated() {
+                ThreadFactory f = this.getThreadFactory();
+                if (f instanceof AWQThreadFactory awqThreadFactory) {
+                    awqThreadFactory.shutdown();
+                }
+                if (watchDog != null) {
+                    watchDog.shutdown();
+                }
+            }
+        };
     }
 }
