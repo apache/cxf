@@ -19,6 +19,13 @@
 
 package org.apache.cxf.systest.hc5.jaxws;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import javax.jws.WebService;
@@ -26,9 +33,12 @@ import javax.xml.ws.Response;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -38,6 +48,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -112,6 +124,39 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
         }
         
         assertTrue("Response still not received.", response.isDone());
+        assertThat(response.get().getResponseType(), equalTo("CXF"));
+    }
+    
+    @Test
+    public void testAsyncClientChunking() throws Exception {
+        // setup the feature by using JAXWS front-end API
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+        factory.getOutInterceptors().add(new LoggingOutInterceptor());
+        factory.getInInterceptors().add(new LoggingInInterceptor());
+        factory.setServiceClass(Greeter.class);
+        Greeter proxy = factory.create(Greeter.class);
+
+        Client client = ClientProxy.getClient(proxy);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.getClient().setAllowChunking(true);
+
+        final char[] bytes = new char [32 * 1024];
+        final Random random = new Random();
+        for (int i = 0; i < bytes.length; ++i) {
+            bytes[i] = (char)(random.nextInt(26) + 'a');
+        }
+
+        final String greeting = new String(bytes);
+        Response<GreetMeResponse>  response = proxy.greetMeAsync(greeting);
+        int waitCount = 0;
+        while (!response.isDone() && waitCount < 15) {
+            Thread.sleep(1000);
+            waitCount++;
+        }
+        
+        assertTrue("Response still not received.", response.isDone());
+        assertThat(response.get().getResponseType(), equalTo(greeting.toUpperCase()));
     }
 
     @Test
