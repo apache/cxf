@@ -45,10 +45,12 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 /**
  * A set of tests SSL v3 protocol support. It should be disallowed by default on both the
@@ -62,6 +64,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
 
     private static String previousDisabledAlgorithms;
     private static String previousTlsClientProtocols;
+    private static String previousTlsServerProtocols;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -69,12 +72,14 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         previousDisabledAlgorithms = Security.getProperty("jdk.tls.disabledAlgorithms");
         Security.setProperty("jdk.tls.disabledAlgorithms", "MD5");
 
-        if (JavaUtils.getJavaMajorVersion() >= 14) {
+        // Since JDK, SSLv3 is disabled, see please https://bugs.openjdk.org/browse/JDK-8190492
+        if (JavaUtils.getJavaMajorVersion() >= 11) {
             // Since Java 14, the SSLv3 aliased to TLSv1 (so SSLv3 effectively is not
             // supported). To make it work, the custom SSL context has to be created and
             // SSLv3 and TLSv1 has to be explicitly enabled:
             //   -Djdk.tls.client.protocols=SSLv3
             previousTlsClientProtocols = System.setProperty("jdk.tls.client.protocols", "SSLv3,TLSv1");
+            previousTlsServerProtocols = System.setProperty("jdk.tls.server.protocols", "SSLv3,TLSv1");
         }
         assertTrue(
                 "Server failed to launch",
@@ -95,6 +100,11 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             System.setProperty("jdk.tls.client.protocols", previousTlsClientProtocols);
         } else {
             System.clearProperty("jdk.tls.client.protocols");
+        }
+        if (previousTlsServerProtocols != null) {
+            System.setProperty("jdk.tls.server.protocols", previousTlsServerProtocols);
+        } else {
+            System.clearProperty("jdk.tls.server.protocols");
         }
     }
 
@@ -148,6 +158,9 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
         }
+        
+        assumeThat("SSLv3 is disabled in JDK-11+ by https://bugs.openjdk.org/browse/JDK-8190492",
+            JavaUtils.getJavaMajorVersion(), lessThan(11));
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
@@ -157,6 +170,7 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
+        System.setProperty("https.cipherSuites", "SSL_RSA_WITH_3DES_EDE_CBC_SHA");
 
         URL service = new URL("https://localhost:" + PORT2);
         HttpsURLConnection connection = (HttpsURLConnection) service.openConnection();
@@ -252,6 +266,9 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
             return;
         }
 
+        assumeThat("SSLv3 is disabled in JDK-11+ by https://bugs.openjdk.org/browse/JDK-8190492",
+            JavaUtils.getJavaMajorVersion(), lessThan(11));
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
 
@@ -279,6 +296,9 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             return;
         }
+
+        assumeThat("SSLv3 is disabled in JDK-11+ by https://bugs.openjdk.org/browse/JDK-8190492",
+            JavaUtils.getJavaMajorVersion(), lessThan(11));
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client-allow.xml");
