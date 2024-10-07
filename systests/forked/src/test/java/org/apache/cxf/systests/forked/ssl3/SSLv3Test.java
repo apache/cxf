@@ -45,6 +45,7 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -162,6 +163,9 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         assumeThat("SSLv3 is disabled in JDK-11+ by https://bugs.openjdk.org/browse/JDK-8190492",
             JavaUtils.getJavaMajorVersion(), lessThan(11));
 
+        assumeThat("SSLv3 is disabled in JDK-1.8.0u422 by https://bugs.openjdk.org/browse/JDK-8190492",
+            JavaUtils.isJava8Before(422), is(true));
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SSLv3Test.class.getResource("sslv3-client.xml");
 
@@ -170,7 +174,6 @@ public class SSLv3Test extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         System.setProperty("https.protocols", "SSLv3");
-        System.setProperty("https.cipherSuites", "SSL_RSA_WITH_3DES_EDE_CBC_SHA");
 
         URL service = new URL("https://localhost:" + PORT2);
         HttpsURLConnection connection = (HttpsURLConnection) service.openConnection();
