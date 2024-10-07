@@ -19,12 +19,6 @@
 
 package org.apache.cxf.systest.hc5.jaxws;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
