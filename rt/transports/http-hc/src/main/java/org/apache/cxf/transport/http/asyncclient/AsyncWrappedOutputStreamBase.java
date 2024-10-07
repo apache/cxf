@@ -24,7 +24,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.http.HttpResponse;
 
-public interface AsyncWrappedOutputStreamBase 
+interface AsyncWrappedOutputStreamBase 
     extends CopyingOutputStream, WritableByteChannel  {
     boolean retransmitable();
     

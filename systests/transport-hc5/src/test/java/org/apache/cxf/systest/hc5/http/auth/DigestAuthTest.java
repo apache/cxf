@@ -127,7 +127,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         client.setReceiveTimeout(600000);
         cond.setClient(client);
         if (async) {
-            if (cond.getClass().getName().endsWith("AsyncHTTPConduit")) {
+            if (cond instanceof AsyncHTTPConduit) {
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials("foo", "bar".toCharArray());
                 bp.getRequestContext().put(Credentials.class.getName(), creds);
                 bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
