@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import javax.ws.rs.client.Entity;
@@ -78,7 +77,8 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
     @Test
     public void testMultipartChunking() {
         final String url = "http://localhost:" + PORT + "/file-store";
-        final WebClient webClient = WebClient.create(url, List.of(new MultipartProvider())).query("chunked", chunked);
+        final WebClient webClient = WebClient.create(url,
+            Arrays.asList(new MultipartProvider())).query("chunked", chunked);
 
         final ClientConfiguration config = WebClient.getConfig(webClient);
         config.getBus().setProperty(AsyncHTTPConduit.USE_ASYNC, true);

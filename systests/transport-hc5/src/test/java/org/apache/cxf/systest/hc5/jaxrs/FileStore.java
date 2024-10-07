@@ -68,12 +68,12 @@ public class FileStore {
                 return Response.ok(new StreamingOutput() {
                     @Override
                     public void write(OutputStream out) throws IOException, WebApplicationException {
-                        in.transferTo(out);
+                        IOUtils.copyAndCloseInput(in, out);
                     }
                 }).build();
             } else {
                 // Make sure we have small amount of data for chunking to not kick in
-                final byte[] content = in.readAllBytes(); 
+                final byte[] content = IOUtils.readBytesFromStream(in); 
                 return Response.ok(Arrays.copyOf(content, content.length / 10)).build();
             }
         } finally {
