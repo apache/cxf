@@ -55,6 +55,8 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.http_undertow.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -118,14 +120,11 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         client.setReceiveTimeout(600000);
         cond.setClient(client);
         if (async) {
-            if (cond.getClass().getName().endsWith("AsyncHTTPConduit")) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
-                bp.getRequestContext().put(Credentials.class.getName(), creds);
-                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
-                client.setAutoRedirect(true);
-            } else {
-                fail("Not an async conduit");
-            }
+            assertThat("Not an async conduit", cond, isInstanceOfAsyncHttpConduit());
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
+            bp.getRequestContext().put(Credentials.class.getName(), creds);
+            bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+            client.setAutoRedirect(true);
         } else {
             bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
             bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");

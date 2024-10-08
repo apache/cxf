@@ -55,6 +55,8 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -116,14 +118,11 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         HTTPClientPolicy client = new HTTPClientPolicy();
         cond.setClient(client);
         if (async) {
-            if (cond.getClass().getName().endsWith("AsyncHTTPConduit")) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd");
-                bp.getRequestContext().put(Credentials.class.getName(), creds);
-                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
-                client.setAutoRedirect(true);
-            } else {
-                fail("Not an async conduit");
-            }
+            assertThat("Not an async conduit", cond, isInstanceOfAsyncHttpConduit());
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd");
+            bp.getRequestContext().put(Credentials.class.getName(), creds);
+            bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+            client.setAutoRedirect(true);
         } else {
             bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
             bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");

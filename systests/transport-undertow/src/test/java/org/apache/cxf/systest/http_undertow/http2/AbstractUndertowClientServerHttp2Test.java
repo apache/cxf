@@ -30,16 +30,16 @@ import org.apache.cxf.transport.https.InsecureTrustManager;
 
 import org.junit.Test;
 
+import static org.apache.cxf.systest.http_undertow.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/notFound", true);
-        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
 
         final Response response = client
             .accept("text/plain")
@@ -54,7 +54,7 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
     @Test
     public void testBookWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/booknames", true);
-        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
 
         final Response response = client
             .accept("text/plain")
@@ -69,8 +69,8 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
     @Test
     public void testGetBookStreamHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/bookstream", true);
-        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
-        
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
+
         final Response response = client
             .accept("application/json")
             .get();
