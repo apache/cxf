@@ -32,6 +32,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.http.HttpRequest;
@@ -85,7 +86,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
     //CXF specific
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
-
+    
+    
 
     public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
@@ -129,6 +131,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout();
     boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
     boolean tcpNoDelay = true;
+    
 
 
     AsyncHTTPConduitFactory() {
@@ -262,7 +265,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         if (isShutdown) {
             return null;
         }
-        return new AsyncHTTPConduit(bus, localInfo, target, this);
+        if (HTTPTransportFactory.isForceURLConnectionConduit()) {
+            return new URLConnectionAsyncHTTPConduit(bus, localInfo, target, this);
+        } else {
+            return new AsyncHTTPConduit(bus, localInfo, target, this);
+        }
     }
 
     public void shutdown() {
@@ -375,7 +382,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
     }
 
-    public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
+    public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c) throws IOException {
         if (client == null) {
             setupNIOClient(c.getClient());
         }

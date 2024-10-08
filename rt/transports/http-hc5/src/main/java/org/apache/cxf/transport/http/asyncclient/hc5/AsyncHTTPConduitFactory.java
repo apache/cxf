@@ -35,6 +35,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
@@ -89,7 +90,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
 
     private static final Logger LOG = LogUtils.getL7dLogger(AsyncHTTPConduitFactory.class);
-
+    
+    
     public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
 
@@ -153,6 +155,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     private int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout().toMillisecondsIntBound();
     private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
     private boolean tcpNoDelay = true;
+
 
     AsyncHTTPConduitFactory() {
         super();
@@ -276,7 +279,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         if (isShutdown) {
             return null;
         }
-        return new AsyncHTTPConduit(bus, localInfo, target, this);
+        if (HTTPTransportFactory.isForceURLConnectionConduit()) {
+            return new URLConnectionAsyncHTTPConduit(bus, localInfo, target, this);
+        } else {
+            return new AsyncHTTPConduit(bus, localInfo, target, this);
+        }
     }
 
     public void shutdown() {
@@ -399,7 +406,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
     }
 
-    public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c, final TlsStrategy tlsStrategy) 
+    public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c, final TlsStrategy tlsStrategy) 
             throws IOException {
 
         return clients
