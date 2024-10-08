@@ -62,7 +62,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
 import org.apache.cxf.transport.http.Headers;
-import org.apache.cxf.transport.http.HttpClientHTTPConduit;
+import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitFactory.UseAsyncPolicy;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHttpResponseWrapperFactory.AsyncHttpResponseWrapper;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -96,7 +96,7 @@ import org.apache.hc.core5.util.Timeout;
 /**
  * Async HTTP Conduit using Apache HttpClient 5
  */
-public class AsyncHTTPConduit extends HttpClientHTTPConduit {
+public class URLConnectionAsyncHTTPConduit extends URLConnectionHTTPConduit {
     /**
      * Enable HTTP/2 support
      */
@@ -112,7 +112,9 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     private volatile SSLSession session;
     private volatile CloseableHttpAsyncClient client;
 
-    public AsyncHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, AsyncHTTPConduitFactory factory) 
+    public URLConnectionAsyncHTTPConduit(Bus b, EndpointInfo ei, 
+                                         EndpointReferenceType t, 
+                                         AsyncHTTPConduitFactory factory) 
             throws IOException {
         super(b, ei, t);
         this.factory = factory;
@@ -537,11 +539,12 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     if (creds != null) {
                         return creds;
                     }
-                    if (AsyncHTTPConduit.this.proxyAuthorizationPolicy != null
-                            && AsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName() != null) {
+                    if (URLConnectionAsyncHTTPConduit.this.proxyAuthorizationPolicy != null
+                            && URLConnectionAsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName() != null) {
                         return new UsernamePasswordCredentials(
-                                AsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName(),
-                                AsyncHTTPConduit.this.proxyAuthorizationPolicy.getPassword().toCharArray());
+                                URLConnectionAsyncHTTPConduit.this.proxyAuthorizationPolicy.getUserName(),
+                                URLConnectionAsyncHTTPConduit.this.proxyAuthorizationPolicy.getPassword().
+                                toCharArray());
                     }
                     return null;
                 }

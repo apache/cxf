@@ -31,15 +31,15 @@ import org.apache.cxf.transport.https.InsecureTrustManager;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/notFound", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
 
         final Response response = client
             .accept("text/plain")
@@ -54,7 +54,7 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
     @Test
     public void testBookWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/booknames", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
 
         final Response response = client
             .accept("text/plain")
@@ -69,7 +69,7 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
     @Test
     public void testGetBookStreamHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/bookstream", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertTrue(WebClient.getConfig(client).getHttpConduit().getClass().getName().endsWith("AsyncHTTPConduit"));
         
         final Response response = client
             .accept("application/json")

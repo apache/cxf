@@ -69,6 +69,10 @@ public class HTTPTransportFactory
             "http://schemas.xmlsoap.org/wsdl/http/"
         ));
 
+    private static boolean forceURLConnectionConduit
+        = Boolean.valueOf(SystemPropertyAction.getProperty("org.apache.cxf.transport.http.forceURLConnection"));
+
+
     private static final Logger LOG = LogUtils.getL7dLogger(HTTPTransportFactory.class);
 
     /**
@@ -86,8 +90,6 @@ public class HTTPTransportFactory
     private final Lock r = lock.readLock();
     private final Lock w = lock.writeLock();
     
-    private boolean forceURLConnectionConduit 
-        = Boolean.valueOf(SystemPropertyAction.getProperty("org.apache.cxf.transport.http.forceURLConnection"));
 
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
@@ -237,7 +239,7 @@ public class HTTPTransportFactory
             conduit = factory.createConduit(this, bus, endpointInfo, target);
         }
         if (conduit == null) {
-            if (forceURLConnectionConduit) {
+            if (HTTPTransportFactory.isForceURLConnectionConduit()) {
                 conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
             } else {
                 conduit = new HttpClientHTTPConduit(bus, endpointInfo, target);
@@ -301,5 +303,8 @@ public class HTTPTransportFactory
             r.unlock();
         }
     }
-
+    
+    public static boolean isForceURLConnectionConduit() {
+        return forceURLConnectionConduit;
+    }
 }
