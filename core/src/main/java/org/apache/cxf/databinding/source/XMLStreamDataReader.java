@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -216,33 +215,37 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     }
 
     private Element validate(XMLStreamReader input) throws XMLStreamException, IOException {
-        DOMSource ds = read(input);
-        final Element rootElement;
-        if (ds.getNode() instanceof Document) {
-            rootElement = ((Document)ds.getNode()).getDocumentElement();
-        } else {
-            rootElement = (Element)ds.getNode();
-        }
-
+        Element rootElement;
         WoodstoxValidationImpl impl = new WoodstoxValidationImpl();
-        XMLStreamWriter nullWriter = null;
+        XMLStreamReader inputWithoutXop = null;
         if (impl.canValidate()) {
-            nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
-            impl.setupValidation(nullWriter, message.getExchange().getEndpoint(),
-                                 message.getExchange().getService().getServiceInfos().get(0));
+            //filter xop node, which causes validation to fail
+            XMLStreamReader filteredReader =
+                    StaxUtils.createFilteredReader(input, new StaxStreamFilter(XOP));
+            try (CachedOutputStream out = new CachedOutputStream()) {
+                StaxUtils.copy(filteredReader, out);
+                inputWithoutXop = StaxUtils.createXMLStreamReader(out.getInputStream());
+                impl.setupValidation(inputWithoutXop, message.getExchange().getEndpoint(),
+                        message.getExchange().getService().getServiceInfos().get(0));
+            } finally {
+                filteredReader.close();
+            }
         }
         //check if the impl can still validate after the setup, possible issue loading schemas or similar
         if (impl.canValidate()) {
             //Can use the MSV libs and woodstox to handle the schema validation during
-            //parsing and processing.   Much faster and single traversal
-            //filter xop node
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
-            XMLStreamReader filteredReader =
-                StaxUtils.createFilteredReader(reader,
-                                               new StaxStreamFilter(new QName[] {XOP}));
+            //parsing and processing. Much faster and single traversal
+            rootElement =  StaxUtils.read(inputWithoutXop).getDocumentElement();
 
-            StaxUtils.copy(filteredReader, nullWriter);
         } else {
+
+            DOMSource ds = read(input);
+            if (ds.getNode() instanceof Document) {
+                rootElement = ((Document)ds.getNode()).getDocumentElement();
+            } else {
+                rootElement = (Element)ds.getNode();
+            }
+
             //MSV not available, use a slower method of cloning the data, replace the xop's, validate
             LOG.fine("NO_MSV_AVAILABLE");
             Element newElement = rootElement;
@@ -312,16 +315,6 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     public void setProperty(String prop, Object value) {
         if (Message.class.getName().equals(prop)) {
             message = (Message)value;
-        }
-    }
-
-    static class NUllOutputStream extends OutputStream {
-        public void write(byte[] b, int off, int len) {
-        }
-        public void write(int b) {
-        }
-
-        public void write(byte[] b) throws IOException {
         }
     }
 }
