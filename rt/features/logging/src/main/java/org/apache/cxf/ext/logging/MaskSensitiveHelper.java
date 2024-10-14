@@ -32,7 +32,7 @@ public class MaskSensitiveHelper {
             + "\\u00F8-\\u02FF\\u0300-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u203F-\\u2040\\u2070-\\u218F"
             + "\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD]+";
     private static final String MATCH_PATTERN_XML_TEMPLATE = "(<(" + PATTERN_XML_NAMESPACE_PREFIX
-            + ":)?-ELEMENT_NAME-.*?>)(.*?)(</(" + PATTERN_XML_NAMESPACE_PREFIX + ":)?-ELEMENT_NAME->)";
+            + ":)?-ELEMENT_NAME-\\b[^>]*>)(.*?)(</(" + PATTERN_XML_NAMESPACE_PREFIX + ":)?-ELEMENT_NAME->)";
     private static final String REPLACEMENT_XML_TEMPLATE = "$1XXX$4";
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
