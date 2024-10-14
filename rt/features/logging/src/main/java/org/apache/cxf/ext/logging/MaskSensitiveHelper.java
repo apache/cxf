@@ -47,7 +47,7 @@ public class MaskSensitiveHelper {
         private final String replacement;
 
         ReplacementPair(String matchPattern, String replacement) {
-            this.matchPattern = Pattern.compile(matchPattern);
+            this.matchPattern = Pattern.compile(matchPattern, Pattern.DOTALL);
             this.replacement = replacement;
         }
     }
