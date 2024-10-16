@@ -29,7 +29,21 @@ import jakarta.xml.bind.annotation.XmlType;
  * Bean with a selection of elements suitable for testing the JavaScript client.
  */
 @XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
-@XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
+@XmlType(namespace = "uri:org.apache.cxf.javascript.testns",
+        propOrder = {
+        "stringItem",
+        "intItem",
+        "longItem",
+        "base64Item",
+        "optionalIntItem",
+        "optionalStringItem",
+        "optionalIntArrayItem",
+        "doubleItem",
+        "beanTwoItem",
+        "beanTwoNotRequiredItem",
+        "enumeration",
+        "enum2"
+        })
 public class TestBean1 {
 
     public TestBean1() {
