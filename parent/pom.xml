@@ -56,7 +56,7 @@
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>9.7</cxf.asm.version>
+        <cxf.asm.version>9.7.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,10)</cxf.osgi.asm.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
