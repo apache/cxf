@@ -165,7 +165,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 "jakarta.servlet.http.HttpServletRequest",
                 "jakarta.servlet.ServletContext"));
         }
-        beanManager.fireEvent(this);
+        beanManager.getEvent().fire(this);
     }
 
     /**
