@@ -146,9 +146,31 @@ public class DelayedCachedOutputStreamCleanerTest {
     }
     
     @Test
-    public void testBusLifecycle() throws InterruptedException {
+    public void testCleanOnShutdown() throws InterruptedException {
         /* Delay of 2.5 seconds */
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
+        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+
+        final AtomicBoolean latch = new AtomicBoolean();
+        final Closeable closeable = () -> latch.compareAndSet(false, true);
+
+        bus.setProperty(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500); /* 2.5 seconds */
+        final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+        cleaner.register(closeable);
+
+        // Closes the bus, the cleaner should cancel the internal timer(s)
+        bus.shutdown(true);
+
+        // The Closeable::close should be called on shutdown
+        assertThat(latch.get(), is(true));
+    }
+
+    @Test
+    public void testCleanOnShutdownDisabled() throws InterruptedException {
+        /* Delay of 2.5 seconds */
+        final Map<String, Object> properties = new HashMap<>();
+        properties.put(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
+        properties.put(CachedConstants.CLEANER_CLEAN_ON_SHUTDOWN_BUS_PROP, false);
         bus = new ExtensionManagerBus(new HashMap<>(), properties);
 
         final AtomicBoolean latch = new AtomicBoolean();
