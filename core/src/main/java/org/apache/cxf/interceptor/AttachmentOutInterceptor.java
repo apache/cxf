@@ -119,11 +119,13 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
             AttachmentSerializer ser = message.getContent(AttachmentSerializer.class);
             if (ser != null) {
                 try {
+                    message.put(Message.PARTIAL_ATTACHMENTS_MESSAGE, true);
                     String cte = (String)message.getContextualProperty(Message.CONTENT_TRANSFER_ENCODING);
                     if (cte != null) {
                         ser.setContentTransferEncoding(cte);
                     }
                     ser.writeAttachments();
+                    message.put(Message.PARTIAL_ATTACHMENTS_MESSAGE, false);
                 } catch (IOException e) {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("WRITE_ATTACHMENTS", BUNDLE), e);
                 }
