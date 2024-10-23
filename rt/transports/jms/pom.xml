@@ -191,7 +191,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-Djava.security.manager=allow</argLine>
+                            <argLine>${cxf.surefire.fork.vmargs} -Djava.security.manager=allow</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
