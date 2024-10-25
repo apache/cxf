@@ -79,6 +79,14 @@ public final class CachedConstants {
     public static final String CLEANER_DELAY_BUS_PROP =
         "bus.io.CachedOutputStreamCleaner.Delay";
 
+    /**
+     * Forces cleaning of the unclosed {@code CachedOutputStream} instances on {@link Bus} shutdown.
+     * The default value is "true", if the cleaner is deactivated or the value is set to "false", no
+     * cleanup attempt on shutdown will be performed.
+     */
+    public static final String CLEANER_CLEAN_ON_SHUTDOWN_BUS_PROP =
+        "bus.io.CachedOutputStreamCleaner.CleanOnShutdown";
+
     private CachedConstants() {
         // complete
     }
