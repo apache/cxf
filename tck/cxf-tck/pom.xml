@@ -307,6 +307,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>UpdateJerseyCommonManifests</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>zip</executable>
+                            <arguments>
+                                <argument>-d</argument>
+                                <argument>${project.build.directory}/glassfish7/glassfish/modules/jersey-common.jar</argument>
+                                <argument>META-INF/services/jakarta.ws.rs.ext.RuntimeDelegate</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>UpdateJerseyServerManifests</id>
                         <phase>pre-integration-test</phase>
                         <goals>
