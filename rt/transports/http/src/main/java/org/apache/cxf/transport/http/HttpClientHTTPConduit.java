@@ -383,6 +383,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         cb.sslContext(sslContext);
                     }
                     if (sslContext != null) {
+                        cb.sslContext(sslContext);
                         String[] supportedCiphers =  org.apache.cxf.configuration.jsse.SSLUtils
                                 .getSupportedCipherSuites(sslContext);
                         String[] cipherSuites = org.apache.cxf.configuration.jsse.SSLUtils
