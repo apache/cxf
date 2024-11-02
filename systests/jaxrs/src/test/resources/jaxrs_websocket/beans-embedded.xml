@@ -35,6 +35,12 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
         
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
+    
+    <cxf:bus>
+        <cxf:properties>
+            <entry key="skip.jakarta.json.providers.registration" value="true"/>
+        </cxf:properties>
+    </cxf:bus>
 
     <jaxrs:server id="bookservice" address="ws://localhost:${testutil.ports.org.apache.cxf.systest.jaxrs.websocket.BookServerWebSocket.2}/websocket">
         <jaxrs:serviceBeans>

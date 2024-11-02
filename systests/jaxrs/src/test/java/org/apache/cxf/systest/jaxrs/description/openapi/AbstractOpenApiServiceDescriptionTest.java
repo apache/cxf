@@ -29,6 +29,7 @@ import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -42,6 +43,7 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.openapi.parse.OpenApiParseUtils;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.hamcrest.CoreMatchers;
@@ -78,6 +80,9 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractClie
 
         @Override
         protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
+            // Make sure default JSON-P/JSON-B providers are not loaded
+            bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreOpenApi.class);
             sf.setResourceClasses(BookStoreStylesheetsOpenApi.class);
@@ -87,6 +92,7 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractClie
             final OpenApiFeature feature = createOpenApiFeature();
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
+            sf.setBus(bus);
             return sf.create();
         }
 
@@ -110,6 +116,10 @@ public abstract class AbstractOpenApiServiceDescriptionTest extends AbstractClie
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(serverClass, false));
+
+        final Bus bus = BusFactory.getThreadDefaultBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
 
     protected abstract String getPort();

@@ -46,7 +46,6 @@ import jakarta.ws.rs.ext.ContextResolver;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
@@ -74,7 +73,6 @@ public class JAXRS31ClientServerBookTest extends AbstractBusClientServerTestBase
         final String origin = String.format("Origin(%d)", ThreadLocalRandom.current().nextInt(1000));
         try (Client client = ClientBuilder
                 .newBuilder()
-                .register(new JsrJsonbProvider())
                 .register(new CustomJsonbProvider(CLIENT))
                 .build()) {
 
@@ -110,7 +108,6 @@ public class JAXRS31ClientServerBookTest extends AbstractBusClientServerTestBase
         protected Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreResource.class);
-            sf.setProvider(new JsrJsonbProvider());
             sf.setProvider(new CustomJsonbProvider(SERVER));
             sf.setAddress("http://localhost:" + PORT + "/");
             return sf.create();
