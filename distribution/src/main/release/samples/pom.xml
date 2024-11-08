@@ -35,7 +35,7 @@
         <cxf.jetty10.version>10.0.24</cxf.jetty10.version>
         <cxf.netty.version>4.1.114.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>5.17.14</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.18.1</cxf.swagger.ui.version>
         <cxf.tika.version>2.9.1</cxf.tika.version>
         <cxf.tomcat.version>9.0.96</cxf.tomcat.version>
         <cxf.lucene.version>9.12.0</cxf.lucene.version>
