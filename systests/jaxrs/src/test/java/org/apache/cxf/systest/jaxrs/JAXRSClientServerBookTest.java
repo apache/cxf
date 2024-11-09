@@ -65,6 +65,7 @@ import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.ReaderInterceptor;
 import jakarta.xml.bind.JAXBElement;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.Bus;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
@@ -75,6 +76,7 @@ import org.apache.cxf.jaxrs.client.cache.CacheControlFeature;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
@@ -118,7 +120,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(BookServer.class, true));
-        createStaticBus();
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
 
     @Test

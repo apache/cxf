@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.LoadDistributorFeature;
@@ -32,6 +34,7 @@ import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -128,12 +131,17 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
 
     protected JAXRSClientFactoryBean createBean(String address,
                                                 FailoverFeature feature) {
+        final Bus bus = new ExtensionManagerBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         List<AbstractFeature> features = new ArrayList<>();
         features.add(feature);
         bean.setFeatures(features);
-
+        bean.setBus(bus);
+   
         return bean;
     }
 

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.provider;
 
-import java.util.Arrays;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -32,7 +31,6 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
@@ -60,7 +58,6 @@ public class JsrJsonbProviderTest extends AbstractClientServerTestBase {
                 new SingletonResourceProvider(new BookJsonStore()));
             sf.setResourceProvider(BookJsonStore2.class,
                 new SingletonResourceProvider(new BookJsonStore2()));
-            sf.setProvider(new JsrJsonbProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
             return sf.create();
         }
@@ -241,8 +238,7 @@ public class JsrJsonbProviderTest extends AbstractClientServerTestBase {
 
     private static WebClient createWebClient(final String url) {
         return WebClient
-            .create("http://localhost:" + PORT + url,
-                Arrays.< Object >asList(new JsrJsonbProvider()))
+            .create("http://localhost:" + PORT + url)
             .accept(MediaType.APPLICATION_JSON);
     }
 

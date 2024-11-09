@@ -38,6 +38,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.AfterClass;
@@ -58,11 +59,13 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         assertTrue("server did not launch correctly",
                    launchServer(BookServerResourceJacksonSpringProviders.class, true));
         createStaticBus();
-        BusFactory.getDefaultBus().setProperty("skip.default.json.provider.registration", true);
+        BusFactory.getDefaultBus().setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+        BusFactory.getDefaultBus().setProperty(ProviderFactory.SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION, true);
     }
     @AfterClass
     public static void afterClass() throws Exception {
-        BusFactory.getDefaultBus().getProperties().remove("skip.default.json.provider.registration");
+        BusFactory.getDefaultBus().getProperties().remove(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION);
+        BusFactory.getDefaultBus().getProperties().remove(ProviderFactory.SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION);
     }
 
     @Test
