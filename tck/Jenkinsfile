@@ -4,8 +4,8 @@ pipeline {
    }
    
     tools { 
-        maven 'maven_3.6.3' 
-        jdk 'jdk_11_latest' 
+        maven 'maven_latest' 
+        jdk 'jdk_17_latest' 
     }
 
     stages {
@@ -47,7 +47,7 @@ pipeline {
        stage('Build JAX-RS TCK') {
            steps {
                echo "Using Apache CXF version: " + params.Version
-               sh "mvn clean install -f rest"
+               sh "mvn clean install -f rest -DskipTests=true"
            }
        }
 
@@ -62,10 +62,6 @@ pipeline {
        }
        
        stage('Run JAX-RS TCK') {
-           tools { 
-                jdk 'jdk_17_latest' 
-           }
-
            steps {
                 dir("${WORKSPACE}/cxf/tck/cxf-tck") {
                     sh "mvn clean verify -Dcxf.version=${params.Version}"
