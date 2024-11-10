@@ -191,17 +191,34 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 LogUtils.log(LOG, Level.INFO, "EXCEPTION_WHILE_CREATING_EXCEPTION", e1, e1.getMessage());
             }
         } else {
-            if (fault.getMessage() != null) {
+            Exception ex = (Exception)e; 
+            final String message = fault.getMessage();
+            if (message != null) {
                 Field f;
                 try {
                     f = Throwable.class.getDeclaredField("detailMessage");
                     ReflectionUtil.setAccessible(f);
-                    f.set(e, fault.getMessage());
+                    f.set(ex, fault.getMessage());
                 } catch (Exception e1) {
-                    //ignore
+                    try {
+                        // Fallback, try to clone the exception instead of accessing the detailMessage over reflection
+                        final Constructor<? extends Object> constructor = ReflectionUtil.getConstructor(ex.getClass(),
+                            String.class, Throwable.class); /* String message, Throwable cause */
+
+                        if (constructor != null) {
+                            final Exception clone = (Exception) constructor.newInstance(message, ex.getCause());
+                            clone.setStackTrace(ex.getStackTrace());
+                            if (ex.getSuppressed().length > 0) {
+                                Arrays.stream(ex.getSuppressed()).forEach(clone::addSuppressed);
+                            }
+                            ex = clone;
+                        }
+                    } catch (Exception e2) {
+                        /* nothing to do */
+                    }
                 }
             }
-            msg.setContent(Exception.class, e);
+            msg.setContent(Exception.class, ex);
         }
     }
 
