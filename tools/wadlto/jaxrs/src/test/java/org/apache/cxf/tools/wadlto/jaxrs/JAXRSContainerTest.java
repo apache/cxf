@@ -26,9 +26,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -48,7 +51,6 @@ import org.apache.cxf.tools.wadlto.WadlToolConstants;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -184,7 +186,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         methods.put("postThename", new Class<?>[] {java.io.IOException.class, java.lang.NoSuchMethodException.class});
         try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
             for (String className : cc.getServiceClassNames().values()) {
-                final Class<?> generatedClass = loader.loadClass(className);
+                final Class<?> generatedClass = loader.loadClass(className);      
                 for (Map.Entry<String, Class<?>[]> entry : methods.entrySet()) {
                     Method m;
                     try {
@@ -192,7 +194,24 @@ public class JAXRSContainerTest extends ProcessorTestBase {
                     } catch (NoSuchMethodException e) {
                         m = generatedClass.getMethod(entry.getKey(), String.class, String.class);
                     }
-                    assertArrayEquals(entry.getValue(), m.getExceptionTypes());
+                    ClassLoader classLoader = generatedClass.getClassLoader();
+                    Class<?>[] expectedExceptions = new Class<?>[entry.getValue().length];
+                    for (int i = 0; i < entry.getValue().length; i++) {
+                        expectedExceptions[i] = classLoader.loadClass(entry.getValue()[i].getName());
+                    }
+
+                    // Compare exception class names
+                    Set<String> expectedExceptionNames = Arrays.stream(expectedExceptions)
+                        .map(Class::getName)
+                        .collect(Collectors.toSet());
+
+                    Set<String> actualExceptionNames = Arrays.stream(m.getExceptionTypes())
+                        .map(Class::getName)
+                        .collect(Collectors.toSet());
+
+                    assertEquals("Exceptions for method " + m.getName() + " do not match.",
+                        expectedExceptionNames, actualExceptionNames);
+                    
                 }
             }
         }
