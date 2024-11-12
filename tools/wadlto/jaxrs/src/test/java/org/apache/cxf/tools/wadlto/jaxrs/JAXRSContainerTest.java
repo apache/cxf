@@ -186,7 +186,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         methods.put("postThename", new Class<?>[] {java.io.IOException.class, java.lang.NoSuchMethodException.class});
         try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
             for (String className : cc.getServiceClassNames().values()) {
-                final Class<?> generatedClass = loader.loadClass(className);      
+                final Class<?> generatedClass = loader.loadClass(className);
                 for (Map.Entry<String, Class<?>[]> entry : methods.entrySet()) {
                     Method m;
                     try {
