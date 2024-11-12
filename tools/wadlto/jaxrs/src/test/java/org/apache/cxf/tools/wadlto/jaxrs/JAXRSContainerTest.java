@@ -27,7 +27,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -178,7 +178,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         ClassCollector cc = context.get(ClassCollector.class);
         assertEquals(2, cc.getServiceClassNames().size());
 
-        final Map<String, Class<?>[]> methods = new HashMap<>();
+        final Map<String, Class<?>[]> methods = new LinkedHashMap<>();
         methods.put("listRepositories", new Class<?>[] {});
         methods.put("createRepository", new Class<?>[] {java.io.IOException.class});
         methods.put("deleteRepository",
