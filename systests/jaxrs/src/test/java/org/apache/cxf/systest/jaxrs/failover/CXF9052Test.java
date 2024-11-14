@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jaxrs.failover;
 
 import java.util.List;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.SequentialStrategy;
@@ -39,26 +39,26 @@ public class CXF9052Test {
     
     @Test
     public void failover() {
-        var failover = new FailoverFeature();
+        FailoverFeature failover = new FailoverFeature();
         failover.setStrategy(makeStrategy());
         makeRequest(List.of(failover));
     }
     
     @Test
     public void loadDistributor() {
-        var distro = new LoadDistributorFeature();
+        LoadDistributorFeature distro = new LoadDistributorFeature();
         distro.setStrategy(makeStrategy());
         makeRequest(List.of(distro));
     }
 
     private static SequentialStrategy makeStrategy() {
-        var s = new SequentialStrategy();
+        SequentialStrategy s = new SequentialStrategy();
         s.setAlternateAddresses(List.of("http://localhost:1234/test"));
         return s;
     }
 
     private static void makeRequest(List<Feature> features) {
-        var fct = new JAXRSClientFactoryBean();
+        JAXRSClientFactoryBean fct = new JAXRSClientFactoryBean();
         fct.setFeatures(features);
         fct.setServiceClass(Root.class);
         fct.setAddress("http://localhost:1234/test");
