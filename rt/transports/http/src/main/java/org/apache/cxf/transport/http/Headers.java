@@ -111,7 +111,7 @@ public class Headers {
         Map<String, List<Object>> filteredHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         filteredHeaders.putAll(headers);
         if (!logSensitiveHeaders) {
-            for (String filteredKey : SENSITIVE_HEADERS) {
+            for (String filteredKey : getSensitiveHeaderList()) {
                 filteredHeaders.put(filteredKey, SENSITIVE_HEADER_MARKER);
             }
         }
@@ -315,7 +315,7 @@ public class Headers {
         if (logger.isLoggable(level)) {
             for (Map.Entry<String, List<Object>> entry : headersMap.entrySet()) {
                 String key = entry.getKey();
-                boolean sensitive = !logSensitiveHeaders && SENSITIVE_HEADERS.contains(key);
+                boolean sensitive = !logSensitiveHeaders && getSensitiveHeaderList().contains(key);
                 List<Object> headerList = sensitive ? SENSITIVE_HEADER_MARKER : entry.getValue();
                 for (Object value : headerList) {
                     logger.log(level, key + ": "
@@ -579,5 +579,9 @@ public class Headers {
 
     public static String toHttpLanguage(Locale locale) {
         return locale.toString().replace('_', '-');
+    }
+
+    public static List<String> getSensitiveHeaderList() {
+        return SENSITIVE_HEADERS;
     }
 }
