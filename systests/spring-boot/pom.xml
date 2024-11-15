@@ -153,5 +153,11 @@
             <artifactId>micrometer-tracing-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${cxf.junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
