@@ -19,10 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.failover;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.SequentialStrategy;
@@ -34,26 +36,32 @@ import org.junit.Test;
 public class CXF9052Test {
     @Test
     public void noClustering() {
-        makeRequest(List.of());
+        makeRequest(new ArrayList<Feature>());
     }
     
     @Test
     public void failover() {
         FailoverFeature failover = new FailoverFeature();
         failover.setStrategy(makeStrategy());
-        makeRequest(List.of(failover));
+        List<Feature> features = new ArrayList<Feature>();
+        features.add(failover);
+        makeRequest(features);
     }
     
     @Test
     public void loadDistributor() {
         LoadDistributorFeature distro = new LoadDistributorFeature();
         distro.setStrategy(makeStrategy());
-        makeRequest(List.of(distro));
+        List<Feature> features = new ArrayList<Feature>();
+        features.add(distro);
+        makeRequest(features);
     }
 
     private static SequentialStrategy makeStrategy() {
         SequentialStrategy s = new SequentialStrategy();
-        s.setAlternateAddresses(List.of("http://localhost:1234/test"));
+        List<String> addresses = new ArrayList<String>();
+        addresses.add("http://localhost:1234/test");
+        s.setAlternateAddresses(addresses);
         return s;
     }
 
