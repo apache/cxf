@@ -106,20 +106,30 @@ public class Activator implements BundleActivator {
             if (intentReg == null) {
                 Dictionary<String, Object> properties = new Hashtable<>();
                 properties.put("org.apache.cxf.dosgi.IntentName", "logging");
-                bundleContext.registerService(AbstractFeature.class.getName(), logging, properties);
+                intentReg = safeRegister(AbstractFeature.class.getName(), logging, properties);
             }
 
             if (enabled) {
                 if (serviceReg == null) {
                     Dictionary<String, Object> properties = new Hashtable<>();
                     properties.put("name", "logging");
-                    serviceReg = bundleContext.registerService(Feature.class.getName(), logging, properties);
+                    serviceReg = safeRegister(Feature.class.getName(), logging, properties);
                 }
             } else {
                 if (serviceReg != null) {
                     serviceReg.unregister();
                     serviceReg = null;
                 }
+            }
+        }
+
+        private ServiceRegistration<?> safeRegister(String name, Object service,
+                            Dictionary<String, Object> properties) {
+            try {
+                return bundleContext.registerService(name, service, properties);
+            } catch (IllegalStateException e) {
+                // ignore, likely the bundle is stopped
+                return null;
             }
         }
 
