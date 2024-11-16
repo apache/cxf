@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.SequentialStrategy;
