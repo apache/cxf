@@ -19,10 +19,20 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import jakarta.jws.WebService;
+public class SayException extends Exception {
+    private static final long serialVersionUID = 1L;
+    private final int code;
 
-@WebService
-interface ExceptionService {
-    String saySomething(String text) throws IllegalArgumentException;
-    String sayNothing(String text) throws SayException;
+    public SayException() {
+        this(null, 0);
+    }
+
+    public SayException(final String message, final int code) {
+        super(message);
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
 }

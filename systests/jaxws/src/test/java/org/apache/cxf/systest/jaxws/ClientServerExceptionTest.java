@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import jakarta.xml.ws.Service;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,20 +36,33 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class ClientServerExceptionTest extends AbstractBusClientServerTestBase {
+    private ExceptionService port;
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(ClientServerExceptionServer.class, true));
     }
 
-    @Test
-    public void exceptionMessageIsPreserved() throws MalformedURLException {
+    @Before
+    public void setUp() throws Exception {
         URL wsdlURL = new URL("http://localhost:" + ClientServerExceptionServer.PORT + "/ExceptionService?wsdl");
         QName qname = new QName("http://cxf.apache.org/", "ExceptionService");
         Service service = Service.create(wsdlURL, qname);
-        ExceptionService port = service.getPort(ExceptionService.class);
+        port = service.getPort(ExceptionService.class);
+    }
 
+    @Test
+    public void exceptionMessageIsPreserved() throws MalformedURLException {
         final IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
             () -> port.saySomething("Hello World!"));
         assertEquals("Simulated!", ex.getMessage());
+    }
+
+    @Test
+    public void exceptionCustomExceptionMessageIsPreserved() throws MalformedURLException {
+        final SayException ex = assertThrows(SayException.class,
+            () -> port.sayNothing("Hello World!"));
+        assertEquals("Simulated!", ex.getMessage());
+        assertEquals(100, ex.getCode());
     }
 }
