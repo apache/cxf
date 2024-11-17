@@ -33,6 +33,11 @@ public class ClientServerExceptionServer extends AbstractBusTestServerBase {
         public String saySomething(String text) throws IllegalArgumentException {
             throw new IllegalArgumentException("Simulated!");
         }
+
+        @Override
+        public String sayNothing(String text) throws SayException {
+            throw new SayException("Simulated!", 100);
+        }
     }
 
     protected void run() {
