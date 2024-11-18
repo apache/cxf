@@ -200,7 +200,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                     ReflectionUtil.setAccessible(f);
                     f.set(ex, fault.getMessage());
                 } catch (Exception e1) {
-                    if (isJdkException(ex.getClass().getPackageName())) {
+                    if (isJdkException(ex.getClass().getName())) {
                         ex = cloneJdkException(ex, message);
                     }
                 }
