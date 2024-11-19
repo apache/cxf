@@ -434,7 +434,11 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     this.basicEntity.setContentLength(out.size());
                     wrappedStream = null;
                     handleHeadersTrustCaching();
-                    out.writeCacheTo(wrappedStream);
+                    // The wrappedStrem could be null for KNOWN_HTTP_VERBS_WITH_NO_CONTENT or empty
+                    // requests (org.apache.cxf.empty.request)
+                    if (wrappedStream != null) {
+                        out.writeCacheTo(wrappedStream);
+                    }
                 }
             }
             super.close();
