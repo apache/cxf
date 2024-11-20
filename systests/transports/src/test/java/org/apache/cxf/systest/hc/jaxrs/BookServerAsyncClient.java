@@ -33,6 +33,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.IOUtils;
@@ -40,8 +42,6 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 public class BookServerAsyncClient extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerAsyncClient.class);
