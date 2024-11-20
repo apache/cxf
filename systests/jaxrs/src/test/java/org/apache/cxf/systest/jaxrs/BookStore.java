@@ -337,6 +337,14 @@ public class BookStore {
         return book;
     }
 
+    @GET
+    @Path("/getbody")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book getBodyBook(Book book) {
+        return book;
+    }
+
     @POST
     @Path("/echoxmlbookquery")
     @Produces("application/xml")
