@@ -19,12 +19,21 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.Provider;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
+import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -46,10 +55,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+
 public class SchemaValidationClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
-
+    private static URL wsdlUrl;
     private final QName portName = new QName("http://cxf.apache.org/jaxws/schemavalidation", "servicePort");
+    
 
     public static class Server extends AbstractBusTestServerBase {
 
@@ -67,6 +78,10 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());
             ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
             ep.publish(address);
+            EndpointImpl endpoint = (EndpointImpl)Endpoint.publish(
+                                    "http://localhost:" + PORT + "/server", new TestEndpoint());
+            endpoint.getProperties().put("not-use-msv-schema-validator", "true");
+            wsdlUrl = this.getClass().getClassLoader().getResource("wsdl_systest_jaxws/cxf8979.wsdl");
         }
 
         public static void main(String[] args) {
@@ -79,6 +94,26 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             } finally {
                 System.out.println("done!");
             }
+        }
+    }
+    
+    public static class TestClient extends Service {
+
+        protected TestClient(URL wsdlDocumentLocation, QName serviceName) {
+            super(wsdlDocumentLocation, serviceName);
+        }
+    }
+
+    @ServiceMode(value = Service.Mode.PAYLOAD)
+    @WebServiceProvider(wsdlLocation = "wsdl_systest_jaxws/cxf8979.wsdl",
+                serviceName = "TestService", portName = "TestService", targetNamespace = "http://test.namespace/")
+    @SchemaValidation(type = SchemaValidation.SchemaValidationType.REQUEST)
+    public static class TestEndpoint implements Provider<Source> {
+
+                
+        @Override
+        public Source invoke(Source request) {
+            return request;
         }
     }
 
@@ -157,5 +192,23 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         }
 
     }
+    
+    @Test
+    public void testWithValidation() {
+        QName serviceName = new QName("http://test.namespace/", "TestService");
+        QName port = new QName("http://test.namespace/", "TestService");
+        TestClient service = new TestClient(wsdlUrl, serviceName);
+        Source request = readResource("wsdl_systest_jaxws/cxf8979-request.xml");
+        Dispatch<Source> dispatcher = service.createDispatch(port, Source.class, Service.Mode.MESSAGE);
+        dispatcher.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                           "http://localhost:" + PORT + "/server");
+
+        dispatcher.invoke(request);
+    }
+
+    private Source readResource(String resName) {
+        return new StreamSource(this.getClass().getClassLoader().getResourceAsStream(resName));
+    }
+
 
 }
