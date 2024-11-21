@@ -40,6 +40,7 @@ import org.apache.ws.commons.schema.constants.Constants;
 public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBinding {
 
     public static final String PREFERRED_FORMAT = "source-preferred-format";
+    public static final String NOT_USE_MSV_SCHEMA_VALIDATOR = "not-use-msv-schema-validator";
 
     final Class<?> preferred;
 
