@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
-
-import com.google.common.io.Files;
 
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingProvider;
@@ -1017,7 +1016,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testEchoProviderThresholdAsync() throws Exception {
-        final File f = Files.createTempDir();
+        final File f = Files.createTempDirectory(null).toFile();
         LOG.info("Using temp folder: " + f.getAbsolutePath());
         
         System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
@@ -1048,7 +1047,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testEchoProviderThresholdAsyncThrows() throws Exception {
-        final File f = Files.createTempDir();
+        final File f = Files.createTempDirectory(null).toFile();
         LOG.info("Using temp folder: " + f.getAbsolutePath());
         
         System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
@@ -1081,7 +1080,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testEchoProviderThresholdTimeout() throws Exception {
-        final File f = Files.createTempDir();
+        final File f = Files.createTempDirectory(null).toFile();
         LOG.info("Using temp folder: " + f.getAbsolutePath());
         
         System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
