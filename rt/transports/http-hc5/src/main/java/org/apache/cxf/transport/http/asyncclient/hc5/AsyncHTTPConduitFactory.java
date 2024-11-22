@@ -346,7 +346,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
         
         final Lookup<TlsStrategy> tlsLookupStrategy = RegistryBuilder.<TlsStrategy>create()
-            .register("https", (tlsStrategy != null) ? tlsStrategy : DefaultClientTlsStrategy.getSystemDefault())
+            .register("https", (tlsStrategy != null) ? tlsStrategy : DefaultClientTlsStrategy.createSystemDefault())
             .build();
 
         final PoolingAsyncClientConnectionManager connectionManager = new PoolingAsyncClientConnectionManager(

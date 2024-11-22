@@ -44,7 +44,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 
@@ -78,19 +77,16 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.BasicFuture;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.nio.ssl.BasicClientTlsStrategy;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.net.NamedEndpoint;
-import org.apache.hc.core5.reactor.ssl.SSLSessionInitializer;
-import org.apache.hc.core5.reactor.ssl.SSLSessionVerifier;
-import org.apache.hc.core5.reactor.ssl.TlsDetails;
+import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.util.Timeout;
 
 /**
@@ -574,28 +570,21 @@ public class URLConnectionAsyncHTTPConduit extends URLConnectionHTTPConduit {
                     final HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
                         .getHostnameVerifier(tlsClientParameters);
      
-                    tlsStrategy = new BasicClientTlsStrategy(sslcontext,
-                        new SSLSessionInitializer() {
-                            @Override
-                            public void initialize(NamedEndpoint endpoint, SSLEngine engine) {
-                                initializeSSLEngine(sslcontext, engine);
-                            }
-                        },
-                        new SSLSessionVerifier() {
-                            @Override
-                            public TlsDetails verify(NamedEndpoint endpoint, SSLEngine engine) 
-                                    throws SSLException {
-                                final SSLSession sslsession = engine.getSession();
+                    String[] cipherSuites =
+                        SSLUtils.getCiphersuitesToInclude(tlsClientParameters.getCipherSuites(),
+                                                          tlsClientParameters.getCipherSuitesFilter(),
+                                                          sslcontext.getSocketFactory().getDefaultCipherSuites(),
+                                                          SSLUtils.getSupportedCipherSuites(sslcontext),
+                                                          LOG);
 
-                                if (!verifier.verify(endpoint.getHostName(), sslsession)) {
-                                    throw new SSLException("Could not verify host " + endpoint.getHostName());
-                                }
+                    final String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
+                        .getSecureSocketProtocol() : sslcontext.getProtocol();
 
-                                setSSLSession(sslsession);
-                                return new TlsDetails(sslsession, engine.getApplicationProtocol());
-                            }
-                        }
-                    );
+                    final String[] protocols = findProtocols(protocol,
+                        sslContext.getSupportedSSLParameters().getProtocols());
+
+                    tlsStrategy = new DefaultClientTlsStrategy(sslcontext, protocols,
+                        cipherSuites, SSLBufferMode.STATIC, verifier);
                 } catch (final GeneralSecurityException e) {
                     LOG.warning(e.getMessage());
                 }
