@@ -275,19 +275,6 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-        <profile>
-            <id>jdk17</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>spring.milestone</id>
-                    <url>https://repo.spring.io/milestone/</url>
-                    <name>Spring Milestone Repo</name>
-                </repository>
-            </repositories>
-        </profile>
     </profiles>
     <!--
      we turn off the deploy in the properties above, but deploy plugin will
@@ -306,4 +293,11 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>spring.milestone</id>
+            <url>https://repo.spring.io/milestone/</url>
+            <name>Spring Milestone Repo</name>
+        </repository>
+    </repositories>
 </project>
