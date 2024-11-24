@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -102,7 +103,7 @@ public class HeadersTest {
         headerMap.put("Accept", Arrays.asList("text/plain"));
         message.put(Message.PROTOCOL_HEADERS, headerMap);
 
-        String loggedString = Headers.toString(message, false);
+        String loggedString = Headers.toString(headerMap, Set.of("Authorization", "Proxy-Authorization"), false);
         assertFalse("The value of a sensitive header could be logged: " + loggedString, loggedString.contains("FAIL"));
         assertTrue("The value of a non-sensitive header would not be logged: " + loggedString,
                    loggedString.contains("application/xml") && loggedString.contains("text/plain"));
@@ -119,9 +120,8 @@ public class HeadersTest {
         headerMap.put("MyCustomHeader", Arrays.asList("Value1"));
         headerMap.put("NotMyCustomHeader", Arrays.asList("Value2"));
         message.put(Message.PROTOCOL_HEADERS, headerMap);
-        message.put("org.apache.http.sensitive.headers", "Authorization,MyCustomHeader");
 
-        String loggedString = Headers.toString(message, false);
+        String loggedString = Headers.toString(headerMap, Set.of("Authorization", "MyCustomHeader"), false);
 
         assertFalse("The value of a custom sensitive header should not be logged: "
                 + loggedString, loggedString.contains("FAIL"));
@@ -183,7 +183,8 @@ public class HeadersTest {
                 // no-op
             } });
 
-        Headers.logProtocolHeaders(logger, Level.INFO, message, false);
+        Headers.logProtocolHeaders(logger, Level.INFO, headerMap, 
+            Set.of("Authorization", "Proxy-Authorization"), false);
     }
 
     @Test
