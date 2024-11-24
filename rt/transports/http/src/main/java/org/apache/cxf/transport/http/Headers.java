@@ -112,11 +112,12 @@ public class Headers {
      * filtered keys), so it should be used sparingly - i.e. only when debug is
      * enabled.
      */
-    static String toString(Message message, boolean logSensitiveHeaders) {
+    static String toString(Map<String, List<Object>> headers, Set<String> sensitiveHeaders,
+            boolean logSensitiveHeaders) {
         Map<String, List<Object>> filteredHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        filteredHeaders.putAll(CastUtils.cast(getSetProtocolHeaders(message)));
+        filteredHeaders.putAll(CastUtils.cast(headers));
         if (!logSensitiveHeaders) {
-            for (String filteredKey : getSensitiveHeaders(message)) {
+            for (String filteredKey : sensitiveHeaders) {
                 filteredHeaders.put(filteredKey, SENSITIVE_HEADER_MARKER);
             }
         }
@@ -314,13 +315,13 @@ public class Headers {
      * @param logSensitiveHeaders whether to log sensitive headers
      */
     static void logProtocolHeaders(Logger logger, Level level,
-                                   Message message,
-                                   boolean logSensitiveHeaders) {
+            Map<String, List<Object>> headersMap,
+            Set<String> sensitiveHeaders,
+            boolean logSensitiveHeaders) {
         if (logger.isLoggable(level)) {
-            Map<String, List<Object>> headersMap = CastUtils.cast(getSetProtocolHeaders(message));
             for (Map.Entry<String, List<Object>> entry : headersMap.entrySet()) {
                 String key = entry.getKey();
-                boolean sensitive = !logSensitiveHeaders && getSensitiveHeaders(message).contains(key);
+                boolean sensitive = !logSensitiveHeaders && sensitiveHeaders.contains(key);
                 List<Object> headerList = sensitive ? SENSITIVE_HEADER_MARKER : entry.getValue();
                 for (Object value : headerList) {
                     logger.log(level, key + ": "
@@ -371,7 +372,8 @@ public class Headers {
 
         transferProtocolHeadersToURLConnection(connection);
 
-        logProtocolHeaders(LOG, Level.FINE, message, logSensitiveHeaders());
+        Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
+        logProtocolHeaders(LOG, Level.FINE, theHeaders, getSensitiveHeaders(), logSensitiveHeaders());
     }
 
     public String determineContentType() {
@@ -455,7 +457,9 @@ public class Headers {
             headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
         }
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Request Headers: " + toString(message, logSensitiveHeaders()));
+            Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
+            LOG.log(Level.FINE, "Request Headers: " + toString(theHeaders, getSensitiveHeaders(), 
+                logSensitiveHeaders()));
         }
     }
 
@@ -583,7 +587,7 @@ public class Headers {
         return locale.toString().replace('_', '-');
     }
 
-    static Set<String> getSensitiveHeaders(Message message) {
+    private Set<String> getSensitiveHeaders() {
         return MessageUtils.getContextualStrings(message, SENSITIVE_HEADERS_PROP_NAME,
                 DEFAULT_SENSITIVE_HEADERS);
     }
