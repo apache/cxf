@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.jboss.ws.cxf</groupId>
             <artifactId>jbossws-cxf-client</artifactId>
-            <version>7.2.0.Final</version>
+            <version>7.3.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
