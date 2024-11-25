@@ -1873,6 +1873,20 @@
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-test</artifactId>
                 <version>${cxf.micrometer.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>ru.lanwen.wiremock</groupId>
+                        <artifactId>wiremock-junit5</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.tomakehurst</groupId>
+                        <artifactId>wiremock-jre8-standalone</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
