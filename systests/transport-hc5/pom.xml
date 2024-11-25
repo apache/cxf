@@ -233,6 +233,10 @@
                     <groupId>org.junit.jupiter</groupId>
                     <artifactId>junit-jupiter</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

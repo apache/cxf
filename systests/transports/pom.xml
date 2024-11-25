@@ -297,6 +297,10 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
