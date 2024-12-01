@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="Download" targetNamespace="http://cxf.apache.org/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.apache.org/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://cxf.apache.org/"
+                   xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
+                   elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/">
+
+            <xs:import namespace="http://www.w3.org/2005/05/xmlmime"/>
+            <xs:element name="downloadNext" type="tns:downloadNext"/>
+            <xs:element name="downloadNextResponse" type="tns:downloadNextResponse"/>
+            <xs:complexType name="downloadNextResponseType">
+                <xs:sequence>
+                    <xs:element name="dataContent" type="xs:base64Binary"
+                                xmime:expectedContentTypes="application/octet-stream"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="downloadNext">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="simulate" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="downloadNextResponse">
+                <xs:sequence>
+                    <xs:element form="qualified" minOccurs="0" name="downloadNextResponse"
+                                type="tns:downloadNextResponseType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="DownloadFault" type="tns:DownloadFault"/>
+            <xs:complexType name="DownloadFault">
+                <xs:sequence/>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="DownloadFault">
+        <wsdl:part name="DownloadFault" element="tns:DownloadFault">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="downloadNextResponse">
+        <wsdl:part name="parameters" element="tns:downloadNextResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="downloadNext">
+        <wsdl:part name="parameters" element="tns:downloadNext">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="Download">
+        <wsdl:operation name="downloadNext">
+            <wsdl:input name="downloadNext" message="tns:downloadNext"
+                        wsam:Action="http://cxf.apache.org/downloadNext">
+            </wsdl:input>
+            <wsdl:output name="downloadNextResponse" message="tns:downloadNextResponse"
+                         wsam:Action="http://cxf.apache.org/Download/downloadNextResponse">
+            </wsdl:output>
+            <wsdl:fault name="DownloadFault" message="tns:DownloadFault"
+                        wsam:Action="http://cxf.apache.org/Download/downloadNext/Fault/DownloadFault">
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="DownloadServiceInterfaceServiceSoapBinding" type="tns:Download">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="downloadNext">
+            <soap:operation soapAction="http://cxf.apache.org/downloadNext" style="document"/>
+            <wsdl:input name="downloadNext">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="downloadNextResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="DownloadFault">
+                <soap:fault name="DownloadFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="DownloadServiceInterfaceService">
+        <wsdl:port name="DownloadPort" binding="tns:DownloadServiceInterfaceServiceSoapBinding">
+            <soap:address location="http://localhost:9090/DownloadPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
