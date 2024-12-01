@@ -37,6 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -64,9 +65,16 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
         }
         public void handleMessage(SoapMessage message) throws Fault {
             LOG.info(getClass() + (String) message.get(Message.CONTENT_TYPE));
+            Fault f = (Fault)message.getContent(Exception.class);
+
+            // If only some attachments have been written (usually, using chunked transfer), we  could 
+            // have been streaming some data already and may not be able to inject a fault in the middle 
+            // of the data transfer.
+            if (MessageUtils.getContextualBoolean(message, Message.PARTIAL_ATTACHMENTS_MESSAGE, false)) {
+                throw f;
+            }
 
             XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
-            Fault f = (Fault)message.getContent(Exception.class);
             message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
 
             SoapFault fault = SoapFault.createFault(f, message.getVersion());
