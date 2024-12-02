@@ -1,4 +1,4 @@
-Apache CXF 3.6.4 Release Notes
+Apache CXF 3.6.5 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.4 fixes over 13 issues/tasks reported by users.
+3.6.5 fixes over 25 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -67,29 +67,36 @@ for caveats when upgrading.
 7. Release Notes
 
 ** Bug
-    * [CXF-8951] - Concurrent WebClient usage causes massive thread overhead
-    * [CXF-8980] - JaxRS client - receive timeout not working since CXF 4.0.1
-    * [CXF-8987] - Java 21 - HttpClientHTTPConduit thread locked during shutdown 
-    * [CXF-9009] - Async operations fail in concurrent calls
-    * [CXF-9015] - Typo in JsonMapObjectReaderWriter treats \h as a special character instead of \n
-    * [CXF-9030] - "-suppress-generated-date" does not omit timestamps from @Generated
+    * [CXF-7396] - CachedOutputStream doesn't delete temp files
+    * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
+    * [CXF-8931] - HttpClientHTTPConduit can't disable the http chunk mode
+    * [CXF-8950] - HttpClient in CXF closing prematurely; 4.0.4-SNAPSHOT
+    * [CXF-8979] - XML (Woodstox/MSV) based schema validation is broken
+    * [CXF-8995] - OpcodesProxy java.lang.ArrayIndexOutOfBoundsException: Index 7 out of bounds for length 7
+    * [CXF-9021] - Warning "Could not resolve Schema for datatypes.dtd" when file was found
+    * [CXF-9037] - NPE when using com.ctc.wstx.returnNullForDefaultNamespace=true
+    * [CXF-9042] - Several unit tests are non-idempotent
+    * [CXF-9052] - LoadDistributorFeature not comaptible with JAX-RS subresources
+    * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
+    * [CXF-9060] - WSDL2Java Service generation results in 'unused import' warnings
+    * [CXF-9064] - AsyncHTTPConduit doesn't close copied wrappedStream on close
+    * [CXF-9066] - MaskSensitiveHelper does not mask multi-line content
+    * [CXF-9067] - MaskSensitiveHelper incorrectly masks wrapper element
+    * [CXF-9074] - HttpClientHTTPConduit ignores SSLContext in TLSClientParameters (Java HttpClient)
+    * [CXF-9076] - Exception message is not unmarshalled with JDK17
+    * [CXF-9078] - AsyncHTTPConduit.java causing NullPointerException when closing
+    * [CXF-9079] - java.lang.IllegalStateException: Encoding process already completed from LengthDelimitedEncoder
+    * [CXF-9081] - Possible IllegalStateException from OSGi when bundle is stopped
 
 
 
 
 ** Improvement
-    * [CXF-8982] - LoggingFeature does not hide sensitive xml elements with namespace prefix
-    * [CXF-8996] - JAXRS Bean introspection utility Beanspector relies on Class.getMethods natural order
-    * [CXF-9016] - Upgrade Spring-Framework to 5.3.34 in Apache-cxf
-
-** Test
-    * [CXF-8994] - CorbaConduitTest no longer requires IBM JDK destination activation routine.
-    * [CXF-8997] - AbstractSTSTokenTest and TransportBindingTests no longer need to set https protocol to TLSv1 on IBM Java
-    * [CXF-8999] - KerberosTokenTest testKerberosViaCustomTokenAction should not run on IBM Java
-
-
-** Task
-    * [CXF-9001] - CDI extension not comptible with IBM Semeru
+    * [CXF-9047] - http-undertow transport: enable to specify CipherSuites
+    * [CXF-9055] - Follow OpenTelemetry semantic conventions for trace span and its attributes
+    * [CXF-9059] - HttpConduit should flush output stream ahead of closing connections when HttpClient is autocloseable
+    * [CXF-9062] - Be able to create AsyncHTTPConduit based on URLConnectionHTTPConduit
+    * [CXF-9082] - SENSITIVE_HEADERS list is hardcoded
 
 
 
