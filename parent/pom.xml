@@ -229,7 +229,7 @@
              with a qualifier. We do want a range. -->
         <cxf.validation.api.package.version>[3,4)</cxf.validation.api.package.version>
         <cxf.validation.api.version>3.0.2</cxf.validation.api.version>
-        <cxf.velocity.version>2.3</cxf.velocity.version>
+        <cxf.velocity.version>2.4.1</cxf.velocity.version>
         <cxf.wildfly.common.version>2.0.1</cxf.wildfly.common.version>
         <cxf.wiremock.version>3.10.0</cxf.wiremock.version>
         <cxf.woodstox.core.version>7.1.0</cxf.woodstox.core.version>
