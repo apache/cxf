@@ -48,7 +48,6 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor"/>
-    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwsjsonhmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -56,7 +55,6 @@ under the License.
         <jaxrs:providers>
             <ref bean="jwsInFilter"/>
             <ref bean="jwsOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
@@ -73,7 +71,6 @@ under the License.
             <ref bean="jwsOutFilter"/>
             <ref bean="jweInFilter"/>
             <ref bean="jweOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>

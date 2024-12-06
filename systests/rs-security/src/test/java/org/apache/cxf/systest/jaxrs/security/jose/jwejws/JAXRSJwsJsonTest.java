@@ -28,8 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -86,7 +84,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
         BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
-                                       Collections.singletonList(new JacksonJsonProvider()));
+                                       List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -98,8 +96,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
             return;
         }
         String address = "https://localhost:" + PORT + "/jwejwsjsonhmac";
-        List<?> extraProviders = Arrays.asList(new JacksonJsonProvider(),
-                                               new JweWriterInterceptor(),
+        List<?> extraProviders = Arrays.asList(new JweWriterInterceptor(),
                                                new JweClientResponseFilter());
         String jwkStoreProperty = "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties";
         Map<String, Object> props = new HashMap<>();

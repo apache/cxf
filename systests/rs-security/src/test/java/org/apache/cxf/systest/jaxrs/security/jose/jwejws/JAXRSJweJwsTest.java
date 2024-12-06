@@ -20,12 +20,9 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;
@@ -85,8 +82,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweJwkBookBeanRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
-        BookStore bs = createJweBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -265,8 +261,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider =
             new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256);
-        BookStore bs = createJweJwsBookStore(address, hmacProvider,
-                                             Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweJwsBookStore(address, hmacProvider, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -303,8 +298,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJwkBookHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
-        BookStore bs = createJwsBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJwsBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());

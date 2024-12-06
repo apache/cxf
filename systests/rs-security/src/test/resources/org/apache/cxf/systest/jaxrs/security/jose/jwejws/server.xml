@@ -163,7 +163,6 @@ under the License.
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkrsa">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -171,7 +170,6 @@ under the License.
         <jaxrs:providers>
             <ref bean="jweInFilter"/>
             <ref bean="jweOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk.properties"/>
@@ -212,7 +210,6 @@ under the License.
             <ref bean="jweOutFilter"/>
             <ref bean="jwsHmacInFilter"/>
             <ref bean="jwsOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
@@ -229,7 +226,6 @@ under the License.
         <jaxrs:providers>
             <ref bean="jwsInFilter"/>
             <ref bean="jwsOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
@@ -243,7 +239,6 @@ under the License.
             <ref bean="jwsInFilterHttpHeaders"/>
             <ref bean="httpHeaderFilter"/>
             <ref bean="jwsOutFilter"/>
-            <ref bean="jackson"/>
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>

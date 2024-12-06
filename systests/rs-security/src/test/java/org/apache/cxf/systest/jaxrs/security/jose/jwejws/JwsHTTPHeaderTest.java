@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.interceptor.Fault;
@@ -65,7 +63,6 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         URL busFile = JwsHTTPHeaderTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor jwsWriterInterceptor = new JwsWriterInterceptor();
         providers.add(jwsWriterInterceptor);
 
@@ -97,7 +94,6 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         URL busFile = JwsHTTPHeaderTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor jwsWriterInterceptor = new JwsWriterInterceptor();
         jwsWriterInterceptor.setProtectHttpHeaders(true);
         Set<String> headersToSign = new HashSet<>();
@@ -133,7 +129,6 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         URL busFile = JwsHTTPHeaderTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor jwsWriterInterceptor = new JwsWriterInterceptor();
         jwsWriterInterceptor.setProtectHttpHeaders(true);
         Set<String> headersToSign = new HashSet<>();
@@ -168,7 +163,6 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         URL busFile = JwsHTTPHeaderTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor jwsWriterInterceptor = new JwsWriterInterceptor();
         jwsWriterInterceptor.setProtectHttpHeaders(true);
         providers.add(jwsWriterInterceptor);
@@ -208,7 +202,6 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         URL busFile = JwsHTTPHeaderTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor jwsWriterInterceptor = new JwsWriterInterceptor();
         jwsWriterInterceptor.setProtectHttpHeaders(true);
         Set<String> headersToSign = new HashSet<>();
