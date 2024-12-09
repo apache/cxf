@@ -16,9 +16,9 @@
 	-->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:soapjms="http://www.w3.org/2010/soapjms/"
-	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
 	targetNamespace="http://www.w3.org/2010/soapjms/"
-	elementFormDefault="qualified" jaxb:version="2.0">
+	elementFormDefault="qualified" jaxb:version="3.0">
 
 	<xs:element name="jndiContextParameter" type="soapjms:jndiContextParameterType" />
 	<xs:element name="jndiConnectionFactoryName" type="soapjms:jndiConnectionFactoryNameType" />
