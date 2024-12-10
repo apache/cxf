@@ -613,7 +613,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public UriBuilder scheme(String s) throws IllegalArgumentException {
-        scheme = s;
+        scheme = (s != null) ? s.toLowerCase() : s;
         return this;
     }
 

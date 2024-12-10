@@ -19,8 +19,11 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Date;
 import java.util.HashMap;
@@ -144,7 +147,25 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
         final JAXRSServerFactoryBean factory = ResourceUtils.createApplication(application, false, false, false, null);
-        final URI address = configuration.baseUriBuilder().path(factory.getAddress()).build();
+        
+        Configuration.Builder instanceConfigurationBuilder = Configuration.builder().from(configuration);
+        if (!configuration.hasProperty(Configuration.HOST)) { // The default value is "localhost"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.host("localhost");
+        }
+        if (!configuration.hasProperty(Configuration.PROTOCOL)) { // The default value is "HTTP"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.protocol("HTTP");
+        }
+        if (!configuration.hasProperty(Configuration.PORT)) { // The default value is implementation specific
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(8080); /* non-priviledged port */
+        } else if (configuration.port() == configuration.FREE_PORT) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(findFreePort()); /* free port */
+        }
+        if (!configuration.hasProperty(Configuration.ROOT_PATH)) { // The default value is "/"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.rootPath("/");
+        }
+        
+        final Configuration instanceConfiguration = instanceConfigurationBuilder.build();
+        final URI address = instanceConfiguration.baseUriBuilder().path(factory.getAddress()).build();
         factory.setAddress(address.toString());
         factory.setStart(true);
         
@@ -174,7 +195,7 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
 
         return CompletableFuture
             .supplyAsync(() -> factory.create())
-            .thenApply(s -> new InstanceImpl(s, configuration));
+            .thenApply(s -> new InstanceImpl(s, instanceConfiguration));
     }
 
     @Override
@@ -197,5 +218,16 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
         return new EntityPartBuilderImpl(partName);
+    }
+
+    @SuppressWarnings("removal")
+    private static int findFreePort() {
+        return AccessController.doPrivileged((PrivilegedAction<Integer>) () -> {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                return socket.getLocalPort();
+            } catch (final IOException e) {
+                return -1;
+            }
+        });
     }
 }
