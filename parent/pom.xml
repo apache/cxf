@@ -239,7 +239,7 @@
         <cxf.xmlschema.version>2.3.1</cxf.xmlschema.version>
         <cxf.xnio.version>3.8.16.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
-        <cxf.zipkin-reporter.version>3.4.2</cxf.zipkin-reporter.version>
+        <cxf.zipkin-reporter.version>3.4.3</cxf.zipkin-reporter.version>
 
         <!-- various OSGi related versions -->
         <cxf.aries.api.version>1.0.1</cxf.aries.api.version>
