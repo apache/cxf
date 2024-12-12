@@ -35,7 +35,7 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cxf.version>4.1.0-SNAPSHOT</cxf.version>
+        <cxf.version>4.1.1-SNAPSHOT</cxf.version>
         <glassfish.container.version>7.0.16</glassfish.container.version>
         <glassfish.home>${project.build.directory}/glassfish7</glassfish.home>
         <jakarta.platform.version>10.0.0</jakarta.platform.version>
@@ -154,6 +154,12 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <scope>test</scope>
         </dependency> 
+
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -581,6 +587,17 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>apache-snapshots</id>
+            <name>Apache SNAPSHOT Repository</name>
+            <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
 </project>

@@ -19,8 +19,11 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,6 +58,8 @@ import org.apache.cxf.jaxrs.bootstrap.InstanceImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class RuntimeDelegateImpl extends RuntimeDelegate {
+     // The default value is implementation specific, using non-priviledged default port
+    private static final int DEFAULT_HTTP_PORT = 8080;
     protected Map<Class<?>, HeaderDelegate<?>> headerProviders = new HashMap<>();
 
     public RuntimeDelegateImpl() {
@@ -144,7 +149,30 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
         final JAXRSServerFactoryBean factory = ResourceUtils.createApplication(application, false, false, false, null);
-        final URI address = configuration.baseUriBuilder().path(factory.getAddress()).build();
+
+        Configuration.Builder instanceConfigurationBuilder = Configuration.builder().from(configuration);
+        if (!configuration.hasProperty(Configuration.HOST)) { // The default value is "localhost"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.host("localhost");
+        }
+
+        if (!configuration.hasProperty(Configuration.PROTOCOL)) { // The default value is "HTTP"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.protocol("HTTP");
+        }
+
+        if (!configuration.hasProperty(Configuration.PORT)) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(DEFAULT_HTTP_PORT);
+        } else if (configuration.port() == Configuration.FREE_PORT) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(findFreePort()); /* free port */
+        } else if (configuration.port() == Configuration.DEFAULT_PORT) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(DEFAULT_HTTP_PORT); 
+        }
+
+        if (!configuration.hasProperty(Configuration.ROOT_PATH)) { // The default value is "/"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.rootPath("/");
+        }
+
+        final Configuration instanceConfiguration = instanceConfigurationBuilder.build();
+        final URI address = instanceConfiguration.baseUriBuilder().path(factory.getAddress()).build();
         factory.setAddress(address.toString());
         factory.setStart(true);
         
@@ -174,9 +202,10 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
 
         return CompletableFuture
             .supplyAsync(() -> factory.create())
-            .thenApply(s -> new InstanceImpl(s, configuration));
+            .thenApply(s -> new InstanceImpl(s, instanceConfiguration));
     }
 
+    @SuppressWarnings({ "removal", "deprecation" })
     @Override
     public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
         try {
@@ -197,5 +226,16 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
         return new EntityPartBuilderImpl(partName);
+    }
+
+    @SuppressWarnings({ "removal", "deprecation" })
+    private static int findFreePort() {
+        return AccessController.doPrivileged((PrivilegedAction<Integer>) () -> {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                return socket.getLocalPort();
+            } catch (final IOException e) {
+                return -1;
+            }
+        });
     }
 }
