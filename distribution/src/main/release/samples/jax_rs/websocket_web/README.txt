@@ -16,13 +16,13 @@ Using either UNIX or Windows:
 
 This will produce a war file in the target folder.
 
-To run the war file using jetty9
+To run the war file using jetty
 
   mvn jetty:run-war  (from one command line window)
 
-To run the war file using tomcat7
+To run the war file using tomcat
 
-  mvn tomcat7:run-war  (from one command line window)
+  mvn cargo:run  (from one command line window)
 
 To remove the target dir, run mvn clean".
 

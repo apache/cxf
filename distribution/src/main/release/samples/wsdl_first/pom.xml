@@ -49,13 +49,38 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.2</version>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.8.5</version>
                     <configuration>
-                        <server>myTomcat</server>
-                        <url>http://localhost:8080/manager/text</url>
-                        <path>/${project.build.finalName}</path>
+                        <container>
+                            <containerId>tomcat</containerId>
+                            <artifactInstaller>
+                                <groupId>org.apache.tomcat</groupId>
+                                <artifactId>tomcat</artifactId>
+                                <version>${cxf.tomcat.version}</version>
+                            </artifactInstaller>
+                        </container>
+                        <configuration>
+                            <type>standalone</type>
+                            <home>
+                                ${project.build.directory}/apache-tomcat-${cxf.tomcat.version}
+                            </home>
+                            <properties>
+                                <cargo.servlet.port>8080</cargo.servlet.port>
+                                <cargo.logging>high</cargo.logging>
+                            </properties>
+                        </configuration>
+                        <deployables>
+                            <deployable>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <type>war</type>
+                                <properties>
+                                    <context>/${project.build.finalName}</context>
+                                </properties>
+                            </deployable>
+                        </deployables>
                     </configuration>
                 </plugin>
             </plugins>

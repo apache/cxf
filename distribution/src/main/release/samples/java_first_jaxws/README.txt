@@ -25,13 +25,9 @@ Alternative: WAR deployment of service to Tomcat (either embedded or standalone)
 value, for running this sample on your local machine most likely:
 "http://localhost:8080/java_first_jaxws/services/hello_world".
 
-2.) Standalone Tomcat: Manually copy the generated WAR file to the Tomcat webapps folder, 
-or, if you have Maven and Tomcat set up to use the Tomcat Maven Plugin 
-(http://tomcat.apache.org/maven-plugin-2.2/tomcat7-maven-plugin/index.html) you can
-use the mvn tomcat7:redeploy command instead.  
+2.) Standalone Tomcat: Manually copy the generated WAR file to the Tomcat webapps folder
 
-For embedded Tomcat 7: Just run mvn tomcat7:run-war from the project base folder.
-For embedded Tomcat 8: Just run mvn cargo:run from the project base folder.
+For embedded Tomcat: Just run mvn cargo:run from the project base folder.
 
 Prior to running the client (mvn -Pclient) it would be good to confirm the 
 generated WSDL can be seen from a web browser at:
