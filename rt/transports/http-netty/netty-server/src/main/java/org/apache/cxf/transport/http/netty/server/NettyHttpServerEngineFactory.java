@@ -35,6 +35,7 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.transport.http.HTTPServerEngineFactoryParametersProvider;
 
 
 @NoJSR250Annotations(unlessNull = "bus")
@@ -176,6 +177,17 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         if ("https".equals(protocol) && tlsServerParametersMap != null) {
             tlsServerParameters = tlsServerParametersMap.get(Integer.toString(port));
         }
+        
+        if (tlsServerParameters == null) {
+            final HTTPServerEngineFactoryParametersProvider provider = 
+                bus.getExtension(HTTPServerEngineFactoryParametersProvider.class);
+            if (provider != null) {
+                tlsServerParameters = provider
+                    .getDefaultTlsServerParameters(bus, host, port, protocol, null)
+                    .orElse(null);
+            }
+        }
+
         NettyHttpServerEngine ref = getOrCreate(this, host, port, tlsServerParameters);
         // checking the protocol
         if (!protocol.equals(ref.getProtocol())) {

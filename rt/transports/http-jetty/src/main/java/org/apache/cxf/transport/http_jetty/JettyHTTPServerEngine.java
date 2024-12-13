@@ -53,6 +53,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.jsse.SSLContextServerParameters;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
@@ -854,6 +855,11 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         return result;
     }
     protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
+        // The full SSL context is provided by SSLContextServerParameters
+        if (tlsServerParameters instanceof SSLContextServerParameters sslContextServerParameters) {
+            return sslContextServerParameters.getSslContext();
+        }
+
         String proto = tlsServerParameters.getSecureSocketProtocol() == null
             ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
 
