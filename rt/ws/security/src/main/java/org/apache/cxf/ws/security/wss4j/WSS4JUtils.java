@@ -47,6 +47,7 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.cache.CXFEHCacheReplayCache;
+import org.apache.cxf.ws.security.cache.jcache.CXFJCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
@@ -73,6 +74,20 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 public final class WSS4JUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JUtils.class);
+    private static final boolean JCACHE_INSTALLED;
+
+    static {
+        boolean jcacheInstalled = false;
+        try {
+            final Class<?> caching = Class.forName("javax.cache.Caching");
+            if (caching != null) {
+                jcacheInstalled = true;
+            }
+        } catch (Exception e) {
+            LOG.fine("No JCache SPIs detected on classpath: " + e.getMessage());
+        }
+        JCACHE_INSTALLED = jcacheInstalled;
+    }
 
     private WSS4JUtils() {
         // complete
@@ -146,6 +161,9 @@ public final class WSS4JUtils {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                         }
                         replayCache = new CXFEHCacheReplayCache(cacheKey, bus, diskstoreParent);
+                    } else if (isJCacheInstalled()) {
+                        Bus bus = message.getExchange().getBus();
+                        replayCache = new CXFJCacheReplayCache(cacheKey, bus);
                     } else {
                         replayCache = new MemoryReplayCache();
                     }
@@ -388,5 +406,9 @@ public final class WSS4JUtils {
         }
 
         return null;
+    }
+    
+    public static boolean isJCacheInstalled() {
+        return JCACHE_INSTALLED;
     }
 }
