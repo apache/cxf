@@ -20,7 +20,15 @@
 <config
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xmlns='http://www.ehcache.org/v3'
-        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.8.xsd">
+        xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.8.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+    <service> 
+        <jsr107:defaults default-template="org.apache.cxf.ws.security.tokenstore.TokenStore.template"> 
+            <jsr107:cache name="org.apache.cxf.ws.security.tokenstore.TokenStore" template="org.apache.cxf.ws.security.tokenstore.TokenStore.template"/> 
+        </jsr107:defaults>
+    </service>
 
     <!--
          Security Tokens are not writable to Disk so use a memory only
@@ -28,9 +36,9 @@
          cache is per-endpoint so not "too large" to not consume the
          entire heap.
     -->
-    <cache-template name="org.apache.cxf.ws.security.tokenstore.TokenStore">
+    <cache-template name="org.apache.cxf.ws.security.tokenstore.TokenStore.template">
         <key-type>java.lang.String</key-type>
-        <value-type>org.apache.cxf.ws.security.tokenstore.SecurityToken</value-type>
+        <value-type copier="org.ehcache.impl.copy.IdentityCopier">org.apache.cxf.ws.security.tokenstore.SecurityToken</value-type>
         <expiry>
             <ttl unit="seconds">3600</ttl>
         </expiry>
