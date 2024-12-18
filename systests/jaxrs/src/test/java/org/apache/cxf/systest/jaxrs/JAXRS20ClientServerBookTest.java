@@ -63,6 +63,7 @@ import jakarta.ws.rs.client.ResponseProcessingException;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.core.GenericEntity;
@@ -1122,6 +1123,23 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             + "jakarta.ws.rs.ext.Provider,jakarta.ws.rs.Consumes}"));
     }
     
+    @Test
+    public void testGetCookies() throws Exception {
+        final WebTarget target = ClientBuilder
+            .newClient()
+            .property("org.apache.cxf.http.cookie.separator", ";")
+            .target("http://localhost:" + PORT + "/bookstore/cookies");
+
+        @SuppressWarnings("unchecked")
+        final Response response = target
+            .request().accept("application/json")
+            .cookie(new Cookie("a", "1"))
+            .cookie(new Cookie("b", "2"))
+            .get();
+
+        assertThat(response.getHeaderString(HttpHeaders.SET_COOKIE), equalTo("$Version=1;a=1; $Version=1;b=2"));
+    }
+
     private static final class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override
