@@ -21,9 +21,15 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 
+import org.apache.cxf.rs.security.saml.sso.jcache.JCacheTokenReplayCache;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,12 +37,23 @@ import static org.junit.Assert.assertTrue;
 /**
  * Some unit tests for the TokenReplayCache implementations
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class TokenReplayCacheTest {
+    private final Class<? extends TokenReplayCache<String>> tokenReplayCacheClass;
+    
+    public TokenReplayCacheTest(Class<? extends TokenReplayCache<String>> tokenReplayCacheClass) {
+        this.tokenReplayCacheClass = tokenReplayCacheClass;
+    }
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Class<? extends TokenReplayCache<String>>> data() {
+        return Arrays.asList(EHCacheTokenReplayCache.class, JCacheTokenReplayCache.class);
+    }
 
     @Test
-    public void testEhCacheTokenReplayCache() throws Exception {
+    public void testTokenReplayCacheTokenReplayCache() throws Exception {
 
-        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        TokenReplayCache<String> replayCache = createCache();
 
         testTokenReplayCacheInstance(replayCache);
 
@@ -44,16 +61,16 @@ public class TokenReplayCacheTest {
     }
 
     @Test
-    public void testEhCacheCloseCacheTwice() throws Exception {
-        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+    public void testTokenReplayCacheCloseCacheTwice() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
         replayCache.close();
         replayCache.close();
     }
 
     // No expiry specified so it falls back to the default
     @Test
-    public void testEhCacheTokenReplayCacheNoExpirySpecified() throws Exception {
-        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+    public void testTokenReplayCacheNoExpirySpecified() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id);
@@ -64,8 +81,8 @@ public class TokenReplayCacheTest {
 
     // The negative expiry is rejected and it falls back to the default
     @Test
-    public void testEhCacheTokenReplayCacheNegativeExpiry() throws Exception {
-        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+    public void testTokenReplayCacheNegativeExpiry() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id, Instant.now().minusSeconds(100L));
@@ -76,8 +93,8 @@ public class TokenReplayCacheTest {
 
     // The huge expiry is rejected and it falls back to the default
     @Test
-    public void testEhCacheTokenReplayCacheHugeExpiry() throws Exception {
-        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+    public void testTokenReplayCacheHugeExpiry() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
 
         String id = UUID.randomUUID().toString();
         replayCache.putId(id, Instant.now().plus(14, ChronoUnit.HOURS));
@@ -104,5 +121,9 @@ public class TokenReplayCacheTest {
         Thread.sleep(1250L);
         assertFalse(replayCache.contains(id));
 
+    }
+
+    private TokenReplayCache<String> createCache() throws Exception {
+        return tokenReplayCacheClass.getDeclaredConstructor().newInstance();
     }
 }
