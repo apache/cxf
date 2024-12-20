@@ -75,7 +75,7 @@
         <cxf.osgi.jakarta.servlet.version>[5,6)</cxf.osgi.jakarta.servlet.version>
         <cxf.osgi.jakarta.xml.ws.version>[3,4)</cxf.osgi.jakarta.xml.ws.version>
         <cxf.osgi.cdi.version>[3,4)</cxf.osgi.cdi.version>
-        <cxf.osgi.jakarta.jwsapi.version>[3,4)</cxf.osgi.jakarta.jwsapi.version>
+        <cxf.osgi.jakarta.jwsapi.version>[4,5)</cxf.osgi.jakarta.jwsapi.version>
         <cxf.osgi.saaj.version>[2,3)</cxf.osgi.saaj.version>
         <cxf.opensaml.osgi.version>[4.2,5)</cxf.opensaml.osgi.version>
         <cxf.ehcache.osgi.version>[3,4)</cxf.ehcache.osgi.version>
