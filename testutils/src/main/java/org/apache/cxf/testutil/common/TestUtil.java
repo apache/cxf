@@ -124,8 +124,8 @@ public final class TestUtil {
         return getPortNumber(cls.getName(), cls.getSimpleName());
     }
     public static String getPortNumber(Class<?> cls, int count) {
-        return getPortNumber(cls.getName() + "." + count,
-                             cls.getSimpleName() + "." + count);
+        return getPortNumber(cls.getName() + '.' + count,
+                             cls.getSimpleName() + '.' + count);
     }
     public static String getPortNumber(String name) {
         return getPortNumber(name, name);
@@ -135,8 +135,8 @@ public final class TestUtil {
         return getNewPortNumber(cls.getName(), cls.getSimpleName());
     }
     public static String getNewPortNumber(Class<?> cls, int count) {
-        return getNewPortNumber(cls.getName() + "." + count,
-                             cls.getSimpleName() + "." + count);
+        return getNewPortNumber(cls.getName() + '.' + count,
+                             cls.getSimpleName() + '.' + count);
     }
     public static String getNewPortNumber(String name) {
         return getNewPortNumber(name, name);
@@ -147,30 +147,12 @@ public final class TestUtil {
         ports.setProperty("testutil.ports." + simpleName, p);
         System.setProperty("testutil.ports." + fullName, p);
         System.setProperty("testutil.ports." + simpleName, p);
-        if (fullName.endsWith("." + simpleName)) {
-            int idx = fullName.lastIndexOf('.', fullName.lastIndexOf('.'));
-            while (idx != -1) {
-                String name = fullName.substring(idx + 1);
-                ports.setProperty("testutil.ports." + name, p);
-                System.setProperty("testutil.ports." + name, p);
-                idx = fullName.lastIndexOf('.', idx - 1);
-            }
-        }
     }
     private static void removeNames(String fullName, String simpleName) {
         ports.remove("testutil.ports." + fullName);
         ports.remove("testutil.ports." + simpleName);
         System.clearProperty("testutil.ports." + fullName);
         System.clearProperty("testutil.ports." + simpleName);
-        if (fullName.endsWith("." + simpleName)) {
-            int idx = fullName.lastIndexOf('.', fullName.lastIndexOf('.'));
-            while (idx != -1) {
-                String name = fullName.substring(idx + 1);
-                ports.remove("testutil.ports." + name);
-                System.clearProperty("testutil.ports." + name);
-                idx = fullName.lastIndexOf('.', idx - 1);
-            }
-        }
     }
 
     public static String getNewPortNumber(String fullName, String simpleName) {
@@ -181,10 +163,6 @@ public final class TestUtil {
         String p = ports.getProperty("testutil.ports." + fullName);
         if (p == null) {
             p = System.getProperty("testutil.ports." + fullName);
-            if (p != null) {
-                ports.setProperty("testutil.ports." + fullName, p);
-                ports.setProperty("testutil.ports." + simpleName, p);
-            }
         }
         while (p == null) {
             int pn = portNum++;
