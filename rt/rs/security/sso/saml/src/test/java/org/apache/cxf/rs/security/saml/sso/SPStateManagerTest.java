@@ -30,6 +30,7 @@ import org.apache.cxf.rs.security.saml.sso.state.MemorySPStateManager;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
+import org.apache.cxf.rs.security.saml.sso.state.jcache.JCacheSPStateManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +56,7 @@ public class SPStateManagerTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Class<? extends SPStateManager>> data() {
-        return Arrays.asList(MemorySPStateManager.class, EHCacheSPStateManager.class);
+        return Arrays.asList(MemorySPStateManager.class, EHCacheSPStateManager.class, JCacheSPStateManager.class);
     }
 
     @Before

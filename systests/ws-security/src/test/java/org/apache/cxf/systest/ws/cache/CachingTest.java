@@ -20,8 +20,6 @@
 package org.apache.cxf.systest.ws.cache;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Random;
 
 import javax.xml.namespace.QName;
@@ -40,6 +38,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
+import org.apache.cxf.ws.security.tokenstore.jcache.JCacheTokenStore;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
@@ -59,11 +59,18 @@ public class CachingTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
+    
+    @FunctionalInterface
+    private interface TokenStoreCacheFactory {
+        TokenStore create(String key, Bus b) throws TokenStoreException;
+    }
 
-    final TestParam test;
+    private final TestParam test;
+    private final TokenStoreCacheFactory factory;
 
-    public CachingTest(TestParam type) {
+    public CachingTest(TestParam type, TokenStoreCacheFactory factory) {
         this.test = type;
+        this.factory = factory;
     }
 
     @BeforeClass
@@ -76,12 +83,18 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         );
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
-                                              new TestParam(PORT, true),
-        });
+    @Parameters(name = "{0},{1}")
+    public static Object[][] data() {
+        return new Object[][] {
+            {new TestParam(PORT, false), (TokenStoreCacheFactory) (String key, Bus b) ->
+                new EHCacheTokenStore(key, b, ClassLoaderUtils.getResource("cxf-ehcache.xml", CachingTest.class))},
+            {new TestParam(PORT, false), (TokenStoreCacheFactory) (String key, Bus b) ->
+                new JCacheTokenStore(key, b, ClassLoaderUtils.getResource("cxf-jcache.xml", CachingTest.class))},
+            {new TestParam(PORT, true), (TokenStoreCacheFactory) (String key, Bus b) ->
+                new EHCacheTokenStore(key, b, ClassLoaderUtils.getResource("cxf-ehcache.xml", CachingTest.class))},
+            {new TestParam(PORT, true), (TokenStoreCacheFactory) (String key, Bus b) ->
+                new JCacheTokenStore(key, b, ClassLoaderUtils.getResource("cxf-jcache.xml", CachingTest.class))}
+        };
     }
 
     @org.junit.AfterClass
@@ -174,8 +187,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
 
         // Create shared cache
         String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE + '-' + Math.abs(new Random().nextInt());
-        TokenStore tokenStore = new EHCacheTokenStore(cacheKey, bus,
-                ClassLoaderUtils.getResource("cxf-ehcache.xml", this.getClass()));
+        TokenStore tokenStore = factory.create(cacheKey, bus);
         Client client = ClientProxy.getClient(port);
         client.getEndpoint().getEndpointInfo().setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
 
