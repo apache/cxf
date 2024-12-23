@@ -38,6 +38,7 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -416,6 +417,49 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testAddBookAsJAXB2() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxb2";
         doAddBook(address, "attachmentData", 200);
+    }
+
+    @Test
+    public void testAddBookWithDetailsAsMultipart() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/details";
+
+        final Client client = ClientBuilder.newClient();
+        try (InputStream is = getClass()
+                .getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData")) {
+            final MultipartBody builder = new MultipartBody(Arrays.asList(
+                new AttachmentBuilder()
+                    .mediaType("application/xml")
+                    .id("book")
+                    .object(new Book())
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile1Detail")
+                    .object(is)
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field1\";"))
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile2Detail")
+                    .dataHandler(new DataHandler(
+                        new InputStreamDataSource(new ByteArrayInputStream(new byte[0]), "text/xml")))
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field2\";"))
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile3Detail")
+                    .dataHandler(new DataHandler(new InputStreamDataSource(
+                        new ByteArrayInputStream(new byte[0]), "text/xml")))
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field3\";"))
+                    .build()));
+        
+            final Response response = client
+                .target(address)
+                .request("text/xml")
+                .post(Entity.entity(builder, "multipart/form-data"));
+
+            final Book book = response.readEntity(Book.class);
+            assertThat("Unexpected status code for response:" + response, 
+                response.getStatus(), equalTo(200));
+            assertThat(book.getName(), equalTo("upfile1Detail,upfile2Detail,upfile3Detail"));
+        }
     }
 
     @Test
