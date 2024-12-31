@@ -1852,6 +1852,15 @@ public class BookStore {
         return httpHeaders.getRequestHeaders();
     }
     
+    @GET
+    @Path("/cookies")
+    @Produces("application/json")
+    public Response getCookies() {
+        return Response.ok()
+            .header(HttpHeaders.SET_COOKIE, httpHeaders.getRequestHeaders().getFirst(HttpHeaders.COOKIE))
+            .build();
+    }
+    
     public final String init() {
         books.clear();
         cds.clear();
