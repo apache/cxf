@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
@@ -32,8 +33,10 @@ import org.apache.cxf.jaxrs.resources.BookStore;
 
 import org.junit.Test;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -341,6 +344,24 @@ public class WebClientTest {
     public void testLanguageHeader() {
         WebClient wc = WebClient.create("http://foo").language("en_CA");
         assertEquals("en_CA", wc.getHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE));
+    }
+
+    @Test
+    public void testDefaultCookie() {
+        WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.cookie(new Cookie("a", "1"));
+        wc.cookie(new Cookie("b", "2"));
+        assertThat(wc.getHeaders().get(HttpHeaders.COOKIE),
+            containsInAnyOrder("$Version=1;a=1", "$Version=1;b=2"));
+    }
+
+    @Test
+    public void testCookieNoVersion() {
+        WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.cookie(new Cookie("a", "1", null, null, 0));
+        wc.cookie(new Cookie("b", "2", null, null, 0));
+        assertThat(wc.getHeaders().get(HttpHeaders.COOKIE),
+            containsInAnyOrder("a=1", "b=2"));
     }
 
     private static final class ParamConverterProviderImpl implements ParamConverterProvider {
