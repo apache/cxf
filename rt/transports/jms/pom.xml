@@ -172,7 +172,7 @@
         <profile>
             <id>jdk23</id>
             <activation>
-                <jdk>[23,)</jdk>
+                <jdk>[23,24)</jdk>
             </activation>
             <build>
                 <plugins>
