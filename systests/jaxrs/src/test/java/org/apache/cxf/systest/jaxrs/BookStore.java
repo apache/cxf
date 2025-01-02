@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -1857,7 +1858,11 @@ public class BookStore {
     @Produces("application/json")
     public Response getCookies() {
         return Response.ok()
-            .header(HttpHeaders.SET_COOKIE, httpHeaders.getRequestHeaders().getFirst(HttpHeaders.COOKIE))
+            .header(HttpHeaders.SET_COOKIE, httpHeaders
+                .getRequestHeaders()
+                .get(HttpHeaders.COOKIE)
+                .stream()
+                .collect(Collectors.joining("; ")))
             .build();
     }
     
