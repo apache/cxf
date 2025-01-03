@@ -54,7 +54,7 @@
                      address="https://localhost:${testutil.ports.ClientAuthServer}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="direct-trust-tls-settings"/>
-    
+
      <httpj:engine-factory id="chain-trust-tls-settings">
         <httpj:engine port="${testutil.ports.ClientAuthServer.2}">
             <httpj:tlsServerParameters>
@@ -76,5 +76,26 @@
                      address="https://localhost:${testutil.ports.ClientAuthServer.2}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="chain-trust-tls-settings"/>
-    
+
+    <httpj:engine-factory id="direct-trust-tls-1.3-settings">
+        <httpj:engine port="${testutil.ports.ClientAuthServer.3}">
+            <httpj:tlsServerParameters secureSocketProtocol="TLSv1.3">
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+                </sec:trustManagers>
+                <sec:clientAuthentication want="true" required="true"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="DirectTrustServerTls1.3" 
+                     implementor="org.apache.cxf.systest.hc5.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.ClientAuthServer.3}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="direct-trust-tls-1.3-settings"/>
 </beans>
