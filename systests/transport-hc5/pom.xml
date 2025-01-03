@@ -82,6 +82,8 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
+                                <!-- See please https://issues.apache.org/jira/browse/HTTPCORE-775 -->
+                                <jsse.SSLEngine.acceptLargeFragments>true</jsse.SSLEngine.acceptLargeFragments>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -90,6 +92,8 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <org.apache.cxf.transport.http.forceURLConnection>false</org.apache.cxf.transport.http.forceURLConnection>
+                                <!-- See please https://issues.apache.org/jira/browse/HTTPCORE-775 -->
+                                <jsse.SSLEngine.acceptLargeFragments>true</jsse.SSLEngine.acceptLargeFragments>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
