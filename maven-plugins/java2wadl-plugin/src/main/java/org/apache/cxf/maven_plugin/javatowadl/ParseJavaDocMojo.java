@@ -21,10 +21,12 @@ package org.apache.cxf.maven_plugin.javatowadl;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.doxia.tools.SiteTool;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -34,10 +36,10 @@ import org.apache.maven.plugins.javadoc.JavadocReport;
 import org.apache.maven.plugins.javadoc.options.DocletArtifact;
 import org.apache.maven.plugins.javadoc.resolver.ResourceResolver;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
-import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * @goal parsejavadoc
@@ -78,19 +80,6 @@ public class ParseJavaDocMojo extends AbstractMojo {
      * @component
      */
     private ResourceResolver resourceResolver;
-    
-    /**
-     * @component
-     */
-    private DependencyResolver dependencyResolver;
-
-    
-    /**
-     * @component
-     */
-    private ArtifactResolver artifactResolver;
-    
-    
 
     /**
      * @component
@@ -109,15 +98,6 @@ public class ParseJavaDocMojo extends AbstractMojo {
      */
     private File dumpFileOutputDirectory;
 
-    /**
-     * The local maven repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
-     */
-    private ArtifactRepository localRepository;
-
     
     /**
      * Directory into which assembled {@link JavadocOptions} instances will be written before they
@@ -128,9 +108,37 @@ public class ParseJavaDocMojo extends AbstractMojo {
      */
     private File javadocOptionsDir;
 
+    /**
+     * @component
+     */
+    private RepositorySystem repoSystem;
+
+    /**
+     * @parameter default-value = "${repositorySystemSession}"
+     * @required
+     * @readonly
+     */
+    private RepositorySystemSession repoSession;
+
+    /**
+     * @component
+     */
+    private ArtifactHandlerManager artifactHandlerManager;
+    
+    /**
+     * @component
+     */
+    private SiteTool siteTool;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        AbstractJavadocMojo mojo = new JavadocReport();
+        AbstractJavadocMojo mojo = new JavadocReport(siteTool,
+                archiverManager,
+                resourceResolver,
+                repoSystem,
+                artifactHandlerManager,
+                mavenProjectBuilder,
+                toolchainManager);
         Locale locale = Locale.getDefault();
         try {
             Field f = AbstractJavadocMojo.class.getDeclaredField("doclet");
@@ -164,39 +172,10 @@ public class ParseJavaDocMojo extends AbstractMojo {
             }
             f.set(mojo, docletArtifact);
 
-            
-            f = AbstractJavadocMojo.class.getDeclaredField("mavenProjectBuilder");
-            f.setAccessible(true);
-            f.set(mojo, this.mavenProjectBuilder);
-            
-            f = AbstractJavadocMojo.class.getDeclaredField("resourceResolver");
-            f.setAccessible(true);
-            f.set(mojo, this.resourceResolver);
-            
             f = AbstractJavadocMojo.class.getDeclaredField("session");
             System.out.println("========>" + session.getProjects());
             f.setAccessible(true);
             f.set(mojo, this.session);
-            
-            f = AbstractJavadocMojo.class.getDeclaredField("dependencyResolver");
-            f.setAccessible(true);
-            f.set(mojo, this.dependencyResolver);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("artifactResolver");
-            f.setAccessible(true);
-            f.set(mojo, this.artifactResolver);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("archiverManager");
-            f.setAccessible(true);
-            f.set(mojo, this.archiverManager);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("toolchainManager");
-            f.setAccessible(true);
-            f.set(mojo, this.toolchainManager);
-
-            f = AbstractJavadocMojo.class.getDeclaredField("localRepository");
-            f.setAccessible(true);
-            f.set(mojo, this.localRepository);
 
             f = AbstractJavadocMojo.class.getDeclaredField("applyJavadocSecurityFix");
             f.setAccessible(true);
@@ -220,6 +199,14 @@ public class ParseJavaDocMojo extends AbstractMojo {
                 f.setAccessible(true);
                 f.set(mojo, dumpFileOutputDirectory);
             }
+
+            f = AbstractJavadocMojo.class.getDeclaredField("reactorProjects");
+            f.setAccessible(true);
+            f.set(mojo, List.of());
+
+            f = AbstractJavadocMojo.class.getDeclaredField("repoSession");
+            f.setAccessible(true);
+            f.set(mojo, repoSession);
 
             Method m = AbstractJavadocMojo.class.getDeclaredMethod("executeReport", Locale.class);
             m.setAccessible(true);
