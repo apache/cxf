@@ -143,6 +143,26 @@
                     <goalPrefix>cxf-java2wadl</goalPrefix>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test-integration</id>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <settingsFile>src/it/settings.xml</settingsFile>
+                            <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                            <skipInvocation>${maven.test.skip.exec}</skipInvocation>
+                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
