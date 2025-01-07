@@ -90,7 +90,8 @@ public class NettyServerTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         IOUtils.copyAndCloseInput(in, bos);
         String result = bos.toString();
-        assertTrue("Expect the SOAPService", result.indexOf("<service name=\"SOAPService\">") > 0);
+        assertTrue("Expect the SOAPService", result.indexOf("<service name=\"SOAPService\">") > 0
+                || result.indexOf("<wsdl:service name=\"SOAPService\">") > 0);
     }
 
 }
