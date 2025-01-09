@@ -24,6 +24,8 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -65,6 +67,7 @@ import static org.junit.Assert.fail;
 public class ClientAuthTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ClientAuthServer.class);
     static final String PORT2 = allocatePort(ClientAuthServer.class, 2);
+    static final String PORT3 = allocatePort(ClientAuthServer.class, 3);
 
     final Boolean async;
 
@@ -573,6 +576,74 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
+    }
+
+    // Server directly trusts the client cert and uses TLSv1.3, no chunking
+    @org.junit.Test
+    public void testDirectTrustTls13LargeNoChunking() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClientAuthTest.class.getResource("client-auth-tls-1.3.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT3);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.getClient().setAllowChunking(false);
+
+        final String name = IntStream.range(0, 500).mapToObj(i -> "Kitty ").collect(Collectors.joining());
+        assertEquals(port.greetMe(name), "Hello " + name);
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+ // Server directly trusts the client cert and uses TLSv1.3, chunking
+    @org.junit.Test
+    public void testDirectTrustTls13LargeChunking() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClientAuthTest.class.getResource("client-auth-tls-1.3.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL url = SOAPService.WSDL_LOCATION;
+        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+        assertNotNull("Service is null", service);
+        final Greeter port = service.getHttpsPort();
+        assertNotNull("Port is null", port);
+
+        updateAddressPort(port, PORT3);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
+        Client client = ClientProxy.getClient(port);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+        http.getClient().setAllowChunking(true);
+
+        final String name = IntStream.range(0, 500).mapToObj(i -> "Kitty ").collect(Collectors.joining());
+        assertEquals(port.greetMe(name), "Hello " + name);
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
     }
 
     private static final class DisableCNCheckVerifier implements HostnameVerifier {
