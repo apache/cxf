@@ -22,8 +22,14 @@ package org.apache.cxf.xkms.cache;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.xkms.cache.jcache.JCacheXKMSClientCache;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,14 +39,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * A test for the XKMSClientCache
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class XKMSClientCacheTest {
 
     private final XKMSClientCache cache;
-    private final X509Certificate alice;
-    private final X509Certificate bob;
+    private X509Certificate alice;
+    private X509Certificate bob;
 
-    public XKMSClientCacheTest() throws Exception {
-        cache = new EHCacheXKMSClientCache();
+    public XKMSClientCacheTest(XKMSClientCache cache) throws Exception {
+        this.cache = cache;
 
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks",
@@ -53,6 +60,11 @@ public class XKMSClientCacheTest {
                                                            XKMSClientCacheTest.class),
                                                            "password".toCharArray());
         bob = (X509Certificate)keystore.getCertificate("bob");
+    }
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<XKMSClientCache> cache() throws XKMSClientCacheException {
+        return Arrays.asList(new EHCacheXKMSClientCache(), new JCacheXKMSClientCache());
     }
 
     @org.junit.Test
