@@ -21,7 +21,7 @@ package org.apache.cxf.maven_plugin.javatowadl;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
 
 import org.apache.maven.artifact.Artifact;
@@ -202,7 +202,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
 
             f = AbstractJavadocMojo.class.getDeclaredField("reactorProjects");
             f.setAccessible(true);
-            f.set(mojo, List.of());
+            f.set(mojo, Collections.emptyList());
 
             f = AbstractJavadocMojo.class.getDeclaredField("repoSession");
             f.setAccessible(true);
