@@ -98,7 +98,14 @@ public final class LogUtils {
                     // as we'll just use j.u.l and pax-logging will pick it up fine
                     // If we don't call this and there isn't a slf4j impl avail,
                     // you get warnings printed to stderr about NOPLoggers and such
-                    Class.forName("org.slf4j.impl.StaticLoggerBinder");
+                    try {
+                        // SLF4J 2.x
+                        Class.forName("org.slf4j.spi.SLF4JServiceProvider");
+                    } catch (final ClassNotFoundException ex) {
+                        // SLF4J 1.x
+                        Class.forName("org.slf4j.impl.StaticLoggerBinder");
+                    }
+
                     Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
                     Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
                     String clsName = fcls.getName();
