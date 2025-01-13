@@ -329,6 +329,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         List<String> header = headers.computeIfAbsent(name, k -> new ArrayList<>());
+        header = new ArrayList<String>(header); //ensure header List is modifiable
+        headers.put(name, header);
         if (header.isEmpty() || !header.contains(value)) {
             header.add(value);
         }
