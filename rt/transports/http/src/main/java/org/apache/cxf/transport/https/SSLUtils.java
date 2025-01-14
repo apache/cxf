@@ -293,7 +293,12 @@ public final class SSLUtils {
     static class SSLEngineWrapper extends SSLEngine {
         final SSLEngine delegate;
         SSLEngineWrapper(SSLEngine delegate) {
-            this.delegate = delegate;
+            // Unwrap the delegate if it is an instance of the SSLEngineWrapper
+            if (delegate instanceof SSLEngineWrapper) {
+                this.delegate = ((SSLEngineWrapper) delegate).delegate;
+            } else {
+                this.delegate = delegate;
+            }
         }
         public SSLParameters getSSLParameters() {
             //make sure the hostname verification is not done in the default X509 stuff
