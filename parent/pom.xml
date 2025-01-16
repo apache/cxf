@@ -109,7 +109,7 @@
         <cxf.derby.version>10.16.1.1</cxf.derby.version>
         <cxf.dom4j.version>2.1.4</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
-        <cxf.dropwizard4.version>4.2.29</cxf.dropwizard4.version>
+        <cxf.dropwizard4.version>4.2.30</cxf.dropwizard4.version>
         <cxf.ehcache3.version>3.10.8</cxf.ehcache3.version>
         <cxf.el-api.version>5.0.1</cxf.el-api.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
