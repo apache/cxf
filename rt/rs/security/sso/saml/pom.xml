@@ -71,5 +71,12 @@
             <classifier>jakarta</classifier>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.ehcache.modules</groupId>
+            <artifactId>ehcache-107</artifactId>
+            <version>${cxf.ehcache3.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>
