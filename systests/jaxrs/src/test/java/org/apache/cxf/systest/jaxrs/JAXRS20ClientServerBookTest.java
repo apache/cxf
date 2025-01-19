@@ -604,8 +604,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
 
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/collections";
-        WebClient wc = WebClient.create(endpointAddress,
-                                        Collections.singletonList(new JacksonXmlBindJsonProvider()));
+        WebClient wc = WebClient.create(endpointAddress);
         doTestPostGetCollectionGenericEntityAndType(wc, MediaType.APPLICATION_JSON_TYPE);
     }
 
