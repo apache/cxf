@@ -25,11 +25,14 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.tokenstore.jcache.JCacheTokenStoreFactory;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -46,14 +49,13 @@ public class TokenStoreTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<TokenStore> data() throws TokenStoreException {
         Message message = new MessageImpl();
-        message.put(
-                SecurityConstants.CACHE_CONFIG_FILE,
-                ClassLoaderUtils.getResource("cxf-ehcache.xml", TokenStoreTest.class)
-        );
         message.setExchange(new ExchangeImpl());
         return Arrays.asList(
                 new MemoryTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message),
-                new EHCacheTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message)
+                new EHCacheTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, 
+                    withConfigFile(message, "cxf-ehcache.xml")),
+                new JCacheTokenStoreFactory().newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, 
+                    withConfigFile(message, "cxf-jcache.xml"))
         );
     }
 
@@ -84,7 +86,7 @@ public class TokenStoreTest {
         store.add(token1);
         store.add(token2);
         store.add(token3);
-        assertTrue(store.getTokenIdentifiers().size() == 3);
+        assertThat(store.getTokenIdentifiers(), hasSize(3));
         store.remove(token3.getId());
         assertNull(store.getToken("test3"));
         store.remove(token1.getId());
@@ -92,4 +94,11 @@ public class TokenStoreTest {
         assertTrue(store.getTokenIdentifiers().isEmpty());
     }
 
+    private static Message withConfigFile(Message message, String configFile) {
+        message.put(
+                SecurityConstants.CACHE_CONFIG_FILE,
+                ClassLoaderUtils.getResource(configFile, TokenStoreTest.class)
+        );
+        return message;
+    }
 }
