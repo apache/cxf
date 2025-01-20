@@ -124,6 +124,7 @@
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${project.version}">cxf-ws-addr</feature>
         <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${cxf.geronimo.jta.version}</bundle>
+        <bundle start-level="40" dependency="true">mvn:javax.cache/cache-api/${cxf.jcache.version}</bundle>
         <bundle start-level="40" dependency="true">mvn:org.ehcache/ehcache/${cxf.ehcache3.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
     </feature>
