@@ -30,8 +30,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationClientFilter;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -64,7 +62,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -100,7 +97,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -135,7 +131,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -170,7 +165,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwtnearfuture/bookstore/books";
@@ -205,7 +199,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -241,7 +234,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwtnearfuture/bookstore/books";
@@ -277,7 +269,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -308,7 +299,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -340,7 +330,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
@@ -370,7 +359,6 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";

@@ -29,8 +29,6 @@ import java.util.Properties;
 import javax.annotation.Priority;
 import javax.ws.rs.BadRequestException;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -96,8 +94,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweJwkBookBeanRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
-        BookStore bs = createJweBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -276,8 +273,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider =
             new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256);
-        BookStore bs = createJweJwsBookStore(address, hmacProvider,
-                                             Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweJwsBookStore(address, hmacProvider, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -314,8 +310,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJwkBookHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
-        BookStore bs = createJwsBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJwsBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
