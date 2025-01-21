@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.utils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -35,10 +37,14 @@ public final class JCacheUtils {
         boolean jcacheInstalled = false;
         try {
             final Class<?> caching = Class.forName("javax.cache.Caching");
+            final Class<?> cachingProvider = Class.forName("javax.cache.spi.CachingProvider");
             if (caching != null) {
-                jcacheInstalled = true;
+                jcacheInstalled = MethodHandles
+                    .publicLookup()
+                    .findStatic(caching, "getCachingProvider", MethodType.methodType(cachingProvider))
+                    .invoke() != null;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.fine("No JCache SPIs detected on classpath: " + e.getMessage());
         }
         JCACHE_INSTALLED = jcacheInstalled;
