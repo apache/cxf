@@ -225,6 +225,16 @@ public class FiqlParserTest {
     }
 
     @Test
+    public void testParseOldLocalDateWithDefaultFormat() throws SearchParseException {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(SearchUtils.DEFAULT_DATE_FORMAT);
+        SearchCondition<Condition> filter = parser.parse("localDate==1893-04-02");
+        assertTrue(filter.isMet(new Condition("whatever", 15, null, LocalDate.parse("1893-04-02", df))));
+
+        filter = parser.parse("localDate==1893-04-01");
+        assertTrue(filter.isMet(new Condition("whatever", 15, null, LocalDate.parse("1893-04-01", df))));
+    }
+
+    @Test
     public void testParseInstantWithDefaultFormat() throws SearchParseException, ParseException {
         SearchCondition<Condition> filter = parser.parse("instant=le=2010-03-11");
         DateFormat df = new SimpleDateFormat(SearchUtils.DEFAULT_DATE_FORMAT);
