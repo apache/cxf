@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
 import java.security.Security;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
