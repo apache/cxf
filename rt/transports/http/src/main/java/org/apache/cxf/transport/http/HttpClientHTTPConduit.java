@@ -821,17 +821,30 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         @Override
         public void close() throws IOException {
-            super.close();
-            if (pout != null) {
-                pout.close();
-                pout = null;
+            try {
+                super.close();
+            } finally {
+                if (pout != null) {
+                    try {
+                        pout.close();
+                    } catch (IOException e) {
+                        logStackTrace(e);
+                    }
+                    pout = null;
+                }
+                if (publisher != null) {
+                    try {
+                        publisher.close();
+                    } catch (IOException e) {
+                        logStackTrace(e);
+                    }
+                    publisher = null;
+                }
+                request = null;
+                subscribers = null;
             }
-            if (publisher != null) {
-                publisher.close();
-                publisher = null;
-            }
-            request = null;
-            subscribers = null;
+            
+            
         }
         void addSubscriber(Flow.Subscriber<? super ByteBuffer> subscriber) {
             subscribers.add(subscriber);
