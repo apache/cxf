@@ -1015,5 +1015,8 @@
 {
   "name":"sun.security.provider.SHA2$SHA256",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.apache.cxf.io.DelayedCachedOutputStreamCleaner"
 }
 ]
