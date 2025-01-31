@@ -18,13 +18,20 @@
  */
 package org.apache.cxf.ext.logging;
 
+import java.security.Principal;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import javax.security.auth.Subject;
+
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
@@ -145,6 +152,28 @@ public class DefaultLogEventMapperTest {
         LogEvent event = mapper.map(message);
 
         assertEquals("PUT[test]", event.getOperationName());
+    }
+
+    @Test
+    public void testMultiplePrincipalsReturnedByAccessControllerContext() {
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(Message.REQUEST_URI, "test");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        Set<Principal> principals = IntStream.range(0, 3)
+                .mapToObj(i -> new SimplePrincipal("principal-" + i))
+                .collect(Collectors.toSet());
+
+        Subject subject = new Subject(false, principals, Set.of(), Set.of());
+
+        LogEvent event = Subject.doAs(subject, (PrivilegedAction<LogEvent>) () -> mapper.map(message));
+        String[] splitPrincipals = event.getPrincipal().split(",");
+        Set<String> expected = Set.of("principal-0", "principal-1", "principal-2");
+
+        assertEquals(expected, Arrays.stream(splitPrincipals).collect(Collectors.toSet()));
     }
 
 }
