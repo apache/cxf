@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.provider.jsrjsonb;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -36,6 +38,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
@@ -77,7 +81,13 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupportedMediaType(mediaType);
+        return isSupportedMediaType(mediaType) 
+            && !InputStream.class.isAssignableFrom(type)
+            && !OutputStream.class.isAssignableFrom(type)
+            && !Writer.class.isAssignableFrom(type)
+            && !StreamingOutput.class.isAssignableFrom(type)
+            && !CharSequence.class.isAssignableFrom(type)
+            && !Response.class.isAssignableFrom(type);
     }
 
     @Override
@@ -89,7 +99,11 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupportedMediaType(mediaType);
+        return isSupportedMediaType(mediaType)
+            && !InputStream.class.isAssignableFrom(type)
+            && !Reader.class.isAssignableFrom(type)
+            && !Response.class.isAssignableFrom(type)
+            && !CharSequence.class.isAssignableFrom(type);
     }
 
     @Override

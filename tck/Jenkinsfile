@@ -32,13 +32,6 @@ pipeline {
                     echo "WORKSPACE = ${PWD}"
                 '''
             }
-        }
-
-       stage('Build JAX-RS TCK') {
-           steps {
-               echo "Using Apache CXF version: " + params.Version
-               sh "mvn clean install -f rest -DskipTests=true"
-           }
        }
 
       stage('Checkout Apache CXF') {
