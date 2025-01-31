@@ -33,17 +33,7 @@ pipeline {
                 '''
             }
         }
-       
-       stage('Download JakartaEE Restful Services TCK') {
-           steps {
-               checkout([$class: 'GitSCM',
-	               branches: [[name: 'refs/tags/tck-3.1.2']],
-                   userRemoteConfigs: [[url: 'https://github.com/jakartaee/rest/']],
-                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'rest']]
-               ])
-           }
-       }
-       
+
        stage('Build JAX-RS TCK') {
            steps {
                echo "Using Apache CXF version: " + params.Version

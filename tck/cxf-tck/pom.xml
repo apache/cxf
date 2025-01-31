@@ -42,7 +42,7 @@
         <junit.jupiter.version>5.11.0</junit.jupiter.version>
         <jakarta.rest.version>3.1.0</jakarta.rest.version>
         <tck.artifactId>jakarta-restful-ws-tck</tck.artifactId>
-        <arquillian.version>1.8.0.Final</arquillian.version>
+        <arquillian.version>1.8.1.Final</arquillian.version>
     </properties>
 
     <dependencyManagement>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>${tck.artifactId}</artifactId>
-            <version>${project.version}</version>
+            <version>3.1.5</version>
             <scope>test</scope>
         </dependency>
 
