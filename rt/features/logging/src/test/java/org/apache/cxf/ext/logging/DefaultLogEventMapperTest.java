@@ -43,7 +43,13 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Test;
 
 import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.MASKED_HEADER_VALUE;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeThat;
 
 public class DefaultLogEventMapperTest {
 
@@ -156,6 +162,9 @@ public class DefaultLogEventMapperTest {
 
     @Test
     public void testMultiplePrincipalsReturnedByAccessControllerContext() {
+        assumeThat("Subject::getSubject is not supported in JDK-23 and above",
+            Runtime.version().feature(), lessThanOrEqualTo(22));
+        
         DefaultLogEventMapper mapper = new DefaultLogEventMapper();
         Message message = new MessageImpl();
         message.put(Message.HTTP_REQUEST_METHOD, "GET");
@@ -176,4 +185,25 @@ public class DefaultLogEventMapperTest {
         assertEquals(expected, Arrays.stream(splitPrincipals).collect(Collectors.toSet()));
     }
 
+    @Test
+    public void testNoSubjectReturned() {
+        assumeThat("Subject::getSubject is not supported in JDK-23 and above",
+            Runtime.version().feature(), greaterThanOrEqualTo(23));
+        
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(Message.REQUEST_URI, "test");
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+
+        Set<Principal> principals = IntStream.range(0, 3)
+                .mapToObj(i -> new SimplePrincipal("principal-" + i))
+                .collect(Collectors.toSet());
+
+        Subject subject = new Subject(false, principals, Set.of(), Set.of());
+
+        LogEvent event = Subject.doAs(subject, (PrivilegedAction<LogEvent>) () -> mapper.map(message));
+        assertThat(event.getPrincipal(), is(nullValue()));
+    }
 }
