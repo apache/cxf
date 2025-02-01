@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.security.AccessController;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,7 +110,7 @@ public class DefaultLogEventMapper {
     }
 
     private String getPrincipal(Message message) {
-        String principal = getJAASPrincipal();
+        String principal = getConcatenatedJAASPrincipals();
         if (principal != null) {
             return principal;
         }
@@ -125,25 +126,35 @@ public class DefaultLogEventMapper {
         return null;
     }
 
-    private String getJAASPrincipal() {
-        StringBuilder principals = new StringBuilder();
-        Iterator<? extends Object> principalIt = getJAASPrincipals();
-        while (principalIt.hasNext()) {
-            principals.append(principalIt.next());
-            if (principalIt.hasNext()) {
-                principals.append(',');
-            }
-        }
-        if (principals.length() == 0) {
+    private String getConcatenatedJAASPrincipals() {
+        StringBuilder principalsStringBuilder = new StringBuilder();
+        Set<Principal> principals = getJAASPrincipals();
+
+        if (principals.isEmpty()) {
             return null;
         }
-        return principals.toString();
+
+        synchronized (principals) {
+            Iterator<Principal> principalIt = principals.iterator();
+            while (principalIt.hasNext()) {
+                principalsStringBuilder.append(principalIt.next());
+                if (principalIt.hasNext()) {
+                    principalsStringBuilder.append(',');
+                }
+            }
+        }
+
+        if (principalsStringBuilder.length() == 0) {
+            return null;
+        }
+
+        return principalsStringBuilder.toString();
     }
 
-    private Iterator<? extends Object> getJAASPrincipals() {
+    private Set<Principal> getJAASPrincipals() {
         Subject subject = Subject.getSubject(AccessController.getContext());
         return subject != null && subject.getPrincipals() != null
-            ? subject.getPrincipals().iterator() : Collections.emptyIterator();
+                ? subject.getPrincipals() : Collections.emptySet();
     }
 
     private Map<String, String> getHeaders(Message message) {
