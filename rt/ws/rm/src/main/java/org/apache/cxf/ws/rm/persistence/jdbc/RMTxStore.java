@@ -886,6 +886,8 @@ public class RMTxStore implements RMStore {
             while (rs.next()) {
                 dbCols.add(rs.getString(4));
             }
+            rs.close();
+
             for (String[] col : tableCols) {
                 if (!dbCols.contains(col[0])) {
                     newCols.add(col);

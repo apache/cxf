@@ -239,8 +239,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
+            realStream.close();
             return type.cast(response);
-
         } catch (JAXBException e) {
             handleJAXBException(e, true);
         } catch (XMLStreamException e) {

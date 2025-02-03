@@ -95,7 +95,7 @@ public class PlugInClassLoader extends SecureClassLoader {
 
         props.load(in);
         LOG.fine("Contents: " + propsFileName + props);
-
+        in.close();
         return props;
     }
 

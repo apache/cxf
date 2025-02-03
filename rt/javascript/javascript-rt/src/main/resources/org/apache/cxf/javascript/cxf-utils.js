@@ -540,7 +540,7 @@ function org_apache_cxf_pad_string(string, len, pad, type) {
 	pad = typeof(pad) == 'string' ? pad : ' ';
 
 	if (type == org_apache_cxf_pad_string_PAD_BOTH) {
-		string = org_apache_cxf_pad_sring(Math.floor(len / 2) + string.length,
+		string = org_apache_cxf_pad_string(Math.floor(len / 2) + string.length,
 				pad, org_apache_cxf_pad_string_PAD_LEFT);
 		return (org_apache_cxf_pad_string(Math.ceil(len / 2) + string.length,
 				pad, org_apache_cxf_pad_string_PAD_RIGHT));
