@@ -709,7 +709,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            // The response hasn't been handled yet, should be handled asynchronously
+            if (httpResponse == null) {
+                isAsync = true;
+            }
         }
 
         protected void closeInputStream() throws IOException {
