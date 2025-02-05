@@ -206,8 +206,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         XMLStreamReader reader = null;
         String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         Unmarshaller unmarshaller = null;
-        try {
-            InputStream realStream = getInputStream(type, genericType, is);
+        try (InputStream realStream = getInputStream(type, genericType, is)) {
             if (Document.class.isAssignableFrom(type)) {
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
                 reader = createReader(type, realStream, false, enc);
@@ -239,7 +238,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
-            realStream.close();
             return type.cast(response);
         } catch (JAXBException e) {
             handleJAXBException(e, true);

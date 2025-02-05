@@ -76,12 +76,22 @@ public class PlugInClassLoader extends SecureClassLoader {
     }
 
     private static Properties getProperties(ClassLoader parent, String propsFileName) throws IOException {
-        InputStream in = parent.getResourceAsStream(propsFileName);
+        Properties props = new Properties();
 
-        if (null == in) {
-            in = PlugInClassLoader.class.getResourceAsStream(propsFileName);
+        try (InputStream in = parent.getResourceAsStream(propsFileName)) {
+            if (null != in) {
+                props.load(in);
+                LOG.fine("Contents: " + propsFileName + props);
+                return props;
+            }
+        }
 
-            if (null == in) {
+        try (InputStream in = PlugInClassLoader.class.getResourceAsStream(propsFileName)) {
+            if (null != in) {
+                props.load(in);
+                LOG.fine("Contents: " + propsFileName + props);
+                return props;
+            } else {
                 String msg = "Internal rar classloader failed to locate configuration resource: "
                         + propsFileName;
                 IOException ioe = new IOException(msg);
@@ -90,13 +100,6 @@ public class PlugInClassLoader extends SecureClassLoader {
                 throw ioe;
             }
         }
-
-        Properties props = new Properties();
-
-        props.load(in);
-        LOG.fine("Contents: " + propsFileName + props);
-        in.close();
-        return props;
     }
 
     private String[] loadUrls(ClassLoader parent) throws IOException {
