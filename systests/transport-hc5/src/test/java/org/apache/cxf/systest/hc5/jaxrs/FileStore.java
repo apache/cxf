@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import jakarta.activation.DataHandler;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -38,8 +39,10 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -54,7 +57,7 @@ public class FileStore {
     @POST
     @Path("/stream")
     @Consumes("*/*")
-    public Response addBook(@QueryParam("chunked") boolean chunked, InputStream in) throws IOException {
+    public Response addFile(@QueryParam("chunked") boolean chunked, InputStream in) throws IOException {
         String transferEncoding = headers.getHeaderString("Transfer-Encoding");
 
         if (chunked != Objects.equals("chunked", transferEncoding)) {
@@ -75,11 +78,11 @@ public class FileStore {
                 return Response.ok(Arrays.copyOf(content, content.length / 10)).build();
             }
         }
-    } 
+    }
 
     @POST
     @Consumes("multipart/form-data")
-    public void addBook(@QueryParam("chunked") boolean chunked, 
+    public void addFile(@QueryParam("chunked") boolean chunked, 
             @Suspended final AsyncResponse response, @Context final UriInfo uri, final MultipartBody body)  {
 
         String transferEncoding = headers.getHeaderString("Transfer-Encoding");
@@ -135,5 +138,54 @@ public class FileStore {
 
             }
         }
+    }
+
+    @GET
+    @Consumes("multipart/form-data")
+    public void getFile(@QueryParam("chunked") boolean chunked, @QueryParam("filename") String source,
+            @Suspended final AsyncResponse response) {
+
+        if (StringUtils.isEmpty(source)) {
+            response.resume(Response.status(Status.BAD_REQUEST).build());
+            return;
+        }
+
+        try {
+            if (!store.containsKey(source)) {
+                response.resume(Response.status(Status.NOT_FOUND).build());
+                return;
+            }
+
+            final byte[] content = store.get(source);
+            if (response.isSuspended()) {
+                final StreamingOutput stream = new StreamingOutput() {
+                    @Override
+                    public void write(OutputStream os) throws IOException, WebApplicationException {
+                        if (chunked) {
+                            // Make sure we have enough data for chunking to kick in
+                            for (int i = 0; i < 10; ++i) {
+                                os.write(content);
+                            }
+                        } else {
+                            os.write(content);
+                        }
+                    }
+                };
+                response.resume(Response.ok().entity(stream).build());
+            }
+
+        } catch (final Exception ex) {
+            response.resume(Response.serverError().build());
+        }
+    }
+
+    @GET
+    @Path("/redirect")
+    public Response redirectFile(@Context UriInfo uriInfo) {
+        final UriBuilder builder = uriInfo.getBaseUriBuilder().path(getClass());
+        uriInfo.getQueryParameters(true).forEach((p, v) -> builder.queryParam(p, v.get(0)));
+
+        final ResponseBuilder response = Response.status(303).header("Location", builder.build());
+        return response.build();
     }
 }
