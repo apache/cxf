@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.hc5.jaxrs;
+package org.apache.cxf.systest.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
