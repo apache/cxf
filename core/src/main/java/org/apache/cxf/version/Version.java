@@ -29,7 +29,7 @@ public final class Version {
     private static String fullVersion;
     private static String buildNumber;
 
-    private static final String VERSION_BASE = "/org/apache/cxf/version/";
+    private static final String VERSION_BASE = "org/apache/cxf/version/";
 
     private Version() {
         // utility class - never constructed
@@ -37,11 +37,7 @@ public final class Version {
 
     private static InputStream getResourceAsStream(String resource) {
         ClassLoader cl = Version.class.getClassLoader();
-        InputStream ins = cl.getResourceAsStream(resource);
-        if (ins == null && resource.startsWith("/")) {
-            ins = cl.getResourceAsStream(resource.substring(1));
-        }
-        return ins;
+        return cl.getResourceAsStream(resource);
     }
 
     private static synchronized void loadProperties() {
