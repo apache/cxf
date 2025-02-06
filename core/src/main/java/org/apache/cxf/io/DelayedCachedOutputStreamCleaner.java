@@ -119,7 +119,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
                 final DelayedCloseable next = iterator.next();
                 try {
                     iterator.remove();
-                    LOG.warning("Unclosed (leaked?) stream detected: " + next.closeable);
+                    LOG.warning("Unclosed (leaked?) stream detected: " + next.closeable.hashCode());
                     next.closeable.close();
                 } catch (final IOException | RuntimeException ex) {
                     LOG.warning("Unable to close (leaked?) stream: " + ex.getMessage());
