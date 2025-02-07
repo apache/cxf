@@ -624,6 +624,10 @@ public abstract class AbstractHTTPDestination
             //However, also don't want to consume indefinitely.   We'll limit to 16M.
             try {
                 IOUtils.consume(in, 16 * 1024 * 1024);
+
+                // we need to reset this input stream.
+                // It may be used later (i.e. this is required for oneWay/WSAddresing scenarios)
+                in.reset();
             } catch (Exception ioe) {
                 //ignore
             }
