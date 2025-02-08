@@ -165,7 +165,8 @@
                                 <descriptor>file:${project.build.directory}/classes/features.xml</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
-                            <javase>11</javase>
+                            <!-- Apache Karaf 4.4.6 and above use Spring Framework 6.x, needs JDK-17 baseline -->
+                            <javase>17</javase>
                             <framework>
                                 <feature>framework</feature>
                             </framework>

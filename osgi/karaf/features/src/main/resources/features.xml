@@ -543,6 +543,8 @@
         </config>
         <feature>spring</feature>
         <feature>aries-blueprint</feature>
+        <!-- Jackson is required by Apache ActiveMQ (PersistenceAdapterView, ..) -->
+        <feature version="${project.version}">cxf-jackson</feature>
         <feature version="${project.version}">cxf-wsn-api</feature>
         <feature version="${project.version}">cxf-http-provider</feature>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6</bundle>
