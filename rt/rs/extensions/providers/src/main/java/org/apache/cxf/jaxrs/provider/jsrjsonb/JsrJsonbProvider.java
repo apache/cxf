@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.provider.jsrjsonb;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,8 +84,7 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
         return isSupportedMediaType(mediaType) 
             && !OutputStream.class.isAssignableFrom(type)
             && !Writer.class.isAssignableFrom(type)
-            && !CharSequence.class.isAssignableFrom(type)
-            && !Response.class.isAssignableFrom(type)
+            && !isKnownUnsupportedInOutType(type)
             && !JAXRSUtils.isStreamingLikeOutType(type, genericType);
     }
 
@@ -98,11 +98,10 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return isSupportedMediaType(mediaType)
-            && !Response.class.isAssignableFrom(type)
-            && !CharSequence.class.isAssignableFrom(type)
+            && !isKnownUnsupportedInOutType(type)
             && !JAXRSUtils.isStreamingLikeOutType(type, genericType);
     }
-
+    
     @Override
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream) 
@@ -142,5 +141,12 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
         } else {
             return DefaultJsonbSupplier.INSTANCE;
         }
+    }
+
+    private static boolean isKnownUnsupportedInOutType(Class<?> type) {
+        return Response.class.isAssignableFrom(type)
+            || CharSequence.class.isAssignableFrom(type)
+            || File.class.isAssignableFrom(type)
+            || byte[].class.isAssignableFrom(type);
     }
 }
