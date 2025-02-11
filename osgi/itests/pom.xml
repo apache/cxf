@@ -111,7 +111,21 @@
                </exclusion>
             </exclusions>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>spring-legacy</artifactId>
+            <type>xml</type>
+            <version>${cxf.karaf.version}</version>
+            <classifier>features</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+               </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>

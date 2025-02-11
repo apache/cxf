@@ -79,8 +79,12 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
             cxfBaseConfig(),
             testUtils(),
             features(cxfUrl, "cxf-jaxws", "cxf-transports-jms"),
-            features(maven().groupId("org.apache.activemq").artifactId("activemq-karaf").versionAsInProject()
-                .type("xml").classifier("features-core"),
+            features(
+                maven().groupId("org.apache.karaf.features").artifactId("spring-legacy").versionAsInProject()
+                    .type("xml").classifier("features"), "spring-legacy"), 
+            features(
+                maven().groupId("org.apache.activemq").artifactId("activemq-karaf").versionAsInProject()
+                    .type("xml").classifier("features-core"),
                 "cxf-jackson", "activemq-client"),
             provision(serviceBundle())
         );
