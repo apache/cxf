@@ -295,7 +295,7 @@ public class SAMLSSOResponseValidator {
                 if (audienceRestriction.getAudiences() != null) {
                     boolean matchFound = false;
                     for (org.opensaml.saml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
-                        if (appliesTo.equals(audience.getAudienceURI())) {
+                        if (appliesTo.equals(audience.getURI())) {
                             matchFound = true;
                             oneMatchFound = true;
                             break;
