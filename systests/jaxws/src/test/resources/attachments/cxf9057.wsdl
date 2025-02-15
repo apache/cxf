@@ -21,6 +21,7 @@
             </xs:complexType>
             <xs:complexType name="downloadNext">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="minNumberOfChunks" type="xs:int"/>
                     <xs:element minOccurs="0" name="simulate" type="xs:boolean"/>
                 </xs:sequence>
             </xs:complexType>

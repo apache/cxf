@@ -19,37 +19,40 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
 import jakarta.xml.ws.Binding;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.soap.SOAPBinding;
-import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Download;
+import org.apache.cxf.DownloadFault_Exception;
+import org.apache.cxf.DownloadNextResponseType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-public class AttachmentChunkingTest extends AbstractAttachmentChunkingTest {
+public class AttachmentMtomChunkingTest extends AbstractAttachmentChunkingTest {
     private static final String PORT = allocatePort(DownloadServer.class);
-    private static final Logger LOG = LogUtils.getLogger(AttachmentChunkingTest.class);
+    private static final Logger LOG = LogUtils.getLogger(AttachmentMtomChunkingTest.class);
 
     public static class DownloadServer extends AbstractBusTestServerBase {
         protected void run() {
             Object implementor = new DownloadImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-            Endpoint.publish(address, implementor);
+            final Endpoint endpoint = Endpoint.publish(address, implementor, new LoggingFeature());
+            ((SOAPBinding)endpoint.getBinding()).setMTOMEnabled(true);
         }
 
         public static void main(String[] args) {
@@ -69,9 +72,9 @@ public class AttachmentChunkingTest extends AbstractAttachmentChunkingTest {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(DownloadServer.class, true));
     }
-
+    
     @Test
-    public void testChunkingPartialFailure() {
+    public void testChunkingPartialEarlyFailure() throws IOException, DownloadFault_Exception {
         final JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setFeatures(List.of(new LoggingFeature()));
         factory.setServiceClass(Download.class);
@@ -85,8 +88,26 @@ public class AttachmentChunkingTest extends AbstractAttachmentChunkingTest {
         ((SOAPBinding) binding).setMTOMEnabled(true);
 
         // See please https://issues.apache.org/jira/browse/CXF-9057
-        SOAPFaultException ex = assertThrows(SOAPFaultException.class, () -> client.downloadNext(1, true));
-        assertThat(ex.getMessage(), containsString("simulated error during stream processing"));
+        assertThrows(WebServiceException.class, () -> client.downloadNext(1, true));
+    }
+
+    @Test
+    public void testChunkingPartialLateFailure() throws IOException, DownloadFault_Exception {
+        final JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setFeatures(List.of(new LoggingFeature()));
+        factory.setServiceClass(Download.class);
+
+        final Download client = (Download) factory.create();
+        final BindingProvider bindingProvider = (BindingProvider) client;
+        final Binding binding = bindingProvider.getBinding();
+
+        final String address = String.format("http://localhost:%s/SoapContext/SoapPort/DownloadPort", getPort());
+        bindingProvider.getRequestContext().put("jakarta.xml.ws.service.endpoint.address", address);
+        ((SOAPBinding) binding).setMTOMEnabled(true);
+
+        // See please https://issues.apache.org/jira/browse/CXF-9057
+        final DownloadNextResponseType response = client.downloadNext(10, true);
+        assertThrows(IOException.class, () -> IOUtils.readBytesFromStream(response.getDataContent().getInputStream()));
     }
 
     @Override
