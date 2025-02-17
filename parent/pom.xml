@@ -2276,7 +2276,7 @@
             </activation>
             <properties>
                 <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
-                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
+                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
         </profile>
     </profiles>
