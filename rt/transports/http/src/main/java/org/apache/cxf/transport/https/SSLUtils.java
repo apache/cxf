@@ -51,6 +51,7 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.SSLContextServerParameters;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.TLSParameterBase;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
@@ -123,7 +124,7 @@ public final class SSLUtils {
             HostnameVerifier hnv = getHostnameVerifier((TLSClientParameters)parameters);
             for (int i = 0; i < tms.length; i++) {
                 if (tms[i] instanceof  X509TrustManager) {
-                    tms[i] = new X509TrustManagerWrapper((X509TrustManager)tms[i], hnv);                    
+                    tms[i] = new X509TrustManagerWrapper((X509TrustManager)tms[i], hnv);
                 }
             }
         }
@@ -160,7 +161,14 @@ public final class SSLUtils {
     }
 
     public static SSLEngine createServerSSLEngine(TLSServerParameters parameters) throws Exception {
-        SSLContext sslContext = getSSLContext(parameters);
+        SSLContext sslContext = null;
+        // The full SSL context is provided by SSLContextServerParameters
+        if (parameters instanceof SSLContextServerParameters sslContextServerParameters) { 
+            sslContext = sslContextServerParameters.getSslContext();
+        } else {
+            sslContext = getSSLContext(parameters);
+        }
+
         SSLEngine serverEngine = sslContext.createSSLEngine();
         serverEngine.setUseClientMode(false);
         serverEngine.setNeedClientAuth(parameters.getClientAuthentication().isRequired());
