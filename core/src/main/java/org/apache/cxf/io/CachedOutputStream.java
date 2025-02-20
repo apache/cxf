@@ -283,8 +283,10 @@ public class CachedOutputStream extends OutputStream {
                     }
                 } finally {
                     streamList.remove(currentStream);
+                    // we are not backed by file anymore, unregister from the cleaner
                     if (cachedOutputStreamCleaner != null) {
                         cachedOutputStreamCleaner.unregister(currentStream);
+                        cachedOutputStreamCleaner.unregister(this);
                     }
                     deleteTempFile();
                     inmem = true;

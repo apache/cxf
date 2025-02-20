@@ -19,18 +19,21 @@
 package org.apache.cxf.jaxrs.client.logging;
 
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.LongAdder;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.AbstractLoggingInterceptor;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.io.CachedOutputStreamCleaner;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -40,7 +43,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 public class RESTLoggingTest {
 
@@ -66,30 +72,51 @@ public class RESTLoggingTest {
         Server server = createService(SERVICE_URI, new TestServiceRest(), loggingFeature);
         server.start();
 
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(SERVICE_URI);
-        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        WebClient client = bean.createWebClient();
+        try {
+            final JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+            bean.setAddress(SERVICE_URI);
+            bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+    
+            final LongAdder registers = new LongAdder();
+            final WebClient client = bean.createWebClient();
+            final Bus bus = bean.getBus();
 
-        System.gc();
-        var memoryMXBean = ManagementFactory.getMemoryMXBean();
-        var before = memoryMXBean.getHeapMemoryUsage(); // Snapshot of the memory usage before execution
+            // See please https://issues.apache.org/jira/browse/CXF-9110
+            final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+            bus.setExtension(new CachedOutputStreamCleaner() {
+                @Override
+                public void clean() {
+                    cleaner.clean();
+                }
 
-        String response = null;
-        for (int i = 0; i < 1_000; i++) { // ~2...5 seconds of the execution
-            response = client.post("DATA", String.class);
+                @Override
+                public void unregister(Closeable closeable) {
+                    cleaner.unregister(closeable);
+                }
+
+                @Override
+                public void register(Closeable closeable) {
+                    cleaner.register(closeable);
+                    registers.increment();
+                }
+
+                @Override
+                public int size() {
+                    return cleaner.size();
+                }
+            }, CachedOutputStreamCleaner.class);
+
+            String response = null;
+            for (int i = 0; i < 1_000; i++) { // ~2...5 seconds of the execution
+                response = client.post("DATA", String.class);
+            }
+            assertEquals("DATA", response);
+
+            assertThat(registers.longValue(), equalTo(3000L));
+            assertThat(cleaner.size(), equalTo(0));
+        } finally {
+            server.destroy();
         }
-        Assert.assertEquals("DATA", response);
-
-        System.gc(); // Try to free the memory
-        var after = memoryMXBean.getHeapMemoryUsage(); // Snapshot of the memory usage after execution
-
-        long consumed = after.getUsed() - before.getUsed();
-        // Expected not more than 1MB. The 3MB threshold is enough to detect leaked CachedOutputStreams
-        // Because of after 1_000 execution it was consumed more than 23MB
-        Assert.assertTrue("The memory has been consumed more than 3MB: " + consumed, consumed < 3_000_000);
-
-        server.destroy();
     }
 
     @Test
