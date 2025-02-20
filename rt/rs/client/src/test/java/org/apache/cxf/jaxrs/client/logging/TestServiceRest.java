@@ -34,5 +34,5 @@ public class TestServiceRest {
     public String post(String msg) {
         return msg;
     }
-
 }
+

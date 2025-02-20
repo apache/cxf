@@ -52,19 +52,24 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
         @Override
         default void register(Closeable closeable) {
         }
-        
+
         @Override
         default void unregister(Closeable closeable) {
         }
-        
+
         @Override
         default void close() {
         }
-        
+
         @Override
         default void clean() {
         }
-        
+
+        @Override
+        default int size() {
+            return 0;
+        }
+
         default void forceClean() {
         }
     }
@@ -101,18 +106,23 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             queue.drainTo(closeables);
             clean(closeables);
         }
-        
+
         @Override
         public void forceClean() {
             clean(queue);
         }
-        
+
         @Override
         public void close()  {
             timer.cancel();
             queue.clear();
         }
-        
+
+        @Override
+        public int size() {
+            return queue.size();
+        }
+
         private void clean(Collection<DelayedCloseable> closeables) {
             final Iterator<DelayedCloseable> iterator = closeables.iterator();
             while (iterator.hasNext()) {
@@ -167,8 +177,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             }
             
             final DelayedCloseable other = (DelayedCloseable) obj;
-            //  because of the broken Liskov Substitution Principle, check in two ways to find equal streams
-            return Objects.equals(other.closeable, closeable) || Objects.equals(closeable, other.closeable);
+            return Objects.equals(closeable, other.closeable);
         }
     }
 
@@ -223,6 +232,11 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     @Override
     public void unregister(Closeable closeable) {
         cleaner.unregister(closeable);
+    }
+
+    @Override
+    public int size() {
+        return cleaner.size();
     }
 
     @Override
