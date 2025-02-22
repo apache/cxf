@@ -113,7 +113,7 @@ public class JettyHTTPDestination extends ServletDestination {
     }
 
     /**
-     * Post-configure retreival of server engine.
+     * Post-configure retrieval of server engine.
      */
     protected void retrieveEngine()
         throws GeneralSecurityException,

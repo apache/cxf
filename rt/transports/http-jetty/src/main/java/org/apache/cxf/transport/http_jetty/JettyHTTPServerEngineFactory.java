@@ -38,6 +38,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.transport.http.HTTPServerEngineFactoryParametersProvider;
 import org.eclipse.jetty.util.component.Container;
 
 
@@ -265,6 +266,15 @@ public class JettyHTTPServerEngineFactory {
         if (id != null && tlsParametersMap != null && tlsParametersMap.containsKey(id)) {
             tlsParameters = tlsParametersMap.get(id);
         }
+
+        if (tlsParameters == null) {
+            final HTTPServerEngineFactoryParametersProvider provider = 
+                bus.getExtension(HTTPServerEngineFactoryParametersProvider.class);
+            if (provider != null) {
+                tlsParameters = provider.getDefaultTlsServerParameters(bus, host, port, protocol, id).orElse(null);
+            }
+        }
+
         JettyHTTPServerEngine ref = getOrCreate(this, host, port, tlsParameters);
         // checking the protocol
         if (!protocol.equals(ref.getProtocol())) {

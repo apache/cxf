@@ -40,6 +40,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.jsse.SSLContextServerParameters;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
@@ -512,6 +513,11 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
 
 
     protected SSLContext createSSLContext() throws Exception  {
+        // The full SSL context is provided by SSLContextServerParameters
+        if (tlsServerParameters instanceof SSLContextServerParameters sslContextServerParameters) {
+            return sslContextServerParameters.getSslContext();
+        }
+
         String proto = tlsServerParameters.getSecureSocketProtocol() == null
             ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
 
