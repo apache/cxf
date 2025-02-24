@@ -564,7 +564,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 // such empty paths having matrix parameters...
                 int schemeIndex = pathEncoded.indexOf("//");
                 if (schemeIndex != -1) {
-                    int pathComponentStart = pathEncoded.indexOf("/", schemeIndex + 2);
+                    int pathComponentStart = pathEncoded.indexOf('/', schemeIndex + 2);
                     if (pathComponentStart == -1) {
                         this.originalPathEmpty = true;
                         pathComponentStart = pathEncoded.indexOf(';');

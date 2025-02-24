@@ -339,7 +339,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
         if (tlsCerts != null && tlsCerts.length > 0 && subjectCerts != null
             && subjectCerts.length > 0 && tlsCerts[0].equals(subjectCerts[0])) {
             return true;
-        } else if (tlsCerts != null && tlsCerts.length > 0 && subjectPublicKey != null
+        } else if (tlsCerts != null && tlsCerts.length > 0 
             && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
             return true;
         }

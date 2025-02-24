@@ -283,7 +283,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                 String piData = ((ProcessingInstruction)n).getData();
                 int hRefStart = piData.indexOf("href=\"");
                 if (hRefStart > 0) {
-                    int hRefEnd = piData.indexOf("\"", hRefStart + 6);
+                    int hRefEnd = piData.indexOf('"', hRefStart + 6);
                     templateRef = piData.substring(hRefStart + 6, hRefEnd);
                 }
             }
