@@ -597,7 +597,7 @@ public final class HttpUtils {
             return defaultEncoding;
         }
         try {
-            "0".getBytes(enc);
+            "0".getBytes(enc); //NOPMD
             return enc;
         } catch (UnsupportedEncodingException ex) {
             String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING",

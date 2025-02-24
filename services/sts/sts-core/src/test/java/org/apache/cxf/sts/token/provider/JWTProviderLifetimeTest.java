@@ -124,7 +124,7 @@ public class JWTProviderLifetimeTest {
 
         Instant now = Instant.now();
         Long expiry = (Long)jwt.getClaim(JwtConstants.CLAIM_EXPIRY);
-        Instant.ofEpochSecond(expiry).isAfter(now);
+        assertTrue(Instant.ofEpochSecond(expiry).isAfter(now));
     }
 
     /**
