@@ -50,7 +50,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         SUPPORTED_TYPES.add(ConditionType.LESS_THAN);
         SUPPORTED_TYPES.add(ConditionType.LESS_OR_EQUALS);
     }
-    private final ConditionType joiningType = ConditionType.AND;
+    private static final ConditionType JOINING_TYPE = ConditionType.AND;
     private T condition;
 
     private List<SearchCondition<T>> scts;
@@ -129,7 +129,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     @Override
     public ConditionType getConditionType() {
         if (scts.size() > 1) {
-            return joiningType;
+            return JOINING_TYPE;
         }
         return scts.get(0).getStatement().getCondition();
     }
