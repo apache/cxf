@@ -54,6 +54,11 @@ import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -268,6 +273,44 @@ public class JAXRSClientFactoryBeanTest {
         assertNotNull(store.getBook(""));
     }
 
+    @Test
+    public void testCreateClientFrom() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStore.class);
+
+        final Client client = bean.create();
+        final WebClient wc = WebClient.fromClient(client);
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+
+        client.close();
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+
+        wc.close();
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+    }
+
+    @Test
+    public void testCreateClientFromAndInvoke() throws Exception {
+        final SuperBookStore superBookResource = JAXRSClientFactory
+            .create("http://localhost:9000", SuperBookStore.class);
+        final Client client = (Client) superBookResource;
+        final WebClient wc = WebClient.fromClient(client);
+
+        final Book book = superBookResource.getNewBook("id4", true);
+        assertNotNull(book);
+        
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+
+        client.close();
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+
+        wc.close();
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+
+    }
 
     private final class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
