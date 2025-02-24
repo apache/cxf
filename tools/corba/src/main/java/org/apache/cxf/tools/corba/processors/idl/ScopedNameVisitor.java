@@ -622,7 +622,7 @@ public class ScopedNameVisitor extends VisitorBase {
         Alias alias = (Alias) corbaType;
         //loop through alias base types, till you get a non-alias corba type
         CorbaType type = findCorbaType(typeMap, alias.getBasetype());
-        while ((type != null) && type instanceof Alias) {
+        while (type instanceof Alias) {
             alias = (Alias) type;
             type = findCorbaType(typeMap, alias.getBasetype());
         }
