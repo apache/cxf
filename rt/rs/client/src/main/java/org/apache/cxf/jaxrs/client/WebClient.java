@@ -1232,7 +1232,7 @@ public class WebClient extends AbstractClient {
     static void copyProperties(Client toClient, Client fromClient) {
         AbstractClient newClient = toAbstractClient(toClient);
         AbstractClient oldClient = toAbstractClient(fromClient);
-        newClient.setConfiguration(oldClient.getConfiguration());
+        newClient.setConfigurationReference(oldClient.getConfigurationReference());
     }
 
     private static AbstractClient toAbstractClient(Object client) {
