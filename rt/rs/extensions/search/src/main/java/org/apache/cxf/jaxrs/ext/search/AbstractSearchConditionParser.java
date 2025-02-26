@@ -343,7 +343,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             if (LocalTime.class.isAssignableFrom(valueType)) {
                 return LocalTime.parse(value);
             } else if (LocalDate.class.isAssignableFrom(valueType)) {
-                return LocalDate.from(convertToDefaultDate(value).toInstant().atZone(ZoneId.systemDefault()));
+                return LocalDate.parse(value, SearchUtils.getLocalDateFormat(contextProperties));
             } else if (LocalDateTime.class.isAssignableFrom(valueType)) {
                 return convertTo(value, SearchUtils.DEFAULT_DATETIME_FORMAT, Boolean.FALSE, LocalDateTime::parse);
             } else if (OffsetTime.class.isAssignableFrom(valueType)) {
