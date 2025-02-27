@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.client.logging;
 
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
@@ -26,6 +27,11 @@ public class TestServiceRest {
     @GET
     @Path("{msg}")
     public String echo(@PathParam("msg") String msg) {
+        return msg;
+    }
+
+    @POST
+    public String post(String msg) {
         return msg;
     }
 

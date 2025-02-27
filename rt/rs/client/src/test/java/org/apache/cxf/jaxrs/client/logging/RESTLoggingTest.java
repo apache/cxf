@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.logging;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,40 @@ public class RESTLoggingTest {
         String result = client.get(String.class);
         server.destroy();
         Assert.assertEquals("test1", result);
+    }
+
+    @Test
+    public void testCacheCleanUp() throws Exception {
+        LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setInMemThreshold(1); // To activate usage of the CachedOutputStream
+
+        Server server = createService(SERVICE_URI, new TestServiceRest(), loggingFeature);
+        server.start();
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(SERVICE_URI);
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        WebClient client = bean.createWebClient();
+
+        System.gc();
+        var memoryMXBean = ManagementFactory.getMemoryMXBean();
+        var before = memoryMXBean.getHeapMemoryUsage(); // Snapshot of the memory usage before execution
+
+        String response = null;
+        for (int i = 0; i < 1_000; i++) { // ~2...5 seconds of the execution
+            response = client.post("DATA", String.class);
+        }
+        Assert.assertEquals("DATA", response);
+
+        System.gc(); // Try to free the memory
+        var after = memoryMXBean.getHeapMemoryUsage(); // Snapshot of the memory usage after execution
+
+        long consumed = after.getUsed() - before.getUsed();
+        // Expected not more than 1MB. The 3MB threshold is enough to detect leaked CachedOutputStreams
+        // Because of after 1_000 execution it was consumed more than 23MB
+        Assert.assertTrue("The memory has been consumed more than 3MB: " + consumed, consumed < 3_000_000);
+
+        server.destroy();
     }
 
     @Test
