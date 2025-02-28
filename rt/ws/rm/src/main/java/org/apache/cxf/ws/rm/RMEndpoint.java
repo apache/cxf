@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -101,8 +101,8 @@ public class RMEndpoint {
     private EndpointReferenceType replyTo;
     private Source source;
     private Destination destination;
-    private final Map<ProtocolVariation, WrappedService> services = new HashMap<>();
-    private final Map<ProtocolVariation, Endpoint> endpoints = new HashMap<>();
+    private final Map<ProtocolVariation, WrappedService> services = new EnumMap<>(ProtocolVariation.class);
+    private final Map<ProtocolVariation, Endpoint> endpoints = new EnumMap<>(ProtocolVariation.class);
     private Object tokenStore;
     private Proxy proxy;
     private Servant servant;
