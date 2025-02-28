@@ -403,7 +403,7 @@ public class SAMLClaimsTest {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
 
-        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM;
         assertTrue(tokenString.contains(requiredClaim));
         assertTrue(tokenString.contains("DUMMY"));
         assertTrue(tokenString.contains("CustomRole"));
@@ -447,7 +447,7 @@ public class SAMLClaimsTest {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
 
-        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM.toString();
+        String requiredClaim = CustomClaimsHandler.ROLE_CLAIM;
         assertTrue(tokenString.contains(requiredClaim));
         assertTrue(tokenString.contains("DUMMY"));
         assertTrue(tokenString.contains("CustomRole"));

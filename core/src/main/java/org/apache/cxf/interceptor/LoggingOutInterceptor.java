@@ -177,7 +177,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         public void close() throws IOException {
             LoggingMessage buffer = setupBuffer(message);
             if (count >= lim) {
-                buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                buffer.getMessage().append("(message truncated to ").append(lim).append(" bytes)\n");
             }
             StringWriter w2 = out2;
             if (w2 == null) {
