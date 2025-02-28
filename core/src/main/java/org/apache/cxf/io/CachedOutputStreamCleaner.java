@@ -40,4 +40,12 @@ public interface CachedOutputStreamCleaner {
      * Unregister the stream instance from the clean up (closed properly)
      */
     void register(Closeable closeable);
+
+    /**
+     * The exact or approximate (depending on the implementation) size of the cleaner queue
+     * @return exact or approximate (depending on the implementation) size of the cleaner queue
+     */
+    default int size() {
+        return 0;
+    }
 }
