@@ -53,19 +53,24 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
         @Override
         default void register(Closeable closeable) {
         }
-        
+
         @Override
         default void unregister(Closeable closeable) {
         }
-        
+
         @Override
         default void close() {
         }
-        
+
         @Override
         default void clean() {
         }
-        
+
+        @Override
+        default int size() {
+            return 0;
+        }
+
         default void forceClean() {
         }
     }
@@ -102,18 +107,23 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             queue.drainTo(closeables);
             clean(closeables);
         }
-        
+
         @Override
         public void forceClean() {
             clean(queue);
         }
-        
+
         @Override
         public void close()  {
             timer.cancel();
             queue.clear();
         }
-        
+
+        @Override
+        public int size() {
+            return queue.size();
+        }
+
         private void clean(Collection<DelayedCloseable> closeables) {
             final Iterator<DelayedCloseable> iterator = closeables.iterator();
             while (iterator.hasNext()) {
@@ -223,6 +233,11 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     @Override
     public void unregister(Closeable closeable) {
         cleaner.unregister(closeable);
+    }
+
+    @Override
+    public int size() {
+        return cleaner.size();
     }
 
     @Override
