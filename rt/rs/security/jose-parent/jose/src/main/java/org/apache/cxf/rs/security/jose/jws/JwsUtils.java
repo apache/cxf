@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -229,7 +229,7 @@ public final class JwsUtils {
 
     public static Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> getJwsJsonSignatureMap(
         List<JwsJsonSignatureEntry> signatures) {
-        Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> map = new HashMap<>();
+        Map<SignatureAlgorithm, List<JwsJsonSignatureEntry>> map = new EnumMap<>(SignatureAlgorithm.class);
         for (JwsJsonSignatureEntry entry : signatures) {
             SignatureAlgorithm sigAlgorithm = entry.getUnionHeader().getSignatureAlgorithm();
             List<JwsJsonSignatureEntry> entries = map.get(sigAlgorithm);
