@@ -59,6 +59,8 @@ public class AsyncTest {
                     os.write(body.getBytes());
                 }
             }
+            // See please https://bugs.openjdk.org/browse/JDK-6968351
+            exchange.getResponseBody().flush();
         }
     }
 

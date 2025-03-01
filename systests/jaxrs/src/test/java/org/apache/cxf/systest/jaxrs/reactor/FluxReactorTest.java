@@ -26,7 +26,9 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvoker;
 import org.apache.cxf.jaxrs.reactor.client.ReactorInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -43,7 +45,9 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(ReactorServer.class, true));
-        createStaticBus();
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
     
     @Test

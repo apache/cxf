@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -58,6 +58,18 @@
                                   <super>org.apache.cxf.endpoint.Client</super>
                                 </seiSuper>
                             </defaultOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-attachments-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <fork>${cxf.codegenplugin.forkmode}</fork>
+                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
+                            <testWsdlRoot>${basedir}/src/test/resources/attachments</testWsdlRoot>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>

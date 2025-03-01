@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.provider;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
-import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.message.MessageImpl;
 
@@ -42,7 +42,7 @@ public class ProviderFactoryAllTest {
     @Test
     public void testCustomJsonProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        JSONProvider<Book> provider = new JSONProvider<>();
+        JsrJsonbProvider provider = new JsrJsonbProvider();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null,
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
@@ -78,7 +78,7 @@ public class ProviderFactoryAllTest {
 
     @Test
     public void testGetJSONProviderConsumeMime() throws Exception {
-        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, JSONProvider.class,
+        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, JsrJsonbProvider.class,
                        "application/json");
     }
 

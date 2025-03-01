@@ -27,14 +27,16 @@ import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
-
 
 public class MultipartServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(MultipartServer.class);
 
     @Override
     protected Server createServer(Bus bus) throws Exception {
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
 

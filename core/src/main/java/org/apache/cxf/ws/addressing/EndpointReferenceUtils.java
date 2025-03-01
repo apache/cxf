@@ -203,6 +203,7 @@ public final class EndpointReferenceUtils {
                         impl.setByteStream(source.getByteStream());
                         impl.setSystemId(source.getSystemId());
                         impl.setPublicId(source.getPublicId());
+                        return impl;
                     }
                 }
                 LOG.warning("Could not resolve Schema for " + systemId);

@@ -140,6 +140,7 @@
     </jaxrs:server>
     <cxf:bus name="cxf2" id="cxf2">
        <cxf:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
            <entry key="skip.default.json.provider.registration" value="true"/>
        </cxf:properties>
     </cxf:bus>
@@ -226,6 +227,11 @@
             <entry key="org.apache.cxf.stax.maxChildElements" value="1"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <cxf:bus>
+       <cxf:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
+       </cxf:properties>
+    </cxf:bus>
     <jaxrs:server id="bookservice10" address="/thebooks10">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

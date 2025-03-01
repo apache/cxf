@@ -33,8 +33,10 @@ import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx2.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -55,7 +57,9 @@ public class JAXRSRxJava2FlowableTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(RxJava2FlowableServer.class, true));
-        createStaticBus();
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
     @Test
     public void testGetHelloWorldAsyncText() throws Exception {

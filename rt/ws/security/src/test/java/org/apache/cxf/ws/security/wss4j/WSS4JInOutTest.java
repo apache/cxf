@@ -230,6 +230,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(ConfigurationConstants.USER, alias);
         outProperties.put(ConfigurationConstants.ENC_KEY_TRANSPORT, WSS4JConstants.KEYWRAP_AES128);
         outProperties.put(ConfigurationConstants.ENC_KEY_AGREEMENT_METHOD, WSS4JConstants.AGREEMENT_METHOD_ECDH_ES);
+        outProperties.put(ConfigurationConstants.ENC_KEY_DERIVATION_FUNCTION, WSS4JConstants.KEYDERIVATION_CONCATKDF);
 
         Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPTION);

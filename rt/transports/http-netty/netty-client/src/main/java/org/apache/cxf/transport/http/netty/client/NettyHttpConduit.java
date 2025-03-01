@@ -591,7 +591,10 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         @Override
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            // The response hasn't been handled yet, should be handled asynchronously
+            if (httpResponse == null) {
+                isAsync = true;
+            }
         }
 
         @Override

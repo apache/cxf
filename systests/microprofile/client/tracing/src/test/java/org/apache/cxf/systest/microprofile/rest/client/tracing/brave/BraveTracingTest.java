@@ -20,8 +20,6 @@ package org.apache.cxf.systest.microprofile.rest.client.tracing.brave;
 
 import java.net.URI;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import brave.ScopedSpan;
 import brave.Tracing;
 import brave.sampler.Sampler;
@@ -67,7 +65,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
             sf.setAddress("http://localhost:" + PORT);
-            sf.setProvider(new JacksonJsonProvider());
             sf.setProvider(new BraveFeature(brave));
             return sf.create();
         }
@@ -183,7 +180,6 @@ public class BraveTracingTest extends AbstractClientServerTestBase {
     private RestClientBuilder createRestClientBuilder() {
         return RestClientBuilder.newBuilder()
             .baseUri(URI.create("http://localhost:" + PORT))
-            .register(JacksonJsonProvider.class)
             .register(braveClientProvider);
     }
 }

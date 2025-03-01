@@ -169,11 +169,13 @@ public class MicrometerClientMetricsContextTest {
         doReturn(FIRST_TIMED_ANNOTATION_DUMMY_VALUE).when(firstTimedAnnotation).value();
         doReturn("").when(firstTimedAnnotation).description();
         doReturn(new double[]{}).when(firstTimedAnnotation).percentiles();
+        doReturn(new double[]{}).when(firstTimedAnnotation).serviceLevelObjectives();
 
 
         doReturn(SECOND_TIMED_ANNOTATION_DUMMY_VALUE).when(secondTimedAnnotation).value();
         doReturn("").when(secondTimedAnnotation).description();
         doReturn(new double[]{}).when(secondTimedAnnotation).percentiles();
+        doReturn(new double[]{}).when(secondTimedAnnotation).serviceLevelObjectives();
 
         TimingContext timingContext = new TimingContext(sample);
 

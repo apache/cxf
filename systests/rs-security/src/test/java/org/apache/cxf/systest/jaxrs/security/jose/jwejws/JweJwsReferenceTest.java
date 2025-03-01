@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
@@ -64,7 +62,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludekey/bookstore/books";
@@ -91,7 +88,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
@@ -128,7 +124,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
@@ -158,7 +153,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
@@ -195,7 +189,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
@@ -229,7 +222,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecert/bookstore/books";
@@ -264,7 +256,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecert/bookstore/books";
@@ -292,7 +283,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecertsha1/bookstore/books";
@@ -328,7 +318,6 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsReferenceTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecertsha1/bookstore/books";

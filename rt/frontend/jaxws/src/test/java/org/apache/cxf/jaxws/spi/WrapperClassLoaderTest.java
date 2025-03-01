@@ -21,8 +21,12 @@ package org.apache.cxf.jaxws.spi;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
 
@@ -31,6 +35,8 @@ import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
+import org.apache.cxf.common.spi.GeneratedClassClassLoaderCapture;
+import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.service.SayHi;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.DescriptionInfo;
@@ -59,10 +65,8 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
     public void setUpBus() throws Exception {
         super.setUpBus();
 
-        GeneratedClassClassLoader.TypeHelperClassLoader mockClassLoader =
-                Mockito.mock(GeneratedClassClassLoader.TypeHelperClassLoader.class);
-        doReturn(SayHi.class).when(mockClassLoader).loadClass("org.apache.cxf.jaxws.service.jaxws_asm.SayHi");
-        bus.setExtension(mockClassLoader, GeneratedClassClassLoader.TypeHelperClassLoader.class);
+        Capture c = new Capture();
+        bus.setExtension(c, GeneratedClassClassLoaderCapture.class);
 
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
         bindingFactory.setBus(bus);
@@ -115,8 +119,31 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
     }
 
     @org.junit.Test
-    public void testWrapperClassLoaderWithWrappedOperations() throws Exception {
-        WrapperClassLoader wrapperClassLoader = new WrapperClassLoader(bus);
+    public void testWrapperClassLoaderWithWrappedOperationsAndDefaultConvention() throws Exception {
+        final List<String> loadedClassNames = testWrapperClassLoaderWithNamingConvention(
+                new WrapperClassNamingConvention.DefaultWrapperClassNamingConvention());
+        assertEquals(
+                List.of(
+                        "org.apache.cxf.jaxws.service.jaxws_asm.sayhi.SayHi",
+                        "org.apache.cxf.jaxws.service.jaxws_asm.sayhi.SayHiResponse"),
+                loadedClassNames);
+    }
+
+    @org.junit.Test
+    public void testWrapperClassLoaderWithWrappedOperationsAndLegacyConvention() throws Exception {
+        final List<String> loadedClassNames = testWrapperClassLoaderWithNamingConvention(
+                new WrapperClassNamingConvention.LegacyWrapperClassNamingConvention());
+        assertEquals(
+                List.of(
+                        "org.apache.cxf.jaxws.service.jaxws_asm.SayHi",
+                        "org.apache.cxf.jaxws.service.jaxws_asm.SayHiResponse"),
+                loadedClassNames);
+    }
+
+    private List<String> testWrapperClassLoaderWithNamingConvention(WrapperClassNamingConvention convention)
+            throws Exception {
+        bus.setExtension(convention, WrapperClassNamingConvention.class);
+        WrapperClassGenerator wrapperClassGenerator = new WrapperClassGenerator(bus);
         JaxWsServiceFactoryBean factory = new JaxWsServiceFactoryBean();
 
         QName serviceName = new QName(
@@ -153,10 +180,53 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
         outputInfo.addMessagePart(sayHi);
         operationInfo.setOutput("sayHi", outputInfo);
 
-        Set<Class<?>> result = wrapperClassLoader.generate(factory, interfaceInfo, false);
-
         //Both Input and Output Messages will be found on Classpath
         //org.apache.cxf.jaxws.service.jaxws_asm.SayHi
-        assertEquals(2, result.size());
+        Set<Class<?>> generatedClasses = wrapperClassGenerator.generate(factory, interfaceInfo, false);
+        assertEquals(2, generatedClasses.size());
+
+
+        operationInfo.getInput().getFirstMessagePart().setTypeClass(null);
+        operationInfo.getOutput().getFirstMessagePart().setTypeClass(null);
+
+        WrapperClassLoader wrapperClassLoader = new WrapperClassLoader(bus);
+        GeneratedClassClassLoader.TypeHelperClassLoader cl = wrapperClassLoader.getClassLoader();
+        Capture c = (Capture)bus.getExtension(GeneratedClassClassLoaderCapture.class);
+        c.restore(cl);
+
+        Set<Class<?>> loadedClasses = wrapperClassLoader.generate(factory, interfaceInfo, false);
+        assertEquals(2, loadedClasses.size());
+
+        // The class names must match, but the classes themselves are different because they were loaded
+        // using different class loaders
+        final List<String> generatedClassNames = generatedClasses.stream()
+                .map(Class::getName)
+                .collect(Collectors.toList());
+        final List<String> loadedClassNames = loadedClasses.stream()
+                .map(Class::getName)
+                .collect(Collectors.toList());
+        assertEquals(
+                generatedClassNames,
+                loadedClassNames);
+        return loadedClassNames;
     }
+
+    static class Capture implements GeneratedClassClassLoaderCapture {
+
+        private final Map<String, byte[]> sources = new HashMap<>();
+
+        public void capture(String className, byte[] bytes) {
+            if (sources.containsKey(className)) {
+                throw new IllegalStateException("Class " + className + " defined twice");
+            }
+            sources.put(className, bytes);
+        }
+
+        public void restore(org.apache.cxf.common.spi.GeneratedClassClassLoader.TypeHelperClassLoader cl) {
+            for  (Map.Entry<String, byte[]> cls : sources.entrySet()) {
+                cl.defineClass(cls.getKey(), cls.getValue());
+            }
+        }
+    }
+
 }

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -70,8 +71,9 @@ public class Headers {
     private static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
 
-    private static final List<String> SENSITIVE_HEADERS = Arrays.asList("Authorization", "Proxy-Authorization");
-    private static final List<Object> SENSITIVE_HEADER_MARKER = Arrays.asList("***");
+    private static final String SENSITIVE_HEADERS_PROP_NAME = "org.apache.http.sensitive.headers";
+    private static final Set<String> DEFAULT_SENSITIVE_HEADERS = Set.of("Authorization", "Proxy-Authorization");
+    private static final List<Object> SENSITIVE_HEADER_MARKER = Collections.singletonList("***");
     private static final String ALLOW_LOGGING_SENSITIVE_HEADERS = "allow.logging.sensitive.headers";
 
     private final Message message;
@@ -107,11 +109,12 @@ public class Headers {
      * filtered keys), so it should be used sparingly - i.e. only when debug is
      * enabled.
      */
-    static String toString(Map<String, List<Object>> headers, boolean logSensitiveHeaders) {
+    static String toString(Map<String, List<Object>> headers, Set<String> sensitiveHeaders,
+            boolean logSensitiveHeaders) {
         Map<String, List<Object>> filteredHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        filteredHeaders.putAll(headers);
+        filteredHeaders.putAll(CastUtils.cast(headers));
         if (!logSensitiveHeaders) {
-            for (String filteredKey : SENSITIVE_HEADERS) {
+            for (String filteredKey : sensitiveHeaders) {
                 filteredHeaders.put(filteredKey, SENSITIVE_HEADER_MARKER);
             }
         }
@@ -306,16 +309,17 @@ public class Headers {
      *
      * @param logger     The Logger to log to.
      * @param level   The Logging Level.
-     * @param headersMap The Message protocol headers.
+     * @param message The Message.
      * @param logSensitiveHeaders whether to log sensitive headers
      */
     static void logProtocolHeaders(Logger logger, Level level,
-                                   Map<String, List<Object>> headersMap,
-                                   boolean logSensitiveHeaders) {
+            Map<String, List<Object>> headersMap,
+            Set<String> sensitiveHeaders,
+            boolean logSensitiveHeaders) {
         if (logger.isLoggable(level)) {
             for (Map.Entry<String, List<Object>> entry : headersMap.entrySet()) {
                 String key = entry.getKey();
-                boolean sensitive = !logSensitiveHeaders && SENSITIVE_HEADERS.contains(key);
+                boolean sensitive = !logSensitiveHeaders && sensitiveHeaders.contains(key);
                 List<Object> headerList = sensitive ? SENSITIVE_HEADER_MARKER : entry.getValue();
                 for (Object value : headerList) {
                     logger.log(level, key + ": "
@@ -367,7 +371,7 @@ public class Headers {
         transferProtocolHeadersToURLConnection(connection);
 
         Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
-        logProtocolHeaders(LOG, Level.FINE, theHeaders, logSensitiveHeaders());
+        logProtocolHeaders(LOG, Level.FINE, theHeaders, getSensitiveHeaders(), logSensitiveHeaders());
     }
 
     public String determineContentType() {
@@ -452,8 +456,8 @@ public class Headers {
         }
         if (LOG.isLoggable(Level.FINE)) {
             Map<String, List<Object>> theHeaders = CastUtils.cast(headers);
-            LOG.log(Level.FINE, "Request Headers: " + toString(theHeaders,
-                                                               logSensitiveHeaders()));
+            LOG.log(Level.FINE, "Request Headers: " + toString(theHeaders, getSensitiveHeaders(), 
+                logSensitiveHeaders()));
         }
     }
 
@@ -579,5 +583,10 @@ public class Headers {
 
     public static String toHttpLanguage(Locale locale) {
         return locale.toString().replace('_', '-');
+    }
+
+    private Set<String> getSensitiveHeaders() {
+        return MessageUtils.getContextualStrings(message, SENSITIVE_HEADERS_PROP_NAME,
+                DEFAULT_SENSITIVE_HEADERS);
     }
 }

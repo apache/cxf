@@ -192,7 +192,7 @@ public final class SamlpRequestComponentBuilder {
                 builderFactory.getBuilder(AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
         }
         AuthnContextClassRef authnCtxClassRef = requestedAuthnCtxClassRefBuilder.buildObject();
-        authnCtxClassRef.setAuthnContextClassRef(authnCtxClassRefValue);
+        authnCtxClassRef.setURI(authnCtxClassRefValue);
 
         return authnCtxClassRef;
     }

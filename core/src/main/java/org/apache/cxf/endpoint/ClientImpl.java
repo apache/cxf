@@ -543,7 +543,9 @@ public class ClientImpl
                 Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
                 resContext.put(MessageContext.HTTP_RESPONSE_CODE, responseCode);
                 resContext.put(org.apache.cxf.message.Message.RESPONSE_CODE, responseCode);
-                setResponseContext(resContext);
+                if (null != responseContext) {
+                    setResponseContext(resContext);
+                }
             }
             if (origLoader != null) {
                 origLoader.reset();

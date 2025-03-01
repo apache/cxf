@@ -204,14 +204,14 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         String servletPath = request.getServletPath();
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null) {
+        if (StringUtils.isEmpty(pathInfo)) {
             if (servletPath != null) {
                 servletPath += "";
             }
         } else {
             servletPath += pathInfo;
         }
-        if (servletPath == null) {
+        if (StringUtils.isEmpty(servletPath)) {
             servletPath = (String)m.get(Message.PATH_INFO);
         }
         boolean foundValidScope = false;

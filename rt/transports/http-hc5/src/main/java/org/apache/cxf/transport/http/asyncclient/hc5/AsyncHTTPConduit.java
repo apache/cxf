@@ -31,7 +31,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -45,7 +44,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 
@@ -58,7 +56,6 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -80,19 +77,16 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.BasicFuture;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.nio.ssl.BasicClientTlsStrategy;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.net.NamedEndpoint;
-import org.apache.hc.core5.reactor.ssl.SSLSessionInitializer;
-import org.apache.hc.core5.reactor.ssl.SSLSessionVerifier;
-import org.apache.hc.core5.reactor.ssl.TlsDetails;
+import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.util.Timeout;
 
 /**
@@ -285,7 +279,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     }
 
     public class AsyncWrappedOutputStream extends WrappedOutputStream
-            implements CopyingOutputStream, WritableByteChannel {
+            implements AsyncWrappedOutputStreamBase {
         private final HTTPClientPolicy csPolicy;
 
         private CXFHttpRequest entity;
@@ -432,11 +426,16 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             }
             closed = true;
             if (!chunking && wrappedStream instanceof CachedOutputStream) {
-                CachedOutputStream out = (CachedOutputStream)wrappedStream;
-                this.basicEntity.setContentLength(out.size());
-                wrappedStream = null;
-                handleHeadersTrustCaching();
-                out.writeCacheTo(wrappedStream);
+                try (CachedOutputStream out = (CachedOutputStream)wrappedStream) {
+                    this.basicEntity.setContentLength(out.size());
+                    wrappedStream = null;
+                    handleHeadersTrustCaching();
+                    // The wrappedStrem could be null for KNOWN_HTTP_VERBS_WITH_NO_CONTENT or empty
+                    // requests (org.apache.cxf.empty.request)
+                    if (wrappedStream != null) {
+                        out.writeCacheTo(wrappedStream);
+                    }
+                }
             }
             super.close();
         }
@@ -568,28 +567,21 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     final HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
                         .getHostnameVerifier(tlsClientParameters);
      
-                    tlsStrategy = new BasicClientTlsStrategy(sslcontext,
-                        new SSLSessionInitializer() {
-                            @Override
-                            public void initialize(NamedEndpoint endpoint, SSLEngine engine) {
-                                initializeSSLEngine(sslcontext, engine);
-                            }
-                        },
-                        new SSLSessionVerifier() {
-                            @Override
-                            public TlsDetails verify(NamedEndpoint endpoint, SSLEngine engine) 
-                                    throws SSLException {
-                                final SSLSession sslsession = engine.getSession();
+                    String[] cipherSuites =
+                        SSLUtils.getCiphersuitesToInclude(tlsClientParameters.getCipherSuites(),
+                                                          tlsClientParameters.getCipherSuitesFilter(),
+                                                          sslcontext.getSocketFactory().getDefaultCipherSuites(),
+                                                          SSLUtils.getSupportedCipherSuites(sslcontext),
+                                                          LOG);
+                    
+                    final String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
+                        .getSecureSocketProtocol() : sslcontext.getProtocol();
 
-                                if (!verifier.verify(endpoint.getHostName(), sslsession)) {
-                                    throw new SSLException("Could not verify host " + endpoint.getHostName());
-                                }
+                    final String[] protocols = findProtocols(protocol,
+                        sslContext.getSupportedSSLParameters().getProtocols());
 
-                                setSSLSession(sslsession);
-                                return new TlsDetails(sslsession, engine.getApplicationProtocol());
-                            }
-                        }
-                    );
+                    tlsStrategy = new DefaultClientTlsStrategy(sslcontext, protocols,
+                        cipherSuites, SSLBufferMode.STATIC, verifier);
                 } catch (final GeneralSecurityException e) {
                     LOG.warning(e.getMessage());
                 }
@@ -634,7 +626,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     || lastURL.getPort() != url.getPort();
         }
 
-        protected boolean retrySetHttpResponse(HttpResponse r) {
+        public boolean retrySetHttpResponse(HttpResponse r) {
             if (isAsync) {
                 setHttpResponse(r);
             }
@@ -704,7 +696,10 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         }
 
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            // The response hasn't been handled yet, should be handled asynchronously
+            if (httpResponse == null) {
+                isAsync = true;
+            }
         }
 
         protected void closeInputStream() throws IOException {

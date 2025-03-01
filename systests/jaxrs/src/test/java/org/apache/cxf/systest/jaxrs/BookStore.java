@@ -337,6 +337,14 @@ public class BookStore {
         return book;
     }
 
+    @GET
+    @Path("/getbody")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book getBodyBook(Book book) {
+        return book;
+    }
+
     @POST
     @Path("/echoxmlbookquery")
     @Produces("application/xml")
@@ -1842,6 +1850,15 @@ public class BookStore {
     @Produces("application/json")
     public Map<String, List<String>> getHeaders() {
         return httpHeaders.getRequestHeaders();
+    }
+    
+    @GET
+    @Path("/cookies")
+    @Produces("application/json")
+    public Response getCookies() {
+        return Response.ok()
+            .header(HttpHeaders.SET_COOKIE, httpHeaders.getRequestHeaders().getFirst(HttpHeaders.COOKIE))
+            .build();
     }
     
     public final String init() {

@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -66,6 +66,31 @@
                                     <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>forceURLConnection-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>false</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
@@ -207,6 +232,10 @@
                 <exclusion>
                     <groupId>org.junit.jupiter</groupId>
                     <artifactId>junit-jupiter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

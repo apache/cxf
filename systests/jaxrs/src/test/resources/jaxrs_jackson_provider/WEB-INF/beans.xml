@@ -51,11 +51,13 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:server>
     <core:bus>
        <core:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
            <entry key="skip.default.json.provider.registration" value="true"/>
        </core:properties>
     </core:bus>
     <core:bus name="cxf1" id="cxf1">
        <core:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
            <entry key="skip.default.json.provider.registration" value="true"/>
        </core:properties>
     </core:bus>

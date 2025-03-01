@@ -274,6 +274,7 @@ final class InternalContextUtils {
                         DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
                         if (in != null) {
                             in.cacheInput();
+                            inMessage.put("cxf.io.cacheinput", Boolean.TRUE);
                         }
                     }
                     if (chain != null && !chain.doIntercept(partialResponse)

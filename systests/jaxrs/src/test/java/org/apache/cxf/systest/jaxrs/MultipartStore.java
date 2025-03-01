@@ -406,6 +406,24 @@ public class MultipartStore {
     }
 
     @POST
+    @Path("/books/details")
+    @Consumes("multipart/form-data")
+    @Produces("text/xml")
+    public Response addBookWithDetails(@Multipart(value = "book", type = "application/xml") Book book,
+            @Multipart("upfile1Detail") Attachment a1,
+            @Multipart("upfile2Detail") Attachment a2,
+            @Multipart("upfile3Detail") Attachment a3)
+        throws Exception {
+
+        if (a1.equals(a2) || a1.equals(a3) || a2.equals(a3)) {
+            throw new WebApplicationException();
+        }
+
+        book.setName(a1.getContentId() + "," + a2.getContentId() + "," + a3.getContentId());
+        return Response.ok(book).build();
+    }
+
+    @POST
     @Path("/books/jaxb-body")
     @Consumes("multipart/related;type=\"text/xml\"")
     @Produces("text/xml")

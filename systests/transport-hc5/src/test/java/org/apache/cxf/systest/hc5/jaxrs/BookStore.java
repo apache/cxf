@@ -121,6 +121,14 @@ public class BookStore {
     }
 
     @GET
+    @Path("/getbody")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book getBodyBook(Book book) {
+        return book;
+    }
+
+    @GET
     @Path("setcookies")
     public Response setComplexCookies() {
         return Response.ok().header("Set-Cookie",

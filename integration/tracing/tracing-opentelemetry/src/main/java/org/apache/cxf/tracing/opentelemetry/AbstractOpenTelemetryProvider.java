@@ -35,7 +35,9 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.semconv.ErrorAttributes;
 import io.opentelemetry.semconv.HttpAttributes;
+import io.opentelemetry.semconv.ServerAttributes;
 import io.opentelemetry.semconv.UrlAttributes;
 
 public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvider {
@@ -65,11 +67,17 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
         SpanBuilder spanBuilder = tracer.spanBuilder(buildSpanDescription(uri.getPath(), method))
             .setSpanKind(SpanKind.SERVER)
             .setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, method)
-            .setAttribute(UrlAttributes.URL_FULL, uri.toString());
+            .setAttribute(UrlAttributes.URL_PATH, uri.getPath())
+            .setAttribute(UrlAttributes.URL_SCHEME, uri.getScheme())
+            .setAttribute(ServerAttributes.SERVER_ADDRESS, uri.getHost())
+            .setAttribute(ServerAttributes.SERVER_PORT, Long.valueOf(uri.getPort()));
+
+        if (uri.getQuery() != null) {
+            spanBuilder.setAttribute(UrlAttributes.URL_QUERY, uri.getQuery());
+        }
+
         Span activeSpan = spanBuilder.startSpan();
         Scope scope = activeSpan.makeCurrent();
-
-        // Set additional tags
 
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
@@ -103,6 +111,13 @@ public abstract class AbstractOpenTelemetryProvider extends AbstractTracingProvi
             // one.
             if (holder.isDetached()) {
                 scope = span.makeCurrent();
+            }
+
+            // Check if the response status code starts with 3, 4, or 5 (indicating redirection,
+            // client error, or server error)
+            // If true, set the error type attribute on the span with the response status code
+            if (responseStatus >= 300) {
+                span.setAttribute(ErrorAttributes.ERROR_TYPE, String.valueOf(responseStatus));
             }
 
             span.setAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, responseStatus);

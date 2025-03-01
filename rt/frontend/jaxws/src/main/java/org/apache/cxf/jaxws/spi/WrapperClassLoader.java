@@ -24,9 +24,7 @@ import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -41,8 +39,11 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
  * @author olivier dufour
  */
 public class WrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
+    private final WrapperClassNamingConvention wrapperClassNaming;
+
     public WrapperClassLoader(Bus bus) {
         super(bus);
+        wrapperClassNaming = bus.getExtension(WrapperClassNamingConvention.class);
     }
 
     @Override
@@ -87,9 +88,10 @@ public class WrapperClassLoader extends GeneratedClassClassLoader implements Wra
                                     Method method,
                                     boolean isRequest,
                                     JaxWsServiceFactoryBean factory) {
-        boolean anonymous = factory.getAnonymousWrapperTypes();
 
-        String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
+        String pkg = wrapperClassNaming.getWrapperClassPackageName(
+                method.getDeclaringClass(),
+                factory.getAnonymousWrapperTypes());
         String className = pkg + "."
                 + StringUtils.capitalize(op.getName().getLocalPart());
         if (!isRequest) {
@@ -111,9 +113,5 @@ public class WrapperClassLoader extends GeneratedClassClassLoader implements Wra
         }
         //throw new ClassNotFoundException(origClassName);
         return null;
-    }
-    private String getPackageName(Method method) {
-        String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
-        return pkg.length() == 0 ? WrapperClassGenerator.DEFAULT_PACKAGE_NAME : pkg;
     }
 }

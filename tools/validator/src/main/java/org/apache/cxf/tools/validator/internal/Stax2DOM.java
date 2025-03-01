@@ -43,9 +43,6 @@ public class Stax2DOM {
     public Document getDocument(String wsdl) throws ToolException {
         try {
             URI wsdlURI = new URI(URIParserUtil.getAbsoluteURI(wsdl));
-            if (wsdlURI.toString().startsWith("http")) {
-                return getDocument(wsdlURI.toURL());
-            }
             return getDocument(wsdlURI.toURL());
         } catch (ToolException e) {
             throw e;

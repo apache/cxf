@@ -138,7 +138,7 @@ public class LDAPClaimsTest {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
+                Assert.fail("Claim '" + c.getClaimType() + "' not requested");
             }
         }
     }
@@ -171,7 +171,7 @@ public class LDAPClaimsTest {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
+                Assert.fail("Claim '" + c.getClaimType() + "' not requested");
             }
         }
     }
@@ -210,7 +210,7 @@ public class LDAPClaimsTest {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
+                Assert.fail("Claim '" + c.getClaimType() + "' not requested");
             }
         }
 
@@ -232,7 +232,7 @@ public class LDAPClaimsTest {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
+                Assert.fail("Claim '" + c.getClaimType() + "' not requested");
             }
         }
     }
@@ -295,7 +295,7 @@ public class LDAPClaimsTest {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
+                Assert.fail("Claim '" + c.getClaimType() + "' not requested");
             }
         }
     }

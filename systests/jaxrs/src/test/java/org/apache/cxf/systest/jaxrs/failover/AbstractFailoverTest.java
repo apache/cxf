@@ -27,6 +27,8 @@ import java.util.Map;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;
@@ -35,6 +37,7 @@ import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -206,9 +209,14 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
 
     private static JAXRSClientFactoryBean createBean(String address,
                                                 FailoverFeature feature) {
+        final Bus bus = new ExtensionManagerBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         bean.setFeatures(Arrays.asList(feature));
+        bean.setBus(bus);
         return bean;
     }
 

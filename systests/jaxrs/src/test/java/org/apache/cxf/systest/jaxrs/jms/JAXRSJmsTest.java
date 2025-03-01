@@ -72,6 +72,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         props.put("java.util.logging.config.file",
                   System.getProperty("java.util.logging.config.file"));
 
+        // See please https://bugs.openjdk.org/browse/JDK-8296244
+        if (Runtime.version().feature() >= 23) {
+            props.put("java.security.manager", "allow");
+        }
+
         assertTrue("server did not launch correctly",
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, false));
         assertTrue("server did not launch correctly",

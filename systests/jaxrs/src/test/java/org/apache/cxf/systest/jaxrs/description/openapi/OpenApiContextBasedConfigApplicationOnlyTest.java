@@ -27,6 +27,7 @@ import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.Feature;
@@ -37,6 +38,7 @@ import org.apache.cxf.jaxrs.model.UserApplication;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.openapi.parse.OpenApiParseUtils;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.systest.jaxrs.description.group2.BookStore;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
@@ -58,6 +60,8 @@ public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractClient
     public static class OpenApiContextBased extends AbstractServerTestServerBase {
         @Override
         protected Server createServer(Bus bus) throws Exception {
+            // Make sure default JSON-P/JSON-B providers are not loaded
+            bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
             createServerFactory("/api", "This is first API (api)", BookStoreOpenApi.class);
             return createServerFactory("/api2", "This is second API (api2)", BookStore.class);
         }
@@ -101,6 +105,10 @@ public class OpenApiContextBasedConfigApplicationOnlyTest extends AbstractClient
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(OpenApiContextBased.class, false));
+
+        final Bus bus = BusFactory.getThreadDefaultBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
 
     @Test

@@ -83,6 +83,13 @@ public interface Message extends StringMap {
     String ONE_WAY_REQUEST = "OnewayRequest";
 
     /**
+     * Boolean property specifying if the attachments have been partially written
+     * (due to I/O error, fe).
+     */
+    String PARTIAL_ATTACHMENTS_MESSAGE = "org.apache.cxf.partial.attachments";
+
+
+    /**
      * Boolean property specifying if oneWay response must be processed.
      */
     String PROCESS_ONEWAY_RESPONSE = "org.apache.cxf.transport.processOneWayResponse";

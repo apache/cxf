@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -135,7 +135,7 @@
             <version>${cxf.mockito.version}</version>
             <scope>test</scope>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
             <scope>test</scope>

@@ -19,9 +19,11 @@
 
 package org.apache.cxf.jaxrs.provider.jsrjsonb;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -36,12 +38,14 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 /**
  * 11.2.7 Java API for JSON Binding (JSR-370)
@@ -77,7 +81,11 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupportedMediaType(mediaType);
+        return isSupportedMediaType(mediaType) 
+            && !OutputStream.class.isAssignableFrom(type)
+            && !Writer.class.isAssignableFrom(type)
+            && !isKnownUnsupportedInOutType(type)
+            && !JAXRSUtils.isStreamingLikeOutType(type, genericType);
     }
 
     @Override
@@ -89,9 +97,11 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupportedMediaType(mediaType);
+        return isSupportedMediaType(mediaType)
+            && !isKnownUnsupportedInOutType(type)
+            && !JAXRSUtils.isStreamingLikeOutType(type, genericType);
     }
-
+    
     @Override
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream) 
@@ -131,5 +141,12 @@ public class JsrJsonbProvider implements MessageBodyReader<Object>, MessageBodyW
         } else {
             return DefaultJsonbSupplier.INSTANCE;
         }
+    }
+
+    private static boolean isKnownUnsupportedInOutType(Class<?> type) {
+        return Response.class.isAssignableFrom(type)
+            || CharSequence.class.isAssignableFrom(type)
+            || File.class.isAssignableFrom(type)
+            || byte[].class.isAssignableFrom(type);
     }
 }

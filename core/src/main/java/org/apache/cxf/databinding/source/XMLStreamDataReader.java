@@ -52,6 +52,7 @@ import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
@@ -226,13 +227,16 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
         WoodstoxValidationImpl impl = new WoodstoxValidationImpl();
         XMLStreamWriter nullWriter = null;
-        if (impl.canValidate()) {
+        boolean notUseMsvSchemaValidator = 
+            MessageUtils.getContextualBoolean(message, SourceDataBinding.NOT_USE_MSV_SCHEMA_VALIDATOR, false);
+        if (impl.canValidate()
+            && !notUseMsvSchemaValidator) {
             nullWriter = StaxUtils.createXMLStreamWriter(new NUllOutputStream());
             impl.setupValidation(nullWriter, message.getExchange().getEndpoint(),
                                  message.getExchange().getService().getServiceInfos().get(0));
         }
         //check if the impl can still validate after the setup, possible issue loading schemas or similar
-        if (impl.canValidate()) {
+        if (impl.canValidate() && !notUseMsvSchemaValidator) {
             //Can use the MSV libs and woodstox to handle the schema validation during
             //parsing and processing.   Much faster and single traversal
             //filter xop node

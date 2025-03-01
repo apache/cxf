@@ -99,11 +99,9 @@ switching the soap:address value to the servlet-specific one (presently
 commented-out).
 
 2.) For standalone Tomcat: You can manually copy the generated WAR file to the Tomcat 
-webapps folder, or, if you have Maven and Tomcat set up to use the Tomcat Maven Plugin 
-(http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/index.html) 
-you can use the mvn tomcat7:redeploy command instead. 
+webapps folder.
 
-For embedded Tomcat: Just run mvn tomcat7:run-war from the project base folder.
+For embedded Tomcat: Just run mvn cargo:run from the project base folder.
 
 3.) Next activate the client via mvn -Pclient as explained in the previous section.
 

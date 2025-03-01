@@ -26,6 +26,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx3.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
@@ -35,8 +36,10 @@ public class RxJava3FlowableServer extends AbstractServerTestServerBase {
 
     @Override
     protected Server createServer(Bus bus) throws Exception {
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
         // Make sure default JSONProvider is not loaded
-        bus.setProperty("skip.default.json.provider.registration", true);
+        bus.setProperty(ProviderFactory.SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION, true);
         createFactoryBean(false, "/rx3").create();
         return createFactoryBean(true, "/rx33").create();
     }

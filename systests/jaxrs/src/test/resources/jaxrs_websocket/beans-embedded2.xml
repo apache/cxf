@@ -36,12 +36,19 @@
         
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
 
+    <cxf:bus>
+        <cxf:properties>
+            <entry key="skip.jakarta.json.providers.registration" value="true"/>
+        </cxf:properties>
+    </cxf:bus>
+
     <jaxrs:server id="bookservice" address="ws://localhost:${testutil.ports.org.apache.cxf.systest.jaxrs.websocket.BookServerWebSocket.5}/websocket">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.jaxrs.provider.StreamingResponseProvider"/>
+            <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
 </beans>

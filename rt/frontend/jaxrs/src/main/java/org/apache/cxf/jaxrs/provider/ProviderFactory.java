@@ -79,6 +79,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public abstract class ProviderFactory {
+    public static final String SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION = "skip.default.json.provider.registration";
+    public static final String SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION = "skip.jakarta.json.providers.registration";
+
     public static final String DEFAULT_FILTER_NAME_BINDING = "org.apache.cxf.filter.binding";
     public static final String PROVIDER_SELECTION_PROPERTY_CHANGED = "provider.selection.property.changed";
     public static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
@@ -157,6 +160,10 @@ public abstract class ProviderFactory {
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider");
     private static final LazyProviderClass MULTIPART_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.MultipartProvider");
+    private static final LazyProviderClass JSONB_PROVIDER_CLASS =
+            new LazyProviderClass("org.apache.cxf.jaxrs.provider.jsrjsonb.JsrJsonbProvider");
+    private static final LazyProviderClass JSONP_PROVIDER_CLASS = 
+            new LazyProviderClass("org.apache.cxf.jaxrs.provider.jsrjsonp.JsrJsonpProvider");
 
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors =
         new NameKeyMap<>(true);
@@ -216,8 +223,13 @@ public abstract class ProviderFactory {
                      JAXB_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
                      JAXB_ELEMENT_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
                      MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory.getBus()));
-        Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
-        if (!PropertyUtils.isTrue(prop)) {
+        final Object skipJakartaJsonProviders = factory.getBus().getProperty(SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION);
+        if (!PropertyUtils.isTrue(skipJakartaJsonProviders)) {
+            factory.setProviders(false, false, JSONP_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                JSONB_PROVIDER_CLASS.tryCreateInstance(factory.getBus()));
+        }
+        final Object skipDefaultJsonProvider = factory.getBus().getProperty(SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION);
+        if (!PropertyUtils.isTrue(skipDefaultJsonProvider)) {
             factory.setProviders(false, false, createProvider(JSON_PROVIDER_NAME, factory.getBus()));
         }
     }

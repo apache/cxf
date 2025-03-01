@@ -20,7 +20,11 @@
 package org.apache.cxf.systest.http_undertow;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.namespace.QName;
 
@@ -42,6 +46,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
@@ -55,6 +60,8 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.http_undertow.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -110,6 +117,7 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         BindingProvider bp = (BindingProvider)greeter;
         ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
+        ClientProxy.getClient(greeter).getOutInterceptors().add(new GZIPOutInterceptor());
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    ADDRESS);
         HTTPConduit cond = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
@@ -118,14 +126,11 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         client.setReceiveTimeout(600000);
         cond.setClient(client);
         if (async) {
-            if (cond instanceof AsyncHTTPConduit) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
-                bp.getRequestContext().put(Credentials.class.getName(), creds);
-                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
-                client.setAutoRedirect(true);
-            } else {
-                fail("Not an async conduit");
-            }
+            assertThat("Not an async conduit", cond, isInstanceOfAsyncHttpConduit());
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd".toCharArray());
+            bp.getRequestContext().put(Credentials.class.getName(), creds);
+            bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+            client.setAutoRedirect(true);
         } else {
             bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
             bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
@@ -133,10 +138,19 @@ public class UndertowDigestAuthTest extends AbstractClientServerTestBase {
         }
 
         ClientProxy.getClient(greeter).getOutInterceptors()
-            .add(new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM_ENDING) {
+            .add(new AbstractPhaseInterceptor<Message>(Phase.USER_LOGICAL) {
 
                 public void handleMessage(Message message) throws Fault {
-                    Map<String, ?> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+                    Map<String, List<Object>> headers = 
+                        CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+                    if (headers == null) {
+                        headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+                        message.put(Message.PROTOCOL_HEADERS, headers);
+                    }
+                    List<Object> header = 
+                        (List<Object>)headers.computeIfAbsent("Accept-Encoding", k -> new ArrayList<>());
+                    header = Arrays.asList(header.toArray());
+                    headers.put("Accept-Encoding", header);
                     if (headers.containsKey("Proxy-Authorization")) {
                         throw new RuntimeException("Should not have Proxy-Authorization");
                     }

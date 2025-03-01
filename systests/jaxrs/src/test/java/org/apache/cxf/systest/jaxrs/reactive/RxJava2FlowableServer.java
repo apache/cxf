@@ -26,6 +26,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx2.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
@@ -35,8 +36,9 @@ public class RxJava2FlowableServer extends AbstractServerTestServerBase {
 
     @Override
     protected Server createServer(Bus bus) throws Exception {
-        // Make sure default JSONProvider is not loaded
-        bus.setProperty("skip.default.json.provider.registration", true);
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
         createFactoryBean(false, "/rx2").create();
         return createFactoryBean(true, "/rx22").create();
     }

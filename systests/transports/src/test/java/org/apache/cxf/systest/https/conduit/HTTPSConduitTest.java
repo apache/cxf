@@ -22,19 +22,29 @@ package org.apache.cxf.systest.https.conduit;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -361,6 +371,78 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
      */
     @Test
     public void testHttpsBasicConnection() throws Exception {
+        // Use common/shared TLSClientParameters
+        testHttpsBasicConnection(tlsClientParameters);
+    }
+
+    @Test
+    public void testHttpsBasicConnectionCustomSslContext() throws Exception {
+        // Use custom SSLContext registered in TLSClientParameters
+        SSLContext ctx = SSLContext.getInstance("TLSv1.3");
+        try (InputStream keyStoreIs = ClassLoaderUtils.getResourceAsStream(
+            "keys/Morpit.jks", HTTPSConduitTest.class
+        )) {
+            KeyManager[] keyManagers = getKeyManagers(getKeyStore(
+                "JKS", keyStoreIs, "password"), "password"
+            );
+            // I need to disable CN verification (as certificate contains Bethal as CN),
+            // but I cannot use TLSClientParameters.setDisableCNCheck(), because in this case
+            // URLCONNECTION is always used (see HttpClientHTTPConduit.setupConnection())
+            // -> I must used own TrustManager without verification
+            TrustManager trustManager = new X509ExtendedTrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[] {};
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) {
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
+                }
+            };
+            ctx.init(
+                keyManagers,
+                new TrustManager[] {trustManager},
+                SecureRandom.getInstance("SHA1PRNG")
+            );
+        }
+
+        // HostnameVerifier (disable host name verification)
+        class AllowAllHostnameVerifier implements HostnameVerifier {
+            @Override
+            public boolean verify(String host, SSLSession session) {
+                try {
+                    Certificate[] certs = session.getPeerCertificates();
+                    return certs != null && certs[0] instanceof X509Certificate;
+                } catch (SSLPeerUnverifiedException e) {
+                    return false;
+                }
+            }
+        }
+
+        // TLSClientParameters (Custom SSLContext)
+        TLSClientParameters tlsClientParams = new TLSClientParameters();
+        tlsClientParams.setSslContext(ctx);
+        // TLSClientParameters (disable host name verification - now needed only when URLConnection is used)
+        tlsClientParams.setHostnameVerifier(new AllowAllHostnameVerifier());
+
+        testHttpsBasicConnection(tlsClientParams);
+    }
+
+    private void testHttpsBasicConnection(TLSClientParameters tlsClientParams) throws Exception {
         startServer("Bethal");
 
         URL wsdl = getClass().getResource("greeting.wsdl");
@@ -392,7 +474,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         authPolicy.setPassword("password");
 
         http.setClient(httpClientPolicy);
-        http.setTlsClientParameters(tlsClientParameters);
+        http.setTlsClientParameters(tlsClientParams);
         http.setAuthorization(authPolicy);
 
         configureProxy(client);

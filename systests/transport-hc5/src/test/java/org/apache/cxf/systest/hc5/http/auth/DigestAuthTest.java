@@ -49,6 +49,8 @@ import org.apache.hello_world.services.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.hc5.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -127,14 +129,11 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         client.setReceiveTimeout(600000);
         cond.setClient(client);
         if (async) {
-            if (cond instanceof AsyncHTTPConduit) {
-                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("foo", "bar".toCharArray());
-                bp.getRequestContext().put(Credentials.class.getName(), creds);
-                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
-                client.setAutoRedirect(true);
-            } else {
-                fail("Not an async conduit");
-            }
+            assertThat("Not an async conduit", cond, isInstanceOfAsyncHttpConduit());
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials("foo", "bar".toCharArray());
+            bp.getRequestContext().put(Credentials.class.getName(), creds);
+            bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+            client.setAutoRedirect(true);
         } else {
             bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "foo");
             bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "bar");

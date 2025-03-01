@@ -177,7 +177,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         public void close() throws IOException {
             LoggingMessage buffer = setupBuffer(message);
             if (count >= lim) {
-                buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                buffer.getMessage().append("(message truncated to ").append(lim).append(" bytes)\n");
             }
             StringWriter w2 = out2;
             if (w2 == null) {
@@ -236,14 +236,14 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (cos.getTempFile() == null) {
                 //buffer.append("Outbound Message:\n");
                 if (cos.size() >= lim) {
-                    buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    buffer.getMessage().append("(message truncated to ").append(lim).append(" bytes)\n");
                     truncated = true;
                 }
             } else {
                 buffer.getMessage().append("Outbound Message (saved to tmp file):\n");
-                buffer.getMessage().append("Filename: " + cos.getTempFile().getAbsolutePath() + "\n");
+                buffer.getMessage().append("Filename: ").append(cos.getTempFile().getAbsolutePath()).append('\n');
                 if (cos.size() >= lim) {
-                    buffer.getMessage().append("(message truncated to " + lim + " bytes)\n");
+                    buffer.getMessage().append("(message truncated to ").append(lim).append(" bytes)\n");
                     truncated = true;
                 }
             }

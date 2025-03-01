@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.1.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -84,6 +84,31 @@
                                     <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>forceURLConnection-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>false</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
@@ -272,6 +297,10 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -333,6 +362,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${cxf.junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <version>${cxf.junit5.version}</version>
@@ -364,6 +399,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-alpn-java-client</artifactId>
             <version>${cxf.jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

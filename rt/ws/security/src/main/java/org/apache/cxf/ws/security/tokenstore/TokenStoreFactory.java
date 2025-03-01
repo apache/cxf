@@ -20,36 +20,23 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import org.apache.cxf.message.Message;
+import org.apache.cxf.ws.security.tokenstore.jcache.JCacheTokenStoreFactory;
+import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.wss4j.common.cache.WSS4JCacheUtil;
 
 /**
  * An abstract factory to return a TokenStore instance. It returns an EHCacheTokenStoreFactory
  * if EH-Cache is available. Otherwise it returns a MemoryTokenStoreFactory.
  */
 public abstract class TokenStoreFactory {
-
-    private static boolean ehCacheInstalled;
-
-    static {
-        try {
-            Class<?> cacheManagerClass = Class.forName("org.ehcache.CacheManager");
-            if (cacheManagerClass != null) {
-                ehCacheInstalled = true;
-            }
-        } catch (Exception e) {
-            //ignore
-        }
-    }
-
-    public static synchronized boolean isEhCacheInstalled() {
-        return ehCacheInstalled;
-    }
-
     public static TokenStoreFactory newInstance() {
-        if (isEhCacheInstalled()) {
+        if (WSS4JCacheUtil.isEhCacheInstalled()) {
             return new EHCacheTokenStoreFactory();
+        } else if (JCacheUtils.isJCacheInstalled()) {
+            return new JCacheTokenStoreFactory();
+        } else {
+            return new MemoryTokenStoreFactory();
         }
-
-        return new MemoryTokenStoreFactory();
     }
 
     public abstract TokenStore newTokenStore(String key, Message message) throws TokenStoreException;

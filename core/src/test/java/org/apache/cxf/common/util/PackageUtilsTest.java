@@ -127,6 +127,7 @@ public class PackageUtilsTest {
     @Test
     public void testGetPackageNameByNameSpaceURI() throws Exception {
         assertEquals("com.iona.cxf", PackageUtils.getPackageNameByNameSpaceURI("http://www.cxf.iona.com"));
+        assertEquals("com.iona.cxf", PackageUtils.getPackageNameByNameSpaceURI("https://www.cxf.iona.com"));
         assertEquals("com.iona._class", PackageUtils.getPackageNameByNameSpaceURI("urn:www.class.iona.com"));
         assertEquals("uri.cxf_apache_org.jstest",
                 PackageUtils.getPackageNameByNameSpaceURI("uri:cxf.apache.org:jstest"));
@@ -134,10 +135,16 @@ public class PackageUtilsTest {
                 PackageUtils.getPackageNameByNameSpaceURI("com.esendex.ems.soapinterface"));
         assertEquals("ddd.cc.bb.aa._int.fff_v01_00",
                 PackageUtils.getPackageNameByNameSpaceURI("http://aa.bb.cc.ddd/Int/fff-v01.00"));
+        assertEquals("ddd.cc.bb.aa._int.fff_v01_00",
+                PackageUtils.getPackageNameByNameSpaceURI("https://aa.bb.cc.ddd/Int/fff-v01.00"));
         assertEquals("org.apache.cxf._case",
                 PackageUtils.getPackageNameByNameSpaceURI("http://www.case.cxf.apache.org"));
         assertEquals("org.apache.cxf._case",
+                PackageUtils.getPackageNameByNameSpaceURI("https://www.case.cxf.apache.org"));
+        assertEquals("org.apache.cxf._case",
                 PackageUtils.getPackageNameByNameSpaceURI("http://www.Case.cxf.apache.org"));
+        assertEquals("org.apache.cxf._case",
+                PackageUtils.getPackageNameByNameSpaceURI("https://www.Case.cxf.apache.org"));
     }
 
     @Test

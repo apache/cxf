@@ -22,6 +22,7 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -67,6 +68,7 @@ public class DigestAuthSupplierSpringTest {
     @Test
     public void test() {
         WebClient client = WebClient.create("http://localhost:" + port, (String) null);
+        WebClient.getConfig(client).getBus().setProperty(AsyncHTTPConduit.USE_ASYNC, true);
 
         assertThrows(NotAuthorizedException.class, () -> client.get(String.class));
 

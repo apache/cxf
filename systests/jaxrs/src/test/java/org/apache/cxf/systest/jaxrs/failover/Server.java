@@ -23,8 +23,11 @@ package org.apache.cxf.systest.jaxrs.failover;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -41,8 +44,17 @@ public class Server extends AbstractBusTestServerBase {
     List<org.apache.cxf.endpoint.Server> servers = new ArrayList<>();
 
     protected void run()  {
-        createEndpoint(ADDRESS2);
-        createEndpoint(ADDRESS3);
+        Bus bus = getBus();
+
+        if (bus == null) {
+            bus = new ExtensionManagerBus();
+        }
+
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
+        createEndpoint(ADDRESS2, bus);
+        createEndpoint(ADDRESS3, bus);
     }
     public void tearDown() throws Exception {
         for (org.apache.cxf.endpoint.Server s : servers) {
@@ -52,11 +64,12 @@ public class Server extends AbstractBusTestServerBase {
         servers.clear();
     }
 
-    private void createEndpoint(String address) {
+    private void createEndpoint(String address, Bus bus) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore(), false));
         sf.setAddress(address);
+        sf.setBus(bus);
         servers.add(sf.create());
     }
 

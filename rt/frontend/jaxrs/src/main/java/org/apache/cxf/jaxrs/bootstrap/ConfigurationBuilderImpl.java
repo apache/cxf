@@ -76,4 +76,20 @@ public class ConfigurationBuilderImpl implements SeBootstrap.Configuration.Build
         return this;
     }
     
+    @Override
+    public SeBootstrap.Configuration.Builder from(Object externalConfig) {
+        if (SeBootstrap.Configuration.class.isInstance(externalConfig)) {
+            final SeBootstrap.Configuration other = (SeBootstrap.Configuration) externalConfig;
+            from((name, clazz) -> {
+                final Object property = other.property(name);
+                if (property != null && clazz.equals(property.getClass())) {
+                    return Optional.of(property);
+                } else {
+                    return Optional.empty();
+                }
+            });
+        }
+        return this;
+    }
+
 }
