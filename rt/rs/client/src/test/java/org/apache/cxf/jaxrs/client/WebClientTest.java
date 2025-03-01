@@ -28,18 +28,24 @@ import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.ParamConverter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
+import org.apache.cxf.Bus;
+import org.apache.cxf.Bus.BusState;
 import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 
 public class WebClientTest {
 
@@ -371,6 +377,111 @@ public class WebClientTest {
         wc.cookie(new Cookie.Builder("b").value("2").build());
         assertThat(wc.getHeaders().get(HttpHeaders.COOKIE),
             containsInAnyOrder("$Version=1;a=1", "$Version=1;b=2"));
+    }
+
+    @Test
+    public void testWebClientClose() {
+        final WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.getConfiguration().setShutdownBusOnClose(true);
+
+        final Bus bus = wc.getConfiguration().getBus();
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+        wc.close();
+
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+        assertThat(wc.getConfiguration(), is(nullValue()));
+
+        assertThat(bus.getState(), equalTo(BusState.SHUTDOWN));
+    }
+
+    @Test
+    public void testWebClientFrom() {
+        final WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.getConfiguration().setShutdownBusOnClose(true);
+
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+
+        final WebClient wc1 = WebClient.fromClient(wc);
+        assertThat(wc.getConfigurationReference(), equalTo(wc1.getConfigurationReference()));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+        wc.close();
+
+        final ClientConfiguration configuration = wc1.getConfiguration();
+        assertThat(configuration, is(not(nullValue())));
+        assertThat(configuration.getBus().getState(), anyOf(equalTo(BusState.RUNNING),
+            equalTo(BusState.INITIALIZING), equalTo(BusState.INITIAL)));
+
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+        assertThat(wc1.getConfigurationReference().refCount(), equalTo(1L));
+        wc1.close();
+
+        assertThat(wc1.getConfigurationReference(), is(nullValue()));
+        assertThat(configuration.getBus().getState(), equalTo(BusState.SHUTDOWN));
+    }
+    
+    @Test
+    public void testWebClientFromChained() {
+        final WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.getConfiguration().setShutdownBusOnClose(true);
+
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+
+        final WebClient wc1 = WebClient.fromClient(wc);
+        assertThat(wc.getConfigurationReference(), equalTo(wc1.getConfigurationReference()));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+
+        final WebClient wc2 = WebClient.fromClient(wc);
+        assertThat(wc.getConfigurationReference(), equalTo(wc2.getConfigurationReference()));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(3L));
+        wc.close();
+
+        final ClientConfiguration configuration1 = wc1.getConfiguration();
+        assertThat(configuration1, is(not(nullValue())));
+        assertThat(configuration1.getBus().getState(), anyOf(equalTo(BusState.RUNNING),
+            equalTo(BusState.INITIALIZING), equalTo(BusState.INITIAL)));
+        assertThat(wc1.getConfigurationReference().refCount(), equalTo(2L));
+
+        final ClientConfiguration configuration2 = wc2.getConfiguration();
+        assertThat(configuration2, is(not(nullValue())));
+        assertThat(configuration2.getBus(), is(configuration1.getBus()));
+        wc1.close();
+
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+        assertThat(wc2.getConfigurationReference().refCount(), equalTo(1L));
+        wc2.close();
+
+        assertThat(wc2.getConfigurationReference(), is(nullValue()));
+        assertThat(configuration2.getBus().getState(), equalTo(BusState.SHUTDOWN));
+    }
+    
+    @Test
+    public void testWebClientFromShare() {
+        final WebClient wc = WebClient.create("http://foo").language("en_CA");
+        wc.getConfiguration().setShutdownBusOnClose(true);
+        wc.getConfiguration().getBus().setProperty(WebClient.USE_CONFIGURATION_REFERENCE_WHEN_COPY, false);
+
+        assertThat(wc.getConfigurationReference(), is(not(nullValue())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+
+        final WebClient wc1 = WebClient.fromClient(wc);
+        assertThat(wc.getConfigurationReference(), not(equalTo(wc1.getConfigurationReference())));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
+        assertThat(wc1.getConfigurationReference().refCount(), equalTo(1L));
+        wc.close();
+
+        final ClientConfiguration configuration = wc1.getConfiguration();
+        assertThat(configuration, is(not(nullValue())));
+        assertThat(configuration.getBus().getState(), equalTo(BusState.SHUTDOWN));
+
+        assertThat(wc.getConfigurationReference(), is(nullValue()));
+        assertThat(wc1.getConfigurationReference().refCount(), equalTo(1L));
+        wc1.close();
+
+        assertThat(wc1.getConfigurationReference(), is(nullValue()));
+        assertThat(configuration.getBus().getState(), equalTo(BusState.SHUTDOWN));
     }
 
     private static final class ParamConverterProviderImpl implements ParamConverterProvider {
