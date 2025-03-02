@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import javax.ws.rs.PathParam;
@@ -130,6 +131,34 @@ public abstract class AbstractClient implements Client {
     protected ClientConfiguration cfg = new ClientConfiguration();
     private ClientState state;
     private final AtomicBoolean closed = new AtomicBoolean();
+    private volatile ConfigurationReference configurationReference = new ConfigurationReference(cfg); 
+
+    protected static final class ConfigurationReference {
+        private final AtomicLong refCount = new AtomicLong(1);
+        private final ClientConfiguration cfg;
+
+        public ConfigurationReference(ClientConfiguration cfg) {
+            this.cfg = cfg;
+        }
+
+        public ConfigurationReference acquire() {
+            refCount.incrementAndGet();
+            return this;
+        }
+        
+        public long refCount() {
+            return refCount.get();
+        }
+
+        public long release() {
+            return refCount.decrementAndGet();
+        }
+
+        public ClientConfiguration getConfiguration() {
+            return cfg;
+        }
+    }
+    
     protected AbstractClient(ClientState initialState) {
         this.state = initialState;
     }
@@ -342,7 +371,11 @@ public abstract class AbstractClient implements Client {
             if (cfg.getBus() == null) {
                 return;
             }
-            cfg.getEndpoint().getCleanupHooks().
+
+            final ConfigurationReference reference = configurationReference;
+            final boolean shutdownConfiguration = reference == null || reference.release() == 0L;
+            if (shutdownConfiguration) {
+                cfg.getEndpoint().getCleanupHooks().
                     forEach(c -> {
                         try {
                             c.close();
@@ -350,26 +383,35 @@ public abstract class AbstractClient implements Client {
                             //ignore
                         }
                     });
-            ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
+            }
+
+            final ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
             if (null != mgr) {
                 mgr.clientDestroyed(new FrontendClientAdapter(getConfiguration()));
             }
 
-            if (cfg.getConduitSelector() instanceof Closeable) {
-                try {
-                    ((Closeable)cfg.getConduitSelector()).close();
-                } catch (IOException e) {
-                    //ignore, we're destroying anyway
+            if (shutdownConfiguration) {
+                if (cfg.getConduitSelector() instanceof Closeable) {
+                    try {
+                        ((Closeable)cfg.getConduitSelector()).close();
+                    } catch (IOException e) {
+                        //ignore, we're destroying anyway
+                    }
+                } else {
+                    cfg.getConduit().close();
                 }
-            } else {
-                cfg.getConduit().close();
             }
+
+            // reset state
             state.reset();
-            if (cfg.isShutdownBusOnClose()) {
+
+            if (shutdownConfiguration && cfg.isShutdownBusOnClose()) {
                 cfg.getBus().shutdown(false);
             }
+
             state = null;
             cfg = null;
+            configurationReference = null;
         }
     }
 
@@ -901,6 +943,7 @@ public abstract class AbstractClient implements Client {
 
     protected void setConfiguration(ClientConfiguration config) {
         cfg = config;
+        configurationReference = new ConfigurationReference(config);
     }
 
     // Note that some conduit selectors may update Message.ENDPOINT_ADDRESS
@@ -1320,5 +1363,27 @@ public abstract class AbstractClient implements Client {
 
         protected void handleAsyncFault(Message message) {
         }
+    }
+    
+    /**
+     * References the configuration (by another client) so it won't shut down till all the 
+     * client instances are closed. 
+     * @param reference configuration reference
+     */
+    protected void setConfigurationReference(ConfigurationReference reference) {
+        if (reference == null) {
+            throw new IllegalArgumentException("The configuration reference is not set "
+                + "(the client was already closed)");
+        }
+        this.configurationReference = reference.acquire();
+        this.cfg = configurationReference.getConfiguration();
+    }
+
+    /**
+     * Returns configuration reference
+     * @return configuration reference
+     */
+    protected ConfigurationReference getConfigurationReference() {
+        return this.configurationReference;
     }
 }
