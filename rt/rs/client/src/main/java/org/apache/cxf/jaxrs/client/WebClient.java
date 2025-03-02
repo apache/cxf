@@ -82,6 +82,9 @@ import org.apache.cxf.message.Message;
  *
  */
 public class WebClient extends AbstractClient {
+    // Use client configuration reference instead of sharing the instance directly
+    public static final String USE_CONFIGURATION_REFERENCE_WHEN_COPY = "use.configuration.reference.when.copy";
+
     private static final String REQUEST_CLASS = "request.class";
     private static final String REQUEST_TYPE = "request.type";
     private static final String REQUEST_ANNS = "request.annotations";
@@ -1233,7 +1236,21 @@ public class WebClient extends AbstractClient {
     static void copyProperties(Client toClient, Client fromClient) {
         AbstractClient newClient = toAbstractClient(toClient);
         AbstractClient oldClient = toAbstractClient(fromClient);
-        newClient.setConfiguration(oldClient.getConfiguration());
+        final ClientConfiguration oldCfg = oldClient.getConfiguration();
+
+        boolean useConfigurationReference = true;
+        if (oldCfg != null && oldCfg.getBus() != null) {
+            Object useConfigurationReferenceProp = oldCfg.getBus().getProperty(USE_CONFIGURATION_REFERENCE_WHEN_COPY);
+            if (useConfigurationReferenceProp != null) {
+                useConfigurationReference = PropertyUtils.isTrue(useConfigurationReferenceProp);
+            }
+        }
+
+        if (useConfigurationReference) {
+            newClient.setConfigurationReference(oldClient.getConfigurationReference());
+        } else {
+            newClient.setConfiguration(oldClient.getConfiguration());
+        }
     }
 
     private static AbstractClient toAbstractClient(Object client) {
