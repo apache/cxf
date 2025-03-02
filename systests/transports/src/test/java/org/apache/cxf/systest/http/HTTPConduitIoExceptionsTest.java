@@ -77,12 +77,13 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     }
 
     @Test
+    @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
     public void testServiceUnavailable() throws Exception {
         final Greeter greeter = getGreeter();
 
         exception.expect(WebServiceException.class);
         exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private static final String message = "HTTP response '503: Service Unavailable' when "
+            private final String message = "HTTP response '503: Service Unavailable' when "
                 + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
 
             @Override
@@ -104,12 +105,13 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     }
 
     @Test
+    @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
     public void testNotFound() throws Exception {
         final Greeter greeter = getGreeter();
 
         exception.expect(WebServiceException.class);
         exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private static final String message = "HTTP response '404: Not Found' when "
+            private final String message = "HTTP response '404: Not Found' when "
                 + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
 
             @Override
