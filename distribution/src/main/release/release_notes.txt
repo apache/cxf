@@ -1,4 +1,4 @@
-Apache CXF 4.0.6 Release Notes
+Apache CXF 4.0.7 Release Notes
 
 1. Overview
 
@@ -21,7 +21,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.6 fixes over 29 JIRA issues reported by users and the community.
+4.0.7 fixes over 14 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -64,40 +64,23 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-7396] - CachedOutputStream doesn't delete temp files
     * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
-    * [CXF-8931] - HttpClientHTTPConduit can't disable the http chunk mode
-    * [CXF-8950] - HttpClient in CXF closing prematurely; 4.0.4-SNAPSHOT
-    * [CXF-8979] - XML (Woodstox/MSV) based schema validation is broken
-    * [CXF-8995] - OpcodesProxy java.lang.ArrayIndexOutOfBoundsException: Index 7 out of bounds for length 7
-    * [CXF-9021] - Warning "Could not resolve Schema for datatypes.dtd" when file was found
-    * [CXF-9037] - NPE when using com.ctc.wstx.returnNullForDefaultNamespace=true
-    * [CXF-9041] - Regression: CXF will only accept org.glassfish.jaxb.runtime.v2.ContextFactory
-    * [CXF-9042] - Several unit tests are non-idempotent
-    * [CXF-9052] - LoadDistributorFeature not comaptible with JAX-RS subresources
+    * [CXF-8992] - WebClient.fromClient() broken due to garbage collection
     * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
-    * [CXF-9058] - jaxws binding example in documentation no more work in v4.x because of jarkarta
-    * [CXF-9060] - WSDL2Java Service generation results in 'unused import' warnings
-    * [CXF-9064] - AsyncHTTPConduit doesn't close copied wrappedStream on close
-    * [CXF-9066] - MaskSensitiveHelper does not mask multi-line content
-    * [CXF-9067] - MaskSensitiveHelper incorrectly masks wrapper element
-    * [CXF-9074] - HttpClientHTTPConduit ignores SSLContext in TLSClientParameters (Java HttpClient)
-    * [CXF-9076] - Exception message is not unmarshalled with JDK17
-    * [CXF-9078] - AsyncHTTPConduit.java causing NullPointerException when closing
-    * [CXF-9079] - java.lang.IllegalStateException: Encoding process already completed from LengthDelimitedEncoder
+    * [CXF-9065] - StackOverflow Exception during execution of WebClient POST Request on SSLUtils class
+    * [CXF-9091] - Camel 3|CXF: ParsingErrors with OneWay Messages
+    * [CXF-9094] - Hard coded "org.slf4j.impl.StaticLoggerBinder" of slf4j 1.x in LogUtils
+    * [CXF-9095] - Connection Leak in HttpClientWrappedOutputStream due to Unreleased Resources on IOException
+    * [CXF-9097] - Camel 3|CXF|Tomcat: Request has been recycled
+    * [CXF-9099] - GZIPOutInterceptor : ensure the CXF headers that GZIPOutInterceptor needs to resize is modifiable
+    * [CXF-9101] - Invalid api visibility in CXFHttpRequest
+    * [CXF-9105] - ConcurrentModificationException in org.apache.cxf.ext.logging.event when iterating over principals
+    * [CXF-9110] - Memory leak in DelayedCleanerImpl.queue when LoggingFeature is enabled
 
 
 
 
 ** Improvement
-    * [CXF-9047] - http-undertow transport: enable to specify CipherSuites
-    * [CXF-9055] - Follow OpenTelemetry semantic conventions for trace span and its attributes
-    * [CXF-9059] - HttpConduit should flush output stream ahead of closing connections when HttpClient is autocloseable
-    * [CXF-9062] - Be able to create AsyncHTTPConduit based on URLConnectionHTTPConduit
-    * [CXF-9071] - replace calls to deprecated method BeanManager#fireEvent
-    * [CXF-9082] - SENSITIVE_HEADERS list is hardcoded
-    * [CXF-9085] - Replace use of Google Guava with JDK API
-
-** Test
-    * [CXF-9048] - Failed integration tests with upcomming santuario and wss4j library
+    * [CXF-8765] - Option to remove Ehcache
+    * [CXF-9090] - samples: use cargo-maven2-plugin instead of tomcat-maven-plugin to launch tomcat
 
