@@ -1,4 +1,4 @@
-Apache CXF 3.5.10 Release Notes
+Apache CXF 3.5.11 Release Notes
 
 1. Overview
 
@@ -31,7 +31,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-3.5.10 fixes over 18 JIRA issues reported by users and the community.
+3.5.11 fixes over 5 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -74,26 +74,8 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-7396] - CachedOutputStream doesn't delete temp files
     * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
-    * [CXF-8979] - XML (Woodstox/MSV) based schema validation is broken
-    * [CXF-9021] - Warning "Could not resolve Schema for datatypes.dtd" when file was found
-    * [CXF-9037] - NPE when using com.ctc.wstx.returnNullForDefaultNamespace=true
-    * [CXF-9042] - Several unit tests are non-idempotent
-    * [CXF-9052] - LoadDistributorFeature not comaptible with JAX-RS subresources
+    * [CXF-8992] - WebClient.fromClient() broken due to garbage collection
     * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
-    * [CXF-9064] - AsyncHTTPConduit doesn't close copied wrappedStream on close
-    * [CXF-9066] - MaskSensitiveHelper does not mask multi-line content
-    * [CXF-9067] - MaskSensitiveHelper incorrectly masks wrapper element
-    * [CXF-9076] - Exception message is not unmarshalled with JDK17
-    * [CXF-9078] - AsyncHTTPConduit.java causing NullPointerException when closing
-    * [CXF-9079] - java.lang.IllegalStateException: Encoding process already completed from LengthDelimitedEncoder
-    * [CXF-9081] - Possible IllegalStateException from OSGi when bundle is stopped
-
-
-
-
-** Improvement
-    * [CXF-9047] - http-undertow transport: enable to specify CipherSuites
-    * [CXF-9055] - Follow OpenTelemetry semantic conventions for trace span and its attributes
-    * [CXF-9082] - SENSITIVE_HEADERS list is hardcoded
+    * [CXF-9105] - ConcurrentModificationException in org.apache.cxf.ext.logging.event when iterating over principals
+    * [CXF-9110] - Memory leak in DelayedCleanerImpl.queue when LoggingFeature is enabled
