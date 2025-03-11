@@ -613,6 +613,9 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                       new CXFHttpAsyncResponseConsumer(this, inbuf, responseCallback),
                       ctx,
                       callback);
+            if (exception != null) {
+            	reThrowException();
+            }            
         }
 
         private boolean isSslTargetDifferent(URI lastURL, URI url) {
@@ -674,13 +677,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     //inbuf = null;
 
                     if (exception != null) {
-                        if (exception instanceof IOException) {
-                            throw (IOException)exception;
-                        }
-                        if (exception instanceof RuntimeException) {
-                            throw (RuntimeException)exception;
-                        }
-                        throw new IOException(exception);
+                    	reThrowException();
                     }
 
                     throw new SocketTimeoutException("Read Timeout");
@@ -689,6 +686,16 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             return httpResponse;
         }
 
+        private void reThrowException() throws IOException {
+            if (exception instanceof IOException) {
+                throw (IOException)exception;
+            }
+            if (exception instanceof RuntimeException) {
+                throw (RuntimeException)exception;
+            }
+            throw new IOException(exception);       	
+        }
+        
         protected void handleResponseAsync() throws IOException {
             
         }
