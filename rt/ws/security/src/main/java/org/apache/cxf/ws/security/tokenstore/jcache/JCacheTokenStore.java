@@ -37,7 +37,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheSupport;
 
 /**
  * An in-memory JCache implementation of the TokenStore interface. The default TTL is 60 minutes
@@ -66,7 +66,7 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
             final CachingProvider cachingProvider = Caching.getCachingProvider();
             cacheManager = cachingProvider.getCacheManager(configFileURL.toURI(),
                     SecurityToken.class.getClassLoader()); 
-            cache = JCacheUtils.getOrCreate(cacheManager, key, String.class, SecurityToken.class);
+            cache = JCacheSupport.getOrCreate(cacheManager, key, String.class, SecurityToken.class);
         } catch (Exception e) {
             throw new TokenStoreException(e);
         }

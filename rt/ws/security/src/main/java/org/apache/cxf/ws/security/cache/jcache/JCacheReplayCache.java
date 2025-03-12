@@ -30,7 +30,7 @@ import javax.cache.expiry.Duration;
 import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.spi.CachingProvider;
 
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheSupport;
 import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheValue;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -59,7 +59,7 @@ class JCacheReplayCache implements ReplayCache {
         try {
             final CachingProvider cachingProvider = Caching.getCachingProvider();
             cacheManager = cachingProvider.getCacheManager(); 
-            cache = JCacheUtils.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
+            cache = JCacheSupport.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
                 cacheConfiguration -> cacheConfiguration.setExpiryPolicyFactory(() -> new ExpiryPolicy() {
                     @Override
                     public Duration getExpiryForCreation() {

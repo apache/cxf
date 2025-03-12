@@ -21,7 +21,7 @@ package org.apache.cxf.ws.security.tokenstore;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.tokenstore.jcache.JCacheTokenStoreFactory;
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheUtil;
 import org.apache.wss4j.common.cache.WSS4JCacheUtil;
 
 /**
@@ -32,7 +32,7 @@ public abstract class TokenStoreFactory {
     public static TokenStoreFactory newInstance() {
         if (WSS4JCacheUtil.isEhCacheInstalled()) {
             return new EHCacheTokenStoreFactory();
-        } else if (JCacheUtils.isJCacheInstalled()) {
+        } else if (JCacheUtil.isJCacheInstalled()) {
             return new JCacheTokenStoreFactory();
         } else {
             return new MemoryTokenStoreFactory();

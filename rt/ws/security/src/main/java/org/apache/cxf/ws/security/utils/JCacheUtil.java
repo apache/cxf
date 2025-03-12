@@ -20,17 +20,12 @@ package org.apache.cxf.ws.security.utils;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.function.Function;
 import java.util.logging.Logger;
-
-import javax.cache.Cache;
-import javax.cache.CacheManager;
-import javax.cache.configuration.MutableConfiguration;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-public final class JCacheUtils {
-    private static final Logger LOG = LogUtils.getL7dLogger(JCacheUtils.class);
+public final class JCacheUtil {
+    private static final Logger LOG = LogUtils.getL7dLogger(JCacheUtil.class);
     private static final boolean JCACHE_INSTALLED;
 
     static {
@@ -50,26 +45,7 @@ public final class JCacheUtils {
         JCACHE_INSTALLED = jcacheInstalled;
     }
 
-    private JCacheUtils() {
-    }
-    
-    public static <K, V> Cache<K, V> getOrCreate(CacheManager cacheManager, String name, Class<K> kclass,
-            Class<V> vclass) {
-        return getOrCreate(cacheManager, name, kclass, vclass, Function.identity());
-    }
-
-    public static <K, V> Cache<K, V> getOrCreate(CacheManager cacheManager, String name, Class<K> kclass,
-            Class<V> vclass, Function<MutableConfiguration<K, V>, MutableConfiguration<K, V>> customizer) {
-
-        final Cache<K, V> cache = cacheManager.getCache(name, kclass, vclass);
-        if (cache != null) {
-            return cache;
-        }
-
-        MutableConfiguration<K, V> cacheConfiguration = new MutableConfiguration<>();
-        cacheConfiguration = customizer.apply(cacheConfiguration.setTypes(kclass, vclass));
-
-        return cacheManager.createCache(name, cacheConfiguration);
+    private JCacheUtil() {
     }
 
     public static boolean isJCacheInstalled() {
