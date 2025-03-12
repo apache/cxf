@@ -51,7 +51,7 @@ import org.apache.cxf.ws.security.cache.jcache.CXFJCacheReplayCache;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheUtil;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.WSS4JCacheUtil;
@@ -148,7 +148,7 @@ public final class WSS4JUtils {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                         }
                         replayCache = new CXFEHCacheReplayCache(cacheKey, bus, diskstoreParent);
-                    } else if (JCacheUtils.isJCacheInstalled()) {
+                    } else if (JCacheUtil.isJCacheInstalled()) {
                         Bus bus = message.getExchange().getBus();
                         replayCache = new CXFJCacheReplayCache(cacheKey, bus);
                     } else {

@@ -48,7 +48,7 @@ import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.cache.AbstractIdentityCache;
 import org.apache.cxf.sts.cache.EHCacheIdentityValue;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheSupport;
 
 /**
  * A JCache based cache to cache identities in different realms where
@@ -92,7 +92,7 @@ public class JCacheIdentityCache extends AbstractIdentityCache
         final URL xmlConfigURL = configFileURL != null ? configFileURL : getDefaultConfigFileURL();
         try {
             cacheManager = cachingProvider.getCacheManager(xmlConfigURL.toURI(), getClass().getClassLoader());
-            cache = JCacheUtils.getOrCreate(cacheManager, KEY, String.class, EHCacheIdentityValue.class);
+            cache = JCacheSupport.getOrCreate(cacheManager, KEY, String.class, EHCacheIdentityValue.class);
         } catch (final URISyntaxException ex) {
             throw new IllegalStateException("Unable to convert " + xmlConfigURL + " to URI", ex);
         } 
