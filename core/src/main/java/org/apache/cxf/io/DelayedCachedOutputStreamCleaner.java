@@ -145,7 +145,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
         
         DelayedCloseable(final Closeable closeable, final long delay) {
             this.closeable = closeable;
-            this.expireAt = System.nanoTime() + delay;
+            this.expireAt = System.nanoTime() + TimeUnit.NANOSECONDS.convert(delay, TimeUnit.MILLISECONDS);
         }
 
         @Override
