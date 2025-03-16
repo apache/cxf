@@ -1031,6 +1031,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         pout.notifyAll();
                     }
                 }
+                try {
+                    close();
+                } catch (IOException e) {
+                    ex.addSuppressed(e);
+                }
                 return null;
             });
         }
