@@ -69,7 +69,7 @@
         <cxf.osgi.spring.version>[6,7)</cxf.osgi.spring.version>
         <cxf.osgi.slf4j.version>[2,3)</cxf.osgi.slf4j.version>
         <cxf.osgi.jakarta.annotation.version>[2,3)</cxf.osgi.jakarta.annotation.version>
-        <cxf.osgi.jakarta.bind.version>[3,4)</cxf.osgi.jakarta.bind.version>
+        <cxf.osgi.jakarta.bind.version>[4,5)</cxf.osgi.jakarta.bind.version>
         <cxf.osgi.jakarta.activation.version>[2,3)</cxf.osgi.jakarta.activation.version>
         <cxf.osgi.jakarta.mail.version>[2,3)</cxf.osgi.jakarta.mail.version>
         <cxf.osgi.jakarta.servlet.version>[5,6)</cxf.osgi.jakarta.servlet.version>
