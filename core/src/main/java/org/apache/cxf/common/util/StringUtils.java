@@ -60,14 +60,6 @@ public final class StringUtils {
         return list.size() == 1 && isEmpty(list.get(0));
     }
 
-    public static String diff(String str1, String str2) {
-        int index = str1.lastIndexOf(str2);
-        if (index > -1) {
-            return str1.substring(str2.length());
-        }
-        return str1;
-    }
-
     public static String getFirstFound(String contents, String regex) {
         if (isEmpty(regex) || isEmpty(contents)) {
             return null;
