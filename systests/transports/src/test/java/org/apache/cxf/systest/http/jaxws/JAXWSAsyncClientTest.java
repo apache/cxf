@@ -45,6 +45,7 @@ import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.soap.SOAPBinding;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Client;
@@ -68,6 +69,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -101,7 +103,7 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
         public class GreeterImpl extends AbstractGreeterImpl {
             @Override
             public String greetMe(String arg) {
-                if ("timeout".equalsIgnoreCase(arg)) {
+                if ("timeout".equalsIgnoreCase(arg) || arg.startsWith("timeout")) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -205,6 +207,32 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
                        ex.getCause() instanceof java.net.ConnectException
                        || ex.getCause() instanceof java.net.SocketTimeoutException);
         }
+    }
+    
+    @Test
+    public void testTimeoutWithChunking() throws Exception {
+        // setup the feature by using JAXWS front-end API
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+        factory.setServiceClass(Greeter.class);
+        Greeter proxy = factory.create(Greeter.class);
+
+        // See please https://issues.apache.org/jira/browse/CXF-9115
+        HTTPConduit cond = (HTTPConduit)((Client)proxy).getConduit();
+        cond.getClient().setChunkingThreshold(8);
+        cond.getClient().setChunkLength(8);
+        cond.getClient().setConnectionTimeout(500);
+        cond.getClient().setReceiveTimeout(100);
+        cond.getClient().setAllowChunking(true);
+        
+        final char[] bytes = new char [64 * 1024];
+        final Random random = new Random();
+        for (int i = 0; i < bytes.length; ++i) {
+            bytes[i] = (char)(random.nextInt(26) + 'a');
+        }
+
+        final String greeting = "timeout" + new String(bytes);
+        assertThrows(WebServiceException.class, () -> proxy.greetMe(greeting));
     }
     
     /**
