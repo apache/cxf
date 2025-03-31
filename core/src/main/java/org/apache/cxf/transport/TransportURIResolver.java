@@ -155,7 +155,6 @@ public class TransportURIResolver extends ExtendedURIResolver {
             } catch (Exception e) {
                 //ignore
                 LOG.log(Level.FINEST, "Conduit initiator could not resolve " + baseUri + " " + curUri, e);
-                e.printStackTrace();
             }
         }
         if (is == null
