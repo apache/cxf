@@ -326,7 +326,7 @@ public final class JAXRSUtils {
             segments.addAll(
                 Arrays
                     .stream(thePath.substring(start).split("/"))
-                    .filter(StringUtils.notEmpty())
+                    .filter(s -> !s.isEmpty())
                     .map(p -> new PathSegmentImpl(p, decode))
                     .collect(Collectors.toList()));
 
