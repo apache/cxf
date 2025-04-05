@@ -32,6 +32,7 @@ import jakarta.jws.WebService;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
@@ -178,5 +179,24 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
                        ex.getCause() instanceof IOException
                        || ex.getCause() instanceof ReadTimeoutException);
         }
+    }
+
+    @Test
+    public void testAsyncClientWithLogging() throws Exception {
+        // setup the feature by using JAXWS front-end API
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+        factory.setServiceClass(Greeter.class);
+        factory.setFeatures(List.of(new LoggingFeature()));
+        Greeter proxy = factory.create(Greeter.class);
+
+        Response<GreetMeResponse>  response = proxy.greetMeAsync("cxf");
+        int waitCount = 0;
+        while (!response.isDone() && waitCount < 15) {
+            Thread.sleep(1000);
+            waitCount++;
+        }
+        
+        assertTrue("Response still not received.", response.isDone());
     }
 }
