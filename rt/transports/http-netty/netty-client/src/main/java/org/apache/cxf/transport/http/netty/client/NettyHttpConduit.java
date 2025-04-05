@@ -611,7 +611,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         @Override
         protected InputStream getInputStream() throws IOException {
-            return new ByteBufInputStream(getHttpResponseContent().content());
+            return new ByteBufInputStream(getHttpResponseContent().content(), true);
         }
 
         @Override
