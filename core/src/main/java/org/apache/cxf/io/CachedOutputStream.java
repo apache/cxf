@@ -216,20 +216,41 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public void close() throws IOException {
+        RuntimeException callbacksChainFailed = null;
         currentStream.flush();
         outputLocked = true;
         if (null != callbacks) {
             for (CachedOutputStreamCallback cb : callbacks) {
-                cb.onClose(this);
+                try {
+                    cb.onClose(this);
+                } catch (final RuntimeException ex) {
+                    if (callbacksChainFailed != null) {
+                        callbacksChainFailed.addSuppressed(ex);
+                    } else {
+                        callbacksChainFailed = ex;
+                    }
+                }
             }
         }
-        doClose();
-        currentStream.close();
-        if (ciphers != null) {
-            ciphers.clean();
+
+        try {
+            doClose();
+            currentStream.close();
+            if (ciphers != null) {
+                ciphers.clean();
+            }
+            if (!maybeDeleteTempFile(currentStream)) {
+                postClose();
+            }
+        } catch (final IOException | RuntimeException ex) {
+            if (callbacksChainFailed != null) {
+                ex.addSuppressed(callbacksChainFailed);
+            }
+            throw ex;
         }
-        if (!maybeDeleteTempFile(currentStream)) {
-            postClose();
+
+        if (callbacksChainFailed != null) {
+            throw callbacksChainFailed;
         }
     }
 
