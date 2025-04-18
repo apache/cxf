@@ -80,7 +80,7 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         AttachmentImpl att = new AttachmentImpl(id, handler);
         att.setXOP(false);
         atts.add(att);
-        return id;
+        return "cid:" + id;
     }
 
     public void setXOPPackage(boolean xop) {
