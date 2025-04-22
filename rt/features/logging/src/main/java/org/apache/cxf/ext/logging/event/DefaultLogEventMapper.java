@@ -65,7 +65,19 @@ public class DefaultLogEventMapper {
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
-    private MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
+    private MaskSensitiveHelper maskSensitiveHelper;
+    
+    public DefaultLogEventMapper() {
+        this(new MaskSensitiveHelper());
+    }
+    
+    public DefaultLogEventMapper(final MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
+
+    public void setSensitiveDataHelper(MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
