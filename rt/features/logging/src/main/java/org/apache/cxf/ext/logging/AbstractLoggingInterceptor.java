@@ -50,7 +50,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected boolean logMultipart = true;
 
     protected LogEventSender sender;
-    protected final DefaultLogEventMapper eventMapper = new DefaultLogEventMapper();
+    protected final DefaultLogEventMapper eventMapper;
 
     protected MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
 
@@ -59,6 +59,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
         this.sender = sender;
+        this.eventMapper = new DefaultLogEventMapper(maskSensitiveHelper);
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
@@ -105,6 +106,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     public void setSensitiveDataHelper(MaskSensitiveHelper helper) {
         this.maskSensitiveHelper = helper;
+        this.eventMapper.setSensitiveDataHelper(helper);
     }
 
     public void setPrettyLogging(boolean prettyLogging) {
