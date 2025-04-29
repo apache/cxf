@@ -21,14 +21,21 @@ package org.apache.cxf.systest.http.jaxws;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import javax.jws.WebService;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
@@ -39,11 +46,13 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThrows;
@@ -141,5 +150,54 @@ public class JAXWSClientTest  extends AbstractBusClientServerTestBase {
 
         // HttpClient may keep some small amount worker threads around, capping it to 5
         assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads + 5L));
+    }
+
+    @Test
+    public void testNoChunkingHighLoad() throws Exception {
+        // setup the feature by using JAXWS front-end API
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+        factory.setServiceClass(Greeter.class);
+
+        final Greeter proxy = factory.create(Greeter.class);
+        Client client = ClientProxy.getClient(proxy);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+
+        final HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(3000);
+        httpClientPolicy.setAllowChunking(false);
+        httpClientPolicy.setVersion("1.1");
+        http.setClient(httpClientPolicy);
+
+        final AuthorizationPolicy authPolicy = new AuthorizationPolicy();
+        authPolicy.setUserName("test");
+        authPolicy.setPassword("test");
+        authPolicy.setAuthorizationType("Basic");
+        http.setAuthorization(authPolicy);
+
+        final char[] bytes = new char [32 * 1024];
+        final Random random = new Random();
+        for (int i = 0; i < bytes.length; ++i) {
+            bytes[i] = (char)(random.nextInt(26) + 'a');
+        }
+
+        final String greeting = new String(bytes);
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        try {
+            for (int  i = 0; i < 2000; ++i) {
+                futures.add(executor.submit(() -> proxy.greetMe(greeting)));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo(greeting.toUpperCase()));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
     }
 }
