@@ -509,6 +509,19 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void attachmentIsNotWrappedIntoAnotherAttachment() throws Exception {
+        MultipartStore store =
+                JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+
+        Attachment attachment =
+                new Attachment("audio", MediaType.APPLICATION_OCTET_STREAM, new byte[]{42});
+
+        Book b = store.addAudioBook(new Book("CXF in Action", 125L), attachment);
+        assertEquals(125L, b.getId());
+        assertEquals("CXF in Action - 42", b.getName());
+    }
+
+    @Test
     public void testNullPartProxy() throws Exception {
         MultipartStore store =
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
