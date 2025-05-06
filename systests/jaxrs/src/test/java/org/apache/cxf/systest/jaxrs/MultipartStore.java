@@ -470,6 +470,17 @@ public class MultipartStore {
     }
 
     @POST
+    @Path("/books/audiofiles")
+    @Consumes("multipart/related")
+    @Produces("text/xml")
+    public Book addAudioBook(
+            @Multipart(value = "book", type = "application/json") Book book,
+            @Multipart(value = "audio") Attachment audioFile) throws Exception {
+        String payload = String.valueOf(audioFile.getDataHandler().getContent().toString().getBytes()[0]);
+        return new Book(book.getName() + " - " + payload, book.getId());
+    }
+
+    @POST
     @Path("/books/jaxbandsimpleparts")
     @Consumes("multipart/related")
     @Produces("text/xml")
