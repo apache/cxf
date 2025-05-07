@@ -106,7 +106,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
     private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
     volatile RefCount<HttpClient> clientRef;
-    volatile int lastTlsHash = -1;
     private final ReentrantLock initializationLock = new ReentrantLock();
 
     private static final class RefCount<T extends HttpClient> {
