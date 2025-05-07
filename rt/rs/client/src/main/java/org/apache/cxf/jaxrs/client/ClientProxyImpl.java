@@ -801,7 +801,11 @@ public class ClientProxyImpl extends AbstractClient implements
             if (part != null) {
                 Object partObject = params[p.getIndex()];
                 if (partObject != null) {
-                    atts.add(new Attachment(part.value(), part.type(), partObject));
+                    if (partObject instanceof Attachment) {
+                        atts.add((Attachment)partObject);
+                    } else {
+                        atts.add(new Attachment(part.value(), part.type(), partObject));
+                    }
                 }
             }
         });

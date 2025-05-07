@@ -96,7 +96,7 @@
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.13</cxf.atmosphere.version>
         <cxf.bcprov.version>1.77</cxf.bcprov.version>
-        <cxf.brave.version>6.1.0</cxf.brave.version>
+        <cxf.brave.version>6.2.0</cxf.brave.version>
         <cxf.cdi.api.version>4.0.1</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
@@ -159,7 +159,7 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty12.version>12.0.19</cxf.jetty12.version>
+        <cxf.jetty12.version>12.0.20</cxf.jetty12.version>
         <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
@@ -219,7 +219,7 @@
         <cxf.swagger.ui.version>5.21.0</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.30</cxf.swagger.v3.version>
         <cxf.tika.version>3.0.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.35</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.40</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.version>2.3.18.Final</cxf.undertow.version>
         <cxf.yasson.version>3.0.4</cxf.yasson.version>
@@ -435,7 +435,7 @@
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-java</artifactId>
-                            <version>7.12.0</version>
+                            <version>7.13.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
