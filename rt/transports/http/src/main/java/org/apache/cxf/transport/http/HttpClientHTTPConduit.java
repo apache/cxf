@@ -352,7 +352,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
             sslURL = null;
             if (clientRef != null) {
-                clientRef.release();
                 clientRef = null;
             }
         }
