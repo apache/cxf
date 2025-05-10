@@ -106,8 +106,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
     private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
     volatile RefCount<HttpClient> clientRef;
-    volatile int lastTlsHash = -1;
-    volatile URI sslURL;
     private final ReentrantLock initializationLock = new ReentrantLock();
 
     private static final class RefCount<T extends HttpClient> {
@@ -241,12 +239,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         return headers;
     }
 
-    private boolean isSslTargetDifferent(URI lastURL, URI url) {
-        return !lastURL.getScheme().equals(url.getScheme())
-                || !lastURL.getHost().equals(url.getHost())
-                || lastURL.getPort() != url.getPort();
-    }
-
     @Override
     public void close(Message msg) throws IOException {
         try {
@@ -349,13 +341,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             return;
         }
 
-        if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
-            sslURL = null;
-            if (clientRef != null) {
-                clientRef.release();
-                clientRef = null;
-            }
-        }
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -378,7 +363,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }
 
             if ("https".equals(uri.getScheme())) {
-                sslURL = uri;
                 try {
                     SSLContext sslContext = clientParameters.getSslContext();
                     if (sslContext == null) {
