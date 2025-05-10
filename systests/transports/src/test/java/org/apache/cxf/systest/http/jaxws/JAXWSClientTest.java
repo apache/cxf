@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import jakarta.jws.WebService;
+import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
@@ -191,6 +192,37 @@ public class JAXWSClientTest  extends AbstractBusClientServerTestBase {
 
             for (final Future<String> f: futures) {
                 assertThat(f.get(10, TimeUnit.SECONDS), equalTo(greeting.toUpperCase()));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateAddress() throws Exception {
+        // setup the feature by using JAXWS front-end API
+        final JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+        factory.setServiceClass(Greeter.class);
+
+        final Greeter proxy = factory.create(Greeter.class);
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        try {
+            for (int  i = 0; i < 100; ++i) {
+                futures.add(executor.submit(() -> {
+                    final BindingProvider bp = (BindingProvider)proxy;
+                    updateAddressPort(bp, PORT);
+                    return proxy.greetMe("Hi!");
+                }));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo("Hi!".toUpperCase()));
             }
         } finally {
             executor.shutdown();
