@@ -73,7 +73,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
                   System.getProperty("java.util.logging.config.file"));
 
         // See please https://bugs.openjdk.org/browse/JDK-8296244
-        if (Runtime.version().feature() >= 23) {
+        if (Runtime.version().feature() >= 23 && Runtime.version().feature() < 24) {
             props.put("java.security.manager", "allow");
         }
 
