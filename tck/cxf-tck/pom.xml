@@ -556,7 +556,7 @@
                                 <optional.tech.packages.to.ignore>jakarta.xml.bind</optional.tech.packages.to.ignore>
                                 <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar:${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar:${project.build.directory}/jdk11-bundle/java.base:${project.build.directory}/jdk11-bundle/java.rmi:${project.build.directory}/jdk11-bundle/java.sql:${project.build.directory}/jdk11-bundle/java.naming</signature.sigTestClasspath>
                                 <!-- Fails ee.jakarta.tck.ws.rs.jaxrs21.ee.sse.sseeventsource.JAXRSClientIT#closeTest -->
-                                <org.apache.cxf.transport.http.forceVersion>1.1</org.apache.cxf.transport.http.forceVersion>
+                                <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <GLASSFISH_HOME>${glassfish.home}</GLASSFISH_HOME>
