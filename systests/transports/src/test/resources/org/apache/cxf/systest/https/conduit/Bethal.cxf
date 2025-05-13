@@ -60,6 +60,19 @@
 	      <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	  </httpj:engine>
+      <httpj:engine port="${testutil.ports.BusServer.6}">
+         <httpj:tlsServerParameters>
+          <sec:keyManagers keyPassword="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v">
+               <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v" 
+                    resource="keys/Bethal.jks"/>
+          </sec:keyManagers>
+          <sec:trustManagers>
+              <sec:keyStore type="JKS" password="OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v"
+                   resource="keys/Truststore.jks"/>
+          </sec:trustManagers>
+          <sec:clientAuthentication want="true" required="true"/>
+        </httpj:tlsServerParameters>
+      </httpj:engine>
    </httpj:engine-factory>
   
    <cxf:bus>
