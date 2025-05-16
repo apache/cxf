@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.6.7-SNAPSHOT</version>
+        <version>3.6.8-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.artemis.version>2.10.1</cxf.artemis.version>
