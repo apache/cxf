@@ -1,4 +1,4 @@
-Apache CXF 3.6.6 Release Notes
+Apache CXF 3.6.7 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.6 fixes over 11 issues/tasks reported by users.
+3.6.7 fixes over 10 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -67,56 +67,18 @@ for caveats when upgrading.
 7. Release Notes
 
 ** Bug
-    * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
-    * [CXF-8992] - WebClient.fromClient() broken due to garbage collection
-    * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
-    * [CXF-9065] - StackOverflow Exception during execution of WebClient POST Request on SSLUtils class
-    * [CXF-9091] - Camel 3|CXF: ParsingErrors with OneWay Messages
-    * [CXF-9095] - Connection Leak in HttpClientWrappedOutputStream due to Unreleased Resources on IOException
-    * [CXF-9097] - Camel 3|CXF|Tomcat: Request has been recycled
-    * [CXF-9099] - GZIPOutInterceptor : ensure the CXF headers that GZIPOutInterceptor needs to resize is modifiable
-    * [CXF-9105] - ConcurrentModificationException in org.apache.cxf.ext.logging.event when iterating over principals
-    * [CXF-9110] - Memory leak in DelayedCleanerImpl.queue when LoggingFeature is enabled
+    * [CXF-8985] - headers masking implementation not replaceable
+    * [CXF-9100] - HttpClient-1-Worker-* thread leak when throwing exception in LoggingOutInterceptor and sending large SOAP message
+    * [CXF-9115] - Race Condition in HttpClientHttpConduit Causes Writing Thread to Hang Forever
+    * [CXF-9117] - cxf-rt-ws-security fails if JCache is not on the classpath
+    * [CXF-9118] - DelayedCachedOutputStreamCleaner may expire streams prematurely
+    * [CXF-9121] - LEAK: ByteBuf.release() was not called before it's garbage-collected
+    * [CXF-9124] - TransportURIResolver prints stack trace to stderr when using HTTP Authentication
+    * [CXF-9128] - swaref does not use "cid:" reference scheme
+    * [CXF-9132] - HttpClientHTTPConduit releases the client while there are connection(s) still using it
 
 
 
 
 ** Improvement
-    * [CXF-8765] - Option to remove Ehcache
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    * [CXF-9134] - When sending Multipart request do not wrap Attachment into another Attachment
