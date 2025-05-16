@@ -1,4 +1,4 @@
-Apache CXF 4.1.1 Release Notes
+Apache CXF 4.1.2 Release Notes
 
 1. Overview
 
@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.1 fixes over 17 JIRA issues reported by users and the community.
+4.1.2 fixes over 16 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,27 +70,27 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
-    * [CXF-8992] - WebClient.fromClient() broken due to garbage collection
-    * [CXF-9003] - Name clash when two SEIs have a same name method in the same Java package
-    * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
-    * [CXF-9065] - StackOverflow Exception during execution of WebClient POST Request on SSLUtils class
-    * [CXF-9091] - Camel 3|CXF: ParsingErrors with OneWay Messages
-    * [CXF-9094] - Hard coded "org.slf4j.impl.StaticLoggerBinder" of slf4j 1.x in LogUtils
-    * [CXF-9095] - Connection Leak in HttpClientWrappedOutputStream due to Unreleased Resources on IOException
-    * [CXF-9099] - GZIPOutInterceptor : ensure the CXF headers that GZIPOutInterceptor needs to resize is modifiable
-    * [CXF-9101] - Invalid api visibility in CXFHttpRequest
-    * [CXF-9105] - ConcurrentModificationException in org.apache.cxf.ext.logging.event when iterating over principals
-    * [CXF-9110] - Memory leak in DelayedCleanerImpl.queue when LoggingFeature is enabled
-    * [CXF-9112] - OAuthRequestFilter: Better to use CXF StringUtils to check if servletPath|pathInfo isEmpty or not
+    * [CXF-8985] - headers masking implementation not replaceable
+    * [CXF-9005] - EE10 JAX-RS TCK Test Failures
+    * [CXF-9100] - HttpClient-1-Worker-* thread leak when throwing exception in LoggingOutInterceptor and sending large SOAP message
+    * [CXF-9113] - EntityPart.Builder does not seem to work in a Java SE environment
+    * [CXF-9115] - Race Condition in HttpClientHttpConduit Causes Writing Thread to Hang Forever
+    * [CXF-9117] - cxf-rt-ws-security fails if JCache is not on the classpath
+    * [CXF-9118] - DelayedCachedOutputStreamCleaner may expire streams prematurely
+    * [CXF-9119] - Spring Boot runtime :  property placeholder in xml bean of jaxws:client not resolved correctly
+    * [CXF-9120] - OSGi jakarta.xml.bind version mismatch
+    * [CXF-9121] - LEAK: ByteBuf.release() was not called before it's garbage-collected
+    * [CXF-9124] - TransportURIResolver prints stack trace to stderr when using HTTP Authentication
+    * [CXF-9128] - swaref does not use "cid:" reference scheme
+    * [CXF-9130] - WrapperClassLoader.generate() should not add null values; createWrapperClass() should log a warning when failing to create wrapper class
+    * [CXF-9132] - HttpClientHTTPConduit releases the client while there are connection(s) still using it
 
 
 
 
 ** Improvement
-    * [CXF-8765] - Option to remove Ehcache
-    * [CXF-8910] - Package Name for https URI
-    * [CXF-9090] - samples: use cargo-maven2-plugin instead of tomcat-maven-plugin to launch tomcat
-    * [CXF-9092] - some modules of CXF 4.1.0 still have jakarta.jws-api dependency
+    * [CXF-9039] - Run Jakarta RESTful Web Services 3.1 TCK
+    * [CXF-9134] - When sending Multipart request do not wrap Attachment into another Attachment
+
 
 
