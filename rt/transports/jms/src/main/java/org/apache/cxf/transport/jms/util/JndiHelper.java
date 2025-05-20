@@ -34,6 +34,13 @@ public class JndiHelper {
      */
     public JndiHelper(Properties environment) {
         this.environment = environment;
+
+        // Avoid unsafe protocols if they are somehow misconfigured
+        String providerUrl = environment.getProperty(Context.PROVIDER_URL);
+        if (providerUrl != null && (providerUrl.startsWith("ldap://")
+                || providerUrl.startsWith("rmi://"))) {
+            throw new IllegalArgumentException("Unsafe protocol in JNDI URL: " + providerUrl);
+        }
     }
 
     @SuppressWarnings("unchecked")
