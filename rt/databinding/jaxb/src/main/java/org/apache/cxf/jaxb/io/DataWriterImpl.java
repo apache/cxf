@@ -101,7 +101,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             // CXF-1194/CXF-7438 this hack is specific to MTOM, so pretty safe to leave in
             // here before calling the origHandler.
             String msg = event.getMessage();
-            if ((msg.startsWith("cvc-type.3.1.2") || msg.startsWith("cvc-complex-type.2.2"))
+            if (marshaller.getLastMTOMElementName() != null
+                && (msg.startsWith("cvc-type.3.1.2") || msg.startsWith("cvc-complex-type.2.2"))
                 && msg.contains(marshaller.getLastMTOMElementName().getLocalPart())) {
                 return true;
             }
