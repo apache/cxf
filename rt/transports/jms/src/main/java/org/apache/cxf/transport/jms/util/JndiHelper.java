@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.jms.util;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -27,6 +29,8 @@ import javax.naming.NamingException;
 
 public class JndiHelper {
 
+    private static final List<String> ALLOWED_PROTOCOLS = Arrays.asList(
+        "vm://", "tcp://", "nio://", "ssl://", "http://", "https://", "ws://", "wss://");
     private Properties environment;
 
     /**
@@ -37,8 +41,7 @@ public class JndiHelper {
 
         // Avoid unsafe protocols if they are somehow misconfigured
         String providerUrl = environment.getProperty(Context.PROVIDER_URL);
-        if (providerUrl != null && (providerUrl.startsWith("ldap://")
-                || providerUrl.startsWith("rmi://"))) {
+        if (providerUrl != null && !ALLOWED_PROTOCOLS.stream().anyMatch(providerUrl::startsWith)) {
             throw new IllegalArgumentException("Unsafe protocol in JNDI URL: " + providerUrl);
         }
     }
