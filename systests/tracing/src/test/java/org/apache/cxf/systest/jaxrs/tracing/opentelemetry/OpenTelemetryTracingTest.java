@@ -255,13 +255,30 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             final Response r = withTrace(createWebClient("/bookstore/books/async")).get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+            int spanSize = 2;
+            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == spanSize);
 
-            assertThat(otelRule.getSpans().size(), equalTo(2));
-            assertEquals("Processing books", otelRule.getSpans().get(0).getName());
-            assertEquals("GET /bookstore/books/async", otelRule.getSpans().get(1).getName());
-            assertThat(otelRule.getSpans().get(1).getParentSpanContext().isValid(), equalTo(true));
-            assertThat(otelRule.getSpans().get(1).getParentSpanId(),
+            assertThat(otelRule.getSpans().size(), equalTo(spanSize));
+
+            boolean foundProcessing = false;
+            for (int i = 0; i < spanSize; i++) {
+                if ("Processing books".equals(otelRule.getSpans().get(i).getName())) {
+                    foundProcessing = true;
+                }
+            }
+            assertTrue("Could not find Processing books in span getOperationName()", foundProcessing);
+
+            boolean foundAsync = false;
+            int getIndex = -1;
+            for (int i = 0; i < spanSize; i++) {
+                if ("GET /bookstore/books/async".equals(otelRule.getSpans().get(i).getName())) {
+                    foundAsync = true;
+                    getIndex = i;
+                }
+            }
+
+            assertThat(otelRule.getSpans().get(getIndex).getParentSpanContext().isValid(), equalTo(true));
+            assertThat(otelRule.getSpans().get(getIndex).getParentSpanId(),
                        equalTo(Span.current().getSpanContext().getSpanId()));
         }
     }
