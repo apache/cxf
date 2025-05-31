@@ -178,8 +178,8 @@
             <artifactId>angus-activation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
