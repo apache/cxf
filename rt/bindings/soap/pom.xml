@@ -42,6 +42,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>jakarta.xml.soap</groupId>
             <artifactId>jakarta.xml.soap-api</artifactId>
         </dependency>
@@ -93,11 +98,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-mail</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
