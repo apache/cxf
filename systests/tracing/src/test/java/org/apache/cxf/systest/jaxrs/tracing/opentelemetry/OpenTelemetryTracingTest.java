@@ -20,8 +20,11 @@ package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
 
 import java.net.MalformedURLException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -255,31 +258,15 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             final Response r = withTrace(createWebClient("/bookstore/books/async")).get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            int spanSize = 2;
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == spanSize);
+            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
 
-            assertThat(otelRule.getSpans().size(), equalTo(spanSize));
+            final List<SpanData> spans = getSpansSorted();
+            assertThat(spans.size(), equalTo(2));
 
-            boolean foundProcessing = false;
-            for (int i = 0; i < spanSize; i++) {
-                if ("Processing books".equals(otelRule.getSpans().get(i).getName())) {
-                    foundProcessing = true;
-                }
-            }
-            assertTrue("Could not find Processing books in span getOperationName()", foundProcessing);
-
-            boolean foundAsync = false;
-            int getIndex = -1;
-            for (int i = 0; i < spanSize; i++) {
-                if ("GET /bookstore/books/async".equals(otelRule.getSpans().get(i).getName())) {
-                    foundAsync = true;
-                    getIndex = i;
-                }
-            }
-
-            assertThat(otelRule.getSpans().get(getIndex).getParentSpanContext().isValid(), equalTo(true));
-            assertThat(otelRule.getSpans().get(getIndex).getParentSpanId(),
-                       equalTo(Span.current().getSpanContext().getSpanId()));
+            assertEquals("Processing books", spans.get(0).getName());
+            assertEquals("GET /bookstore/books/async", spans.get(1).getName());
+            assertThat(spans.get(1).getParentSpanContext().isValid(), equalTo(true));
+            assertThat(spans.get(1).getParentSpanId(), equalTo(Span.current().getSpanContext().getSpanId()));
         }
     }
 
@@ -303,9 +290,10 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
 
         await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
 
-        assertThat(otelRule.getSpans().size(), equalTo(2));
-        assertThat(otelRule.getSpans().get(0).getName(), equalTo("Processing books"));
-        assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books/async"));
+        final List<SpanData> spans = getSpansSorted();
+        assertThat(spans.size(), equalTo(2));
+        assertThat(spans.get(0).getName(), equalTo("Processing books"));
+        assertThat(spans.get(1).getName(), equalTo("GET /bookstore/books/async"));
     }
 
     @Test
@@ -543,6 +531,15 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         } catch (InterruptedException | TimeoutException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private List<SpanData> getSpansSorted() {
+        final List<SpanData> spans = new ArrayList<>(otelRule.getSpans());
+        spans.sort(Comparator
+            .comparingLong(SpanData::getStartEpochNanos)
+            .thenComparingLong(SpanData::getEndEpochNanos)
+            .reversed());
+        return spans;
     }
 
     public static class OpenTelemetryServer extends AbstractTestServerBase {
