@@ -20,8 +20,11 @@ package org.apache.cxf.systest.jaxrs.tracing.opentelemetry;
 
 import java.net.MalformedURLException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -257,12 +260,13 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
 
             await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
 
-            assertThat(otelRule.getSpans().size(), equalTo(2));
-            assertEquals("Processing books", otelRule.getSpans().get(0).getName());
-            assertEquals("GET /bookstore/books/async", otelRule.getSpans().get(1).getName());
-            assertThat(otelRule.getSpans().get(1).getParentSpanContext().isValid(), equalTo(true));
-            assertThat(otelRule.getSpans().get(1).getParentSpanId(),
-                       equalTo(Span.current().getSpanContext().getSpanId()));
+            final List<SpanData> spans = getSpansSorted();
+            assertThat(spans.size(), equalTo(2));
+
+            assertEquals("Processing books", spans.get(0).getName());
+            assertEquals("GET /bookstore/books/async", spans.get(1).getName());
+            assertThat(spans.get(1).getParentSpanContext().isValid(), equalTo(true));
+            assertThat(spans.get(1).getParentSpanId(), equalTo(Span.current().getSpanContext().getSpanId()));
         }
     }
 
@@ -286,9 +290,10 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
 
         await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
 
-        assertThat(otelRule.getSpans().size(), equalTo(2));
-        assertThat(otelRule.getSpans().get(0).getName(), equalTo("Processing books"));
-        assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books/async"));
+        final List<SpanData> spans = getSpansSorted();
+        assertThat(spans.size(), equalTo(2));
+        assertThat(spans.get(0).getName(), equalTo("Processing books"));
+        assertThat(spans.get(1).getName(), equalTo("GET /bookstore/books/async"));
     }
 
     @Test
@@ -526,6 +531,15 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         } catch (InterruptedException | TimeoutException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private List<SpanData> getSpansSorted() {
+        final List<SpanData> spans = new ArrayList<>(otelRule.getSpans());
+        spans.sort(Comparator
+            .comparingLong(SpanData::getStartEpochNanos)
+            .thenComparingLong(SpanData::getEndEpochNanos)
+            .reversed());
+        return spans;
     }
 
     public static class OpenTelemetryServer extends AbstractTestServerBase {
