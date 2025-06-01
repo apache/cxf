@@ -20,9 +20,12 @@ package org.apache.cxf.systest.jaxrs.tracing.opentracing;
 
 import java.net.MalformedURLException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -50,6 +53,7 @@ import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingClientProvider;
 import org.apache.cxf.tracing.opentracing.jaxrs.OpenTracingFeature;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.jaegertracing.internal.JaegerSpan;
 import io.jaegertracing.internal.JaegerSpanContext;
 import io.jaegertracing.internal.JaegerTracer;
 import io.jaegertracing.internal.reporters.InMemoryReporter;
@@ -198,11 +202,12 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
         await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
 
-        assertThat(REPORTER.getSpans().size(), equalTo(2));
-        assertEquals("Processing books", REPORTER.getSpans().get(0).getOperationName());
-        assertEquals("GET /bookstore/books/async", REPORTER.getSpans().get(1).getOperationName());
-        assertThat(REPORTER.getSpans().get(1).getReferences(), not(empty()));
-        assertThat(REPORTER.getSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(),
+        final List<JaegerSpan> spans = getSpansSorted();
+        assertThat(spans.size(), equalTo(2));
+        assertEquals("Processing books", spans.get(0).getOperationName());
+        assertEquals("GET /bookstore/books/async", spans.get(1).getOperationName());
+        assertThat(spans.get(1).getReferences(), not(empty()));
+        assertThat(spans.get(1).getReferences().get(0).getSpanContext().getSpanId(),
             equalTo(spanId.getSpanId()));
     }
 
@@ -224,9 +229,10 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
 
         await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 2);
 
-        assertThat(REPORTER.getSpans().size(), equalTo(2));
-        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Processing books"));
-        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
+        final List<JaegerSpan> spans = getSpansSorted();
+        assertThat(spans.size(), equalTo(2));
+        assertThat(spans.get(0).getOperationName(), equalTo("Processing books"));
+        assertThat(spans.get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
     }
 
     @Test
@@ -459,5 +465,14 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         return new JaegerSpanContext(RANDOM.getAndIncrement() /* traceId hi */,
             RANDOM.getAndIncrement() /* traceId lo */, RANDOM.getAndIncrement() /* spanId */,
             RANDOM.getAndIncrement() /* parentId */, (byte) 1 /* sampled */);
+    }
+
+    private List<JaegerSpan> getSpansSorted() {
+        final List<JaegerSpan> spans = new ArrayList<>(REPORTER.getSpans());
+        spans.sort(Comparator
+            .comparingLong(JaegerSpan::getStart)
+            .thenComparing((s1, s2) -> Long.compare(s1.getStart() + s1.getDuration(), s2.getStart() + s2.getDuration()))
+            .reversed());
+        return spans;
     }
 }
