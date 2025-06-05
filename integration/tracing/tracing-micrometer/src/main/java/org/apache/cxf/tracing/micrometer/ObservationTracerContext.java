@@ -54,7 +54,7 @@ public class ObservationTracerContext implements TracerContext {
             scope = continuationObservation.openScope();
         }
 
-        try { //NOPMD
+        try {
             return traceable.call(new ObservationTracerContext(observationRegistry));
         } finally {
             if (continuationObservation != null && scope != null) {

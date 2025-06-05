@@ -49,7 +49,7 @@ public class JndiHelper {
     @SuppressWarnings("unchecked")
     public <T> T lookup(final String name, Class<T> requiredType) throws NamingException {
         Context ctx = new InitialContext(this.environment);
-        try { // NOPMD - UseTryWithResources
+        try {
             Object located = ctx.lookup(name);
             if (located == null) {
                 throw new NameNotFoundException("JNDI object with [" + name + "] not found");

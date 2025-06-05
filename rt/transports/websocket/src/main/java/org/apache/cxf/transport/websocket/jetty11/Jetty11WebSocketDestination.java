@@ -285,7 +285,7 @@ public class Jetty11WebSocketDestination extends JettyHTTPDestination implements
             return session.getUpgradeRequest().getRequestURI().getPath();
         }
         public StringBuffer getRequestURL() {
-            return new StringBuffer(session.getUpgradeRequest().getRequestURI().toString()); //NOPMD
+            return new StringBuffer(session.getUpgradeRequest().getRequestURI().toString());
         }
         public DispatcherType getDispatcherType() {
             return null;

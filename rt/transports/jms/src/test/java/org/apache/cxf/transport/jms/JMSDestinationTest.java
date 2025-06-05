@@ -245,7 +245,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
     public void testDurableInvalidClientId() throws Throwable {
         Connection con = cf1.createConnection();
         JMSDestination destination = null;
-        try { // NOPMD - UseTryWithResources
+        try {
             con.setClientID("testClient");
             con.start();
             EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");

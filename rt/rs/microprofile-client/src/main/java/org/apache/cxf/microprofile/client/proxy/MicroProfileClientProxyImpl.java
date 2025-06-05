@@ -109,7 +109,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private final TLSConfiguration tlsConfig;
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
@@ -126,7 +125,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         init(executorService, configuration);
     }
 
-    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
