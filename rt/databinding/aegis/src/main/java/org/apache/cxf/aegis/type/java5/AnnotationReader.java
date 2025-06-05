@@ -60,7 +60,7 @@ public class AnnotationReader {
     }
 
     public Boolean isNillable(AnnotatedElement element) {
-        return Boolean.TRUE.equals(getAnnotationValue("nillable", // NOPMD
+        return Boolean.TRUE.equals(getAnnotationValue("nillable",
                 element,
                 Boolean.FALSE,
                 XmlElement.class,
@@ -70,7 +70,7 @@ public class AnnotationReader {
         if (anns == null) {
             return null;
         }
-        return (Boolean)getAnnotationValue("nillable", // NOPMD
+        return (Boolean)getAnnotationValue("nillable",
                 anns,
                 XmlElement.class,
                 XML_ELEMENT);
@@ -257,7 +257,7 @@ public class AnnotationReader {
     }
 
     @SafeVarargs
-    private static boolean isAnnotationPresent(AnnotatedElement element, // NOPMD
+    private static boolean isAnnotationPresent(AnnotatedElement element,
             Class<? extends Annotation>... annotations) {
         for (Class<?> annotation : annotations) {
             if (annotation != null && element.isAnnotationPresent(annotation.asSubclass(Annotation.class))) {

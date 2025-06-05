@@ -529,7 +529,7 @@ public class WSDLToIDLAction {
                     scope.promoteHeldToScope();
                     result = intf;
                     intf = storedIntf;
-                } catch (Exception ex) { //NOPMD
+                } catch (Exception ex) {
                     String msgStr = "Interface type " + intf.fullName() + " not found.";
                     org.apache.cxf.common.i18n.Message msg =
                         new org.apache.cxf.common.i18n.Message(msgStr, LOG);

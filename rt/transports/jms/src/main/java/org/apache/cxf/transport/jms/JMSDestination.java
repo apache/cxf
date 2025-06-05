@@ -121,7 +121,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
-        try { // NOPMD - UseTryWithResources
+        try {
             ExceptionListener exListener = new ExceptionListener() {
                 private boolean restartTriggered;
 

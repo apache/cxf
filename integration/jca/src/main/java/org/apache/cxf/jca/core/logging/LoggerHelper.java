@@ -65,7 +65,7 @@ public final class LoggerHelper {
 
     // true if log output is already going somewhere
     public static boolean loggerInitialisedOutsideConnector() {
-        final Handler[] handlers = getConsoleLogger().getHandlers(); //NOPMD
+        final Handler[] handlers = getConsoleLogger().getHandlers();
         return handlers != null && handlers.length > 0;
     }
 
@@ -81,14 +81,14 @@ public final class LoggerHelper {
     }
 
     public static void disableConsoleLogging() {
-        final Handler handler = getHandler(getConsoleLogger(), CONSOLE_HANDLER);  //NOPMD
-        getConsoleLogger().removeHandler(handler);  //NOPMD
+        final Handler handler = getHandler(getConsoleLogger(), CONSOLE_HANDLER);
+        getConsoleLogger().removeHandler(handler);
     }
 
     public static void enableConsoleLogging() {
-        if (getHandler(getConsoleLogger(), CONSOLE_HANDLER) == null) {  //NOPMD
+        if (getHandler(getConsoleLogger(), CONSOLE_HANDLER) == null) {
             final Handler console = new ConsoleHandler();
-            getConsoleLogger().addHandler(console);  //NOPMD
+            getConsoleLogger().addHandler(console);
         }
     }
 

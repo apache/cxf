@@ -128,7 +128,7 @@ public class MapType extends AegisType {
         Class<?> cls = getTypeClass();
         if (cls.equals(Map.class)) {
             map = new HashMap<>();
-        } else if (cls.equals(Hashtable.class)) { //NOPMD
+        } else if (cls.equals(Hashtable.class)) {
             map = new Hashtable<>();
         } else if (cls.equals(ConcurrentMap.class)) {
             map = new ConcurrentHashMap<>();

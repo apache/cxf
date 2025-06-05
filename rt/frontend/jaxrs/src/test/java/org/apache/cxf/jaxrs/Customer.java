@@ -476,7 +476,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
 //  CHECKSTYLE:OFF
-    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) { //NOPMD
+    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) {
         // complete
     }
 //  CHECKSTYLE:ON

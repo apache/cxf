@@ -193,8 +193,8 @@ public class OAuthPermission implements Serializable {
             || getDescription() != null && !getDescription().equals(that.getDescription())) {
             return false;
         }
-        if (isInvisibleToClient() != that.isInvisibleToClient() //NOPMD
-            || isDefaultPermission() != that.isDefaultPermission()) { //NOPMD
+        if (isInvisibleToClient() != that.isInvisibleToClient()
+            || isDefaultPermission() != that.isDefaultPermission()) {
             return false;
         }
 

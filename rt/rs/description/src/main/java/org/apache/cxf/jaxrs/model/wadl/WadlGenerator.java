@@ -599,7 +599,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     // CHECKSTYLE:OFF
-    protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes, //NOPMD
+    protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
                                       OperationResourceInfo ori, Map<Parameter, Object> classParams,
                                       OperationResourceInfo nextOp, boolean resourceTagOpened,

@@ -87,7 +87,7 @@ public class JaxrsHeaderPropagationTest extends AbstractClientServerTestBase {
     @Test
     public void testHeadersArePropagated() throws Exception {
         Logger logger = 
-            Logger.getLogger("org.eclipse.microprofile.rest.client.ext.DefaultClientHeadersFactoryImpl"); //NOPMD
+            Logger.getLogger("org.eclipse.microprofile.rest.client.ext.DefaultClientHeadersFactoryImpl");
         logger.setLevel(Level.ALL);
         ConsoleHandler h = new ConsoleHandler();
         h.setLevel(Level.ALL);

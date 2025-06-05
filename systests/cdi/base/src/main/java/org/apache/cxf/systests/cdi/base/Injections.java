@@ -49,93 +49,93 @@ public class Injections {
 
     @Inject
     @ContextResolved
-    private Application cxfApplication; //NOPMD
+    private Application cxfApplication;
 
     @Inject
-    private UriInfo uriInfo; //NOPMD
-
-    @Inject
-    @ContextResolved
-    private UriInfo cxfUriInfo; //NOPMD
-
-    @Inject
-    private HttpHeaders httpHeaders; //NOPMD
+    private UriInfo uriInfo;
 
     @Inject
     @ContextResolved
-    private HttpHeaders cxfHttpHeaders; //NOPMD
+    private UriInfo cxfUriInfo;
 
     @Inject
-    private Request request; //NOPMD
-
-    @Inject
-    @ContextResolved
-    private Request cxfRequest; //NOPMD
-
-    @Inject
-    private SecurityContext securityContext; //NOPMD
+    private HttpHeaders httpHeaders;
 
     @Inject
     @ContextResolved
-    private SecurityContext cxfSecurityContext; //NOPMD
+    private HttpHeaders cxfHttpHeaders;
 
     @Inject
-    private Providers providers; //NOPMD
+    private Request request;
 
     @Inject
     @ContextResolved
-    private Providers cxfProviders; //NOPMD
+    private Request cxfRequest;
+
+    @Inject
+    private SecurityContext securityContext;
+
+    @Inject
+    @ContextResolved
+    private SecurityContext cxfSecurityContext;
+
+    @Inject
+    private Providers providers;
+
+    @Inject
+    @ContextResolved
+    private Providers cxfProviders;
 
     @SuppressWarnings("rawtypes")
     @Inject
-    private ContextResolver contextResolver; //NOPMD
+    private ContextResolver contextResolver;
 
     @SuppressWarnings("rawtypes")
     @Inject
     @ContextResolved
-    private ContextResolver cxfContextResolver; //NOPMD
+    private ContextResolver cxfContextResolver;
 
     @Inject
-    private HttpServletRequest httpServletRequest; //NOPMD
-
-    @Inject
-    @ContextResolved
-    private HttpServletRequest cxfHttpServletRequest; //NOPMD
-
-    @Inject
-    private HttpServletResponse httpServletResponse; //NOPMD
+    private HttpServletRequest httpServletRequest;
 
     @Inject
     @ContextResolved
-    private HttpServletRequest cxfhttpServletResponse; //NOPMD
+    private HttpServletRequest cxfHttpServletRequest;
 
     @Inject
-    private ServletContext servletContext; //NOPMD
-
-    @Inject
-    @ContextResolved
-    private ServletContext cxfServletContext; //NOPMD
-
-    @Inject
-    private ResourceContext resourceContext; //NOPMD
+    private HttpServletResponse httpServletResponse;
 
     @Inject
     @ContextResolved
-    private ResourceContext cxfResourceContext; //NOPMD
+    private HttpServletRequest cxfhttpServletResponse;
 
     @Inject
-    private ResourceInfo resourceInfo; //NOPMD
-
-    @Inject
-    @ContextResolved
-    private ResourceInfo cxfResourceInfo; //NOPMD
-
-    @Inject
-    private Configuration configuration; //NOPMD
+    private ServletContext servletContext;
 
     @Inject
     @ContextResolved
-    private Configuration cxfConfiguration; //NOPMD
+    private ServletContext cxfServletContext;
+
+    @Inject
+    private ResourceContext resourceContext;
+
+    @Inject
+    @ContextResolved
+    private ResourceContext cxfResourceContext;
+
+    @Inject
+    private ResourceInfo resourceInfo;
+
+    @Inject
+    @ContextResolved
+    private ResourceInfo cxfResourceInfo;
+
+    @Inject
+    private Configuration configuration;
+
+    @Inject
+    @ContextResolved
+    private Configuration cxfConfiguration;
 
     public String state() {
         return Stream.of(Injections.class.getDeclaredFields())

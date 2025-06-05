@@ -109,7 +109,7 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         String json = jws.getUnsignedEncodedSequence();
 
         Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
-        return (MultivaluedMap<String, String>)map; //NOPMD
+        return (MultivaluedMap<String, String>)map;
     }
 
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {

@@ -101,7 +101,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     //CHECKSTYLE:OFF
-    protected ServerAccessToken doCreateAccessToken(List<String> audiences, //NOPMD
+    protected ServerAccessToken doCreateAccessToken(List<String> audiences,
                                                     Client client,
                                                     String clientCodeVerifier,
                                                     Map<String, String> extraProperties,

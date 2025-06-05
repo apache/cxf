@@ -941,11 +941,11 @@ public final class InjectionUtils {
     static Class<?> getCollectionType(Class<?> rawType) {
         Class<?> type = null;
         if (SortedSet.class.isAssignableFrom(rawType)) {
-            type = TreeSet.class; //NOPMD
+            type = TreeSet.class;
         } else if (Set.class.isAssignableFrom(rawType)) {
-            type = HashSet.class; //NOPMD
+            type = HashSet.class;
         } else if (Collection.class.isAssignableFrom(rawType)) {
-            type = ArrayList.class; //NOPMD
+            type = ArrayList.class;
         }
         return type;
 

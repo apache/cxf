@@ -1065,7 +1065,7 @@ public class WebClient extends AbstractClient {
                                    inAnns, respClass, outType, exchange, invContext);
     }
     //CHECKSTYLE:OFF
-    protected Response doChainedInvocation(String httpMethod, //NOPMD
+    protected Response doChainedInvocation(String httpMethod,
                                            MultivaluedMap<String, String> headers,
                                            Object body,
                                            Class<?> requestClass,
@@ -1099,7 +1099,7 @@ public class WebClient extends AbstractClient {
     }
 
     //CHECKSTYLE:OFF
-    private Message finalizeMessage(String httpMethod, //NOPMD
+    private Message finalizeMessage(String httpMethod,
                                    MultivaluedMap<String, String> headers,
                                    Object body,
                                    Class<?> requestClass,

@@ -225,7 +225,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     public JAXBDataBinding(Class<?>... classes) throws JAXBException {
         contextClasses = new LinkedHashSet<>(Arrays.asList(classes));
-        setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
+        setContext(createJAXBContext(contextClasses));
     }
     public JAXBDataBinding(boolean qualified, Map<String, Object> props) throws JAXBException {
         this(qualified);
