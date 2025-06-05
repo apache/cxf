@@ -140,7 +140,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     private class LogWriter extends FilterWriter {
         StringWriter out2;
         int count;
-        Logger logger; //NOPMD
+        Logger logger;
         Message message;
         final int lim;
 
@@ -203,7 +203,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
         private final Message message;
         private final OutputStream origStream;
-        private final Logger logger; //NOPMD
+        private final Logger logger;
         private final int lim;
 
         LoggingCallback(final Logger logger, final Message msg, final OutputStream os) {

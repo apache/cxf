@@ -293,7 +293,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     //CHECKSTYLE:OFF
-    private String substituteVarargs(URITemplate templ, //NOPMD
+    private String substituteVarargs(URITemplate templ,
                                      Map<String, Object> alreadyResolvedTs,
                                      Map<String, Object> alreadyResolvedTsPathEnc,
                                      Map<String, Object> alreadyResolvedTsEnc,

@@ -149,7 +149,7 @@ public final class CustomizationParser {
             }
             
             XMLStreamReader reader = null;
-            try {   //NOPMD
+            try {
                 reader = StaxUtils.createXMLStreamReader(uri, resolver.getInputStream());
                 doc = StaxUtils.read(reader, true);
             } catch (Exception e) {
