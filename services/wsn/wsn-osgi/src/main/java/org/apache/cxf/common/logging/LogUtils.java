@@ -30,7 +30,7 @@ public final class LogUtils {
     private LogUtils() { }
 
     public static Logger getL7dLogger(Class<?> cls) {
-        return Logger.getLogger(cls.getName(), null); //NOPMD
+        return Logger.getLogger(cls.getName(), null);
     }
 
 }

@@ -84,7 +84,7 @@ public abstract class AbstractAttributedInterceptorProvider extends ConcurrentHa
     }
 
     @Override
-    public int hashCode() {     //NOPMD
+    public int hashCode() {
         return super.hashCode();
     }
 

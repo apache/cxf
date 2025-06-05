@@ -1421,7 +1421,7 @@ public class JSONProviderTest {
         };
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(list, ArrayList.class, type, //NOPMD
+        provider.writeTo(list, ArrayList.class, type,
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected =
             "{\"tagholders\":["
