@@ -77,7 +77,6 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     }
 
     @Test
-    @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
     public void testServiceUnavailable() throws Exception {
         final Greeter greeter = getGreeter();
 
@@ -105,7 +104,6 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     }
 
     @Test
-    @SuppressWarnings("PMD.FinalFieldCouldBeStatic")
     public void testNotFound() throws Exception {
         final Greeter greeter = getGreeter();
 
