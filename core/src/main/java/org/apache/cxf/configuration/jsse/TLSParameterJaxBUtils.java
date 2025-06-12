@@ -160,8 +160,8 @@ public final class TLSParameterJaxBUtils {
                     LOG.severe(msg);
                     throw new IOException(msg);
                 }
+                keyStore.load(is, password);
             }
-            keyStore.load(is, password);
         } else if (kst.isSetUrl()) {
             keyStore.load(new URL(kst.getUrl()).openStream(), password);
         } else {
