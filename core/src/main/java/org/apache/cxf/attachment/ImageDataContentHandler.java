@@ -84,13 +84,14 @@ public class ImageDataContentHandler implements DataContentHandler {
             if (writers.hasNext()) {
                 ImageWriter writer = writers.next();
 
-                BufferedImage bimg = convertToBufferedImage((Image)obj);
-                ImageOutputStream out = ImageIO.createImageOutputStream(os);
-                writer.setOutput(out);
-                writer.write(bimg);
-                writer.dispose();
-                out.flush();
-                out.close();
+                try (ImageOutputStream out = ImageIO.createImageOutputStream(os)) {
+                    writer.setOutput(out);
+                    BufferedImage bimg = convertToBufferedImage((Image) obj);
+                    writer.write(bimg);
+                    out.flush();
+                } finally {
+                    writer.dispose();
+                }
                 return;
             }
         } else if (obj instanceof byte[]) {

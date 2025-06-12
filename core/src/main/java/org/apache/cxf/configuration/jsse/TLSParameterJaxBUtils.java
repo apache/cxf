@@ -153,14 +153,15 @@ public final class TLSParameterJaxBUtils {
                 keyStore.load(kstInputStream, password);
             }
         } else if (kst.isSetResource()) {
-            final InputStream is = getResourceAsStream(kst.getResource());
-            if (is == null) {
-                final String msg =
-                    "Could not load keystore resource " + kst.getResource();
-                LOG.severe(msg);
-                throw new IOException(msg);
+            try (InputStream is = getResourceAsStream(kst.getResource())) {
+                if (is == null) {
+                    final String msg =
+                            "Could not load keystore resource " + kst.getResource();
+                    LOG.severe(msg);
+                    throw new IOException(msg);
+                }
+                keyStore.load(is, password);
             }
-            keyStore.load(is, password);
         } else if (kst.isSetUrl()) {
             keyStore.load(new URL(kst.getUrl()).openStream(), password);
         } else {

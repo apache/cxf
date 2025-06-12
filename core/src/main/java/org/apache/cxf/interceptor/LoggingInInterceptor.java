@@ -169,8 +169,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
 
     protected void logReader(Message message, Reader reader, LoggingMessage buffer) {
-        try {
-            CachedWriter writer = new CachedWriter();
+        try (CachedWriter writer = new CachedWriter()) {
             IOUtils.copyAndCloseInput(reader, writer);
             message.setContent(Reader.class, writer.getReader());
 
@@ -183,7 +182,6 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("(message truncated to ").append(limit).append(" bytes)\n");
             }
             writer.writeCacheTo(buffer.getPayload(), limit);
-            writer.close();
         } catch (Exception e) {
             throw new Fault(e);
         }
