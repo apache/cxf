@@ -1,9 +1,12 @@
 package org.apache.cxf.jaxrs.client;
 
 
+import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.random.RandomGenerator;
 import java.util.stream.Stream;
@@ -16,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class ThreadLocalClientStateTest {
 
@@ -134,7 +138,7 @@ public class ThreadLocalClientStateTest {
      * 200MB of Heap are allocated for this test in up to 20 separate chunks.
      */
     @Test
-    public void testThreadAndMemorySafety() {
+    public void testThreadAndMemorySafetyWhenTheStateInternallyHoldsAThread() {
         record TestData(Thread t, byte[] bytes, int id) {
         }
         var testDataList = Stream.generate(() -> {
@@ -149,6 +153,29 @@ public class ThreadLocalClientStateTest {
             }, r -> new Thread(r).start())).toList().forEach(CompletableFuture::join);
         }
     }
+
+    @Test
+    public void testMemorySafetyWhenManyThreadLocalInstancesAreNoLongerReferenced() {
+        var refs = new ArrayList<WeakReference<ClientState>>();
+        var states = new ArrayList<ClientState>();
+        for (int i = 0; i < 3; i++) {
+            var newLcs = randomClientState();
+            var state = (ThreadLocalClientState) sut.newState(newLcs.getBaseURI(), newLcs.getRequestHeaders(), newLcs.getTemplates());
+            states.add(state);
+            refs.add(new WeakReference<>(state.getState()));
+        }
+        // All references exist
+        System.gc();
+        assertTrue(refs.stream().map(WeakReference::get).noneMatch(Objects::isNull));
+
+        states.clear();
+        sut.getState();
+
+        // All references are gc'ed
+        System.gc();
+        assertTrue(refs.stream().map(WeakReference::get).allMatch(Objects::isNull));
+    }
+
 
     private LocalClientState randomClientState() {
         var rng = RandomGenerator.getDefault();
