@@ -844,9 +844,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     } catch (IOException e) {
                         logStackTrace(e);
                     }
-                    if (wrappedStream == pout){
-                        wrappedStream = null;
-                    }
                     pout = null;
                 }
                 if (publisher != null) {
