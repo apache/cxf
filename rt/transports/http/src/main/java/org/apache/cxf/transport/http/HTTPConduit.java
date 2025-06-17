@@ -1421,6 +1421,7 @@ public abstract class HTTPConduit
                 } finally {
                     if (cachingForRetransmission && cachedStream != null) {
                         cachedStream.close();
+                        cachedStream = null;
                     }
                 }
             } catch (HttpRetryException e) {
