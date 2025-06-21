@@ -22,26 +22,26 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.4-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.jdk.version>17</cxf.jdk.version>
+        <cxf.jdk.version>21</cxf.jdk.version>
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.spring.boot.version>3.4.10</cxf.spring.boot.version>
-        <cxf.spring.cloud.eureka.version>4.2.2</cxf.spring.cloud.eureka.version>
-        <cxf.jetty12.version>12.0.28</cxf.jetty12.version>
-        <cxf.netty.version>4.1.128.Final</cxf.netty.version>
+        <cxf.spring.boot.version>4.0.0-M2</cxf.spring.boot.version>
+        <cxf.spring.cloud.eureka.version>5.0.0-M2</cxf.spring.cloud.eureka.version>
+        <cxf.jetty12.version>12.1.2</cxf.jetty12.version>
+        <cxf.netty.version>4.2.7.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
         <cxf.swagger.ui.version>5.29.3</cxf.swagger.ui.version>
-        <cxf.tika.version>3.0.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.47</cxf.tomcat.version>
-        <cxf.jboss.weld.version>5.1.2.Final</cxf.jboss.weld.version>
+        <cxf.tika.version>3.2.0</cxf.tika.version>
+        <cxf.tomcat.version>11.0.12</cxf.tomcat.version>
+        <cxf.jboss.weld.version>6.0.3.Final</cxf.jboss.weld.version>
         <cxf.gson.version>2.13.2</cxf.gson.version>
-        <cxf.lucene.version>9.12.1</cxf.lucene.version>
+        <cxf.lucene.version>10.3.1</cxf.lucene.version>
         <cxf.olingo.server.version>5.0.0</cxf.olingo.server.version>
         <cxf.aspectj.version>1.9.24</cxf.aspectj.version>
         <cxf.brave.version>6.3.0</cxf.brave.version>
@@ -51,7 +51,7 @@
         <cxf.h2.version>2.4.240</cxf.h2.version>
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
-        <cxf.camel.version>4.11.0</cxf.camel.version>
+        <cxf.camel.version>4.15.0</cxf.camel.version>
         <cxf.openfeign.version>13.6</cxf.openfeign.version>
     </properties>
     <dependencies>
@@ -169,21 +169,21 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>4.1.4-SNAPSHOT</version>
+                <version>4.2.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>4.1.4-SNAPSHOT</version>
+                <version>4.2.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.corba</groupId>
                 <artifactId>glassfish-corba-orb</artifactId>
-                <version>4.2.5</version>
+                <version>5.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
