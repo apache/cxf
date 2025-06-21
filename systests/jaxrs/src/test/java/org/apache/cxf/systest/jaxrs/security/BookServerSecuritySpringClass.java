@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security;
 
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
-import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee11.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
