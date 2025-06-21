@@ -46,7 +46,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -59,8 +58,6 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
 
     static final Logger LOG = LogUtils.getLogger(DataSourceProviderTest.class);
     private static final String BOUNDARY = "----=_Part_4_701508.1145579811786";
-    private HttpURLConnection conn;
-    private URL url;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -68,23 +65,19 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true));
     }
 
-    @Before
-    public void createConnection() throws Exception {
-        url = new URL("http://localhost:" + serverPort + "/test/foo");
-        conn = (HttpURLConnection) url.openConnection();
-        conn.setDoOutput(true);
-    }
-
-
     @Test
     public void invokeOnServer() throws Exception {
-        url = new URL("http://localhost:" + serverPort + "/test/foo");
-        conn = (HttpURLConnection) url.openConnection();
+        URL url = new URL("http://localhost:" + serverPort + "/test/foo");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         printSource(new StreamSource(conn.getInputStream()));
     }
 
     @Test
-    public void postAttachmentToServer() throws Exception {
+    public void invokePostAttachmentToServer() throws Exception {
+        URL url = new URL("http://localhost:" + serverPort + "/test/foo");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setDoOutput(true);
+
         String contentType = "multipart/related; type=\"text/xml\"; "
             + "start=\"attachmentData\"; "
             + "boundary=\"" + BOUNDARY + "\"";

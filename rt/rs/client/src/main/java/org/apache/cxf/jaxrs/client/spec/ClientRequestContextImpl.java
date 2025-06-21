@@ -22,7 +22,9 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -180,6 +182,19 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     public MultivaluedMap<String, String> getStringHeaders() {
         h = null;
         return HttpUtils.getModifiableStringHeaders(m);
+    }
+
+    @Override
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        final List<String> headerStrings = HttpUtils.getHeaderStrings(getHeaders().get(name));
+        final String headerString = HttpUtils.getHeaderString(headerStrings);
+        if (headerString == null) {
+            return false;
+        }
+        return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .filter(valuePredicate)
+            .findAny()
+            .isPresent();
     }
 
 }

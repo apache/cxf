@@ -20,6 +20,8 @@ package org.apache.cxf.jaxrs.client.spec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -70,5 +72,17 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
         } catch (IOException ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
+    }
+
+    @Override
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        final String headerString = HttpUtils.getHeaderString(getHeaders().get(name));
+        if (headerString == null) {
+            return false;
+        }
+        return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .filter(valuePredicate)
+            .findAny()
+            .isPresent();
     }
 }

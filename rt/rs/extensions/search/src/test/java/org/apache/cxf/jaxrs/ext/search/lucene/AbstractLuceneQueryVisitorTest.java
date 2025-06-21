@@ -111,7 +111,7 @@ public abstract class AbstractLuceneQueryVisitorTest {
         assertEquals(1, hits.length);
         // Iterate through the results:
         for (int i = 0; i < hits.length; i++) {
-            Document hitDoc = isearcher.doc(hits[i].doc);
+            Document hitDoc = isearcher.storedFields().document(hits[i].doc);
             assertEquals("name=text", hitDoc.get("contents"));
         }
 
@@ -130,7 +130,7 @@ public abstract class AbstractLuceneQueryVisitorTest {
         assertEquals(1, hits.length);
         // Iterate through the results:
         for (int i = 0; i < hits.length; i++) {
-            Document hitDoc = isearcher.doc(hits[i].doc);
+            Document hitDoc = isearcher.storedFields().document(hits[i].doc);
             IndexableField field = hitDoc.getField("intfield");
             assertEquals(4, field.numericValue().intValue());
         }

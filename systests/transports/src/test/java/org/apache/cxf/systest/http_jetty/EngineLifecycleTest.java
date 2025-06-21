@@ -33,7 +33,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
-import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee11.webapp.WebAppContext;
 import org.eclipse.jetty.server.Handler;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
@@ -69,7 +69,7 @@ public class EngineLifecycleTest {
         for (Handler h : jettyServer.getDescendants(WebAppContext.class)) {
             WebAppContext wac = (WebAppContext) h;
             if ("/jsunit".equals(wac.getContextPath())) {
-                wac.addServlet("org.eclipse.jetty.ee10.servlet.DefaultServlet", "/bloop");
+                wac.addServlet("org.eclipse.jetty.ee11.servlet.DefaultServlet", "/bloop");
                 break;
             }
         }

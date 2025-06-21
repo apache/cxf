@@ -370,4 +370,11 @@ public class WebSocketUndertowServletResponse implements HttpServletResponse {
         }
         responseHeaders.put(WebSocketUtils.SC_KEY, Integer.toString(sc));
     }
+    
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "sendRedirect({0}, {1}, {2})", new Object[]{location, sc, clearBuffer});
+        }
+    }
 }

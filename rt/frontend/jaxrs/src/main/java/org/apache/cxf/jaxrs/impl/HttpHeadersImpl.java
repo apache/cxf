@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -374,4 +376,15 @@ public class HttpHeadersImpl implements HttpHeaders {
         return HttpUtils.getContentLength(values.get(0));
     }
 
+    @Override
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        final String headerString = getHeaderString(name);
+        if (headerString == null) {
+            return false;
+        }
+        return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .filter(valuePredicate)
+            .findAny()
+            .isPresent();
+    }
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.concurrent.Phaser;
 
 import jakarta.ws.rs.DefaultValue;
@@ -109,6 +111,8 @@ abstract class BookStoreClientCloseable {
                 sink.close();
             } catch (final InterruptedException ex) {
                 LOG.error("Communication error", ex);
+            } catch (final IOException ex) {
+                throw new UncheckedIOException(ex);
             }
         }
         ).start();

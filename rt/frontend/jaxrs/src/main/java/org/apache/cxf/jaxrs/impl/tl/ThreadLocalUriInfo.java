@@ -109,4 +109,9 @@ public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
     public URI resolve(URI uri) {
         return get().resolve(uri);
     }
+
+    @Override
+    public String getMatchedResourceTemplate() {
+        return get().getMatchedResourceTemplate();
+    }
 }

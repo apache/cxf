@@ -27,14 +27,14 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
-import io.opentelemetry.semconv.incubating.ServiceIncubatingAttributes;
+import io.opentelemetry.semconv.ServiceAttributes;
 import io.opentracing.util.GlobalTracer;
 
 public class OpenTelemetrySetup {
 
     public static OpenTelemetrySdk setup(String serviceName) {
         Resource resource = Resource.getDefault()
-            .merge(Resource.create(Attributes.of(ServiceIncubatingAttributes.SERVICE_NAME, serviceName)));
+            .merge(Resource.create(Attributes.of(ServiceAttributes.SERVICE_NAME, serviceName)));
 
         final SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder()
             .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())

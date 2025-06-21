@@ -243,4 +243,25 @@ public class UriInfoImpl implements UriInfo {
         return HttpUtils.resolve(getBaseUriBuilder(), uri);
     }
 
+    @Override
+    public String getMatchedResourceTemplate() {
+        if (stack != null) {
+            final List<URITemplate> templates = new LinkedList<>();
+            for (MethodInvocationInfo invocation : stack) {
+                OperationResourceInfo ori = invocation.getMethodInfo();
+                templates.add(ori.getClassResourceInfo().getURITemplate());
+                templates.add(ori.getURITemplate());
+            }
+            
+            if (!templates.isEmpty()) {
+                UriBuilder builder = UriBuilder.fromPath(templates.get(0).getValue());
+                for (int i = 1; i < templates.size(); ++i) {
+                    builder = builder.path(templates.get(i).getValue());
+                }
+                return builder.build().toString();
+            }
+        }
+        LOG.fine("No resource stack information, returning empty template");
+        return "";
+    }
 }
