@@ -20,7 +20,7 @@ package org.apache.cxf.systest.http.auth;
 
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee11.webapp.WebAppContext;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
