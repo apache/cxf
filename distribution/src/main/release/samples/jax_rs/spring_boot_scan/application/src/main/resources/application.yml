@@ -19,6 +19,8 @@ cxf:
 
 eureka:
   client:
+    restclient:
+      enabled: true
     registerWithEureka: true
     serviceUrl:
       defaultZone: ${EUREKA_SERVER_URI:http://127.0.0.1}:${EUREKA_SERVER_PORT:8761}/eureka/

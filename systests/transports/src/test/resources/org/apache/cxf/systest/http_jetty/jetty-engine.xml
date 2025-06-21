@@ -29,7 +29,7 @@
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.EngineLifecycleTest.2}">
             <httpj:handlers>
-                <bean class="org.eclipse.jetty.ee10.webapp.WebAppContext">
+                <bean class="org.eclipse.jetty.ee11.webapp.WebAppContext">
                     <constructor-arg value="."/>
                     <constructor-arg value="/jsunit"/>
                 </bean>

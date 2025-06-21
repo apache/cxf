@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.sse;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -124,9 +125,22 @@ public final class SseBroadcasterImpl implements SseBroadcaster {
         }
         
         if (closed.compareAndSet(false, true)) {
-            subscribers.forEach(subscriber -> {
-                subscriber.close();
-            });
+            UncheckedIOException exception = null;
+            for (final SseEventSink subscriber: subscribers) {
+                try {
+                    subscriber.close();
+                } catch (final IOException ex) {
+                    if (exception == null) {
+                        exception = new UncheckedIOException(ex); 
+                    } else {
+                        exception.addSuppressed(exception);
+                    }
+                }
+            }
+
+            if (exception != null) {
+                throw exception;
+            }
         }
     }
 }

@@ -22,8 +22,8 @@ package org.apache.cxf.systest.jaxrs.nonspring;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.BookApplicationNonSpring;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.servlet.ServletHolder;
 
 public class NonSpringJaxrsServletBookServer2 extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(NonSpringJaxrsServletBookServer2.class);
