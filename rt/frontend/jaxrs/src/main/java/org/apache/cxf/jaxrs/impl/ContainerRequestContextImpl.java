@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -178,5 +180,17 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     public void setMethod(String method) throws IllegalStateException {
         checkNotPreMatch();
         super.setMethod(method);
+    }
+    
+    @Override
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        final String headerString = HttpUtils.getHeaderString(getHeaders().get(name));
+        if (headerString == null) {
+            return false;
+        }
+        return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .filter(valuePredicate)
+            .findAny()
+            .isPresent();
     }
 }
