@@ -98,10 +98,8 @@ public class DigestAuthSupplierSpringTest {
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             DigestAuthenticationEntryPoint authenticationEntryPoint = digestAuthenticationEntryPoint();
             return http
-                .authorizeRequests().anyRequest().authenticated()
-                    .and()
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .and()
+                .authorizeHttpRequests(c -> c.anyRequest().authenticated())
+                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilter(digestAuthenticationFilter(authenticationEntryPoint))
                 .build();
         }
