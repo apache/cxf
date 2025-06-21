@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -89,6 +91,8 @@ public class BookStore2 extends BookStoreClientCloseable {
                     sink.close();
                 } catch (final InterruptedException ex) {
                     LOG.error("Communication error", ex);
+                } catch (final IOException ex) {
+                    throw new UncheckedIOException(ex);
                 }
             }
         }.start();
@@ -117,6 +121,8 @@ public class BookStore2 extends BookStoreClientCloseable {
                     sink.close();
                 } catch (final InterruptedException ex) {
                     LOG.error("Communication error", ex);
+                } catch (final IOException ex) {
+                    throw new UncheckedIOException(ex);
                 }
             }
         }.start();
@@ -136,7 +142,13 @@ public class BookStore2 extends BookStoreClientCloseable {
                 sink.send(createEvent(builder.name("book"), 4));
                 sink.send(createEvent(builder.name("book"), 5));
             })
-            .whenComplete((r, ex) -> sink.close());
+            .whenComplete((r, ex) -> {
+                try {
+                    sink.close();
+                } catch (final IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
     }
 
     @GET
@@ -153,7 +165,13 @@ public class BookStore2 extends BookStoreClientCloseable {
                 sink.send(createRawEvent(builder.name("book"), 4));
                 sink.send(createRawEvent(builder.name("book"), 5));
             })
-            .whenComplete((r, ex) -> sink.close());
+            .whenComplete((r, ex) -> {
+                try {
+                    sink.close();
+                } catch (final IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
     }
 
     @GET
@@ -170,7 +188,7 @@ public class BookStore2 extends BookStoreClientCloseable {
     @GET
     @Path("nodata")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void nodata(@Context SseEventSink sink) {
+    public void nodata(@Context SseEventSink sink) throws IOException {
         sink.close();
     }
 
@@ -207,6 +225,8 @@ public class BookStore2 extends BookStoreClientCloseable {
                     sink.close();
                 } catch (final InterruptedException ex) {
                     LOG.error("Communication error", ex);
+                } catch (final IOException ex) {
+                    throw new UncheckedIOException(ex);
                 }
             }
         }.start();

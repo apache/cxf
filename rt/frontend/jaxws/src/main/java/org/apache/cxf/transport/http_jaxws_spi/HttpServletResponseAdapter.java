@@ -196,8 +196,9 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     public void sendError(int sc, String msg) throws IOException {
         this.sendError(sc);
     }
-
-    public void sendRedirect(String location) throws IOException {
+    
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         throw new UnsupportedOperationException();
     }
 
