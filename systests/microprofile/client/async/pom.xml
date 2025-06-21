@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-microprofile-tck</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -73,7 +73,6 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
-                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -110,7 +109,6 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
-                <classifier>jakarta</classifier>
                 <scope>test</scope>
                 <exclusions>
                     <exclusion>
@@ -123,7 +121,6 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-mapper</artifactId>
                 <version>${cxf.johnzon.version}</version>
-                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -157,6 +154,12 @@
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-servlet</artifactId>
+                <version>${cxf.jetty.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
