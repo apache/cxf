@@ -537,7 +537,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                                                                                ex.getMessage()
                 });
             }
-            if (servlet != null && servlet instanceof JettyHTTPHandler && servletHolder.isStarted()) {
+            if (servlet instanceof JettyHTTPHandler && servletHolder.isStarted()) {
                 try {
 
                     // the servlet exist with the same path
@@ -1078,7 +1078,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                         });
                         continue;
                     }
-                    if (servlet != null && servlet instanceof JettyHTTPHandler
+                    if (servlet instanceof JettyHTTPHandler
                         && (contextName.equals(contextHandler.getContextPath())
                             || (StringUtils.isEmpty(contextName)
                                 && "/".equals(contextHandler.getContextPath())))
@@ -1405,15 +1405,15 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
 
                         switch (type) {
                         case TEXT_HTML:
-                            writeErrorHtml(request, writer, charset, code, message, cause, showStacks);
+                            writeErrorHtml(request, writer, charset, code, message, cause);
                             break;
                         case TEXT_JSON:
                             
                         case APPLICATION_JSON:
-                            writeErrorJson(request, writer, code, message, cause, showStacks);
+                            writeErrorJson(request, writer, code, message, cause);
                             break;
                         case TEXT_PLAIN:
-                            writeErrorPlain(request, writer, code, message, cause, showStacks);
+                            writeErrorPlain(request, writer, code, message, cause);
                             break;
                         default:
                             throw new IllegalStateException();
