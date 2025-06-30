@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;

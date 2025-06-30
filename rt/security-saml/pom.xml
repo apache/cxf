@@ -44,7 +44,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-ws-security-dom</artifactId>
+            <artifactId>wss4j-ws-security-saml</artifactId>
+            <version>${cxf.jakarta.wss4j.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>

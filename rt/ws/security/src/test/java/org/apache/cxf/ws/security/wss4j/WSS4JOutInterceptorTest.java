@@ -31,9 +31,9 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.action.UsernameTokenAction;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 
 import org.junit.Test;
@@ -227,12 +227,11 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         private int executions;
 
         @Override
-        public void execute(WSHandler handler, SecurityActionToken actionToken,
-                RequestData reqData) throws WSSecurityException {
+        public void execute(SecurityActionToken actionToken, RequestData reqData) throws WSSecurityException {
 
             this.executions++;
             reqData.setPwType(WSS4JConstants.PW_TEXT);
-            super.execute(handler, actionToken, reqData);
+            super.execute(actionToken, reqData);
         }
 
         public int getExecutions() {

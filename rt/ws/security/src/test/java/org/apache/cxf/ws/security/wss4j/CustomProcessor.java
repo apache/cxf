@@ -19,11 +19,14 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+
+import javax.xml.namespace.QName;
+
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.common.dom.validate.Validator;
 
 /**
  * a custom processor that inserts itself into the results vector
@@ -43,6 +46,12 @@ public class CustomProcessor implements Processor {
 
     public void setValidator(Validator validator) {
         //
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 
 }

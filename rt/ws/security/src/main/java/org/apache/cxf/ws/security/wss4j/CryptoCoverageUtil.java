@@ -39,7 +39,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.common.WSDataRef;
 
 
 /**

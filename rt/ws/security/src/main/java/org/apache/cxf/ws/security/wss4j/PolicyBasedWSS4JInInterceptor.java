@@ -57,12 +57,13 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.common.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
@@ -148,7 +149,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
                 String hActor = (attr != null) ? attr.getValue() : null;
 
-                if (WSSecurityUtil.isActorEqual(actor, hActor)) {
+                if (XMLUtils.isActorEqual(actor, hActor)) {
                     return true;
                 }
             }

@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.wss4j.dom.callback.DOMCallbackLookup;
+import org.apache.wss4j.common.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**

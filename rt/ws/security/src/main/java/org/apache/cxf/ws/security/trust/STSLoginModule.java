@@ -60,9 +60,9 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.validate.Credential;
 
 /**
  * A JAAS LoginModule for authenticating a Username/Password to the STS. It can be configured
@@ -335,9 +335,9 @@ public class STSLoginModule implements LoginModule {
     }
 
     private Set<Principal> getRoles(Message msg, Credential credential) {
-        SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
+        SamlAssertionWrapper samlAssertion = (SamlAssertionWrapper)credential.getTransformedToken();
         if (samlAssertion == null) {
-            samlAssertion = credential.getSamlAssertion();
+            samlAssertion = (SamlAssertionWrapper)credential.getSamlAssertion();
         }
         if (samlAssertion != null) {
             String roleAttributeName = null;
