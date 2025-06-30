@@ -20,8 +20,8 @@
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.wss4j.dom.message.WSSecBase;
-import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecBase;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
 
 /**
  *

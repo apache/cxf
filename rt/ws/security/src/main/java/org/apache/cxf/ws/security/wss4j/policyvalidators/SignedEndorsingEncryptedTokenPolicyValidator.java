@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;

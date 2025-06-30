@@ -73,18 +73,18 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.WSDataRef;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.common.dom.processor.Processor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.NoOpValidator;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 
 /**

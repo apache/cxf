@@ -22,8 +22,8 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.validate.Credential;
 
 import org.junit.Test;
 

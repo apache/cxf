@@ -51,7 +51,7 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 

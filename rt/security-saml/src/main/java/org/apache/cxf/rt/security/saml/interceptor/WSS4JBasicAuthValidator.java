@@ -37,14 +37,13 @@ import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * An abstract class containing some functionality to validate a username + password received
@@ -119,9 +118,9 @@ public abstract class WSS4JBasicAuthValidator {
     }
 
     protected SecurityContext createSecurityContext(Message msg, Credential credential) {
-        SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
+        SamlAssertionWrapper samlAssertion = (SamlAssertionWrapper)credential.getTransformedToken();
         if (samlAssertion == null) {
-            samlAssertion = credential.getSamlAssertion();
+            samlAssertion = (SamlAssertionWrapper)credential.getSamlAssertion();
         }
         if (samlAssertion != null) {
             String roleAttributeName =
@@ -145,10 +144,8 @@ public abstract class WSS4JBasicAuthValidator {
     }
 
     public Validator getValidator() {
-        if (validator != null) {
-            return validator;
-        }
-        return new UsernameTokenValidator();
+        return validator;
+        // TODO return new UsernameTokenValidator();
     }
 
     public void setValidator(Validator validator) {

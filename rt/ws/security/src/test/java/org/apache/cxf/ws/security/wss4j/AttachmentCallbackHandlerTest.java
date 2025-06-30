@@ -30,7 +30,7 @@ import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.message.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 
 import org.junit.Test;
 

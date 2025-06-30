@@ -26,6 +26,7 @@ import java.util.List;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
@@ -39,9 +40,9 @@ import org.apache.cxf.ws.security.trust.delegation.DelegationCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.Validator;
 
 /**
  * A WSS4J-based Validator to validate a received WS-Security credential by dispatching
@@ -88,12 +89,12 @@ public class STSTokenValidator implements Validator {
             Element tokenElement = null;
             int hash = 0;
             if (credential.getSamlAssertion() != null) {
-                SamlAssertionWrapper assertion = credential.getSamlAssertion();
+                SamlAssertionWrapper assertion = (SamlAssertionWrapper)credential.getSamlAssertion();
                 byte[] signatureValue = assertion.getSignatureValue();
                 if (signatureValue != null && signatureValue.length > 0) {
                     hash = Arrays.hashCode(signatureValue);
                 }
-                tokenElement = credential.getSamlAssertion().getElement();
+                tokenElement = ((SamlAssertionWrapper)credential.getSamlAssertion()).getElement();
             } else if (credential.getUsernametoken() != null) {
                 tokenElement = credential.getUsernametoken().getElement();
                 hash = credential.getUsernametoken().hashCode();
@@ -266,6 +267,12 @@ public class STSTokenValidator implements Validator {
                 }
             }
         }
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 
 }

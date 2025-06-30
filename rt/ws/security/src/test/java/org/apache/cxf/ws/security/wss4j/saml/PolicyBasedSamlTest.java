@@ -35,7 +35,7 @@ import org.apache.cxf.ws.security.wss4j.AbstractPolicySecurityTest;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 import org.apache.wss4j.policy.SP12Constants;
 
 import org.junit.Test;

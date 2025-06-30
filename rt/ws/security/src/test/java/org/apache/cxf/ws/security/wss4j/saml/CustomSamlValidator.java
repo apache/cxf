@@ -24,9 +24,9 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 
 /**
  * A trivial custom Validator for a SAML Assertion. It makes sure that the issuer is
@@ -58,7 +58,7 @@ public class CustomSamlValidator extends SamlAssertionValidator {
         //
         // Do some custom validation on the assertion
         //
-        SamlAssertionWrapper assertion = credential.getSamlAssertion();
+        SamlAssertionWrapper assertion = (SamlAssertionWrapper)credential.getSamlAssertion();
         if (!"www.example.com".equals(assertion.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }

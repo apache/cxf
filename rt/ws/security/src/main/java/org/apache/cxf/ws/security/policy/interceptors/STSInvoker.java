@@ -53,7 +53,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.XMLUtils;

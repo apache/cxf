@@ -106,18 +106,18 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.callback.CallbackLookup;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.callback.CallbackLookup;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.WSSecBase;
+import org.apache.wss4j.common.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.common.dom.message.WSSecHeader;
+import org.apache.wss4j.common.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -1539,7 +1539,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             ((X509Security)bstToken).setX509Certificate(encCert);
             bstToken.addWSUNamespace();
             bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", encCert));
-            WSSecurityUtil.prependChildElement(
+            XMLUtils.prependChildElement(
                 secHeader.getSecurityHeaderElement(), bstToken.getElement()
             );
             bstElement = bstToken.getElement();
