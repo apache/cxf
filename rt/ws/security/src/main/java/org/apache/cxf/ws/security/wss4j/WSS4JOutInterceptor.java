@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.security.Provider;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 
@@ -38,12 +43,16 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.dom.action.Action;
@@ -86,6 +95,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     public Object getProperty(Object msgContext, String key) {
         // use the superclass first
         Object result = super.getProperty(msgContext, key);
+        if (result == null) {
+            result = msgContext instanceof SoapMessage
+                ? ((SoapMessage)msgContext).getContextualProperty(key)
+                : null;
+        }
 
         // handle the special case of the RECV_RESULTS
         if (result == null
@@ -181,7 +195,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                     CastUtils.cast((List<?>)getProperty(mc, WSHandlerConstants.HANDLER_ACTIONS));
                 if (actions == null) {
                     // If null then just fall back to the "action" String
-                    String action = getString(ConfigurationConstants.ACTION, mc);
+                    String action = (String)getProperty(mc, ConfigurationConstants.ACTION);
                     if (action == null) {
                         throw new SoapFault(new Message("NO_ACTION", LOG), version
                                 .getReceiver());
@@ -195,13 +209,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
                 translateProperties(mc);
                 reqData.setMsgContext(mc);
+                reqData.setCallbackHandler(getCallback(reqData));
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
 
                 // Enable XOP Include unless the user has explicitly configured it
-                if (getString(ConfigurationConstants.EXPAND_XOP_INCLUDE, mc) == null) {
+                if (getProperty(mc, ConfigurationConstants.EXPAND_XOP_INCLUDE) == null) {
                     reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(mc));
                 }
-                if (getString(ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT, mc) == null) {
+                if (getProperty(mc, ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT) == null) {
                     reqData.setStoreBytesInAttachment(AttachmentUtil.isMtomEnabled(mc));
                 }
 
@@ -345,5 +360,54 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> getAdditionalInterceptors() {
             return null;
         }
+    }
+
+    private CallbackHandler getCallback(RequestData reqData) throws WSSecurityException {
+        Object o =
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER,
+                                                   (SoapMessage)reqData.getMsgContext());
+        CallbackHandler cbHandler;
+        try {
+            cbHandler = SecurityUtils.getCallbackHandler(o);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
+
+        if (cbHandler == null) {
+            try {
+                cbHandler = getPasswordCallbackHandler(reqData);
+            } catch (WSSecurityException sec) {
+                // Ignore
+            }
+        }
+
+        // Defer to SecurityConstants.PASSWORD or "password" if no callback handler is defined
+        if (cbHandler == null) {
+            String password =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD,
+                                                       (SoapMessage)reqData.getMsgContext());
+            if (StringUtils.isEmpty(password)) {
+                password = (String)SecurityUtils.getSecurityPropertyValue("password",
+                                                       (SoapMessage)reqData.getMsgContext());
+            }
+
+            if (!StringUtils.isEmpty(password)) {
+                final String contextualPassword = password;
+                cbHandler = new CallbackHandler() {
+
+                    @Override
+                    public void handle(Callback[] callbacks)
+                        throws IOException, UnsupportedCallbackException {
+                        for (Callback c : callbacks) {
+                            WSPasswordCallback pwCallback = (WSPasswordCallback)c;
+                            pwCallback.setPassword(contextualPassword);
+                        }
+                    }
+                };
+            }
+
+        }
+
+        return cbHandler;
     }
 }

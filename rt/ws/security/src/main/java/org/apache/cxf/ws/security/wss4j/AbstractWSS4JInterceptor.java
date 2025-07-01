@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -94,10 +95,6 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         properties.put(key, value);
     }
 
-    public String getPassword(Object msgContext) {
-        return (String)((Message)msgContext).getContextualProperty("password");
-    }
-
     public Object getProperty(Object msgContext, String key) {
         if (msgContext == null) {
             return null;
@@ -110,8 +107,24 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         return obj;
     }
 
-    public void setPassword(Object msgContext, String password) {
-        ((Message)msgContext).put("password", password);
+    @Override
+    public CallbackHandler getCallbackHandler(
+        String callbackHandlerClass,
+        String callbackHandlerRef,
+        RequestData requestData
+    ) throws WSSecurityException {
+        if (callbackHandlerRef != null && properties.containsKey(callbackHandlerRef)) {
+            return (CallbackHandler)properties.get(callbackHandlerRef);
+        }
+        return super.getCallbackHandler(callbackHandlerClass, callbackHandlerRef, requestData);
+    }
+    
+    @Override
+    protected String getString(String key, Map<String, Object> mc) {
+        if (properties.containsKey(key)) {
+            return (String)properties.get(key);
+        }
+        return super.getString(key, mc);
     }
 
     public void setProperty(Object msgContext, String key, Object value) {

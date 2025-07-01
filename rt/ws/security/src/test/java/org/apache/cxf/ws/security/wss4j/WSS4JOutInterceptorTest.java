@@ -34,7 +34,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.dom.action.UsernameTokenAction;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
 
 import org.junit.Test;
 

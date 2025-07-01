@@ -185,6 +185,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public Object getProperty(Object msgContext, String key) {
         // use the superclass first
         Object result = super.getProperty(msgContext, key);
+        if (result == null) {
+            result = msgContext instanceof SoapMessage
+                ? ((SoapMessage)msgContext).getContextualProperty(key)
+                : null;
+        }
 
         // handle the special case of the SEND_SIGV
         if (result == null
@@ -223,6 +228,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         boolean utWithCallbacks =
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
         translateProperties(msg);
+        
 
         RequestData reqData = new CXFRequestData();
 
@@ -297,8 +303,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             // Only search for and expand (Signed) XOP Elements if MTOM is enabled (and not
             // explicitly specified by the user)
-            if (getString(ConfigurationConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg) == null
-                && getString(ConfigurationConstants.EXPAND_XOP_INCLUDE, msg) == null) {
+            if (getProperty(msg, ConfigurationConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE) == null
+                && getProperty(msg, ConfigurationConstants.EXPAND_XOP_INCLUDE) == null) {
                 reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(msg));
             }
 

@@ -41,7 +41,7 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.

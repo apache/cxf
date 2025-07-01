@@ -39,7 +39,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 
 public abstract class AbstractModifyRequestInterceptor implements PhaseInterceptor<SoapMessage> {
 

@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 
@@ -37,7 +37,7 @@ public class CustomSaml2Validator extends SamlAssertionValidator {
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
+        SamlAssertionWrapper assertion = (SamlAssertionWrapper)validatedCredential.getSamlAssertion();
 
         if (!"sts".equals(assertion.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
