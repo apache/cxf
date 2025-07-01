@@ -46,6 +46,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
@@ -95,11 +96,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     public Object getProperty(Object msgContext, String key) {
         // use the superclass first
         Object result = super.getProperty(msgContext, key);
-        if (result == null) {
-            result = msgContext instanceof SoapMessage
-                ? ((SoapMessage)msgContext).getContextualProperty(key)
-                : null;
-        }
 
         // handle the special case of the RECV_RESULTS
         if (result == null
@@ -212,6 +208,11 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 reqData.setCallbackHandler(getCallback(reqData));
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
 
+                if (!MessageUtils.isRequestor(mc)) {
+                    Object recvResults = ((SoapMessage)mc).getExchange().getInMessage().get(WSHandlerConstants.RECV_RESULTS);
+                    mc.put(WSHandlerConstants.RECV_RESULTS, recvResults);
+                }
+                
                 // Enable XOP Include unless the user has explicitly configured it
                 if (getProperty(mc, ConfigurationConstants.EXPAND_XOP_INCLUDE) == null) {
                     reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(mc));
