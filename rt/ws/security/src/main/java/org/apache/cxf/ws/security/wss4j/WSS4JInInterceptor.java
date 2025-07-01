@@ -185,11 +185,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public Object getProperty(Object msgContext, String key) {
         // use the superclass first
         Object result = super.getProperty(msgContext, key);
-        if (result == null) {
-            result = msgContext instanceof SoapMessage
-                ? ((SoapMessage)msgContext).getContextualProperty(key)
-                : null;
-        }
 
         // handle the special case of the SEND_SIGV
         if (result == null
