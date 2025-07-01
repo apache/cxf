@@ -26,7 +26,7 @@ import jakarta.xml.ws.WebServiceContext;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.example.contract.doubleit.DoubleItFault;
