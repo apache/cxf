@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSConstants;
 
 /**
  * This class contains various configuration properties that can be used to sign an issued token,

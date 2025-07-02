@@ -61,7 +61,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -126,20 +126,25 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
 
                 if (assertion != null) {
                     String wssecRealm = stsProperties.getSamlRealmCodec().getRealmFromToken(assertion);
-                    SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.fine("SAML token realm of user '" + samlPrincipal.getName() + "' is " + wssecRealm);
-                    }
+                    try {
+                        SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.fine("SAML token realm of user '" + samlPrincipal.getName() + "' is " + wssecRealm);
+                        }
 
-                    ReceivedToken wssecToken = new ReceivedToken(assertion.getElement());
-                    wssecToken.setState(STATE.VALID);
-                    TokenValidatorResponse tokenResponse = new TokenValidatorResponse();
-                    tokenResponse.setPrincipal(samlPrincipal);
-                    tokenResponse.setToken(wssecToken);
-                    tokenResponse.setTokenRealm(wssecRealm);
-                    tokenResponse.setAdditionalProperties(new HashMap<String, Object>());
-                    processValidToken(providerParameters, wssecToken, tokenResponse);
-                    providerParameters.setPrincipal(wssecToken.getPrincipal());
+                        ReceivedToken wssecToken = new ReceivedToken(assertion.getElement());
+                        wssecToken.setState(STATE.VALID);
+                        TokenValidatorResponse tokenResponse = new TokenValidatorResponse();
+                        tokenResponse.setPrincipal(samlPrincipal);
+                        tokenResponse.setToken(wssecToken);
+                        tokenResponse.setTokenRealm(wssecRealm);
+                        tokenResponse.setAdditionalProperties(new HashMap<String, Object>());
+                        processValidToken(providerParameters, wssecToken, tokenResponse);
+                        providerParameters.setPrincipal(wssecToken.getPrincipal());
+                    }  catch (org.apache.wss4j.common.ext.WSSecurityException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw new STSException("Error in providing a token", ex, STSException.REQUEST_FAILED);
+                    }
                 }
             }
 

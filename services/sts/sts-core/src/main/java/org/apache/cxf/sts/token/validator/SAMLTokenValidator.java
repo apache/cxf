@@ -50,13 +50,13 @@ import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SignatureTrustValidator;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
@@ -174,7 +174,7 @@ public class SAMLTokenValidator implements TokenValidator {
             KeyInfo keyInfo = sig.getKeyInfo();
             SAMLKeyInfo samlKeyInfo =
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(), requestData, sigCrypto
                 );
             assertion.verifySignature(samlKeyInfo);
 

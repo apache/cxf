@@ -42,12 +42,12 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SignatureTrustValidator;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 

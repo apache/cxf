@@ -32,7 +32,7 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 
 /**
  * This class validates a SecurityContextToken.
