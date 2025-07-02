@@ -20,8 +20,8 @@ package org.apache.cxf.systest.sts.custom_onbehalfof;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 /**
