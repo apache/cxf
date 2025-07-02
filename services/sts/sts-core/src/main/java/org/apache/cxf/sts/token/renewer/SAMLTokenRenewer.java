@@ -59,15 +59,15 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.saml.DOMSAMLUtil;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.DOMSAMLUtil;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml1.core.Audience;
@@ -338,7 +338,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             // Parse the HOK subject if it exists
 
             assertion.parseSubject(
-                new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
+                new WSSSAMLKeyInfoProcessor(), requestData, sigCrypto
             );
 
             SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();

@@ -39,7 +39,7 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.common.dom.message.token.SecurityContextToken;
 
 import org.junit.BeforeClass;
 

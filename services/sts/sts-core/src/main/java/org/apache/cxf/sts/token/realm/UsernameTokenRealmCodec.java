@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.realm;
 
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.dom.message.token.UsernameToken;
 
 /**
  * This interface defines a pluggable way to return a realm associated with a UsernameToken.

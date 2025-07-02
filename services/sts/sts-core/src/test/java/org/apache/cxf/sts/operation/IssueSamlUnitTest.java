@@ -68,12 +68,12 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -889,7 +889,7 @@ public class IssueSamlUnitTest {
         data.setWsDocInfo(new WSDocInfo(assertion.getOwnerDocument()));
 
         assertionWrapper.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
+            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto()
         );
 
         SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
