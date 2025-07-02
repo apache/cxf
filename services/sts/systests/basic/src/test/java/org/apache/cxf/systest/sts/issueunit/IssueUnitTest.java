@@ -62,11 +62,11 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.common.saml.processor.SAMLTokenProcessor;
 
 import org.junit.BeforeClass;
 

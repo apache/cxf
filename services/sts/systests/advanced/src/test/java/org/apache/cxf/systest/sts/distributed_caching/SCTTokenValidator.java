@@ -25,8 +25,8 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.policy.SP12Constants;
 
 /**
