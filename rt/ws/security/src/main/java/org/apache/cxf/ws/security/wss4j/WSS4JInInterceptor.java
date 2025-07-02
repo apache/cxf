@@ -73,6 +73,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.DOMSAMLUtil;
 import org.apache.wss4j.common.dom.WSConstants;
 import org.apache.wss4j.common.WSDataRef;
 import org.apache.wss4j.common.dom.engine.WSSConfig;
@@ -325,6 +326,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 originalNode = elem.cloneNode(true);
             }
             WSHandlerResult wsResult = engine.processSecurityHeader(elem, reqData);
+
+            if (engine.getCallbackLookup() != null && reqData.isValidateSamlSubjectConfirmation()) {
+                DOMSAMLUtil.validateSAMLResults(wsResult.getActionResults(), reqData.getTlsCerts(), 
+                    engine.getCallbackLookup().getSOAPBody());
+            }
+
             importNewDomToSAAJ(doc, elem, originalNode, wsResult);
             Element header = SAAJUtils.getHeader(doc);
             Element body = SAAJUtils.getBody(doc);
