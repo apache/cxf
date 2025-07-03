@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.services.WellKnownService;
 import org.apache.cxf.rt.security.saml.interceptor.WSS4JBasicAuthValidator;
+import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 
 /**
  * Extends the WSS4J validator as a JAX-RS request filter
@@ -39,6 +40,11 @@ import org.apache.cxf.rt.security.saml.interceptor.WSS4JBasicAuthValidator;
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class WSS4JBasicAuthFilter extends WSS4JBasicAuthValidator implements ContainerRequestFilter {
+
+    public WSS4JBasicAuthFilter() {
+        super();
+        setValidator(new UsernameTokenValidator());
+    }
 
     public void filter(ContainerRequestContext requestContext) throws IOException {
         if (requestContext.getUriInfo().getPath().contains(WellKnownService.WELL_KNOWN_PATH)) {
@@ -60,5 +66,6 @@ public class WSS4JBasicAuthFilter extends WSS4JBasicAuthValidator implements Con
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
+    
 
 }
