@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 
 import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
+import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
@@ -32,7 +33,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.validate.Validator;
 
 /**
  * A Validator that checks for a custom "realm" parameter in the RST request and only allows
@@ -72,5 +73,11 @@ public class CustomUTValidator implements Validator {
     private SOAPMessage getSOAPMessage(SoapMessage msg) {
         SAAJInInterceptor.INSTANCE.handleMessage(msg);
         return msg.getContent(SOAPMessage.class);
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 }

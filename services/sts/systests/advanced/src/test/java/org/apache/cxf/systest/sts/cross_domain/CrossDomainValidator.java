@@ -22,7 +22,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 
 /**
  * This class validates a SAML Assertion by checking the issuer name.
@@ -32,7 +32,7 @@ public class CrossDomainValidator extends SamlAssertionValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
 
-        SamlAssertionWrapper token = validatedCredential.getSamlAssertion();
+        SamlAssertionWrapper token = (SamlAssertionWrapper)validatedCredential.getSamlAssertion();
         if (token == null || token.getSaml2() == null
             || !"b-issuer".equals(token.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);

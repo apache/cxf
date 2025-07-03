@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.systest.sts.custom_onbehalfof;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.validate.Validator;
 
 /**
  * This class just mocks a local validation of a custom BinarySecurityToken
@@ -33,6 +35,12 @@ public class LocalBSTTokenValidator implements Validator {
         Credential validatedCredential = credential;
         validatedCredential.setPrincipal(new CustomTokenPrincipal("Custom"));
         return validatedCredential;
+    }
+
+    @Override
+    public QName[] getSupportedQNames() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSupportedQNames'");
     }
 
 }

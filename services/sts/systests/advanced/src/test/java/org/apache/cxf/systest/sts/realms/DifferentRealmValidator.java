@@ -35,7 +35,7 @@ public class DifferentRealmValidator extends STSTokenValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
 
-        SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
+        SamlAssertionWrapper transformedToken = (SamlAssertionWrapper)validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"B-Issuer".equals(transformedToken.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);

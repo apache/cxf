@@ -27,7 +27,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 import org.opensaml.core.xml.XMLObject;
 
 /**
@@ -41,7 +41,7 @@ public class ClaimsValidator extends SamlAssertionValidator {
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
+        SamlAssertionWrapper assertion = (SamlAssertionWrapper)validatedCredential.getSamlAssertion();
 
         boolean valid = false;
         if (assertion.getSaml1() != null) {

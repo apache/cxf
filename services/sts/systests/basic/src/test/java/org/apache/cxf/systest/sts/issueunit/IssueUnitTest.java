@@ -63,6 +63,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.dom.processor.Processor;
@@ -586,6 +587,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     private List<WSSecurityEngineResult> processToken(SecurityToken token) throws Exception {
         RequestData requestData = new RequestData();
         requestData.setDisableBSPEnforcement(true);
+        requestData.setWssConfig(WSSConfig.getNewInstance());
         CallbackHandler callbackHandler = new org.apache.cxf.systest.sts.common.CommonCallbackHandler();
         requestData.setCallbackHandler(callbackHandler);
         Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
