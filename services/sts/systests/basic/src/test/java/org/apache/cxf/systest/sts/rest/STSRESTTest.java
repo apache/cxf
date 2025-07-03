@@ -58,6 +58,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
 import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.dom.RequestData;
 import org.apache.wss4j.common.saml.processor.SAMLTokenProcessor;
@@ -825,10 +826,11 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     private static List<WSSecurityEngineResult> processToken(Element assertionElement)
         throws Exception {
         RequestData requestData = new RequestData();
+        requestData.setWssConfig(WSSConfig.getNewInstance());
 //        requestData.setDisableBSPEnforcement(true);
         requestData.setCallbackHandler(new org.apache.cxf.systest.sts.common.CommonCallbackHandler());
         requestData.setDecCrypto(serviceCrypto);
-//        requestData.setSigVerCrypto(serviceCrypto);
+        requestData.setSigVerCrypto(serviceCrypto);
         requestData.setWsDocInfo(new WSDocInfo(assertionElement.getOwnerDocument()));
 
         return new SAMLTokenProcessor().handleToken(assertionElement, requestData);

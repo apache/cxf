@@ -23,7 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.common.dom.validate.Credential;
 
 /**
@@ -35,14 +35,14 @@ public class SCTTokenValidator extends STSTokenValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
 
-        SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
+        SamlAssertionWrapper transformedToken = (SamlAssertionWrapper)validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"DoubleItSTSIssuer".equals(transformedToken.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
 
         transformedToken.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
+            new WSSSAMLKeyInfoProcessor(), data, data.getSigVerCrypto()
         );
         SAMLKeyInfo keyInfo = transformedToken.getSubjectKeyInfo();
         byte[] secret = keyInfo.getSecret();
