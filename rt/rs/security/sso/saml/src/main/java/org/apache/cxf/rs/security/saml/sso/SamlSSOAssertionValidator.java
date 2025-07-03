@@ -27,7 +27,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 
 /**
  * An extension of the WSS4J SamlAssertionValidator. We can weaken the subject confirmation method requirements a bit

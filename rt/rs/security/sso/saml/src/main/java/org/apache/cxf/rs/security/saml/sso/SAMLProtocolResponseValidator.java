@@ -50,13 +50,13 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.validate.Credential;
-import org.apache.wss4j.dom.validate.SignatureTrustValidator;
-import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.common.dom.WSDocInfo;
+import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.common.dom.validate.Validator;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
@@ -284,7 +284,7 @@ public class SAMLProtocolResponseValidator {
             try {
                 samlKeyInfo =
                     SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(), requestData, sigCrypto
                     );
             } catch (WSSecurityException ex) {
                 LOG.log(Level.FINE, "Error in getting KeyInfo from SAML Response: " + ex.getMessage(), ex);
@@ -399,7 +399,7 @@ public class SAMLProtocolResponseValidator {
                 KeyInfo keyInfo = sig.getKeyInfo();
                 if (keyInfo != null) {
                     samlKeyInfo = SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(), requestData, sigCrypto
                     );
                 } else if (!keyInfoMustBeAvailable) {
                     samlKeyInfo = createKeyInfoFromDefaultAlias(sigCrypto);
@@ -413,7 +413,7 @@ public class SAMLProtocolResponseValidator {
                 assertion.verifySignature(samlKeyInfo);
 
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(requestData), requestData.getSigVerCrypto()
+                    new WSSSAMLKeyInfoProcessor(), requestData, requestData.getSigVerCrypto()
                 );
             } catch (WSSecurityException e) {
                 LOG.log(Level.FINE, "Assertion failed signature validation", e);
