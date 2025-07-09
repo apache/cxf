@@ -46,7 +46,7 @@ import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
+import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
