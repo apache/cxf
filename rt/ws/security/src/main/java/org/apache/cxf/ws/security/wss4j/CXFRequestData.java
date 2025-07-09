@@ -27,9 +27,9 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 public class CXFRequestData extends RequestData {
 

@@ -36,7 +36,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.Assert;

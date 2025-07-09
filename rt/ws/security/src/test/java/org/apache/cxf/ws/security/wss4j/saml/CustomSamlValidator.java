@@ -24,8 +24,8 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
 
 /**

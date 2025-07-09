@@ -43,7 +43,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 
 /**

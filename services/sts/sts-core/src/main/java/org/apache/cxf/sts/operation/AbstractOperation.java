@@ -81,7 +81,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

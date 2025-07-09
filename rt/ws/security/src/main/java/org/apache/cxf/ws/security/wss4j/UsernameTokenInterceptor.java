@@ -59,11 +59,11 @@ import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSDocInfo;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -241,8 +241,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                                                                   boolean allowNamespaceQualifiedPWDTypes)
         throws WSSecurityException, Base64DecodingException {
         BSPEnforcer bspEnforcer = new org.apache.wss4j.common.bsp.BSPEnforcer(!bspCompliant);
-        org.apache.wss4j.common.dom.message.token.UsernameToken ut =
-            new org.apache.wss4j.common.dom.message.token.UsernameToken(tokenElement, allowNamespaceQualifiedPWDTypes,
+        org.apache.wss4j.api.dom.message.token.UsernameToken ut =
+            new org.apache.wss4j.api.dom.message.token.UsernameToken(tokenElement, allowNamespaceQualifiedPWDTypes,
                                                                  bspEnforcer);
 
         WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(ut.getName(), ut.isHashed());

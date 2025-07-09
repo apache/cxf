@@ -68,10 +68,10 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSDocInfo;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
 

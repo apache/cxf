@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
 
 public class TrustValidator {

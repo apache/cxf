@@ -30,10 +30,10 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 /**
  * A Validator that checks for a custom "realm" parameter in the RST request and only allows

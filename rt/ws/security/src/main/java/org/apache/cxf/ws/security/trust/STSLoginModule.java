@@ -60,9 +60,9 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.validate.Credential;
 
 /**
  * A JAAS LoginModule for authenticating a Username/Password to the STS. It can be configured

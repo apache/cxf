@@ -28,12 +28,12 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.api.dom.action.SecurityActionToken;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.action.UsernameTokenAction;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 
 import org.junit.Test;
 

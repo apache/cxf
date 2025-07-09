@@ -36,7 +36,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 
 /**
  * An Interceptor to "retrieve" a SAML Token, i.e. create one and set it on the message
