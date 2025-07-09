@@ -32,7 +32,7 @@ import org.apache.cxf.ws.security.policy.custom.DefaultAlgorithmSuiteLoader;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;

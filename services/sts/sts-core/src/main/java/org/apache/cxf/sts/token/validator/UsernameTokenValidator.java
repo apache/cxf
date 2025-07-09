@@ -54,11 +54,11 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
-import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 /**
  * This class validates a wsse UsernameToken.

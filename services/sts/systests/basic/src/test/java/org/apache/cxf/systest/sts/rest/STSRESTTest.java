@@ -57,10 +57,10 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.WSDocInfo;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.common.saml.processor.SAMLTokenProcessor;
 
 import static org.apache.cxf.ws.security.trust.STSUtils.WST_NS_05_12;

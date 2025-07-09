@@ -30,8 +30,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.message.token.KerberosSecurity;
 
 /**
  * A CallbackHandler implementation for the kerberos client.

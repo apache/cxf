@@ -40,14 +40,14 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenT
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
+import org.apache.wss4j.api.dom.token.X509Security;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.common.dom.validate.SignatureTrustValidator;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.content.X509Data;
 

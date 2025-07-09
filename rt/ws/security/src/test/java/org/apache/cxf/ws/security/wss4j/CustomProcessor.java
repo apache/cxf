@@ -19,14 +19,14 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.processor.Processor;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.processor.Processor;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 /**
  * a custom processor that inserts itself into the results vector

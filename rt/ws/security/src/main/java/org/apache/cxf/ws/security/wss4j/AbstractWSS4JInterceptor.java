@@ -40,7 +40,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor,

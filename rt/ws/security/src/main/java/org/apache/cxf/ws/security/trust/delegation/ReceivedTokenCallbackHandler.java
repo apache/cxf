@@ -36,10 +36,10 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.token.PKIPathSecurity;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.token.PKIPathSecurity;
+import org.apache.wss4j.api.dom.token.X509Security;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 

@@ -39,7 +39,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**

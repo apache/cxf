@@ -48,10 +48,10 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.dom.WSDocInfo;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.processor.Processor;
+import org.apache.wss4j.api.dom.WSDocInfo;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.processor.Processor;
 import org.apache.wss4j.common.saml.processor.SAMLTokenProcessor;
 import org.example.contract.doubleit.DoubleItPortType;
 

@@ -28,8 +28,8 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.provider.TokenProviderUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.dom.WSConstants;
+import org.apache.wss4j.api.dom.token.BinarySecurity;
+import org.apache.wss4j.api.dom.WSConstants;
 
 /**
  * A Dummy TokenProvider for use in the unit tests. It mocks up a dummy BinarySecurityToken.

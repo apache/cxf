@@ -22,9 +22,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
-import org.apache.wss4j.common.dom.validate.Validator;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
+import org.apache.wss4j.api.dom.validate.Validator;
 
 /**
  * This class just mocks a local validation of a custom BinarySecurityToken

@@ -42,10 +42,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.dom.WSConstants;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.WSConstants;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
-import org.apache.wss4j.common.dom.RequestData;
+import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
@@ -207,7 +207,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
         @Override
         protected void verifyCustomPassword(
-            org.apache.wss4j.common.dom.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.api.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
@@ -217,7 +217,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
         @Override
         protected void verifyPlaintextPassword(
-            org.apache.wss4j.common.dom.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.api.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
@@ -227,7 +227,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
         @Override
         protected void verifyDigestPassword(
-            org.apache.wss4j.common.dom.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.api.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             if (!supportDigestPasswords) {
@@ -245,7 +245,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
         @Override
         protected void verifyUnknownPassword(
-            org.apache.wss4j.common.dom.message.token.UsernameToken usernameToken,
+            org.apache.wss4j.api.dom.message.token.UsernameToken usernameToken,
             RequestData data
         ) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(

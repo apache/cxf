@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.dom.engine.WSSecurityEngineResult;
+import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.saml.DOMSAMLUtil;
 
 /**

@@ -21,8 +21,8 @@ package org.apache.cxf.systest.sts.custom_onbehalfof;
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.validate.Credential;
 
 /**
  * This class validates a custom BinarySecurityToken by dispatching it to an STS. It then

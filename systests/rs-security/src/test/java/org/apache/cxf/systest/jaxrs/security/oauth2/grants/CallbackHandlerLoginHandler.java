@@ -29,10 +29,10 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.dom.engine.WSSConfig;
-import org.apache.wss4j.common.dom.RequestData;
-import org.apache.wss4j.common.dom.message.token.UsernameToken;
-import org.apache.wss4j.common.dom.validate.Credential;
+import org.apache.wss4j.api.dom.engine.WSSConfig;
+import org.apache.wss4j.api.dom.RequestData;
+import org.apache.wss4j.api.dom.message.token.UsernameToken;
+import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 
 /**
