@@ -35,6 +35,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.AbstractClient;
+import org.apache.cxf.jaxrs.client.ClientConfigurationProvider;
 import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.ClientProxyImpl;
 import org.apache.cxf.jaxrs.client.ClientState;
@@ -124,6 +125,7 @@ public class MicroProfileClientFactoryBean extends JAXRSClientFactoryBean {
                 comparator);
         factory.setUserProviders(registeredProviders);
         ep.put(MicroProfileClientProviderFactory.CLIENT_FACTORY_NAME, factory);
+        ep.put(ClientConfigurationProvider.CLIENT_CONFIGURATION_PPROVIDER_NAME, factory);
     }
 
     @Override

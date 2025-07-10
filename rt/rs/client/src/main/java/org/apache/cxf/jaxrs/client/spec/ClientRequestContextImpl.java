@@ -31,6 +31,7 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import org.apache.cxf.jaxrs.client.ClientConfigurationProvider;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -64,7 +65,10 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public Configuration getConfiguration() {
-        ClientProviderFactory cpf = ClientProviderFactory.getInstance(m);
+        ClientConfigurationProvider cpf = ClientConfigurationProvider.getInstance(m);
+        if (cpf == null) {
+            cpf = ClientProviderFactory.getInstance(m);
+        }
         return cpf.getConfiguration(m);
     }
 

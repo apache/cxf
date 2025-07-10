@@ -34,12 +34,13 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.client.ClientConfigurationProvider;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
-public final class MicroProfileClientProviderFactory extends ProviderFactory {
+public final class MicroProfileClientProviderFactory extends ProviderFactory implements ClientConfigurationProvider {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
     private static final Class<?> ASYNC_II_FACTORY_CLASS;
     private static final Logger LOG = LogUtils.getL7dLogger(MicroProfileClientProviderFactory.class);

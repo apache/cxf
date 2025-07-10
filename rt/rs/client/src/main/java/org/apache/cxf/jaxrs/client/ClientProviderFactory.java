@@ -36,7 +36,7 @@ import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
-public final class ClientProviderFactory extends ProviderFactory {
+public final class ClientProviderFactory extends ProviderFactory implements ClientConfigurationProvider {
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters =
         new ArrayList<>(1);
     private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters =
