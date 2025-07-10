@@ -389,6 +389,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
         ClientProviderFactory factory = ClientProviderFactory.createInstance(getBus());
         setupFactory(factory, ep);
+        ep.put(ClientConfigurationProvider.CLIENT_CONFIGURATION_PPROVIDER_NAME, factory);
 
         final Map<String, Object> theProperties = super.getProperties();
         final boolean encodeClientParameters = PropertyUtils.isTrue(theProperties, "url.encode.client.parameters");

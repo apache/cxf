@@ -25,6 +25,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Response;
 
 public class InvokedMethodClientRequestFilter implements ClientRequestFilter {
@@ -32,6 +33,11 @@ public class InvokedMethodClientRequestFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext ctx) throws IOException {
         try {
+            final Configuration configuration = ctx.getConfiguration();
+            if (configuration == null) {
+                throw new NullPointerException("Configuration is null");
+            }
+
             Method m = (Method) ctx.getProperty("org.eclipse.microprofile.rest.client.invokedMethod");
 
             Path path = m.getAnnotation(Path.class);
