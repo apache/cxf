@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
 
 /**
  * An interface that allows a pluggable way of obtaining a SAML SubjectBean used to populate the

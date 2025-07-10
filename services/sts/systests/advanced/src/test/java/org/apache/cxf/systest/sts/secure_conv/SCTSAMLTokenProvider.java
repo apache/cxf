@@ -48,12 +48,12 @@ import org.apache.cxf.sts.token.validator.SCTValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.SAMLUtil;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
 
 /**
  * A TokenProvider implementation that provides a SAML Token that contains a Symmetric Key that is obtained

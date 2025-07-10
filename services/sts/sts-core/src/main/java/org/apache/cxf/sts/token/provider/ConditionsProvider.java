@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
 
 /**
  * An interface that allows a pluggable way of obtaining a SAML ConditionsBean used to populate the

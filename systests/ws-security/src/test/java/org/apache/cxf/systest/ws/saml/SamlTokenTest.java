@@ -45,11 +45,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;

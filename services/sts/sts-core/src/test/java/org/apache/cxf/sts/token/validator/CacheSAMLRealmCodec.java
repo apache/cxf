@@ -20,7 +20,7 @@
 package org.apache.cxf.sts.token.validator;
 
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 
 /**

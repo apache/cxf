@@ -26,7 +26,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 public class CXFMessageParser {
     private Message message;

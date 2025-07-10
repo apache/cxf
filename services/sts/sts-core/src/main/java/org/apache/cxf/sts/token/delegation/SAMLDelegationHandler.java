@@ -30,9 +30,9 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
 
 /**

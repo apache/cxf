@@ -34,7 +34,7 @@ import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Attribute;

@@ -73,7 +73,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.DOMSAMLUtil;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.WSDataRef;
 import org.apache.wss4j.api.dom.engine.WSSConfig;

@@ -23,11 +23,11 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.validate.SamlAssertionValidator;
 
 /**
  * An extension of the WSS4J SamlAssertionValidator. We can weaken the subject confirmation method requirements a bit

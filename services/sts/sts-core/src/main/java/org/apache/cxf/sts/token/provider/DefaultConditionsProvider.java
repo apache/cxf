@@ -31,8 +31,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.sts.request.Participants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
 
 /**
  * A default implementation of the ConditionsProvider interface.

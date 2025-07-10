@@ -45,14 +45,14 @@ import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.SAMLUtil;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
 import org.opensaml.saml.common.SAMLVersion;
 
 /**

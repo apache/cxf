@@ -37,7 +37,7 @@ import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.token.BinarySecurity;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;

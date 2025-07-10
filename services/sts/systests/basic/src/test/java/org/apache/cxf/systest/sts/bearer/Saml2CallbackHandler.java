@@ -25,12 +25,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.bean.AttributeBean;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.bean.Version;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 
 /**
  * Create a SAML2 Bearer Assertion.

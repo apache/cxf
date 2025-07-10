@@ -58,7 +58,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.message.token.UsernameToken;

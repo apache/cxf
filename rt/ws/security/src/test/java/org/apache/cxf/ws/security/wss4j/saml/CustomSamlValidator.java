@@ -20,13 +20,13 @@
 package org.apache.cxf.ws.security.wss4j.saml;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
-import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.saml.validate.SamlAssertionValidator;
 
 /**
  * A trivial custom Validator for a SAML Assertion. It makes sure that the issuer is

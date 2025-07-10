@@ -24,10 +24,10 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
-import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.saml.validate.SamlAssertionValidator;
 import org.opensaml.core.xml.XMLObject;
 
 /**

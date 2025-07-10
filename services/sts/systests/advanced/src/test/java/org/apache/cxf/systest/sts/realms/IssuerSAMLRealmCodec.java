@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.sts.realms;
 
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 
 /**

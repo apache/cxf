@@ -37,7 +37,7 @@ import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.token.realm.RealmSupport;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.SAMLVersion;
 

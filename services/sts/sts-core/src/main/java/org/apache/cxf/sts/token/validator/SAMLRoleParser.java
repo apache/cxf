@@ -23,7 +23,7 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 
 /**

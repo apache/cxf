@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.xml.AbstractXmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 
 public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {

@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.AttributeBean;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
 
 /**
  * A default AttributeStatementProvider implementation. It simply creates a default attribute with

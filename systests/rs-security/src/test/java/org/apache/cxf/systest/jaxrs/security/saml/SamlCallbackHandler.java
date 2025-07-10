@@ -38,20 +38,20 @@ import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.SAMLClaim;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.bean.ActionBean;
-import org.apache.wss4j.common.saml.bean.AttributeBean;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean.Decision;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.KeyInfoBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.bean.ActionBean;
+import org.apache.wss4j.dom.saml.bean.AttributeBean;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.dom.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthDecisionStatementBean.Decision;
+import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.KeyInfoBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.bean.Version;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.

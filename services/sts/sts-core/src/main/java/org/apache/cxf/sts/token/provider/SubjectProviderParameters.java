@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
 
 /**
  * The parameters that are passed through to a SubjectProvider implementation to create a Subject(Bean).

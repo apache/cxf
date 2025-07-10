@@ -21,8 +21,8 @@ package org.apache.cxf.systest.sts.sts_sender_vouches;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.token.provider.DefaultSubjectProvider;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 
 /**
  */

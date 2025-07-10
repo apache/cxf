@@ -21,7 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import org.w3c.dom.Element;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 /**
  * Validate a WS-SecurityPolicy Claims policy.

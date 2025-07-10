@@ -37,7 +37,7 @@ import org.apache.wss4j.binding.wsu10.AttributedDateTime;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.token.BinarySecurity;
 import org.apache.wss4j.api.dom.token.PKIPathSecurity;
 import org.apache.wss4j.api.dom.token.X509Security;

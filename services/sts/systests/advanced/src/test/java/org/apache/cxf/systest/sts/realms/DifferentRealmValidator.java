@@ -20,7 +20,7 @@ package org.apache.cxf.systest.sts.realms;
 
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
 import org.opensaml.saml.saml2.core.Assertion;

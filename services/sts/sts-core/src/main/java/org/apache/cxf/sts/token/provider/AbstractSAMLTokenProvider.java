@@ -32,7 +32,7 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 /**
  * Some abstract functionality for creating a SAML token

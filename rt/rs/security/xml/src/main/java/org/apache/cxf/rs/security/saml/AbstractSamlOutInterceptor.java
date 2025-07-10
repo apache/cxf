@@ -27,7 +27,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 public abstract class AbstractSamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
 

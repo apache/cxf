@@ -58,7 +58,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.WSDocInfo;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
