@@ -25,7 +25,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 /**
  * Validate a WS-SecurityPolicy Claims policy for the

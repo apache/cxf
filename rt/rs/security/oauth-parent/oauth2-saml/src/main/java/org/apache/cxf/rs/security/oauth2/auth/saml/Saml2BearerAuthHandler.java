@@ -41,7 +41,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.AbstractSamlInHandler;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);

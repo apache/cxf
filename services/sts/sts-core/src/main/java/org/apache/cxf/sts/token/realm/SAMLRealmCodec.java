@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.realm;
 
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 
 /**

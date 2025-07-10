@@ -34,7 +34,7 @@ import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;

@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 public class XACMLRequestBuilderTest {
 
     static {
-        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
+        org.apache.wss4j.dom.saml.OpenSAMLUtil.initSamlEngine();
     }
 
     @org.junit.Test

@@ -43,7 +43,7 @@ import org.opensaml.xacml.ctx.SubjectType;
 public class PolicyDecisionPointMockImpl implements PolicyDecisionPoint {
 
     public PolicyDecisionPointMockImpl() {
-        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
+        org.apache.wss4j.dom.saml.OpenSAMLUtil.initSamlEngine();
     }
 
     @Override

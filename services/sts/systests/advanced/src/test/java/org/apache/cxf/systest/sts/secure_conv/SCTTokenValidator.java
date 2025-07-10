@@ -21,9 +21,9 @@ package org.apache.cxf.systest.sts.secure_conv;
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.RequestData;
-import org.apache.wss4j.common.saml.message.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.saml.message.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.api.dom.validate.Credential;
 
 /**

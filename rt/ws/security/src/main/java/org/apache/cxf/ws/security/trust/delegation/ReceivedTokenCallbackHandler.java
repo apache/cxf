@@ -35,7 +35,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.token.PKIPathSecurity;
 import org.apache.wss4j.api.dom.token.X509Security;
 import org.apache.wss4j.api.dom.WSConstants;

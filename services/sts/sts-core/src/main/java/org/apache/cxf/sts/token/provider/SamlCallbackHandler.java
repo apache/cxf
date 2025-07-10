@@ -29,13 +29,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.dom.saml.SAMLCallback;
+import org.apache.wss4j.dom.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.dom.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.saml.bean.Version;
 
 /**
  * This CallbackHandler implementation is populated with SAML Beans by the SAMLTokenProvider, and is tasked

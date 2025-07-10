@@ -54,14 +54,14 @@ import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.WSDocInfo;
 import org.apache.wss4j.api.dom.engine.WSSConfig;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.api.dom.RequestData;
-import org.apache.wss4j.common.saml.processor.SAMLTokenProcessor;
+import org.apache.wss4j.dom.saml.processor.SAMLTokenProcessor;
 
 import static org.apache.cxf.ws.security.trust.STSUtils.WST_NS_05_12;
 import static org.junit.Assert.assertEquals;

@@ -62,8 +62,8 @@ import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 
 @PreMatching

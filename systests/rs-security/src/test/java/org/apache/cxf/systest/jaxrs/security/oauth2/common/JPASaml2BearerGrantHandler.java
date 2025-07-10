@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 /**
  * Extend Saml2BearerGrantHandler not to use SamlUserSubject, which is not an entity and hence causes problems with JPA.

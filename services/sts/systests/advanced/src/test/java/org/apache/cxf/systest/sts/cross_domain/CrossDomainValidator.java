@@ -19,10 +19,10 @@
 package org.apache.cxf.systest.sts.cross_domain;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.RequestData;
 import org.apache.wss4j.api.dom.validate.Credential;
-import org.apache.wss4j.common.saml.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.saml.validate.SamlAssertionValidator;
 
 /**
  * This class validates a SAML Assertion by checking the issuer name.

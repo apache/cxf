@@ -19,10 +19,10 @@
 package org.apache.cxf.sts.token.provider;
 
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
-import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.dom.saml.bean.SubjectLocalityBean;
+import org.apache.wss4j.dom.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 
 /**
  * A custom AuthenticationStatementProvider implementation for use in the tests.

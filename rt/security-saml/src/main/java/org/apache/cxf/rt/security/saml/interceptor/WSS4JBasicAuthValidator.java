@@ -43,7 +43,7 @@ import org.apache.wss4j.api.dom.validate.Credential;
 import org.apache.wss4j.api.dom.validate.Validator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 /**
  * An abstract class containing some functionality to validate a username + password received

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 
 import net.shibboleth.shared.xml.DOMTypeSupport;
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.opensaml.xacml.ctx.ActionType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;

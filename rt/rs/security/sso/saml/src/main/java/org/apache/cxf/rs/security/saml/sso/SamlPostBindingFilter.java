@@ -40,7 +40,7 @@ import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.saml2.core.AuthnRequest;

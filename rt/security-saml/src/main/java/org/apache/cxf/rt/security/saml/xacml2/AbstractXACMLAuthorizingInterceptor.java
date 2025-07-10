@@ -38,7 +38,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.xacml.ctx.DecisionType.DECISION;
 import org.opensaml.xacml.ctx.RequestType;
@@ -59,7 +59,7 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
 
     public AbstractXACMLAuthorizingInterceptor() {
         super(Phase.PRE_INVOKE);
-        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
+        org.apache.wss4j.dom.saml.OpenSAMLUtil.initSamlEngine();
     }
 
     public void handleMessage(Message message) throws Fault {

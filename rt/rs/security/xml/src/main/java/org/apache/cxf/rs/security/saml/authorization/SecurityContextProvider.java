@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.saml.authorization;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 
 public interface SecurityContextProvider {
     SecurityContext getSecurityContext(Message message, SamlAssertionWrapper wrapper);
