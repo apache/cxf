@@ -59,7 +59,8 @@
             jakarta.xml.ws*;version="${cxf.osgi.jakarta.xml.ws.version}",
             jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}",
             jakarta.validation*;resolution:=optional;version="${cxf.validation.api.package.version}",
-            !sun.misc
+            !sun.misc,
+            !java.security.acl
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
