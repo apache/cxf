@@ -140,6 +140,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private void init(ExecutorService executorService, Configuration configuration) {
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
         cfg.getRequestContext().putAll(configuration.getProperties());
+        cfg.getRequestContext().put(Configuration.class.getName(), configuration);
 
         List<Interceptor<? extends Message>>inboundChain = cfg.getInInterceptors();
         inboundChain.add(new MPAsyncInvocationInterceptorPostAsyncImpl());
