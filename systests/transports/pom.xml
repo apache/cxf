@@ -352,7 +352,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.littleshoot</groupId>
+            <groupId>io.github.littleproxy</groupId>
             <artifactId>littleproxy</artifactId>
             <scope>test</scope>
         </dependency>

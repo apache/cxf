@@ -171,7 +171,7 @@
         <cxf.junit5.version>5.13.3</cxf.junit5.version>
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.3</cxf.ldapsdk.version>
-        <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
+        <cxf.littleproxy.version>2.4.3</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.5.18</cxf.logback.classic.version>
         <cxf.lucene.version>9.12.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.10</cxf.maven.core.version>
@@ -1798,7 +1798,7 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.littleshoot</groupId>
+                <groupId>io.github.littleproxy</groupId>
                 <artifactId>littleproxy</artifactId>
                 <version>${cxf.littleproxy.version}</version>
                 <exclusions>
