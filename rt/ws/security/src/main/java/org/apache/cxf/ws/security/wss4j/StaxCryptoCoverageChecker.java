@@ -33,7 +33,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;

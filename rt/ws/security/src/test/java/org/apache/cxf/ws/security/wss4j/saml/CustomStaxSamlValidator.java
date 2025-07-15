@@ -23,7 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.saml.OpenSAMLUtil;
 import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
-import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
@@ -55,8 +55,8 @@ public class CustomStaxSamlValidator extends SamlTokenValidatorImpl {
     ) throws WSSecurityException {
         //jdk 1.6 compiler bug? http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
         //type parameters of <T>T cannot be determined; no unique maximal instance exists for type variable T with
-        // upper bounds org.apache.wss4j.stax.securityToken.SamlSecurityToken,
-        // org.apache.wss4j.stax.securityToken.SamlSecurityToken,
+        // upper bounds org.apache.wss4j.api.stax.securityToken.SamlSecurityToken,
+        // org.apache.wss4j.api.stax.securityToken.SamlSecurityToken,
         // org.apache.xml.security.stax.ext.securityToken.InboundSecurityToken
         //works fine on jdk 1.7
         final SamlSecurityToken token =

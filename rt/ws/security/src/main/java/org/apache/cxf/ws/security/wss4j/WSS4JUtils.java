@@ -64,8 +64,8 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 /**

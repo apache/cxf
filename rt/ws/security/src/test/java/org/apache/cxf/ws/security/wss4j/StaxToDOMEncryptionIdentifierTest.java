@@ -35,9 +35,9 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 import org.junit.Test;

@@ -36,7 +36,7 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 import org.apache.wss4j.policy.model.TransportBinding;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 
 /**

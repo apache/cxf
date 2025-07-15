@@ -34,7 +34,7 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 
 import org.junit.Test;
 

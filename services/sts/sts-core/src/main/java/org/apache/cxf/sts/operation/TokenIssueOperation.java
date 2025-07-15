@@ -64,8 +64,8 @@ import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.api.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 /**

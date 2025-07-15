@@ -29,8 +29,8 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 
 /**
  * A StAX-based server
