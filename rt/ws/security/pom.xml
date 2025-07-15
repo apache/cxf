@@ -133,6 +133,12 @@
             <artifactId>wss4j-ws-security-stax</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-stax-saml</artifactId>
+            <version>${cxf.jakarta.wss4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
         </dependency>
