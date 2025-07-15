@@ -35,9 +35,9 @@ import org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 
 import demo.wssec.client.UTPasswordCallback;

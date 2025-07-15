@@ -46,9 +46,9 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.saml.builder.SAML1Constants;
 import org.apache.wss4j.dom.saml.builder.SAML2Constants;
 import org.apache.wss4j.api.dom.WSConstants;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 
 import org.junit.Test;
 

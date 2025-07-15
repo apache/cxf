@@ -55,7 +55,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 

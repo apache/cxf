@@ -31,8 +31,8 @@ import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
 
 import demo.wssec.server.UTPasswordCallback;
 

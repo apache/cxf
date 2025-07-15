@@ -57,9 +57,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.api.dom.WSConstants;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.ext.WSSConstants;
+import org.apache.wss4j.api.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;

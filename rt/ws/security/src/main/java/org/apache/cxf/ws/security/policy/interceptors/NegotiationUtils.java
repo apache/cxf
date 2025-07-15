@@ -63,7 +63,7 @@ import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.api.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**

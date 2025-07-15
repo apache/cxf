@@ -57,8 +57,8 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.HttpsToken;
 import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
