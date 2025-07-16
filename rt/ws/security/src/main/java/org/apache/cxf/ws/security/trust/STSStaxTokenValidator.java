@@ -139,7 +139,7 @@ public class STSStaxTokenValidator
                 try {
                     super.verify();
                 } catch (XMLSecurityException ex) {
-                    SamlAssertionWrapper assertion = super.getSamlAssertionWrapper();
+                    SamlAssertionWrapper assertion = (SamlAssertionWrapper)super.getSamlAssertion();
                     Element tokenElement = assertion.getElement();
                     validateTokenToSTS(tokenElement, message);
                 }

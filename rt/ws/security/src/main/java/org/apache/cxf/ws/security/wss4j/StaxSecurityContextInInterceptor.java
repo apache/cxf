@@ -223,8 +223,8 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
         // The SAML Assertion must be signed by default
         return event.getSecurityToken() != null
-            && event.getSecurityToken().getSamlAssertionWrapper() != null
-            && (allowUnsignedSamlPrincipals || event.getSecurityToken().getSamlAssertionWrapper().isSigned());
+            && event.getSecurityToken().getSamlAssertion() != null
+            && (allowUnsignedSamlPrincipals || ((SamlAssertionWrapper)event.getSecurityToken().getSamlAssertion()).isSigned());
     }
 
     private boolean isUsernameTokenEventAllowed(UsernameTokenSecurityEvent event, Message msg) {

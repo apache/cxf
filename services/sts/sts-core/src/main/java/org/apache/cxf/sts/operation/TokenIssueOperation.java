@@ -410,8 +410,8 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             org.apache.xml.security.stax.securityToken.SecurityToken securityToken =
                 findInboundSecurityToken(WSSecurityEventConstants.SAML_TOKEN, messageContext);
             if (securityToken instanceof SamlSecurityToken
-                && ((SamlSecurityToken)securityToken).getSamlAssertionWrapper() != null) {
-                return ((SamlSecurityToken)securityToken).getSamlAssertionWrapper();
+                && ((SamlSecurityToken)securityToken).getSamlAssertion() != null) {
+                return (SamlAssertionWrapper)((SamlSecurityToken)securityToken).getSamlAssertion();
             }
         } catch (XMLSecurityException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
