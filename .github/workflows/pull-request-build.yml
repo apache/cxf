@@ -12,17 +12,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest] 
+        os: [windows-latest, ubuntu-latest]
+        jdk: [17, 21] 
     permissions:
       contents: read  
       pull-requests: read
     timeout-minutes: 130
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v3.6.0
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.jdk }}
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
-          java-version: '17'
+          java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
           cache: maven
       - name: Build with Apache Maven (Windows)
