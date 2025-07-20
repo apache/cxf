@@ -79,12 +79,11 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     @Test
     public void testServiceUnavailable() throws Exception {
         final Greeter greeter = getGreeter();
+        final String message = "HTTP response '503: Service Unavailable' when "
+                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
 
         exception.expect(WebServiceException.class);
         exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private final String message = "HTTP response '503: Service Unavailable' when "
-                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
-
             @Override
             public void describeTo(Description description) {
                 description
@@ -106,11 +105,11 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     @Test
     public void testNotFound() throws Exception {
         final Greeter greeter = getGreeter();
+        final String message = "HTTP response '404: Not Found' when "
+                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
 
         exception.expect(WebServiceException.class);
         exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private final String message = "HTTP response '404: Not Found' when "
-                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
 
             @Override
             public void describeTo(Description description) {
