@@ -153,16 +153,21 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                 String[] parts = originalLogString.split(Pattern.quote(boundary));
                 String payload = "";
                 for (String str : parts) {
-                    if (findContentType(str) != null
+                    final String contentType = findContentType(str);
+                    if (contentType != null
                         && eventMapper.isBinaryContent(
-                           findContentType(str).substring("Content-Type:".length()).trim())) {
-                        payload = payload + "\r\n" + CONTENT_SUPPRESSED + "\r\n";
+                                contentType.substring("Content-Type:".length()).trim())) {
+                        final String headers = extractHeaders(str);
+                        if (headers == null || headers.isEmpty()) {
+                            payload = payload + "\r\n" + CONTENT_SUPPRESSED + "\r\n";
+                        } else {
+                            payload = payload + "\r\n" + headers + "\r\n" + CONTENT_SUPPRESSED + "\r\n";
+                        }
                     } else {
                         payload = payload + str;
                         payload = payload + boundary;
                     }
                 }
-            
                 originalLogString = payload;
             }
         } catch (Exception ex) {
@@ -172,6 +177,43 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         
     }
     
+    private static String extractHeaders(String str) {
+        // We know that content header is present, let's start from that
+        final Matcher m = CONTENT_TYPE_PATTERN.matcher(str);
+        if  (m.find()) {
+            int payloadStart = 0;
+
+            // Look for empty line to find out where the actual payload starts (it should
+            // follow headers)
+            int buffer = 0;
+            for (int i = m.start(0); i < str.length(); ++i) {
+                final char c = str.charAt(i);
+                // a linefeed is a terminator, always.
+                if (c == '\n') {
+                    if (buffer == 0) {
+                        payloadStart = i;
+                        break;
+                    } else {
+                        buffer = 0;
+                    }
+                } else if (c == '\r') {
+                    //just ignore the CR.  The next character SHOULD be an NL.  If not, we're
+                    //just going to discard this
+                    continue;
+                } else {
+                    // just count is as a buffer
+                    ++buffer;
+                }
+            }
+
+            if (payloadStart > 0 && payloadStart < str.length()) {
+                return str.substring(0, payloadStart).trim();
+            }
+        }
+
+        return null;
+    }
+
     private String findContentType(String payload) {
         // Use regex to get the Content-Type and return null if it's not found
         Matcher m = CONTENT_TYPE_PATTERN.matcher(payload);
