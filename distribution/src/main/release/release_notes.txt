@@ -1,4 +1,4 @@
-Apache CXF 4.1.2 Release Notes
+Apache CXF 4.1.3 Release Notes
 
 1. Overview
 
@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.2 fixes over 16 JIRA issues reported by users and the community.
+4.1.3 fixes over 10 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,27 +70,25 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8985] - headers masking implementation not replaceable
-    * [CXF-9005] - EE10 JAX-RS TCK Test Failures
-    * [CXF-9100] - HttpClient-1-Worker-* thread leak when throwing exception in LoggingOutInterceptor and sending large SOAP message
-    * [CXF-9113] - EntityPart.Builder does not seem to work in a Java SE environment
-    * [CXF-9115] - Race Condition in HttpClientHttpConduit Causes Writing Thread to Hang Forever
-    * [CXF-9117] - cxf-rt-ws-security fails if JCache is not on the classpath
-    * [CXF-9118] - DelayedCachedOutputStreamCleaner may expire streams prematurely
-    * [CXF-9119] - Spring Boot runtime :  property placeholder in xml bean of jaxws:client not resolved correctly
-    * [CXF-9120] - OSGi jakarta.xml.bind version mismatch
-    * [CXF-9121] - LEAK: ByteBuf.release() was not called before it's garbage-collected
-    * [CXF-9124] - TransportURIResolver prints stack trace to stderr when using HTTP Authentication
-    * [CXF-9128] - swaref does not use "cid:" reference scheme
-    * [CXF-9130] - WrapperClassLoader.generate() should not add null values; createWrapperClass() should log a warning when failing to create wrapper class
-    * [CXF-9132] - HttpClientHTTPConduit releases the client while there are connection(s) still using it
+    * [CXF-9114] - ClientRequestContext#getConfiguration always return null in the MicroProfile RestClient
+    * [CXF-9139] - Null Safety Issue in getLocalPart Call in DataWriterImpl
+    * [CXF-9141] - MaskSensitiveHelperMasking malfunctions for empty tags
+    * [CXF-9146] - MemoryLeak in HttpClientHTTPConduit when used with the ThreadLocalClientState
+    * [CXF-9148] - Using @Oneway annotation cases NullPointerException in CXF + Jetty 12 REST Service
+    * [CXF-9150] - Deal with java.security.acl
+    * [CXF-9153] - The class org.apache.cxf.transport.servlet.servicelist.UnformattedServiceListWriter does not work for RESTful destinations
 
 
 
 
 ** Improvement
-    * [CXF-9039] - Run Jakarta RESTful Web Services 3.1 TCK
-    * [CXF-9134] - When sending Multipart request do not wrap Attachment into another Attachment
+    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
+    * [CXF-9151] - use io.github.littleproxy:littleproxy instead of org.littleshoot:littleproxy
+
+
+
+** Task
+    * [CXF-9142] - Change async tracing tests to be order-agnostic
 
 
 
