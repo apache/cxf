@@ -1,4 +1,4 @@
-Apache CXF 3.6.7 Release Notes
+Apache CXF 3.6.8 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.7 fixes over 10 issues/tasks reported by users.
+3.6.8 fixes over 6 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -67,18 +67,11 @@ for caveats when upgrading.
 7. Release Notes
 
 ** Bug
-    * [CXF-8985] - headers masking implementation not replaceable
-    * [CXF-9100] - HttpClient-1-Worker-* thread leak when throwing exception in LoggingOutInterceptor and sending large SOAP message
-    * [CXF-9115] - Race Condition in HttpClientHttpConduit Causes Writing Thread to Hang Forever
-    * [CXF-9117] - cxf-rt-ws-security fails if JCache is not on the classpath
-    * [CXF-9118] - DelayedCachedOutputStreamCleaner may expire streams prematurely
-    * [CXF-9121] - LEAK: ByteBuf.release() was not called before it's garbage-collected
-    * [CXF-9124] - TransportURIResolver prints stack trace to stderr when using HTTP Authentication
-    * [CXF-9128] - swaref does not use "cid:" reference scheme
-    * [CXF-9132] - HttpClientHTTPConduit releases the client while there are connection(s) still using it
-
-
-
+    * [CXF-9114] - ClientRequestContext#getConfiguration always return null in the MicroProfile RestClient
+    * [CXF-9139] - Null Safety Issue in getLocalPart Call in DataWriterImpl
+    * [CXF-9141] - MaskSensitiveHelperMasking malfunctions for empty tags
+    * [CXF-9146] - MemoryLeak in HttpClientHTTPConduit when used with the ThreadLocalClientState
+    * [CXF-9153] - The class org.apache.cxf.transport.servlet.servicelist.UnformattedServiceListWriter does not work for RESTful destinations
 
 ** Improvement
-    * [CXF-9134] - When sending Multipart request do not wrap Attachment into another Attachment
+    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
