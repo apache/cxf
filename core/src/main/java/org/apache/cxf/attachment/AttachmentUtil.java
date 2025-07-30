@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -40,7 +41,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,7 +82,7 @@ public final class AttachmentUtil {
     private static final AtomicInteger COUNTER = new AtomicInteger();
     private static final String ATT_UUID = UUID.randomUUID().toString();
 
-    private static final Random BOUND_RANDOM = new Random();
+    private static final SecureRandom BOUND_RANDOM = new SecureRandom();
     private static final CommandMap DEFAULT_COMMAND_MAP = CommandMap.getDefaultCommandMap();
     private static final MailcapCommandMap COMMAND_MAP = new EnhancedMailcapCommandMap();
     
@@ -258,9 +258,6 @@ public final class AttachmentUtil {
 
     public static String getUniqueBoundaryValue() {
         //generate a random UUID.
-        //we don't need the cryptographically secure random uuid that
-        //UUID.randomUUID() will produce.  Thus, use a faster
-        //pseudo-random thing
         long leastSigBits;
         long mostSigBits;
         synchronized (BOUND_RANDOM) {
