@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
-@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
 public class CorbaOctetSequenceEventProducer implements CorbaTypeEventProducer {
 
     int state;
