@@ -29,7 +29,6 @@ import javax.xml.stream.events.Namespace;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.omg.CORBA.ORB;
 
-@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
 public abstract class AbstractStartEndEventProducer implements
         CorbaTypeEventProducer {
 
