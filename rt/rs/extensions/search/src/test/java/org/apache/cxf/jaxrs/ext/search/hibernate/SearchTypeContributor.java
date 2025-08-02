@@ -26,7 +26,6 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.type.descriptor.java.EnumJavaType;
 import org.hibernate.type.descriptor.jdbc.EnumJdbcType;
-import org.hibernate.usertype.StaticUserTypeSupport;
 
 public class SearchTypeContributor implements TypeContributor {
     @Override
