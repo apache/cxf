@@ -20,6 +20,7 @@
 package org.apache.cxf.metrics.micrometer;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -99,14 +100,26 @@ abstract class MicrometerMetricsContext implements MetricsContext {
         Timer.Sample timerSample = timingContext.getTimerSample();
         Supplier<Iterable<Tag>> tags = () -> getAllTags(ex);
 
-        if (annotations.isEmpty()) {
-            if (this.autoTimeRequests) {
-                stop(timerSample, tags, Timer.builder(this.metricName));
-            }
-        } else {
+        boolean defaultMetricReported = false;
+        if (!annotations.isEmpty()) {
+            final Optional<String> defaultMetricNameOpt = timedAnnotationProvider
+                .getDefaultMetricName(ex, client);
+
             for (Timed annotation : annotations) {
-                stop(timerSample, tags, Timer.builder(annotation, this.metricName));
+                // Edge case, the @Timed without value would be reported as a default one.
+                // We should not report the same metric more than once.
+                if (annotation.value().isEmpty() && defaultMetricReported) {
+                    continue;
+                }
+                
+                defaultMetricReported |= defaultMetricNameOpt.isEmpty() && annotation.value().isEmpty();
+                stop(timerSample, tags, Timer.builder(annotation, 
+                        defaultMetricNameOpt.orElse(this.metricName)));                
             }
+        }
+        
+        if (this.autoTimeRequests && !defaultMetricReported) {
+            stop(timerSample, tags, Timer.builder(this.metricName));
         }
     }
 

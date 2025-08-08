@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.jaxws.resources;
 
-package org.apache.cxf.metrics.micrometer.provider;
-
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.cxf.message.Exchange;
+import jakarta.jws.WebService;
 
 import io.micrometer.core.annotation.Timed;
 
-public interface TimedAnnotationProvider {
+import static java.util.Objects.requireNonNull;
 
-    Set<Timed> getTimedAnnotations(Exchange ex, boolean client);
-    
-    default Optional<String> getDefaultMetricName(Exchange ex, boolean client) {
-        return Optional.empty();
+@WebService(serviceName = "HelloService", portName = "HelloPort",
+        targetNamespace = "http://service.ws.sample/",
+        endpointInterface = "org.apache.cxf.systest.jaxws.resources.HelloService")
+public class HelloServiceEmptyTimedImpl implements HelloService {
+
+    @Timed
+    public String sayHello(String name) {
+        requireNonNull(name);
+        return "Hello, " + name;
     }
+
 }
