@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -64,6 +65,16 @@ public class DefaultTimedAnnotationProvider implements TimedAnnotationProvider {
             }
             return timed;
         });
+    }
+    
+    @Override
+    public Optional<String> getDefaultMetricName(Exchange ex, boolean client) {
+        final HandlerMethod handlerMethod = HandlerMethod.create(ex, client);
+        if (handlerMethod == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(handlerMethod.method.getName());
+        }
     }
 
     Set<Timed> findTimedAnnotations(AnnotatedElement element) {
