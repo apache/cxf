@@ -185,7 +185,7 @@ public class MicrometerServerMetricsContextTest {
         underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
 
         // then
-        verify(sample, times(2)).stop(timerArgumentCaptor.capture());
+        verify(sample, times(3)).stop(timerArgumentCaptor.capture());
 
         List<Meter.Id> timers = timerArgumentCaptor.getAllValues().stream().map(Meter::getId)
                 .collect(Collectors.toList());
@@ -197,6 +197,74 @@ public class MicrometerServerMetricsContextTest {
                         null,
                         Meter.Type.OTHER),
                 new Meter.Id(SECOND_TIMED_ANNOTATION_DUMMY_VALUE,
+                        Tags.of(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG),
+                        null,
+                        null,
+                        Meter.Type.OTHER)));
+    }
+
+    @Test
+    public void testStopShoulCallStopOnTimedAnnotationAndDoNotEmitDefaultMetric() {
+        // given
+        doReturn(new HashSet<>(asList(firstTimedAnnotation)))
+                .when(timedAnnotationProvider).getTimedAnnotations(exchange, false);
+
+        doReturn("").when(firstTimedAnnotation).value();
+        doReturn("").when(firstTimedAnnotation).description();
+        doReturn(new double[]{}).when(firstTimedAnnotation).percentiles();
+
+        
+        TimingContext timingContext = new TimingContext(sample);
+
+        doReturn(timingContext).when(request).getContent(TimingContext.class);
+
+        // when
+        underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
+
+        // then
+        verify(sample, times(1)).stop(timerArgumentCaptor.capture());
+
+        List<Meter.Id> timers = timerArgumentCaptor.getAllValues().stream().map(Meter::getId)
+                .collect(Collectors.toList());
+
+        assertThat(timers, hasItems(
+                new Meter.Id(DUMMY_METRIC,
+                        Tags.of(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG),
+                        null,
+                        null,
+                        Meter.Type.OTHER)));
+    }
+
+    @Test
+    public void testStopShoulCallStopOnAllTimedAnnotationsAndDoNotEmitDefaultMetric() {
+        // given
+        doReturn(new HashSet<>(asList(firstTimedAnnotation, secondTimedAnnotation)))
+                .when(timedAnnotationProvider).getTimedAnnotations(exchange, false);
+
+        doReturn("").when(firstTimedAnnotation).value();
+        doReturn("").when(firstTimedAnnotation).description();
+        doReturn(new double[]{}).when(firstTimedAnnotation).percentiles();
+
+        doReturn("").when(secondTimedAnnotation).value();
+        doReturn("").when(secondTimedAnnotation).description();
+        doReturn(new double[]{}).when(secondTimedAnnotation).percentiles();
+
+        
+        TimingContext timingContext = new TimingContext(sample);
+
+        doReturn(timingContext).when(request).getContent(TimingContext.class);
+
+        // when
+        underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
+
+        // then
+        verify(sample, times(1)).stop(timerArgumentCaptor.capture());
+
+        List<Meter.Id> timers = timerArgumentCaptor.getAllValues().stream().map(Meter::getId)
+                .collect(Collectors.toList());
+
+        assertThat(timers, hasItems(
+                new Meter.Id(DUMMY_METRIC,
                         Tags.of(DEFAULT_DUMMY_TAG, FIRST_ADDITIONAL_DUMMY_TAG, SECOND_ADDITIONAL_DUMMY_TAG),
                         null,
                         null,

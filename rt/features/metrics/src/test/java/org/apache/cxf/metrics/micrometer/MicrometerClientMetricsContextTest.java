@@ -183,7 +183,7 @@ public class MicrometerClientMetricsContextTest {
         underTest.stop(DUMMY_LONG, DUMMY_LONG, DUMMY_LONG, exchange);
 
         // then
-        verify(sample, times(2)).stop(timerArgumentCaptor.capture());
+        verify(sample, times(3)).stop(timerArgumentCaptor.capture());
 
         List<Meter.Id> timers = timerArgumentCaptor.getAllValues().stream().map(Meter::getId)
                 .collect(Collectors.toList());
