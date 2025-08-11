@@ -29,8 +29,8 @@ import org.apache.wss4j.dom.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.api.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.api.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
-import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.opensaml.core.xml.XMLObject;
 

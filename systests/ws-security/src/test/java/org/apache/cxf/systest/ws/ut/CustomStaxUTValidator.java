@@ -26,7 +26,7 @@ import org.apache.wss4j.binding.wss10.UsernameTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.wss4j.api.stax.securityToken.UsernameSecurityToken;
-import org.apache.wss4j.stax.validate.TokenContext;
+import org.apache.wss4j.api.stax.validate.TokenContext;
 import org.apache.wss4j.stax.validate.UsernameTokenValidatorImpl;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
