@@ -85,6 +85,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
             }
             setEventHandler = MessageUtils.getContextualBoolean(m,
                     JAXBDataBinding.SET_VALIDATION_EVENT_HANDLER, true);
+            mtomEnabled = MessageUtils.getContextualBoolean(m,
+                          org.apache.cxf.message.Message.MTOM_ENABLED, false);
         }
     }
 
