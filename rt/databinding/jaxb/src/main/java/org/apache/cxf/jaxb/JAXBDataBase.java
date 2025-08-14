@@ -57,7 +57,8 @@ public abstract class JAXBDataBase {
     protected Schema schema;
     protected Collection<Attachment> attachments;
     protected Integer mtomThreshold; // null if we should default.
-
+    protected boolean mtomEnabled;
+    
     protected JAXBDataBase(JAXBContext ctx) {
         context = ctx;
     }
@@ -90,7 +91,7 @@ public abstract class JAXBDataBase {
     }
 
     protected AttachmentMarshaller getAttachmentMarshaller() {
-        return new JAXBAttachmentMarshaller(attachments, mtomThreshold);
+        return new JAXBAttachmentMarshaller(attachments, mtomThreshold, mtomEnabled);
     }
 
     public void setProperty(String prop, Object value) {
