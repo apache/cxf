@@ -47,7 +47,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.test.context.ActiveProfiles;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -75,9 +74,7 @@ import static org.hamcrest.Matchers.empty;
         properties = {
             "cxf.metrics.server.max-uri-tags=2"
         })
-@ImportResource("classpath:spring/jaxws-client.xml") 
 @ActiveProfiles("jaxws")
-
 public class SpringJaxwsTimedTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
