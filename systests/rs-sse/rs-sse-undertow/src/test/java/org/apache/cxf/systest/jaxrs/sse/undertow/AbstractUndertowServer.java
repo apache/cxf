@@ -83,9 +83,6 @@ public abstract class AbstractUndertowServer extends AbstractBusTestServerBase {
         }
     }
 
-    protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-
-    }
 
     public void tearDown() throws Exception {
         super.tearDown();
