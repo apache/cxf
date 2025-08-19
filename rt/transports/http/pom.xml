@@ -157,60 +157,52 @@
                     </extensions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.googlecode.maven-download-plugin</groupId>
-                <artifactId>download-maven-plugin</artifactId>
-                <version>1.13.0</version>
-                <executions>
-                    <execution>
-                        <id>download-public-suffix-list</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <url>${cxf.public.suffix.list.url}</url>
-                            <outputDirectory>${project.build.outputDirectory}/mozilla</outputDirectory>
-                            <outputFileName>public-suffix-list.txt</outputFileName>
-                        </configuration>
-                    </execution>
-                </executions>
-             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            com.googlecode.maven-download-plugin
-                                        </groupId>
-                                        <artifactId>
-                                            download-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.2.0,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>wget</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>online</id>
+            <activation>
+                <property>
+                    <!-- Active by default, Inactive with -Doffline -->
+                    <name>!offline</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>download-public-suffix-list</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                        <configuration>
+                            <!-- Download the suffix file and store it locally only if the content changes -->
+                            <!-- so that the file timestamp does not change on every build -->
+                            <source>
+                                import java.nio.file.Files
+                                def newContent = new URL(project.properties['cxf.public.suffix.list.url']).text
+                                String relPath = 'src/main/resources/mozilla/public-suffix-list.txt'
+                                def destPath = java.nio.file.Path.of(project.properties['project.basedir'] + relPath)
+                                if (!Files.exists(destPath) || !newContent.equals(destPath.getText('UTF-8'))) {
+                                    Files.createDirectories(destPath.getParent())
+                                    destPath.setText(newContent.toString(), 'UTF-8')
+                                    println('🚀 Updating ' + relPath)
+                                } else {
+                                    println('✅ Up to date: ' + relPath)
+                                }
+                            </source>
+                        </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+
+        </profile>
+    </profiles>
 </project>
