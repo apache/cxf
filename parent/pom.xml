@@ -32,11 +32,12 @@
     <properties>
         <cxf.protect-xmlschema-collections>false</cxf.protect-xmlschema-collections>
         <cxf.surefire.fork.count>1</cxf.surefire.fork.count>
+        <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
         <cxf.surefire.format>brief</cxf.surefire.format>
         <cxf.surefire.usefile>false</cxf.surefire.usefile>
         <org.apache.cxf.transport.websocket.atmosphere.disabled>false</org.apache.cxf.transport.websocket.atmosphere.disabled>
         <cxf.surefire.parallel.mode />
-        <cxf.surefire.fork.vmargs>-ea</cxf.surefire.fork.vmargs>
+        <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
         <cxf.surefire.enable.assertions>true</cxf.surefire.enable.assertions>
         <cxf.surefire.rerun.count>3</cxf.surefire.rerun.count>
@@ -607,6 +608,16 @@
                     <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <compilerArgument>${cxf.compile.flags}</compilerArgument>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                         <!-- https://github.com/bcgit/bc-java/issues/589  -->
+                         <jdk.tls.namedGroups>secp256r1,secp384r1,secp521r1,sect283k1,sect283r1,sect409k1,sect409r1,sect571k1,sect571r1,secp256k1,ffdhe2048,ffdhe3072,ffdhe4096,ffdhe6144,ffdhe8192</jdk.tls.namedGroups>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -2231,7 +2242,7 @@
                     <name>ekstazi</name>
                 </property>
             </activation>
-          
+
             <build>
                 <plugins>
                     <plugin>
@@ -2252,7 +2263,7 @@
                             </execution>
                         </executions>
                     </plugin>
-              
+
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
@@ -2266,36 +2277,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>jdk13</id>
-            <activation>
-                <jdk>[13,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                 <!-- https://github.com/bcgit/bc-java/issues/589  -->
-                                 <jdk.tls.namedGroups>secp256r1,secp384r1,secp521r1,sect283k1,sect283r1,sect409k1,sect409r1,sect571k1,sect571r1,secp256k1,ffdhe2048,ffdhe3072,ffdhe4096,ffdhe6144,ffdhe8192</jdk.tls.namedGroups>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jdk16</id>
-            <activation>
-                <jdk>[16,)</jdk>
-            </activation>
-            <properties>
-                <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
-                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</cxf.surefire.fork.vmargs>
-            </properties>
         </profile>
         <profile>
             <id>coverage</id>
