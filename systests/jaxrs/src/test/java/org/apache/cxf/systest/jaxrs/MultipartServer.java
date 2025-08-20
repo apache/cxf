@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -36,6 +37,7 @@ public class MultipartServer extends AbstractServerTestServerBase {
     @Override
     protected Server createServer(Bus bus) throws Exception {
         bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+        bus.getInInterceptors().add(new LoggingInInterceptor());
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
