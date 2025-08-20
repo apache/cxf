@@ -44,6 +44,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -99,6 +100,9 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private String attachmentDir;
     private String attachmentThreshold;
     private String attachmentMaxSize;
+    
+    @Context
+    private HttpHeaders httpHeaders;
 
     public void setMessageContext(MessageContext context) {
         this.mc = context;
@@ -353,7 +357,20 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = getHandlerForObject(att.getObject(),
                                      att.getObject().getClass(), new Annotation[]{},
                                      att.getContentType().toString(), id);
-            return new Attachment(att.getContentId(), dh, att.getHeaders());
+            MediaType mediaType = httpHeaders.getMediaType();
+            Attachment ret = null;
+            if (MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType)) {
+                ContentDisposition cd = new 
+                    ContentDisposition("form-data;name=\"" 
+                        + att.getContentId() + "\"");
+                MultivaluedMap<String, String> newHeaders = 
+                    new MetadataMap<String, String>(att.getHeaders(), false, true);
+                newHeaders.putSingle("Content-Disposition", cd.toString());
+                ret = new Attachment(att.getContentId(), dh, newHeaders);
+            } else {
+                ret = new Attachment(att.getContentId(), dh, att.getHeaders());
+            }
+            return ret;
         } else if (byte[].class.isAssignableFrom(obj.getClass())) {
             ByteDataSource source = new ByteDataSource((byte[])obj);
             source.setContentType(mimeType);
