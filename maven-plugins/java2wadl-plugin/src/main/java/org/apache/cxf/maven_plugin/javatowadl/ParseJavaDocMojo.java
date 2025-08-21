@@ -208,6 +208,12 @@ public class ParseJavaDocMojo extends AbstractMojo {
             f.setAccessible(true);
             f.set(mojo, repoSession);
 
+            if (Runtime.version().feature() >= 24) {
+                f = AbstractJavadocMojo.class.getDeclaredField("disableNoFonts");
+                f.setAccessible(true);
+                f.set(mojo, true);
+            }
+
             Method m = AbstractJavadocMojo.class.getDeclaredMethod("executeReport", Locale.class);
             m.setAccessible(true);
             m.invoke(mojo, locale);
