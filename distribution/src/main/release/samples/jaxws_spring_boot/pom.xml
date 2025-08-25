@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-        <version>4.2.0-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
             <exclusions><!-- CXF uses java.util.logging by default -->
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
