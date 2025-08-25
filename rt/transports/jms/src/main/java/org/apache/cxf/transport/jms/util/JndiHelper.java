@@ -30,7 +30,9 @@ import javax.naming.NamingException;
 public class JndiHelper {
 
     private static final List<String> ALLOWED_PROTOCOLS = Arrays.asList(
-        "vm://", "tcp://", "nio://", "ssl://", "http://", "https://", "ws://", "wss://");
+        "vm://", "tcp://", "nio://", "ssl://", "http://", "https://", "ws://", "wss://",
+        "remote://", "remote+tls://", "remote+http://", "remote+https://" // JBoss Remoting protocols
+    );
     private Properties environment;
 
     /**
@@ -41,7 +43,8 @@ public class JndiHelper {
 
         // Avoid unsafe protocols if they are somehow misconfigured
         String providerUrl = environment.getProperty(Context.PROVIDER_URL);
-        if (providerUrl != null && !ALLOWED_PROTOCOLS.stream().anyMatch(providerUrl::startsWith)) {
+        if (providerUrl != null && !providerUrl.isEmpty()
+            && !ALLOWED_PROTOCOLS.stream().anyMatch(providerUrl::startsWith)) {
             throw new IllegalArgumentException("Unsafe protocol in JNDI URL: " + providerUrl);
         }
     }
