@@ -149,7 +149,7 @@
             <!-- Not needed if deploying to a Servlet 3 based container or non-jetty container -->
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>4.2.0-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
