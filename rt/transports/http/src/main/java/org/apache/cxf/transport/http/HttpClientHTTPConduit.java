@@ -76,6 +76,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -113,9 +114,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
-        private long count;
-        private boolean shuttingDown; // guarded by 'this'
-
+        private final AtomicLong count;
         private final TLSClientParameters clientParameters;
         private final HTTPClientPolicy policy;
         private final T client;
@@ -126,97 +125,76 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             this.policy = policy;
             this.clientParameters = clientParameters;
             this.finalizer = finalizer;
+            this.count = new AtomicLong(1);
         }
 
-        /**
-         * Acquire a reference. Throws if shutdown has begun.
-         */
-        synchronized RefCount<T> acquire() {
-            if (shuttingDown) {
-                throw new IllegalStateException("Client already shutting down");
+        RefCount<T> acquire() {
+            while (true) {
+                final long c = count.get();
+                if (c == 0L) {
+                    throw new IllegalStateException("The client is already shutdown");
+                } else if (count.compareAndSet(c, c + 1)) {
+                    break;
+                }
             }
-            count++;
             return this;
         }
 
-        /**
-         * Release a reference. If this was the last one, trigger shutdown
-         * OUTSIDE the synchronized block to avoid blocking other threads.
-         */
         void release() {
-            boolean doShutdownNow = false;
-
-            synchronized (this) {
-                if (count <= 0) {
-                    // Defensive against double-release; nothing to do.
-                    return;
-                }
-
-                count--;
-                if (count == 0 && !shuttingDown) {
-                    shuttingDown = true;      // prevent future acquires
-                    doShutdownNow = true;     // perform shutdown after leaving the monitor
-                }
-            }
-
-            if (doShutdownNow) {
-                doShutdown();
-            }
-        }
-
-        private void doShutdown() {
-            // User-provided cleanup first
-            try {
+            if (count.decrementAndGet() == 0) {
                 finalizer.run();
-            } catch (Throwable ignored) {
-                // ignore
-            }
 
-            if (client instanceof AutoCloseable) {
-                try {
-                    // Best-effort: try shutdownNow() first (may not exist on all JDKs)
+                if (client instanceof AutoCloseable) {
                     try {
-                        AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
-                            try {
-                                MethodHandles.publicLookup()
-                                    .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
-                                    .bindTo(client)
-                                    .invokeExact();
-                                return null;
-                            } catch (final Throwable ex) {
-                                if (ex instanceof Error) {
-                                    throw (Error) ex;
-                                } else {
-                                    throw (Exception) ex;
+                        // The HttpClient::close may hang during the termination.
+                        try {
+                            // Try to call shutdownNow() first
+                            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+                                try {
+                                    MethodHandles.publicLookup()
+                                        .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
+                                        .bindTo(client)
+                                        .invokeExact();
+                                    return null;
+                                } catch (final Throwable ex) {
+                                    if (ex instanceof Error) {
+                                        throw (Error) ex;
+                                    } else {
+                                        throw (Exception) ex;
+                                    }
                                 }
-                            }
-                        });
-                    } catch (PrivilegedActionException ignored) {
-                        // ignore if method not present or call failed
-                    }
+                            });
+                        } catch (final PrivilegedActionException e) {
+                            //ignore
+                        }
 
-                    ((AutoCloseable) client).close();
-                } catch (Exception ignored) {
-                    // ignore close exceptions
+                        ((AutoCloseable)client).close();
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                } else if (client != null) {
+                    tryToShutdownSelector(client);
                 }
-            } else if (client != null) {
-                tryToShutdownSelector(client);
             }
         }
+        
+        boolean isClosed() {
+            return count.get() == 0L;
+        }
 
-        HttpClient client() { 
-            return client; 
+        HttpClient client() {
+            return client;
         }
-        
-        HTTPClientPolicy policy() { 
-            return policy; 
+
+        HTTPClientPolicy policy() {
+            return policy;
         }
-        
-        TLSClientParameters clientParameters() { 
-            return clientParameters; 
+
+        public TLSClientParameters clientParameters() {
+            return clientParameters;
         }
     }
-    
+
     private static final class HttpClientCache {
         private static final int MAX_SIZE = 100; // Keeping at most 100 clients
 
@@ -229,15 +207,21 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
             // Do not share if it is not allowed for the conduit or cache capacity is exceeded
             if (!shareHttpClient || clients.size() >= MAX_SIZE) {
-                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { }).acquire();
+                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { });
             }
 
             lock.lock();
             try {
-                for (final RefCount<HttpClient> p: clients) {
-                    if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
-                        return p.acquire();
+                try {
+                    for (final RefCount<HttpClient> p: clients) {
+                        if (p.isClosed() /* skip the closed but not yet removed clients */) {
+                            continue;
+                        } else if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                            return p.acquire();
+                        }
                     }
+                } catch (final IllegalStateException ex) {
+                    /* The client is being shutdown */
                 }
 
                 final HttpClient client = supplier.get();
@@ -245,7 +229,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         () -> this.remove(policy, clientParameters));
                 clients.add(clientRef);
 
-                return clientRef.acquire();
+                return clientRef;
             } finally {
                 lock.unlock();
             }
