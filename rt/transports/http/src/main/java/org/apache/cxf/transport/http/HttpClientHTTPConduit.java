@@ -76,7 +76,6 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -114,7 +113,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
-        private final AtomicLong count = new AtomicLong();
+        private long count;
+        private boolean shuttingDown; // guarded by 'this'
+
         private final TLSClientParameters clientParameters;
         private final HTTPClientPolicy policy;
         private final T client;
@@ -127,62 +128,95 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             this.finalizer = finalizer;
         }
 
-        RefCount<T> acquire() {
-            count.incrementAndGet();
+        /**
+         * Acquire a reference. Throws if shutdown has begun.
+         */
+        synchronized RefCount<T> acquire() {
+            if (shuttingDown) {
+                throw new IllegalStateException("Client already shutting down");
+            }
+            count++;
             return this;
         }
 
+        /**
+         * Release a reference. If this was the last one, trigger shutdown
+         * OUTSIDE the synchronized block to avoid blocking other threads.
+         */
         void release() {
-            if (count.decrementAndGet() == 0) {
-                finalizer.run();
+            boolean doShutdownNow = false;
 
-                if (client instanceof AutoCloseable) {
-                    try {
-                        // The HttpClient::close may hang during the termination.
-                        try {
-                            // Try to call shutdownNow() first
-                            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
-                                try {
-                                    MethodHandles.publicLookup()
-                                        .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
-                                        .bindTo(client)
-                                        .invokeExact();
-                                    return null;
-                                } catch (final Throwable ex) {
-                                    if (ex instanceof Error) {
-                                        throw (Error) ex;
-                                    } else {
-                                        throw (Exception) ex;
-                                    }
-                                }
-                            });
-                        } catch (final PrivilegedActionException e) {
-                            //ignore
-                        }
-
-                        ((AutoCloseable)client).close();
-                    } catch (Exception e) {
-                        //ignore
-                    }
-                } else if (client != null) {
-                    tryToShutdownSelector(client);
+            synchronized (this) {
+                if (count <= 0) {
+                    // Defensive against double-release; nothing to do.
+                    return;
                 }
+
+                count--;
+                if (count == 0 && !shuttingDown) {
+                    shuttingDown = true;      // prevent future acquires
+                    doShutdownNow = true;     // perform shutdown after leaving the monitor
+                }
+            }
+
+            if (doShutdownNow) {
+                doShutdown();
             }
         }
 
-        HttpClient client() {
-            return client;
+        private void doShutdown() {
+            // User-provided cleanup first
+            try {
+                finalizer.run();
+            } catch (Throwable ignored) {
+                // ignore
+            }
+
+            if (client instanceof AutoCloseable) {
+                try {
+                    // Best-effort: try shutdownNow() first (may not exist on all JDKs)
+                    try {
+                        AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+                            try {
+                                MethodHandles.publicLookup()
+                                    .findVirtual(HttpClient.class, "shutdownNow", MethodType.methodType(void.class))
+                                    .bindTo(client)
+                                    .invokeExact();
+                                return null;
+                            } catch (final Throwable ex) {
+                                if (ex instanceof Error) {
+                                    throw (Error) ex;
+                                } else {
+                                    throw (Exception) ex;
+                                }
+                            }
+                        });
+                    } catch (PrivilegedActionException ignored) {
+                        // ignore if method not present or call failed
+                    }
+
+                    ((AutoCloseable) client).close();
+                } catch (Exception ignored) {
+                    // ignore close exceptions
+                }
+            } else if (client != null) {
+                tryToShutdownSelector(client);
+            }
         }
 
-        HTTPClientPolicy policy() {
-            return policy;
+        HttpClient client() { 
+            return client; 
         }
-
-        public TLSClientParameters clientParameters() {
-            return clientParameters;
+        
+        HTTPClientPolicy policy() { 
+            return policy; 
+        }
+        
+        TLSClientParameters clientParameters() { 
+            return clientParameters; 
         }
     }
-
+    
     private static final class HttpClientCache {
         private static final int MAX_SIZE = 100; // Keeping at most 100 clients
 
