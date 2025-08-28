@@ -218,12 +218,16 @@ public final class OidcUtils {
     }
 
     public static OidcProviderMetadata getOidcProviderMetadata(String issuerURL) {
-        Response response = WebClient.create(issuerURL).path("/.well-known/openid-configuration")
-            .accept(MediaType.APPLICATION_JSON).get();
-        if (Status.OK.getStatusCode() != response.getStatus()) {
-            throw ExceptionUtils.toWebApplicationException(response);
+        try (WebClient client = WebClient.create(issuerURL)) {
+            try (Response response = client.path("/.well-known/openid-configuration")
+                .accept(MediaType.APPLICATION_JSON).get()) {
+                if (Status.OK.getStatusCode() != response.getStatus()) {
+                    throw ExceptionUtils.toWebApplicationException(response);
+                }
+                return new OidcProviderMetadata(new JsonMapObjectReaderWriter()
+                    .fromJson(response.readEntity(String.class)));
+            }
         }
-        return new OidcProviderMetadata(new JsonMapObjectReaderWriter().fromJson(response.readEntity(String.class)));
     }
 
 }
