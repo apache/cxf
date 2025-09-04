@@ -289,7 +289,7 @@
         <bundle start-level="10" dependency="true">mvn:jakarta.annotation/jakarta.annotation-api/${cxf.javax.annotation-api.version}</bundle>
         <bundle start-level="35">mvn:org.yaml/snakeyaml/${cxf.snakeyaml.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
-        <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
+        <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.annotations.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.databind.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle>
