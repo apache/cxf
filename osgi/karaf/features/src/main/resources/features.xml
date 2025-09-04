@@ -182,7 +182,6 @@
         <bundle start-level="40">mvn:org.bouncycastle/bcprov-jdk18on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:org.bouncycastle/bcutil-jdk18on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:org.bouncycastle/bctls-jdk18on/${cxf.bcprov.version}</bundle>
-        <bundle start-level="40">wrap:mvn:org.graalvm.nativeimage/svm/19.3.6</bundle>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
@@ -200,7 +199,6 @@
         <bundle start-level="40">mvn:org.bouncycastle/bcprov-jdk18on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:org.bouncycastle/bcutil-jdk18on/${cxf.bcprov.version}</bundle>
         <bundle start-level="40">mvn:org.bouncycastle/bctls-jdk18on/${cxf.bcprov.version}</bundle>
-        <bundle start-level="40">wrap:mvn:org.graalvm.nativeimage/svm/19.3.6</bundle>
         <bundle start-level="40">mvn:io.netty/netty-tcnative-classes/${cxf.netty.tcnative.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-common/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport-native-unix-common/${cxf.netty.version}</bundle>
