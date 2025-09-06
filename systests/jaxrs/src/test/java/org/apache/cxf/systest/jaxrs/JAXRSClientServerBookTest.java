@@ -349,7 +349,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getInInterceptors().add(new LoggingInInterceptor());
         Response r = wc.get();
-        assertEquals("text/plain", r.getMediaType().toString());
+        assertEquals("text/plain;charset=iso-8859-1", r.getMediaType().toString());
         assertEquals("Good Book", r.readEntity(String.class));
     }
 
@@ -2199,14 +2199,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookByHeader() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/bookheaders",
                                "resources/expected_get_book123.txt",
-                               "application/xml;q=0.5,text/xml", "text/xml", 200);
+                               "application/xml;q=0.5,text/xml", "text/xml;charset=utf-8", 200);
     }
 
     @Test
     public void testGetBookByHeaderPerRequest() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore2/bookheaders",
                                "resources/expected_get_book123.txt",
-                               "application/xml;q=0.5,text/xml", "text/xml", 200);
+                               "application/xml;q=0.5,text/xml", "text/xml;charset=utf-8", 200);
     }
 
     @Test
@@ -2256,7 +2256,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBookByHeaderDefault() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/bookheaders2",
                                "resources/expected_get_book123.txt",
-                               "application/xml;q=0.5,text/xml", "text/xml", 200);
+                               "application/xml;q=0.5,text/xml", "text/xml;charset=utf-8", 200);
     }
 
     @Test
@@ -2487,7 +2487,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBook123ReturnString() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/booknames/123",
                                "resources/expected_get_book123_returnstring.txt",
-                               "text/plain", "text/plain", 200);
+                               "text/plain", "text/plain;charset=iso-8859-1", 200);
     }
 
     @Test
@@ -2800,7 +2800,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "[class org.apache.cxf.systest.jaxrs.Chapter, "
                       + "class org.apache.cxf.systest.jaxrs.Book, "
                       + "class org.apache.cxf.systest.jaxrs.BookStore]",
-                      "text/plain", "text/plain", 200);
+                      "text/plain", "text/plain;charset=iso-8859-1", 200);
     }
 
     @Test
@@ -2810,7 +2810,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                       "[class org.apache.cxf.systest.jaxrs.Chapter, "
                       + "class org.apache.cxf.systest.jaxrs.Book, "
                       + "class org.apache.cxf.systest.jaxrs.BookStore]",
-                      "text/plain", "text/plain", 200);
+                      "text/plain", "text/plain;charset=iso-8859-1", 200);
     }
 
     @Test
@@ -2821,7 +2821,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                           + "bookstore]";
         getAndCompare("http://localhost:" + PORT + "/bookstore/"
                       + "booksubresource/123/chapters/sub/1/matched!uris?decode=true",
-                      expected, "text/plain", "text/plain", 200);
+                      expected, "text/plain", "text/plain;charset=iso-8859-1", 200);
     }
 
     @Test
