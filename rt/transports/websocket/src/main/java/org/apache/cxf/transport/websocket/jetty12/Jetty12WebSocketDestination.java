@@ -339,7 +339,11 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
             if (upgradeRequest instanceof JettyServerUpgradeRequest r) {
                 return r.getHttpServletRequest().getAttribute(name);
             } else if (upgradeRequest instanceof CompletedUpgradeRequest r) {
-                return null; /* no request attrributes */
+                if (name.equals("org.apache.cxf.transport.endpoint.address")) {
+                    return address;
+                } else {
+                    return null; /* no request attributes */
+                }
             } else {
                 throw new IllegalStateException("Unsupported upgrade request class: " + upgradeRequest.getClass());
             }
