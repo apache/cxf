@@ -103,7 +103,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
+            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE.withCharset("utf-8")));
         }
     }
 
@@ -119,7 +119,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
         try (Response response = uiClient.get()) {
             String html = response.readEntity(String.class);
             assertThat(html, containsString("<!-- HTML"));
-            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE));
+            assertThat(response.getMediaType(), equalTo(MediaType.TEXT_HTML_TYPE.withCharset("utf-8")));
         }
     }
 
