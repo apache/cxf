@@ -212,16 +212,18 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
             lock.lock();
             try {
-                try {
-                    for (final RefCount<HttpClient> p: clients) {
-                        if (p.isClosed() /* skip the closed but not yet removed clients */) {
+                for (final RefCount<HttpClient> p: clients) {
+                    try {
+                        if (p.isClosed()) { // skip closed but not yet removed clients
                             continue;
-                        } else if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                        }
+                        if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
                             return p.acquire();
                         }
+                    } catch (final IllegalStateException ex) {
+                        // candidate raced into shutdown; skip and try next
+                        continue;
                     }
-                } catch (final IllegalStateException ex) {
-                    /* The client is being shutdown */
                 }
 
                 final HttpClient client = supplier.get();
