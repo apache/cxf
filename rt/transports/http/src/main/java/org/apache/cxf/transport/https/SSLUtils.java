@@ -233,14 +233,12 @@ public final class SSLUtils {
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String s) throws CertificateException {
-            System.out.println("cst1: " + s);
             delegate.checkServerTrusted(chain, s);
         }
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String s, Socket socket)
                 throws CertificateException {
-            System.out.println("cst2: " + s);
             if (extendedDelegate != null) {
                 extendedDelegate.checkServerTrusted(chain, s, socket);
             } else {
