@@ -114,7 +114,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
-        private final AtomicLong count = new AtomicLong();
+        private final AtomicLong count;
         private final TLSClientParameters clientParameters;
         private final HTTPClientPolicy policy;
         private final T client;
@@ -125,10 +125,18 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             this.policy = policy;
             this.clientParameters = clientParameters;
             this.finalizer = finalizer;
+            this.count = new AtomicLong(1);
         }
 
         RefCount<T> acquire() {
-            count.incrementAndGet();
+            while (true) {
+                final long c = count.get();
+                if (c == 0L) {
+                    throw new IllegalStateException("The client is already shutdown");
+                } else if (count.compareAndSet(c, c + 1)) {
+                    break;
+                }
+            }
             return this;
         }
 
@@ -169,6 +177,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 }
             }
         }
+        
+        boolean isClosed() {
+            return count.get() == 0L;
+        }
 
         HttpClient client() {
             return client;
@@ -195,14 +207,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
             // Do not share if it is not allowed for the conduit or cache capacity is exceeded
             if (!shareHttpClient || clients.size() >= MAX_SIZE) {
-                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { }).acquire();
+                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { });
             }
 
             lock.lock();
             try {
                 for (final RefCount<HttpClient> p: clients) {
-                    if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
-                        return p.acquire();
+                    try {
+                        if (p.isClosed()) { // skip closed but not yet removed clients
+                            continue;
+                        }
+                        if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                            return p.acquire();
+                        }
+                    } catch (final IllegalStateException ex) {
+                        // candidate raced into shutdown; skip and try next
+                        continue;
                     }
                 }
 
@@ -211,7 +231,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         () -> this.remove(policy, clientParameters));
                 clients.add(clientRef);
 
-                return clientRef.acquire();
+                return clientRef;
             } finally {
                 lock.unlock();
             }
