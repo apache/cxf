@@ -20,8 +20,9 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.util.concurrent.CompletableFuture;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
