@@ -173,7 +173,7 @@
         <cxf.junit5.version>5.13.4</cxf.junit5.version>
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.3</cxf.ldapsdk.version>
-        <cxf.littleproxy.version>2.4.4</cxf.littleproxy.version>
+        <cxf.littleproxy.version>2.4.5</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.5.18</cxf.logback.classic.version>
         <cxf.lucene.version>9.12.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.10</cxf.maven.core.version>
