@@ -22,9 +22,13 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.core.MultivaluedMap;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
@@ -77,4 +81,19 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
         m.setContent(OutputStream.class, os);
 
     }
+    
+    @Override
+    public boolean containsHeaderString(String name, String valueSeparatorRegex, Predicate<String> valuePredicate) {
+        final List<String> headerStrings = HttpUtils.getHeaderStrings(getHeaders().get(name));
+        final String headerString = HttpUtils.getHeaderString(headerStrings);
+        if (headerString == null) {
+            return false;
+        }
+        return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .filter(valuePredicate)
+            .findAny()
+            .isPresent();
+    }
+
+
 }
