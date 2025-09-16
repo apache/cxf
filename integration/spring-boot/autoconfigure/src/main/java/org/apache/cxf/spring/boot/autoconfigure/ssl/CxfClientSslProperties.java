@@ -117,11 +117,11 @@ public class CxfClientSslProperties {
         this.disableCnCheck = disableCnCheck;
     }
 
-    public List<CxfClientSslBundle> getCxfClientSslBundle() {
+    public List<CxfClientSslBundle> getCxfClientSslBundles() {
         return cxfClientSslBundles;
     }
 
-    public void setCxfClientSslBundle(List<CxfClientSslBundle> clientSslBundles) {
+    public void setCxfClientSslBundles(List<CxfClientSslBundle> clientSslBundles) {
         this.cxfClientSslBundles = clientSslBundles;
     }
 }

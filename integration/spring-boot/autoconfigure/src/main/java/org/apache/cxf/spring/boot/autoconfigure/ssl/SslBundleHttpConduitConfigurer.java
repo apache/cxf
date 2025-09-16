@@ -48,7 +48,7 @@ final class SslBundleHttpConduitConfigurer implements HTTPConduitConfigurer {
     @Override
     public void configure(String name, String address, HTTPConduit conduit) {
         CxfClientSslProperties.CxfClientSslBundle cxfClientSslBundle 
-            = findMatchCxfClientSslBundle(address, props.getCxfClientSslBundle());
+            = findMatchCxfClientSslBundle(address, props.getCxfClientSslBundles());
         String bundleName = cxfClientSslBundle != null ? cxfClientSslBundle.getBundle() : props.getBundle();
         if (!StringUtils.hasText(bundleName)) {
             return;
