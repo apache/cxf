@@ -34,13 +34,15 @@ public class CxfClientSslProperties {
     private String bundle = "cxf-client";
     // Convenience flag for tests
     private Boolean disableCnCheck = Boolean.FALSE;
-    private List<Rule> rules = new ArrayList<>();
+    private List<CxfClientSslBundle> cxfClientSslBundles = new ArrayList<>();
 
-    public static class Rule {
+    public static class CxfClientSslBundle {
+        private String name;
         private String address;
         private String bundle;
         private String protocol;
         private List<String> cipherSuites;
+        private Boolean disableCnCheck = Boolean.FALSE;
 
         public String getAddress() {
             return address;
@@ -73,6 +75,22 @@ public class CxfClientSslProperties {
         public void setCipherSuites(List<String> cipherSuites) {
             this.cipherSuites = cipherSuites;
         }
+        
+        public Boolean getDisableCnCheck() {
+            return disableCnCheck;
+        }
+
+        public void setDisableCnCheck(Boolean disableCnCheck) {
+            this.disableCnCheck = disableCnCheck;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
     public boolean isEnabled() {
@@ -99,11 +117,11 @@ public class CxfClientSslProperties {
         this.disableCnCheck = disableCnCheck;
     }
 
-    public List<Rule> getRules() {
-        return rules;
+    public List<CxfClientSslBundle> getCxfClientSslBundle() {
+        return cxfClientSslBundles;
     }
 
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
+    public void setCxfClientSslBundle(List<CxfClientSslBundle> clientSslBundles) {
+        this.cxfClientSslBundles = clientSslBundles;
     }
 }

@@ -47,35 +47,45 @@ final class SslBundleHttpConduitConfigurer implements HTTPConduitConfigurer {
 
     @Override
     public void configure(String name, String address, HTTPConduit conduit) {
-        CxfClientSslProperties.Rule rule = matchRule(address, props.getRules());
-        String bundleName = rule != null ? rule.getBundle() : props.getBundle();
+        CxfClientSslProperties.CxfClientSslBundle cxfClientSslBundle 
+            = findMatchCxfClientSslBundle(address, props.getCxfClientSslBundle());
+        String bundleName = cxfClientSslBundle != null ? cxfClientSslBundle.getBundle() : props.getBundle();
         if (!StringUtils.hasText(bundleName)) {
             return;
         }
         SslBundle bundle = sslBundles.getBundle(bundleName);
-        TLSClientParameters tls = buildTls(bundle, rule);
+        TLSClientParameters tls = buildTls(bundle, cxfClientSslBundle);
         conduit.setTlsClientParameters(tls);
     }
 
-    private TLSClientParameters buildTls(SslBundle bundle, CxfClientSslProperties.Rule rule) {
+    private TLSClientParameters buildTls(SslBundle bundle, 
+                                         CxfClientSslProperties.CxfClientSslBundle cxfClientSslBundle) {
         SSLContext ctx = bundle.createSslContext();
         TLSClientParameters tls = new TLSClientParameters();
         tls.setSslContext(ctx);
-        if (rule != null && StringUtils.hasText(rule.getProtocol())) {
-            tls.setSecureSocketProtocol(rule.getProtocol());
+        if (cxfClientSslBundle != null && StringUtils.hasText(cxfClientSslBundle.getProtocol())) {
+            tls.setSecureSocketProtocol(cxfClientSslBundle.getProtocol());
         }
-        if (rule != null && rule.getCipherSuites() != null && !rule.getCipherSuites().isEmpty()) {
-            tls.setCipherSuites(rule.getCipherSuites());
+        if (cxfClientSslBundle != null 
+            && cxfClientSslBundle.getCipherSuites() != null 
+            && !cxfClientSslBundle.getCipherSuites().isEmpty()) {
+            tls.setCipherSuites(cxfClientSslBundle.getCipherSuites());
         }
-        tls.setDisableCNCheck(props.getDisableCnCheck());
+        if (cxfClientSslBundle != null) {
+            tls.setDisableCNCheck(cxfClientSslBundle.getDisableCnCheck());
+        } else {
+            tls.setDisableCNCheck(props.getDisableCnCheck());
+        }
         return tls;
     }
 
-    private CxfClientSslProperties.Rule matchRule(String address, List<CxfClientSslProperties.Rule> rules) {
-        if (!StringUtils.hasText(address) || rules == null) {
+    private CxfClientSslProperties.CxfClientSslBundle findMatchCxfClientSslBundle(
+                       String address, 
+                       List<CxfClientSslProperties.CxfClientSslBundle> cxfClientSslBundles) {
+        if (!StringUtils.hasText(address) || cxfClientSslBundles == null) {
             return null;
         }
-        for (CxfClientSslProperties.Rule r : rules) {
+        for (CxfClientSslProperties.CxfClientSslBundle r : cxfClientSslBundles) {
             String pat = r.getAddress();
             if (!StringUtils.hasText(pat)) {
                 continue;
