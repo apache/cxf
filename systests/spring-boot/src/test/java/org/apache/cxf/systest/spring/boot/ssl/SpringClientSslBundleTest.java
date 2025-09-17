@@ -133,7 +133,7 @@ public class SpringClientSslBundleTest {
         HelloApi api = JAXRSClientFactory.create(base, HelloApi.class);
 
         // Retrieve configured bundle from properties
-        String bundleName = clientSslProperties.getBundle();
+        String bundleName = clientSslProperties.getDefaultBundle();
         assertThat(bundleName).isEqualTo("cxf-client");
         SslBundle clientBundle = sslBundles.getBundle(bundleName);
         assertThat(clientBundle).isNotNull();
