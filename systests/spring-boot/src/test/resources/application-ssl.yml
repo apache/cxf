@@ -40,7 +40,7 @@ cxf:
   client:
     ssl:
       enabled: true
-      bundle: cxf-client
+      defaultBundle: cxf-client
       disable-cn-check: true   # set to false if your server cert has SAN=localhost
 
 

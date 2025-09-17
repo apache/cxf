@@ -31,7 +31,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CxfClientSslProperties {
     private boolean enabled;
     //Name of the Spring SSL bundle to use for outbound CXF clients. */
-    private String bundle = "cxf-client";
+    private String defaultBundle = "cxf-client";
     // Convenience flag for tests
     private Boolean disableCnCheck = Boolean.FALSE;
     private List<CxfClientSslBundle> cxfClientSslBundles = new ArrayList<>();
@@ -101,12 +101,12 @@ public class CxfClientSslProperties {
         this.enabled = enabled;
     }
 
-    public String getBundle() {
-        return bundle;
+    public String getDefaultBundle() {
+        return defaultBundle;
     }
 
-    public void setBundle(String bundle) {
-        this.bundle = bundle;
+    public void setDefaultBundle(String bundle) {
+        this.defaultBundle = bundle;
     }
     
     public Boolean getDisableCnCheck() {
