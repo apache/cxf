@@ -33,7 +33,7 @@ pipeline {
         axes {
           axis {
             name 'JAVA_VERSION'
-            values 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest'
+            values 'jdk_11_latest', 'jdk_17_latest', 'jdk_21_latest', 'jdk_25_latest'
           }
         }
         stages {
