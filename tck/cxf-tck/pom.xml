@@ -35,14 +35,14 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cxf.version>4.1.2-SNAPSHOT</cxf.version>
+        <cxf.version>4.2.0-SNAPSHOT</cxf.version>
         <glassfish.container.version>7.0.16</glassfish.container.version>
         <glassfish.home>${project.build.directory}/glassfish7</glassfish.home>
-        <jakarta.platform.version>10.0.0</jakarta.platform.version>
-        <junit.jupiter.version>5.11.0</junit.jupiter.version>
-        <jakarta.rest.version>3.1.0</jakarta.rest.version>
+        <jakarta.platform.version>11.0.0</jakarta.platform.version>
+        <junit.jupiter.version>5.13.1</junit.jupiter.version>
+        <jakarta.rest.version>4.0.0</jakarta.rest.version>
         <tck.artifactId>jakarta-restful-ws-tck</tck.artifactId>
-        <arquillian.version>1.8.0.Final</arquillian.version>
+        <arquillian.version>1.9.6.Final</arquillian.version>
     </properties>
 
     <dependencyManagement>
