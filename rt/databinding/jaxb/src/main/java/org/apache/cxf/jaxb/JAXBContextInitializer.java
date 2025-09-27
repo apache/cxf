@@ -83,6 +83,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     }
 
     @Override
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public void begin(MessagePartInfo part) {
         Class<?> clazz = part.getTypeClass();
         if (clazz == null) {
