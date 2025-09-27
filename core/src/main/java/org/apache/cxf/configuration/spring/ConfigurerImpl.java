@@ -61,6 +61,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions = new TreeMap<>();
     private BeanFactory beanFactory;
 
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
         String wildCardId;

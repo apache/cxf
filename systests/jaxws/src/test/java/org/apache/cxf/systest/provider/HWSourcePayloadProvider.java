@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.provider;
 
+@SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
 public class HWSourcePayloadProvider extends AbstractSourcePayloadProvider
     implements Comparable<HWSourcePayloadProvider> {
 

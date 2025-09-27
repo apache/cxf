@@ -19,6 +19,7 @@
 
 package org.apache.cxf.aegis.type.array;
 
+@SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
 public class DuplicateArrayReturnItem implements Comparable<Object> {
 
     String name;

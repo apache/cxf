@@ -46,6 +46,7 @@ public final class JAnnotation {
         return imports;
     }
 
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     private void prompt() {
         toString();
     }

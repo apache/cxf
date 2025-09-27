@@ -96,6 +96,7 @@ public class BookContinuationStore implements BookAsyncInterface {
 
     @GET
     @Path("/books/cancel")
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public void getBookDescriptionWithCancel(@PathParam("id") String id,
                                              @Suspended AsyncResponse async) {
         PhaseInterceptorChain.getCurrentMessage().getClass();
