@@ -88,6 +88,8 @@ final class JDKBugHacks {
         return Boolean.parseBoolean(cname);
     }
 
+    
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public static void doHacks() {
         if (skipHack("org.apache.cxf.JDKBugHacks.all")) {
             return;

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -56,7 +57,11 @@ public class WrappedAttachmentsTest {
         assertTrue(attachments.containsAll(attachments));
         List<String> testCollection = new ArrayList<>();
         testCollection.add("Some value");
-        assertFalse(attachments.containsAll(testCollection));
+        assertFalse(attachments
+            .stream()
+            .map(Attachment::toString)
+            .collect(Collectors.toList())
+            .containsAll(testCollection));
 
         attachments.add(att3);
         assertEquals(3, attachments.size());
