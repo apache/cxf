@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -208,6 +210,45 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
                 assertThat(response.getStatus(), equalTo(200));
                 assertThat(response.getHeaderString("Transfer-Encoding"), equalTo(chunked ? "chunked" : null));
                 assertThat(response.getEntity(), not(equalTo(null)));
+            }
+        } finally {
+            webClient.close();
+        }
+
+        assertNoDuplicateLogging();
+    }
+    
+    @Test
+    public void testStreamChunkingAsyncParallel() 
+            throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        final String url = "http://localhost:" + PORT + "/file-store/stream";
+        final WebClient webClient = WebClient.create(url).query("chunked", chunked);
+        
+        final ClientConfiguration config = WebClient.getConfig(webClient);
+        config.getBus().setProperty(AsyncHTTPConduit.USE_ASYNC, true);
+        config.getHttpConduit().getClient().setAllowChunking(chunked);
+        config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
+        configureLogging(config);
+
+        final byte[] bytes = new byte [32 * 1024];
+        final Random random = new Random();
+        random.nextBytes(bytes);
+
+        final Collection<Future<Response>> futures = new ArrayList<>();
+        try {
+            for (int i = 0; i < 100; ++i) {
+                try (InputStream in = new ByteArrayInputStream(bytes)) {
+                    final Entity<InputStream> entity = Entity.entity(in, MediaType.APPLICATION_OCTET_STREAM);
+                    futures.add(webClient.async().post(entity));
+                }
+            }
+
+            for (Future<Response> future: futures) {
+                try (Response response = future.get(10, TimeUnit.SECONDS)) {
+                    assertThat(response.getStatus(), equalTo(200));
+                    assertThat(response.getHeaderString("Transfer-Encoding"), equalTo(chunked ? "chunked" : null));
+                    assertThat(response.getEntity(), not(equalTo(null)));
+                }
             }
         } finally {
             webClient.close();
