@@ -48,6 +48,7 @@ public class ConfigurerImpl implements Configurer {
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
         = new TreeMap<>();
 
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
         String wildCardId;

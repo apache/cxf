@@ -65,6 +65,7 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
     /**
      * Stores the configuration data index by matcher and sorted by order
      */
+    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
     private static class PidInfo implements Comparable<PidInfo> {
         final Dictionary<String, String> props;
         final Matcher matcher;
