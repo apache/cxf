@@ -115,6 +115,7 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
     }
 
     @org.junit.Test
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public void testWrapperClassLoaderWithWrappedOperations() throws Exception {
         WrapperClassLoader wrapperClassLoader = new WrapperClassLoader(bus);
         JaxWsServiceFactoryBean factory = new JaxWsServiceFactoryBean();
