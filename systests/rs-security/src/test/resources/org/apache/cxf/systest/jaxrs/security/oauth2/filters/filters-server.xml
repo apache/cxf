@@ -64,7 +64,7 @@ under the License.
    
    <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
    
-   <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+   <bean id="jackson" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     
    <bean id="tvServiceClientFactory" class="org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean">
          <property name="address" value="https://localhost:${testutil.ports.jaxrs-oauth2-service}/services/validate"/>

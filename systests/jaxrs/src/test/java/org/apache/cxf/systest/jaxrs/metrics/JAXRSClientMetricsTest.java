@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxrs.metrics;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import jakarta.ws.rs.NotFoundException;
@@ -38,6 +37,7 @@ import org.apache.cxf.metrics.MetricsFeature;
 import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.TestUtil;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.Rule;

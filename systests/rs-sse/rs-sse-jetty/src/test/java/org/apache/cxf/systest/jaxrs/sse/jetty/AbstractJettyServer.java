@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.sse.jetty;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
@@ -32,7 +30,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.util.resource.ResourceFactory;
-
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import static org.junit.Assert.fail;
 

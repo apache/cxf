@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.brave;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import brave.Tracing;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -33,6 +31,7 @@ import org.apache.cxf.tracing.brave.BraveClientFeature;
 import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.BeforeClass;
 

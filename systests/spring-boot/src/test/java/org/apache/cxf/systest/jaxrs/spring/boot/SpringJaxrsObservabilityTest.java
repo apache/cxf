@@ -21,8 +21,6 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 
 import java.time.Duration;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import brave.handler.SpanHandler;
 import brave.sampler.Sampler;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -45,6 +43,7 @@ import org.springframework.boot.webmvc.autoconfigure.WebMvcObservationAutoConfig
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;

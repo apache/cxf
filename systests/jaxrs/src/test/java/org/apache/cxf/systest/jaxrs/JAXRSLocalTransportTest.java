@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.Fault;
@@ -40,6 +38,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.After;
 import org.junit.Before;

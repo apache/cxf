@@ -22,20 +22,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBase {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    protected String toJson(final String name, final Integer id) throws JsonProcessingException {
+    protected String toJson(final String name, final Integer id) throws JacksonException {
         return mapper.writeValueAsString(new Book(name, id));
     }
 

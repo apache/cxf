@@ -149,7 +149,7 @@
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
             <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
         </jaxrs:providers>
         <jaxrs:inInterceptors>
@@ -245,7 +245,7 @@
             <bean class="org.apache.cxf.systest.jaxrs.DocumentResourceImpl"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
     <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">

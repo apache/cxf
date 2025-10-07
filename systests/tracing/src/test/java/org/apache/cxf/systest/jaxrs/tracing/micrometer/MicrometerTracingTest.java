@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.micrometer;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import brave.Tracing;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -40,6 +38,7 @@ import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestReceiverOb
 import org.apache.cxf.tracing.micrometer.jaxrs.DefaultContainerRequestSenderObservationConvention;
 import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
 import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
