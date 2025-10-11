@@ -24,9 +24,9 @@ import org.apache.cxf.metrics.micrometer.provider.jaxrs.JaxrsTags;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTags;
 import org.apache.cxf.spring.boot.autoconfigure.CxfProperties;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
 
 import org.junit.Test;
