@@ -178,7 +178,7 @@
         <cxf.lucene.version>9.12.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.10</cxf.maven.core.version>
         <cxf.micrometer.version>1.14.12</cxf.micrometer.version>
-        <cxf.micrometer-tracing.version>1.4.11</cxf.micrometer-tracing.version>
+        <cxf.micrometer-tracing.version>1.5.5</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.1</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>3.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>3.1.2</cxf.microprofile.openapi.version>
