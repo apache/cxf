@@ -187,7 +187,7 @@
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.1</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.1.128.Final</cxf.netty.version>
+        <cxf.netty.version>4.2.7.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.69.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.13</cxf.olingo.version>
         <cxf.openjpa.version>3.2.2</cxf.openjpa.version>
