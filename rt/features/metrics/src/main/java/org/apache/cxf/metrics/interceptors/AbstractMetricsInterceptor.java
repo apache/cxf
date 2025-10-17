@@ -184,7 +184,20 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         return o;
     }
     private Object createMetricsContextForOperation(Message message, BindingOperationInfo boi) {
-        Object o = boi.getProperty(MetricsContext.class.getName());
+        Object o = null;
+        if (isRequestor(message)) {
+            o = boi.getProperty(MetricsContext.class.getName());
+        } else {
+            //on the client side the MetricsContext may already be created
+            //at endpoint level; avoid recreating another one
+            o = message.getExchange().getEndpoint().get(MetricsContext.class.getName());
+            if (o == null) {
+                o = boi.getProperty(MetricsContext.class.getName());
+            } else {
+                boi.setProperty(MetricsContext.class.getName(), o);
+            }
+        }
+       
         if (o == null) {
             List<MetricsContext> contexts = new ArrayList<>();
             for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
