@@ -42,8 +42,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.http.DefaultEurekaClientHttpRequestFactorySupplier;
-import org.springframework.cloud.netflix.eureka.http.RestTemplateDiscoveryClientOptionalArgs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -77,11 +75,6 @@ public class SampleRestClientApplication {
                 System.out.println(service.sayHello("ApacheCxfProxyUser2"));
             }
         };
-    }
-
-    @Bean
-    RestTemplateDiscoveryClientOptionalArgs restTemplateDiscoveryClientOptionalArgs() {
-        return new RestTemplateDiscoveryClientOptionalArgs(new DefaultEurekaClientHttpRequestFactorySupplier());
     }
 
     /**
