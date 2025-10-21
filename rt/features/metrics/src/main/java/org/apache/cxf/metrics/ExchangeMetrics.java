@@ -40,9 +40,11 @@ public class ExchangeMetrics {
     }
 
     public ExchangeMetrics addContext(MetricsContext ctx) {
-        contexts.addLast(ctx);
-        if (started) {
-            ctx.start(exchange);
+        if (!contexts.contains(ctx)) {
+            contexts.addLast(ctx);
+            if (started) {
+                ctx.start(exchange);
+            }
         }
         return this;
     }
