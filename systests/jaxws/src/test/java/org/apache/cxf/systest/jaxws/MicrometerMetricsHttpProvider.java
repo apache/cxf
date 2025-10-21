@@ -20,17 +20,16 @@ package org.apache.cxf.systest.jaxws;
 
 import java.io.StringReader;
 
+import javax.annotation.Resource;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.BindingType;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.WebServiceProvider;
 
-
-import jakarta.annotation.Resource;
-import jakarta.xml.ws.BindingType;
-import jakarta.xml.ws.Provider;
-import jakarta.xml.ws.Service;
-import jakarta.xml.ws.ServiceMode;
-import jakarta.xml.ws.WebServiceContext;
-import jakarta.xml.ws.WebServiceProvider;
 import org.apache.cxf.message.Message;
 
 import io.micrometer.core.instrument.Counter;
@@ -45,7 +44,7 @@ import io.micrometer.core.instrument.Timer;
 
 @WebServiceProvider(serviceName = "MetricsService", portName = "MetricsPort", targetNamespace = "urn:metrics")
 @ServiceMode(Service.Mode.MESSAGE)
-@BindingType(jakarta.xml.ws.http.HTTPBinding.HTTP_BINDING)
+@BindingType(javax.xml.ws.http.HTTPBinding.HTTP_BINDING)
 public class MicrometerMetricsHttpProvider implements Provider<Source> {
 
     @Resource
