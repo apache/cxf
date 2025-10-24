@@ -36,10 +36,11 @@ import org.apache.cxf.tracing.micrometer.jaxrs.ObservationClientProvider;
 import org.apache.cxf.tracing.micrometer.jaxrs.ObservationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
+import org.springframework.boot.micrometer.tracing.test.autoconfigure.AutoConfigureTracing;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.test.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,7 +61,8 @@ import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsWebObservabilityTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
-@AutoConfigureObservability
+@AutoConfigureMetrics
+@AutoConfigureTracing
 public class SpringJaxrsWebObservabilityTest {
 
     @Autowired
