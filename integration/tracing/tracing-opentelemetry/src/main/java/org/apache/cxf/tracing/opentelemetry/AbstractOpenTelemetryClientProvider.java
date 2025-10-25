@@ -141,7 +141,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
 
             span.setStatus(StatusCode.ERROR);
             if (ex != null) {
-                span.recordException(ex, Attributes.of(ExceptionAttributes.EXCEPTION_ESCAPED, true));
+                span.recordException(ex);
             }
             span.end();
 

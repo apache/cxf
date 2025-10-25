@@ -90,7 +90,7 @@
         <dependency>
             <groupId>io.opentelemetry.semconv</groupId>
             <artifactId>opentelemetry-semconv-incubating</artifactId>
-            <version>${cxf.opentelemetry.semconv.version}</version>
+            <version>${cxf.opentelemetry.semconv.incubating.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
