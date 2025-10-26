@@ -33,6 +33,8 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -40,8 +42,19 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@RunWith(Parameterized.class)
 public class DelayedCachedOutputStreamCleanerTest {
+    private final String strategy;
     private Bus bus;
+
+    public DelayedCachedOutputStreamCleanerTest(final String strategy) {
+        this.strategy = strategy;
+    }
+
+    @Parameterized.Parameters(name = CachedConstants.CLEANER_STRATEGY_BUS_PROP + "= {0}")
+    public static String[] strategies() throws Exception {
+        return new String[] {"default", "single-timer", null};
+    }
 
     @After
     public void tearDown() {
@@ -50,11 +63,11 @@ public class DelayedCachedOutputStreamCleanerTest {
             bus = null;
         }
     }
-    
+
     @Test
     public void testNoop() {
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 0);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
         
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
@@ -64,7 +77,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     
     @Test
     public void testForceClean() throws InterruptedException {
-        bus = new ExtensionManagerBus();
+        bus = createBus();
         
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
@@ -88,7 +101,7 @@ public class DelayedCachedOutputStreamCleanerTest {
 
         /* Delay of 2.5 seconds */
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         cleaner.register(closeable1);
@@ -101,7 +114,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     
     @Test
     public void testForceCleanForEmpty() throws InterruptedException {
-        bus = new ExtensionManagerBus();
+        bus = createBus();
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
@@ -121,7 +134,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     
     @Test
     public void testForceCleanException() throws InterruptedException {
-        bus = new ExtensionManagerBus();
+        bus = createBus();
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
@@ -149,7 +162,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     public void testCleanOnShutdown() throws InterruptedException {
         /* Delay of 5 seconds */
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 5000);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final AtomicBoolean latch = new AtomicBoolean();
         final Closeable closeable = () -> latch.compareAndSet(false, true);
@@ -170,7 +183,7 @@ public class DelayedCachedOutputStreamCleanerTest {
         final Map<String, Object> properties = new HashMap<>();
         properties.put(CachedConstants.CLEANER_DELAY_BUS_PROP, 3000); /* 3 seconds */
         properties.put(CachedConstants.CLEANER_CLEAN_ON_SHUTDOWN_BUS_PROP, false);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final AtomicBoolean latch = new AtomicBoolean();
         final Closeable closeable = () -> latch.compareAndSet(false, true);
@@ -188,7 +201,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     @Test
     public void testNegativeDelay() throws InterruptedException {
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, -1);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
@@ -199,7 +212,7 @@ public class DelayedCachedOutputStreamCleanerTest {
     @Test
     public void testTooSmallDelay() throws InterruptedException {
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 1500);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class)); /* noop */
@@ -215,7 +228,7 @@ public class DelayedCachedOutputStreamCleanerTest {
 
         /* Delay of 5 seconds */
         final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
-        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+        bus = createBus(properties);
 
         final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
         cleaner.register(closeable1);
@@ -230,6 +243,18 @@ public class DelayedCachedOutputStreamCleanerTest {
         await().atMost(5, TimeUnit.SECONDS).untilAtomic(latch, equalTo(2));
 
         assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
+    }
+
+    private Bus createBus() {
+        return createBus(Collections.emptyMap());
+    }
+
+    private Bus createBus(Map<String, Object> properties) {
+        final Map<String, Object> combined = new HashMap<>(properties);
+        if (strategy != null) {
+            combined.put(CachedConstants.CLEANER_STRATEGY_BUS_PROP, strategy);
+        }
+        return new ExtensionManagerBus(new HashMap<>(), combined);
     }
 
     private void assertNoopCleaner(final CachedOutputStreamCleaner cleaner) {
