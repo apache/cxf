@@ -27,11 +27,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JsonWebKeysProvider;
@@ -61,6 +63,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
@@ -90,9 +94,11 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
             new SpringBusTestServer("oidc-server-jcache-jwt-non-persist");
 
     final String port;
+    final Map<String, Object> properties;
 
-    public OIDCFlowTest(String port) {
+    public OIDCFlowTest(String port, Map<String, Object> properties) {
         this.port = port;
+        this.properties = properties;
     }
 
     @BeforeClass
@@ -104,14 +110,25 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
         assertTrue("Server failed to launch", launchServer(JPA_SERVER));
         assertTrue("Server failed to launch", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
     }
+    
+    @Before
+    public void setUp() {
+        BusFactory.getDefaultBus(false).setProperties(properties);
+    }
+    
+    @After
+    public void tearDown() {
+        properties.keySet().forEach(name -> BusFactory.getDefaultBus(false).setProperty(name, null));
+    }
 
     @Parameters(name = "{0}")
-    public static String[] data() {
-        return new String[]{
-                JCACHE_SERVER.getPort(),
-                JWT_JCACHE_SERVER.getPort(),
-                JPA_SERVER.getPort(),
-                JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
+    public static Object[][] data() {
+        return new Object[][]{
+            new Object[] {JCACHE_SERVER.getPort(), Map.of()},
+            new Object[] {JWT_JCACHE_SERVER.getPort(), Map.of()},
+            new Object[] {JPA_SERVER.getPort(), Map.of("share.httpclient.http.conduit", false)},
+            new Object[] {JWT_NON_PERSIST_JCACHE_SERVER.getPort(), Map.of()}
+        };
     }
 
     @org.junit.Test
