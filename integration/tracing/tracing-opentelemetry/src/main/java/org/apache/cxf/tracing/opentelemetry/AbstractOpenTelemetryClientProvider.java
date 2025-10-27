@@ -29,7 +29,6 @@ import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.cxf.tracing.opentelemetry.internal.TextMapInjectAdapter;
 
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
@@ -37,7 +36,6 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.semconv.ErrorAttributes;
-import io.opentelemetry.semconv.ExceptionAttributes;
 import io.opentelemetry.semconv.HttpAttributes;
 import io.opentelemetry.semconv.NetworkAttributes;
 import io.opentelemetry.semconv.ServerAttributes;
@@ -141,7 +139,7 @@ public abstract class AbstractOpenTelemetryClientProvider extends AbstractTracin
 
             span.setStatus(StatusCode.ERROR);
             if (ex != null) {
-                span.recordException(ex, Attributes.of(ExceptionAttributes.EXCEPTION_ESCAPED, true));
+                span.recordException(ex);
             }
             span.end();
 
