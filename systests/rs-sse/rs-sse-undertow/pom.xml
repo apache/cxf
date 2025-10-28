@@ -41,7 +41,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.undertow</groupId>
+            <groupId>io.undertow.ee</groupId>
             <artifactId>undertow-servlet</artifactId>
             <scope>test</scope>
         </dependency>
