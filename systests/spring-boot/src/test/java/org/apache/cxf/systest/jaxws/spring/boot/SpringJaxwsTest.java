@@ -37,6 +37,7 @@ import jakarta.xml.ws.Service.Mode;
 import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.soap.SOAPFaultException;
 import org.apache.cxf.Bus;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.metrics.MetricsFeature;
@@ -47,12 +48,15 @@ import org.apache.cxf.systest.jaxws.resources.HelloServiceImpl;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.test.context.ActiveProfiles;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -64,6 +68,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -73,13 +78,19 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.empty;
 
+@SpringBootApplication
 @SpringBootTest(
         webEnvironment = WebEnvironment.RANDOM_PORT,
-        classes = SpringJaxwsTest.TestConfig.class,
+        classes = {
+            SpringJaxwsTest.TestConfig.class,
+      
+        },
         properties = {
             "cxf.metrics.server.max-uri-tags=2"
         })
+@ImportResource("classpath:spring/jaxws-client.xml") 
 @ActiveProfiles("jaxws")
+
 public class SpringJaxwsTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
@@ -91,6 +102,9 @@ public class SpringJaxwsTest {
 
     @Autowired
     private MeterRegistry registry;
+    
+    @Autowired
+    private ApplicationContext applicationContext;
     
     @Autowired
     private MetricsProvider metricsProvider;
@@ -305,6 +319,16 @@ public class SpringJaxwsTest {
     }
     
     @Test
+    public void testJaxwsFromXmlProxy() throws MalformedURLException {
+        final HelloService api = createApiFromSpringXml(); 
+        //ensure the property placeholder is resolved
+        assertThat("http://localhost:port/Service/HelloV1")
+            .isEqualTo(ClientProxy.getClient(api).getConduit().
+                       getTarget().getAddress().getValue());
+                     
+    }
+    
+    @Test
     public void testJaxwsProxyFailedMetric() {
         final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
 
@@ -385,6 +409,11 @@ public class SpringJaxwsTest {
         return factory.create(HelloService.class);
     }
 
+    private HelloService createApiFromSpringXml() {
+        return this.applicationContext.getBean("cxfClient",
+                HelloService.class);
+    }
+    
     private String sendSoapRequest(String requestBody, final String serviceName) throws MalformedURLException {
         String address = "http://localhost:" + port + "/Service/" + serviceName;
 

@@ -21,8 +21,12 @@ package org.apache.cxf.jaxws.spi;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.spi.GeneratedClassClassLoader;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -39,8 +43,12 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
  * @author olivier dufour
  */
 public class WrapperClassLoader extends GeneratedClassClassLoader implements WrapperClassCreator {
+    
+    protected static final Logger LOG = LogUtils.getL7dLogger(WrapperClassLoader.class);
+    
     private final WrapperClassNamingConvention wrapperClassNaming;
-
+    
+        
     public WrapperClassLoader(Bus bus) {
         super(bus);
         wrapperClassNaming = bus.getExtension(WrapperClassNamingConvention.class);
@@ -58,23 +66,29 @@ public class WrapperClassLoader extends GeneratedClassClassLoader implements Wra
                 MessagePartInfo inf = opInfo.getInput().getFirstMessagePart();
                 if (inf.getTypeClass() == null) {
                     MessageInfo messageInfo = opInfo.getUnwrappedOperation().getInput();
-                    wrapperBeans.add(createWrapperClass(inf,
-                            messageInfo,
-                            opInfo,
-                            method,
-                            true,
-                            factory));
+                    Class<?> wrapperClass = createWrapperClass(inf,
+                                       messageInfo,
+                                       opInfo,
+                                       method,
+                                       true,
+                                       factory);
+                    if (wrapperClass != null) {
+                        wrapperBeans.add(wrapperClass);
+                    }
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
                 if (messageInfo != null) {
                     inf = opInfo.getOutput().getFirstMessagePart();
                     if (inf.getTypeClass() == null) {
-                        wrapperBeans.add(createWrapperClass(inf,
-                                messageInfo,
-                                opInfo,
-                                method,
-                                false,
-                                factory));
+                        Class<?> wrapperClass = createWrapperClass(inf,
+                                           messageInfo,
+                                           opInfo,
+                                           method,
+                                           false,
+                                           factory);
+                        if (wrapperClass != null) {
+                            wrapperBeans.add(wrapperClass);
+                        }
                     }
                 }
             }
@@ -112,6 +126,9 @@ public class WrapperClassLoader extends GeneratedClassClassLoader implements Wra
             }
         }
         //throw new ClassNotFoundException(origClassName);
+        LOG.log(Level.WARNING, "Failed to find or generate wrapper class for operation '{}', "
+            + "                 method '{}'. This may lead to runtime errors.", 
+                new Object[] {op.getName(), method.getName()});
         return null;
     }
 }

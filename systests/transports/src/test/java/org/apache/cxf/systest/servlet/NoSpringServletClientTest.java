@@ -51,10 +51,10 @@ import static org.junit.Assert.fail;
 
 public class NoSpringServletClientTest extends AbstractServletTest {
     private static final String PORT = NoSpringServletServer.PORT;
+    private static final String SERVICE_URL = "http://localhost:" + PORT + "/soap/";
     private static Bus serverBus;
     private static NoSpringServletServer server;
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
-    private final String serviceURL = "http://localhost:" + PORT + "/soap/";
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -73,7 +73,7 @@ public class NoSpringServletClientTest extends AbstractServletTest {
 
     @Test
     public void testBasicConnection() throws Exception {
-        SOAPService service = new SOAPService(new URL(serviceURL + "Greeter?wsdl"));
+        SOAPService service = new SOAPService(new URL(SERVICE_URL + "Greeter?wsdl"));
         Greeter greeter = service.getPort(portName, Greeter.class);
         try {
             String reply = greeter.greetMe("test");
@@ -90,7 +90,7 @@ public class NoSpringServletClientTest extends AbstractServletTest {
     @Test
     public void testHelloService() throws Exception {
         JaxWsProxyFactoryBean cpfb = new JaxWsProxyFactoryBean();
-        String address = serviceURL + "Hello";
+        String address = SERVICE_URL + "Hello";
         cpfb.setServiceClass(Hello.class);
         cpfb.setAddress(address);
         Hello hello = (Hello) cpfb.create();
@@ -133,7 +133,7 @@ public class NoSpringServletClientTest extends AbstractServletTest {
     @Test
     public void testGetServiceList() throws Exception {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            final HttpGet method = new HttpGet(serviceURL + "/services");
+            final HttpGet method = new HttpGet(SERVICE_URL + "/services");
 
             try (CloseableHttpResponse res = client.execute(method)) {
                 HTMLDocumentImpl doc = parse(res.getEntity().getContent());
@@ -144,9 +144,9 @@ public class NoSpringServletClientTest extends AbstractServletTest {
                     s.add(l.getHref());
                 }
                 assertEquals("There should be 3 links for the service", 3, links.size());
-                assertTrue(s.contains(serviceURL + "Greeter?wsdl"));
-                assertTrue(s.contains(serviceURL + "Hello?wsdl"));
-                assertTrue(s.contains(serviceURL + "?wsdl"));
+                assertTrue(s.contains(SERVICE_URL + "Greeter?wsdl"));
+                assertTrue(s.contains(SERVICE_URL + "Hello?wsdl"));
+                assertTrue(s.contains(SERVICE_URL + "?wsdl"));
                 assertEquals("text/html", getContentType(res));
             }
         }

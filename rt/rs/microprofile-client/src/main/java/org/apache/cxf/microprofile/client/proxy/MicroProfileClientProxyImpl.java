@@ -109,7 +109,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private final TLSConfiguration tlsConfig;
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
@@ -126,7 +125,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         init(executorService, configuration);
     }
 
-    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
@@ -141,6 +139,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private void init(ExecutorService executorService, Configuration configuration) {
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
         cfg.getRequestContext().putAll(configuration.getProperties());
+        cfg.getRequestContext().put(Configuration.class.getName(), configuration);
 
         List<Interceptor<? extends Message>>inboundChain = cfg.getInInterceptors();
         inboundChain.add(new MPAsyncInvocationInterceptorPostAsyncImpl());

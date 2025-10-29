@@ -31,9 +31,16 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -47,6 +54,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
@@ -76,6 +84,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -111,7 +121,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
     private static List<String> servers = new ArrayList<>();
 
-    private static Map<String, String> addrMap = new TreeMap<>();
+    private static Map<String, Collection<String>> addrMap = new TreeMap<>();
 
     static {
         try (InputStream key = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", HTTPSConduitTest.class);
@@ -152,12 +162,13 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     public static void allocatePorts() {
         BusServer.resetPortMap();
         addrMap.clear();
-        addrMap.put("Mortimer", "http://localhost:" + getPort("PORT0") + "/");
-        addrMap.put("Tarpin",   "https://localhost:" + getPort("PORT1") + "/");
-        addrMap.put("Poltim",   "https://localhost:" + getPort("PORT2") + "/");
-        addrMap.put("Gordy",    "https://localhost:" + getPort("PORT3") + "/");
-        addrMap.put("Bethal",   "https://localhost:" + getPort("PORT4") + "/");
-        addrMap.put("Morpit",   "https://localhost:" + getPort("PORT5") + "/");
+        addrMap.put("Mortimer", List.of("http://localhost:" + getPort("PORT0") + "/"));
+        addrMap.put("Tarpin",   List.of("https://localhost:" + getPort("PORT1") + "/"));
+        addrMap.put("Poltim",   List.of("https://localhost:" + getPort("PORT2") + "/"));
+        addrMap.put("Gordy",    List.of("https://localhost:" + getPort("PORT3") + "/"));
+        addrMap.put("Bethal",   List.of("https://localhost:" + getPort("PORT4") + "/", 
+            "https://localhost:" + getPort("PORT6") + "/"));
+        addrMap.put("Morpit",   List.of("https://localhost:" + getPort("PORT5") + "/"));
         tlsClientParameters.setDisableCNCheck(true);
         servers.clear();
     }
@@ -184,7 +195,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         boolean server = launchServer(Server.class, null,
                 new String[] {
                     name,
-                    addrMap.get(name),
+                    addrMap.get(name).stream().collect(Collectors.joining(",")),
                     serverC.toString() },
                 IN_PROCESS);
         if (server) {
@@ -844,5 +855,104 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @Test
+    public void testUpdateAddress() throws Exception {
+        startServer("Bethal");
+
+        URL config = getClass().getResource("BethalClientConfig.cxf");
+
+        // We go through the back door, setting the default bus.
+        new DefaultBusFactory().createBus(config);
+        URL wsdl = getClass().getResource("greeting.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull("Service is null", service);
+
+        Greeter bethal = service.getPort(bethalQ, Greeter.class);
+        updateAddressPort(bethal, getPort("PORT4"));
+        verifyBethalClient(bethal);
+        
+        updateAddressPort(bethal, getPort("PORT6"));
+        verifyBethalClient(bethal);
+
+        // setup the feature by using JAXWS front-end API
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Random random = new Random();
+
+        try {
+            for (int  i = 0; i < 30; ++i) {
+                futures.add(executor.submit(() -> {
+                    if (random.nextBoolean()) {
+                        updateAddressPort(bethal, getPort("PORT4"));
+                    } else {
+                        updateAddressPort(bethal, getPort("PORT6"));
+                    }
+                    return bethal.greetMe("timeout!");
+                }));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo("Hello timeout!"));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateAddressNoClientReset() throws Exception {
+        startServer("Bethal");
+
+        URL config = getClass().getResource("BethalClientConfig.cxf");
+
+        // We go through the back door, setting the default bus.
+        new DefaultBusFactory().createBus(config);
+        URL wsdl = getClass().getResource("greeting.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull("Service is null", service);
+
+        Greeter bethal = service.getPort(bethalQ, Greeter.class);
+        ((BindingProvider)bethal).getRequestContext().put("https.reset.httpclient.http.conduit", false);
+
+        updateAddressPort(bethal, getPort("PORT4"));
+        verifyBethalClient(bethal);
+        
+        updateAddressPort(bethal, getPort("PORT6"));
+        verifyBethalClient(bethal);
+
+        // setup the feature by using JAXWS front-end API
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Random random = new Random();
+
+        try {
+            for (int  i = 0; i < 30; ++i) {
+                futures.add(executor.submit(() -> {
+                    if (random.nextBoolean()) {
+                        updateAddressPort(bethal, getPort("PORT4"));
+                    } else {
+                        updateAddressPort(bethal, getPort("PORT6"));
+                    }
+                    return bethal.greetMe("timeout!");
+                }));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo("Hello timeout!"));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
 }
 

@@ -103,6 +103,29 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
+    
+    @Test
+    public void testDetailWithoutMTOM() throws Exception {
+        ByteArrayOutputStream input = setupInLogging();
+        ByteArrayOutputStream output = setupOutLogging();
+
+        Holder<byte[]> photo = new Holder<>("CXF".getBytes());
+        Holder<Image> image = new Holder<>(getImage("/java.jpg"));
+
+        Hello port = getPort();
+
+        SOAPBinding binding = (SOAPBinding) ((BindingProvider)port).getBinding();
+        binding.setMTOMEnabled(false);
+
+        port.detail(photo, image);
+
+        String expected = "<xop:Include ";
+        assertTrue(output.toString().indexOf(expected) == -1);
+        assertTrue(input.toString().indexOf(expected) != -1);
+
+        assertEquals("CXF", new String(photo.value));
+        assertNotNull(image.value);
+    }
 
     @Test
     @org.junit.Ignore

@@ -49,6 +49,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 
 @NoJSR250Annotations
+@SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
 public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public static final String PROPERTY_NAME = "name";
     static final int DEFAULT_MAX_QUEUE_SIZE = 256;

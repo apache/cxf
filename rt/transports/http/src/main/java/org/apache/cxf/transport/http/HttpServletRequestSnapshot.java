@@ -19,7 +19,10 @@
 package org.apache.cxf.transport.http;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,7 +62,10 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     private HttpSession session;
     private Principal principal;
     private Enumeration<String> requestHeaderNames;
+    private Enumeration<String> attributeNames;
     private Map<String, Enumeration<String>> headersMap =
+        new java.util.concurrent.ConcurrentHashMap<>();
+    private Map<String, Object> attributesMap =
         new java.util.concurrent.ConcurrentHashMap<>();
     private String requestedSessionId;
 
@@ -77,6 +83,16 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
             String key = tmp.nextElement();
             headersMap.put(key, request.getHeaders(key));
         }
+        tmp = request.getAttributeNames();
+        List<String> newVector = new ArrayList<>();
+        while (tmp.hasMoreElements()) {
+            String key = tmp.nextElement();
+            newVector.add(key);
+            if (request.getAttribute(key) != null) {
+                attributesMap.put(key, request.getAttribute(key));
+            }
+        }
+        attributeNames = Collections.enumeration(newVector);
         localAddr = request.getLocalAddr();
         local = request.getLocale();
         localName = request.getLocalName();
@@ -125,6 +141,14 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         }
         return null;
     }
+    
+    @Override
+    public Object getAttribute(String name) {
+        if (attributesMap.get(name) != null) {
+            return attributesMap.get(name);
+        }
+        return null;
+    }
 
     @SuppressWarnings({
         "unchecked", "rawtypes"
@@ -132,6 +156,11 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     @Override
     public Enumeration getHeaderNames() {
         return this.requestHeaderNames;
+    }
+    
+    @Override
+    public Enumeration<String> getAttributeNames() {
+        return this.attributeNames;
     }
 
     @SuppressWarnings({

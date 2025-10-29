@@ -65,7 +65,19 @@ public class DefaultLogEventMapper {
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
-    private MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
+    private MaskSensitiveHelper maskSensitiveHelper;
+    
+    public DefaultLogEventMapper() {
+        this(new MaskSensitiveHelper());
+    }
+    
+    public DefaultLogEventMapper(final MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
+
+    public void setSensitiveDataHelper(MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
@@ -222,11 +234,22 @@ public class DefaultLogEventMapper {
 
     private boolean isBinaryContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
-        return contentType != null && binaryContentMediaTypes.contains(contentType);
+        return isBinaryContent(contentType);
     }
 
     public boolean isBinaryContent(String contentType) {
-        return contentType != null && binaryContentMediaTypes.contains(contentType);
+        if (contentType == null) {
+            return false;
+        } else {
+            // Consider compound header values, like: 
+            //    Content-Type: application/xop+xml; charset=UTF-8; type="text/xml"
+            final int index = contentType.indexOf(';');
+            if (index > 0) {
+                return binaryContentMediaTypes.contains(contentType.substring(0, index).trim());
+            } else {
+                return binaryContentMediaTypes.contains(contentType);
+            }
+        }
     }
     
     private boolean isMultipartContent(Message message) {

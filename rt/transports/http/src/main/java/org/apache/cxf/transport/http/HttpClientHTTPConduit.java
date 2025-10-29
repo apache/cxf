@@ -66,9 +66,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
@@ -102,16 +104,17 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private static final String FORCE_URLCONNECTION_HTTP_CONDUIT = "force.urlconnection.http.conduit";
     private static final String SHARE_HTTPCLIENT_CONDUIT = "share.httpclient.http.conduit";
+    private static final String HTTPS_RESET_HTTPCLIENT_CONDUIT = "https.reset.httpclient.http.conduit";
 
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
     private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
     volatile RefCount<HttpClient> clientRef;
-    volatile int lastTlsHash = -1;
     volatile URI sslURL;
     private final ReentrantLock initializationLock = new ReentrantLock();
+    private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
-        private final AtomicLong count = new AtomicLong();
+        private final AtomicLong count;
         private final TLSClientParameters clientParameters;
         private final HTTPClientPolicy policy;
         private final T client;
@@ -122,10 +125,18 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             this.policy = policy;
             this.clientParameters = clientParameters;
             this.finalizer = finalizer;
+            this.count = new AtomicLong(1);
         }
 
         RefCount<T> acquire() {
-            count.incrementAndGet();
+            while (true) {
+                final long c = count.get();
+                if (c == 0L) {
+                    throw new IllegalStateException("The client is already shutdown");
+                } else if (count.compareAndSet(c, c + 1)) {
+                    break;
+                }
+            }
             return this;
         }
 
@@ -166,6 +177,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 }
             }
         }
+        
+        boolean isClosed() {
+            return count.get() == 0L;
+        }
 
         HttpClient client() {
             return client;
@@ -192,14 +207,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
             // Do not share if it is not allowed for the conduit or cache capacity is exceeded
             if (!shareHttpClient || clients.size() >= MAX_SIZE) {
-                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { }).acquire();
+                return new RefCount<HttpClient>(supplier.get(), policy, clientParameters, () -> { });
             }
 
             lock.lock();
             try {
                 for (final RefCount<HttpClient> p: clients) {
-                    if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
-                        return p.acquire();
+                    try {
+                        if (p.isClosed()) { // skip closed but not yet removed clients
+                            continue;
+                        }
+                        if (cpc.equals(p.policy(), policy) && p.clientParameters().equals(clientParameters)) {
+                            return p.acquire();
+                        }
+                    } catch (final IllegalStateException ex) {
+                        // candidate raced into shutdown; skip and try next
+                        continue;
                     }
                 }
 
@@ -208,7 +231,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         () -> this.remove(policy, clientParameters));
                 clients.add(clientRef);
 
-                return clientRef.acquire();
+                return clientRef;
             } finally {
                 lock.unlock();
             }
@@ -270,6 +293,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             clientRef.release();
             clientRef = null;
         }
+        deferredClientRefs.forEach(RefCount::release);
+        deferredClientRefs.clear();
         defaultAddress = null;
         super.close();
     }
@@ -351,9 +376,18 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
             sslURL = null;
-            if (clientRef != null) {
-                clientRef.release();
-                clientRef = null;
+
+            // Reset the client in case of HTTPS URL change
+            final boolean httpsResetHttpClient = MessageUtils.getContextualBoolean(message,
+                HTTPS_RESET_HTTPCLIENT_CONDUIT, true);
+            if (httpsResetHttpClient) {
+                final RefCount<HttpClient> ref = clientRef;
+                // Do not release client immediately since it could be in use, instead
+                // move it off to deferred release queue.
+                if (ref != null) {
+                    deferredClientRefs.add(ref);
+                    clientRef = null;
+                }
             }
         }
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
@@ -1030,6 +1064,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     synchronized (pout) {
                         pout.notifyAll();
                     }
+                }
+                try {
+                    close();
+                } catch (IOException e) {
+                    ex.addSuppressed(e);
                 }
                 return null;
             });

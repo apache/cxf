@@ -134,7 +134,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
         boolean removeAttachments
     ) throws IOException {
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
-        if (attachments != null && attachments.size() > 0) { // NOPMD
+        if (attachments != null && attachments.size() > 0) {
             for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
                 iterator.hasNext();) {
                 org.apache.cxf.message.Attachment attachment = iterator.next();

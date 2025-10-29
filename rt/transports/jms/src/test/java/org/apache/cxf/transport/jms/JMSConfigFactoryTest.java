@@ -19,6 +19,9 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.util.Properties;
+
+import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.xa.XAException;
 
@@ -34,6 +37,26 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JMSConfigFactoryTest extends AbstractJMSTester {
+
+    @Test
+    public void testJndiForbiddenProtocol() throws Exception {
+        Properties env = new Properties();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://127.0.0.1:12345");
+        // Allow following referrals (important for LDAP injection)
+        env.put(Context.REFERRAL, "follow");
+        
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        jmsConfig.setJndiEnvironment(env);
+        jmsConfig.setConnectionFactoryName("objectName");
+        
+        try {
+            jmsConfig.getConnectionFactory();
+            Assert.fail("JNDI lookup should have failed");
+        } catch (Exception e) {
+            Assert.assertTrue(e.getMessage().contains("Unsafe protocol in JNDI URL"));
+        }
+    }
 
     @Test
     public void testUsernameAndPassword() throws Exception {

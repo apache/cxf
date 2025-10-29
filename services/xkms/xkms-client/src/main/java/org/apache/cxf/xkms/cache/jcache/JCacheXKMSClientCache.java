@@ -33,7 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.cxf.ws.security.utils.JCacheUtils;
+import org.apache.cxf.ws.security.utils.JCacheSupport;
 import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
 import org.apache.cxf.xkms.cache.XKMSClientCacheException;
@@ -65,7 +65,7 @@ public class JCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListe
         final CachingProvider cachingProvider = Caching.getCachingProvider();
         cacheManager = cachingProvider.getCacheManager(); 
 
-        cache = JCacheUtils.getOrCreate(cacheManager, cacheKey, String.class, XKMSCacheToken.class,
+        cache = JCacheSupport.getOrCreate(cacheManager, cacheKey, String.class, XKMSCacheToken.class,
             cacheConfiguration -> cacheConfiguration.setExpiryPolicyFactory(() -> new ExpiryPolicy() {
                 @Override
                 public Duration getExpiryForCreation() {

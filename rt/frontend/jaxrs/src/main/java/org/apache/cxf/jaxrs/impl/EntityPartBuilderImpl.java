@@ -33,10 +33,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 public class EntityPartBuilderImpl implements EntityPart.Builder {
     private final String name;
@@ -107,8 +109,16 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     @Override
     public EntityPart build() throws IllegalStateException, IOException, WebApplicationException {
         final MediaType mt = Objects.requireNonNullElse(mediaType, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-        final Message message = JAXRSUtils.getCurrentMessage();
-        final ProviderFactory factory = ServerProviderFactory.getInstance(message);
+
+        Message message = JAXRSUtils.getCurrentMessage();
+        ProviderFactory factory = null;
+
+        if (message == null) {
+            message = new MessageImpl();
+            factory = ServerProviderFactory.createInstance(BusFactory.getThreadDefaultBus());
+        } else {
+            factory = ProviderFactory.getInstance(message);
+        }
 
         if (genericType != null) {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {

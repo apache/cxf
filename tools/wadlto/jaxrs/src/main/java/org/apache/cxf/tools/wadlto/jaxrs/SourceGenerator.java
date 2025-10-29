@@ -1179,7 +1179,7 @@ public class SourceGenerator {
         sbCode.append(localName).append(' ');
     }
     //CHECKSTYLE:OFF: ParameterNumber
-    private void writeRequestTypes(Element requestEl, //NOPMD
+    private void writeRequestTypes(Element requestEl,
                                    String classPackage,
                                    Element repElement,
                                    List<Element> inParamEls,

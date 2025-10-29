@@ -147,7 +147,7 @@ public class XsDateTimeFormat extends Format {
             TimeZone tz = cal.getTimeZone();
             // JDK 1.4: int offset = tz.getOffset(cal.getTimeInMillis());
             int offset = cal.get(Calendar.ZONE_OFFSET);
-            if (tz.inDaylightTime(cal.getTime())) { //NOPMD
+            if (tz.inDaylightTime(cal.getTime())) {
                 offset += cal.get(Calendar.DST_OFFSET);
             }
             if (offset == 0) {

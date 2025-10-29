@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.1-SNAPSHOT</version>
+        <version>4.1.4-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -303,7 +303,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.littleshoot</groupId>
+            <groupId>io.github.littleproxy</groupId>
             <artifactId>littleproxy</artifactId>
             <scope>test</scope>
         </dependency>
@@ -329,6 +329,11 @@
             <version>${cxf.jacorb.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>        
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <scope>test</scope>
+        </dependency>      
     </dependencies>
     <profiles>
         <profile>

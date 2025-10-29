@@ -35,14 +35,14 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <cxf.version>4.1.1-SNAPSHOT</cxf.version>
+        <cxf.version>4.1.2-SNAPSHOT</cxf.version>
         <glassfish.container.version>7.0.16</glassfish.container.version>
         <glassfish.home>${project.build.directory}/glassfish7</glassfish.home>
         <jakarta.platform.version>10.0.0</jakarta.platform.version>
         <junit.jupiter.version>5.11.0</junit.jupiter.version>
         <jakarta.rest.version>3.1.0</jakarta.rest.version>
         <tck.artifactId>jakarta-restful-ws-tck</tck.artifactId>
-        <arquillian.version>1.8.1.Final</arquillian.version>
+        <arquillian.version>1.8.0.Final</arquillian.version>
     </properties>
 
     <dependencyManagement>
@@ -555,6 +555,8 @@
                                 <jimage.dir>${project.build.directory}/jdk11-bundle</jimage.dir>
                                 <optional.tech.packages.to.ignore>jakarta.xml.bind</optional.tech.packages.to.ignore>
                                 <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar:${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar:${project.build.directory}/jdk11-bundle/java.base:${project.build.directory}/jdk11-bundle/java.rmi:${project.build.directory}/jdk11-bundle/java.sql:${project.build.directory}/jdk11-bundle/java.naming</signature.sigTestClasspath>
+                                <!-- Fails ee.jakarta.tck.ws.rs.jaxrs21.ee.sse.sseeventsource.JAXRSClientIT#closeTest -->
+                                <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
                             </systemPropertyVariables>
                             <environmentVariables>
                                 <GLASSFISH_HOME>${glassfish.home}</GLASSFISH_HOME>

@@ -265,7 +265,7 @@ public class UndertowHTTPServerEngineFactory {
             tlsParameters = tlsParametersMap.get(id);
         }
 
-        if (tlsParameters == null) {
+        if (tlsParameters == null && bus != null) {
             final HTTPServerEngineFactoryParametersProvider provider = 
                 bus.getExtension(HTTPServerEngineFactoryParametersProvider.class);
             if (provider != null) {

@@ -43,7 +43,7 @@ import org.apache.maven.project.MavenProject;
 // TODO: Move to the common plugin module
 public class ClassLoaderSwitcher {
 
-    private Log log;    //NOPMD
+    private Log log;
     private String origClassPath;
     private Properties origProps;
     private ClassLoader origContextClassloader;

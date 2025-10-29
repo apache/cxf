@@ -22,15 +22,23 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -111,6 +119,46 @@ public class JAXRSClientChunkingTest extends AbstractBusClientServerTestBase {
             }
         } finally {
             webClient.close();
+        }
+    }
+    
+    @Test
+    public void testStreamChunkingParallel() 
+            throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        final String url = "http://localhost:" + PORT + "/file-store/stream";
+        final WebClient webClient = WebClient.create(url).query("chunked", chunked);
+        final ExecutorService pool = Executors.newFixedThreadPool(100);
+
+        final ClientConfiguration config = WebClient.getConfig(webClient);
+        config.getHttpConduit().getClient().setAllowChunking(chunked);
+
+        final byte[] bytes = new byte [32 * 1024];
+        final Random random = new Random();
+        random.nextBytes(bytes);
+
+        final Collection<Future<Response>> futures = new ArrayList<>();
+        try {
+            for (int i = 0; i < 100; ++i) {
+                try (InputStream in = new ByteArrayInputStream(bytes)) {
+                    final Entity<InputStream> entity = Entity.entity(in, MediaType.APPLICATION_OCTET_STREAM);
+                    futures.add(pool.submit(() -> webClient.post(entity)));
+                }
+            }
+
+            for (Future<Response> future: futures) {
+                try (Response response = future.get(10, TimeUnit.SECONDS)) {
+                    assertThat(response.getStatus(), equalTo(200));
+                    assertThat(response.getHeaderString("Transfer-Encoding"), equalTo(chunked ? "chunked" : null));
+                    assertThat(response.getEntity(), not(equalTo(null)));
+                }
+            }
+        } finally {
+            webClient.close();
+        }
+        
+        pool.shutdown();
+        if (!pool.awaitTermination(2, TimeUnit.MINUTES)) {
+            pool.shutdownNow();
         }
     }
 }

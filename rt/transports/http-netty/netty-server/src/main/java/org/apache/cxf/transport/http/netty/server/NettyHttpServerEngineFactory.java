@@ -178,7 +178,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
             tlsServerParameters = tlsServerParametersMap.get(Integer.toString(port));
         }
         
-        if (tlsServerParameters == null) {
+        if (tlsServerParameters == null && bus != null) {
             final HTTPServerEngineFactoryParametersProvider provider = 
                 bus.getExtension(HTTPServerEngineFactoryParametersProvider.class);
             if (provider != null) {

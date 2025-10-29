@@ -66,11 +66,20 @@ public class MaskSensitiveHelperTest {
     private static final String MASKED_LOGGING_CONTENT_XML_WITH_WITH_WRAPPER =
         "<passwords><password>XXX</password></passwords>";
 
+    private static final String SENSITIVE_LOGGING_XML_EMPTY_TAG_REPEATED =
+       "<user1><password/></user1><user2><password>VALUE</password></user2>";
+    private static final String MASKED_LOGGING_XML_EMPTY_TAG_REPEATED =
+        "<user1><password/></user1><user2><password>XXX</password></user2>";
+
     private static final String SENSITIVE_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"my secret password\"";
     private static final String MASKED_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"XXX\"";
 
+    private static final String SENSITIVE_LOGGING_CONTENT_JSON_ARRAY =
+            "\"user\":\"testUser\", \"password\": [\"G\",\"e\",\"h\",\"e\",\"i\",\"m\",\"1\",\"2\",\"3\",\"!\"]";
+    private static final String MASKED_LOGGING_CONTENT_JSON_ARRAY =
+            "\"user\":\"testUser\", \"password\": [\"X\",\"X\",\"X\"]";
     private static final String SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML =
         "<item><user>testUser1</user><password myAttribute=\"test\">my secret password 1</password></item>"
             + "<item><user>testUser2</user><password>my secret password 2</password></item>";
@@ -105,9 +114,11 @@ public class MaskSensitiveHelperTest {
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, MASKED_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_MULTILINE, MASKED_LOGGING_CONTENT_XML_WITH_MULTILINE, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_WRAPPER, MASKED_LOGGING_CONTENT_XML_WITH_WITH_WRAPPER, APPLICATION_XML},
+            {SENSITIVE_LOGGING_XML_EMPTY_TAG_REPEATED, MASKED_LOGGING_XML_EMPTY_TAG_REPEATED, APPLICATION_XML},
             {SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML, MASKED_LOGGING_MULTIPLE_ELEMENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_NAMESPACE, MASKED_LOGGING_CONTENT_XML_WITH_NAMESPACE, APPLICATION_XML},
-            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON}
+            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON},
+            {SENSITIVE_LOGGING_CONTENT_JSON_ARRAY, MASKED_LOGGING_CONTENT_JSON_ARRAY, APPLICATION_JSON}
         });
     }
 

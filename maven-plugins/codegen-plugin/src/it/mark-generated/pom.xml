@@ -6,12 +6,30 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>cxf7708-codegen</name>
-    
+
     <properties>
         <wsdl.groupid>org.apache.cxf.cxf7708</wsdl.groupid>
         <wsdl.artifactid>Cxf7708Service</wsdl.artifactid>
         <wsdl.version>1.0.0</wsdl.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -73,29 +91,4 @@
             </plugin>
         </plugins>
     </build>
-  <profiles>
-    <profile>
-      <id>java11</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <dependencies>
-          <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.1</version>
-          </dependency>
-          <dependency>
-            <groupId>jakarta.xml.ws</groupId>
-            <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>4.0.0</version>
-          </dependency>
-          <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.0</version>
-          </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

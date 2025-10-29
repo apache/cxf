@@ -226,6 +226,7 @@ public final class LogUtils {
     /**
      * Create a logger
      */
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     protected static Logger createLogger(Class<?> cls,
                                          String name,
                                          String loggerName) {
@@ -286,10 +287,10 @@ public final class LogUtils {
 
             Logger logger;
             try {
-                logger = Logger.getLogger(loggerName, bundleName); //NOPMD
+                logger = Logger.getLogger(loggerName, bundleName);
             } catch (IllegalArgumentException | MissingResourceException ex) {
                 //likely a mismatch on the bundle name, just return the default
-                logger = Logger.getLogger(loggerName); //NOPMD
+                logger = Logger.getLogger(loggerName);
             }
             
             return logger;

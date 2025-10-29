@@ -19,9 +19,13 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.concurrent.ThreadLocalRandom;
 
 import jakarta.json.bind.Jsonb;
@@ -41,6 +45,7 @@ import jakarta.ws.rs.RuntimeType;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.ext.ContextResolver;
 import org.apache.cxf.Bus;
@@ -56,6 +61,8 @@ import static jakarta.ws.rs.RuntimeType.CLIENT;
 import static jakarta.ws.rs.RuntimeType.SERVER;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_XML;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
@@ -100,7 +107,21 @@ public class JAXRS31ClientServerBookTest extends AbstractBusClientServerTestBase
             assertThat(response.getName(), is(expectedWaypoints));
         }
     }
-    
+
+    @Test
+    public void testPostEmptyBookXml() throws IOException, InterruptedException {
+        String address = "http://localhost:" + PORT + "/bookstore/jaxb";
+        final HttpClient client = HttpClient.newHttpClient();
+
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(address))
+            .method("POST", HttpRequest.BodyPublishers.noBody())
+            .header("Content-Type", MediaType.APPLICATION_XML)
+            .build();
+                
+        final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode(), equalTo(400));
+    }
+
     public static final class BookServer31 extends AbstractServerTestServerBase {
         public static final String PORT = allocatePort(BookServer31.class);
 
@@ -124,6 +145,15 @@ public class JAXRS31ClientServerBookTest extends AbstractBusClientServerTestBase
         @Consumes(APPLICATION_JSON)
         @Produces(APPLICATION_JSON)
         public Book echo(final Book book) {
+            book.setName(String.join(",", book.getName(), "BookResource"));
+            return book;
+        }
+        
+        @POST
+        @Path("/jaxb")
+        @Consumes(APPLICATION_XML)
+        @Produces(APPLICATION_XML)
+        public Book jaxb(final Book book) {
             book.setName(String.join(",", book.getName(), "BookResource"));
             return book;
         }

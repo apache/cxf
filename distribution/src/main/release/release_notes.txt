@@ -1,4 +1,4 @@
-Apache CXF 4.1.0 Release Notes
+Apache CXF 4.1.3 Release Notes
 
 1. Overview
 
@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.0 fixes over 54 JIRA issues reported by users and the community.
+4.1.3 fixes over 10 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,70 +70,25 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8629] - AsyncHTTPConduit (hc5) should support chunked request / response
-    * [CXF-8903] - Too many open files error in HttpClientHTTPConduit
-    * [CXF-8931] - HttpClientHTTPConduit can't disable the http chunk mode
-    * [CXF-8951] - Concurrent WebClient usage causes massive thread overhead
-    * [CXF-8979] - XML (Woodstox/MSV) based schema validation is broken
-    * [CXF-8980] - JaxRS client - receive timeout not working since CXF 4.0.1
-    * [CXF-8987] - Java 21 - HttpClientHTTPConduit thread locked during shutdown 
-    * [CXF-9004] - Jetty12 : always use pre-saved HTTP_REQUEST from InMessage to populate SecurityContext
-    * [CXF-9007] - NullPointerException in XMLStreamDataWriter.writeNode
-    * [CXF-9009] - Async operations fail in concurrent calls
-    * [CXF-9011] - WSDLTo JAXWS Frontend service.vm Velocity template uses deprecated URL constructor
-    * [CXF-9015] - Typo in JsonMapObjectReaderWriter treats \h as a special character instead of \n
-    * [CXF-9021] - Warning "Could not resolve Schema for datatypes.dtd" when file was found
-    * [CXF-9030] - "-suppress-generated-date" does not omit timestamps from @Generated
-    * [CXF-9034] - IllegalAccessError: class org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine
-    * [CXF-9041] - Regression: CXF will only accept org.glassfish.jaxb.runtime.v2.ContextFactory
-    * [CXF-9042] - Several unit tests are non-idempotent
-    * [CXF-9052] - LoadDistributorFeature not comaptible with JAX-RS subresources
-    * [CXF-9057] - Chunked Stream is closed regularly when Exception is thrown
-    * [CXF-9058] - jaxws binding example in documentation no more work in v4.x because of jarkarta
-    * [CXF-9060] - WSDL2Java Service generation results in 'unused import' warnings
-    * [CXF-9064] - AsyncHTTPConduit doesn't close copied wrappedStream on close
-    * [CXF-9066] - MaskSensitiveHelper does not mask multi-line content
-    * [CXF-9067] - MaskSensitiveHelper incorrectly masks wrapper element
-    * [CXF-9074] - HttpClientHTTPConduit ignores SSLContext in TLSClientParameters (Java HttpClient)
-    * [CXF-9076] - Exception message is not unmarshalled with JDK17
-    * [CXF-9077] - JAX-RS 3.1+: Add support for JSON-P and JSON-B providers by default
-    * [CXF-9078] - AsyncHTTPConduit.java causing NullPointerException when closing
-    * [CXF-9079] - java.lang.IllegalStateException: Encoding process already completed from LengthDelimitedEncoder
+    * [CXF-9114] - ClientRequestContext#getConfiguration always return null in the MicroProfile RestClient
+    * [CXF-9139] - Null Safety Issue in getLocalPart Call in DataWriterImpl
+    * [CXF-9141] - MaskSensitiveHelperMasking malfunctions for empty tags
+    * [CXF-9146] - MemoryLeak in HttpClientHTTPConduit when used with the ThreadLocalClientState
+    * [CXF-9148] - Using @Oneway annotation cases NullPointerException in CXF + Jetty 12 REST Service
+    * [CXF-9150] - Deal with java.security.acl
+    * [CXF-9153] - The class org.apache.cxf.transport.servlet.servicelist.UnformattedServiceListWriter does not work for RESTful destinations
 
 
 
-** New Feature
-    * [CXF-8970] - ensure we can build and run without bouncycastle dependencies
 
 ** Improvement
-    * [CXF-8671] - Support Jakarta EE 10
-    * [CXF-8969] - Update to Brave 6
-    * [CXF-8976] - Update to OpenTelemetry v1.39.0
-    * [CXF-8993] - Migrate from net.sf.cglib (cglib) to org.springframework.cglib (spring)
-    * [CXF-9013] - Move performance benchmark to distribution samples folder
-    * [CXF-9016] - Upgrade Spring-Framework to 5.3.34 in Apache-cxf
-    * [CXF-9026] - Integrate Jacoco into Apache CXF builds to collect code coverage stats
-    * [CXF-9045] - Enhance samples/performance/jax-rs to accept host values
-    * [CXF-9046] - JAX-RS performance client should close response objects after calls.
-    * [CXF-9047] - http-undertow transport: enable to specify CipherSuites
-    * [CXF-9055] - Follow OpenTelemetry semantic conventions for trace span and its attributes
-    * [CXF-9059] - HttpConduit should flush output stream ahead of closing connections when HttpClient is autocloseable
-    * [CXF-9062] - Be able to create AsyncHTTPConduit based on URLConnectionHTTPConduit
-    * [CXF-9082] - SENSITIVE_HEADERS list is hardcoded
-    * [CXF-9085] - Replace use of Google Guava with JDK API
+    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
+    * [CXF-9151] - use io.github.littleproxy:littleproxy instead of org.littleshoot:littleproxy
 
-** Test
-    * [CXF-9006] - TrustedAuthorityValidatorCRLTest#testIsCertChainValid fails when using Red Hat OpenJDK on PPC64LE
-    * [CXF-9010] - Update benchmark soap http doc lit suite for CXF 4.1.x 
-    * [CXF-9014] - org.apache.cxf.systest.ws.action.SignatureWhitespaceTest test fail on RH OpenJDK
-    * [CXF-9019] - Increase unit test coverage on cxf-rt-frontend-jaxws jaxws spi package.
-    * [CXF-9023] - Increase unit test coverage on org.apache.cxf.bus
-    * [CXF-9027] - Update Performance benchmark pom values
-    * [CXF-9048] - Failed integration tests with upcomming santuario and wss4j library
 
 
 ** Task
-    * [CXF-8891] - Evaluate changes to org.glassfish.jaxb:jaxb-runtime:4.0.3
-    * [CXF-9029] - Update to JAXB runtime 4.0.5
+    * [CXF-9142] - Change async tracing tests to be order-agnostic
+
 
 

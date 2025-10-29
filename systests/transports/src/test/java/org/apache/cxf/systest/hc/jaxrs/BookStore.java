@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -50,6 +51,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
+
 @Path("/bookstore")
 @GZIP(threshold = 1)
 public class BookStore {
@@ -61,6 +63,9 @@ public class BookStore {
     private UriInfo ui;
     @Context
     private MessageContext messageContext;
+    
+    @Context
+    private HttpServletRequest request;
 
     public BookStore() {
         init();
@@ -167,11 +172,18 @@ public class BookStore {
         }).build();
     }
 
+
+    
     @POST
     @Path("/oneway")
     @Oneway
     public void onewayRequest() {
         if (!PhaseInterceptorChain.getCurrentMessage().getExchange().isOneWay()) {
+            throw new WebApplicationException();
+        }
+        try {
+            request.getAttribute("someAttr"); //shouldn't get NPE here
+        } catch (NullPointerException ex) {
             throw new WebApplicationException();
         }
     }

@@ -20,17 +20,14 @@
 package org.apache.cxf.common.logging;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.SecureRandom;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
@@ -88,6 +85,8 @@ final class JDKBugHacks {
         return Boolean.parseBoolean(cname);
     }
 
+    
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public static void doHacks() {
         if (skipHack("org.apache.cxf.JDKBugHacks.all")) {
             return;
@@ -99,56 +98,52 @@ final class JDKBugHacks {
                 .setThreadContextClassloader(ClassLoader.getSystemClassLoader());
             try {
                 try {
-                    //Trigger a call to sun.awt.AppContext.getAppContext()
+                    /*
+                     * Several components end up calling: sun.awt.AppContext.getAppContext()
+                     *
+                     * Those libraries / components known to trigger memory leaks due to eventual calls to
+                     * getAppContext() are:
+                     * - Google Web Toolkit via its use of javax.imageio
+                     * - Batik
+                     * - others TBD
+                     *
+                     * Note that a call to sun.awt.AppContext.getAppContext() results in a thread being started named
+                     * AWT-AppKit that requires a graphical environment to be available.
+                     */
+
+                    // Trigger a call to sun.awt.AppContext.getAppContext(). This
+                    // will pin the system class loader in memory but that shouldn't
+                    // be an issue.
                     if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO", "true")) {
                         ImageIO.getCacheDirectory();
                     }
                 } catch (Throwable t) {
                     //ignore
                 }
+
                 try {
-                    //DocumentBuilderFactory seems to SOMETIMES pin the classloader
-                    if (!skipHack("org.apache.cxf.JDKBugHacks.documentBuilderFactory")) {
-                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                        factory.newDocumentBuilder();
+                    /*
+                     * Several components end up opening JarURLConnections without first disabling caching.
+                     * This effectively locks the file. Whilst more noticeable and harder to ignore on Windows,
+                     * it affects all operating systems.
+                     *
+                     * Those libraries/components known to trigger this issue include:
+                     * - log4j versions 1.2.15 and earlier
+                     *  -javax.xml.bind.JAXBContext.newInstance()
+                     *
+                     * https://bugs.openjdk.java.net/browse/JDK-8163449
+                     *
+                     * Disable caching for JAR URLConnections
+                     */
+
+                    // Set the default URL caching policy to not to cache
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.defaultUsesCaches")) {
+                        URLConnection.setDefaultUseCaches("JAR", false);
                     }
-                } catch (Throwable e) {
-                    //ignore
-                }
-                // Several components end up calling:
-                // sun.misc.GC.requestLatency(long)
-                //
-                // Those libraries / components known to trigger memory leaks due to
-                // eventual calls to requestLatency(long) are:
-                // - javax.management.remote.rmi.RMIConnectorServer.start()
-                try {
-                    if (!skipHack("org.apache.cxf.JDKBugHacks.gcRequestLatency")) {
-                        Class<?> clazz = Class.forName("sun.misc.GC");
-                        Method method = clazz.getDeclaredMethod("currentLatencyTarget");
-                        Long l = (Long)method.invoke(null);
-                        if (l != null && l.longValue() == 0) {
-                            //something already set it, move on
-                            method = clazz.getDeclaredMethod("requestLatency", Long.TYPE);
-                            method.invoke(null, Long.valueOf(36000000));
-                        }
-                    }
-                } catch (Throwable e) {
+                } catch (Throwable t) {
                     //ignore
                 }
 
-                // Calling getPolicy retains a static reference to the context
-                // class loader.
-                try {
-                    // Policy.getPolicy();
-                    if (!skipHack("org.apache.cxf.JDKBugHacks.policy")) {
-                        Class<?> policyClass = Class
-                            .forName("javax.security.auth.Policy");
-                        Method method = policyClass.getMethod("getPolicy");
-                        method.invoke(null);
-                    }
-                } catch (Throwable e) {
-                    // ignore
-                }
                 try {
                     // Initializing javax.security.auth.login.Configuration retains a static reference
                     // to the context class loader.
@@ -159,6 +154,7 @@ final class JDKBugHacks {
                 } catch (Throwable e) {
                     // Ignore
                 }
+
                 // Creating a MessageDigest during web application startup
                 // initializes the Java Cryptography Architecture. Under certain
                 // conditions this starts a Token poller thread with TCCL equal
@@ -168,22 +164,14 @@ final class JDKBugHacks {
                 }
 
                 try {
-                    // Several components end up opening JarURLConnections without first
-                    // disabling caching. This effectively locks the file.
-                    // JAXB does this and thus affects us pretty badly.
-                    // Doesn't matter that this JAR doesn't exist - just as long as
-                    // the URL is well-formed
-                    if (!skipHack("org.apache.cxf.JDKBugHacks.defaultUsesCaches")) {
-                        URL url = new URL("jar:file://dummy.jar!/");
-                        URLConnection uConn = new URLConnection(url) {
-                            @Override
-                            public void connect() throws IOException {
-                                // NOOP
-                            }
-                        };
-                        uConn.setDefaultUseCaches(false);
+                    /*
+                     * Initialize the SeedGenerator of the JVM, as some platforms use a thread which could end up being
+                     * associated with a webapp rather than the container.
+                     */
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.secureRandom", "true")) {
+                        SecureRandom.getSeed(1);
                     }
-                } catch (Throwable e) {
+                } catch (Throwable t) {
                     //ignore
                 }
             } finally {

@@ -84,7 +84,8 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
         if (resp != null) {
             return JAXRSUtils.copyResponseIfNeeded(resp);
         }
-        ResponseBuilder rb = JAXRSUtils.toResponseBuilder((Integer)inMessage.get(Message.RESPONSE_CODE));
+        final Integer responseCode = (Integer)inMessage.get(Message.RESPONSE_CODE);
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder(responseCode == null ? 200 : responseCode);
         rb.entity(inMessage.get(InputStream.class));
 
         @SuppressWarnings("unchecked")

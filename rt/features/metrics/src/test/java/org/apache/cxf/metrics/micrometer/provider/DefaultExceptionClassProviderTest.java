@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+@SuppressWarnings("PMD.UselessPureMethodCall")
 public class DefaultExceptionClassProviderTest {
 
     private static final Exception EXCEPTION_CAUSE = new CauseException();

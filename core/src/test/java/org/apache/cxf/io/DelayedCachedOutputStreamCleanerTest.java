@@ -206,6 +206,31 @@ public class DelayedCachedOutputStreamCleanerTest {
 
         assertNoopCleaner(cleaner);
     }
+    
+    @Test
+    public void testDelayedClean() throws InterruptedException {
+        final AtomicInteger latch = new AtomicInteger();
+        final Closeable closeable1 = () -> latch.incrementAndGet();
+        final Closeable closeable2 = () -> latch.incrementAndGet();
+
+        /* Delay of 5 seconds */
+        final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
+        bus = new ExtensionManagerBus(new HashMap<>(), properties);
+
+        final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+        cleaner.register(closeable1);
+
+        Thread.sleep(2000);
+        cleaner.register(closeable2);
+
+        // Await for Closeable::close to be called on schedule
+        await().atMost(3, TimeUnit.SECONDS).untilAtomic(latch, equalTo(1));
+
+        // Await for Closeable::close to be called on schedule
+        await().atMost(5, TimeUnit.SECONDS).untilAtomic(latch, equalTo(2));
+
+        assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
+    }
 
     private void assertNoopCleaner(final CachedOutputStreamCleaner cleaner) {
         final AtomicBoolean latch = new AtomicBoolean(false);

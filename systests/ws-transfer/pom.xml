@@ -28,7 +28,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.1-SNAPSHOT</version>
+        <version>4.1.4-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     
@@ -67,5 +67,23 @@
           <scope>test</scope>
         </dependency>
     </dependencies>
-    
+    <profiles>
+        <profile>
+            <id>jdk24</id>
+            <activation>
+                <jdk>[24,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>${cxf.surefire.fork.vmargs} -Djdk.xml.enableExtensionFunctions=true</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

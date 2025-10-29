@@ -21,9 +21,11 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -92,7 +94,7 @@ import static org.junit.Assert.assertTrue;
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = MultipartServer.PORT;
     public static final String PORTINV = allocatePort(JAXRSMultipartTest.class, 1);
-
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -102,6 +104,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
 
+    
+    
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/stream";
@@ -512,10 +516,31 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void attachmentIsNotWrappedIntoAnotherAttachment() throws Exception {
+        MultipartStore store =
+                JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+
+        Attachment attachment =
+                new Attachment("audio", MediaType.APPLICATION_OCTET_STREAM, new byte[]{42});
+
+        Book b = store.addAudioBook(new Book("CXF in Action", 125L), attachment);
+        assertEquals(125L, b.getId());
+        assertEquals("CXF in Action - 42", b.getName());
+    }
+
+    @Test
     public void testNullPartProxy() throws Exception {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+
+        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        
         MultipartStore store =
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        WebClient.getConfig(store).getOutInterceptors().add(out);
         assertEquals("nobody home2", store.testNullParts("value1", null));
+        String expected = "Content-Disposition: form-data;name=\"someid\"";
+        assertTrue(output.toString().indexOf(expected) != -1);
     }
 
     @Test
