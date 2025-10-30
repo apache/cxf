@@ -197,20 +197,19 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     private static final class DefaultDelayedCleaner implements DelayedCleaner {
         private final long delay; /* default is 30 minutes, in milliseconds */
         private final DelayQueue<DelayedCloseable> queue = new DelayQueue<>();
-        private final Timer timer;
-        private final AtomicBoolean scheduled = new AtomicBoolean(false);
+        private final AtomicBoolean initialized = new AtomicBoolean(false);
+        private volatile Timer timer;
 
         DefaultDelayedCleaner(final long delay) {
             this.delay = delay;
-            this.timer = new Timer("DelayedCachedOutputStreamCleaner", true);
-            
         }
 
         @Override
         public void register(Closeable closeable) {
             queue.put(new DelayedCloseable(closeable, delay));
             // Initialize timer lazily only when at least one closeable is registered
-            if (scheduled.compareAndSet(false, true)) {
+            if (initialized.compareAndSet(false, true)) {
+                this.timer = new Timer("DelayedCachedOutputStreamCleaner", true);
                 this.timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
@@ -239,7 +238,10 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
 
         @Override
         public void close()  {
-            timer.cancel();
+            final Timer t = timer;
+            if (t != null) {
+                t.cancel();
+            }
             queue.clear();
         }
 

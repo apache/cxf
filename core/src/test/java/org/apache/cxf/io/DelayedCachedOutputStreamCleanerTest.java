@@ -74,7 +74,16 @@ public class DelayedCachedOutputStreamCleanerTest {
         
         assertNoopCleaner(cleaner);
     }
-    
+
+    @Test
+    public void testNoTimer() {
+        final Map<String, Object> properties = Collections.singletonMap(CachedConstants.CLEANER_DELAY_BUS_PROP, 2500);
+        bus = createBus(properties);
+        
+        final CachedOutputStreamCleaner cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+        assertThat(cleaner, instanceOf(DelayedCachedOutputStreamCleaner.class));
+    }
+
     @Test
     public void testForceClean() throws InterruptedException {
         bus = createBus();
