@@ -301,7 +301,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     @Override
     public RestClientBuilder header(String name, Object value) {
-        headers.add(name, value);
+        headers.add(name, Objects.requireNonNull(value, "Header value should not be null"));
         return this;
     }
 }
