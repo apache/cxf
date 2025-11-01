@@ -147,7 +147,7 @@ public class Cookie {
      */
     public String requestCookieHeader() {
         StringBuilder b = new StringBuilder(64);
-        b.append("$Version=\"1\"");
+        b.append("$Version=1");
         b.append("; ").append(getName())
             .append('=').append(getValue());
         if (getPath() != null && getPath().length() > 0) {
