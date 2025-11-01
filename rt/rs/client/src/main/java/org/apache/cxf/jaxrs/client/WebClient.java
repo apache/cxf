@@ -1064,6 +1064,7 @@ public class WebClient extends AbstractClient {
                                    inAnns, respClass, outType, exchange, invContext);
     }
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     protected Response doChainedInvocation(String httpMethod,
                                            MultivaluedMap<String, String> headers,
                                            Object body,
@@ -1098,6 +1099,7 @@ public class WebClient extends AbstractClient {
     }
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     private Message finalizeMessage(String httpMethod,
                                    MultivaluedMap<String, String> headers,
                                    Object body,

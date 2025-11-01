@@ -46,7 +46,6 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         objectName = on;
     }
 
-    @SuppressWarnings("PMD.UselessPureMethodCall")
     public void  increase(MessageHandlingTimeRecorder mhtr) {
         if (!enabled) {
             return;
