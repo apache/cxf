@@ -35,6 +35,7 @@ public class LogicalHandlerFaultInInterceptor
         addAfter(SOAPHandlerFaultInInterceptor.class.getName());
     }
 
+    @SuppressWarnings("PMD.IdenticalConditionalBranches")
     @Override
     public void handleMessage(Message message) {
         if (binding.getHandlerChain().isEmpty()) {

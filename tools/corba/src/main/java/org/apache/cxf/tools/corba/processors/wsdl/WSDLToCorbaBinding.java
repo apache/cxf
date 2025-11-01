@@ -863,7 +863,7 @@ public class WSDLToCorbaBinding {
             if (verboseOn) {
                 ex.printStackTrace();
             }
-            System.exit(1); //NOPMD
+            System.exit(1);
         }
     }
 

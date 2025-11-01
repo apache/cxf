@@ -1179,6 +1179,7 @@ public class SourceGenerator {
         sbCode.append(localName).append(' ');
     }
     //CHECKSTYLE:OFF: ParameterNumber
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     private void writeRequestTypes(Element requestEl,
                                    String classPackage,
                                    Element repElement,
