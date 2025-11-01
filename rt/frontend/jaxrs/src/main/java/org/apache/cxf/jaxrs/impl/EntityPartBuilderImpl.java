@@ -87,6 +87,7 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     @Override
     public Builder content(InputStream in) throws IllegalArgumentException {
         this.content = in;
+        this.type = InputStream.class;
         return this;
     }
 
