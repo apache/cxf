@@ -17,17 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.utils;
+package org.apache.cxf.attachment;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
+import java.io.IOException;
 
-public final class ParameterizedCollectionType extends ParameterizedCollectionBaseType {
-    public ParameterizedCollectionType(Class<?> collectionMemberClass) {
-        super(Collection.class, collectionMemberClass);
-    }
-
-    public ParameterizedCollectionType(Type pt) {
-        super(Collection.class, InjectionUtils.getRawType(pt));
-    }
+interface CloseableAttachmentDeserializer {
+    void markClosed(DelegatingInputStream is) throws IOException;
 }

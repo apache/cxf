@@ -67,6 +67,7 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -175,6 +176,7 @@ public final class JAXRSUtils {
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
     private static final Set<String> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
         Arrays.asList(
+            "jakarta.ws.rs.core.EntityPart",
             "org.apache.cxf.jaxrs.ext.xml.XMLSource", 
             "org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource", 
             "org.apache.cxf.jaxrs.ext.multipart.MultipartBody", 
@@ -1199,8 +1201,13 @@ public final class JAXRSUtils {
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
-                    MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-                    FormUtils.populateMapFromMultipart(params, body, m, decode);
+                    if (pClass.isAssignableFrom(EntityPart.class)) {
+                        final List<EntityPart> body = EntityPartUtils.getEntityParts(mc);
+                        FormUtils.populateMapFromEntityParts(params, body, m, decode);
+                    } else {
+                        MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+                        FormUtils.populateMapFromMultipart(params, body, m, decode);
+                    }
                 } else {
                     org.apache.cxf.common.i18n.Message errorMsg =
                         new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE",

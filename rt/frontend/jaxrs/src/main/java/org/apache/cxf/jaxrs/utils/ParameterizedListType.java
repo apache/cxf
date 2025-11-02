@@ -19,15 +19,10 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
+import java.util.List;
 
-public final class ParameterizedCollectionType extends ParameterizedCollectionBaseType {
-    public ParameterizedCollectionType(Class<?> collectionMemberClass) {
-        super(Collection.class, collectionMemberClass);
-    }
-
-    public ParameterizedCollectionType(Type pt) {
-        super(Collection.class, InjectionUtils.getRawType(pt));
+public final class ParameterizedListType extends ParameterizedCollectionBaseType {
+    public ParameterizedListType(Class<?> collectionMemberClass) {
+        super(List.class, collectionMemberClass);
     }
 }

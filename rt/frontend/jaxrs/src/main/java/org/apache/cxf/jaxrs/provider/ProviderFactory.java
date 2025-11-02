@@ -222,7 +222,8 @@ public abstract class ProviderFactory {
                      new PrimitiveTextProvider<Object>(),
                      JAXB_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
                      JAXB_ELEMENT_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
-                     MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory.getBus()));
+                     MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                     new EntityPartProvider());
         final Object skipJakartaJsonProviders = factory.getBus().getProperty(SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION);
         if (!PropertyUtils.isTrue(skipJakartaJsonProviders)) {
             factory.setProviders(false, false, JSONP_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),

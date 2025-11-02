@@ -184,9 +184,9 @@ public class ProviderFactoryTest {
         WildcardReader2 reader2 = new WildcardReader2();
         pf.registerUserProvider(reader2);
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(11, readers.size());
-        assertSame(reader1, readers.get(7).getProvider());
-        assertSame(reader2, readers.get(8).getProvider());
+        assertEquals(12, readers.size());
+        assertSame(reader1, readers.get(8).getProvider());
+        assertSame(reader2, readers.get(9).getProvider());
     }
 
     @Test
@@ -212,13 +212,13 @@ public class ProviderFactoryTest {
 
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(10, writers.size());
-        Object lastWriter = writers.get(9).getProvider();
+        assertEquals(11, writers.size());
+        Object lastWriter = writers.get(10).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(9, readers.size());
-        Object lastReader = readers.get(8).getProvider();
+        assertEquals(10, readers.size());
+        Object lastReader = readers.get(9).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
     }
     @Test
@@ -242,13 +242,13 @@ public class ProviderFactoryTest {
 
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(10, writers.size());
-        Object lastWriter = writers.get(9).getProvider();
+        assertEquals(11, writers.size());
+        Object lastWriter = writers.get(10).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(9, readers.size());
-        Object lastReader = readers.get(8).getProvider();
+        assertEquals(10, readers.size());
+        Object lastReader = readers.get(9).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
     }
     @SuppressWarnings("rawtypes")
@@ -276,13 +276,13 @@ public class ProviderFactoryTest {
 
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(10, writers.size());
+        assertEquals(11, writers.size());
         Object lastWriter = writers.get(8).getProvider();
         assertFalse(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(9, readers.size());
-        Object lastReader = readers.get(8).getProvider();
+        assertEquals(10, readers.size());
+        Object lastReader = readers.get(9).getProvider();
         assertTrue(lastReader instanceof StringTextProvider);
     }
     @Test
@@ -309,13 +309,13 @@ public class ProviderFactoryTest {
 
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-        assertEquals(10, writers.size());
-        Object lastWriter = writers.get(9).getProvider();
+        assertEquals(11, writers.size());
+        Object lastWriter = writers.get(10).getProvider();
         assertTrue(lastWriter instanceof StringTextProvider);
         //readers
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(9, readers.size());
-        Object lastReader = readers.get(8).getProvider();
+        assertEquals(10, readers.size());
+        Object lastReader = readers.get(9).getProvider();
         assertFalse(lastReader instanceof StringTextProvider);
     }
 
@@ -401,9 +401,9 @@ public class ProviderFactoryTest {
         ProviderFactory pf = ServerProviderFactory.createInstance(bus);
         pf.registerUserProvider(wc2);
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(11, readers.size());
-        assertSame(wc2, readers.get(7).getProvider());
-        assertSame(wc1, readers.get(8).getProvider());
+        assertEquals(12, readers.size());
+        assertSame(wc2, readers.get(8).getProvider());
+        assertSame(wc1, readers.get(9).getProvider());
     }
     @Test
     public void testCustomProviderSortingWithBus2() {
@@ -414,9 +414,9 @@ public class ProviderFactoryTest {
         ProviderFactory pf = ServerProviderFactory.createInstance(bus);
         pf.registerUserProvider(wc1);
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(11, readers.size());
-        assertSame(wc1, readers.get(7).getProvider());
-        assertSame(wc2, readers.get(8).getProvider());
+        assertEquals(12, readers.size());
+        assertSame(wc1, readers.get(8).getProvider());
+        assertSame(wc2, readers.get(9).getProvider());
     }
 
     @Test
@@ -1548,11 +1548,11 @@ public class ProviderFactoryTest {
         pf.registerUserProvider(reader);
         
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-        assertEquals(10, readers.size());
-        assertSame(reader, readers.get(7).getProvider());
+        assertEquals(11, readers.size());
+        assertSame(reader, readers.get(8).getProvider());
 
         pf.registerUserProvider(new ClientWildcardReader());
-        assertEquals(10, pf.getMessageReaders().size());
+        assertEquals(11, pf.getMessageReaders().size());
     }
 
     private static class RuntimeExceptionA extends RuntimeException {
