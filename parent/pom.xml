@@ -218,7 +218,7 @@
         <cxf.spring.security.version>6.4.12</cxf.spring.security.version>
         <cxf.spring.version>6.2.12</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>5.30.0</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.30.1</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
         <cxf.tika.version>3.0.0</cxf.tika.version>
         <cxf.tomcat.version>10.1.47</cxf.tomcat.version>
