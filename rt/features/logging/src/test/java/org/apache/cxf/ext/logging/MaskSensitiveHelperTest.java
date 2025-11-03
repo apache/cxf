@@ -92,6 +92,23 @@ public class MaskSensitiveHelperTest {
 
     private static final String MASKED_LOGGING_CONTENT_XML_WITH_NAMESPACE =
             "<ns:user>testUser</ns:user><ns:password>XXX</ns:password>";
+    
+    // attributes with slash characters are supported
+    private static final String SENSITIVE_XML_WITH_NS_URI = "<root xmlns:x=\"http://a/b/c\">"
+            + "<x:password alg=\"http://algo/sha-256\">secret</x:password>"
+                                                            + "</root>";
+    private static final String MASKED_XML_WITH_NS_URI = "<root xmlns:x=\"http://a/b/c\">"
+                                                         + "<x:password alg=\"http://algo/sha-256\">XXX</x:password>"
+                                                         + "</root>";
+
+    // plain attribute value containing slashes
+    private static final String SENSITIVE_XML_WITH_ATTR_URL = "<root><password href=\"https://example.com/path\">"
+        + "secret</password></root>";
+    private static final String MASKED_XML_WITH_ATTR_URL = "<root><password href=\"https://example.com/path\">"
+        + "XXX</password></root>";
+
+    // Self-closing element
+    private static final String SELF_CLOSING_UNCHANGED = "<root><password/></root>";
 
     private static final Set<String> SENSITIVE_ELEMENTS = new HashSet<>(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
@@ -118,7 +135,10 @@ public class MaskSensitiveHelperTest {
             {SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML, MASKED_LOGGING_MULTIPLE_ELEMENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_NAMESPACE, MASKED_LOGGING_CONTENT_XML_WITH_NAMESPACE, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON},
-            {SENSITIVE_LOGGING_CONTENT_JSON_ARRAY, MASKED_LOGGING_CONTENT_JSON_ARRAY, APPLICATION_JSON}
+            {SENSITIVE_LOGGING_CONTENT_JSON_ARRAY, MASKED_LOGGING_CONTENT_JSON_ARRAY, APPLICATION_JSON},
+            {SENSITIVE_XML_WITH_NS_URI, MASKED_XML_WITH_NS_URI, APPLICATION_XML },
+            {SENSITIVE_XML_WITH_ATTR_URL, MASKED_XML_WITH_ATTR_URL, APPLICATION_XML },
+            {SELF_CLOSING_UNCHANGED, SELF_CLOSING_UNCHANGED, APPLICATION_XML },
         });
     }
 
