@@ -239,7 +239,7 @@
     <httpj:engine-factory id="STSClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.Server.3}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>

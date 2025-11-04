@@ -116,7 +116,7 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         HTTPConduit httpConduit = (HTTPConduit) ClientProxy.getClient(port).getConduit();
 
         TLSClientParameters tlsCP = new TLSClientParameters();
-        String keyPassword = "ckpass";
+        String keyPassword = "cspass";
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(SSLNettyServerTest.class.getResourceAsStream(keyStoreLoc), "cspass".toCharArray());
         KeyManager[] myKeyManagers = getKeyManagers(keyStore, keyPassword);
