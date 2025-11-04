@@ -41,7 +41,7 @@
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.DoubleItServer}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
@@ -74,7 +74,7 @@
     </jaxws:client>
     <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="ckpass">
+            <sec:keyManagers keyPassword="cspass">
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>

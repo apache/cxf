@@ -99,7 +99,7 @@
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>
                 </sec:trustManagers>
-                <sec:keyManagers keyPassword="stskpass">
+                <sec:keyManagers keyPassword="stsspass">
                     <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="true" required="true"/>

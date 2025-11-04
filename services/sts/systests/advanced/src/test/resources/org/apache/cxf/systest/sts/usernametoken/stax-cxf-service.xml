@@ -58,7 +58,7 @@
     <httpj:engine-factory id="StaxClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.StaxDoubleItServer}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
@@ -70,7 +70,7 @@
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:trustManagers>
-            <sec:keyManagers keyPassword="skpass">
+            <sec:keyManagers keyPassword="sspass">
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>

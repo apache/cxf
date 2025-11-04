@@ -36,7 +36,7 @@
     <httpn:engine-factory>
         <httpn:engine port="${SSLNettySpringServerTest.port}">
             <httpn:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
