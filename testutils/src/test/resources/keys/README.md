@@ -9,3 +9,14 @@ How to create / update certs and truststores
 5. `keytool -importkeystore -srckeystore keyStore.p12 -srcstoretype pkcs12 -destalias <alias> -srcalias 1 -destkeystore <keystore.jks>`
 
 
+
+
+How to create / update stsstore.jks, clientstore.jks and servicestore.jks
+###
+
+1. `openssl req -x509 -newkey rsa:4096 -keyout myclientkey.pem -out myclientkey.cert -days 3650 -nodes`
+2. `keytool -import -alias myclientkey -file myclientkey.cert -keystore stsstore.jks -trustcacerts`
+3. `openssl req -x509 -newkey rsa:4096 -keyout myservicekey.pem -out myservicekey.cert -days 3650 -nodes`
+4. `openssl pkcs12 -export -out mystskey.p12 -inkey myservicekey.pem -in myservicekey.cert -name mystskey`
+5. `keytool -importkeystore -deststorepass stsspass -destkeystore clientstore.jks -srckeystore mystskey.p12 -srcstoretype PKCS12 -alias mystskey -destkeypass stspass`
+6. `keytool -import -alias myservicekey -file myservicekey.cert -keystore stsstore.jks -trustcacerts`

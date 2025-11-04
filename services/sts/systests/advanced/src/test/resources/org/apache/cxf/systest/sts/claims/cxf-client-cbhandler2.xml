@@ -61,7 +61,7 @@
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:trustManagers>
-            <sec:keyManagers keyPassword="ckpass">
+            <sec:keyManagers keyPassword="cspass">
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>

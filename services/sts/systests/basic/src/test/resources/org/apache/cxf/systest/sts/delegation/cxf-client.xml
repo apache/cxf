@@ -32,7 +32,7 @@
     
     <http:conduit name="https://localhost.*">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="ckpass">
+            <sec:keyManagers keyPassword="cspass">
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
