@@ -79,7 +79,8 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     }
 
     private static final class SingleTimerDelayedCleaner implements DelayedCleaner {
-        private static final Timer TIMER = new Timer("DelayedCachedOutputStreamCleaner", true);
+        private static volatile Timer timer;
+        private static final Object TIMER_LOCK = new Object();
 
         private final long delay; /* default is 30 minutes, in milliseconds */
         private final DelayQueue<DelayedCloseable> queue = new DelayQueue<>();
@@ -108,7 +109,18 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             }
 
             if (newTimerTask != null) {
-                TIMER.scheduleAtFixedRate(newTimerTask, 0, Math.max(MIN_DELAY, delay >> 1));
+                Timer t;
+                // CHECKSTYLE:OFF
+                // May the Gods of Code Style forgive us these three inner assignments
+                if ((t = timer) == null) {
+                    synchronized (TIMER_LOCK) {
+                        if ((t = timer) == null) {
+                            t = timer = new Timer("DelayedCachedOutputStreamCleaner", true);
+                        }
+                    }
+                }
+                // CHECKSTYLE:ON
+                t.scheduleAtFixedRate(newTimerTask, 0, Math.max(MIN_DELAY, delay >> 1));
             }
         }
 
@@ -268,7 +280,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     private static final class DelayedCloseable implements Delayed {
         private final Closeable closeable;
         private final long expireAt;
-        
+
         DelayedCloseable(final Closeable closeable, final long delay) {
             this.closeable = closeable;
             this.expireAt = System.nanoTime() + TimeUnit.NANOSECONDS.convert(delay, TimeUnit.MILLISECONDS);
@@ -294,15 +306,15 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             if (this == obj) {
                 return true;
             }
-            
+
             if (obj == null) {
                 return false;
             }
-            
+
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            
+
             final DelayedCloseable other = (DelayedCloseable) obj;
             return Objects.equals(closeable, other.closeable);
         }
@@ -325,8 +337,8 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             } else if (SINGLE_TIMER_STRATEGY.equalsIgnoreCase(strategy)) {
                 delayedCleanerStrategy = SingleTimerDelayedCleaner::new;
             } else {
-                throw new IllegalArgumentException("The value of " + CachedConstants.CLEANER_STRATEGY_BUS_PROP 
-                    + " property is invalid: " + strategy + " (should be " + DEFAULT_STRATEGY + " or " 
+                throw new IllegalArgumentException("The value of " + CachedConstants.CLEANER_STRATEGY_BUS_PROP
+                    + " property is invalid: " + strategy + " (should be " + DEFAULT_STRATEGY + " or "
                         + SINGLE_TIMER_STRATEGY);
             }
         }
@@ -351,7 +363,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             } else {
                 cleaner = NOOP_CLEANER;
                 if (value != 0) {
-                    throw new IllegalArgumentException("The value of " + CachedConstants.CLEANER_DELAY_BUS_PROP 
+                    throw new IllegalArgumentException("The value of " + CachedConstants.CLEANER_DELAY_BUS_PROP
                         + " property is invalid: " + value + " (should be >= " + MIN_DELAY + ", 0 to deactivate)");
                 }
             }
@@ -381,11 +393,11 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
     public void clean() {
         cleaner.clean();
     }
-    
+
     @Override
     public void initComplete() {
     }
-    
+
     @Override
     public void postShutdown() {
         // If cleanup on shutdown is asked, force cleaning all cached output streams
@@ -394,7 +406,7 @@ public final class DelayedCachedOutputStreamCleaner implements CachedOutputStrea
             cleaner.close();
         }
     }
-    
+
     @Override
     public void preShutdown() {
         // If cleanup on shutdown is asked, defer closing till postShutdown hook
