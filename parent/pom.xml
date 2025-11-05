@@ -92,7 +92,7 @@
         <cxf.ahc.version>3.0.3</cxf.ahc.version>
         <cxf.arquillian.version>1.8.1.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>3.0.2.Final</cxf.arquillian.weld.container.version>
-        <cxf.aspectj.version>1.9.24</cxf.aspectj.version>
+        <cxf.aspectj.version>1.9.25</cxf.aspectj.version>
         <cxf.assertj.version>3.27.6</cxf.assertj.version>
         <cxf.atmosphere.version.range>[3.0, 4.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>3.0.14</cxf.atmosphere.version>
