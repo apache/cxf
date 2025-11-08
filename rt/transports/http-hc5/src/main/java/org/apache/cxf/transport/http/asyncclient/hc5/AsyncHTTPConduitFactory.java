@@ -151,9 +151,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
     private int ioThreadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
     private long selectInterval = IOReactorConfig.DEFAULT.getSelectInterval().toMilliseconds();
-    private int soLinger = IOReactorConfig.DEFAULT.getSoLinger().toMillisecondsIntBound();
+    private TimeValue soLinger = IOReactorConfig.DEFAULT.getSoLinger();
     private int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout().toMillisecondsIntBound();
-    private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
+    private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepAlive();
     private boolean tcpNoDelay = true;
 
 
@@ -223,11 +223,13 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         selectInterval = getInt(s.get(SELECT_INTERVAL), 1000);
         changed |= l != selectInterval;
 
-        i = soLinger;
-        soLinger = getInt(s.get(SO_LINGER), -1);
-        changed |= i != soLinger;
+        i = soLinger.toSecondsIntBound();
+        // SO_LINGER timeout is set in seconds 
+        soLinger = TimeValue.ofSeconds(getInt(s.get(SO_LINGER), -1));
+        changed |= i != soLinger.toSecondsIntBound();
 
         i = soTimeout;
+        // SO_TIMEOUT timeout is set in milliseconds
         soTimeout = getInt(s.get(SO_TIMEOUT), 0);
         changed |= i != soTimeout;
 
@@ -338,7 +340,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         final IOReactorConfig config = IOReactorConfig.custom()
             .setIoThreadCount(ioThreadCount)
             .setSelectInterval(TimeValue.ofMilliseconds(selectInterval))
-            .setSoLinger(TimeValue.ofMilliseconds(soLinger))
+            .setSoLinger(soLinger)
             .setSoTimeout(Timeout.ofMilliseconds(soTimeout))
             .setSoKeepAlive(soKeepalive)
             .setTcpNoDelay(tcpNoDelay)
