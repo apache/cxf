@@ -221,7 +221,7 @@
         <cxf.swagger.ui.version>5.30.2</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
         <cxf.tika.version>3.0.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.48</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.49</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.version>2.3.20.Final</cxf.undertow.version>
         <cxf.yasson.version>3.0.4</cxf.yasson.version>
