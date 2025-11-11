@@ -22,7 +22,7 @@
         <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi-owb</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -34,8 +34,4 @@
     <properties>
         <cxf.module.name>org.apache.cxf.systests.cdi.owb.noapp</cxf.module.name>
     </properties>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

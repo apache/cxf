@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <groupId>org.apache.cxf.archetype</groupId>
     <artifactId>cxf-jaxws-javafirst</artifactId>
-    <version>3.6.9</version>
+    <version>3.6.10-SNAPSHOT</version>
     <packaging>maven-archetype</packaging>
     <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
     <description>Creates a project for developing a Web service starting from Java code</description>
@@ -54,8 +54,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

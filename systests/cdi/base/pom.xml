@@ -22,7 +22,7 @@
     <parent>
         <artifactId>cxf-systests-cdi</artifactId>
         <groupId>org.apache.cxf.systests</groupId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -97,8 +97,4 @@
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

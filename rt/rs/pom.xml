@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
     </parent>
     <modules>
         <module>client</module>
@@ -50,8 +50,4 @@
         <module>microprofile-client</module>
         <module>description-common-openapi</module>
     </modules>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

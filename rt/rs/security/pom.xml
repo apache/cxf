@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-rs</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
     </parent>
     <modules>
         <module>xml</module>
@@ -38,8 +38,4 @@
         <module>cors</module>
         <module>http-signature</module>
     </modules>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

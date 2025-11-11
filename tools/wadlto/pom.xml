@@ -27,13 +27,9 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-tools</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
     </parent>
     <modules>
         <module>jaxrs</module>
     </modules>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

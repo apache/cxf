@@ -27,15 +27,11 @@
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>
-        <version>3.6.9</version>
+        <version>3.6.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modules>
         <module>ws-discovery-api</module>
         <module>ws-discovery-service</module>
     </modules>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>

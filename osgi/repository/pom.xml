@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>org.apache.cxf</groupId>
 		<artifactId>cxf-parent</artifactId>
-		<version>3.6.9</version>
+		<version>3.6.10-SNAPSHOT</version>
 		<relativePath>../../parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>cxf-repository</artifactId>
@@ -253,8 +253,4 @@
 			<artifactId>jettison</artifactId>
 		</dependency>
 	</dependencies>
-
-  <scm>
-    <tag>cxf-3.6.9</tag>
-  </scm>
 </project>
