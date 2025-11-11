@@ -19,6 +19,14 @@
 
 package org.apache.cxf.jaxrs.swagger.ui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
@@ -30,14 +38,6 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 @Path("api-docs")
@@ -60,7 +60,7 @@ public class SwaggerUiService {
         DEFAULT_MEDIA_TYPES.put("woff2", "application/font-woff2");
     }
 
-
+    
     private final SwaggerUiResourceLocator locator;
     private final Map<String, String> mediaTypes;
     private SwaggerUiConfig config;
@@ -69,7 +69,7 @@ public class SwaggerUiService {
         this.locator = locator;
         this.mediaTypes = mediaTypes;
     }
-
+    
     public void setConfig(SwaggerUiConfig config) {
         this.config = config;
     }
@@ -80,11 +80,11 @@ public class SwaggerUiService {
         if (resourcePath.contains(FAVICON)) {
             return Response.status(404).build();
         }
-
+        
         try {
             final URL resourceURL = locator.locate(resourcePath);
             final String path = resourceURL.getPath();
-
+            
             String mediaType = null;
             int ind = path.lastIndexOf('.');
             if (ind != -1 && ind < path.length()) {
@@ -110,7 +110,7 @@ public class SwaggerUiService {
             if (config != null) {
                 if (path.endsWith("/index.html") && uriInfo.getQueryParameters().isEmpty()) {
                     final Map<String, String> params = config.getConfigParameters();
-
+                    
                     if (params != null && !params.isEmpty()) {
                         final UriBuilder builder = params
                             .entrySet()
@@ -145,6 +145,7 @@ public class SwaggerUiService {
                             if (mediaType != null) {
                                 rb.type(mediaType);
                             }
+
                             return rb.build();
                         }
                     }
