@@ -27,10 +27,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>
-        <version>4.0.10-SNAPSHOT</version>
+        <version>4.0.10</version>
     </parent>
     <modules>
         <module>jaxb</module>
         <module>aegis</module>
     </modules>
+
+  <scm>
+    <tag>cxf-4.0.10</tag>
+  </scm>
 </project>

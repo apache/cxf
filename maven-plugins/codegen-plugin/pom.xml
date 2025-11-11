@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>4.0.10-SNAPSHOT</version>
+        <version>4.0.10</version>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.plugin.codegen</cxf.module.name>
@@ -206,4 +206,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>cxf-4.0.10</tag>
+  </scm>
 </project>

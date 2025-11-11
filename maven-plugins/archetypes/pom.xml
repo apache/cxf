@@ -27,11 +27,15 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>
-        <version>4.0.10-SNAPSHOT</version>
+        <version>4.0.10</version>
     </parent>
     <modules>
         <module>cxf-jaxws-javafirst</module>
         <module>cxf-jaxws-wsdlfirst</module>
         <module>cxf-jaxrs-service</module>
     </modules>
+
+  <scm>
+    <tag>cxf-4.0.10</tag>
+  </scm>
 </project>

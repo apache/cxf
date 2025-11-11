@@ -27,11 +27,15 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.10-SNAPSHOT</version>
+        <version>4.0.10</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <modules>
         <module>oauth2</module>
         <module>oauth2-saml</module>
     </modules>
+
+  <scm>
+    <tag>cxf-4.0.10</tag>
+  </scm>
 </project>

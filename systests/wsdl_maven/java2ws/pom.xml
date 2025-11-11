@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.0.10-SNAPSHOT</version>
+        <version>4.0.10</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     
@@ -138,4 +138,8 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>cxf-4.0.10</tag>
+  </scm>
 </project>
