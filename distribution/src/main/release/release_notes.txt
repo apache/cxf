@@ -1,4 +1,4 @@
-Apache CXF 3.6.8 Release Notes
+Apache CXF 3.6.9 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.8 fixes over 6 issues/tasks reported by users.
+3.6.9 fixes over 12 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -66,12 +66,25 @@ for caveats when upgrading.
 
 7. Release Notes
 
+
 ** Bug
-    * [CXF-9114] - ClientRequestContext#getConfiguration always return null in the MicroProfile RestClient
-    * [CXF-9139] - Null Safety Issue in getLocalPart Call in DataWriterImpl
-    * [CXF-9141] - MaskSensitiveHelperMasking malfunctions for empty tags
-    * [CXF-9146] - MemoryLeak in HttpClientHTTPConduit when used with the ThreadLocalClientState
-    * [CXF-9153] - The class org.apache.cxf.transport.servlet.servicelist.UnformattedServiceListWriter does not work for RESTful destinations
+    * [CXF-8691] - Logging Feature - Sensitive element with arrays
+    * [CXF-8938] - CXF forces XOP for SwA SOAP services
+    * [CXF-9007] - NullPointerException in XMLStreamDataWriter.writeNode
+    * [CXF-9152] - Adding @Timed annotation to JaxWS WebService class breaks Micrometer integration
+    * [CXF-9160] - Add support for JBoss Remoting protocols in JNDI
+    * [CXF-9162] - Reusing a Client with a HttpClientHTTPConduit is not threadsafe in regards to finalization
+    * [CXF-9168] - No Micrometer Metric for requests failing schema validation on jax-ws endpoints
+    * [CXF-9170] - Server requests counted twice after fixing CXF-9168
+    * [CXF-9171] - DelayedCachedOutputStreamCleaner thread accumulation after CVE-2025-23184 fix
+    * [CXF-9173] - Default SO_LINGER induce TCP RST on each connection closure
+
+
+
 
 ** Improvement
-    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
+    * [CXF-9157] - remove jetty server from rs-sse-undertow
+
+** Test
+    * [CXF-9006] - TrustedAuthorityValidatorCRLTest#testIsCertChainValid fails when using Red Hat OpenJDK on PPC64LE
+
