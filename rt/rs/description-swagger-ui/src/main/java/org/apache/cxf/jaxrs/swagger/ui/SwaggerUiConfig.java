@@ -19,10 +19,10 @@
 
 package org.apache.cxf.jaxrs.swagger.ui;
 
+import org.apache.cxf.common.util.StringUtils;
+
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.cxf.common.util.StringUtils;
 
 /**
  * Please refer to https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md
@@ -31,29 +31,29 @@ import org.apache.cxf.common.util.StringUtils;
 public class SwaggerUiConfig {
     // URL to fetch external configuration document from.
     private String configUrl;
-    // The url pointing to API definition (normally 
+    // The url pointing to API definition (normally
     // swagger.json/swagger.yaml/openapi.json/openapi.yaml).
     private String url;
-    // If set, enables filtering. The top bar will show an edit box that 
+    // If set, enables filtering. The top bar will show an edit box that
     // could be used to filter the tagged operations that are shown.
     private String filter;
-    
+
     // Enables or disables deep linking for tags and operations.
     private Boolean deepLinking;
-    //  Controls the display of operationId in operations list. 
+    //  Controls the display of operationId in operations list.
     private Boolean displayOperationId;
     // The default expansion depth for models (set to -1 completely hide the models).
     private Integer defaultModelsExpandDepth;
     // The default expansion depth for the model on the model-example section.
     private Integer defaultModelExpandDepth;
-    
+
     // Controls how the model is shown when the API is first rendered.
     private String defaultModelRendering;
     // Controls the display of the request duration (in milliseconds) for Try-It-Out requests.
     private Boolean displayRequestDuration;
-    // Controls the default expansion setting for the operations and tags. 
+    // Controls the default expansion setting for the operations and tags.
     private String docExpansion;
-    //  If set, limits the number of tagged operations displayed to at most this many. 
+    //  If set, limits the number of tagged operations displayed to at most this many.
     private Integer maxDisplayedTags;
     // Controls the display of vendor extension (x-) fields and values.
     private Boolean showExtensions;
@@ -66,34 +66,37 @@ public class SwaggerUiConfig {
     // Enables overriding configuration parameters via URL search params. If not explicitly set, it
     // will be automatically set to true when setter for any other field is called.
     private Boolean queryConfigEnabled;
-    
+    // Controls the OAuth config. If present, the SwaggerUIBundle initialitation will contain a call to initOAuth
+    // with the parameters contained here
+    private SwaggerUiOAuth2Config oAuthConfig;
+
     public String getConfigUrl() {
         return configUrl;
     }
-    
+
     public void setConfigUrl(final String configUrl) {
         this.configUrl = configUrl;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public String getUrl() {
         return url;
     }
-    
+
     public void setUrl(final String url) {
         this.url = url;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public String getFilter() {
         return filter;
     }
-    
+
     public void setFilter(final String filter) {
         this.filter = filter;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Boolean getShowCommonExtensions() {
         return showCommonExtensions;
     }
@@ -102,7 +105,7 @@ public class SwaggerUiConfig {
         this.showCommonExtensions = showCommonExtensions;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Boolean getShowExtensions() {
         return showExtensions;
     }
@@ -125,7 +128,7 @@ public class SwaggerUiConfig {
         this.showExtensions = showExtensions;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public String getDocExpansion() {
         return docExpansion;
     }
@@ -134,7 +137,7 @@ public class SwaggerUiConfig {
         this.docExpansion = docExpansion;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Boolean getDisplayRequestDuration() {
         return displayRequestDuration;
     }
@@ -143,7 +146,7 @@ public class SwaggerUiConfig {
         this.displayRequestDuration = displayRequestDuration;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public String getDefaultModelRendering() {
         return defaultModelRendering;
     }
@@ -152,7 +155,7 @@ public class SwaggerUiConfig {
         this.defaultModelRendering = defaultModelRendering;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Integer getDefaultModelExpandDepth() {
         return defaultModelExpandDepth;
     }
@@ -161,7 +164,7 @@ public class SwaggerUiConfig {
         this.defaultModelExpandDepth = defaultModelExpandDepth;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Integer getDefaultModelsExpandDepth() {
         return defaultModelsExpandDepth;
     }
@@ -170,7 +173,7 @@ public class SwaggerUiConfig {
         this.defaultModelsExpandDepth = defaultModelsExpandDepth;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Boolean getDisplayOperationId() {
         return displayOperationId;
     }
@@ -179,7 +182,7 @@ public class SwaggerUiConfig {
         this.displayOperationId = displayOperationId;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public Boolean getDeepLinking() {
         return deepLinking;
     }
@@ -188,7 +191,7 @@ public class SwaggerUiConfig {
         this.deepLinking = deepLinking;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
 
     public String getValidatorUrl() {
         return validatorUrl;
@@ -198,7 +201,7 @@ public class SwaggerUiConfig {
         this.validatorUrl = validatorUrl;
         setQueryConfigEnabledIfNeeded();
     }
-    
+
     public SwaggerUiConfig validatorUrl(String value) {
         setValidatorUrl(value);
         return this;
@@ -228,7 +231,7 @@ public class SwaggerUiConfig {
         setDefaultModelRendering(value);
         return this;
     }
-    
+
     public SwaggerUiConfig displayRequestDuration(Boolean value) {
         setDisplayRequestDuration(value);
         return this;
@@ -243,17 +246,17 @@ public class SwaggerUiConfig {
         setShowExtensions(value);
         return this;
     }
-    
+
     public SwaggerUiConfig showCommonExtensions(Boolean value) {
         setShowCommonExtensions(value);
         return this;
     }
-    
+
     public SwaggerUiConfig url(final String u) {
         setUrl(u);
         return this;
     }
-    
+
     public SwaggerUiConfig configUrl(final String cu) {
         setConfigUrl(cu);
         return this;
@@ -284,7 +287,7 @@ public class SwaggerUiConfig {
 
     public Map<String, String> getConfigParameters() {
         final Map<String, String> params = new TreeMap<>();
-        
+
         put("url", getUrl(), params);
         put("configUrl", getConfigUrl(), params);
         put("filter", getFilter(), params);
@@ -303,7 +306,7 @@ public class SwaggerUiConfig {
 
         return params;
     }
-    
+
     protected static void put(final String name, final Integer value, final Map<String, String> params) {
         if (value != null) {
             params.put(name, value.toString());
@@ -315,7 +318,7 @@ public class SwaggerUiConfig {
             params.put(name, value.toString());
         }
     }
-    
+
     protected static void put(final String name, final String value, final Map<String, String> params) {
         if (!StringUtils.isEmpty(value)) {
             params.put(name, value);
@@ -335,5 +338,18 @@ public class SwaggerUiConfig {
     public void setTryItOutEnabled(Boolean tryItOutEnabled) {
         this.tryItOutEnabled = tryItOutEnabled;
         setQueryConfigEnabledIfNeeded();
+    }
+
+    public SwaggerUiOAuth2Config getOAuthConfig() {
+        return oAuthConfig;
+    }
+
+    public void setOAuthConfig(SwaggerUiOAuth2Config oAuthConfig) {
+        this.oAuthConfig = oAuthConfig;
+    }
+
+    public SwaggerUiConfig oAuthConfig(SwaggerUiOAuth2Config oAuthConfig) {
+        setOAuthConfig(oAuthConfig);
+        return this;
     }
 }
