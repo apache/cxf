@@ -27,9 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-tools</artifactId>
-        <version>3.6.9-SNAPSHOT</version>
+        <version>3.6.9</version>
     </parent>
     <modules>
         <module>ws</module>
     </modules>
+
+  <scm>
+    <tag>cxf-3.6.9</tag>
+  </scm>
 </project>

@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.6.9-SNAPSHOT</version>
+        <version>3.6.9</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -174,4 +174,8 @@
             </build>
         </profile>
     </profiles>
+
+  <scm>
+    <tag>cxf-3.6.9</tag>
+  </scm>
 </project>

@@ -27,10 +27,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-rs-security</artifactId>
-        <version>3.6.9-SNAPSHOT</version>
+        <version>3.6.9</version>
     </parent>
     <modules>
         <module>jose</module>
         <module>jose-jaxrs</module>
     </modules>
+
+  <scm>
+    <tag>cxf-3.6.9</tag>
+  </scm>
 </project>

@@ -27,10 +27,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.6.9-SNAPSHOT</version>
+        <version>3.6.9</version>
         <relativePath>../../parent</relativePath>
     </parent>
     <modules>
         <module>compatible</module>
     </modules>
+
+  <scm>
+    <tag>cxf-3.6.9</tag>
+  </scm>
 </project>
