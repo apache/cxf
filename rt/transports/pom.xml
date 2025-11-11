@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>
-        <version>4.0.10</version>
+        <version>4.0.11-SNAPSHOT</version>
     </parent>
     <modules>
         <module>local</module>
@@ -42,8 +42,4 @@
         <module>jms</module>
         <module>websocket</module>
     </modules>
-
-  <scm>
-    <tag>cxf-4.0.10</tag>
-  </scm>
 </project>

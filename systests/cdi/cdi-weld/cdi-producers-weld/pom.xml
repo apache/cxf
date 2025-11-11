@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi-weld</artifactId>
-        <version>4.0.10</version>
+        <version>4.0.11-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -54,8 +54,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>cxf-4.0.10</tag>
-  </scm>
 </project>
