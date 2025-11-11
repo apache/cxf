@@ -19,11 +19,10 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.EntityPart;
@@ -32,7 +31,11 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -87,7 +90,6 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
     @Override
     public Builder content(InputStream in) throws IllegalArgumentException {
         this.content = in;
-        this.type = InputStream.class;
         return this;
     }
 
@@ -109,57 +111,54 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
 
     @Override
     public EntityPart build() throws IllegalStateException, IOException, WebApplicationException {
-        final MediaType mt = Objects.requireNonNullElse(mediaType, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        return new EntityPartImpl(getProviderFactory(), name, fileName, content, type, genericType, headers, mediaType);
+    }
 
-        Message message = JAXRSUtils.getCurrentMessage();
-        ProviderFactory factory = null;
-
+    private static Providers getProviderFactory() {
+        final Message message = JAXRSUtils.getCurrentMessage();
         if (message == null) {
-            message = new MessageImpl();
-            factory = ServerProviderFactory.createInstance(BusFactory.getThreadDefaultBus());
+            return new ReaderWriterProviders(ServerProviderFactory.createInstance(BusFactory.getThreadDefaultBus()));
         } else {
-            factory = ProviderFactory.getInstance(message);
+            return new ReaderWriterProviders(ProviderFactory.getInstance(message));
         }
-
-        if (genericType != null) {
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                writeTo(factory, genericType, mt, message, out);
-                return new EntityPartImpl(factory, name, fileName, new ByteArrayInputStream(out.toByteArray()),
-                    headers, mt);
-            }
-        } else if (type != null) {
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                writeTo(factory, type, mt, message, out);
-                return new EntityPartImpl(factory, name, fileName, new ByteArrayInputStream(out.toByteArray()),
-                    headers, mt);
-            }
-        } else {
-            throw new IllegalStateException("Either type or genericType is expected for the content");
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> void writeTo(final ProviderFactory providers, final GenericType<T> t, final MediaType mt,
-            final Message message, final ByteArrayOutputStream out) throws IOException {
-
-        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) providers
-            .createMessageBodyWriter(t.getRawType(), t.getType(), null, mt, message);
-
-        writer.writeTo((T) content, t.getRawType(), t.getType(), null, mt, cast(headers), out);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> void writeTo(final ProviderFactory providers, final Class<T> t, final MediaType mt,
-            final Message message, final ByteArrayOutputStream out) throws IOException {
-
-        final MessageBodyWriter<T> writer = (MessageBodyWriter<T>) providers
-                .createMessageBodyWriter(t, null, null, mt, message);
-
-        writer.writeTo((T) content, t, null, null, mt, cast(headers), out);
     }
     
-    @SuppressWarnings("unchecked")
-    private static <T, U> MultivaluedMap<T, U> cast(MultivaluedMap<?, ?> p) {
-        return (MultivaluedMap<T, U>)p;
-    }
+
+    private static final class ReaderWriterProviders implements Providers {
+        private final ProviderFactory factory;
+
+        private ReaderWriterProviders(final ProviderFactory factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return factory.createMessageBodyWriter(type, genericType, annotations, mediaType, getCurrentMessage());
+        }
+        
+        @Override
+        public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return factory.createMessageBodyReader(type, genericType, annotations, mediaType, getCurrentMessage());
+        }
+        
+        @Override
+        public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
+            throw new UnsupportedOperationException();
+        }
+
+        private static Message getCurrentMessage() {
+            Message message = JAXRSUtils.getCurrentMessage();
+            if (message == null) { 
+                message = new MessageImpl();
+            }
+            return message;
+        }
+    };
 }
