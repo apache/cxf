@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-tools</artifactId>
-        <version>4.1.4</version>
+        <version>4.1.5-SNAPSHOT</version>
     </parent>
     <modules>
         <module>core</module>
@@ -37,8 +37,4 @@
         <module>test</module>
         <module>misc</module>
     </modules>
-
-  <scm>
-    <tag>cxf-4.1.4</tag>
-  </scm>
 </project>
