@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-rs-sse</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.4</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -52,4 +52,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>cxf-4.1.4</tag>
+  </scm>
 </project>
