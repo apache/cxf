@@ -1,4 +1,4 @@
-Apache CXF 4.1.3 Release Notes
+Apache CXF 4.1.4 Release Notes
 
 1. Overview
 
@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.3 fixes over 10 JIRA issues reported by users and the community.
+4.1.4 fixes over 13 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,13 +70,27 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-9114] - ClientRequestContext#getConfiguration always return null in the MicroProfile RestClient
-    * [CXF-9139] - Null Safety Issue in getLocalPart Call in DataWriterImpl
-    * [CXF-9141] - MaskSensitiveHelperMasking malfunctions for empty tags
-    * [CXF-9146] - MemoryLeak in HttpClientHTTPConduit when used with the ThreadLocalClientState
-    * [CXF-9148] - Using @Oneway annotation cases NullPointerException in CXF + Jetty 12 REST Service
-    * [CXF-9150] - Deal with java.security.acl
-    * [CXF-9153] - The class org.apache.cxf.transport.servlet.servicelist.UnformattedServiceListWriter does not work for RESTful destinations
+    * [CXF-8691] - Logging Feature - Sensitive element with arrays
+    * [CXF-8938] - CXF forces XOP for SwA SOAP services
+    * [CXF-9136] - Add EntityPart MessageBodyReader / MessageBodyWriter support
+    * [CXF-9152] - Adding @Timed annotation to JaxWS WebService class breaks Micrometer integration
+    * [CXF-9160] - Add support for JBoss Remoting protocols in JNDI
+    * [CXF-9162] - Reusing a Client with a HttpClientHTTPConduit is not threadsafe in regards to finalization
+    * [CXF-9168] - No Micrometer Metric for requests failing schema validation on jax-ws endpoints
+    * [CXF-9170] - Server requests counted twice after fixing CXF-9168
+    * [CXF-9171] - DelayedCachedOutputStreamCleaner thread accumulation after CVE-2025-23184 fix
+    * [CXF-9173] - Default SO_LINGER induce TCP RST on each connection closure
+
+
+
+
+** Improvement
+    * [CXF-9157] - remove jetty server from rs-sse-undertow
+    * [CXF-9165] - Remove unnecessary JDK 8 hacks
+
+
+** Wish
+    * [CXF-9159] - Support spring boot SSL bundles
 
 
 
