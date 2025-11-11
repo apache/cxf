@@ -66,7 +66,7 @@ public class SwaggerUiConfig {
     // Enables overriding configuration parameters via URL search params. If not explicitly set, it
     // will be automatically set to true when setter for any other field is called.
     private Boolean queryConfigEnabled;
-    // Controls the OAuth config. If present, the SwaggerUIBundle initialitation will contain a call to initOAuth
+    // Controls the OAuth config. If present, the SwaggerUIBundle initialization will contain a call to initOAuth
     // with the parameters contained here
     private SwaggerUiOAuth2Config oAuthConfig;
     
@@ -105,7 +105,7 @@ public class SwaggerUiConfig {
         this.showCommonExtensions = showCommonExtensions;
         setQueryConfigEnabledIfNeeded();
     }
-
+    
     public Boolean getShowExtensions() {
         return showExtensions;
     }
@@ -113,7 +113,7 @@ public class SwaggerUiConfig {
     public Integer getMaxDisplayedTags() {
         return maxDisplayedTags;
     }
- 
+
     public void setMaxDisplayedTags(Integer maxDisplayedTags) {
         this.maxDisplayedTags = maxDisplayedTags;
         setQueryConfigEnabledIfNeeded();
