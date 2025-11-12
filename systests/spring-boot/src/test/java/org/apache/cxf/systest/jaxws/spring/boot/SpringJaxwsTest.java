@@ -262,7 +262,7 @@ public class SpringJaxwsTest {
 
         // then
         assertThat(registry.get("cxf.server.requests").meters()).hasSize(2);
-        assertThat(output).contains("Reached the maximum number of URI tags for 'cxf.server.requests'");
+        assertThat(output).contains("Reached the maximum number of 'uri' tags for 'cxf.server.requests'");
     }
 
     @Test
