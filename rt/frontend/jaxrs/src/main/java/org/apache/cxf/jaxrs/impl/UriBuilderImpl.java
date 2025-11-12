@@ -293,6 +293,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     private String substituteVarargs(URITemplate templ,
                                      Map<String, Object> alreadyResolvedTs,
                                      Map<String, Object> alreadyResolvedTsPathEnc,
