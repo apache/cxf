@@ -40,6 +40,7 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
 
     }
 
+    @SuppressWarnings("PMD.IdenticalConditionalBranches")
     public int next() {
         int event = states[state];
         if (event != 0) {
