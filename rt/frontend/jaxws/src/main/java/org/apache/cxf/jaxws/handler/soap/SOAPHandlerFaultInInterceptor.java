@@ -105,6 +105,7 @@ public class SOAPHandlerFaultInInterceptor extends
         }
     }
 
+    @SuppressWarnings("PMD.IdenticalConditionalBranches")
     private void handleAbort(SoapMessage message, MessageContext context) {
         if (isRequestor(message)) {
 
