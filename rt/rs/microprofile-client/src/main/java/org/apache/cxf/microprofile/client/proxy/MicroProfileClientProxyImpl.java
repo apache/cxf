@@ -449,6 +449,15 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         }
     }
 
+    @Override
+    protected ClientProxyImpl createProxy(final ClientState newState, final ClassLoader loader,
+            final ClassResourceInfo newCri, final boolean isNewRoot, final boolean newInheritHeaders) {
+        final ExecutorService executor = (ExecutorService) cfg.getRequestContext().get(EXECUTOR_SERVICE_PROPERTY);
+        final Configuration configuration = (Configuration) cfg.getRequestContext().get(Configuration.class.getName());
+        return new MicroProfileClientProxyImpl(newState, loader, newCri, isNewRoot, newInheritHeaders, 
+            executor, configuration, interceptorWrapper, tlsConfig);
+    }
+
     private <T> T mapInstance(Instance<T> instance) {
         cdiInstances.add(instance);
         return instance.getValue();
