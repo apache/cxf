@@ -211,7 +211,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-testutils</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.0.11-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
