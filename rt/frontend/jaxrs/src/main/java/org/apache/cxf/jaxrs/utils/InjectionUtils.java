@@ -55,6 +55,7 @@ import java.util.logging.Logger;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -521,6 +522,10 @@ public final class InjectionUtils {
             } catch (Throwable ex) {
                 result = null;
             }
+        }
+        
+        if (EntityPart.class.isAssignableFrom(pClass) && message != null) {
+            result = EntityPartUtils.getEntityPart(value, message);
         }
 
         if (result == null) {

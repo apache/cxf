@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.5-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>4.1.4-SNAPSHOT</version>
+                <version>4.1.5-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -141,7 +141,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                    <version>4.1.4-SNAPSHOT</version>
+                    <version>4.1.5-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -171,7 +171,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                    <version>4.1.4-SNAPSHOT</version>
+                    <version>4.1.5-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -201,7 +201,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-netty-server</artifactId>
-                    <version>4.1.4-SNAPSHOT</version>
+                    <version>4.1.5-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -260,7 +260,7 @@
                 <dependency>
                     <groupId>org.apache.cxf</groupId>
                     <artifactId>cxf-rt-transports-http-netty-client</artifactId>
-                    <version>4.1.4-SNAPSHOT</version>
+                    <version>4.1.5-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -269,22 +269,22 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-management</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-metrics</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.xjc-utils</groupId>

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi-weld</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.5-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -33,5 +33,4 @@
     <properties>
         <cxf.module.name>org.apache.cxf.systests.cdi.weld.multiapp</cxf.module.name>
     </properties>
-    
 </project>

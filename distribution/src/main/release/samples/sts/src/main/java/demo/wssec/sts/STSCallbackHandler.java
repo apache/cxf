@@ -36,7 +36,7 @@ public class STSCallbackHandler implements CallbackHandler {
                 if (pc.getUsage() == WSPasswordCallback.DECRYPT
                     || pc.getUsage() == WSPasswordCallback.SIGNATURE) {
                     if ("mystskey".equals(pc.getIdentifier())) {
-                        pc.setPassword("stskpass");
+                        pc.setPassword("stsspass");
                     }
                 } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
                     if ("alice".equals(pc.getIdentifier())) {

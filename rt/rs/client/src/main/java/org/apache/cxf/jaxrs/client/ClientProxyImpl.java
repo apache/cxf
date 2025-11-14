@@ -317,8 +317,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
             ClientState newState = getState().newState(uri, subHeaders,
                  getTemplateParametersMap(ori.getURITemplate(), pathParams));
-            ClientProxyImpl proxyImpl =
-                new ClientProxyImpl(newState, proxyLoader, subCri, false, inheritHeaders);
+            ClientProxyImpl proxyImpl = createProxy(newState, proxyLoader, subCri, false, inheritHeaders);
             proxyImpl.setConfiguration(getConfiguration());
             return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         }
@@ -349,6 +348,11 @@ public class ClientProxyImpl extends AbstractClient implements
             resetResponseStateImmediatelyIfNeeded();
         }
 
+    }
+
+    protected ClientProxyImpl createProxy(final ClientState newState, final ClassLoader loader,
+            final ClassResourceInfo newCri, final boolean isNewRoot, final boolean newInheritHeaders) {
+        return new ClientProxyImpl(newState, loader, newCri, isNewRoot, newInheritHeaders);
     }
 
     protected void addNonEmptyPath(UriBuilder builder, String pathValue) {

@@ -109,6 +109,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     private final TLSConfiguration tlsConfig;
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
@@ -125,6 +126,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         init(executorService, configuration);
     }
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
@@ -445,6 +447,15 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         } catch (Throwable t) {
             throwException(t);
         }
+    }
+
+    @Override
+    protected ClientProxyImpl createProxy(final ClientState newState, final ClassLoader loader,
+            final ClassResourceInfo newCri, final boolean isNewRoot, final boolean newInheritHeaders) {
+        final ExecutorService executor = (ExecutorService) cfg.getRequestContext().get(EXECUTOR_SERVICE_PROPERTY);
+        final Configuration configuration = (Configuration) cfg.getRequestContext().get(Configuration.class.getName());
+        return new MicroProfileClientProxyImpl(newState, loader, newCri, isNewRoot, newInheritHeaders, 
+            executor, configuration, interceptorWrapper, tlsConfig);
     }
 
     private <T> T mapInstance(Instance<T> instance) {

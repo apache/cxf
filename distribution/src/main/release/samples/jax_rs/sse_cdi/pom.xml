@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.5-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -20,19 +20,19 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-integration-cdi</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-sse</artifactId>
-            <version>4.1.4-SNAPSHOT</version>
+            <version>4.1.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>

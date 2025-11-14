@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.5-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -77,5 +77,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -231,6 +232,24 @@ public final class FormUtils {
 
         }
     }
+    
+    public static void populateMapFromEntityParts(MultivaluedMap<String, String> params,
+                                                List<EntityPart> parts,
+                                                Message m,
+                                                boolean decode) {
+        checkNumberOfParts(m, parts.size());
+        for (EntityPart part : parts) {
+            try {
+                final String value = part.getContent(String.class);
+                params.add(HttpUtils.urlDecode(part.getName()), decode ? HttpUtils.urlDecode(value) : value);
+            } catch (IllegalArgumentException ex) {
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
+            } catch (IOException ex) {
+                throw ExceptionUtils.toBadRequestException(null, null);
+            }
+        }
+    }
+
 
     public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
                                                 MultipartBody body,

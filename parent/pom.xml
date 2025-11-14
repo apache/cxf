@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -161,7 +161,7 @@
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.5.4</cxf.jettison.version>
-        <cxf.jetty12.version>12.0.29</cxf.jetty12.version>
+        <cxf.jetty12.version>12.0.30</cxf.jetty12.version>
         <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
         <cxf.jexl.version>3.3</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
@@ -174,7 +174,7 @@
         <cxf.kerby.version>2.0.3</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.3</cxf.ldapsdk.version>
         <cxf.littleproxy.version>2.4.6</cxf.littleproxy.version>
-        <cxf.logback.classic.version>1.5.20</cxf.logback.classic.version>
+        <cxf.logback.classic.version>1.5.21</cxf.logback.classic.version>
         <cxf.lucene.version>9.12.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.10</cxf.maven.core.version>
         <cxf.micrometer.version>1.14.13</cxf.micrometer.version>
@@ -216,12 +216,12 @@
         <cxf.spring.ldap.version>3.2.15</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.security.version>6.4.12</cxf.spring.security.version>
-        <cxf.spring.version>6.2.12</cxf.spring.version>
+        <cxf.spring.version>6.2.13</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>5.30.1</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.30.2</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
         <cxf.tika.version>3.0.0</cxf.tika.version>
-        <cxf.tomcat.version>10.1.48</cxf.tomcat.version>
+        <cxf.tomcat.version>10.1.49</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
         <cxf.undertow.version>2.3.20.Final</cxf.undertow.version>
         <cxf.yasson.version>3.0.4</cxf.yasson.version>
@@ -394,7 +394,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>12.1.1</version>
+                            <version>12.1.2</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -432,12 +432,12 @@
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-core</artifactId>
-                            <version>7.17.0</version>
+                            <version>7.18.0</version>
                         </dependency>
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-java</artifactId>
-                            <version>7.17.0</version>
+                            <version>7.18.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
