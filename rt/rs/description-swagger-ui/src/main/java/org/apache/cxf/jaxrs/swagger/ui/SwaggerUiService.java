@@ -129,7 +129,7 @@ public class SwaggerUiService {
                     // Since Swagger UI 4.1.3, passing the default URL as query parameter,
                     // e.g. `?url=swagger.json` is disabled by default due to security concerns.
                     final String url = config.getUrl();
-                    final SwaggerUiOAuth2Config oAuthConfig = config.getOAuthConfig();
+                    final SwaggerUiOAuth2Config oAuthConfig = config.getOAuth2Config();
                     if (!StringUtils.isEmpty(url) || oAuthConfig != null) {
                         try (InputStream in = resourceURL.openStream()) {
                             String resource = IOUtils.readStringFromStream(in);

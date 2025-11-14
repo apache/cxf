@@ -68,7 +68,7 @@ public class SwaggerUiConfig {
     private Boolean queryConfigEnabled;
     // Controls the OAuth config. If present, the SwaggerUIBundle initialization will contain a call to initOAuth
     // with the parameters contained here
-    private SwaggerUiOAuth2Config oAuthConfig;
+    private SwaggerUiOAuth2Config oAuth2Config;
     
     public String getConfigUrl() {
         return configUrl;
@@ -340,16 +340,16 @@ public class SwaggerUiConfig {
         setQueryConfigEnabledIfNeeded();
     }
 
-    public SwaggerUiOAuth2Config getOAuthConfig() {
-        return oAuthConfig;
+    public SwaggerUiOAuth2Config getOAuth2Config() {
+        return oAuth2Config;
     }
 
-    public void setOAuthConfig(SwaggerUiOAuth2Config oAuthConfig) {
-        this.oAuthConfig = oAuthConfig;
+    public void setOAuth2Config(SwaggerUiOAuth2Config oauth) {
+        this.oAuth2Config = oauth;
     }
 
-    public SwaggerUiConfig oAuthConfig(SwaggerUiOAuth2Config oAuthConfig) {
-        setOAuthConfig(oAuthConfig);
+    public SwaggerUiConfig oAuth2Config(SwaggerUiOAuth2Config oauth) {
+        setOAuth2Config(oauth);
         return this;
     }
 }
