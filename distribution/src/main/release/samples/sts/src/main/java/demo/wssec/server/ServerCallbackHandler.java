@@ -34,7 +34,7 @@ public class ServerCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if ("myservicekey".equals(pc.getIdentifier())) {
-                    pc.setPassword("skpass");
+                    pc.setPassword("sspass");
                     break;
                 }
             }
