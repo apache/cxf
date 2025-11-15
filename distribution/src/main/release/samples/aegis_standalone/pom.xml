@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.stax-utils</groupId>

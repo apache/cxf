@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -57,7 +57,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.testenricher</groupId>
-                <artifactId>arquillian-testenricher-cdi-jakarta</artifactId>
+                <artifactId>arquillian-testenricher-cdi</artifactId>
                 <version>${cxf.arquillian.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -101,7 +101,6 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-core</artifactId>
                 <version>${cxf.johnzon.version}</version>
-                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -132,7 +131,6 @@
                 <groupId>org.apache.johnzon</groupId>
                 <artifactId>johnzon-jsonb</artifactId>
                 <version>${cxf.johnzon.version}</version>
-                <classifier>jakarta</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>

@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -42,8 +42,8 @@
             <dependencies>
                 <!-- jetty11 websocket -->
                 <dependency>
-                    <groupId>org.eclipse.jetty.ee10.websocket</groupId>
-                    <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty.ee11.websocket</groupId>
+                    <artifactId>jetty-ee11-websocket-jetty-server</artifactId>
                     <version>${cxf.jetty12.version}</version>
                     <exclusions>
                         <exclusion>
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
@@ -124,8 +124,8 @@
             <version>${cxf.jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-webapp</artifactId>
             <version>${cxf.jetty.version}</version>
         </dependency>
         <dependency>
@@ -142,17 +142,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-websocket</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>4.1.5-SNAPSHOT</version>
+            <version>4.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>jakarta.ws.rs</groupId>

@@ -321,7 +321,9 @@ public class ClientProxyImpl extends AbstractClient implements
             proxyImpl.setConfiguration(getConfiguration());
             return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         }
-        headers.putAll(paramHeaders);
+
+        // Merge values for same headers
+        paramHeaders.forEach((k, v) -> headers.addAll(k, v));
 
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
 

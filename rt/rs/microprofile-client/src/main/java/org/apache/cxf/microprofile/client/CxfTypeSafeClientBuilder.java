@@ -41,8 +41,11 @@ import javax.net.ssl.TrustManagerFactory;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Configurable;
 import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.client.ClientProperties;
 import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.microprofile.client.sse.SseMessageBodyReader;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
@@ -61,6 +64,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
     private final MicroProfileClientConfigurableImpl<RestClientBuilder> configImpl =
             new MicroProfileClientConfigurableImpl<>(this);
     private TLSConfiguration secConfig = new TLSConfiguration();
+    private final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
 
     private static Collection<RestClientListener> listeners() {
         ClassLoader threadContextClassLoader;
@@ -146,6 +150,13 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
             baseUri, aClass, executorService, secConfig);
+        if (!headers.isEmpty()) {
+            bean.setHeaders(headers
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> 
+                    HttpUtils.getHeaderString(HttpUtils.getHeaderStrings(e.getValue())))));
+        }
         return bean.create(aClass);
     }
 
@@ -286,5 +297,11 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
 
     public void close() {
         configImpl.close();
+    }
+
+    @Override
+    public RestClientBuilder header(String name, Object value) {
+        headers.add(name, Objects.requireNonNull(value, "Header value should not be null"));
+        return this;
     }
 }

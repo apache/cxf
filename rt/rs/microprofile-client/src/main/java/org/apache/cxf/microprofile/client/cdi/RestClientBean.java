@@ -18,11 +18,14 @@
  */
 package org.apache.cxf.microprofile.client.cdi;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
@@ -133,6 +136,21 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
         CxfTypeSafeClientBuilder builder = builders.remove(instance);
         if (builder != null) {
             builder.close();
+        }
+        try {
+            if (instance instanceof AutoCloseable c) {
+                c.close();
+            } else if (instance instanceof Closeable c) {
+                c.close();
+            }
+        } catch (final Exception ex) {
+            if (ex instanceof IOException e) {
+                throw new UncheckedIOException(e);
+            } else if (ex instanceof RuntimeException e) {
+                throw e;
+            } else {
+                throw new UndeclaredThrowableException(ex);
+            }
         }
     }
 
