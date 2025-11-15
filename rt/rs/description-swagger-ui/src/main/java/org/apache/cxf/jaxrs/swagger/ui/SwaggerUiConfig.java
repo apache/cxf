@@ -31,16 +31,16 @@ import org.apache.cxf.common.util.StringUtils;
 public class SwaggerUiConfig {
     // URL to fetch external configuration document from.
     private String configUrl;
-    // The url pointing to API definition (normally 
+    // The url pointing to API definition (normally
     // swagger.json/swagger.yaml/openapi.json/openapi.yaml).
     private String url;
-    // If set, enables filtering. The top bar will show an edit box that 
+    // If set, enables filtering. The top bar will show an edit box that
     // could be used to filter the tagged operations that are shown.
     private String filter;
     
     // Enables or disables deep linking for tags and operations.
     private Boolean deepLinking;
-    //  Controls the display of operationId in operations list. 
+    //  Controls the display of operationId in operations list.
     private Boolean displayOperationId;
     // The default expansion depth for models (set to -1 completely hide the models).
     private Integer defaultModelsExpandDepth;
@@ -51,9 +51,9 @@ public class SwaggerUiConfig {
     private String defaultModelRendering;
     // Controls the display of the request duration (in milliseconds) for Try-It-Out requests.
     private Boolean displayRequestDuration;
-    // Controls the default expansion setting for the operations and tags. 
+    // Controls the default expansion setting for the operations and tags.
     private String docExpansion;
-    //  If set, limits the number of tagged operations displayed to at most this many. 
+    //  If set, limits the number of tagged operations displayed to at most this many.
     private Integer maxDisplayedTags;
     // Controls the display of vendor extension (x-) fields and values.
     private Boolean showExtensions;
@@ -66,6 +66,9 @@ public class SwaggerUiConfig {
     // Enables overriding configuration parameters via URL search params. If not explicitly set, it
     // will be automatically set to true when setter for any other field is called.
     private Boolean queryConfigEnabled;
+    // Controls the OAuth config. If present, the SwaggerUIBundle initialization will contain a call to initOAuth
+    // with the parameters contained here
+    private SwaggerUiOAuth2Config oAuth2Config;
     
     public String getConfigUrl() {
         return configUrl;
@@ -335,5 +338,18 @@ public class SwaggerUiConfig {
     public void setTryItOutEnabled(Boolean tryItOutEnabled) {
         this.tryItOutEnabled = tryItOutEnabled;
         setQueryConfigEnabledIfNeeded();
+    }
+
+    public SwaggerUiOAuth2Config getOAuth2Config() {
+        return oAuth2Config;
+    }
+
+    public void setOAuth2Config(SwaggerUiOAuth2Config oauth) {
+        this.oAuth2Config = oauth;
+    }
+
+    public SwaggerUiConfig oAuth2Config(SwaggerUiOAuth2Config oauth) {
+        setOAuth2Config(oauth);
+        return this;
     }
 }
