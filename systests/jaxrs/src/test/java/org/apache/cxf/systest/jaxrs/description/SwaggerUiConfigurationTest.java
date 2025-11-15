@@ -19,11 +19,11 @@
 package org.apache.cxf.systest.jaxrs.description;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -32,12 +32,18 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
+import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiOAuth2Config;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,7 +52,12 @@ import static org.junit.Assert.assertTrue;
 
 public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
     private static final String PORT = allocatePort(SwaggerUiConfigurationTest.class);
-
+    private static final SwaggerUiOAuth2Config OAUTH2_CONFIG = new SwaggerUiOAuth2Config()
+            .usePkceWithAuthorizationCodeGrant(true)
+            .appName("CXF Test App")
+            .additionalQueryStringParams(Map.of("key1", "value1", "key2", "value2"))
+            .scopes(List.of("scope1", "scope2"));
+    
     public static class Server extends AbstractServerTestServerBase {
 
         @Override
@@ -58,7 +69,10 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
             feature.setRunAsFilter(false);
-            feature.setSwaggerUiConfig(new SwaggerUiConfig().url("/swagger.json").queryConfigEnabled(false));
+            feature.setSwaggerUiConfig(new SwaggerUiConfig()
+                    .url("/swagger.json")
+                    .queryConfigEnabled(false)
+                    .oAuth2Config(OAUTH2_CONFIG));
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + PORT + "/");
             return sf.create();
@@ -110,7 +124,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
 
     @Test
     public void testUiRootResourcePicksUrlFromConfigurationOnly() {
-        // Test that Swagger UI URL is picked from configuration only and 
+        // Test that Swagger UI URL is picked from configuration only and
         // never from the query string (when query config is disabled).
         WebClient uiClient = WebClient
             .create("http://localhost:" + getPort() + "/api-docs")
@@ -131,7 +145,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
         WebClient uiClient = WebClient
                 .create("http://localhost:" + getPort() + "/api-docs")
                 .path("/swagger-initializer.js")
-                .query("another-swagger.json")
+                .query("url", "another-swagger.json")
                 .accept("*/*");
 
         try (Response response = uiClient.get()) {
@@ -140,7 +154,26 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
             assertFalse(jsCode.contains("another-swagger.json"));
         }
     }
-
+    
+    @Test
+    public void testUiRootResourceAddsOAuth2ConfigAsConfigured() throws Exception {
+        // With query config disabled or unset, we replace the url value in the Swagger resource with the one
+        // configured in SwaggerUiConfig, and ignore the one in query parameter.
+        WebClient uiClient = WebClient
+                .create("http://localhost:" + getPort() + "/api-docs")
+                .path("/swagger-initializer.js")
+                .accept("*/*");
+        
+        try (Response response = uiClient.get()) {
+            String jsCode = response.readEntity(String.class);
+            final JsonMapper mapper = JsonMapper.builder()
+                    .defaultPropertyInclusion(JsonInclude.Value.construct(NON_EMPTY, NON_EMPTY))
+                    .build();
+            final String expectedConfigAsJson = mapper.writeValueAsString(OAUTH2_CONFIG);
+            assertThat(jsCode, containsString("ui.initOAuth(" + expectedConfigAsJson + ")"));
+        }
+    }
+    
     public static String getPort() {
         return PORT;
     }
