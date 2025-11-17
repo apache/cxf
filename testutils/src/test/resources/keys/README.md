@@ -73,7 +73,7 @@ Update servicestore.jks
 4. `keytool -importkeystore -deststorepass sspass -destkeystore servicestore.jks -srckeystore myservicekey.p12 -srcstoretype PKCS12 -alias myservicekey -destkeypass sspass`
 
 
-How to create / update cxfca.jks, alice.jks and bob.jks
+How to create / update cxfca.jks, alice.jks, bob.jks and sts.jks
 ####
 
-cxfca is a self-signed certificate, where the corresponding private key is used to sign the alice and bob keys. To generate them follow the process listed in https://github.com/apache/ws-wss4j/blob/8b4799f16582cb335a8d8a3f0ea7d41027231cd8/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/SignatureCertTest.java#L60
+cxfca is a self-signed certificate, where the corresponding private key is used to sign the alice and bob keys and sts keys. To generate them follow the process listed in https://github.com/apache/ws-wss4j/blob/8b4799f16582cb335a8d8a3f0ea7d41027231cd8/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/SignatureCertTest.java#L60
