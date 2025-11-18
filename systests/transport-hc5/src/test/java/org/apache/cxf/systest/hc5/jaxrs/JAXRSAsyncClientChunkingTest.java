@@ -104,7 +104,7 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
         config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
         configureLogging(config);
 
-        final String filename = "keymanagers.jks";
+        final String filename = "keymanagers-chunking.jks";
         try {
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);
@@ -135,7 +135,7 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
         config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
         configureLogging(config);
 
-        final String filename = "keymanagers.jks";
+        final String filename = "keymanagers-chunking.jks";
         try {
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);

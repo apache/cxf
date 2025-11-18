@@ -86,7 +86,7 @@ public class JAXRSClientChunkingTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(webClient).getHttpConduit().getClient().setAllowChunking(chunked);
 
         try {
-            final String filename = "keymanagers.jks";
+            final String filename = "keymanagers-chunking.jks";
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);
             headers.add("Content-Type", "application/binary");
