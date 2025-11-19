@@ -86,12 +86,12 @@ public class JAXRSClientChunkingTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(webClient).getHttpConduit().getClient().setAllowChunking(chunked);
 
         try {
-            final String filename = "keymanagers-chunking.jks";
+            final String filename = "Morpit.jks";
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);
             headers.add("Content-Type", "application/binary");
             headers.add("Content-Disposition", "attachment; filename=" + chunked + "_" + filename);
-            final Attachment att = new Attachment(getClass().getResourceAsStream("/" + filename), headers);
+            final Attachment att = new Attachment(getClass().getResourceAsStream("/keys/" + filename), headers);
             final MultipartBody entity = new MultipartBody(att);
             try (Response response = webClient.header("Content-Type", "multipart/form-data").post(entity)) {
                 assertThat(response.getStatus(), equalTo(201));

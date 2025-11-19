@@ -104,13 +104,13 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
         config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
         configureLogging(config);
 
-        final String filename = "keymanagers-chunking.jks";
+        final String filename = "Morpit.jks";
         try {
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);
             headers.add("Content-Type", "application/binary");
             headers.add("Content-Disposition", "attachment; filename=" + chunked + "_" + autoRedirect + "_" + filename);
-            final Attachment att = new Attachment(getClass().getResourceAsStream("/" + filename), headers);
+            final Attachment att = new Attachment(getClass().getResourceAsStream("/keys/" + filename), headers);
             final MultipartBody entity = new MultipartBody(att);
             try (Response response = webClient.header("Content-Type", MediaType.MULTIPART_FORM_DATA).post(entity)) {
                 assertThat(response.getStatus(), equalTo(201));
@@ -135,14 +135,14 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
         config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
         configureLogging(config);
 
-        final String filename = "keymanagers-chunking.jks";
+        final String filename = "Morpit.jks";
         try {
             final MultivaluedMap<String, String> headers = new MetadataMap<>();
             headers.add("Content-ID", filename);
             headers.add("Content-Type", "application/binary");
             headers.add("Content-Disposition", "attachment; filename=" + chunked
                 +  "_" + autoRedirect + "_async_" + filename);
-            final Attachment att = new Attachment(getClass().getResourceAsStream("/" + filename), headers);
+            final Attachment att = new Attachment(getClass().getResourceAsStream("/keys/" + filename), headers);
             final Entity<MultipartBody> entity = Entity.entity(new MultipartBody(att), 
                     MediaType.MULTIPART_FORM_DATA_TYPE);
             try (Response response = webClient.header("Content-Type", MediaType.MULTIPART_FORM_DATA).async()
