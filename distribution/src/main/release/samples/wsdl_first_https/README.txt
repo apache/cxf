@@ -46,20 +46,6 @@ Scenario 2:  (-Psecure.client)
 Same as above, except this time "SecureClient.xml", which contains the
 appropriate credential information.  This SOAP call will succeed here.
 
-In this configuration file, the client provides its certificate "CN=Wibble" 
-and chain stored in the Java KeyStore "certs/wibble.jks" to the server. The
-server authenticates the client's certificate using its truststore
-"certs/truststore.jks", which holds the Certificate Authorities'
-certificates.
-
-Likewise the client authenticates the server's certificate "CN=Cherry"
-and chain against the same trust store.  Note the usage of the
-cipherSuitesFilter configuration in the configuration files,
-where each party imposes different ciphersuites constraints, so that the
-ciphersuite eventually negotiated during the TLS handshake is acceptable
-to both sides. This may be viewed by adding a -Djavax.net.debug=all 
-argument to the JVM.
-
 But please note that it is not advisable to store sensitive data such
 as passwords in clear text configuration files, unless the
 file is sufficiently protected by OS level permissions. The KeyStores
@@ -83,7 +69,4 @@ possibly be disassembled. Typically the password would be obtained at
 runtime by prompting for the password.  The approach taken here is for
 demonstration purposes only.
 
-Certificates:
-See the src/main/config folder for the sample keys used (don't use
-these keys in production!) as well as scripts used for their creation.
 
