@@ -31,11 +31,11 @@
     <httpj:engine-factory>
         <httpj:engine port="9001">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
+                <sec:keyManagers keyPassword="sspass">
+                    <sec:keyStore resource="keys/servicestore.jks" password="sspass" type="JKS"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/main/config/stsstore.jks" password="stsspass" type="JKS"/>
+                    <sec:keyStore resource="keys/stsstore.jks" password="stsspass" type="JKS"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
