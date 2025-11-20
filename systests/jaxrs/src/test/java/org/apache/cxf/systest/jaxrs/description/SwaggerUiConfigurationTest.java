@@ -25,6 +25,10 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -38,10 +42,6 @@ import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static org.hamcrest.CoreMatchers.containsString;
