@@ -82,7 +82,7 @@ public class BlueprintResourceFactory implements ResourceProvider {
             : Collections.singletonMap(Application.class, application.getProvider()));
         Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
         //TODO Very springish...
-        Object instance = values.length > 0 ? blueprintContainer.getComponentInstance(beanId)
+        Object instance = values.length > 0 ? blueprintContainer.getComponentInstance(beanId) // NOPMD
             : blueprintContainer.getComponentInstance(beanId);
         if (!isSingleton() || m == null) {
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
