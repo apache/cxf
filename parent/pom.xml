@@ -121,7 +121,7 @@
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.hamcrest.version>3.0</cxf.hamcrest.version>
         <cxf.hazelcast.version>5.6.0</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>7.1.7.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.em.version>7.1.9.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>9.1.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.4</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
@@ -212,11 +212,11 @@
         <cxf.slf4j.version>2.0.17</cxf.slf4j.version>
         <cxf.snakeyaml.version>2.5</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>4.0.0-RC2</cxf.spring.boot.version>
+        <cxf.spring.boot.version>4.0.0</cxf.spring.boot.version>
         <cxf.spring.ldap.version>4.0.0</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>7.0.0-RC3</cxf.spring.security.version>
-        <cxf.spring.version>7.0.0-RC3</cxf.spring.version>
+        <cxf.spring.security.version>7.0.0</cxf.spring.security.version>
+        <cxf.spring.version>7.0.1</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.30.2</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.40</cxf.swagger.v3.version>
