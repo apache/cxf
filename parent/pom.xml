@@ -171,7 +171,7 @@
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13.2</cxf.junit.version>
         <cxf.junit5.version>5.14.1</cxf.junit5.version>
-        <cxf.kerby.version>2.0.3</cxf.kerby.version>
+        <cxf.kerby.version>2.1.1</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.3</cxf.ldapsdk.version>
         <cxf.littleproxy.version>2.4.6</cxf.littleproxy.version>
         <cxf.logback.classic.version>1.5.21</cxf.logback.classic.version>
