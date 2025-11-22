@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-java2wadl-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>4.1.5-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
     <name>Apache CXF Java2WADL Maven2 Plugin</name>
     <description>Apache CXF Java2WADL Maven2 Plugin</description>
     <url>https://cxf.apache.org</url>
@@ -31,7 +31,7 @@
     <parent>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-maven-plugins</artifactId>
-      <version>4.1.5-SNAPSHOT</version>
+      <version>4.2.0-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.plugin.java2wadl</cxf.module.name>

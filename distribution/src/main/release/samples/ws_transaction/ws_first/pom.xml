@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>ws_transaction</artifactId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>spring-boot-sample-ws-cxf-first-service</artifactId>

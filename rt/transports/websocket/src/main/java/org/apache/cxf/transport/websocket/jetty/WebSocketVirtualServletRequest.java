@@ -55,6 +55,8 @@ import jakarta.servlet.http.Part;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
+import org.eclipse.jetty.ee11.servlet.ServletApiRequest;
+import org.eclipse.jetty.ee11.servlet.ServletChannel;
 import org.eclipse.jetty.websocket.api.Session;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -70,8 +72,10 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     private Map<String, String> requestHeaders;
     private Map<String, Object> attributes;
 
-    public WebSocketVirtualServletRequest(WebSocketServletHolder websocket, InputStream in, Session session)
+    public WebSocketVirtualServletRequest(ServletApiRequest req, WebSocketServletHolder websocket,
+            InputStream in, Session session)
         throws IOException {
+        
         this.webSocketHolder = websocket;
         this.in = in;
 
@@ -92,6 +96,9 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
         Object v = websocket.getAttribute("org.apache.cxf.transport.endpoint.address");
         if (v != null) {
             attributes.put("org.apache.cxf.transport.endpoint.address", v);
+        }
+        if (req.getServletRequestInfo() != null) {
+            attributes.put(ServletChannel.class.getName(), req.getServletRequestInfo().getServletChannel());
         }
     }
 

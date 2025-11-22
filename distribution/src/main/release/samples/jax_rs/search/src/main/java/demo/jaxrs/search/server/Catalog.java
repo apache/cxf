@@ -172,7 +172,7 @@ public class Catalog {
                 final DocumentStoredFieldVisitor fieldVisitor =
                     new DocumentStoredFieldVisitor(LuceneDocumentMetadata.SOURCE_FIELD);
 
-                reader.document(scoreDoc.doc, fieldVisitor);
+                reader.storedFields().document(scoreDoc.doc, fieldVisitor);
                 builder.add(fieldVisitor
                         .getDocument()
                         .getField(LuceneDocumentMetadata.SOURCE_FIELD)
@@ -204,7 +204,7 @@ public class Catalog {
             if (query != null) {
                 final TopDocs topDocs = searcher.search(query, 1000);
                 for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
-                    final Document document = reader.document(scoreDoc.doc);
+                    final Document document = reader.storedFields().document(scoreDoc.doc);
                     final String source = document
                         .getField(LuceneDocumentMetadata.SOURCE_FIELD)
                         .stringValue();
@@ -288,7 +288,7 @@ public class Catalog {
 
         try {
             return searcher.search(new TermQuery(
-                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits.value > 0;
+                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits.value() > 0;
         } finally {
             reader.close();
         }

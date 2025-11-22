@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -90,16 +91,15 @@ public class DigestAuthSupplierSpringTest {
 
     }
 
+    @EnableWebSecurity
     static class SecurityConfig {
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             DigestAuthenticationEntryPoint authenticationEntryPoint = digestAuthenticationEntryPoint();
             return http
-                .authorizeRequests().anyRequest().authenticated()
-                    .and()
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .and()
+                .authorizeHttpRequests(c -> c.anyRequest().authenticated())
+                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilter(digestAuthenticationFilter(authenticationEntryPoint))
                 .build();
         }
@@ -109,6 +109,7 @@ public class DigestAuthSupplierSpringTest {
             DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
             digestAuthenticationFilter.setUserDetailsService(userDetailsService());
             digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
+            digestAuthenticationFilter.setCreateAuthenticatedToken(true);
             return digestAuthenticationFilter;
         }
 

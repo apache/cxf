@@ -254,4 +254,13 @@ public class NettyServletResponse implements HttpServletResponse {
     public Collection<String> getHeaderNames() {
         throw new IllegalStateException("Method 'getHeaderNames' not yet implemented!");
     }
+
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        setStatus(302);
+        setHeader(LOCATION, location);
+        if (clearBuffer) {
+            resetBuffer();
+        }
+    }
 }

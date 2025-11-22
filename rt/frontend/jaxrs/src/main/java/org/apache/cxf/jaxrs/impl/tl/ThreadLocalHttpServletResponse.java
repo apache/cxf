@@ -181,6 +181,9 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
         get().setContentLengthLong(len);
     }
 
-
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        get().sendRedirect(location, sc, clearBuffer);
+    }
 
 }

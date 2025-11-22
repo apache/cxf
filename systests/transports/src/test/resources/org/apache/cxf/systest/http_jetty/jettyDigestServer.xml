@@ -25,7 +25,7 @@
     <httpj:engine-factory bus="cxf">
         <httpj:engine port="${testutil.ports.JettyDigestAuthTest}">
             <httpj:handlers>
-                <bean class="org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler">
+                <bean class="org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler">
                     <property name="authenticationType" value="DIGEST"/>
                     <property name="loginService" ref="securityLoginService"/>
                     <property name="constraintMappings">
@@ -81,7 +81,7 @@
         <property name="targetObject" ref="securityConstraint.builder3" />
         <property name="targetMethod" value="build"/>
     </bean>
-    <bean id="securityConstraintMapping" class="org.eclipse.jetty.ee10.servlet.security.ConstraintMapping">
+    <bean id="securityConstraintMapping" class="org.eclipse.jetty.ee11.servlet.security.ConstraintMapping">
         <property name="constraint" ref="securityConstraint"/>
         <property name="pathSpec" value="/*"/>
     </bean>

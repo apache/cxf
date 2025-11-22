@@ -74,8 +74,8 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         assertEquals("CXF Rocks", value);
         Object contentType = client.getResponse().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
         assertNotNull("Content-Type should be present", contentType);
-        assertEquals(MediaType.TEXT_HTML, contentType.toString());
-        assertEquals(MediaType.TEXT_HTML_TYPE, client.getResponse().getMediaType());
+        assertEquals(MediaType.TEXT_HTML + ";charset=utf-8", contentType.toString());
+        assertEquals(MediaType.TEXT_HTML_TYPE.withCharset("utf-8"), client.getResponse().getMediaType());
     }
 
     @Test

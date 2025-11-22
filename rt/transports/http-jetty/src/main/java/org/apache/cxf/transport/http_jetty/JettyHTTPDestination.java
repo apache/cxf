@@ -47,7 +47,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
-import org.eclipse.jetty.ee10.servlet.HttpOutput;
+import org.eclipse.jetty.ee11.servlet.HttpOutput;
 
 
 public class JettyHTTPDestination extends ServletDestination {

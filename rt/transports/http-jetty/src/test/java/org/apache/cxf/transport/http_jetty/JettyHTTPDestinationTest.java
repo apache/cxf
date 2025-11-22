@@ -70,8 +70,8 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.eclipse.jetty.ee10.servlet.ServletRequestHttpWrapper;
-import org.eclipse.jetty.ee10.servlet.ServletResponseHttpWrapper;
+import org.eclipse.jetty.ee11.servlet.ServletRequestHttpWrapper;
+import org.eclipse.jetty.ee11.servlet.ServletResponseHttpWrapper;
 import org.eclipse.jetty.http.HttpFields;
 
 

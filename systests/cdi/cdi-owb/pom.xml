@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests-cdi</artifactId>
-        <version>4.1.5-SNAPSHOT</version>
+        <version>4.2.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -58,7 +58,6 @@
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-impl</artifactId>
             <version>${cxf.openwebbeans.version}</version>
-            <classifier>jakarta</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.openwebbeans</groupId>
@@ -70,19 +69,16 @@
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-el22</artifactId>
             <version>${cxf.openwebbeans.version}</version>
-            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-spi</artifactId>
             <version>${cxf.openwebbeans.version}</version>
-            <classifier>jakarta</classifier>
         </dependency>
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-web</artifactId>
             <version>${cxf.openwebbeans.version}</version>
-            <classifier>jakarta</classifier>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.openwebbeans</groupId>

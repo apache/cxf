@@ -31,7 +31,7 @@ import jakarta.ws.rs.core.Response;
  * Represents common proxy and http-centric client capabilities
  *
  */
-public interface Client {
+public interface Client extends AutoCloseable {
 
     /**
      * Set HTTP Content-Type header

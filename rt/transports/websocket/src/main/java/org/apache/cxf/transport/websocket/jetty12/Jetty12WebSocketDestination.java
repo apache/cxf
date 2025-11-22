@@ -53,13 +53,15 @@ import org.apache.cxf.transport.websocket.jetty.WebSocketServletHolder;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
-import org.eclipse.jetty.ee10.websocket.server.JettyServerUpgradeRequest;
-import org.eclipse.jetty.ee10.websocket.server.JettyServerUpgradeResponse;
-import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketCreator;
-import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
+import org.eclipse.jetty.ee11.servlet.ServletApiRequest;
+import org.eclipse.jetty.ee11.websocket.server.JettyServerUpgradeRequest;
+import org.eclipse.jetty.ee11.websocket.server.JettyServerUpgradeResponse;
+import org.eclipse.jetty.ee11.websocket.server.JettyWebSocketCreator;
+import org.eclipse.jetty.ee11.websocket.server.JettyWebSocketServerContainer;
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
+import org.eclipse.jetty.websocket.server.internal.CompletedUpgradeRequest;
 
 
 /**
@@ -169,7 +171,8 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
         super.shutdown();
     }
 
-    private void invoke(final byte[] data, final int offset, final int length, final Session session) {
+    private void invoke(final ServletApiRequest req, final byte[] data, final int offset, 
+            final int length, final Session session) {
         // invoke the service asynchronously as the jetty websocket's onMessage is synchronously blocked
         // make sure the byte array passed to this method is immutable, as the websocket framework
         // may corrupt the byte array after this method is returned (i.e., before the data is returned in
@@ -181,7 +184,7 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
                 try {
                     WebSocketServletHolder holder = new Jetty12WebSocketHolder(session);
                     response = createServletResponse(holder);
-                    HttpServletRequest request = createServletRequest(data, offset, length, holder, session);
+                    HttpServletRequest request = createServletRequest(req, data, offset, length, holder, session);
                     String reqid = request.getHeader(REQUEST_ID_KEY);
                     if (reqid != null) {
                         if (WebSocketUtils.isContainingCRLF(reqid)) {
@@ -221,11 +224,10 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
             e.printStackTrace();
         }
     }
-    private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length,
-                                                                WebSocketServletHolder holder,
-                                                                Session session)
-        throws IOException {
-        return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length), session);
+    
+    private WebSocketVirtualServletRequest createServletRequest(ServletApiRequest req, byte[] data, 
+            int offset, int length, WebSocketServletHolder holder, Session session) throws IOException {
+        return new WebSocketVirtualServletRequest(req, holder, new ByteArrayInputStream(data, offset, length), session);
     }
 
     private WebSocketVirtualServletResponse createServletResponse(WebSocketServletHolder holder) throws IOException {
@@ -237,7 +239,7 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
 
         @Override
         public Object createWebSocket(JettyServerUpgradeRequest req, JettyServerUpgradeResponse resp) {
-            return new Jetty12WebSocket();
+            return new Jetty12WebSocket(req);
         }
 
     }
@@ -251,7 +253,7 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
             return null;
         }
         public String getContextPath() {
-            return getHttpServletRequest(session.getUpgradeRequest()).getContextPath();
+            return getContextPath(session.getUpgradeRequest());
         }
         public String getLocalAddr() {
             return null;
@@ -319,7 +321,7 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
         public Object getAttribute(String name) {
             try {
                 final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
-                return getHttpServletRequest(upgradeRequest).getAttribute(name);
+                return getAttribute(upgradeRequest, name);
             } catch (Exception ex) {
                 if (name.equals("org.apache.cxf.transport.endpoint.address")) {
                     return address;
@@ -333,9 +335,25 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
             session.sendBinary(ByteBuffer.wrap(data,  offset, length), null);
         }
         
-        private HttpServletRequest getHttpServletRequest(final UpgradeRequest upgradeRequest) {
-            if (upgradeRequest instanceof JettyServerUpgradeRequest) {
-                return ((JettyServerUpgradeRequest)upgradeRequest).getHttpServletRequest();
+        private Object getAttribute(final UpgradeRequest upgradeRequest, final String name) {
+            if (upgradeRequest instanceof JettyServerUpgradeRequest r) {
+                return r.getHttpServletRequest().getAttribute(name);
+            } else if (upgradeRequest instanceof CompletedUpgradeRequest r) {
+                if (name.equals("org.apache.cxf.transport.endpoint.address")) {
+                    return address;
+                } else {
+                    return null; /* no request attributes */
+                }
+            } else {
+                throw new IllegalStateException("Unsupported upgrade request class: " + upgradeRequest.getClass());
+            }
+        }
+
+        private String getContextPath(final UpgradeRequest upgradeRequest) {
+            if (upgradeRequest instanceof JettyServerUpgradeRequest r) {
+                return r.getHttpServletRequest().getContextPath();
+            } else if (upgradeRequest instanceof CompletedUpgradeRequest r) {
+                return r.getRequestURI().getPath();
             } else {
                 throw new IllegalStateException("Unsupported upgrade request class: " + upgradeRequest.getClass());
             }
@@ -345,6 +363,12 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
     @org.eclipse.jetty.websocket.api.annotations.WebSocket
     public class Jetty12WebSocket {
         volatile Session session;
+        private final ServletApiRequest req;
+
+        public Jetty12WebSocket(JettyServerUpgradeRequest req) {
+            this.req = (ServletApiRequest) req.getServletAttributes()
+                .get(org.eclipse.jetty.websocket.core.WebSocketConstants.WEBSOCKET_WRAPPED_REQUEST_ATTRIBUTE);
+        }
 
         @org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen
         public void onOpen(Session sess) {
@@ -365,7 +389,7 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
         public void onBinaryMessage(ByteBuffer message, Callback callback) {
             byte[] payload = new byte[message.remaining()];
             message.get(payload);
-            invoke(payload, 0, payload.length, session);
+            invoke(req, payload, 0, payload.length, session);
         }
 
 
