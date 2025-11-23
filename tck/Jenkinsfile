@@ -37,7 +37,7 @@ pipeline {
       stage('Checkout Apache CXF') {
            steps {
                checkout([$class: 'GitSCM',
-                   branches: [[name: 'main']],
+                   branches: [[name: '4.1.x-fixes']],
                    userRemoteConfigs: [[url: 'https://github.com/apache/cxf/']],
                    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'cxf'], [$class: 'CloneOption', shallow: true]]
                ])
