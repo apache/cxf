@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.core.MediaType;
@@ -42,7 +40,6 @@ import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -165,11 +162,7 @@ public class SwaggerUiConfigurationTest extends AbstractClientServerTestBase {
         
         try (Response response = uiClient.get()) {
             String jsCode = response.readEntity(String.class);
-            final JsonMapper mapper = JsonMapper.builder()
-                    .defaultPropertyInclusion(JsonInclude.Value.construct(NON_EMPTY, NON_EMPTY))
-                    .build();
-            final String expectedConfigAsJson = mapper.writeValueAsString(OAUTH2_CONFIG);
-            assertThat(jsCode, containsString("ui.initOAuth(" + expectedConfigAsJson + ")"));
+            assertThat(jsCode, containsString("ui.initOAuth(" + OAUTH2_CONFIG.toJsonString() + ")"));
         }
     }
     

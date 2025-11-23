@@ -180,7 +180,7 @@ public class SwaggerUiOAuth2Config {
     private void addListField(StringBuilder json, String name, List<String> value) {
         if (value != null) {
             json.append(quote(name)).append(':').append(
-                    value.stream().map(this::quote)
+                    value.stream().map(this::quote).sorted()
                             .collect(Collectors.joining(",", "[", "]"))
             ).append(',');
         }
@@ -189,7 +189,7 @@ public class SwaggerUiOAuth2Config {
     private void addMapField(StringBuilder json, String name, Map<String, String> value) {
         if (value != null) {
             json.append(quote(name)).append(':').append(
-                    value.entrySet().stream().map(this::entryToString)
+                    value.entrySet().stream().map(this::entryToString).sorted()
                             .collect(Collectors.joining(",", "{", "}"))
             ).append(',');
         }
