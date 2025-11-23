@@ -5,14 +5,14 @@ pipeline {
    
     tools { 
         maven 'maven_latest' 
-        jdk 'jdk_17_latest' 
+        jdk 'jdk_21_latest' 
     }
 
     stages {
         stage("Initialization") {
             steps {
                 script {
-                    currentBuild.displayName = "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 3.1 TCK"
+                    currentBuild.displayName = "#${BUILD_NUMBER} CXF ${params.Version} JAX-RS 4.0 TCK"
                 }
             }
         }
@@ -32,9 +32,10 @@ pipeline {
                     echo "WORKSPACE = ${PWD}"
                 '''
             }
-       }
+        }
+     
 
-      stage('Checkout Apache CXF') {
+        stage('Checkout Apache CXF') {
            steps {
                checkout([$class: 'GitSCM',
                    branches: [[name: 'main']],
@@ -47,7 +48,7 @@ pipeline {
        stage('Run JAX-RS TCK') {
            steps {
                 dir("${WORKSPACE}/cxf/tck/cxf-tck") {
-                    sh "mvn clean verify -Dcxf.version=${params.Version}"
+                    sh "mvn clean verify -Dcxf.version=${params.Version} -U"
                 }
            }
            
@@ -58,7 +59,7 @@ pipeline {
            }
        }
    }
-   
+
    post { 
         always {
             cleanWs()
