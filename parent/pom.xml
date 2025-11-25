@@ -445,7 +445,7 @@
                         <rulesets>
                             <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
                         </rulesets>
-                        <targetJdk>21</targetJdk>
+                        <targetJdk>17</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>
                         <verbose>true</verbose>
@@ -2339,6 +2339,16 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>pre-jdk21</id>
+            <activation>
+                <jdk>[17,21)</jdk>
+            </activation>
+            <properties>
+                <cxf.derby.version>10.16.1.1</cxf.derby.version>
+                <cxf.lucene.version>9.12.3</cxf.lucene.version>
+            </properties>
         </profile>
     </profiles>
 </project>
