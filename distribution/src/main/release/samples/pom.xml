@@ -275,6 +275,15 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
+        <profile>
+            <id>pre-jdk21</id>
+            <activation>
+                <jdk>[17,21)</jdk>
+            </activation>
+            <properties>
+                <cxf.lucene.version>9.12.3</cxf.lucene.version>
+            </properties>
+        </profile>
     </profiles>
     <!--
      we turn off the deploy in the properties above, but deploy plugin will

@@ -287,8 +287,9 @@ public class Catalog {
         final IndexSearcher searcher = new IndexSearcher(reader);
 
         try {
-            return searcher.search(new TermQuery(
-                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits.value() > 0;
+            final TopDocs topDocs = searcher.search(new TermQuery(
+                new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1);
+            return TotalHitsExtractor.getTotalHits(topDocs.totalHits) > 0;
         } finally {
             reader.close();
         }
@@ -313,6 +314,8 @@ public class Catalog {
             }
         }
     }
+    
+    
 }
 
 
