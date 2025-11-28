@@ -53,7 +53,7 @@ public class MicrometerMetricsHttpProvider implements Provider<Source> {
     @Resource
     private WebServiceContext wsContext;
     
-    private MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
     
     public MicrometerMetricsHttpProvider(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
