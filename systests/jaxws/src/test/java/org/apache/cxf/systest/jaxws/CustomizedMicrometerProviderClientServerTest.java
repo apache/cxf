@@ -23,9 +23,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,8 +42,9 @@ import org.apache.cxf.jaxws.schemavalidation.RequestHeader;
 import org.apache.cxf.jaxws.schemavalidation.RequestIdType;
 import org.apache.cxf.jaxws.schemavalidation.Service;
 import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.metrics.MetricsContext;
 import org.apache.cxf.metrics.MetricsFeature;
+import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProperties;
 import org.apache.cxf.metrics.micrometer.MicrometerMetricsProvider;
 import org.apache.cxf.metrics.micrometer.provider.DefaultExceptionClassProvider;
@@ -56,6 +55,7 @@ import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsFaultCodeProvider;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsFaultCodeTagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsOperationTagsCustomizer;
 import org.apache.cxf.metrics.micrometer.provider.jaxws.JaxwsTags;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -70,7 +70,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class SchemaValidationWithoutViolationMetricsClientServerTest extends AbstractBusClientServerTestBase {
+public class CustomizedMicrometerProviderClientServerTest extends AbstractBusClientServerTestBase {
     
     
     public static final MeterRegistry METER_REGISTER = new SimpleMeterRegistry();
@@ -88,21 +88,19 @@ public class SchemaValidationWithoutViolationMetricsClientServerTest extends Abs
             var tagsProvider = new StandardTagsProvider(new DefaultExceptionClassProvider(), standardTags);
             var properties = new MicrometerMetricsProperties();
 
-            var provider = new MicrometerMetricsProvider(
+            var provider = new NullEndpointMicrometerProvider(new MicrometerMetricsProvider(
                     METER_REGISTER,
                     tagsProvider,
                     List.of(operationsCustomizer, faultsCustomizer),
                     new DefaultTimedAnnotationProvider(),
                     properties
-            );
+            ));
 
             String address;
             Object implementor = new ServicePortTypeImpl();
             address = "http://localhost:" + PORT + "/schemavalidation";
             Endpoint ep = Endpoint.create(implementor);
-            Map<String, Object> map = new HashMap<>();
-            map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-            ep.setProperties(map);
+            
             ((EndpointImpl)ep).setWsdlLocation("wsdl_systest_jaxws/schemaValidation.wsdl");
             ((EndpointImpl)ep).setServiceName(new QName(
                     "http://cxf.apache.org/jaxws/schemavalidation", "service"));
@@ -123,15 +121,15 @@ public class SchemaValidationWithoutViolationMetricsClientServerTest extends Abs
     }
 
     @Test
-    public void testSchemavalildationWithMetrics() throws Exception {
-        testSchemaValidationWithoutViolation();
+    public void testCustomizedMetricsProvider() throws Exception {
+        sendRequest();
         testCxfServerRequestsCount();
     }
     
     
     
     
-    private void testSchemaValidationWithoutViolation() throws Exception {
+    private void sendRequest() throws Exception {
         Service service = new Service();
         assertNotNull(service);
 
@@ -183,6 +181,41 @@ public class SchemaValidationWithoutViolationMetricsClientServerTest extends Abs
                 }
             }
             assertTrue(found);
+        }
+    }
+    
+    //A customized MetricProvider which mimics the way that
+    //always return null MetricContext from Endpoint
+    static class NullEndpointMicrometerProvider implements MetricsProvider {
+        private final MetricsProvider delegate;
+
+        NullEndpointMicrometerProvider(MetricsProvider delegate) {
+            this.delegate = delegate;
+        }
+
+        
+
+        @Override
+        public MetricsContext createEndpointContext(org.apache.cxf.endpoint.Endpoint endpoint, 
+                                                    boolean asClient,
+                                                    String clientId) {
+            return null;
+        }
+
+        @Override
+        public MetricsContext createOperationContext(org.apache.cxf.endpoint.Endpoint endpoint,
+                                                     BindingOperationInfo boi, 
+                                                     boolean asClient, 
+                                                     String clientId) {
+            return delegate.createOperationContext(endpoint, boi, asClient, clientId);
+        }
+
+        @Override
+        public MetricsContext createResourceContext(org.apache.cxf.endpoint.Endpoint endpoint, 
+                                                    String resourceName,
+                                                    boolean asClient, 
+                                                    String clientId) {
+            return delegate.createResourceContext(endpoint, resourceName, asClient, clientId);
         }
     }
 }
