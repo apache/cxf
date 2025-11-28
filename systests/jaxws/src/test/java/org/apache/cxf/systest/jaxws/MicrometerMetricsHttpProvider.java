@@ -39,8 +39,10 @@ import io.micrometer.core.instrument.FunctionTimer;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.TimeGauge;
 import io.micrometer.core.instrument.Timer;
+
 
 @WebServiceProvider(serviceName = "MetricsService", portName = "MetricsPort", targetNamespace = "urn:metrics")
 @ServiceMode(Service.Mode.MESSAGE)
@@ -49,6 +51,12 @@ public class MicrometerMetricsHttpProvider implements Provider<Source> {
 
     @Resource
     private WebServiceContext wsContext;
+    
+    private final MeterRegistry meterRegistry;
+    
+    public MicrometerMetricsHttpProvider(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
 
     
     @Override
@@ -63,7 +71,7 @@ public class MicrometerMetricsHttpProvider implements Provider<Source> {
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             sb.append("<metrics>\n");
 
-            for (Meter meter : SchemaValidationWithoutViolationMetricsClientServerTest.METER_REGISTER.getMeters()) {
+            for (Meter meter : this.meterRegistry.getMeters()) {
                 final Meter.Id id = meter.getId();
                 final String name = id.getName();
 

@@ -188,10 +188,12 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         if (isRequestor(message)) {
             o = boi.getProperty(MetricsContext.class.getName());
         } else {
-            //on the client side the MetricsContext may already be created
+            //on the server side the MetricsContext may already be created
             //at endpoint level; avoid recreating another one
             o = message.getExchange().getEndpoint().get(MetricsContext.class.getName());
-            if (o == null) {
+            if (o == null || (o instanceof List && ((List)o).isEmpty())) {
+                // if no MetricsContext retrieved from message exchange created before for endpoint
+                // use the one from operation
                 o = boi.getProperty(MetricsContext.class.getName());
             } else {
                 boi.setProperty(MetricsContext.class.getName(), o);
