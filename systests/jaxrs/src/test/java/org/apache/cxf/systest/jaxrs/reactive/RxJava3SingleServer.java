@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactive;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -28,7 +26,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.rx3.server.ReactiveIOCustomizer;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
-
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public class RxJava3SingleServer extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(RxJava3SingleServer.class);

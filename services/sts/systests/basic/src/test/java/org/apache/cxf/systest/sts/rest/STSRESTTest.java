@@ -29,8 +29,6 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.xml.bind.JAXBElement;
@@ -61,6 +59,7 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.apache.cxf.ws.security.trust.STSUtils.WST_NS_05_12;
 import static org.junit.Assert.assertEquals;

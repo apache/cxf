@@ -25,8 +25,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
@@ -41,6 +39,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public class BookServerAsyncClient extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerAsyncClient.class);

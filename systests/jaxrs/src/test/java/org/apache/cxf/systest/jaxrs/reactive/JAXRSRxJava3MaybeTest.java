@@ -21,8 +21,6 @@ package org.apache.cxf.systest.jaxrs.reactive;
 
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
@@ -31,6 +29,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.subscribers.TestSubscriber;

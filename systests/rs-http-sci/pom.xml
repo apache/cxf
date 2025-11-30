@@ -90,14 +90,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.module</groupId>
+            <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <scope>test</scope>
-        </dependency>              
+        </dependency>
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>

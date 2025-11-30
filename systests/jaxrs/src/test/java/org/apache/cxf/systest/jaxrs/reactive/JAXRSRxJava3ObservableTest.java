@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
@@ -39,6 +37,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx3.client.ObservableRxInvoker;
 import org.apache.cxf.jaxrs.rx3.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;

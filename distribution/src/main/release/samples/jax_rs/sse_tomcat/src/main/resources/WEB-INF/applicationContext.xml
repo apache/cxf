@@ -37,6 +37,5 @@
      </jaxrs:server> 
      
      <bean id="statsRestService" class="demo.jaxrs.sse.StatsRestServiceImpl"/>
-     <bean id="jacksonJsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+     <bean id="jacksonJsonProvider" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
 </beans>
-

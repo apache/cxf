@@ -21,8 +21,6 @@ package org.apache.cxf.systest.jaxrs.metrics;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
@@ -42,6 +40,7 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;

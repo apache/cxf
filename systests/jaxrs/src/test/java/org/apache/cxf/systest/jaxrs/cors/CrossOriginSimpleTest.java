@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
@@ -43,6 +41,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.HttpClientBuilder;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;

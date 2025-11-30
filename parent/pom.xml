@@ -131,8 +131,8 @@
         <cxf.httpcomponents.core.version>4.4.16</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.client5.version>5.5.1</cxf.httpcomponents.client5.version>
         <cxf.httpcomponents.core5.version>5.3.6</cxf.httpcomponents.core5.version>
-        <cxf.jackson.version>2.20.1</cxf.jackson.version>
-        <cxf.jackson.databind.version>2.20.1</cxf.jackson.databind.version>
+        <cxf.jackson.version>3.0.1</cxf.jackson.version>
+        <cxf.jackson.databind.version>3.0.1</cxf.jackson.databind.version>
         <cxf.jackson.annotations.version>2.20</cxf.jackson.annotations.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.1</cxf.jaeger.version>
@@ -1580,7 +1580,7 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <groupId>tools.jackson.jakarta.rs</groupId>
                 <artifactId>jackson-jakarta-rs-json-provider</artifactId>
                 <version>${cxf.jackson.version}</version>
                 <exclusions>
@@ -1591,12 +1591,12 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
+                <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
+                <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${cxf.jackson.databind.version}</version>
             </dependency>
@@ -1606,28 +1606,33 @@
                 <version>${cxf.jackson.annotations.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
+                <groupId>tools.jackson.module</groupId>
                 <artifactId>jackson-module-jsonSchema</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-scala_2.10</artifactId>
+                <groupId>tools.jackson.module</groupId>
+                <artifactId>jackson-module-scala_2.12</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <groupId>tools.jackson.jakarta.rs</groupId>
                 <artifactId>jackson-jakarta-rs-xml-provider</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <groupId>tools.jackson.jakarta.rs</groupId>
                 <artifactId>jackson-jakarta-rs-yaml-provider</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <groupId>tools.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-joda</artifactId>
+                <version>${cxf.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson.module</groupId>
+                <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
                 <version>${cxf.jackson.version}</version>
             </dependency>
             <dependency>
