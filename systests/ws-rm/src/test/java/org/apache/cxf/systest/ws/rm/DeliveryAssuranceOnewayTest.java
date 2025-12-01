@@ -92,12 +92,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         Thread.sleep(100);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtLeastOnce() throws Exception {
         testOnewayAtLeastOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtLeastOnceAsyncExecutor() throws Exception {
         testOnewayAtLeastOnce(Executors.newSingleThreadExecutor());
     }
@@ -138,12 +138,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         assertTrue("Too few messages " + actualArgs.size(), callArgs.length <= actualArgs.size());
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnce() throws Exception {
         testOnewayAtMostOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnceAsyncExecutor() throws Exception {
         testOnewayAtMostOnce(Executors.newSingleThreadExecutor());
     }
@@ -172,12 +172,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnce() throws Exception {
         testOnewayExactlyOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceAsyncExecutor() throws Exception {
         testOnewayExactlyOnce(Executors.newSingleThreadExecutor());
     }
@@ -211,12 +211,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testInOrder() throws Exception {
         testOnewayInOrder(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testInOrderAsyncExecutor() throws Exception {
         testOnewayInOrder(Executors.newSingleThreadExecutor());
     }
@@ -243,7 +243,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testOnewayAtLeastOnceInOrderDelay() throws Exception {
         int numMessages = 4;
         init("org/apache/cxf/systest/ws/rm/atleastonce-inorder.xml", null);
@@ -281,12 +281,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnceInOrder() throws Exception {
         testOnewayAtMostOnceInOrder(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnceInOrderAsyncExecutor() throws Exception {
         testOnewayAtMostOnceInOrder(Executors.newSingleThreadExecutor());
     }
@@ -314,12 +314,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceInOrder() throws Exception {
         testOnewayExactlyOnceInOrder(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceInOrderAsyncExecutor() throws Exception {
         testOnewayExactlyOnceInOrder(Executors.newSingleThreadExecutor());
     }
