@@ -169,6 +169,9 @@ public class ConfigurationImpl implements Configuration {
 
     public void setProperty(String name, Object value) {
         if (name == null) {
+            throw new NullPointerException("Property name must not be null");
+        }
+        if (value == null) {
             props.remove(name);
         } else {
             props.put(name, value);
