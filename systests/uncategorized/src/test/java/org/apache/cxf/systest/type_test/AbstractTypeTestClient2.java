@@ -1298,7 +1298,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
     protected boolean equals(ExtColourEnum x, ExtColourEnum y) {
         return (x.getAttrib1().equals(y.getAttrib1()))
             && (x.getAttrib2().equals(y.getAttrib2()))
-            && (x.getValue().equals(y.getValue()));
+            && (x.getValue() == y.getValue());
     }
     @Test
     public void testExtColourEnum() throws Exception {
