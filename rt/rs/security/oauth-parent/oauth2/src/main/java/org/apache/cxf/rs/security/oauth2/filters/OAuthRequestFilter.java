@@ -149,7 +149,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-        if (am != null && !am.equals(accessTokenV.getTokenSubject().getAuthenticationMethod())) {
+        if (am != null && am != accessTokenV.getTokenSubject().getAuthenticationMethod()) {
             String message = "The token has been authorized by the resource owner "
                 + "using an unsupported authentication method";
             LOG.warning(message);

@@ -90,7 +90,7 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     }
     protected void checkAlgorithms(JweHeaders headers) {
         KeyAlgorithm providedAlgo = headers.getKeyEncryptionAlgorithm();
-        if (providedAlgo != null && !providedAlgo.equals(algorithm)) {
+        if (providedAlgo != null && providedAlgo != algorithm) {
             LOG.warning("Invalid key encryption algorithm: " + providedAlgo);
             throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
