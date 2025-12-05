@@ -120,7 +120,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
 
             QName paramName;
             final CorbaObjectHandler obj;
-            if (param.getMode().equals(ModeType.OUT)) {
+            if (param.getMode() == ModeType.OUT) {
                 if (wrap) {
                     paramName = new QName(wrapNSUri, param.getName());
                 } else {
@@ -180,7 +180,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
             QName idlType = param.getIdltype();
             QName paramName;
             final CorbaObjectHandler obj;
-            if (param.getMode().equals(ModeType.IN)) {
+            if (param.getMode() == ModeType.IN) {
                 if (wrap) {
                     paramName = new QName(wrapNSUri, param.getName());
                 } else {

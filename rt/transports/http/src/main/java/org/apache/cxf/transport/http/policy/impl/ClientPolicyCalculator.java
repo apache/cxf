@@ -227,7 +227,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
 
         if (compatible) {
             compatible &= !p1.isSetProxyServerType() || !p2.isSetProxyServerType()
-                          || p1.getProxyServerType().equals(p2.getProxyServerType());
+                          || p1.getProxyServerType() == p2.getProxyServerType();
         }
 
         if (compatible) {

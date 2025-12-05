@@ -368,10 +368,10 @@ public class FiqlParserTest {
         assertEquals(2, conditions.size());
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
-            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
-            || (ConditionType.EQUALS.equals(st2.getCondition())
-                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+        assertTrue((ConditionType.EQUALS == st1.getCondition()
+            && ConditionType.GREATER_THAN == st2.getCondition())
+            || (ConditionType.EQUALS == st2.getCondition()
+                && ConditionType.GREATER_THAN == st1.getCondition()));
 
         assertTrue(filter.isMet(new Condition("amichalec", 12, new Date())));
         assertTrue(filter.isMet(new Condition("ami", 12, new Date())));
@@ -397,10 +397,10 @@ public class FiqlParserTest {
 
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
-            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
-            || (ConditionType.EQUALS.equals(st2.getCondition())
-                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+        assertTrue((ConditionType.EQUALS == st1.getCondition()
+            && ConditionType.GREATER_THAN == st2.getCondition())
+            || (ConditionType.EQUALS == st2.getCondition()
+                && ConditionType.GREATER_THAN == st1.getCondition()));
 
         assertTrue(filter.isMet(new Condition("ami", 0, new Date())));
         assertTrue(filter.isMet(new Condition("foo", 20, null)));
