@@ -96,12 +96,12 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtLeastOnce() throws Exception {
         testOnewayAtLeastOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtLeastOnceAsyncExecutor() throws Exception {
         testOnewayAtLeastOnce(Executors.newSingleThreadExecutor());
     }
@@ -118,12 +118,12 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         callback.waitAndVerify(8, 1000L, 10000L);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnce() throws Exception {
         testOnewayAtMostOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testAtMostOnceAsyncExecutor() throws Exception {
         testOnewayAtMostOnce(Executors.newSingleThreadExecutor());
     }
@@ -141,12 +141,12 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         callback.waitAndVerify(8, 1000L, 10000L);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnce() throws Exception {
         testOnewayExactlyOnce(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceAsyncExecutor() throws Exception {
         testOnewayExactlyOnce(Executors.newSingleThreadExecutor());
     }
@@ -164,12 +164,12 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         callback.waitAndVerify(8, 1000L, 10000L);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceInOrder() throws Exception {
         testOnewayExactlyOnceInOrder(null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testExactlyOnceInOrderAsyncExecutor() throws Exception {
         testOnewayExactlyOnceInOrder(Executors.newSingleThreadExecutor());
     }
