@@ -390,7 +390,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     jm.setSoapStyle(jf.getSOAPStyle());
                 }
 
-                if (jm.getSoapStyle().equals(jakarta.jws.soap.SOAPBinding.Style.RPC)) {
+                if (jm.getSoapStyle() == jakarta.jws.soap.SOAPBinding.Style.RPC) {
                     jm.getAnnotationMap().remove("SOAPBinding");
                 }
 
@@ -587,7 +587,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (extElement instanceof MIMEContent) {
                     MIMEContent mimeContent = (MIMEContent)extElement;
                     String mimeJavaType = getJavaTypeForMimeType(mPart);
-                    if (JavaType.Style.IN.equals(style)) {
+                    if (JavaType.Style.IN == style) {
                         String paramName = ProcessorUtil.mangleNameToVariableName(mimeContent.getPart());
                         JavaParameter jp = jm.getParameter(paramName);
                         if (jp == null) {
@@ -598,7 +598,7 @@ public class ServiceProcessor extends AbstractProcessor {
                             // jp.setType(mimeJavaType);
                             jp.setClassName(mimeJavaType);
                         }
-                    } else if (JavaType.Style.OUT.equals(style)) {
+                    } else if (JavaType.Style.OUT == style) {
                         JavaType jp = null;
                         if (!"void".equals(jm.getReturn().getType())
                             && mimeContent.getPart().equals(jm.getReturn().getName())) {
