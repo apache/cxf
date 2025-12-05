@@ -135,7 +135,7 @@ public abstract class JAXBDataBase {
 
     protected boolean isOutputMessage(AbstractMessageContainer messageContainer) {
         if (messageContainer instanceof MessageInfo) {
-            return MessageInfo.Type.OUTPUT.equals(((MessageInfo)messageContainer).getType());
+            return MessageInfo.Type.OUTPUT == ((MessageInfo)messageContainer).getType();
         }
         return false;
     }

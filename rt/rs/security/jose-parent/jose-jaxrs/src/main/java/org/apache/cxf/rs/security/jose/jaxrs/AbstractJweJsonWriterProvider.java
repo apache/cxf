@@ -117,7 +117,7 @@ public class AbstractJweJsonWriterProvider {
             ContentAlgorithm currentCtAlgo = JweUtils.getContentEncryptionAlgorithm(m, props, ContentAlgorithm.A128GCM);
             if (ctAlgo == null) {
                 ctAlgo = currentCtAlgo;
-            } else if (currentCtAlgo != null && !ctAlgo.equals(currentCtAlgo)) {
+            } else if (currentCtAlgo != null && ctAlgo != currentCtAlgo) {
                 // ctAlgo must be the same for all the recipients
                 throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }

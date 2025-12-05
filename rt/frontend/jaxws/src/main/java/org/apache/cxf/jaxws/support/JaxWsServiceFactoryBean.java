@@ -502,7 +502,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             Class<?> seiClass = ii.getEndpointClass();
             if (seiClass != null && seiClass.getPackage() != null) {
                 XmlSchema schema = seiClass.getPackage().getAnnotation(XmlSchema.class);
-                if (schema != null && XmlNsForm.QUALIFIED.equals(schema.elementFormDefault())) {
+                if (schema != null && XmlNsForm.QUALIFIED == schema.elementFormDefault()) {
                     setQualifyWrapperSchema(true);
                 }
             }
