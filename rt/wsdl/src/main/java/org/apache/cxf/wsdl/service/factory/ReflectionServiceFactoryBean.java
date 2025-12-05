@@ -1360,7 +1360,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
                 el.setSchemaType((XmlSchemaType)mpi.getXmlSchema());
 
-                if (schema.getElementFormDefault().equals(XmlSchemaForm.UNQUALIFIED)) {
+                if (schema.getElementFormDefault() == XmlSchemaForm.UNQUALIFIED) {
                     mpi.setConcreteName(new QName(null, mpi.getName().getLocalPart()));
                 } else {
                     mpi.setConcreteName(mpi.getName());

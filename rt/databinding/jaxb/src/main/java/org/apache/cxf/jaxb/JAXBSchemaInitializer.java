@@ -592,7 +592,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
 
-        if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)
+        if (xmlAccessorOrder != null && xmlAccessorOrder.value() == XmlAccessOrder.ALPHABETICAL
             && propertyOrder == null) {
             sort(seq);
         }
