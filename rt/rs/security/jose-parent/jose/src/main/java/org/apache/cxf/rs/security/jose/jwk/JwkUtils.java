@@ -565,7 +565,7 @@ public final class JwkUtils {
     }
 
     public static void includeCertChain(JsonWebKey jwk, JoseHeaders headers, String algo) {
-        if (KeyType.RSA.equals(jwk.getKeyType())) {
+        if (KeyType.RSA == jwk.getKeyType()) {
             List<String> chain = CastUtils.cast((List<?>)jwk.getProperty(JsonWebKey.X509_CHAIN));
             if (chain != null) {
                 headers.setX509Chain(chain);
@@ -574,7 +574,7 @@ public final class JwkUtils {
     }
 
     public static void includePublicKey(JsonWebKey jwk, JoseHeaders headers, String algo) {
-        if (KeyType.RSA.equals(jwk.getKeyType())) {
+        if (KeyType.RSA == jwk.getKeyType()) {
             JsonWebKey jwkPublic = JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo);
             if (jwk.getKeyId() != null) {
                 jwkPublic.setKeyId(jwk.getKeyId());

@@ -177,7 +177,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         if (jweInHeaders != null) {
             if (jweInHeaders.getKeyEncryptionAlgorithm() != null
                 && (getKeyAlgorithm() == null
-                    || !getKeyAlgorithm().equals(jweInHeaders.getKeyEncryptionAlgorithm()))) {
+                    || getKeyAlgorithm() != jweInHeaders.getKeyEncryptionAlgorithm())) {
                 LOG.warning("Invalid key encryption algorithm");
                 throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
             }
