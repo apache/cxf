@@ -46,12 +46,12 @@ public class JavaFirstUriDomainExpression implements DomainExpression {
 
         if ("JavaFirstAttachmentPolicyService".equals(serviceName) && "usernamepassword".equals(url)) {
             return ("doInputMessagePolicy".equals(bmi.getBindingOperation().getName().getLocalPart())
-                && MessageInfo.Type.INPUT.equals(bmi.getMessageInfo().getType()))
+                && MessageInfo.Type.INPUT == bmi.getMessageInfo().getType())
                 || ("doOutputMessagePolicy".equals(bmi.getBindingOperation().getName().getLocalPart())
-                && MessageInfo.Type.OUTPUT.equals(bmi.getMessageInfo().getType()));
+                && MessageInfo.Type.OUTPUT == bmi.getMessageInfo().getType());
         } else if ("SslUsernamePasswordAttachmentService".equals(serviceName)
             && "sslusernamepassword".equals(url)) {
-            return MessageInfo.Type.INPUT.equals(bmi.getMessageInfo().getType());
+            return MessageInfo.Type.INPUT == bmi.getMessageInfo().getType();
         } else {
             return false;
         }
