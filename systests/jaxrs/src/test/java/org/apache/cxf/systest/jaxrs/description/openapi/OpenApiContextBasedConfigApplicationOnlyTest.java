@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
@@ -42,6 +40,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.systest.jaxrs.description.group2.BookStore;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner;
 

@@ -20,8 +20,6 @@ package org.apache.cxf.systest.jaxrs.description.openapi;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
@@ -33,6 +31,7 @@ import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

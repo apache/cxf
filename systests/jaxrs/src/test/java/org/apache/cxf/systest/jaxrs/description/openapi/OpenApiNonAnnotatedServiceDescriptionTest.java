@@ -21,14 +21,13 @@ package org.apache.cxf.systest.jaxrs.description.openapi;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.systest.jaxrs.description.group1.BookStore;
 import org.apache.cxf.systest.jaxrs.description.group1.BookStoreStylesheetsOpenApi;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

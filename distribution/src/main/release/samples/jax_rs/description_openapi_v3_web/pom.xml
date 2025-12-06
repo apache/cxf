@@ -59,7 +59,7 @@ under the License.
             <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
     </dependencies>

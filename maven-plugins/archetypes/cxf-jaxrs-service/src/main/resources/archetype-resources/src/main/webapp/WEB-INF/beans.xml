@@ -13,7 +13,7 @@
             <bean class="${package}.HelloWorld"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
 </beans>

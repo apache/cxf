@@ -42,7 +42,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    <bean id="jsonProvider" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider" />
     
     <jaxrs:server id="stsRESTService"
        depends-on="ClientAuthHttpsSettings" 

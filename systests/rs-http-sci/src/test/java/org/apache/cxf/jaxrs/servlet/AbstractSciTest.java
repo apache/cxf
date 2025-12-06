@@ -21,14 +21,13 @@ package org.apache.cxf.jaxrs.servlet;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.demo.resources.Book;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Test;
 

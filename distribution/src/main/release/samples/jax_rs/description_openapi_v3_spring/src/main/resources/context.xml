@@ -28,7 +28,7 @@
     <import resource="classpath:META-INF/cxf/cxf.xml" />
 
     <!-- JAXRS providers -->
-    <bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+    <bean id="jsonProvider" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider" />
     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" />
     <bean id="originFilter" class="demo.jaxrs.openapi.server.ApiOriginFilter" />
 
