@@ -22,11 +22,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 import org.apache.demo.resources.BookStore;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @ApplicationPath("/api")
 public class BookApplication extends Application {

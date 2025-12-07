@@ -22,12 +22,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Test;
 

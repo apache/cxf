@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
@@ -34,6 +32,7 @@ import org.apache.cxf.systests.cdi.base.CustomScopedBookStore;
 import org.apache.cxf.systests.cdi.base.RequestScopedBookStore;
 import org.apache.cxf.systests.cdi.base.bindings.LoggingFilter;
 import org.apache.cxf.systests.cdi.base.contract.BookStoreImpl;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @ApplicationPath("/v2")
 public class BookStoreCustomApplication extends Application {

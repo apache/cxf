@@ -33,9 +33,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -46,6 +43,8 @@ import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 import jakarta.ws.rs.sse.SseEventSource.Builder;
+import tools.jackson.core.JacksonException;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -299,7 +298,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     }
 
     @Test
-    public void testBooksAreReturned() throws JsonProcessingException {
+    public void testBooksAreReturned() throws JacksonException {
         Response r = createWebClient("/rest/api/bookstore", MediaType.APPLICATION_JSON).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 

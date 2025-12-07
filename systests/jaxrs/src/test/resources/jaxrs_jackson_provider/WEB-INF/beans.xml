@@ -123,8 +123,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:providers>
     </jaxrs:server>
     
-    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
-    <bean id="jackson2" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+    <bean id="jackson" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+    <bean id="jackson2" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
         <property name="unmarshallAsJaxbElement" value="true"/>
         <property name="marshallAsJaxbElement" value="true"/>

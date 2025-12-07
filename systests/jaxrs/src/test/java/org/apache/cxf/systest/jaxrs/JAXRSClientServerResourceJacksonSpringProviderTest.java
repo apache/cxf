@@ -27,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.BusFactory;
@@ -40,6 +38,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -80,7 +79,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         assertNotNull(in);
 
         assertEquals("Jackson output not correct",
-                     "{\"class\":\"org.apache.cxf.systest.jaxrs.Book\",\"name\":\"CXF in Action\",\"id\":123}",
+                     "{\"class\":\"org.apache.cxf.systest.jaxrs.Book\",\"id\":123,\"name\":\"CXF in Action\"}",
                      getStringFromInputStream(in).trim());
     }
 

@@ -21,8 +21,6 @@ package demo.jaxrs.sse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -30,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @Configuration
 @ComponentScan(basePackageClasses = StatsRestServiceImpl.class)

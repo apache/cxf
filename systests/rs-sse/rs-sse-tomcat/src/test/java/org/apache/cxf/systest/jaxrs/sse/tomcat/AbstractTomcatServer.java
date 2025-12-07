@@ -22,8 +22,6 @@ package org.apache.cxf.systest.jaxrs.sse.tomcat;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
@@ -32,6 +30,7 @@ import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import static org.junit.Assert.fail;
 

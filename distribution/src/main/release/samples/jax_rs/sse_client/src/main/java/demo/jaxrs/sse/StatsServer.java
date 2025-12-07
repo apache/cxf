@@ -18,8 +18,6 @@
  */
 package demo.jaxrs.sse;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 
 import io.undertow.Handlers;
@@ -27,6 +25,7 @@ import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import static io.undertow.servlet.Servlets.defaultContainer;
 import static io.undertow.servlet.Servlets.deployment;

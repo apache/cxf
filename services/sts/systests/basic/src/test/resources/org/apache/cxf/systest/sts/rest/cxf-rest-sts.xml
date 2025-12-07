@@ -140,7 +140,7 @@
             <ref bean="restSTS" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider" />
         </jaxrs:providers>
         <jaxrs:extensionMappings>
             <entry key="json" value="application/json;charset=UTF-8" />

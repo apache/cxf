@@ -38,7 +38,7 @@
             <param-name>jaxrs.providers</param-name>
             <param-value>
                 org.apache.cxf.jaxrs.provider.MultipartProvider,
-                com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider,
+                tools.jackson.jakarta.rs.json.JacksonJsonProvider,
                 demo.jaxrs.openapi.server.ApiOriginFilter
             </param-value>
         </init-param>

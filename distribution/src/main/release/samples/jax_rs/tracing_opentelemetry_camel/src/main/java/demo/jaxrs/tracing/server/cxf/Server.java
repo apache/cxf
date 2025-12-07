@@ -29,10 +29,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import demo.jaxrs.tracing.OpenTelemetrySetup;
 import io.opentelemetry.api.OpenTelemetry;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 @EnableAutoConfiguration
 @SpringBootApplication

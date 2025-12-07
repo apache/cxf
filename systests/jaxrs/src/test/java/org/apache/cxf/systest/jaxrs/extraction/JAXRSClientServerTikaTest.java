@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -43,6 +41,7 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
