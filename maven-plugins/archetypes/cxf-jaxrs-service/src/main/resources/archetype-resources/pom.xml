@@ -44,9 +44,21 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.0</version>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven3-plugin</artifactId>
+                    <version>1.10.25</version>
+                    <configuration>
+                        <container>
+                            <containerId>tomcat9x</containerId>
+                        </container>
+                        <deployables>
+                            <deployable>
+                                <properties>
+                                    <context>/jaxrs-service</context>
+                                </properties>
+                            </deployable>
+                        </deployables>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>default-cli</id>
@@ -54,9 +66,11 @@
                                 <goal>run</goal>
                             </goals>
                             <configuration>
-                                <port>13000</port>
-                                <path>/jaxrs-service</path>
-                                <useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
+                                <configuration>
+                                    <portNames>
+                                        <portName>13000</portName>
+                                    </portNames>
+                                </configuration>
                             </configuration>
                         </execution>
                     </executions>
@@ -102,26 +116,27 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven3-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>start-tomcat</id>
                         <goals>
-                            <goal>run-war</goal>
+                            <goal>start</goal>
                         </goals>
                         <phase>pre-integration-test</phase>
                         <configuration>
-                            <port>${test.server.port}</port>
-                            <path>/jaxrs-service</path>
-                            <fork>true</fork>
-                            <useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
+                            <configuration>
+                                <properties>
+                                    <cargo.servlet.port>${test.server.port}</cargo.servlet.port>
+                                </properties>
+                            </configuration>
                         </configuration>
                     </execution>
                     <execution>
                         <id>stop-tomcat</id>
                         <goals>
-                            <goal>shutdown</goal>
+                            <goal>stop</goal>
                         </goals>
                         <phase>post-integration-test</phase>
                         <configuration>
