@@ -36,6 +36,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${cxf.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${cxf.spring.version}</version>
         </dependency>
@@ -78,27 +83,40 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <!-- mvn clean install tomcat7:run to deploy
+                    <!-- mvn clean install cargo:run to deploy
                     Look for "Running war on http://xxx" and
                     "Setting the server's publish address to be /yyy"
                     in console output; WSDL browser address will be
                     concatenation of the two: http://xxx/yyy?wsdl
                     -->
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>2.0</version>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven3-plugin</artifactId>
+                    <version>1.10.25</version>
+                    <configuration>
+                        <container>
+                            <containerId>tomcat11x</containerId>
+                        </container>
+                        <deployables>
+                            <deployable>
+                                <properties>
+                                    <context>/webservice</context>
+                                </properties>
+                            </deployable>
+                        </deployables>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>start-tomcat</id>
                             <goals>
-                                <goal>run-war</goal>
+                                <goal>run</goal>
                             </goals>
                             <phase>pre-integration-test</phase>
                             <configuration>
-                                <port>${test.server.port}</port>
-                                <path>/webservice</path>
-                                <fork>true</fork>
-                                <useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
+                                <configuration>
+                                    <properties>
+                                        <cargo.servlet.port>${test.server.port}</cargo.servlet.port>
+                                    </properties>
+                                </configuration>
                             </configuration>
                         </execution>
                     </executions>
