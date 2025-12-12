@@ -61,10 +61,8 @@ public class CXFServlet extends CXFNonSpringServlet
 
         String configLocation = servletConfig.getInitParameter("config-location");
         if (configLocation == null) {
-            try {
-                InputStream is = servletConfig.getServletContext().getResourceAsStream("/WEB-INF/cxf-servlet.xml");
+            try (InputStream is = servletConfig.getServletContext().getResourceAsStream("/WEB-INF/cxf-servlet.xml")) {
                 if (is != null && is.available() > 0) {
-                    is.close();
                     configLocation = "/WEB-INF/cxf-servlet.xml";
                 }
             } catch (Exception ex) {
