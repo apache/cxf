@@ -244,10 +244,13 @@ public class AttachmentDeserializer {
                 if (!ads.isCached()) {
                     ads.cache(message);
                 }
-            } else if (s.getInputStream() instanceof DelegatingInputStream) {
-                cache((DelegatingInputStream) s.getInputStream());
             } else {
-                //assume a normal stream that is already cached
+                InputStream is = s.getInputStream();
+                if (is instanceof DelegatingInputStream) {
+                    cache((DelegatingInputStream) is);
+                } else {
+                    //assume a normal stream that is already cached
+                }
             }
         }
     }

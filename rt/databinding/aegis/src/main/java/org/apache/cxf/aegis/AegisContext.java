@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.aegis;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -286,9 +288,9 @@ public class AegisContext {
     }
 
     private Document getSchemaDocument(String resourcePath) {
-        try {
-            return StaxUtils.read(getClass().getResourceAsStream(resourcePath));
-        } catch (XMLStreamException e) {
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            return StaxUtils.read(is);
+        } catch (XMLStreamException | IOException e) {
             throw new RuntimeException(e);
         }
     }
