@@ -281,15 +281,15 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     }
 
     public void shutdown(boolean wait) {
-        if (state == BusState.SHUTTING_DOWN) {
-            return;
+        synchronized (this) {
+            if (state == BusState.SHUTTING_DOWN) {
+                return;
+            }
+            state = BusState.SHUTTING_DOWN;
         }
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
             lifeCycleManager.preShutdown();
-        }
-        synchronized (this) {
-            state = BusState.SHUTTING_DOWN;
         }
         destroyBeans();
         synchronized (this) {

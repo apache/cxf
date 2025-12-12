@@ -46,8 +46,14 @@ public final class Get {
         System.out.println("Invoking server through HTTP GET to invoke sayHi");
 
         InputStream in = httpConnection.getInputStream();
-        StreamSource source = new StreamSource(in);
-        printSource(source);
+        try {
+            StreamSource source = new StreamSource(in);
+            printSource(source);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
 
         // Sent HTTP GET request to invoke greetMe FAULT
         target = "http://localhost:9000/SoapContext/SoapPort/greetMe/me/CXF";
@@ -58,14 +64,26 @@ public final class Get {
 
         try {
             in = httpConnection.getInputStream();
-            source = new StreamSource(in);
-            printSource(source);
+            try {
+                StreamSource source = new StreamSource(in);
+                printSource(source);
+            } finally {
+                if (in != null) {
+                    in.close();
+                }
+            }
         } catch (Exception e) {
             System.err.println("GreetMe Fault: " + e.getMessage());
         }
         InputStream err = httpConnection.getErrorStream();
-        source = new StreamSource(err);
-        printSource(source);
+        if (err != null) {
+            try {
+                StreamSource source = new StreamSource(err);
+                printSource(source);
+            } finally {
+                err.close();
+            }
+        }
 
         // Sent HTTP GET request to invoke greetMe
         target = "http://localhost:9000/SoapContext/SoapPort/greetMe/requestType/CXF";
@@ -75,8 +93,14 @@ public final class Get {
         System.out.println("Invoking server through HTTP GET to invoke greetMe");
 
         in = httpConnection.getInputStream();
-        source = new StreamSource(in);
-        printSource(source);
+        try {
+            StreamSource source = new StreamSource(in);
+            printSource(source);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
 
         // Sent HTTP GET request to invoke pingMe
         target = "http://localhost:9000/SoapContext/SoapPort/pingMe";
@@ -87,12 +111,21 @@ public final class Get {
 
         try {
             in = httpConnection.getInputStream();
+            if (in != null) {
+                in.close();
+            }
         } catch (Exception e) {
             System.out.println("PingMe fault raised");
         }
         err = httpConnection.getErrorStream();
-        source = new StreamSource(err);
-        printSource(source);
+        if (err != null) {
+            try {
+                StreamSource source = new StreamSource(err);
+                printSource(source);
+            } finally {
+                err.close();
+            }
+        }
     }
 
     private static void printSource(Source source) {
