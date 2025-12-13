@@ -139,9 +139,6 @@
                             <goal>stop</goal>
                         </goals>
                         <phase>post-integration-test</phase>
-                        <configuration>
-                            <path>/jaxrs-service</path>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
