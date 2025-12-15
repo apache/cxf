@@ -62,6 +62,10 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         "org/apache/cxf/systest/jaxrs/security/bob.rs.properties";
     private static final String SERVER_JWEJWS_PROPERTIES =
         "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
+    private static final String CLIENT_SIGN_JWEJWS_PROPERTIES =
+            "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
+    private static final String SERVER_SIGN_JWEJWS_PROPERTIES =
+            "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
     private static final String ENCODED_MAC_KEY = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
         + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     @BeforeClass
@@ -175,7 +179,6 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @org.junit.Ignore // TODO not working since keys were upgraded for some reason
     public void testJweRsaJwsRsaEncryptThenSign() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsaencrsign";
 
@@ -194,8 +197,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         bean.setProviders(providers);
-        bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_JWEJWS_PROPERTIES);
-        bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
+        bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_SIGN_JWEJWS_PROPERTIES);
+        bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_SIGN_JWEJWS_PROPERTIES);
         PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
         bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
         BookStore bs = bean.create(BookStore.class);
