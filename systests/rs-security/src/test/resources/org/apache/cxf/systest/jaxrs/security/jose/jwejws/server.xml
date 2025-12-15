@@ -119,8 +119,8 @@ under the License.
             <ref bean="encrSignJwsInFilter"/>
         </jaxrs:providers>
         <jaxrs:properties>
-            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
-            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
