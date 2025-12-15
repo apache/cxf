@@ -160,7 +160,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
         final AtomicLong httpClientThreads = new AtomicLong(); 
 
-        final Supplier<Long> captureHttpClientThreads = () ->
+        final Supplier<Long> captureHttpClientSelectorThreads = () ->
             Arrays
                 .stream(threadMXBean.getAllThreadIds())
                 .mapToObj(id -> threadMXBean.getThreadInfo(id))
@@ -169,8 +169,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 .filter(t -> t.getThreadName().endsWith("-SelectorManager"))
                 .count();
 
+        final Supplier<Long> captureHttpClientThreads = () ->
+            Arrays
+                .stream(threadMXBean.getAllThreadIds())
+                .mapToObj(id -> threadMXBean.getThreadInfo(id))
+                .filter(Objects::nonNull)
+                .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .count();
+
         // Capture the number of client threads at start
-        final long expectedHttpClientThreads = captureHttpClientThreads.get();
+        final long expectedHttpClientSelectorThreads = captureHttpClientSelectorThreads.get();
         final Collection<WebClient> clients = new ArrayList<>();
         try {
             final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
@@ -195,7 +203,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         } finally {
             pool.shutdown();
             assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
-            assertThat(captureHttpClientThreads.get(), greaterThan(0L));
+            // Since JDK-27, HttpClient selector thread is a virtual thread by default
+            if (Runtime.version().feature() >= 27) {
+                assertThat(captureHttpClientSelectorThreads.get(), equalTo(0L));
+            } else {
+                assertThat(captureHttpClientSelectorThreads.get(), greaterThan(0L));
+            }
             assertThat(httpClientThreads.get(), greaterThan(0L));
             assertThat(httpClientThreads.get(), lessThan(150L)); /* a bit higher that pool size */
         }
@@ -204,7 +217,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     
         // Since JDK-21, HttpClient Implements AutoCloseable
         if (Runtime.version().feature() >= 21) { 
-            assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
+            assertThat(captureHttpClientSelectorThreads.get(), lessThanOrEqualTo(expectedHttpClientSelectorThreads));
         }
     }
 
