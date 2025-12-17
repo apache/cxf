@@ -116,6 +116,10 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
             cacheManager.destroyCache(key);
             cacheManager.close();
         }
+
+        if (bus != null) {
+            bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
+        }
     }
 
     public void initComplete() {
