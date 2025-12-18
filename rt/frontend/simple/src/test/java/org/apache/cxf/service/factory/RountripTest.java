@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.service.factory;
 
+import java.net.URL;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.frontend.ClientFactoryBean;
@@ -63,11 +65,14 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         svrBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
         svrBean.setServiceBean(new GreeterImplDoc());
         svrBean.setServiceClass(Greeter.class);
+        URL wsdl = RountripTest.class.getResource(
+            "/wsdl/hello_world_doc_lit.wsdl");
+
         svrBean.setEndpointName(new QName("http://apache.org/hello_world_doc_lit",
                                         "SoapPort"));
         svrBean.setServiceName(new QName("http://apache.org/hello_world_doc_lit",
                                          "SOAPService"));
-        svrBean.setWsdlLocation("testutils/hello_world_doc_lit.wsdl");
+        svrBean.setWsdlLocation(wsdl.toString());
         svrBean.setBus(getBus());
 
         svrBean.create();
