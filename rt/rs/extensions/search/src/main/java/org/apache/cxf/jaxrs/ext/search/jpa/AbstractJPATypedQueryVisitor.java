@@ -184,7 +184,9 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Predicate doBuildPredicate(ConditionType ct, Path<?> path, Class<?> valueClazz, Object value) {
+    protected Predicate doBuildPredicate(final ConditionType ct,
+            final Path<?> path, final Class<?> valueClazz,
+            final Object value) {
 
         Class<? extends Comparable> clazz = (Class<? extends Comparable>)valueClazz;
         Expression<? extends Comparable> exp = path.as(clazz);
