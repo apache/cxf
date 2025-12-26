@@ -21,6 +21,7 @@ package org.apache.cxf.systest.http2_jetty;
 
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.http2_jetty.Http2TestClient.ClientResponse;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -106,6 +107,36 @@ abstract class AbstractJettyClientServerHttp2Test extends AbstractBusClientServe
         try (Response resp = wc.get()) {
             assertThat(resp.getStatus(), equalTo(200));
             assertEquals("CXF in Action", resp.readEntity(String.class));
+        }
+    }
+    
+    @Test
+    public void testBookWithHttp2Redirect() throws Exception {
+        final WebClient wc = WebClient
+            .create(getAddress() + getContext() + "/web/bookstore/redirect")
+            .accept("application/xml");
+        
+        final ClientConfiguration config = WebClient.getConfig(wc);
+        config.getRequestContext().put(HTTPConduit.FORCE_HTTP_VERSION, "2");
+        config.getHttpConduit().getClient().setAutoRedirect(false);
+
+        if (isSecure()) {
+            final HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
+            TLSClientParameters params = conduit.getTlsClientParameters();
+
+            if (params == null)  {
+                params = new TLSClientParameters();
+                conduit.setTlsClientParameters(params);
+            }
+
+            // Create TrustManager instance which trusts all clients and servers
+            params.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers()); 
+            params.setDisableCNCheck(true);
+        }
+        
+        try (Response resp = wc.get()) {
+            assertThat(resp.getStatus(), equalTo(307));
+            assertEquals("Error while getting books", resp.readEntity(String.class));
         }
     }
 

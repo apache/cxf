@@ -1147,6 +1147,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         @Override
+        @SuppressWarnings("checkstyle:NestedIfDepth")
         protected InputStream getInputStream() throws IOException {
             HttpResponse<InputStream> resp = getResponse();
             String method = (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
@@ -1172,9 +1173,24 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     }
                 } else if (!fChunk.isPresent() || !"chunked".equals(fChunk.get())) {
                     if (resp.version() == Version.HTTP_2) {
-                        InputStream in = resp.body();
+                        final InputStream in = resp.body();
+                        // The InputStream::available is a best effort, if it returns 0, issuing
+                        // the InputStream::read will either block if data is expected or return
+                        // immediately
                         if (in.available() <= 0) {
-                            try (in) {
+                            final PushbackInputStream pbin = new PushbackInputStream(in);
+                            try {
+                                // HttpResponseInputStream will block if there is data to be read
+                                final int c = pbin.read();
+                                if (c != -1) {
+                                    pbin.unread((byte) c);
+                                    return new HttpClientFilteredInputStream(pbin);
+                                }
+                            } catch (final IOException ex) {
+                                // ignore
+                            }
+
+                            try (pbin) {
                                 return null;
                             }
                         }
