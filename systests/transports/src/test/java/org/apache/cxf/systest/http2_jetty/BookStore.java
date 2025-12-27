@@ -20,12 +20,20 @@
 package org.apache.cxf.systest.http2_jetty;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 
@@ -38,6 +46,23 @@ public class BookStore {
     @Produces("text/plain")
     public byte[] getBookName() {
         return "CXF in Action".getBytes();
+    }
+
+    @GET
+    @Path("/redirect")
+    @Produces("application/xml")
+    public Response redirect(@Context final UriInfo info) {
+        return Response
+             .temporaryRedirect(info.getBaseUriBuilder().path("/web/bookstore/bookstream").build())
+             .entity(new StreamingOutput() {
+                 @Override
+                 public void write(OutputStream out) throws IOException {
+                     LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(500));
+                     out.write("Error while getting books".getBytes(StandardCharsets.UTF_8));
+                     out.flush();
+                 }
+             })
+             .build();
     }
 
     @GET
