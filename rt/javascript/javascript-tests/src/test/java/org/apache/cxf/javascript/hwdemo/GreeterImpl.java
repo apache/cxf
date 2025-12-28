@@ -30,7 +30,7 @@ import uri.cxf_apache_org.jstest.types.FaultDetail;
 @jakarta.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http",
                       endpointInterface = "uri.cxf_apache_org.jstest.Greeter")
-@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")
+@org.apache.cxf.feature.Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);

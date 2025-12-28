@@ -28,7 +28,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItTransportSAML2SupportingPort" serviceName="s:DoubleItService" depends-on="StaxClientAuthHttpsSettings" address="https://localhost:${testutil.ports.StaxDoubleItServer.2}/doubleit/services/doubleittransportsaml2supporting" wsdlLocation="org/apache/cxf/systest/sts/sendervouches/DoubleIt.wsdl">

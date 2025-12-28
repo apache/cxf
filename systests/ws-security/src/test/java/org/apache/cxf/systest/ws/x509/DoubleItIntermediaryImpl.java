@@ -36,7 +36,7 @@ import org.example.contract.doubleit.DoubleItPortType;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleItIntermediaryImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";

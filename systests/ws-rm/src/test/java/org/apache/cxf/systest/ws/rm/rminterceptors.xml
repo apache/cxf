@@ -45,7 +45,7 @@
             <ref bean="rmLogicalIn"/>
             <ref bean="rmSoapIn"/>
             <ref bean="rmDelivery"/>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor">
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor">
                 <property name="prettyLogging" value="true"/>
             </bean>
         </cxf:inInterceptors>
@@ -55,7 +55,6 @@
             <ref bean="rmLogicalIn"/>
             <ref bean="rmSoapIn"/>
             <ref bean="rmDelivery"/>
-            <!-- bean class="org.apache.cxf.interceptor.LoggingInInterceptor" /-->
         </cxf:inFaultInterceptors>
         <cxf:outInterceptors>
             <ref bean="mapAggregator"/>
@@ -63,7 +62,7 @@
             <ref bean="rmLogicalOut"/>
             <ref bean="rmSoapOut"/>
             <ref bean="rmCaptureOut"/>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor">
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor">
                 <property name="prettyLogging" value="true"/>
             </bean>
         </cxf:outInterceptors>
@@ -73,7 +72,6 @@
             <ref bean="rmLogicalOut"/>
             <ref bean="rmSoapOut"/>
             <ref bean="rmCaptureOut"/>
-            <!-- bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" /-->
         </cxf:outFaultInterceptors>
     </cxf:bus>
 </beans>

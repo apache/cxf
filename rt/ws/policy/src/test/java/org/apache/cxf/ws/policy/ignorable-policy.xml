@@ -27,7 +27,7 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <cxf:bus>
         <cxf:outInterceptors>
-            <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean id="logOutbound" class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
     <bean class="org.apache.cxf.ws.policy.IgnorablePolicyInterceptorProvider">

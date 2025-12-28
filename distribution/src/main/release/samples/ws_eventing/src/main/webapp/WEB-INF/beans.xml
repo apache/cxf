@@ -10,12 +10,12 @@
     <bean id="subscriptionManagerBean" class="demo.wseventing.services.TestSubscriptionManager"/>
     <jaxws:endpoint implementor="#eventSourceBean" address="/EventSource">
         <jaxws:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxws:features>
     </jaxws:endpoint>
     <jaxws:endpoint implementor="#subscriptionManagerBean" address="/SubscriptionManager">
         <jaxws:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxws:features>
     </jaxws:endpoint>
 </beans>

@@ -21,8 +21,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:cxf="http://cxf.apache.org/core"
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="logIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-    <bean id="logOut" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+    <bean id="logIn" class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
+    <bean id="logOut" class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
     <bean id="catcher" class="org.apache.cxf.systest.interceptor.FaultHandlingInterceptor"/>
     <cxf:bus>
         <cxf:inInterceptors>

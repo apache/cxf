@@ -28,12 +28,12 @@
     <!-- use bean ids if you want to load multiple external attachment providers -->
     <cxf:bus bus="cxf1">
         <cxf:outInterceptors>
-            <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean id="logOutbound" class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
     <cxf:bus bus="cxf2">
         <cxf:inInterceptors>
-            <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean id="logInbound" class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </cxf:inInterceptors>
     </cxf:bus>
     <bean class="org.apache.cxf.ws.policy.IgnorablePolicyInterceptorProvider">

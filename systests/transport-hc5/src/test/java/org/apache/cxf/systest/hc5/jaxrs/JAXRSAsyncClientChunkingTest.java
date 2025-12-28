@@ -32,15 +32,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingMessage;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -48,7 +48,6 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 
@@ -255,17 +254,15 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
 
     private void configureLogging(final ClientConfiguration config) {
         final LoggingOutInterceptor out = new LoggingOutInterceptor();
-        out.setShowMultipartContent(false);
+        out.setLogMultipart(false);
 
-        final LoggingInInterceptor in = new LoggingInInterceptor() {
+        final LoggingInInterceptor in = new LoggingInInterceptor(new LogEventSender() {
             @Override
-            protected void logging(Logger logger, Message message) {
-                super.logging(logger, message);
-                final String id = (String) message.get(LoggingMessage.ID_KEY);
-                ids.computeIfAbsent(id, key -> new AtomicInteger()).incrementAndGet(); 
+            public void send(LogEvent event) {
+                ids.computeIfAbsent(event.getMessageId(), key -> new AtomicInteger()).incrementAndGet();
             }
-        };
-        in.setShowBinaryContent(false);
+        });
+        in.setLogBinary(false);
 
         config.getInInterceptors().add(in);
         config.getOutInterceptors().add(out);

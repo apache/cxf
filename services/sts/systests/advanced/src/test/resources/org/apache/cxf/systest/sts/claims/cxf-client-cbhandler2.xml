@@ -27,7 +27,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <bean id="roleClaimsCallbackHandler" class="org.apache.cxf.systest.sts.claims.ClaimsCallbackHandler">
