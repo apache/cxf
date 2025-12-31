@@ -25,9 +25,9 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.ext.Provider;
-import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.tracing.micrometer.AbstractObservationClientProvider;
 import org.apache.cxf.tracing.micrometer.ObservationScope;
+import org.jspecify.annotations.Nullable;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;

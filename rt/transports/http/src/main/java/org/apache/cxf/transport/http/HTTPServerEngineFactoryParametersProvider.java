@@ -21,9 +21,9 @@ package org.apache.cxf.transport.http;
 
 import java.util.Optional;
 
-import jakarta.annotation.Nullable;
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides programmatic defaults to the different HTTP server engine

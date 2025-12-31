@@ -24,10 +24,10 @@ import java.net.URI;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tracing.micrometer.jaxrs.JaxrsObservationDocumentation.CommonHighCardinalityKeys;
 import org.apache.cxf.tracing.micrometer.jaxrs.JaxrsObservationDocumentation.CommonLowCardinalityKeys;
+import org.jspecify.annotations.Nullable;
 
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
-import io.micrometer.common.lang.Nullable;
 
 /**
  *
