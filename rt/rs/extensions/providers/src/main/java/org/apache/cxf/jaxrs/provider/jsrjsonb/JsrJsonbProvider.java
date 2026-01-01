@@ -27,7 +27,6 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import jakarta.annotation.Nullable;
 import jakarta.json.JsonException;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
@@ -46,6 +45,7 @@ import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 11.2.7 Java API for JSON Binding (JSR-370)

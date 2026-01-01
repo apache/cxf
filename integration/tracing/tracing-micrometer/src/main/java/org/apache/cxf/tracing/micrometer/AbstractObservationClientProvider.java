@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
+import org.jspecify.annotations.Nullable;
 
-import io.micrometer.common.lang.Nullable;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 

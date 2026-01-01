@@ -20,9 +20,9 @@ package org.apache.cxf.tracing.micrometer;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.jspecify.annotations.Nullable;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;

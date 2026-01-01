@@ -46,7 +46,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import jakarta.annotation.Nullable;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
@@ -105,6 +104,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Common proxy and http-centric client implementation
