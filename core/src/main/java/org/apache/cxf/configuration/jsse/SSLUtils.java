@@ -22,9 +22,9 @@ package org.apache.cxf.configuration.jsse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -196,7 +196,7 @@ public final class SSLUtils {
         if (fileName == null) {
             return null;
         }
-        Path path = FileSystems.getDefault().getPath(fileName);
+        Path path = Paths.get(fileName);
         return Files.readAllBytes(path);
     }
 

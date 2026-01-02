@@ -99,7 +99,10 @@ public final class Client {
 
         final HttpPost post = new HttpPost(url);
         MultipartEntity entity = new MultipartEntity();
-        byte[] bytes = IOUtils.readBytesFromStream(Client.class.getResourceAsStream("/" + filename));
+        byte[] bytes;
+        try (InputStream is = Client.class.getResourceAsStream("/" + filename)) {
+            bytes = IOUtils.readBytesFromStream(is);
+        }
         entity.addPart(filename, new ByteArrayBody(bytes, filename));
 
         post.setEntity(entity);

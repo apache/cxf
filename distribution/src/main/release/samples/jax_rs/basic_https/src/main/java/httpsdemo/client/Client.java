@@ -51,7 +51,9 @@ public final class Client {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+        try (FileInputStream fis = new FileInputStream(keyStoreLoc)) {
+            keyStore.load(fis, "cspass".toCharArray());
+        }
 
         SSLContext sslcontext = SSLContexts.custom()
                 .loadTrustMaterial(keyStore, null)
