@@ -31,7 +31,7 @@
         <property name="allowDuplicates" value="false"/>
     </bean>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
-    <bean id="loggingIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+    <bean id="loggingIn" class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
     <cxf:bus>
         <cxf:inInterceptors>

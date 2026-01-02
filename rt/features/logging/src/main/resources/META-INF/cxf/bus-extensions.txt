@@ -1,3 +1,2 @@
 org.apache.cxf.ext.logging.LoggingFactoryBeanListener::true
-org.apache.cxf.ext.logging.OldLoggingFactoryBeanListener::true
 org.apache.cxf.ext.logging.LoggingBusLifecycleListener::true

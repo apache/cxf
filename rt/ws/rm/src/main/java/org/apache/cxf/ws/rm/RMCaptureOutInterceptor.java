@@ -75,7 +75,6 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     public RMCaptureOutInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(AttachmentOutInterceptor.class.getName());
-        addBefore("org.apache.cxf.interceptor.LoggingOutInterceptor");
         addBefore("org.apache.cxf.ext.logging.LoggingOutInterceptor");
     }
 

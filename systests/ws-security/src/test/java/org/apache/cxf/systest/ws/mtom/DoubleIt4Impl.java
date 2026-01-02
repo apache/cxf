@@ -32,7 +32,7 @@ import org.example.contract.doubleit.DoubleItMtomPortType;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItMtomPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleIt4Impl implements DoubleItMtomPortType {
 
     @Override

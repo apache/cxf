@@ -416,15 +416,17 @@ public abstract class AbstractHTTPDestination
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
 
-        SecurityContext httpSecurityContext = new SecurityContext() {
+        final HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
+        final SecurityContext httpSecurityContext = new SecurityContext() {
+            private final Principal principal = reqFromInMessage.getUserPrincipal();
+
             public Principal getUserPrincipal() {
                 //ensure we use req from the one saved in inMessage
                 //as this could be the cachedInput one in oneway and 
                 //ReplyTo is specified when ws-addressing is used
                 //which means we need to switch thread context
                 //and underlying transport might discard any data on the original stream
-                HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
-                return reqFromInMessage.getUserPrincipal();
+                return principal;
             }
             public boolean isUserInRole(String role) {
                 //ensure we use req from the one saved in inMessage
@@ -432,7 +434,6 @@ public abstract class AbstractHTTPDestination
                 //ReplyTo is specified when ws-addressing is used
                 //which means we need to switch thread context
                 //and underlying transport might discard any data on the original stream
-                HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
                 return reqFromInMessage.isUserInRole(role);
             }
         };

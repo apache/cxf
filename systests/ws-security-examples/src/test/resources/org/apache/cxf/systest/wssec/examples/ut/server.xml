@@ -30,7 +30,7 @@
     <cxf:bus>
         <cxf:features>
             <p:policies/>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
