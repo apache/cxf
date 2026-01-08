@@ -41,7 +41,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.UriInfo;
-import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.PATCH;
@@ -51,7 +50,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
-@GZIP(threshold = 1)
 public class BookStore {
 
     private Map<Long, Book> books = new HashMap<>();
