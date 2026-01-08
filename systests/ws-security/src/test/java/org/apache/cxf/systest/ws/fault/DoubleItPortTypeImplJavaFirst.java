@@ -35,7 +35,7 @@ import org.example.contract.doubleit.DoubleItPortType;
             portName = "DoubleItSoap11NoPolicyBinding",
             name = "DoubleItSoap11NoPolicyBinding",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleItPortTypeImplJavaFirst implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;

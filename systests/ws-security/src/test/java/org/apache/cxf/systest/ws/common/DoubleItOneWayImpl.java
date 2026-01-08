@@ -25,7 +25,7 @@ import org.example.contract.doubleit.DoubleItOneWayPortType;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItOneWayPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleItOneWayImpl implements DoubleItOneWayPortType {
 
     @Override

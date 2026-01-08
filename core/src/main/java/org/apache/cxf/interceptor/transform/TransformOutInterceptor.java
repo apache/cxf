@@ -65,7 +65,6 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public TransformOutInterceptor(String phase) {
         super(phase);
         addBefore(StaxOutInterceptor.class.getName());
-        addAfter("org.apache.cxf.interceptor.LoggingOutInterceptor");
         addAfter("org.apache.cxf.ext.logging.LoggingOutInterceptor");
     }
 

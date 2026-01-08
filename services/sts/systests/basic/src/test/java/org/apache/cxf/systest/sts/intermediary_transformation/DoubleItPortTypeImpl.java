@@ -33,7 +33,7 @@ import org.junit.Assert;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 /**
  * A PortType implementation that only allows a user call it twice. This is to test the caching logic
  * of the intermediary.

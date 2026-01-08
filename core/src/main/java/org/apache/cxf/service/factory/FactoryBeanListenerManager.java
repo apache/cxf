@@ -39,7 +39,6 @@ public class FactoryBeanListenerManager {
 
     public FactoryBeanListenerManager() {
         listeners.add(new AnnotationsFactoryBeanListener());
-        listeners.add(new OldLoggingFactoryBeanListener());
     }
     public FactoryBeanListenerManager(Bus b) {
         this();

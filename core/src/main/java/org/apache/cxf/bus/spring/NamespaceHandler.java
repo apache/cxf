@@ -28,12 +28,9 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.beans.factory.xml.ParserContext;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
-    @SuppressWarnings("deprecation")
     public void init() {
         registerBeanDefinitionParser("bus",
                                      new BusDefinitionParser());
-        registerBeanDefinitionParser("logging",
-                                     new SimpleBeanDefinitionParser(org.apache.cxf.feature.LoggingFeature.class));
         registerBeanDefinitionParser("fastinfoset",
                                      new SimpleBeanDefinitionParser(FastInfosetFeature.class));
 
