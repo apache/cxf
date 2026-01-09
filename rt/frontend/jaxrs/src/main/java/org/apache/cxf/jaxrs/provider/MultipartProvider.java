@@ -357,7 +357,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                      att.getObject().getClass(), new Annotation[]{},
                                      att.getContentType().toString(), id);
             MediaType mediaType = httpHeaders.getMediaType();
-            Attachment ret;
+            Attachment ret = null;
             if (MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType)
                 && att.getHeader("Content-Disposition") == null) {
                 ContentDisposition cd = new 
