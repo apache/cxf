@@ -37,7 +37,7 @@
         <cxf.surefire.usefile>false</cxf.surefire.usefile>
         <org.apache.cxf.transport.websocket.atmosphere.disabled>false</org.apache.cxf.transport.websocket.atmosphere.disabled>
         <cxf.surefire.parallel.mode />
-        <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</cxf.surefire.fork.vmargs>
+        <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
         <cxf.surefire.enable.assertions>true</cxf.surefire.enable.assertions>
         <cxf.surefire.rerun.count>3</cxf.surefire.rerun.count>
