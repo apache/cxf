@@ -20,6 +20,7 @@
 package demo.jaxrs.search.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,7 +100,10 @@ public final class Client {
 
         final HttpPost post = new HttpPost(url);
         MultipartEntity entity = new MultipartEntity();
-        byte[] bytes = IOUtils.readBytesFromStream(Client.class.getResourceAsStream("/" + filename));
+        byte[] bytes;
+        try (InputStream is = Client.class.getResourceAsStream("/" + filename)) {
+            bytes = IOUtils.readBytesFromStream(is);
+        }
         entity.addPart(filename, new ByteArrayBody(bytes, filename));
 
         post.setEntity(entity);
