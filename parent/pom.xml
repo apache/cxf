@@ -2272,11 +2272,7 @@
             </activation>
             <properties>
                 <!-- JAXB: see please https://github.com/javaee/jaxb-v2/issues/1184 -->
-<<<<<<< HEAD
-                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED</cxf.surefire.fork.vmargs>
-=======
-                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
->>>>>>> 0e444d3c39 (CXF-8407: Incorporate changes caused by JEP-396 integration into JDK-16+ (#2818))
+                <cxf.surefire.fork.vmargs>-ea --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED  --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED</cxf.surefire.fork.vmargs>
             </properties>
         </profile>
     </profiles>
