@@ -39,13 +39,12 @@ class StreamPrinter extends Thread {
 
     @Override
     public void run() {
-        try {
+        try (InputStreamReader isr = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(isr)) {
             PrintWriter pw = null;
             if (os != null) {
                 pw = new PrintWriter(os);
             }
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
             String line = br.readLine();
             while (line != null) {
                 if (pw != null) {
@@ -58,6 +57,14 @@ class StreamPrinter extends Thread {
             }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                // Ignore close exception
+            }
         }
     }
 }
