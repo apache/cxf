@@ -35,8 +35,8 @@ public class DumpingClassLoaderCapturer implements GeneratedClassClassLoaderCapt
     private final Map<String, byte[]> classes = new ConcurrentHashMap<>();
     
     public void dumpTo(File file) throws IOException {
-        if (!file.exists()) 
-            Files.createDirectories(file.toPath());{
+        if (!file.exists()) {
+            Files.createDirectories(file.toPath());
         }
         
         if (!file.isDirectory()) {

@@ -84,8 +84,10 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         if ("HEAD".equals(request.getMethod())) {
             return;
         }
-        if (bus == null) {
-            bus = BusFactory.getDefaultBus(false);
+        synchronized (this) {
+            if (bus == null) {
+                bus = BusFactory.getDefaultBus(false);
+            }
         }
         final ServiceListWriter serviceListWriter;
         if ("false".equals(request.getParameter("formatted"))) {

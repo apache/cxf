@@ -42,16 +42,14 @@ public class CodeAuthSupplier implements HttpAuthSupplier {
                                    URI currentURI,
                                    Message message,
                                    String fullHeader) {
-        if (code != null) {
-            synchronized (tokenSupplier) {
-                if (tokenSupplier.getClientAccessToken().getTokenKey() == null) {
-                    WebClient wc = tokenSupplier.createAccessTokenServiceClient();
-                    ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
-                                                    tokenSupplier.getConsumer(),
-                                                    new AuthorizationCodeGrant(code));
-                    code = null;
-                    tokenSupplier.setClientAccessToken(at);
-                }
+        synchronized (tokenSupplier) {
+            if (code != null && tokenSupplier.getClientAccessToken().getTokenKey() == null) {
+                WebClient wc = tokenSupplier.createAccessTokenServiceClient();
+                ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
+                                                tokenSupplier.getConsumer(),
+                                                new AuthorizationCodeGrant(code));
+                code = null;
+                tokenSupplier.setClientAccessToken(at);
             }
         }
         return tokenSupplier.getAuthorization(authPolicy, currentURI, message, fullHeader);
