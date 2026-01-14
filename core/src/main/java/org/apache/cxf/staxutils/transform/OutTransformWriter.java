@@ -139,8 +139,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
 
         uri = value != null ? value : uri;
-
-        if (writtenUris.get(0).contains(uri) && namespaceContext.getPrefix(uri).isEmpty()) {
+        String prefix = namespaceContext.getPrefix(uri);
+        if (writtenUris.get(0).contains(uri) && (prefix == null || prefix.isEmpty())) {
             return;
         }
         super.writeDefaultNamespace(uri);
