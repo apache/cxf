@@ -436,7 +436,18 @@
         <xs:enumeration value="ALL"/>
       </xs:restriction>
     </xs:simpleType>
-    
+
+    <xs:complexType name="ServerNames">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds the list of SNI server names.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="serverName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
     <!-- Although there are common elements of TLSClientParametersType
       ** and TLSServerParametersType they are listed separate so we
       ** can use the xs:all element.
@@ -460,7 +471,7 @@
            <xs:element name="cipherSuites" type="tns:CipherSuites" minOccurs="0">
               <xs:annotation>
                 <xs:documentation>
-                This element contains the the CipherSuites that will be supported.
+                This element contains the CipherSuites that will be supported.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
@@ -491,6 +502,13 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains the Certificate Alias.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="serverNames" type="tns:ServerNames" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the SNI server names.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
@@ -577,7 +595,7 @@
            <xs:element name="cipherSuites" type="tns:CipherSuites" minOccurs="0">
               <xs:annotation>
                 <xs:documentation>
-                This element contains the the CipherSuites that will be supported.
+                This element contains the CipherSuites that will be supported.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
@@ -592,14 +610,14 @@
            <xs:element name="excludeProtocols" type="tns:ExcludeProtocols" minOccurs="0">
               <xs:annotation>
                 <xs:documentation>
-                This element contains the the Protocols that will be excluded
+                This element contains the Protocols that will be excluded
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
            <xs:element name="includeProtocols" type="tns:IncludeProtocols" minOccurs="0">
               <xs:annotation>
                 <xs:documentation>
-                This element contains the the Protocols that will be included
+                This element contains the Protocols that will be included
                 </xs:documentation>
               </xs:annotation>
            </xs:element>

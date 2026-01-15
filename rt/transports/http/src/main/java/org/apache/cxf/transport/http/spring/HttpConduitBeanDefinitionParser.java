@@ -36,6 +36,7 @@ import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
+import org.apache.cxf.configuration.security.ServerNames;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -171,6 +172,8 @@ public class HttpConduitBeanDefinitionParser
                                          CertificateConstraintsType.class);
             } else if ("certAlias".equals(ename)) {
                 paramsbean.addPropertyValue(ename, n.getTextContent());
+            } else if ("serverNames".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename, ServerNames.class);
             }
             n = n.getNextSibling();
         }
