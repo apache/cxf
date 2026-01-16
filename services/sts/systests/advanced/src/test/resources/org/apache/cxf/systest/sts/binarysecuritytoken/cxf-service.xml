@@ -28,7 +28,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl" endpointName="s:DoubleItAsymmetricBSTPort" serviceName="s:DoubleItService" address="http://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleitasymmetricbst" wsdlLocation="org/apache/cxf/systest/sts/binarysecuritytoken/DoubleIt.wsdl">

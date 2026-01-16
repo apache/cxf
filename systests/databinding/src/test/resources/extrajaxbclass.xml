@@ -59,10 +59,10 @@ under the License.
     <!-- Client Proxy -->
     <jaxws:client id="testClient" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </jaxws:inInterceptors>
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </jaxws:outInterceptors>
         <jaxws:properties>
             <entry key="jaxb.additionalContextClasses">

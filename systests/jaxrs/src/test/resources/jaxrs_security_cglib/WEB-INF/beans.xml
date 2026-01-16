@@ -43,7 +43,7 @@
             <ref bean="bookstore"/>
         </jaxrs:serviceBeans>
         <jaxrs:features>
-         <cxf:logging />
+         <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
     </jaxrs:features>
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.security.SecurityExceptionMapper"/>

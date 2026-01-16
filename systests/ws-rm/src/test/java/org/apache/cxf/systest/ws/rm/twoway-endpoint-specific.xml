@@ -52,8 +52,8 @@
     <bean id="rmSoapIn" class="org.apache.cxf.ws.rm.soap.RMSoapInInterceptor"/>
     <bean id="rmSoapOut" class="org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor"/>
     <!-- Logging and Utility Interceptor-->
-    <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-    <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+    <bean id="logInbound" class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
+    <bean id="logOutbound" class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
     <!--WS-A Interceptors not required in Fault Chain-->
     <bean name="{http://cxf.apache.org/greeter_control}GreeterPort.endpoint" abstract="true">
         <property name="inInterceptors">
