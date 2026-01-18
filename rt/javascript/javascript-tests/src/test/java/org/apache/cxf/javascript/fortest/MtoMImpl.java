@@ -32,7 +32,7 @@ import org.apache.cxf.helpers.IOUtils;
 /**
  *
  */
-@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")
+@org.apache.cxf.feature.Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 @WebService(targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 @MTOM(enabled = true, threshold = 0)
 public class MtoMImpl implements MtoM {

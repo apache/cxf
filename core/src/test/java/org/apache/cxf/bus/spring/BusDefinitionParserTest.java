@@ -20,7 +20,6 @@
 package org.apache.cxf.bus.spring;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.annotation.PostConstruct;
@@ -29,8 +28,6 @@ import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.message.Message;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
@@ -44,14 +41,9 @@ import static org.junit.Assert.assertTrue;
 public class BusDefinitionParserTest {
 
     @Test
-    @SuppressWarnings("deprecation")
     public void testFeatures() {
         String cfgFile = "org/apache/cxf/bus/spring/bus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
-
-        List<Interceptor<? extends Message>> in = bus.getInInterceptors();
-        assertTrue("could not find logging interceptor.",
-                in.stream().anyMatch(i -> i.getClass() == org.apache.cxf.interceptor.LoggingInInterceptor.class));
 
         Collection<Feature> features = bus.getFeatures();
         TestFeature tf = null;
@@ -113,17 +105,6 @@ public class BusDefinitionParserTest {
                 });
         }
         assertTrue("postShutdown not called", b.get());
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testLazyInit() {
-        String cfgFile = "org/apache/cxf/bus/spring/lazyInitBus.xml";
-        Bus bus = new SpringBusFactory().createBus(cfgFile, true);
-
-        List<Interceptor<? extends Message>> in = bus.getInInterceptors();
-        assertTrue("could not find logging interceptor.",
-                in.stream().anyMatch(i -> i.getClass() == org.apache.cxf.interceptor.LoggingInInterceptor.class));
     }
 
     static class TestBean {

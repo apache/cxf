@@ -23,12 +23,12 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <cxf:bus bus="cxf1">
         <cxf:outInterceptors>
-            <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean id="staxOutbound" class="org.apache.cxf.interceptor.StaxOutInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
     <cxf:bus bus="cxf2">
         <cxf:inInterceptors>
-            <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean id="staxInbound" class="org.apache.cxf.interceptor.StaxInInterceptor"/>
         </cxf:inInterceptors>
     </cxf:bus>
 </beans>

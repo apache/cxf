@@ -398,13 +398,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.apache.cxf.ext.logging.OldLoggingFactoryBeanListener",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
-},
-{
   "name":"org.apache.cxf.jaxrs.JAXRSBindingFactory",
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },

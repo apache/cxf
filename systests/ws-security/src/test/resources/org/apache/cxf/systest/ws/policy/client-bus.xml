@@ -30,7 +30,7 @@
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#Asymmetric"/>
             </p:policies>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">

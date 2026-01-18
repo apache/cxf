@@ -38,21 +38,6 @@
     </xsd:documentation>
   </xsd:annotation>
 
-  <xsd:element name="logging">
-    <xsd:annotation>
-      <xsd:documentation>
-        The logging feature enables you to log the content of inbound and outbound messages and faults.
-        The content is logged by all log handlers configured in your java.util.logging configuration file, 
-        provided the log level for classes org.apache.cxf.interceptor.LoggingInInterceptor and 
-        org.apache.cxf.interceptor.LoggingOutInterceptor is at least INFO.
-      </xsd:documentation>
-    </xsd:annotation>
-    <xsd:complexType>
-      <xsd:sequence />
-      <xsd:attribute name="limit" type="xsd:int" use="optional" default="102400"/>
-      <xsd:attribute name="id" type="xsd:string" use="optional"/>
-    </xsd:complexType>
-  </xsd:element>
   <xsd:element name="fastinfoset">
     <xsd:annotation>
       <xsd:documentation>

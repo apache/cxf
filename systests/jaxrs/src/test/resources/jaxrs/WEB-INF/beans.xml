@@ -70,7 +70,7 @@
             <bean class="org.apache.cxf.systest.jaxrs.InternalServerErrorExceptionMapper"/>
         </jaxrs:providers>
         <jaxrs:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxrs:features>
     </jaxrs:server>
     <jaxrs:server id="booksxsi" address="/thebooksxsi/bookstore">
@@ -81,7 +81,7 @@
             <ref bean="jaxbProviderXsi"/>
         </jaxrs:providers>
         <jaxrs:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxrs:features>
     </jaxrs:server>
     <jaxrs:server id="bookservice4" address="/thebooks4/bookstore">

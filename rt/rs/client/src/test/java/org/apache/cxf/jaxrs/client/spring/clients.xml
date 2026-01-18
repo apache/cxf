@@ -33,10 +33,10 @@
     </bean>
     <jaxrs:client id="client1" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo">
         <jaxrs:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </jaxrs:outInterceptors>
     </jaxrs:client>
     <jaxrs:client xmlns:s="http://books.com" id="setHeaderClient" serviceName="s:BookService" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:8080/simpleWithAddress" username="username" password="password">

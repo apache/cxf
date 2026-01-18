@@ -30,7 +30,7 @@ import org.example.schema.doubleit.DoubleItResponse;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItSwaPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleIt3Impl implements DoubleItSwaPortType {
 
     @Override

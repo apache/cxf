@@ -30,10 +30,10 @@
     </jaxws:server>
     <jaxws:client id="mtom-client" address="http://localhost:${testutil.ports.TestPort}/mtom" serviceClass="org.apache.cxf.javascript.fortest.MtoM">
         <jaxws:inInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingInInterceptor"/>
         </jaxws:inInterceptors>
         <jaxws:outInterceptors>
-            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingOutInterceptor"/>
         </jaxws:outInterceptors>
     </jaxws:client>
 </beans>

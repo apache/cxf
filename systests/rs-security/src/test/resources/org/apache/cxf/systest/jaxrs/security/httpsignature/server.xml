@@ -29,7 +29,7 @@ under the License.
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
