@@ -64,12 +64,12 @@ public class MaskSensitiveHelper {
         }
     }
 
-    private final Set<ReplacementPair> replacementsElements = new HashSet<>();
+    private final Set<ReplacementPair> replacementsXMLElements = new HashSet<>();
     private final Set<ReplacementPair> replacementsJSON = new HashSet<>();
     private final Set<ReplacementPair> replacementsXMLAttributes = new HashSet<>();
 
     public void setSensitiveElementNames(final Set<String> inSensitiveElementNames) {
-        replacementsElements.clear();
+        replacementsXMLElements.clear();
         replacementsJSON.clear();
         addSensitiveElementNames(inSensitiveElementNames);
     }
@@ -77,7 +77,7 @@ public class MaskSensitiveHelper {
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         for (final String sensitiveName : inSensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE,
-                sensitiveName, replacementsElements);
+                sensitiveName, replacementsXMLElements);
             addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE_ARRAY, REPLACEMENT_JSON_TEMPLATE_ARRAY,
                 sensitiveName, replacementsJSON);
             addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE, REPLACEMENT_JSON_TEMPLATE,
@@ -115,7 +115,7 @@ public class MaskSensitiveHelper {
     public String maskSensitiveElements(
             final Message message,
             final String originalLogString) {
-        if (replacementsElements.isEmpty() && replacementsJSON.isEmpty()
+        if (replacementsXMLElements.isEmpty() && replacementsJSON.isEmpty()
             && replacementsXMLAttributes.isEmpty()
                 || originalLogString == null || message == null) {
             return originalLogString;
@@ -127,7 +127,7 @@ public class MaskSensitiveHelper {
         final String lowerCaseContentType = contentType.toLowerCase();
         if (lowerCaseContentType.contains(XML_CONTENT)
                 || lowerCaseContentType.contains(HTML_CONTENT)) {
-            String replacedElement = applyMasks(originalLogString, replacementsElements);
+            String replacedElement = applyMasks(originalLogString, replacementsXMLElements);
             return replacedElement == null ? replacedElement 
                 : applyMasks(replacedElement, replacementsXMLAttributes);
         } else if (lowerCaseContentType.contains(JSON_CONTENT)) {
