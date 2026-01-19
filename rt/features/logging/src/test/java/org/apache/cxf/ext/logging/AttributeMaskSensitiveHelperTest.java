@@ -122,11 +122,9 @@ public class AttributeMaskSensitiveHelperTest {
     public void shouldReplaceSensitiveDataInWithAdd() {
         // Arrange
         final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
-        AttributeMaskingHelper attrMaskHelper = new AttributeMaskingHelper();
-        attrMaskHelper.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
-        attrMaskHelper.setSensitiveElementNames(SENSITIVE_ELEMENTS);
-        inInterceptor.setSensitiveDataHelper(attrMaskHelper);
-
+        inInterceptor.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
+        inInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
+        
         final Message message = prepareInMessage();
 
         // Act
@@ -146,11 +144,8 @@ public class AttributeMaskSensitiveHelperTest {
     public void shouldReplaceSensitiveDataInWithSet() {
         // Arrange
         final LoggingInInterceptor inInterceptor = new LoggingInInterceptor(logEventSender);
-        
-        AttributeMaskingHelper attrMaskHelper = new AttributeMaskingHelper();
-        attrMaskHelper.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
-        attrMaskHelper.setSensitiveElementNames(SENSITIVE_ELEMENTS);
-        inInterceptor.setSensitiveDataHelper(attrMaskHelper);
+        inInterceptor.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
+        inInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
         final Message message = prepareInMessage();
 
         // Act
@@ -170,10 +165,8 @@ public class AttributeMaskSensitiveHelperTest {
     public void shouldReplaceSensitiveDataOutWithAdd() throws IOException {
         // Arrange
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
-        AttributeMaskingHelper attrMaskHelper = new AttributeMaskingHelper();
-        attrMaskHelper.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
-        attrMaskHelper.setSensitiveElementNames(SENSITIVE_ELEMENTS);
-        outInterceptor.setSensitiveDataHelper(attrMaskHelper);
+        outInterceptor.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
+        outInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
 
         final Message message = prepareOutMessage();
 
@@ -194,10 +187,8 @@ public class AttributeMaskSensitiveHelperTest {
     public void shouldReplaceSensitiveDataOutWithSet() throws IOException {
         // Arrange
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
-        AttributeMaskingHelper attrMaskHelper = new AttributeMaskingHelper();
-        attrMaskHelper.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
-        attrMaskHelper.setSensitiveElementNames(SENSITIVE_ELEMENTS);
-        outInterceptor.setSensitiveDataHelper(attrMaskHelper);
+        outInterceptor.setSensitiveAttributeNames(SENSITIVE_ATTRIBUTES);
+        outInterceptor.setSensitiveElementNames(SENSITIVE_ELEMENTS);
 
         final Message message = prepareOutMessage();
 

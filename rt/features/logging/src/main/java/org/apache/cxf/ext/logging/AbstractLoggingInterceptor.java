@@ -94,6 +94,14 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
         maskSensitiveHelper.addSensitiveElementNames(sensitiveElementNames);
     }
+    
+    public void setSensitiveAttributeNames(final Set<String> sensitiveAttributeNames) {
+        maskSensitiveHelper.setSensitiveAttributeNames(sensitiveAttributeNames);
+    }
+    
+    public void addSensitiveAttributeNames(final Set<String> sensitiveAttributeNames) {
+        maskSensitiveHelper.addSensitiveAttributeNames(sensitiveAttributeNames);
+    }
 
     public void setSensitiveProtocolHeaderNames(final Set<String> protocolHeaderNames) {
         this.sensitiveProtocolHeaderNames.clear();
