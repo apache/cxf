@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.cxf.message.Message;
 
 public class MaskSensitiveHelper {
+    private static final String ATTR_NAME_TEMPLATE = "-ATTR_NAME-";
     private static final String ELEMENT_NAME_TEMPLATE = "-ELEMENT_NAME-";
     // see https://www.w3.org/TR/REC-xml-names/#NT-NCName for allowed chars in namespace prefix
     private static final String PATTERN_XML_NAMESPACE_PREFIX = "[\\w.\\-\\u00B7\\u00C0-\\u00D6\\u00D8-\\u00F6"
@@ -42,6 +43,12 @@ public class MaskSensitiveHelper {
     private static final String MATCH_PATTERN_JSON_TEMPLATE = "\"-ELEMENT_NAME-\"[ \\t]*:[ \\t]*\"(.*?)\"";
     private static final String REPLACEMENT_JSON_TEMPLATE = "\"-ELEMENT_NAME-\": \"XXX\"";
     private static final String MASKED_HEADER_VALUE = "XXX";
+    
+    // Case-sensitive attribute pattern; supports optional namespace prefix; preserves original quotes
+    // Groups: 1=full attr name (w/ optional prefix), 2=open quote, 3=value, 4=close quote (backref to 2)
+    private static final String MATCH_PATTERN_XML_ATTR_TEMPLATE =
+            "(\\b(?:" + PATTERN_XML_NAMESPACE_PREFIX + ":)?" + ATTR_NAME_TEMPLATE + ")\\s*=\\s*(\"|')(.*?)(\\2)";
+    private static final String REPLACEMENT_XML_ATTR_TEMPLATE = "$1=$2XXX$4";
 
     private static final String XML_CONTENT = "xml";
     private static final String HTML_CONTENT = "html";
@@ -57,11 +64,12 @@ public class MaskSensitiveHelper {
         }
     }
 
-    private final Set<ReplacementPair> replacementsXML = new HashSet<>();
+    private final Set<ReplacementPair> replacementsXMLElements = new HashSet<>();
     private final Set<ReplacementPair> replacementsJSON = new HashSet<>();
+    private final Set<ReplacementPair> replacementsXMLAttributes = new HashSet<>();
 
     public void setSensitiveElementNames(final Set<String> inSensitiveElementNames) {
-        replacementsXML.clear();
+        replacementsXMLElements.clear();
         replacementsJSON.clear();
         addSensitiveElementNames(inSensitiveElementNames);
     }
@@ -69,12 +77,30 @@ public class MaskSensitiveHelper {
     public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
         for (final String sensitiveName : inSensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE,
-                sensitiveName, replacementsXML);
+                sensitiveName, replacementsXMLElements);
             addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE_ARRAY, REPLACEMENT_JSON_TEMPLATE_ARRAY,
                 sensitiveName, replacementsJSON);
             addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE, REPLACEMENT_JSON_TEMPLATE,
                 sensitiveName, replacementsJSON);
         }
+    }
+    
+    /** Adds attribute names to be masked in XML/HTML logs (values replaced with "XXX"). */
+    public void addSensitiveAttributeNames(final Set<String> inSensitiveAttirbuteNames) {
+        if (inSensitiveAttirbuteNames == null || inSensitiveAttirbuteNames.isEmpty()) {
+            return;
+        }
+        for (final String attr : inSensitiveAttirbuteNames) {
+            final String match = MATCH_PATTERN_XML_ATTR_TEMPLATE.replace(ATTR_NAME_TEMPLATE, Pattern.quote(attr));
+            final String repl  = REPLACEMENT_XML_ATTR_TEMPLATE.replace(ATTR_NAME_TEMPLATE, escapeForReplacement(attr));
+            replacementsXMLAttributes.add(new ReplacementPair(match, repl));
+        }
+    }
+
+    /** Optional convenience resetter if you want it. */
+    public void setSensitiveAttributeNames(final Set<String> inSensitiveAttributeNames) {
+        replacementsXMLAttributes.clear();
+        addSensitiveAttributeNames(inSensitiveAttributeNames);
     }
 
     private void addReplacementPair(final String matchPatternTemplate,
@@ -89,7 +115,8 @@ public class MaskSensitiveHelper {
     public String maskSensitiveElements(
             final Message message,
             final String originalLogString) {
-        if (replacementsXML.isEmpty() && replacementsJSON.isEmpty()
+        if (replacementsXMLElements.isEmpty() && replacementsJSON.isEmpty()
+            && replacementsXMLAttributes.isEmpty()
                 || originalLogString == null || message == null) {
             return originalLogString;
         }
@@ -100,7 +127,9 @@ public class MaskSensitiveHelper {
         final String lowerCaseContentType = contentType.toLowerCase();
         if (lowerCaseContentType.contains(XML_CONTENT)
                 || lowerCaseContentType.contains(HTML_CONTENT)) {
-            return applyMasks(originalLogString, replacementsXML);
+            String replacedElement = applyMasks(originalLogString, replacementsXMLElements);
+            return replacedElement == null ? replacedElement 
+                : applyMasks(replacedElement, replacementsXMLAttributes);
         } else if (lowerCaseContentType.contains(JSON_CONTENT)) {
             return applyMasks(originalLogString, replacementsJSON);
         }
@@ -122,5 +151,12 @@ public class MaskSensitiveHelper {
             resultString = replacementPair.matchPattern.matcher(resultString).replaceAll(replacementPair.replacement);
         }
         return resultString;
+    }
+    
+    private static String escapeForReplacement(String s) {
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+        return s.replace("\\", "\\\\").replace("$", "\\$");
     }
 }
