@@ -39,7 +39,7 @@
         <cxf.swagger.ui.version>5.31.0</cxf.swagger.ui.version>
         <cxf.tika.version>3.2.3</cxf.tika.version>
         <cxf.tomcat.version>11.0.15</cxf.tomcat.version>
-        <cxf.jboss.weld.version>6.0.3.Final</cxf.jboss.weld.version>
+        <cxf.jboss.weld.version>6.0.4.Final</cxf.jboss.weld.version>
         <cxf.gson.version>2.13.2</cxf.gson.version>
         <cxf.lucene.version>10.3.2</cxf.lucene.version>
         <cxf.olingo.server.version>5.0.0</cxf.olingo.server.version>
