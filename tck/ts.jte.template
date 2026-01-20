@@ -151,6 +151,7 @@ command.testExecute=com.sun.ts.lib.harness.ExecTSTestCmd \
         ${JAVA_HOME}/bin/java \
         -Dcts.tmp=$harness.temp.directory \
         -Ddeliverable.class=${deliverable.class} $testExecuteClass $testExecuteArgs
+        -Dorg.apache.cxf.transport.http.forceURLConnection=true
 
 
 #########################################################################
