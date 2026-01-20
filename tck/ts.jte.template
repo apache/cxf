@@ -150,8 +150,8 @@ command.testExecute=com.sun.ts.lib.harness.ExecTSTestCmd \
         PATH="${javaee.home}/nativelib" \
         ${JAVA_HOME}/bin/java \
         -Dcts.tmp=$harness.temp.directory \
+        -Dorg.apache.cxf.transport.http.forceURLConnection=true \
         -Ddeliverable.class=${deliverable.class} $testExecuteClass $testExecuteArgs
-        -Dorg.apache.cxf.transport.http.forceURLConnection=true
 
 
 #########################################################################
