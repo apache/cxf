@@ -31,7 +31,7 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.spring.boot.version>4.0.1</cxf.spring.boot.version>
+        <cxf.spring.boot.version>4.0.2</cxf.spring.boot.version>
         <cxf.spring.cloud.eureka.version>5.0.0</cxf.spring.cloud.eureka.version>
         <cxf.jetty12.version>12.1.5</cxf.jetty12.version>
         <cxf.netty.version>4.2.9.Final</cxf.netty.version>
