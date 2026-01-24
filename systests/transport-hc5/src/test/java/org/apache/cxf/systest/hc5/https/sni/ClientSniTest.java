@@ -23,7 +23,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import jakarta.xml.ws.BindingProvider;
+import javax.xml.ws.BindingProvider;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;

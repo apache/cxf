@@ -28,7 +28,7 @@
     
     <cxf:bus>
         <cxf:features>
-            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
+             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
     <http:conduit name="https://localhost:.*">
