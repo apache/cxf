@@ -137,6 +137,9 @@ public final class TLSClientParametersConfig {
         if (iparams != null && iparams.isSetTrustManagersRef() && !usingDefaults) {
             ret.setTrustManagers(iparams.getTrustManagersRef());
         }
+        if (iparams != null && iparams.isSetServerNames()) {
+            ret.setServerNames(iparams.getServerNames().getServerName());
+        }
         return ret;
     }
 
