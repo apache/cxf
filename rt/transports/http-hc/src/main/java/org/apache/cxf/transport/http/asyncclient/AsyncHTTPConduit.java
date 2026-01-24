@@ -39,12 +39,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
+import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 
@@ -976,6 +979,13 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         String[] p = findProtocols(protocol, sslengine.getSupportedProtocols());
         if (p != null) {
             sslengine.setEnabledProtocols(p);
+        }
+        
+        final List<String> serverNames = tlsClientParameters.getServerNames();
+        if (serverNames != null && !serverNames.isEmpty()) {
+            final SSLParameters params = new SSLParameters();
+            params.setServerNames(serverNames.stream().map(SNIHostName::new).collect(Collectors.toList()));
+            sslengine.setSSLParameters(params);
         }
     }
 

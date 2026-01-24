@@ -58,6 +58,7 @@ public class TLSClientParameters extends TLSParameterBase {
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
     private HostnameVerifier hostnameVerifier;
     private SSLContext sslContext;
+    private List<String> serverNames;
 
     /**
      * Set custom HostnameVerifier
@@ -165,6 +166,21 @@ public class TLSClientParameters extends TLSParameterBase {
         this.useHttpsURLConnectionDefaultHostnameVerifier = useHttpsURLConnectionDefaultHostnameVerifier;
     }
 
+    /**
+     * Sets SNI server names
+     * @param serverNames SNI server names
+     */
+    public void setServerNames(List<String> serverNames) {
+        this.serverNames = serverNames;
+    }
+
+    /**
+     * Returns SNI server names
+     */
+    public List<String> getServerNames() {
+        return serverNames;
+    }
+
     public int hashCode() {
         int hash = disableCNCheck ? 37 : 17;
         if (sslSocketFactory != null) {
@@ -192,6 +208,9 @@ public class TLSClientParameters extends TLSParameterBase {
         if (certConstraints != null) {
             hash = hash(hash, certConstraints.getIssuerDNConstraints());
             hash = hash(hash, certConstraints.getSubjectDNConstraints());
+        }
+        if (serverNames != null) {
+            hash = hash(hash, serverNames);
         }
         return hash;
     }
@@ -252,6 +271,11 @@ public class TLSClientParameters extends TLSParameterBase {
                 }
             } else {
                 eq &= that.certConstraints == null;
+            }
+            if (serverNames != null) {
+                eq &= equals(serverNames, that.serverNames);
+            } else {
+                eq &= that.serverNames == null;
             }
             return eq;
         }
