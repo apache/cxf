@@ -36,10 +36,10 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <cxf.version>4.2.0-SNAPSHOT</cxf.version>
-        <glassfish.container.version>8.0.0-M14</glassfish.container.version>
+        <glassfish.container.version>8.0.0-M15</glassfish.container.version>
         <glassfish.home>${project.build.directory}/glassfish8</glassfish.home>
         <jakarta.platform.version>11.0.0</jakarta.platform.version>
-        <junit.jupiter.version>6.0.1</junit.jupiter.version>
+        <junit.jupiter.version>6.0.2</junit.jupiter.version>
         <jakarta.rest.version>4.0.0</jakarta.rest.version>
         <tck.artifactId>jakarta-restful-ws-tck</tck.artifactId>
         <arquillian.version>1.10.0.Final</arquillian.version>
@@ -92,9 +92,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.hantsy.arquillian-container-glassfish-jakarta</groupId>
-            <artifactId>arquillian-glassfish-managed-jakarta</artifactId>
-            <version>7.0.10</version>
+            <groupId>io.github.hantsy.arquillian</groupId>
+            <artifactId>arquillian-glassfish-managed</artifactId>
+            <version>7.0.14</version>
         </dependency>
 
         <dependency>
