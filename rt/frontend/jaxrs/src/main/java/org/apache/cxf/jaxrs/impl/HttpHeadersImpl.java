@@ -383,6 +383,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             return false;
         }
         return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .map(String::trim)
             .filter(valuePredicate)
             .findAny()
             .isPresent();

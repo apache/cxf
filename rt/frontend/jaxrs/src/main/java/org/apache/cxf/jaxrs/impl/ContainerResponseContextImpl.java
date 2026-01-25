@@ -90,6 +90,7 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
             return false;
         }
         return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .map(String::trim)
             .filter(valuePredicate)
             .findAny()
             .isPresent();

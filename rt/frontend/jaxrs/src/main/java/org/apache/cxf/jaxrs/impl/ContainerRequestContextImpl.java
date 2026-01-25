@@ -189,6 +189,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
             return false;
         }
         return Arrays.stream(headerString.split(valueSeparatorRegex))
+            .map(String::trim)
             .filter(valuePredicate)
             .findAny()
             .isPresent();
