@@ -133,7 +133,7 @@
         <cxf.httpcomponents.core5.version>5.4</cxf.httpcomponents.core5.version>
         <cxf.jackson.version>3.0.3</cxf.jackson.version>
         <cxf.jackson.databind.version>3.0.3</cxf.jackson.databind.version>
-        <cxf.jackson.annotations.version>2.20</cxf.jackson.annotations.version>
+        <cxf.jackson.annotations.version>2.21</cxf.jackson.annotations.version>
         <cxf.jacorb.version>3.9</cxf.jacorb.version>
         <cxf.jaeger.version>1.8.1</cxf.jaeger.version>
         <cxf.jakarta.activation.version>2.1.4</cxf.jakarta.activation.version>
