@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-server</artifactId>
-            <version>4.0.2</version>
+            <version>${cxf.grizzly.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
