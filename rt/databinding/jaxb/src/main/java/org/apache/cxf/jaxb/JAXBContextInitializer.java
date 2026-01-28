@@ -328,7 +328,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
                 }
                 Object factory = createFactory(claz);
-                unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
+                unmarshallerProperties.put("org.glassfish.jaxb.core.ObjectFactory", factory);
                 cls = claz;
             }
             if (null != cls) {
