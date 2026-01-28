@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.EntityPart;
@@ -49,6 +50,7 @@ public class EntityPartImpl implements EntityPart {
     private final GenericType<?> genericType;
     private final Class<?> type;
     private final Providers providers;
+    private final AtomicBoolean consumed = new AtomicBoolean();
 
     //CHECKSTYLE:OFF
     public EntityPartImpl(Providers providers, String name, String fileName, Object content, Class<?> type,
@@ -124,6 +126,10 @@ public class EntityPartImpl implements EntityPart {
     public <T> T getContent(Class<T> asType) throws IllegalArgumentException, IllegalStateException,
             IOException, WebApplicationException {
 
+        if (consumed.compareAndExchange(false, true)) {
+            throw new IllegalStateException("Content has been consumed already");
+        }
+
         if (asType == null) {
             throw new NullPointerException("The type is required");
         }
@@ -151,6 +157,10 @@ public class EntityPartImpl implements EntityPart {
     @Override
     public <T> T getContent(GenericType<T> asType) throws IllegalArgumentException, IllegalStateException,
             IOException, WebApplicationException {
+
+        if (consumed.compareAndExchange(false, true)) {
+            throw new IllegalStateException("Content has been consumed already");
+        }
 
         if (asType == null) {
             throw new NullPointerException("The generic type is required");

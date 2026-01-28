@@ -164,10 +164,10 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
 
             if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(providers, name, fileName, is, c, genericType, headers,
+                return new EntityPartImpl(mc.getProviders(), name, fileName, is, c, genericType, headers,
                     attachment.getContentType());
             } else {
-                return new EntityPartImpl(providers, name, null, is, c, genericType, headers,
+                return new EntityPartImpl(mc.getProviders(), name, null, is, c, genericType, headers,
                     attachment.getContentType());
             }
         } else {
