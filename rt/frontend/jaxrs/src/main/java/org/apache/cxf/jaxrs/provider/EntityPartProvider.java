@@ -44,7 +44,6 @@ import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.Providers;
-import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -161,13 +160,13 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final String fileName = (cd != null) ? cd.getFilename() : null;
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
-            final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
 
             if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(mc.getProviders(), name, fileName, is, c, genericType, headers,
-                    attachment.getContentType());
+                return new EntityPartImpl(mc.getProviders(), contentId, fileName, is, c, genericType,
+                    attachment.getHeaders(), attachment.getContentType());
             } else {
-                return new EntityPartImpl(mc.getProviders(), name, null, is, c, genericType, headers,
+                final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
+                return new EntityPartImpl(mc.getProviders(), name, null, is, c, genericType, attachment.getHeaders(),
                     attachment.getContentType());
             }
         } else {
@@ -207,7 +206,7 @@ public class EntityPartProvider extends AbstractConfigurableProvider
         return part.getFileName()
             .map(fileName -> {
                 final ContentDisposition cd = new ContentDisposition("form-data;name=file;filename=" + fileName);
-                return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, part.getContent(), cd);
+                return new Attachment(part.getName(), part.getContent(), cd);
             })
             .orElseGet(() -> {
                 headers.putSingle("Content-Type", mt);
