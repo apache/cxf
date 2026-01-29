@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -107,19 +108,7 @@ public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
             InputStream is2 = 
                 getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentFormJson")) {
 
-            final EntityPart part1 = EntityPart
-                    .withName("bookXML")
-                    .content(is1)
-                    .mediaType(MediaType.APPLICATION_XML)
-                    .build();
-
-            final EntityPart part2 = EntityPart
-                    .withName("gazetteer")
-                    .content(is2)
-                    .mediaType(MediaType.APPLICATION_JSON)
-                    .build();
-
-            try (Response response = client.postCollection(List.of(part1, part2), EntityPart.class)) {
+            try (Response response = client.post(new SequenceInputStream(is1, is2))) {
                 assertThat(response.getStatus(), equalTo(200));
 
                 try (InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt")) {
@@ -144,14 +133,8 @@ public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
 
         try (InputStream is = 
                 getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName)) {
-
-            final EntityPart part = EntityPart
-                    .withName(name)
-                    .content(is)
-                    .mediaType(mt)
-                    .build();
-
-            try (Response response = client.postCollection(List.of(part), EntityPart.class)) {
+            
+            try (Response response = client.post(is)) {
                 assertThat(response.getStatus(), equalTo(200));
 
                 try (InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt")) {

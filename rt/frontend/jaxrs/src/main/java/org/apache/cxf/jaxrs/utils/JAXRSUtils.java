@@ -1162,7 +1162,8 @@ public final class JAXRSUtils {
                 return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.MATRIX, m, false);
             }
             List<String> values = params.get(key);
-            return InjectionUtils.createParameterObject(values,
+            return InjectionUtils.createParameterObject(key,
+                                                        values,
                                                         pClass,
                                                         genericType,
                                                         paramAnns,
@@ -1232,7 +1233,8 @@ public final class JAXRSUtils {
         }
         List<String> results = params.get(key);
 
-        return InjectionUtils.createParameterObject(results,
+        return InjectionUtils.createParameterObject(key,
+                                                    results,
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1260,7 +1262,8 @@ public final class JAXRSUtils {
         if (values != null && values.isEmpty()) {
             values = null;
         }
-        return InjectionUtils.createParameterObject(values,
+        return InjectionUtils.createParameterObject(header,
+                                                    values,
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1290,7 +1293,8 @@ public final class JAXRSUtils {
         String value = InjectionUtils.isSupportedCollectionOrArray(pClass)
             && InjectionUtils.getActualType(genericType) == Cookie.class
             ? c.toString() : c.getValue();
-        return InjectionUtils.createParameterObject(Collections.singletonList(value),
+        return InjectionUtils.createParameterObject(cookieName,
+                                                    Collections.singletonList(value),
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1427,7 +1431,8 @@ public final class JAXRSUtils {
             return InjectionUtils.handleBean(paramType, paramAnns, values, ParameterType.PATH, m, decoded);
         }
         List<String> results = values.get(parameterName);
-        return InjectionUtils.createParameterObject(results,
+        return InjectionUtils.createParameterObject(parameterName,
+                                                results,
                                                 paramType,
                                                 genericType,
                                                 paramAnns,
@@ -1453,7 +1458,8 @@ public final class JAXRSUtils {
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, queryMap, ParameterType.QUERY, m, false);
         }
-        return InjectionUtils.createParameterObject(queryMap.get(queryName),
+        return InjectionUtils.createParameterObject(queryName,
+                                                    queryMap.get(queryName),
                                                     paramType,
                                                     genericType,
                                                     paramAnns,

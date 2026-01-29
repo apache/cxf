@@ -19,16 +19,15 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.core.EntityPart;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.ext.Providers;
-import org.apache.cxf.attachment.AttachmentBoundaryDeserializer;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -50,14 +49,29 @@ final class EntityPartUtils {
         return from(mc.getProviders(), AttachmentUtils.getMultipartBody(mc));
     }
     
-    public static EntityPart getEntityPart(final String value, final Message message) {
+    public static EntityPart getEntityPart(final String key, final String value, final Message message) {
         final Providers providers = new ProvidersImpl(message);
-        try (InputStream is = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8))) {
-            final AttachmentBoundaryDeserializer deserializer = new AttachmentBoundaryDeserializer(message);
-            final Attachment attachment = new Attachment(deserializer.read(is), providers);
-            return createFromAttachment(providers, attachment);
-        } catch (IOException ex) {
-            throw ExceptionUtils.toBadRequestException(null, null);
+        final MultipartBody body = (MultipartBody) message.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
+        if (body != null) {
+            final Attachment attachment = body.getAttachment(key);
+            if (attachment != null) {
+                final ContentDisposition cd = attachment.getContentDisposition();
+                final String fileName = (cd != null) ? cd.getFilename() : null;
+
+                if (!StringUtils.isEmpty(fileName)) {
+                    return new EntityPartImpl(providers, key, fileName, value, String.class, null,
+                        attachment.getHeaders(), attachment.getContentType());
+                } else {
+                    return new EntityPartImpl(providers, key, null, value, String.class, null, attachment.getHeaders(),
+                        attachment.getContentType());
+                }
+            } else {
+                return new EntityPartImpl(providers, key, null, value, String.class, 
+                        null, new MultivaluedHashMap<>(), MediaType.TEXT_PLAIN_TYPE);
+            }
+        } else {
+            return new EntityPartImpl(providers, key, null, value, String.class, 
+                null, new MultivaluedHashMap<>(), MediaType.TEXT_PLAIN_TYPE);
         }
     }
 
