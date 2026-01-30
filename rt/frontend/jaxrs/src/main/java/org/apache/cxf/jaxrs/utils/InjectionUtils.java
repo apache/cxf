@@ -55,6 +55,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jakarta.annotation.Nullable;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.EntityPart;
@@ -103,7 +104,6 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.jspecify.annotations.Nullable;
 
 public final class InjectionUtils {
     public static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
