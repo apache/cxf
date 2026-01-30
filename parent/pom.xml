@@ -194,7 +194,7 @@
         <cxf.olingo.version>2.0.13</cxf.olingo.version>
         <cxf.openjpa.version>4.1.1</cxf.openjpa.version>
         <cxf.opentelemetry.version>1.58.0</cxf.opentelemetry.version>
-        <cxf.opentelemetry.semconv.version>1.37.0</cxf.opentelemetry.semconv.version>
+        <cxf.opentelemetry.semconv.version>1.39.0</cxf.opentelemetry.semconv.version>
         <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
         <cxf.openwebbeans.version>4.0.3</cxf.openwebbeans.version>
         <cxf.parsson.version>1.1.7</cxf.parsson.version>
