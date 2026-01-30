@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -77,6 +79,7 @@ import org.apache.cxf.common.util.ProxyClassLoaderCache;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.io.ReaderInputStream;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -100,6 +103,7 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.jspecify.annotations.Nullable;
 
 public final class InjectionUtils {
     public static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
@@ -414,9 +418,27 @@ public final class InjectionUtils {
         }
         return null;
     }
-
+    
+    /**
+     * @deprecated please use {@link handleParameter} with key argument
+     */
     @SuppressWarnings("unchecked")
+    @Deprecated
     public static <T> T handleParameter(String value,
+                                        boolean decoded,
+                                        Class<T> pClass,
+                                        Type genericType,
+                                        Annotation[] paramAnns,
+                                        ParameterType pType,
+                                        Message message) {
+        return handleParameter(null, value, decoded, pClass, 
+            genericType, paramAnns, pType, message);
+    }
+
+    //CHECKSTYLE:OFF
+    @SuppressWarnings("unchecked")
+    public static <T> T handleParameter(@Nullable String key,
+                                        String value,
                                         boolean decoded,
                                         Class<T> pClass,
                                         Type genericType,
@@ -525,7 +547,11 @@ public final class InjectionUtils {
         }
         
         if (EntityPart.class.isAssignableFrom(pClass) && message != null) {
-            result = EntityPartUtils.getEntityPart(value, message);
+            result = EntityPartUtils.getEntityPart(key, value, message);
+        }
+
+        if (InputStream.class.isAssignableFrom(pClass) && message != null) {
+            result = new ReaderInputStream(new StringReader(value));
         }
 
         if (result == null) {
@@ -539,6 +565,7 @@ public final class InjectionUtils {
             return null;
         }
     }
+    //CHECKSTYLE:ON
 
     private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {
         //
@@ -741,14 +768,14 @@ public final class InjectionUtils {
 
                     for (MultivaluedMap<String, String> processedValues : processedValuesList) {
                         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-                            Object appendValue = InjectionUtils.injectIntoCollectionOrArray(type,
+                            Object appendValue = InjectionUtils.injectIntoCollectionOrArray(memberKey, type,
                                                             genericType, paramAnns, processedValues,
                                                             isbean, true,
                                                             pType, message);
                             paramValue = InjectionUtils.mergeCollectionsOrArrays(paramValue, appendValue,
                                                             genericType);
                         } else if (isSupportedMap(genericType)) {
-                            Object appendValue = injectIntoMap(
+                            Object appendValue = injectIntoMap(memberKey,
                                 genericType, paramAnns, processedValues, true, pType, message);
                             paramValue = mergeMap(paramValue, appendValue);
 
@@ -756,7 +783,7 @@ public final class InjectionUtils {
                             paramValue = InjectionUtils.handleBean(type, paramAnns, processedValues,
                                                             pType, message, decoded);
                         } else {
-                            paramValue = InjectionUtils.handleParameter(
+                            paramValue = InjectionUtils.handleParameter(memberKey,
                                 processedValues.values().iterator().next().get(0),
                                 decoded, type, type, paramAnns, pType, message);
                         }
@@ -787,7 +814,8 @@ public final class InjectionUtils {
         return null;
     }
 
-    private static Object injectIntoMap(Type genericType,
+    private static Object injectIntoMap(String key,
+                                        Type genericType,
                                         Annotation[] paramAnns,
                                         MultivaluedMap<String, String> processedValues,
                                         boolean decoded,
@@ -805,7 +833,7 @@ public final class InjectionUtils {
             for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
                 List<String> valuesList = processedValuesEntry.getValue();
                 for (String value : valuesList) {
-                    Object o = InjectionUtils.handleParameter(value,
+                    Object o = InjectionUtils.handleParameter(key, value,
                                        decoded, valueType, valueType, paramAnns, pathParam, message);
                     theValues.add(convertStringToPrimitive(processedValuesEntry.getKey(), keyType), o);
                 }
@@ -818,7 +846,7 @@ public final class InjectionUtils {
         for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
             List<String> valuesList = processedValuesEntry.getValue();
             for (String value : valuesList) {
-                Object o = InjectionUtils.handleParameter(value,
+                Object o = InjectionUtils.handleParameter(key, value,
                                    decoded, valueType, valueType, paramAnns, pathParam, message);
                 theValues.put(
                     convertStringToPrimitive(processedValuesEntry.getKey(), keyType),
@@ -955,7 +983,7 @@ public final class InjectionUtils {
 
     }
     //CHECKSTYLE:OFF
-    private static Object injectIntoCollectionOrArray(Class<?> rawType,
+    private static Object injectIntoCollectionOrArray(String key, Class<?> rawType,
                                                       Type genericType,
                                                       Annotation[] paramAnns,
                                         MultivaluedMap<String, String> values,
@@ -998,7 +1026,7 @@ public final class InjectionUtils {
             List<String> valuesList = values.values().iterator().next();
             valuesList = checkPathSegment(valuesList, realType, pathParam);
             for (int ind = 0; ind < valuesList.size(); ind++) {
-                Object o = InjectionUtils.handleParameter(valuesList.get(ind), decoded,
+                Object o = InjectionUtils.handleParameter(key, valuesList.get(ind), decoded,
                                realType, realGenericType, paramAnns, pathParam, message);
                 addToCollectionValues(theValues, o, ind);
             }
@@ -1038,9 +1066,29 @@ public final class InjectionUtils {
         }
         return newValues;
     }
-    //
+    
+    /**
+     * @deprecated please use {@link createParameterObject} with key argument
+     */
+    @Deprecated
     //CHECKSTYLE:OFF
     public static Object createParameterObject(List<String> paramValues,
+            Class<?> paramType,
+            Type genericType,
+            Annotation[] paramAnns,
+            String defaultValue,
+            boolean decoded,
+            ParameterType pathParam,
+            Message message) {
+        return createParameterObject(null, paramValues, paramType, genericType, 
+            paramAnns, defaultValue, decoded, pathParam, message);
+    }
+    //CHECKSTYLE:ON
+
+    //
+    //CHECKSTYLE:OFF
+    public static Object createParameterObject(String key,
+                                               List<String> paramValues,
                                                Class<?> paramType,
                                                Type genericType,
                                                Annotation[] paramAnns,
@@ -1070,7 +1118,7 @@ public final class InjectionUtils {
         if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
             MultivaluedMap<String, String> paramValuesMap = new MetadataMap<>();
             paramValuesMap.put("", paramValues);
-            value = InjectionUtils.injectIntoCollectionOrArray(paramType, genericType, paramAnns,
+            value = InjectionUtils.injectIntoCollectionOrArray(key, paramType, genericType, paramAnns,
                                                 paramValuesMap, false, decoded, pathParam, message);
         } else {
             String result = null;
@@ -1080,7 +1128,7 @@ public final class InjectionUtils {
                                 : paramValues.get(0);
             }
             if (result != null) {
-                value = InjectionUtils.handleParameter(result, decoded, paramType, genericType,
+                value = InjectionUtils.handleParameter(key, result, decoded, paramType, genericType,
                                                        paramAnns, pathParam, message);
             }
         }

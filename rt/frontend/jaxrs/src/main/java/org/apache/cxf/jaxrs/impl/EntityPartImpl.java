@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
@@ -27,7 +28,6 @@ import java.io.PipedOutputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,8 +91,8 @@ public class EntityPartImpl implements EntityPart {
                 return (InputStream) content;
             }  else if (content instanceof byte[]) { 
                 return new ByteArrayInputStream((byte[]) content);
-            } else if (fileName != null && !fileName.isBlank()) { 
-                return Files.newInputStream(Path.of(fileName));
+            } else if (fileName != null && content instanceof File) { 
+                return Files.newInputStream(((File) content).toPath());
             } else {
                 return contentAsStream();
             } 

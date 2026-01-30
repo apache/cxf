@@ -199,7 +199,7 @@ public class InjectionUtilsTest {
     public void testJsr310DateExceptionHandling() {
         Field field = CustomerDetailsWithAdapter.class.getDeclaredFields()[0];
         Annotation[] paramAnns = field.getDeclaredAnnotations();
-        InjectionUtils.createParameterObject(Collections.singletonList("wrongDate"), LocalDate.class,
+        InjectionUtils.createParameterObject(field.getName(), Collections.singletonList("wrongDate"), LocalDate.class,
                 LocalDate.class, paramAnns, null, false, ParameterType.QUERY, createMessage());
     }
 

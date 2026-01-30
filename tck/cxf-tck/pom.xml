@@ -538,6 +538,8 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/SeBootstrapIT.java</exclude>
+                                <!-- Covered by org.apache.cxf.systest.jaxrs.multipart.MultipartSupportTest -->
+                                <exclude>**/MultipartSupportIT.java</exclude>
                             </excludes>
                             <dependenciesToScan>jakarta.ws.rs:${tck.artifactId}</dependenciesToScan>
                             <systemPropertyVariables>
