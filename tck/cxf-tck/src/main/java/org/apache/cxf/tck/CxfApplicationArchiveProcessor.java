@@ -30,6 +30,9 @@ public class CxfApplicationArchiveProcessor implements ApplicationArchiveProcess
         } else if ("jaxrs_ee_core_securitycontext_basic_web.war".equals(archive.getName())) {
             WebArchive webArchive = (WebArchive) archive;
             webArchive.addAsWebInfResource("jaxrs_ee_core_securitycontext_basic_web.war.sun-web.xml", "sun-web.xml");
+        } else if ("MultipartSupportIT.war".equals(archive.getName())) {
+            WebArchive webArchive = (WebArchive) archive;
+            webArchive.addAsWebInfResource("jaxrs_ee_multipart_web.xml", "web.xml");
         }
     }
 }
