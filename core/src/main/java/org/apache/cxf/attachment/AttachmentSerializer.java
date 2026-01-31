@@ -43,6 +43,8 @@ import org.apache.cxf.message.Message;
 public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
+    // https://www.rfc-editor.org/rfc/rfc7578
+    private static final String MULTIPART_FORM_DATA_TYPE = "multipart/form-data";
 
     private String contentTransferEncoding = AttachmentUtil.BINARY;
 
@@ -208,7 +210,13 @@ public class AttachmentSerializer {
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\nContent-Type: ");
         writer.write(contentType);
-        writer.write("\r\nContent-Transfer-Encoding: " + contentTransferEncoding + "\r\n");
+
+        // Content-Transfer-Encoding is deprecated (see please https://www.rfc-editor.org/rfc/rfc7578#page-6)
+        if (!MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(multipartType)) {
+            writer.write("\r\nContent-Transfer-Encoding: " + contentTransferEncoding + "\r\n");
+        } else {
+            writer.write("\r\n");
+        }
 
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
