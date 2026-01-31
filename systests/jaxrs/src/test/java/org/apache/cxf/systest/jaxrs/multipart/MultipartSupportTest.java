@@ -143,9 +143,9 @@ public class MultipartSupportTest extends AbstractBusClientServerTestBase {
                 Assert.assertNotNull(part);
                 Assert.assertEquals("Add part on return.", part.getContent(String.class));
 
-                // Check headers.  Should be 5:  Content-Disposition, Transfer-Encoding, 
-                // Content-Type, and the 2 headers that were added.
-                if ((part.getHeaders() == null) || (part.getHeaders().size() != 5)) {
+                // Check headers.  Should be 5:  Content-Disposition, Content-Type,
+                // and the 2 headers that were added.
+                if ((part.getHeaders() == null) || (part.getHeaders().size() != 4)) {
                     Assert.fail("Expected 4 headers, received " + part.getHeaders().size());
                 }
 
