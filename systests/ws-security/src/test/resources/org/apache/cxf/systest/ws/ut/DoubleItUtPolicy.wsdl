@@ -41,6 +41,9 @@
         <wsdl:port name="DoubleItSupportingTokenPort2" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItSupportingToken2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSupportingTokenPort3" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItSupportingToken3"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItPlaintextPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItPlaintext"/>
         </wsdl:port>
