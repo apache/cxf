@@ -556,6 +556,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
 
             message.put(ConfigurationConstants.ACTION, action.trim());
+
+            // Set any custom WSS4J Processor instances that are configured
+            final Map<QName, Object> processorMap = CastUtils.cast(
+                (Map<?, ?>)SecurityUtils.getSecurityPropertyValue(PROCESSOR_MAP, message));
+            configureCustomProcessors(data.getWssConfig(), processorMap);
         }
     }
 

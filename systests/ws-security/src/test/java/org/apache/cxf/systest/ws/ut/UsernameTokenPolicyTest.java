@@ -406,5 +406,35 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     
     }
     
+    // https://issues.apache.org/jira/browse/CXF-9167
+    // Here we're sending a UsernameToken with a password unknown by the default CallbackHandler on the server side,
+    // but we are overriding the UsernameToken processor to use a CallbackHandler that knows the password.
+    @org.junit.Test
+    public void testSupportingTokenCustomProcessor() throws Exception {
+
+        if (test.getPort().equals(STAX_PORT)) {
+            // We don't support custom processors with streaming for now
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSupportingTokenPort3");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
     
 }
