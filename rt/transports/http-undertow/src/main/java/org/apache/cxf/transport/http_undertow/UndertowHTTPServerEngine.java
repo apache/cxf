@@ -36,6 +36,7 @@ import javax.net.ssl.X509KeyManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -80,10 +81,7 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     public static final String ENABLE_RECORD_REQUEST_START_TIME_PROP = 
         "org.apache.cxf.transports.http_undertow.EnableRecordRequestStartTime";
 
-    //If not specified, the default size is 2MB from Undertow
-    public static final String MULTIPART_MAX_ENTITY_SIZE =
-        "org.apache.cxf.transports.http_undertow.MultiPartMaxEntitySize";
-
+    
     private static final Logger LOG = LogUtils.getL7dLogger(UndertowHTTPServerEngine.class);
 
     /**
@@ -609,10 +607,10 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     private long getMaxEntitySize(Bus bus) {
         Object prop = null;
         if (bus != null) {
-            prop = bus.getProperty(MULTIPART_MAX_ENTITY_SIZE);
+            prop = bus.getProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
         }
         if (prop == null) {
-            prop = SystemPropertyAction.getPropertyOrNull(MULTIPART_MAX_ENTITY_SIZE);
+            prop = SystemPropertyAction.getPropertyOrNull(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
         }
         //default value is 2MB from Undertow
         return convertToLong(prop, 2097152);

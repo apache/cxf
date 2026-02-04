@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.http_undertow.multipart;
 
 import jakarta.xml.ws.Endpoint;
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -33,7 +34,7 @@ public class Server extends AbstractBusTestServerBase {
         String address = "http://localhost:" + port + "/swa";
         EndpointImpl ep;
         try {
-            System.setProperty("org.apache.cxf.transports.http_undertow.MultiPartMaxEntitySize", "-1");
+            System.setProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, "-1");
             ep = (EndpointImpl) Endpoint.create(new SwANoMimeServiceImpl());
             ep.setWsdlLocation("classpath:wsdl/swa-mime-nomime.wsdl");
             ep.publish(address + "-nomime");
