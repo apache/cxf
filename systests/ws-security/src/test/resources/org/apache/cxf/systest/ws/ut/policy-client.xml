@@ -60,6 +60,17 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSupportingTokenPort3" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="security.username" value="Alice"/>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.ut.CustomUTPasswordCallback"/>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/ut/supp-token-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextPort" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>

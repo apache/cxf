@@ -70,6 +70,26 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
+    <!-- Add a java QName for a WS-Security UsernameToken -->
+    <bean id="wsse-username-token" class="javax.xml.namespace.QName">
+        <constructor-arg value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+        <constructor-arg value="UsernameToken"/>
+    </bean>
+    <bean id="custom-ut-processor" class="org.apache.cxf.systest.ws.ut.CustomUTProcessor"/>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SupportingToken3" address="https://localhost:${testutil.ports.PolicyServer}/DoubleItSupportingToken3" serviceName="s:DoubleItService" endpointName="s:DoubleItSupportingTokenPort3" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtPolicy.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="wss4j.processor.map">
+                <map>
+                    <entry key-ref="wsse-username-token" value-ref="custom-ut-processor"/>
+                </map>
+            </entry>
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/ut/supp-token-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlainText" address="https://localhost:${testutil.ports.PolicyServer}/DoubleItPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUtPolicy.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>

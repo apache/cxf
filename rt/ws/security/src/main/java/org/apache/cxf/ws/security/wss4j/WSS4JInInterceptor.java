@@ -133,18 +133,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         // Set any custom WSS4J Processor instances that are configured
         final Map<QName, Object> processorMap = CastUtils.cast(
             (Map<?, ?>)properties.get(PROCESSOR_MAP));
-        if (processorMap != null) {
-            for (Map.Entry<QName, Object> entry : processorMap.entrySet()) {
-                Object val = entry.getValue();
-                if (val instanceof Class<?>) {
-                    config.setProcessor(entry.getKey(), (Class<?>)val);
-                } else if (val instanceof Processor) {
-                    config.setProcessor(entry.getKey(), (Processor)val);
-                } else if (val == null) {
-                    config.setProcessor(entry.getKey(), (Class<?>)null);
-                }
-            }
-        }
+        configureCustomProcessors(config, processorMap);
 
         // Set any custom WSS4J Validator instances that are configured
         Map<QName, Object> validatorMap = CastUtils.cast(
@@ -729,4 +718,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return WSS4JUtils.getReplayCache(message, booleanKey, instanceKey);
     }
 
+    protected void configureCustomProcessors(WSSConfig config, final Map<QName, Object> processorMap) {
+        if (processorMap != null) {
+            for (Map.Entry<QName, Object> entry : processorMap.entrySet()) {
+                Object val = entry.getValue();
+                if (val instanceof Class<?>) {
+                    config.setProcessor(entry.getKey(), (Class<?>)val);
+                } else if (val instanceof Processor) {
+                    config.setProcessor(entry.getKey(), (Processor)val);
+                } else if (val == null) {
+                    config.setProcessor(entry.getKey(), (Class<?>)null);
+                }
+            }
+        }
+    }
 }
