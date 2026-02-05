@@ -36,6 +36,7 @@ import javax.net.ssl.X509KeyManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -80,6 +81,7 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     public static final String ENABLE_RECORD_REQUEST_START_TIME_PROP = 
         "org.apache.cxf.transports.http_undertow.EnableRecordRequestStartTime";
 
+    
     private static final Logger LOG = LogUtils.getL7dLogger(UndertowHTTPServerEngine.class);
 
     /**
@@ -228,6 +230,7 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
     private Undertow createServer(URL url, UndertowHTTPHandler undertowHTTPHandler) throws Exception {
         Undertow.Builder result = Undertow.builder();
         result.setServerOption(UndertowOptions.IDLE_TIMEOUT, getMaxIdleTime());
+        result.setServerOption(UndertowOptions.MAX_ENTITY_SIZE, getMaxEntitySize(undertowHTTPHandler.getBus()));
         if (this.isHttp2Enabled(undertowHTTPHandler.getBus())) {
             result.setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE);
         }
@@ -601,7 +604,31 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
         this.maxIdleTime = maxIdleTime;
     }
 
+    private long getMaxEntitySize(Bus bus) {
+        Object prop = null;
+        if (bus != null) {
+            prop = bus.getProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
+        }
+        if (prop == null) {
+            prop = SystemPropertyAction.getPropertyOrNull(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
+        }
+        //default value is 2MB from Undertow
+        return convertToLong(prop, 2097152);
+    }
 
+    private long convertToLong(Object prop, long defaultValue) {
+        if (prop instanceof Number) {
+            return ((Number) prop).longValue();
+        }
+        if (prop instanceof String) {
+            try {
+                return Long.parseLong((String) prop);
+            } catch (NumberFormatException e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
     /**
      * set the Undertow server's handlers
      * @param h
