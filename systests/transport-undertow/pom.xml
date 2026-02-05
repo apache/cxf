@@ -244,5 +244,10 @@
             <artifactId>cxf-rt-transports-http-hc5</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
