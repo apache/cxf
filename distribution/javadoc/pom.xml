@@ -192,7 +192,7 @@
             <version>${cxf.hazelcast.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
+            <groupId>org.apache.artemis</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
         </dependency>
         <dependency>

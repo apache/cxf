@@ -167,7 +167,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
+            <groupId>org.apache.artemis</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
         </dependency>
     </dependencies>
