@@ -107,6 +107,7 @@
         <cxf.commons-lang3.version>3.20.0</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.3.5</cxf.commons-logging.version>
         <cxf.commons-text.version>1.15.0</cxf.commons-text.version>
+        <cxf.checkstyle.version>13.1.0</cxf.checkstyle.version>
         <cxf.derby.version>10.17.1.0</cxf.derby.version>
         <cxf.dom4j.version>2.2.0</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
@@ -397,7 +398,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>12.3.1</version>
+                            <version>${cxf.checkstyle.version}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -2371,6 +2372,7 @@
                 <cxf.derby.version>10.16.1.1</cxf.derby.version>
                 <cxf.lucene.version>9.12.3</cxf.lucene.version>
                 <cxf.grizzly.version>4.0.2</cxf.grizzly.version>
+                <cxf.checkstyle.version>12.3.1</cxf.checkstyle.version>
             </properties>
         </profile>
     </profiles>
