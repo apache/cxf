@@ -232,6 +232,7 @@ public class ClientImpl implements Client {
         private Configurable<WebTarget> configImpl;
         private UriBuilder uriBuilder;
         private WebClient targetClient;
+        private boolean threadSafeTargetClient;
 
 
         public WebTargetImpl(UriBuilder uriBuilder,
@@ -310,7 +311,7 @@ public class ClientImpl implements Client {
                 cxfFeature.initialize(clientCfg, clientCfg.getBus());
             }
             // Start building the invocation
-            return new InvocationBuilderImpl(WebClient.fromClient(targetClient),
+            return new InvocationBuilderImpl(threadSafeTargetClient ? targetClient : WebClient.fromClient(targetClient),
                                              getConfiguration());
         }
         private void setConnectionProperties(Map<String, Object> configProps, ClientConfiguration clientCfg) {
@@ -361,6 +362,7 @@ public class ClientImpl implements Client {
                     }
                 }
                 targetClient = bean.createWebClient();
+                threadSafeTargetClient = threadSafe;
                 ClientImpl.this.baseClients.add(targetClient);
             } else if (!targetClient.getCurrentURI().equals(uri)) {
                 targetClient.to(uri.toString(), false);
@@ -470,7 +472,7 @@ public class ClientImpl implements Client {
         private WebTarget newWebTarget(UriBuilder newBuilder) {
             WebClient newClient;
             if (targetClient != null) {
-                newClient = WebClient.fromClient(targetClient);
+                newClient = threadSafeTargetClient ? targetClient : WebClient.fromClient(targetClient);
             } else {
                 newClient = null;
             }
