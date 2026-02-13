@@ -107,7 +107,7 @@
         <cxf.commons-lang3.version>3.20.0</cxf.commons-lang3.version>
         <cxf.commons-logging.version>1.3.5</cxf.commons-logging.version>
         <cxf.commons-text.version>1.15.0</cxf.commons-text.version>
-        <cxf.checkstyle.version>13.1.0</cxf.checkstyle.version>
+        <cxf.checkstyle.version>13.2.0</cxf.checkstyle.version>
         <cxf.derby.version>10.17.1.0</cxf.derby.version>
         <cxf.dom4j.version>2.2.0</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
