@@ -20,9 +20,11 @@ package org.apache.cxf.jaxrs.ext.search;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +49,7 @@ public final class SearchUtils {
     public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
     public static final String DECODE_QUERY_VALUES = "search.decode.values";
     public static final String ESCAPE_UNDERSCORE_CHAR = "search.escape.underscore.char";
+    private static final Map<String, DateTimeFormatter> FORMATTER_CACHE = new ConcurrentHashMap<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(SearchUtils.class);
 
@@ -86,6 +89,11 @@ public final class SearchUtils {
         }
 
         return dateFromStringWithDefaultFormats(value);
+    }
+
+    public static DateTimeFormatter getLocalDateFormat(Map<String, String> properties) {
+        String format = properties.getOrDefault(DATE_FORMAT_PROPERTY, DEFAULT_DATE_FORMAT);
+        return FORMATTER_CACHE.computeIfAbsent(format, DateTimeFormatter::ofPattern);
     }
 
     public static SimpleDateFormat getDateFormatOrDefault(Map<String, String> properties, String pattern) {
