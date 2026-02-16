@@ -52,7 +52,7 @@
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.narayana.spring.boot.version>2.6.7</cxf.narayana.spring.boot.version>
         <cxf.camel.version>4.17.0</cxf.camel.version>
-        <cxf.openfeign.version>13.7</cxf.openfeign.version>
+        <cxf.openfeign.version>13.8</cxf.openfeign.version>
     </properties>
     <dependencies>
         <dependency>
