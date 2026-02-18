@@ -426,7 +426,7 @@ public abstract class AbstractHTTPDestination
                 try {
                     HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
                     return reqFromInMessage.getUserPrincipal();
-                } catch (final RuntimeException ex) {
+                } catch (final NullPointerException ex) {
                     // It may happen the underlying HTTP request is already recycled and getUserPrincipal()
                     // may fail with NPE, see please jetty/jetty.project#12080 fe 
                     return null;
@@ -441,7 +441,7 @@ public abstract class AbstractHTTPDestination
                 try {
                     HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
                     return reqFromInMessage.isUserInRole(role);
-                } catch (final RuntimeException ex) {
+                } catch (final NullPointerException ex) {
                     // It may happen the underlying HTTP request is already recycled and isUserInRole() 
                     // may fail with NPE, see please jetty/jetty.project#12080 fe 
                     return false;
