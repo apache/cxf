@@ -416,17 +416,21 @@ public abstract class AbstractHTTPDestination
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
 
-        final HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
-        final SecurityContext httpSecurityContext = new SecurityContext() {
-            private final Principal principal = reqFromInMessage.getUserPrincipal();
-
+        SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
                 //ensure we use req from the one saved in inMessage
                 //as this could be the cachedInput one in oneway and 
                 //ReplyTo is specified when ws-addressing is used
                 //which means we need to switch thread context
                 //and underlying transport might discard any data on the original stream
-                return principal;
+                try {
+                    HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
+                    return reqFromInMessage.getUserPrincipal();
+                } catch (final NullPointerException ex) {
+                    // It may happen the underlying HTTP request is already recycled and getUserPrincipal()
+                    // may fail with NPE, see please jetty/jetty.project#12080 fe 
+                    return null;
+                }
             }
             public boolean isUserInRole(String role) {
                 //ensure we use req from the one saved in inMessage
@@ -434,7 +438,14 @@ public abstract class AbstractHTTPDestination
                 //ReplyTo is specified when ws-addressing is used
                 //which means we need to switch thread context
                 //and underlying transport might discard any data on the original stream
-                return reqFromInMessage.isUserInRole(role);
+                try {
+                    HttpServletRequest reqFromInMessage = (HttpServletRequest)exchange.getInMessage().get(HTTP_REQUEST);
+                    return reqFromInMessage.isUserInRole(role);
+                } catch (final NullPointerException ex) {
+                    // It may happen the underlying HTTP request is already recycled and isUserInRole() 
+                    // may fail with NPE, see please jetty/jetty.project#12080 fe 
+                    return false;
+                }
             }
         };
 
