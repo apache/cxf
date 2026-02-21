@@ -251,7 +251,7 @@ public final class OAuthUtils {
 
     public static List<String> parseScope(String requestedScope) {
         if (requestedScope != null) {
-            return Arrays.stream(requestedScope.split(" ")).filter(StringUtils.notEmpty()).collect(toList());
+            return Arrays.stream(requestedScope.split(" ")).filter(s -> !s.isEmpty()).collect(toList());
         } else {
             return Collections.emptyList();
         }
