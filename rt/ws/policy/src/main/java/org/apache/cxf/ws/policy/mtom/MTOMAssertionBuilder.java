@@ -33,7 +33,7 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class MTOMAssertionBuilder implements AssertionBuilder<Element> {
     private static final QName[] KNOWN_ELEMENTS
-        = {MetadataConstants.MTOM_ASSERTION_QNAME};
+        = {MetadataConstants.MTOM_ASSERTION_QNAME, MetadataConstants.MTOM11_ASSERTION_QNAME};
 
     public Assertion build(Element elem, AssertionBuilderFactory f) {
         String localName = elem.getLocalName();
@@ -47,6 +47,8 @@ public class MTOMAssertionBuilder implements AssertionBuilder<Element> {
 
         if (MetadataConstants.MTOM_ASSERTION_QNAME.equals(qn)) {
             return new PrimitiveAssertion(MetadataConstants.MTOM_ASSERTION_QNAME, optional);
+        } else if (MetadataConstants.MTOM11_ASSERTION_QNAME.equals(qn)) {
+            return new PrimitiveAssertion(MetadataConstants.MTOM11_ASSERTION_QNAME, optional);
         }
 
         return null;
