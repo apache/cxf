@@ -173,6 +173,10 @@ public abstract class AbstractJPATypedQueryVisitorTest {
         }
     }
 
+    protected EntityManager getEntityManager() {
+        return em;
+    }
+
 
 
     protected List<Book> queryBooks(String expression) throws Exception {
