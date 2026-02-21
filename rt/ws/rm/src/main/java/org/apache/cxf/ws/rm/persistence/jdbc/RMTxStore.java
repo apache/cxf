@@ -880,12 +880,15 @@ public class RMTxStore implements RMStore {
     protected void verifyTable(Connection con, String tableName, String[][] tableCols) {
         try {
             DatabaseMetaData metadata = con.getMetaData();
-            ResultSet rs = metadata.getColumns(null, null, tableName, "%");
+
             Set<String> dbCols = new HashSet<>();
             List<String[]> newCols = new ArrayList<>();
-            while (rs.next()) {
-                dbCols.add(rs.getString(4));
+            try (ResultSet rs = metadata.getColumns(null, null, tableName, "%")) {
+                while (rs.next()) {
+                    dbCols.add(rs.getString(4));
+                }
             }
+
             for (String[] col : tableCols) {
                 if (!dbCols.contains(col[0])) {
                     newCols.add(col);
