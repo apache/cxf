@@ -39,7 +39,7 @@ final class Rfc3986UriValidator {
 
     private static final String LAST = "#(.*)";
 
-    private static final Pattern HTTP_URL = Pattern.compile("^" + SCHEME 
+    private static final Pattern HTTP_URL = Pattern.compile("^" + SCHEME
         + "(//(" + USERINFO + "@)?" + HOST  + ")?" + PATH
         + "(\\?" + QUERY + ")?" + "(" + LAST + ")?");
 
@@ -47,13 +47,20 @@ final class Rfc3986UriValidator {
     }
 
     /**
-     * Validate the HTTP URL according to https://datatracker.ietf.org/doc/html/rfc3986#appendix-B  
+     * Validate the HTTP URL according to https://datatracker.ietf.org/doc/html/rfc3986#appendix-B
      * @param uri HTTP schemed URI to validate
      * @return "true" if URI matches RFC-3986 validation rules, "false" otherwise
      */
     public static boolean validate(final URI uri) {
         // Only validate the HTTP(s) URIs
-        if (HttpUtils.isHttpScheme(uri.getScheme())) { 
+        if (HttpUtils.isHttpScheme(uri.getScheme())) {
+        // If URI.getHost() returns a host name, validate it and
+            // skip the expensive regular expression logic.
+            final String uriHost = uri.getHost();
+            if (uriHost != null) {
+                return !StringUtils.isEmpty(uriHost);
+            }
+
             final Matcher matcher = HTTP_URL.matcher(uri.toString());
             if (matcher.matches()) {
                 final String host = matcher.group(5);
