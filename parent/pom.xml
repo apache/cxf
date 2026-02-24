@@ -226,8 +226,8 @@
         <cxf.tika.version>3.2.3</cxf.tika.version>
         <cxf.tomcat.version>11.0.18</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.8</cxf.tomitribe.http.signature.version>
-        <cxf.undertow.version>2.4.0.Alpha1</cxf.undertow.version>
-        <cxf.undertow.ee.version>2.0.0.Alpha2</cxf.undertow.ee.version>
+        <cxf.undertow.version>2.4.0.Beta1</cxf.undertow.version>
+        <cxf.undertow.ee.version>2.0.0.Beta1</cxf.undertow.ee.version>
         <cxf.yasson.version>3.0.4</cxf.yasson.version>
         <!-- the Export-Package is the same as the Maven artifact
              version (with the Final), but we don't want an import package with a version
