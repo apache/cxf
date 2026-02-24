@@ -143,7 +143,7 @@
         <cxf.jakarta.injectapi.version>2.0.1</cxf.jakarta.injectapi.version>
         <cxf.jakarta.interceptorapi.version>2.2.0</cxf.jakarta.interceptorapi.version>
         <cxf.jakarta.soapapi.version>3.0.2</cxf.jakarta.soapapi.version>
-        <cxf.jakarta.wsapi.version>4.0.2</cxf.jakarta.wsapi.version>
+        <cxf.jakarta.wsapi.version>4.0.3</cxf.jakarta.wsapi.version>
         <cxf.jakarta.jms.version>3.1.0</cxf.jakarta.jms.version>
         <cxf.jakarta.transaction.version>2.0.1</cxf.jakarta.transaction.version>
         <cxf.jakarta.ejb.version>4.0.1</cxf.jakarta.ejb.version>
