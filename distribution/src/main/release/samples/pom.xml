@@ -36,7 +36,7 @@
         <cxf.jetty12.version>12.1.6</cxf.jetty12.version>
         <cxf.netty.version>4.2.10.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>5.31.0</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>5.31.2</cxf.swagger.ui.version>
         <cxf.tika.version>3.2.3</cxf.tika.version>
         <cxf.tomcat.version>11.0.18</cxf.tomcat.version>
         <cxf.jboss.weld.version>6.0.4.Final</cxf.jboss.weld.version>
