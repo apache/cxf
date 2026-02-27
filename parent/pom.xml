@@ -123,7 +123,7 @@
         <cxf.grizzly.version>5.0.0</cxf.grizzly.version>
         <cxf.hamcrest.version>3.0</cxf.hamcrest.version>
         <cxf.hazelcast.version>5.6.0</cxf.hazelcast.version>
-        <cxf.hibernate.em.version>7.2.4.Final</cxf.hibernate.em.version>
+        <cxf.hibernate.em.version>7.2.5.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>9.1.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.4</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
