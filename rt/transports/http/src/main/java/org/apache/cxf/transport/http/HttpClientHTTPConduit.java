@@ -445,6 +445,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 }
             }
             String verc = (String)message.getContextualProperty(FORCE_HTTP_VERSION);
+            if (verc == null && "http".equals(uri.getScheme())) {
+                verc="1.1";  
+            }
             if (verc == null) {
                 verc = csPolicy.getVersion();
             }
