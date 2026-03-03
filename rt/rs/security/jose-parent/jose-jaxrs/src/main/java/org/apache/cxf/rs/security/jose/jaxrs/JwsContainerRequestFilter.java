@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.Principal;
+import java.security.PublicKey;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.HttpMethod;
@@ -77,28 +78,31 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             if (securityContext != null) {
                 JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
             }
+
         }
     }
 
     protected SecurityContext configureSecurityContext(JwsSignatureVerifier sigVerifier) {
-        if (sigVerifier instanceof PublicKeyJwsSignatureVerifier
-            && ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate() != null) {
-            final Principal principal =
-                ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
-            return new SecurityContext() {
+        if (sigVerifier instanceof PublicKeyJwsSignatureVerifier) {
+            JAXRSUtils.getCurrentMessage().getExchange().put(PublicKey.class, ((PublicKeyJwsSignatureVerifier) sigVerifier).getPublicKey());
+            if (((PublicKeyJwsSignatureVerifier) sigVerifier).getX509Certificate() != null) {
+                final Principal principal =
+                        ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
+                return new SecurityContext() {
 
-                public Principal getUserPrincipal() {
-                    return principal;
-                }
+                    public Principal getUserPrincipal() {
+                        return principal;
+                    }
 
-                public boolean isUserInRole(String arg0) {
-                    return false;
-                }
-            };
+                    public boolean isUserInRole(String arg0) {
+                        return false;
+                    }
+                };
+            }
         }
         return null;
     }
-    
+
     protected boolean isMethodWithNoContent(String method) {
         return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
