@@ -20,18 +20,20 @@ package org.apache.cxf.systest.jaxrs.sse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
@@ -60,6 +62,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
+
+
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
     @Before
     public void setUp() {
@@ -70,6 +74,9 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
 
     }
     
+    
+
+        
     @Test
     public void testBooksStreamIsReturnedFromLastEventId() throws InterruptedException {
         final WebTarget target = createWebTarget("/rest/api/bookstore/sse/" + UUID.randomUUID())
@@ -408,6 +415,47 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             assertThat(response.getHeaderString("X-My-ProtocolHeader"), equalTo("protocol-headers"));
         }
     }
+    
+ 
+    private static String captureStdoutDuring(Callable<?> action) throws Exception {
+        PrintStream oldOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8.name());
+        System.setOut(ps);
+        try {
+            action.call();
+            // give async logger a moment *before restoring*
+            Thread.sleep(1000);
+        } finally {
+            System.setOut(oldOut);
+            ps.close();
+        }
+        return baos.toString(StandardCharsets.UTF_8);
+    }
+
+
+       
+    @Test
+    public void testSseEndpointExceptionIsLoggedToConsole() throws Exception {
+        final String out = captureStdoutDuring(() -> {
+            try (Response r = createWebTarget("/rest/api/bookstore/sse/fail/request")
+                    .request(MediaType.SERVER_SENT_EVENTS)
+                    .get()) {
+                // Force the client to actually start consuming
+                r.readEntity(String.class);
+            } catch (Exception ex) {
+                // expected
+            }
+            return null;
+            
+        });
+
+        assertTrue("Expected SSE marker in stdout, got:\n" + out,
+            out.contains("Unhandled exception from JAX-RS invocation (async/SSE path)")
+            && out.contains("CXF-9189-MARKER"));
+    }
+    
+        
 
     /**
      * Jetty / Undertow do not propagate errors from the runnable passed to
@@ -426,4 +474,6 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     private static Consumer<InboundSseEvent> collectRaw(final Collection<String> titles) {
         return event -> titles.add(event.readData(String.class, MediaType.TEXT_PLAIN_TYPE));
     }
+    
+    
 }
