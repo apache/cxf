@@ -78,7 +78,7 @@ public class JndiHelper {
 
     @SuppressWarnings("unchecked")
     public <T> T lookup(final String name, Class<T> requiredType) throws NamingException {
-        Context ctx = new InitialContext(this.environment);
+        Context ctx = createInitialContext();
         try {
             Object located = ctx.lookup(name);
             if (located == null) {
@@ -88,6 +88,10 @@ public class JndiHelper {
         } finally {
             ResourceCloser.close(ctx);
         }
+    }
+
+    public InitialContext createInitialContext() throws NamingException {
+        return new InitialContext(this.environment);
     }
 
 }
