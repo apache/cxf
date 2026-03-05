@@ -20,21 +20,23 @@ package org.apache.cxf.systest.jaxrs.sse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.core.read.ListAppender;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -45,8 +47,10 @@ import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 import jakarta.ws.rs.sse.SseEventSource.Builder;
+import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +64,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+
 
 
 
@@ -417,27 +423,18 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     }
     
  
-    private static String captureStdoutDuring(Callable<?> action) throws Exception {
-        PrintStream oldOut = System.out;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8.name());
-        System.setOut(ps);
-        try {
-            action.call();
-            // give async logger a moment *before restoring*
-            Thread.sleep(1000);
-        } finally {
-            System.setOut(oldOut);
-            ps.close();
-        }
-        return baos.toString(StandardCharsets.UTF_8);
-    }
-
-
-       
     @Test
     public void testSseEndpointExceptionIsLoggedToConsole() throws Exception {
-        final String out = captureStdoutDuring(() -> {
+        final Logger logger = (Logger) LoggerFactory.getLogger("org.apache.cxf.jaxrs.JAXRSInvoker");
+
+        final Level oldLevel = logger.getLevel();
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+
+        try {
+            logger.setLevel(Level.ERROR);
+            logger.addAppender(appender);
+
             try (Response r = createWebTarget("/rest/api/bookstore/sse/fail/request")
                     .request(MediaType.SERVER_SENT_EVENTS)
                     .get()) {
@@ -446,17 +443,76 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             } catch (Exception ex) {
                 // expected
             }
-            return null;
-            
-        });
 
-        assertTrue("Expected SSE marker in stdout, got:\n" + out,
-            out.contains("Unhandled exception from JAX-RS invocation (async/SSE path)")
-            && out.contains("CXF-9189-MARKER"));
+            // Wait until we have at least one ERROR from JAXRSInvoker
+            awaitEvents(2000, appender.list, 1);
+
+            assertTrue("Expected SSE log event, got:\n" + dump(appender),
+                    hasUnhandledExceptionEvent(appender));
+
+            assertTrue("Expected SSE marker in throwable, got:\n" + dump(appender),
+                    hasMarkerInUnhandledExceptionEvent(appender, "CXF-9189-MARKER"));
+        } finally {
+            logger.detachAppender(appender);
+            logger.setLevel(oldLevel);
+            appender.stop();
+        }
+    }
+
+    private static boolean hasUnhandledExceptionEvent(ListAppender<ILoggingEvent> appender) {
+        final String msgNeedle = "Unhandled exception from JAX-RS invocation (async/SSE path)";
+        for (ILoggingEvent e : appender.list) {
+            String msg = e.getFormattedMessage();
+            if (msg != null && msg.contains(msgNeedle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasMarkerInUnhandledExceptionEvent(ListAppender<ILoggingEvent> appender, String marker) {
+        final String msgNeedle = "Unhandled exception from JAX-RS invocation (async/SSE path)";
+        for (ILoggingEvent e : appender.list) {
+            String msg = e.getFormattedMessage();
+            if (msg == null || !msg.contains(msgNeedle)) {
+                continue;
+            }
+            // marker can be in message OR in throwable chain
+            if (msg.contains(marker) || throwableChainContains(e.getThrowableProxy(), marker)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean throwableChainContains(IThrowableProxy tp, String needle) {
+        for (IThrowableProxy cur = tp; cur != null; cur = cur.getCause()) {
+            String m = cur.getMessage();
+            if (m != null && m.contains(needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String dump(ListAppender<ILoggingEvent> appender) {
+        StringBuilder sb = new StringBuilder();
+        for (ILoggingEvent e : appender.list) {
+            sb.append('[').append(e.getLevel()).append("] ")
+              .append(e.getLoggerName()).append(" - ")
+              .append(e.getFormattedMessage());
+            if (e.getThrowableProxy() != null) {
+                sb.append(" (thrown: ")
+                  .append(e.getThrowableProxy().getClassName())
+                  .append(": ")
+                  .append(e.getThrowableProxy().getMessage())
+                  .append(')');
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
     }
     
-        
-
     /**
      * Jetty / Undertow do not propagate errors from the runnable passed to
      * AsyncContext::start() up to the AsyncEventListener::onError(). Tomcat however
