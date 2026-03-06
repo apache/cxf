@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -31,6 +32,7 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.naming.Context;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 
@@ -38,6 +40,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.pool.XaPooledConnectionFactory;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.awaitility.Awaitility;
 
@@ -71,6 +74,28 @@ public class MessageListenerTest {
         assertEquals("The connection is already closed", ex.getMessage());
     }
     
+    @Test
+    public void testJndiForbiddenProtocolForPollingContainer() {
+        Properties env = new Properties();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://127.0.0.1:12345");
+        env.put(Context.REFERRAL, "follow");
+
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        jmsConfig.setJndiEnvironment(env);
+
+        PollingMessageListenerContainer container =
+            new PollingMessageListenerContainer(jmsConfig, false, message -> { });
+        container.setJndiEnvironment(env);
+
+        try {
+            container.createInitialContext();
+            org.junit.Assert.fail("JNDI context creation should have failed for unsafe LDAP protocol");
+        } catch (IllegalArgumentException ex) {
+            assertTrue(ex.getMessage().contains("Unsafe protocol in JNDI URL"));
+        }
+    }
+
     @Test
     public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException {
         TransactionManager transactionManager = new GeronimoTransactionManager();

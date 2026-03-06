@@ -106,7 +106,8 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     public InitialContext createInitialContext() {
         if (jndiEnvironment != null) {
             try {
-                return new InitialContext(this.jndiEnvironment);
+                JndiHelper helper = new JndiHelper(this.jndiEnvironment);
+                return helper.createInitialContext();
             } catch (NamingException e) {
                 LOG.log(Level.SEVERE, "Could not expose JNDI environment to JMS thread context", e);
             }
