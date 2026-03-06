@@ -19,8 +19,10 @@
 package org.apache.cxf.transport.jms.util;
 
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.Timer;
 
+import javax.naming.Context;
 import javax.transaction.xa.XAException;
 
 import jakarta.jms.Connection;
@@ -53,6 +55,7 @@ import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.junit.EmbeddedActiveMQResource;
 import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.awaitility.Awaitility;
 import org.jboss.narayana.jta.jms.ConnectionFactoryProxy;
 import org.jboss.narayana.jta.jms.TransactionHelperImpl;
@@ -64,6 +67,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 
 public class MessageListenerTest {
@@ -92,6 +96,28 @@ public class MessageListenerTest {
         JMSException ex = exListener.exception;
         assertNotNull(ex);
         assertEquals("Connection is closed", ex.getMessage());
+    }
+
+    @Test
+    public void testJndiForbiddenProtocolForPollingContainer() {
+        Properties env = new Properties();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://127.0.0.1:12345");
+        env.put(Context.REFERRAL, "follow");
+
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        jmsConfig.setJndiEnvironment(env);
+
+        PollingMessageListenerContainer container =
+            new PollingMessageListenerContainer(jmsConfig, false, message -> { });
+        container.setJndiEnvironment(env);
+
+        try {
+            container.createInitialContext();
+            org.junit.Assert.fail("JNDI context creation should have failed for unsafe LDAP protocol");
+        } catch (IllegalArgumentException ex) {
+            assertTrue(ex.getMessage().contains("Unsafe protocol in JNDI URL"));
+        }
     }
 
     @Test
