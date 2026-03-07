@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.ws.rs.WebApplicationException;
@@ -38,6 +39,7 @@ import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.sse.SseEventSink;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -144,6 +146,21 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             return handleFault(new Fault(t), exchange.getInMessage(), null, null);
         } catch (Fault ex) {
+            //If we got here, the fault was effectively "unmapped" (no Response could be created)
+            // and we'd otherwise lose the usual fault logging (common with SSE sink / async paths).
+            Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+            LOG.log(Level.SEVERE, "Unhandled exception from JAX-RS invocation (async/SSE path)", cause);
+            
+            // Best-effort: if this request is SSE, close the sink so the container can complete cleanly.
+            try {
+                SseEventSink sink = (SseEventSink)exchange.getInMessage().get(SseEventSink.class);
+                if (sink != null && !sink.isClosed()) {
+                    sink.close();
+                }
+            } catch (Exception ignore) {
+                // ignore secondary failures; primary goal is to log original cause
+            }
+            
             ar.setUnmappedThrowable(ex.getCause() == null ? ex : ex.getCause());
             if (isSuspended(exchange)) {
                 ar.reset();
