@@ -258,6 +258,15 @@ public class BookStore extends BookStoreClientCloseable {
         return BookStoreResponseFilter.getInvocations();
     }
     
+    @GET
+    @Path("/sse/fail/request")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void failOnRequestThread(@Context SseEventSink sink) {
+        throw new RuntimeException("CXF-9189-MARKER: exception from SSE resource method should be logged");
+    }
+
+    
+        
     @PUT
     @Path("/filtered/stats")
     public void clearStats() {
