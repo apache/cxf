@@ -21,7 +21,7 @@ package org.apache.cxf.tracing.micrometer.jaxrs;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
-import org.apache.cxf.jaxrs.ext.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import io.micrometer.observation.ObservationRegistry;
 

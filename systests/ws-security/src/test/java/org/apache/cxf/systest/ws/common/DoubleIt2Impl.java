@@ -26,7 +26,7 @@ import org.example.contract.doubleit.DoubleItPortType2;
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType2")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class DoubleIt2Impl implements DoubleItPortType2 {
 
     public int doubleIt(int numberToDouble) throws DoubleItFault {

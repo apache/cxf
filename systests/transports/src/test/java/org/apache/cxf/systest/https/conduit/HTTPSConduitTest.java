@@ -22,21 +22,39 @@ package org.apache.cxf.systest.https.conduit;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
 import javax.xml.namespace.QName;
 
+import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
@@ -66,6 +84,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -101,7 +121,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
     private static List<String> servers = new ArrayList<>();
 
-    private static Map<String, String> addrMap = new TreeMap<>();
+    private static Map<String, Collection<String>> addrMap = new TreeMap<>();
 
     static {
         try (InputStream key = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", HTTPSConduitTest.class);
@@ -142,12 +162,13 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     public static void allocatePorts() {
         BusServer.resetPortMap();
         addrMap.clear();
-        addrMap.put("Mortimer", "http://localhost:" + getPort("PORT0") + "/");
-        addrMap.put("Tarpin",   "https://localhost:" + getPort("PORT1") + "/");
-        addrMap.put("Poltim",   "https://localhost:" + getPort("PORT2") + "/");
-        addrMap.put("Gordy",    "https://localhost:" + getPort("PORT3") + "/");
-        addrMap.put("Bethal",   "https://localhost:" + getPort("PORT4") + "/");
-        addrMap.put("Morpit",   "https://localhost:" + getPort("PORT5") + "/");
+        addrMap.put("Mortimer", List.of("http://localhost:" + getPort("PORT0") + "/"));
+        addrMap.put("Tarpin",   List.of("https://localhost:" + getPort("PORT1") + "/"));
+        addrMap.put("Poltim",   List.of("https://localhost:" + getPort("PORT2") + "/"));
+        addrMap.put("Gordy",    List.of("https://localhost:" + getPort("PORT3") + "/"));
+        addrMap.put("Bethal",   List.of("https://localhost:" + getPort("PORT4") + "/", 
+            "https://localhost:" + getPort("PORT6") + "/"));
+        addrMap.put("Morpit",   List.of("https://localhost:" + getPort("PORT5") + "/"));
         tlsClientParameters.setDisableCNCheck(true);
         servers.clear();
     }
@@ -174,7 +195,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         boolean server = launchServer(Server.class, null,
                 new String[] {
                     name,
-                    addrMap.get(name),
+                    addrMap.get(name).stream().collect(Collectors.joining(",")),
                     serverC.toString() },
                 IN_PROCESS);
         if (server) {
@@ -361,6 +382,78 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
      */
     @Test
     public void testHttpsBasicConnection() throws Exception {
+        // Use common/shared TLSClientParameters
+        testHttpsBasicConnection(tlsClientParameters);
+    }
+
+    @Test
+    public void testHttpsBasicConnectionCustomSslContext() throws Exception {
+        // Use custom SSLContext registered in TLSClientParameters
+        SSLContext ctx = SSLContext.getInstance("TLSv1.3");
+        try (InputStream keyStoreIs = ClassLoaderUtils.getResourceAsStream(
+            "keys/Morpit.jks", HTTPSConduitTest.class
+        )) {
+            KeyManager[] keyManagers = getKeyManagers(getKeyStore(
+                "JKS", keyStoreIs, "password"), "password"
+            );
+            // I need to disable CN verification (as certificate contains Bethal as CN),
+            // but I cannot use TLSClientParameters.setDisableCNCheck(), because in this case
+            // URLCONNECTION is always used (see HttpClientHTTPConduit.setupConnection())
+            // -> I must used own TrustManager without verification
+            TrustManager trustManager = new X509ExtendedTrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[] {};
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) {
+                }
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
+                }
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
+                }
+            };
+            ctx.init(
+                keyManagers,
+                new TrustManager[] {trustManager},
+                SecureRandom.getInstance("SHA1PRNG")
+            );
+        }
+
+        // HostnameVerifier (disable host name verification)
+        class AllowAllHostnameVerifier implements HostnameVerifier {
+            @Override
+            public boolean verify(String host, SSLSession session) {
+                try {
+                    Certificate[] certs = session.getPeerCertificates();
+                    return certs != null && certs[0] instanceof X509Certificate;
+                } catch (SSLPeerUnverifiedException e) {
+                    return false;
+                }
+            }
+        }
+
+        // TLSClientParameters (Custom SSLContext)
+        TLSClientParameters tlsClientParams = new TLSClientParameters();
+        tlsClientParams.setSslContext(ctx);
+        // TLSClientParameters (disable host name verification - now needed only when URLConnection is used)
+        tlsClientParams.setHostnameVerifier(new AllowAllHostnameVerifier());
+
+        testHttpsBasicConnection(tlsClientParams);
+    }
+
+    private void testHttpsBasicConnection(TLSClientParameters tlsClientParams) throws Exception {
         startServer("Bethal");
 
         URL wsdl = getClass().getResource("greeting.wsdl");
@@ -392,7 +485,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         authPolicy.setPassword("password");
 
         http.setClient(httpClientPolicy);
-        http.setTlsClientParameters(tlsClientParameters);
+        http.setTlsClientParameters(tlsClientParams);
         http.setAuthorization(authPolicy);
 
         configureProxy(client);
@@ -762,5 +855,104 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @Test
+    public void testUpdateAddress() throws Exception {
+        startServer("Bethal");
+
+        URL config = getClass().getResource("BethalClientConfig.cxf");
+
+        // We go through the back door, setting the default bus.
+        new DefaultBusFactory().createBus(config);
+        URL wsdl = getClass().getResource("greeting.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull("Service is null", service);
+
+        Greeter bethal = service.getPort(bethalQ, Greeter.class);
+        updateAddressPort(bethal, getPort("PORT4"));
+        verifyBethalClient(bethal);
+        
+        updateAddressPort(bethal, getPort("PORT6"));
+        verifyBethalClient(bethal);
+
+        // setup the feature by using JAXWS front-end API
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Random random = new Random();
+
+        try {
+            for (int  i = 0; i < 30; ++i) {
+                futures.add(executor.submit(() -> {
+                    if (random.nextBoolean()) {
+                        updateAddressPort(bethal, getPort("PORT4"));
+                    } else {
+                        updateAddressPort(bethal, getPort("PORT6"));
+                    }
+                    return bethal.greetMe("timeout!");
+                }));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo("Hello timeout!"));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    @Test
+    public void testUpdateAddressNoClientReset() throws Exception {
+        startServer("Bethal");
+
+        URL config = getClass().getResource("BethalClientConfig.cxf");
+
+        // We go through the back door, setting the default bus.
+        new DefaultBusFactory().createBus(config);
+        URL wsdl = getClass().getResource("greeting.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        assertNotNull("Service is null", service);
+
+        Greeter bethal = service.getPort(bethalQ, Greeter.class);
+        ((BindingProvider)bethal).getRequestContext().put("https.reset.httpclient.http.conduit", false);
+
+        updateAddressPort(bethal, getPort("PORT4"));
+        verifyBethalClient(bethal);
+        
+        updateAddressPort(bethal, getPort("PORT6"));
+        verifyBethalClient(bethal);
+
+        // setup the feature by using JAXWS front-end API
+        final Collection<Future<String>> futures = new ArrayList<>();
+        final ExecutorService executor = Executors.newFixedThreadPool(10);
+        final Random random = new Random();
+
+        try {
+            for (int  i = 0; i < 30; ++i) {
+                futures.add(executor.submit(() -> {
+                    if (random.nextBoolean()) {
+                        updateAddressPort(bethal, getPort("PORT4"));
+                    } else {
+                        updateAddressPort(bethal, getPort("PORT6"));
+                    }
+                    return bethal.greetMe("timeout!");
+                }));
+            }
+
+            for (final Future<String> f: futures) {
+                assertThat(f.get(10, TimeUnit.SECONDS), equalTo("Hello timeout!"));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
 }
 

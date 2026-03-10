@@ -22,6 +22,7 @@ package org.apache.cxf.spring.boot.autoconfigure.micrometer.provider;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,6 +65,16 @@ public class SpringBasedTimedAnnotationProvider implements TimedAnnotationProvid
             }
             return timed;
         });
+    }
+
+    @Override
+    public Optional<String> getDefaultMetricName(Exchange ex, boolean client) {
+        final HandlerMethod handlerMethod = HandlerMethod.create(ex, client);
+        if (handlerMethod == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(handlerMethod.method.getName());
+        }
     }
 
     Set<Timed> findTimedAnnotations(AnnotatedElement element) {

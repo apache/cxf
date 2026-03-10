@@ -116,7 +116,7 @@ public class SwaggerUiService {
                             .entrySet()
                             .stream()
                             .reduce(
-                                uriInfo.getRequestUriBuilder(), 
+                                uriInfo.getRequestUriBuilder(),
                                 (b, e) -> b.queryParam(e.getKey(), e.getValue()),
                                 (left, right) -> left
                             );
@@ -124,17 +124,24 @@ public class SwaggerUiService {
                     }
                 }
 
-                // Since Swagger UI 4.1.3, passing the default URL as query parameter, 
-                // e.g. `?url=swagger.json` is disabled by default due to security concerns.
-                final boolean hasUrlPlaceholder = path.endsWith("/index.html")
-                    || path.endsWith("/swagger-initializer.js");
-                if (hasUrlPlaceholder && !Boolean.TRUE.equals(config.isQueryConfigEnabled())) {
+                // customize the following swagger resources
+                if (path.endsWith("/index.html") || path.endsWith("/swagger-initializer.js")) {
+                    // Since Swagger UI 4.1.3, passing the default URL as query parameter,
+                    // e.g. `?url=swagger.json` is disabled by default due to security concerns.
                     final String url = config.getUrl();
-                    if (!StringUtils.isEmpty(url)) {
+                    final SwaggerUiOAuth2Config oAuthConfig = config.getOAuth2Config();
+                    if (!StringUtils.isEmpty(url) || oAuthConfig != null) {
                         try (InputStream in = resourceURL.openStream()) {
-                            final String index = replaceUrl(IOUtils.readStringFromStream(in), url);
-                            final ResponseBuilder rb = Response.ok(index);
-
+                            String resource = IOUtils.readStringFromStream(in);
+                            if (!StringUtils.isEmpty(url) && !Boolean.TRUE.equals(config.isQueryConfigEnabled())) {
+                                resource = replaceUrl(resource, url);
+                            }
+                            // don't try to replace in index.html
+                            if (path.endsWith("/swagger-initializer.js") && oAuthConfig != null) {
+                                resource = addOAuth2Init(resource, oAuthConfig);
+                            }
+                            // render the modified file
+                            final ResponseBuilder rb = Response.ok(resource);
                             if (mediaType != null) {
                                 rb.type(mediaType);
                             }
@@ -156,21 +163,44 @@ public class SwaggerUiService {
     }
 
     /**
-     * Replaces the URL inside Swagger UI index.html file. The implementation does not attempt to 
-     * read the file and parse it as valid HTML but uses straightforward approach by looking for 
+     * Replaces the URL inside Swagger UI index.html file. The implementation does not attempt to
+     * read the file and parse it as valid HTML but uses straightforward approach by looking for
      * the URL pattern of the SwaggerUIBundle initialization and replacing it.
      * @param index index.html file content
-     * @param replacement replacement URL 
+     * @param replacement replacement URL
      * @return index.html file content with replaced URL
      */
     protected String replaceUrl(final String index, final String replacement) {
         final Matcher matcher = URL_PATTERN.matcher(index);
 
         if (matcher.find()) {
-            return index.substring(0, matcher.start(1)) + replacement + index.substring(matcher.end(1)); 
+            return index.substring(0, matcher.start(1)) + replacement + index.substring(matcher.end(1));
         }
 
         return index;
+    }
+
+    /**
+     * Add a JavaScript block in swagger-initializer.js to initialize OAuth2 with parameters read from the provided
+     * OAuth2 config. The implementation jumps after the initialization of SwaggerUIBundle (variable is expected to
+     * be 'ui') and adds a call to <code>iniOAuth()</code> with the provided parameters.
+     * @param original original contents of swagger-initializer.js
+     * @param oAuth2Config OAuth config
+     * @return modified swagger-initializer.js
+     */
+    protected String addOAuth2Init(String original, SwaggerUiOAuth2Config oAuth2Config) {
+        final int startSwaggerConstructIndex = original.indexOf("SwaggerUIBundle({");
+        if (startSwaggerConstructIndex < 0) {
+            return original;
+        }
+        int endSwaggerConstructIndex = original.indexOf("});", startSwaggerConstructIndex);
+        if (endSwaggerConstructIndex < 0) {
+            return original;
+        } else {
+            endSwaggerConstructIndex += 3;
+        }
+        String initJs = "\n  ui.initOAuth(" + oAuth2Config.toJsonString() + ")\n";
+        return original.substring(0, endSwaggerConstructIndex) + initJs + original.substring(endSwaggerConstructIndex);
     }
 }
 

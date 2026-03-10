@@ -89,23 +89,30 @@ public class InstrumentationManagerTest {
         ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                          + ":type=WorkQueues,*");
         Set<ObjectName> s = mbs.queryNames(name, null);
-        assertEquals(2, s.size());
-        Iterator<ObjectName> it = s.iterator();
-        while (it.hasNext()) {
-            ObjectName n = it.next();
-            Long result =
-                (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
-            assertEquals(result, Long.valueOf(256));
-            Integer hwm =
-                (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
-            if (n.getCanonicalName().contains("test-wq")) {
-                assertEquals(10, hwm.intValue());
-            } else {
-                assertEquals(15, hwm.intValue());
+        try {
+            assertEquals(2, s.size());
+            Iterator<ObjectName> it = s.iterator();
+            while (it.hasNext()) {
+                ObjectName n = it.next();
+                Long result =
+                    (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
+                assertEquals(result, Long.valueOf(256));
+                Integer hwm =
+                    (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
+                if (n.getCanonicalName().contains("test-wq")) {
+                    assertEquals(10, hwm.intValue());
+                } else {
+                    assertEquals(15, hwm.intValue());
+                }
             }
+        } finally {
+            // Unregister MBeans at the end of the test
+            Iterator<ObjectName> it2 = s.iterator();
+            while (it2.hasNext()) {
+                mbs.unregisterMBean(it2.next());
+            }
+            bus.shutdown(true);
         }
-
-        bus.shutdown(true);
     }
 
     @Test

@@ -232,7 +232,7 @@ public class JWTTokenProviderTest {
             KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
             decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
             decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
-            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "sspass");
 
             JweDecryptionProvider decProvider =
                 JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());
@@ -282,7 +282,7 @@ public class JWTTokenProviderTest {
             KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
             decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
             decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
-            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "sspass");
             decProperties.put(JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM,
                               ContentAlgorithm.A128CBC_HS256.name());
 
@@ -329,7 +329,7 @@ public class JWTTokenProviderTest {
             KeyStore keystore = ((Merlin)decryptionCrypto).getKeyStore();
             decProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
             decProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "myservicekey");
-            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
+            decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "sspass");
 
             JweDecryptionProvider decProvider =
                 JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());

@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -38,6 +38,10 @@
         </cxf.osgi.import>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -135,7 +139,7 @@
             <version>${cxf.mockito.version}</version>
             <scope>test</scope>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
             <scope>test</scope>
@@ -143,6 +147,11 @@
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>yasson</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

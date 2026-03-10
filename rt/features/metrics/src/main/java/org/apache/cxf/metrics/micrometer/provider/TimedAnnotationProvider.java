@@ -19,6 +19,7 @@
 
 package org.apache.cxf.metrics.micrometer.provider;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.cxf.message.Exchange;
@@ -28,4 +29,8 @@ import io.micrometer.core.annotation.Timed;
 public interface TimedAnnotationProvider {
 
     Set<Timed> getTimedAnnotations(Exchange ex, boolean client);
+    
+    default Optional<String> getDefaultMetricName(Exchange ex, boolean client) {
+        return Optional.empty();
+    }
 }

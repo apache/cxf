@@ -21,7 +21,7 @@ package org.apache.cxf.transport.http.asyncclient;
 
 import java.net.URI;
 
-import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit.AsyncWrappedOutputStream;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -40,7 +40,7 @@ public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnc
 
     private URI uri;
     private HttpEntity entity;
-    private AsyncWrappedOutputStream out;
+    private AsyncWrappedOutputStreamBase out;
     private RequestConfig config;
 
     public CXFHttpRequest(final String method) {
@@ -48,10 +48,10 @@ public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnc
         this.method = method;
     }
 
-    public void setOutputStream(AsyncWrappedOutputStream o) {
+    public void setOutputStream(AsyncWrappedOutputStreamBase o) {
         out = o;
     }
-    public AsyncWrappedOutputStream getOutputStream() {
+    public AsyncWrappedOutputStreamBase getOutputStream() {
         return out;
     }
     public URI getURI() {

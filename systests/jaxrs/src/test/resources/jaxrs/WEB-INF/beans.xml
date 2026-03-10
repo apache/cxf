@@ -70,7 +70,7 @@
             <bean class="org.apache.cxf.systest.jaxrs.InternalServerErrorExceptionMapper"/>
         </jaxrs:providers>
         <jaxrs:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxrs:features>
     </jaxrs:server>
     <jaxrs:server id="booksxsi" address="/thebooksxsi/bookstore">
@@ -81,7 +81,7 @@
             <ref bean="jaxbProviderXsi"/>
         </jaxrs:providers>
         <jaxrs:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxrs:features>
     </jaxrs:server>
     <jaxrs:server id="bookservice4" address="/thebooks4/bookstore">
@@ -140,6 +140,7 @@
     </jaxrs:server>
     <cxf:bus name="cxf2" id="cxf2">
        <cxf:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
            <entry key="skip.default.json.provider.registration" value="true"/>
        </cxf:properties>
     </cxf:bus>
@@ -148,7 +149,7 @@
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
             <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpPreStreamInterceptor"/>
         </jaxrs:providers>
         <jaxrs:inInterceptors>
@@ -226,6 +227,11 @@
             <entry key="org.apache.cxf.stax.maxChildElements" value="1"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <cxf:bus>
+       <cxf:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
+       </cxf:properties>
+    </cxf:bus>
     <jaxrs:server id="bookservice10" address="/thebooks10">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -239,7 +245,7 @@
             <bean class="org.apache.cxf.systest.jaxrs.DocumentResourceImpl"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
     <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">

@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -65,7 +63,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
@@ -107,7 +104,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
@@ -144,7 +140,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
@@ -188,7 +183,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
@@ -232,7 +226,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
@@ -276,7 +269,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
@@ -314,7 +306,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
@@ -353,7 +344,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -397,7 +387,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -441,7 +430,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -481,7 +469,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -521,7 +508,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -561,7 +547,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthzannotations/bookstore/booksrolesallowed";
@@ -601,7 +586,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/booksclaims";
@@ -647,7 +631,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/booksclaims";
@@ -688,7 +671,6 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         URL busFile = JWTAuthnAuthzTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/booksclaims";

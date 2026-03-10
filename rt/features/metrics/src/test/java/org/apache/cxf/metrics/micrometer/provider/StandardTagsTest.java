@@ -37,6 +37,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 
+@SuppressWarnings("PMD.UselessPureMethodCall")
 public class StandardTagsTest {
 
     private static final String DUMMY_METHOD_NAME = "dummyMethod";

@@ -29,7 +29,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.sts.basic_auth.DoubleItPortTypeImpl" endpointName="s:DoubleItPort" serviceName="s:DoubleItService" depends-on="ClientAuthHttpsSettings" address="https://localhost:${testutil.ports.DoubleItServer}/doubleit/services/doubleit" wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/basic_auth/DoubleIt.wsdl">
@@ -74,7 +74,7 @@
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.DoubleItServer}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
@@ -86,7 +86,7 @@
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:trustManagers>
-            <sec:keyManagers keyPassword="skpass">
+            <sec:keyManagers keyPassword="sspass">
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>

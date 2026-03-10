@@ -26,7 +26,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.jaxrs.ext.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import io.micrometer.observation.ObservationRegistry;
 

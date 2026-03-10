@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.search.fiql;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         OPERATORS_MAP.put(EQ, ConditionType.EQUALS);
         OPERATORS_MAP.put(NEQ, ConditionType.NOT_EQUALS);
 
-        CONDITION_MAP = new HashMap<>();
+        CONDITION_MAP = new EnumMap<>(ConditionType.class);
         CONDITION_MAP.put(ConditionType.GREATER_THAN, GT);
         CONDITION_MAP.put(ConditionType.GREATER_OR_EQUALS, GE);
         CONDITION_MAP.put(ConditionType.LESS_THAN, LT);

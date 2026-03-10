@@ -27,7 +27,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import net.shibboleth.utilities.java.support.xml.DOMTypeSupport;
+import net.shibboleth.shared.xml.DOMTypeSupport;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.saml.xacml.CXFMessageParser;
 import org.apache.cxf.rt.security.saml.xacml.XACMLConstants;

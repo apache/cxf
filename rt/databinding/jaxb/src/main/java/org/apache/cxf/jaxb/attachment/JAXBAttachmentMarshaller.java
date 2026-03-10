@@ -37,13 +37,15 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
     private boolean isXop;
     private QName lastElementName;
 
-    public JAXBAttachmentMarshaller(Collection<Attachment> attachments, Integer mtomThreshold) {
+    public JAXBAttachmentMarshaller(Collection<Attachment> attachments, 
+                                    Integer mtomThreshold,
+                                    boolean mtomEnabled) {
         super();
         if (mtomThreshold != null) {
             threshold = mtomThreshold.intValue();
         }
         atts = attachments;
-        isXop = attachments != null;
+        isXop = mtomEnabled && (attachments != null);
     }
 
     public QName getLastMTOMElementName() {
@@ -80,7 +82,7 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         AttachmentImpl att = new AttachmentImpl(id, handler);
         att.setXOP(false);
         atts.add(att);
-        return id;
+        return "cid:" + id;
     }
 
     public void setXOPPackage(boolean xop) {

@@ -50,6 +50,7 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.ext.Provider;
@@ -149,6 +150,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt,
         MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
+
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
@@ -183,6 +185,17 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                         } else {
                             response = unmarshaller.unmarshal(reader, theType);
                         }
+                    } else {
+                        final MessageContext mc = getContext();
+                        if (mc != null) {
+                            final Boolean requestor = (Boolean) mc.get(Message.REQUESTOR_ROLE);
+                            if (requestor == null || !requestor) {
+                                // The pre-packaged JAXB MessageBodyReader implementation MUST throw a
+                                // WebApplicationException with a client error response (HTTP 400) for
+                                // zero-length request entities. Only for the server side.
+                                reportEmptyContentLength();
+                            }
+                        }
                     }
                 }
             } else {
@@ -206,6 +219,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (DepthExceededStaxException e) {
             throw ExceptionUtils.toWebApplicationException(null, JAXRSUtils.toResponse(413));
         } catch (WebApplicationException e) {
+            throw e;
+        } catch (NoContentException e) {
             throw e;
         } catch (Exception e) {
             LOG.warning(ExceptionUtils.getStackTrace(e));

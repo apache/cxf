@@ -77,7 +77,7 @@ public class Saml2CallbackHandler implements CallbackHandler {
                     Crypto crypto = CryptoFactory.getInstance(file);
                     callback.setIssuerCrypto(crypto);
                     callback.setIssuerKeyName("myservicekey");
-                    callback.setIssuerKeyPassword("skpass");
+                    callback.setIssuerKeyPassword("sspass");
                     callback.setSignAssertion(true);
                 } catch (WSSecurityException e) {
                     throw new IOException(e);

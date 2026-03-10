@@ -4,34 +4,28 @@
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
          xmlns:asfext="http://projects.apache.org/ns/asfext#"
 	 xmlns:foaf="http://xmlns.com/foaf/0.1/">
-  <Project rdf:about="http://cxf.apache.org/">
+  <Project rdf:about="https://cxf.apache.org/">
     <created>2009-04-04</created>
-    <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
+    <license rdf:resource="https://spdx.org/licenses/Apache-2.0" />
     <name>Apache CXF</name>
-    <homepage rdf:resource="http://cxf.apache.org/" />
-    <asfext:pmc rdf:resource="http://cxf.apache.org/" />
+    <homepage rdf:resource="https://cxf.apache.org/" />
+    <asfext:pmc rdf:resource="https://cxf.apache.org/" />
     <shortdesc>Apache CXF: An Open Source Service Framework</shortdesc>
     <description>Apache CXF is an open source services framework. CXF helps you build and develop services using frontend programming APIs like JAX-WS and JAX-RS. These services can speak a variety of protocols such as SOAP, XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.</description>
-    <bug-database rdf:resource="http://issues.apache.org/jira/browse/CXF" />
-    <mailing-list rdf:resource="http://cxf.apache.org/mailing-lists.html" />
-    <download-page rdf:resource="http://cxf.apache.org/download.html" />
+    <bug-database rdf:resource="https://issues.apache.org/jira/browse/CXF" />
+    <mailing-list rdf:resource="https://cxf.apache.org/mailing-lists.html" />
+    <download-page rdf:resource="https://cxf.apache.org/download.html" />
     <programming-language>Java</programming-language>
-    <category rdf:resource="http://projects.apache.org/category/library" />
-    <category rdf:resource="http://projects.apache.org/category/xml" />
-    <category rdf:resource="http://projects.apache.org/category/network-client" />
-    <category rdf:resource="http://projects.apache.org/category/network-server" />
+    <category rdf:resource="https://projects.apache.org/category/library" />
+    <category rdf:resource="https://projects.apache.org/category/xml" />
+    <category rdf:resource="https://projects.apache.org/category/network-client" />
+    <category rdf:resource="https://projects.apache.org/category/network-server" />
     <repository>
       <GitRepository>
         <location rdf:resource="https://gitbox.apache.org/repos/asf/cxf.git"/>
         <browse rdf:resource="https://gitbox.apache.org/repos/asf?p=cxf.git"/>
       </GitRepository>
     </repository>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Daniel Kulp</foaf:name>
-          <foaf:mbox rdf:resource="mailto:dkulp@apache.org"/>
-      </foaf:Person>
-    </maintainer>
     <asfext:implements>
       <asfext:Standard>
         <asfext:title>Web Services Metadata</asfext:title>

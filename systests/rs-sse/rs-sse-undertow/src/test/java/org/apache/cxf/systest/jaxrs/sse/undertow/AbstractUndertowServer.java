@@ -19,12 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs.sse.undertow;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.systest.jaxrs.sse.BookStore;
 import org.apache.cxf.systest.jaxrs.sse.BookStoreResponseFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -83,9 +82,6 @@ public abstract class AbstractUndertowServer extends AbstractBusTestServerBase {
         }
     }
 
-    protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-
-    }
 
     public void tearDown() throws Exception {
         super.tearDown();

@@ -32,10 +32,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.core.read.ListAppender;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -46,6 +47,10 @@ import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 import jakarta.ws.rs.sse.SseEventSource.Builder;
+import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +66,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
+
+
+
+
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
     @Before
     public void setUp() {
@@ -71,6 +80,9 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
 
     }
     
+    
+
+        
     @Test
     public void testBooksStreamIsReturnedFromLastEventId() throws InterruptedException {
         final WebTarget target = createWebTarget("/rest/api/bookstore/sse/" + UUID.randomUUID())
@@ -299,7 +311,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     }
 
     @Test
-    public void testBooksAreReturned() throws JsonProcessingException {
+    public void testBooksAreReturned() throws JacksonException {
         Response r = createWebClient("/rest/api/bookstore", MediaType.APPLICATION_JSON).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
@@ -409,7 +421,98 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             assertThat(response.getHeaderString("X-My-ProtocolHeader"), equalTo("protocol-headers"));
         }
     }
+    
+ 
+    @Test
+    public void testSseEndpointExceptionIsLoggedToConsole() throws Exception {
+        final Logger logger = (Logger) LoggerFactory.getLogger("org.apache.cxf.jaxrs.JAXRSInvoker");
 
+        final Level oldLevel = logger.getLevel();
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+
+        try {
+            logger.setLevel(Level.ERROR);
+            logger.addAppender(appender);
+
+            try (Response r = createWebTarget("/rest/api/bookstore/sse/fail/request")
+                    .request(MediaType.SERVER_SENT_EVENTS)
+                    .get()) {
+                // Force the client to actually start consuming
+                r.readEntity(String.class);
+            } catch (Exception ex) {
+                // expected
+            }
+
+            // Wait until we have at least one ERROR from JAXRSInvoker
+            awaitEvents(2000, appender.list, 1);
+
+            assertTrue("Expected SSE log event, got:\n" + dump(appender),
+                    hasUnhandledExceptionEvent(appender));
+
+            assertTrue("Expected SSE marker in throwable, got:\n" + dump(appender),
+                    hasMarkerInUnhandledExceptionEvent(appender, "CXF-9189-MARKER"));
+        } finally {
+            logger.detachAppender(appender);
+            logger.setLevel(oldLevel);
+            appender.stop();
+        }
+    }
+
+    private static boolean hasUnhandledExceptionEvent(ListAppender<ILoggingEvent> appender) {
+        final String msgNeedle = "Unhandled exception from JAX-RS invocation (async/SSE path)";
+        for (ILoggingEvent e : appender.list) {
+            String msg = e.getFormattedMessage();
+            if (msg != null && msg.contains(msgNeedle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasMarkerInUnhandledExceptionEvent(ListAppender<ILoggingEvent> appender, String marker) {
+        final String msgNeedle = "Unhandled exception from JAX-RS invocation (async/SSE path)";
+        for (ILoggingEvent e : appender.list) {
+            String msg = e.getFormattedMessage();
+            if (msg == null || !msg.contains(msgNeedle)) {
+                continue;
+            }
+            // marker can be in message OR in throwable chain
+            if (msg.contains(marker) || throwableChainContains(e.getThrowableProxy(), marker)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean throwableChainContains(IThrowableProxy tp, String needle) {
+        for (IThrowableProxy cur = tp; cur != null; cur = cur.getCause()) {
+            String m = cur.getMessage();
+            if (m != null && m.contains(needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String dump(ListAppender<ILoggingEvent> appender) {
+        StringBuilder sb = new StringBuilder();
+        for (ILoggingEvent e : appender.list) {
+            sb.append('[').append(e.getLevel()).append("] ")
+              .append(e.getLoggerName()).append(" - ")
+              .append(e.getFormattedMessage());
+            if (e.getThrowableProxy() != null) {
+                sb.append(" (thrown: ")
+                  .append(e.getThrowableProxy().getClassName())
+                  .append(": ")
+                  .append(e.getThrowableProxy().getMessage())
+                  .append(')');
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+    
     /**
      * Jetty / Undertow do not propagate errors from the runnable passed to
      * AsyncContext::start() up to the AsyncEventListener::onError(). Tomcat however
@@ -427,4 +530,6 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
     private static Consumer<InboundSseEvent> collectRaw(final Collection<String> titles) {
         return event -> titles.add(event.readData(String.class, MediaType.TEXT_PLAIN_TYPE));
     }
+    
+    
 }

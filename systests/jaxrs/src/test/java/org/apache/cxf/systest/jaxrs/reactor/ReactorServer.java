@@ -19,14 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.reactor.server.ReactorCustomizer;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public class ReactorServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ReactorServer.class);
@@ -37,8 +37,10 @@ public class ReactorServer extends AbstractBusTestServerBase {
     @Override
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
         // Make sure default JSONProvider is not loaded
-        bus.setProperty("skip.default.json.provider.registration", true);
+        bus.setProperty(ProviderFactory.SKIP_DEFAULT_JSON_PROVIDER_REGISTRATION, true);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.getProperties(true).put("useStreamingSubscriber", false);
         sf.setProvider(new JacksonJsonProvider());

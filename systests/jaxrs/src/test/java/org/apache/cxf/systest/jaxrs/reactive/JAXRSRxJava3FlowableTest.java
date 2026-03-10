@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -33,11 +31,14 @@ import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvoker;
 import org.apache.cxf.jaxrs.rx3.client.FlowableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.subscribers.TestSubscriber;
@@ -55,7 +56,9 @@ public class JAXRSRxJava3FlowableTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(RxJava3FlowableServer.class, true));
-        createStaticBus();
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
     @Test
     public void testGetHelloWorldAsyncText() throws Exception {

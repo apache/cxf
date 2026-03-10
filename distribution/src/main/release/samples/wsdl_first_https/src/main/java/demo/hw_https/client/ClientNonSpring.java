@@ -96,12 +96,12 @@ public final class ClientNonSpring {
         tlsCP.setDisableCNCheck(true);
 
         final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        try (InputStream is = new FileInputStream("src/main/config/clientKeystore.jks")) {
+        try (InputStream is = ClientNonSpring.class.getResourceAsStream("/keys/clientstore.jks")) {
             keyStore.load(is, "cspass".toCharArray());
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, "ckpass".toCharArray());
+        kmf.init(keyStore, "cspass".toCharArray());
         tlsCP.setKeyManagers(kmf.getKeyManagers());
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());

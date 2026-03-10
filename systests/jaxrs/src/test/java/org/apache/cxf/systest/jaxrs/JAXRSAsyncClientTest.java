@@ -166,6 +166,16 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testGetWithBody() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/getbody";
+        WebClient wc = createWebClient(address).type("application/xml").accept("application/xml");
+        try (Response response = wc.invoke("GET", new Book("Get", 123L))) {
+            assertEquals(400, response.getStatus());
+        }
+        wc.close();
+    }
+
+    @Test
     public void testRetrieveBookCustomMethodAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);

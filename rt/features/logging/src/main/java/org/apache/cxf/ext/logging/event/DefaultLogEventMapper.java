@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.security.AccessController;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +65,19 @@ public class DefaultLogEventMapper {
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
-    private MaskSensitiveHelper maskSensitiveHelper = new MaskSensitiveHelper();
+    private MaskSensitiveHelper maskSensitiveHelper;
+    
+    public DefaultLogEventMapper() {
+        this(new MaskSensitiveHelper());
+    }
+    
+    public DefaultLogEventMapper(final MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
+
+    public void setSensitiveDataHelper(MaskSensitiveHelper helper) {
+        this.maskSensitiveHelper = helper;
+    }
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
@@ -109,7 +122,7 @@ public class DefaultLogEventMapper {
     }
 
     private String getPrincipal(Message message) {
-        String principal = getJAASPrincipal();
+        String principal = getConcatenatedJAASPrincipals();
         if (principal != null) {
             return principal;
         }
@@ -125,25 +138,42 @@ public class DefaultLogEventMapper {
         return null;
     }
 
-    private String getJAASPrincipal() {
-        StringBuilder principals = new StringBuilder();
-        Iterator<? extends Object> principalIt = getJAASPrincipals();
-        while (principalIt.hasNext()) {
-            principals.append(principalIt.next());
-            if (principalIt.hasNext()) {
-                principals.append(',');
-            }
-        }
-        if (principals.length() == 0) {
+    private String getConcatenatedJAASPrincipals() {
+        StringBuilder principalsStringBuilder = new StringBuilder();
+        Set<Principal> principals = getJAASPrincipals();
+
+        if (principals.isEmpty()) {
             return null;
         }
-        return principals.toString();
+
+        synchronized (principals) {
+            Iterator<Principal> principalIt = principals.iterator();
+            while (principalIt.hasNext()) {
+                principalsStringBuilder.append(principalIt.next());
+                if (principalIt.hasNext()) {
+                    principalsStringBuilder.append(',');
+                }
+            }
+        }
+
+        if (principalsStringBuilder.length() == 0) {
+            return null;
+        }
+
+        return principalsStringBuilder.toString();
     }
 
-    private Iterator<? extends Object> getJAASPrincipals() {
-        Subject subject = Subject.getSubject(AccessController.getContext());
-        return subject != null && subject.getPrincipals() != null
-            ? subject.getPrincipals().iterator() : Collections.emptyIterator();
+    private Set<Principal> getJAASPrincipals() {
+        try {
+            Subject subject = Subject.getSubject(AccessController.getContext());
+            return subject != null && subject.getPrincipals() != null
+                    ? subject.getPrincipals() : Collections.emptySet();
+        } catch (UnsupportedOperationException e) {
+            // JDK 23: The terminally deprecated method Subject.getSubject(AccessControlContext) has been re-specified
+            // to throw UnsupportedOperationException if invoked when a Security Manager is not allowed.
+            // see https://jdk.java.net/23/release-notes#JDK-8296244
+            return Collections.emptySet();
+        }
     }
 
     private Map<String, String> getHeaders(Message message) {
@@ -204,11 +234,22 @@ public class DefaultLogEventMapper {
 
     private boolean isBinaryContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
-        return contentType != null && binaryContentMediaTypes.contains(contentType);
+        return isBinaryContent(contentType);
     }
 
     public boolean isBinaryContent(String contentType) {
-        return contentType != null && binaryContentMediaTypes.contains(contentType);
+        if (contentType == null) {
+            return false;
+        } else {
+            // Consider compound header values, like: 
+            //    Content-Type: application/xop+xml; charset=UTF-8; type="text/xml"
+            final int index = contentType.indexOf(';');
+            if (index > 0) {
+                return binaryContentMediaTypes.contains(contentType.substring(0, index).trim());
+            } else {
+                return binaryContentMediaTypes.contains(contentType);
+            }
+        }
     }
     
     private boolean isMultipartContent(Message message) {

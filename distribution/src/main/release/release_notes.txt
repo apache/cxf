@@ -1,27 +1,33 @@
-Apache CXF 4.0.4 Release Notes
+Apache CXF 4.1.4 Release Notes
 
 1. Overview
 
-The 4.0.x versions of Apache CXF is a significant new version of CXF
+The 4.1.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include:
-* The release is based on JakartaEE 9.1: the javax.* packages are migrated to jakarta.*
-* Support of Spring Framework 6 / Spring Boot 3
-* HTTP/2 support
+    * The release is based on JakartaEE 10
+    * Support of Spring Framework 6.1 / Spring Boot 3.3 /  Spring Security 6.3
+    * Support of OpenZipkin Brave 6.0
+    * Jetty 12
+    * Weld 5
+    * Spring LDAP 3.2
+    * Hazelcast 5.4.0
+    * Woodstox 7.0.0
+    * Hibernate 6.5
+    * Hibernate Validator 8
+    * AsyncHttpClient (AHC) 3.0.0
 
 Important notes:
-* Many features of CXF 4.x now require Java 17.  While CXF is compiled for Java 11,
-many of the dependencies require Java 17 and thus various features may only
-work with Java 17.
+* CXF 4.1 now requires Java 17 as minimum
 
 Users are encouraged to review the migration guide at:
-https://cxf.apache.org/docs/40-migration-guide.html
+https://cxf.apache.org/docs/41-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.0.4 fixes over 28 JIRA issues reported by users and the community.
+4.1.4 fixes over 13 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -58,55 +64,45 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/40-migration-guide.html
+http://cxf.apache.org/docs/41-migration-guide.html
 for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
-
 ** Bug
-    * [CXF-8812] - Content-Type header created with collection containing "null" value
-    * [CXF-8834] - "Operation [{.../wsdl}Issue] already exists" when calling JaxWsServerFactoryBean.create() for SecurityTokenService
-    * [CXF-8932] - [WSDL2JAVA] Not working on JDK11
-    * [CXF-8936] - Fix h2 protocol negotiation in Jetty Transport
-    * [CXF-8939] - java.lang.NullPointerException: Cannot invoke "java.util.List.size()" because the return value of "java.util.Map$Entry.getValue()" is null
-    * [CXF-8940] - ws-security.must-understand works only if security.enable.streaming is true
-    * [CXF-8944] - wsdl2java frontend jaxws21 doesn't work
-    * [CXF-8945] - [JAX-WS] The client out interceptor chain is not called in case of oneway operation
-    * [CXF-8946] - HttpClient in CXF causing memory leak
-    * [CXF-8952] - HttpClientHTTPConduit in CXF doesn't support TLSv1.3 along with other protocols
-    * [CXF-8955] - Custom timeout with Message.RECEIVE_TIMEOUT not working with hc5 / hc
-    * [CXF-8957] - The org.apache.cxf.systest.jaxrs.JAXRSMultipartTest randomly hangs under JDK-21
-    * [CXF-8959] - Detect order dependent flakiness in AttachmentUtilTest.java in core module
-    * [CXF-8962] - HttpClientHTTPConduit sets Content-Type Header for DELETE requests with empty body
-    * [CXF-8963] - URI is always unknown in server request metrics 
-    * [CXF-8964] - Update Bouncycastle from unsupported xxx-jdk15on to xxx-jdk18on
-    * [CXF-8965] - Apache CXF Netty Integration, URI not encoded
-    * [CXF-8978] - Codegen plugin fails with IBM JDK
-    * [CXF-8983] - cxf-services-sts-core should depend on cxf-rt-rs-security-jose instead of cxf-rt-rs-security-jose-jaxrs
-    * [CXF-8984] - HttpClientHTTPConduit.HttpClientWrappedOutputStream throws NPE in closeInputStream()
+    * [CXF-8691] - Logging Feature - Sensitive element with arrays
+    * [CXF-8938] - CXF forces XOP for SwA SOAP services
+    * [CXF-9136] - Add EntityPart MessageBodyReader / MessageBodyWriter support
+    * [CXF-9152] - Adding @Timed annotation to JaxWS WebService class breaks Micrometer integration
+    * [CXF-9160] - Add support for JBoss Remoting protocols in JNDI
+    * [CXF-9162] - Reusing a Client with a HttpClientHTTPConduit is not threadsafe in regards to finalization
+    * [CXF-9168] - No Micrometer Metric for requests failing schema validation on jax-ws endpoints
+    * [CXF-9170] - Server requests counted twice after fixing CXF-9168
+    * [CXF-9171] - DelayedCachedOutputStreamCleaner thread accumulation after CVE-2025-23184 fix
+    * [CXF-9173] - Default SO_LINGER induce TCP RST on each connection closure
 
 
-** New Feature
-    * [CXF-8911] - Allow creating a custom CXFHttpAsyncResponseConsumer
-    * [CXF-8970] - ensure we can build and run without bouncycastle dependencies
 
 
 ** Improvement
-    * [CXF-8894] - ContextHandler - Unimplemented getRequestCharacterEncoding() - use org.eclipse.jetty.servlet.ServletContextHandler
-    * [CXF-8928] - Reduce code quality warnings in generated code
-    * [CXF-8933] - Add doPrivileged block to ProxyFactoryProxySelector.select() in  HttpClientHTTPConduit
-    * [CXF-8937] - Add `cxf-integration-tracing-micrometer` to bom
-    * [CXF-8948] - wsdlto tool should throw exception when bindingFiles is invalid
-    * [CXF-8953] - Better support of the HTTPS protocol versions used by client/server conduits
-    * [CXF-8954] - Always create MBeanServer instance per Jetty Server instance and destroy server properly at shutdown
-    * [CXF-8968] - OpenTelemetryClientFeature cannot be used as a CDI bean unless it has a no-args constructor
+    * [CXF-9157] - remove jetty server from rs-sse-undertow
+    * [CXF-9165] - Remove unnecessary JDK 8 hacks
 
 
-** Test
-    * [CXF-8981] - WSS4J  Encyption using the Key Agreement Method with the apache-CXF
+** Wish
+    * [CXF-9159] - Support spring boot SSL bundles
+
+
+
+
+** Improvement
+    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
+    * [CXF-9151] - use io.github.littleproxy:littleproxy instead of org.littleshoot:littleproxy
+
 
 
 ** Task
-    * [CXF-8935] - Add doPrivileged block to httpclient.sendAsync() in HttpClientHTTPConduit
+    * [CXF-9142] - Change async tracing tests to be order-agnostic
+
+
 

@@ -147,7 +147,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
     // Implementation of org.apache.cxf.common.annotation.AnnotationVisitor
 
     @Override
-    public final void visitClass(final Class<?> clz, final Annotation annotation) { //NOPMD
+    public final void visitClass(final Class<?> clz, final Annotation annotation) {
 
         assert annotation instanceof Resource || annotation instanceof Resources : annotation;
 

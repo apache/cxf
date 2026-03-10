@@ -39,7 +39,7 @@ public class SseSubscription implements Subscription {
     private final AtomicBoolean completed = new AtomicBoolean();
     private final AtomicBoolean canceled = new AtomicBoolean();
     //CHECKSTYLE:OFF
-    private final LinkedList<InboundSseEvent> buffer = new LinkedList<>(); //NOPMD
+    private final LinkedList<InboundSseEvent> buffer = new LinkedList<>();
     //CHECKSTYLE:ON
     private final AtomicInteger bufferSize = new AtomicInteger(DEFAULT_BUFFER_SIZE);
 

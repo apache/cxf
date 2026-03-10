@@ -21,6 +21,7 @@ package org.apache.cxf.tracing.brave;
 import brave.http.HttpTracing;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
@@ -43,6 +44,11 @@ public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
             responseCode = 200;
         }
 
-        super.stopTraceSpan(holder, responseCode);
+        boolean isRequestor = MessageUtils.isRequestor(message);
+        final Message requestMessage = isRequestor ? message.getExchange().getOutMessage()
+            : message.getExchange().getInMessage();
+
+        super.stopTraceSpan(holder, (String) requestMessage.get(Message.HTTP_REQUEST_METHOD), 
+            getUri(requestMessage), responseCode);
     }
 }

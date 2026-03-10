@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<config
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xmlns:jsr107='http://www.ehcache.org/v3/jsr107'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.8.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+    <service> 
+        <jsr107:defaults> 
+            <jsr107:cache name="cxf.samlp.response.state.cache" template="cxf.samlp.response.state.cache.template"/> 
+            <jsr107:cache name="cxf.samlp.request.state.cache" template="cxf.samlp.request.state.cache.template"/>
+            <jsr107:cache name="cxf.samlp.replay.cache" template="cxf.samlp.replay.cache.template"/>
+        </jsr107:defaults>
+    </service>
+
+    <persistence directory="${java.io.tmpdir}/ehcache/" />
+
+    <cache-template name="cxf.samlp.replay.cache.template">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.wss4j.common.cache.EHCacheValue</value-type>
+        <expiry>
+            <class>org.apache.wss4j.common.cache.EHCacheExpiry</class>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+    <cache-template name="cxf.samlp.request.state.cache.template">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.RequestState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+    <cache-template name="cxf.samlp.response.state.cache.template">
+        <key-type>java.lang.String</key-type>
+        <value-type>org.apache.cxf.rs.security.saml.sso.state.ResponseState</value-type>
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">5000</heap>
+            <disk unit="MB" persistent="false">10</disk>
+        </resources>
+    </cache-template>
+
+</config>
+

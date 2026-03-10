@@ -834,7 +834,7 @@ public class RMTxStore implements RMStore {
             return;
         }
 
-        try {   //NOPMD
+        try {
             con.setAutoCommit(true);
             try (Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(CREATE_SRC_SEQUENCES_TABLE_STMT);

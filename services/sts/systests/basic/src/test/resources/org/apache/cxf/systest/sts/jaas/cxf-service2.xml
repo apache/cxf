@@ -63,7 +63,7 @@
     <httpj:engine-factory id="ClientAuthHttpsSettings.2" bus="cxf">
         <httpj:engine port="${testutil.ports.DoubleItServer.2}">
             <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="skpass">
+                <sec:keyManagers keyPassword="sspass">
                     <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>

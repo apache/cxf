@@ -39,7 +39,7 @@ public class CxfJaxwsAutoConfiguration {
         return new BeanFactoryPostProcessor() {
             @Override
             public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-                final var beans = beanFactory.getBeansOfType(CommonAnnotationBeanPostProcessor.class);
+                final var beans = beanFactory.getBeansOfType(CommonAnnotationBeanPostProcessor.class, true, false);
                 // The {@code javax.xml.ws.WebServiceContext} interface should be ignored since it will 
                 // be resolved by the CXF's JAX-WS runtime.
                 beans.forEach((name, bean) -> bean.ignoreResourceType(WebServiceContext.class.getName()));

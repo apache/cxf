@@ -225,6 +225,16 @@ public class FiqlParserTest {
     }
 
     @Test
+    public void testParseOldLocalDateWithDefaultFormat() throws SearchParseException {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(SearchUtils.DEFAULT_DATE_FORMAT);
+        SearchCondition<Condition> filter = parser.parse("localDate==1893-04-02");
+        assertTrue(filter.isMet(new Condition("whatever", 15, null, LocalDate.parse("1893-04-02", df))));
+
+        filter = parser.parse("localDate==1893-04-01");
+        assertTrue(filter.isMet(new Condition("whatever", 15, null, LocalDate.parse("1893-04-01", df))));
+    }
+
+    @Test
     public void testParseInstantWithDefaultFormat() throws SearchParseException, ParseException {
         SearchCondition<Condition> filter = parser.parse("instant=le=2010-03-11");
         DateFormat df = new SimpleDateFormat(SearchUtils.DEFAULT_DATE_FORMAT);
@@ -368,10 +378,10 @@ public class FiqlParserTest {
         assertEquals(2, conditions.size());
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
-            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
-            || (ConditionType.EQUALS.equals(st2.getCondition())
-                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+        assertTrue((ConditionType.EQUALS == st1.getCondition()
+            && ConditionType.GREATER_THAN == st2.getCondition())
+            || (ConditionType.EQUALS == st2.getCondition()
+                && ConditionType.GREATER_THAN == st1.getCondition()));
 
         assertTrue(filter.isMet(new Condition("amichalec", 12, new Date())));
         assertTrue(filter.isMet(new Condition("ami", 12, new Date())));
@@ -397,10 +407,10 @@ public class FiqlParserTest {
 
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
-            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
-            || (ConditionType.EQUALS.equals(st2.getCondition())
-                && ConditionType.GREATER_THAN.equals(st1.getCondition())));
+        assertTrue((ConditionType.EQUALS == st1.getCondition()
+            && ConditionType.GREATER_THAN == st2.getCondition())
+            || (ConditionType.EQUALS == st2.getCondition()
+                && ConditionType.GREATER_THAN == st1.getCondition()));
 
         assertTrue(filter.isMet(new Condition("ami", 0, new Date())));
         assertTrue(filter.isMet(new Condition("foo", 20, null)));

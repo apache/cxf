@@ -55,8 +55,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class AttachmentDeserializerTest {
 
@@ -696,12 +696,8 @@ public class AttachmentDeserializerTest {
         ad.initializeAttachments();
 
         // Force it to load the attachments
-        try {
-            msg.getAttachments().size();
-            fail("Failure expected on too many attachments");
-        } catch (RuntimeException ex) {
-            // expected
-        }
+        assertThrows("Failure expected on too many attachments", RuntimeException.class, 
+            () -> msg.getAttachments().size());
     }
 
     @Test
@@ -734,12 +730,8 @@ public class AttachmentDeserializerTest {
         ad.initializeAttachments();
 
         // Force it to load the attachments
-        try {
-            msg.getAttachments().size();
-            fail("Failure expected on too many attachments");
-        } catch (RuntimeException ex) {
-            // expected
-        }
+        assertThrows("Failure expected on too many attachments", RuntimeException.class,
+            () -> msg.getAttachments().size());
 
         // Now we'll allow it
         msg = new MessageImpl();

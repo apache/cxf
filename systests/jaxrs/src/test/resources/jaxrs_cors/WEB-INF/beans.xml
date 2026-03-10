@@ -23,11 +23,6 @@
         <jaxrs:providers>
             <ref bean="cors-filter"/>
         </jaxrs:providers>
-        <!-- 
-                <jaxrs:features>
-                        <cxf:logging />
-                </jaxrs:features>
-                -->
     </jaxrs:server>
     <jaxrs:server id="ann-cors-service" address="/antest">
         <jaxrs:serviceBeans>
@@ -50,7 +45,7 @@
             <ref bean="config-server"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+            <bean class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
         </jaxrs:providers>
     </jaxrs:server>
     <bean id="config-server" class="org.apache.cxf.systest.jaxrs.cors.ConfigServer">

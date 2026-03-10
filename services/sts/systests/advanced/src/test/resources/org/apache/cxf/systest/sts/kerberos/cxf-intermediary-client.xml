@@ -27,7 +27,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient" id="kerberosClient">
@@ -45,7 +45,7 @@
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:trustManagers>
-            <sec:keyManagers keyPassword="skpass">
+            <sec:keyManagers keyPassword="sspass">
                 <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>

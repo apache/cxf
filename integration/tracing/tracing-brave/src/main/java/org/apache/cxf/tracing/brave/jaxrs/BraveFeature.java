@@ -25,7 +25,6 @@ import brave.http.HttpTracing;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
-import org.apache.cxf.tracing.brave.HttpServerSpanParser;
 
 @Provider
 public class BraveFeature implements Feature {
@@ -39,7 +38,6 @@ public class BraveFeature implements Feature {
         this(
             HttpTracing
                 .newBuilder(Tracing.newBuilder().localServiceName(name).build())
-                .serverParser(new HttpServerSpanParser())
                 .build()
         );
     }
@@ -48,7 +46,6 @@ public class BraveFeature implements Feature {
         this(
           HttpTracing
               .newBuilder(tracing)
-              .serverParser(new HttpServerSpanParser())
               .build()
         );
     }

@@ -40,10 +40,10 @@ public class PasswordCallbackHandler implements CallbackHandler {
                     pc.setPassword("trombone");
                     break;
                 } else if ("mystskey".equals(pc.getIdentifier())) {
-                    pc.setPassword("stskpass");
+                    pc.setPassword("stsspass");
                     break;
                 } else if ("myservicekey".equals(pc.getIdentifier())) {
-                    pc.setPassword("skpass");
+                    pc.setPassword("stsspass");
                     break;
                 }
             }

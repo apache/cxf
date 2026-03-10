@@ -127,6 +127,10 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             cacheManager.removeCache(key);
             cacheManager.close();
         }
+
+        if (bus != null) {
+            bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
+        }
     }
 
     public void initComplete() {

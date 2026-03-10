@@ -39,11 +39,11 @@ public final class BindingAnnotator implements Annotator {
 
         if (processBinding(intf)) {
             JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
-            if (!SOAPBinding.Style.DOCUMENT.equals(intf.getSOAPStyle())) {
+            if (SOAPBinding.Style.DOCUMENT != intf.getSOAPStyle()) {
                 bindingAnnotation.addElement(new JAnnotationElement("style",
                                                                     intf.getSOAPStyle()));
             }
-            if (!SOAPBinding.Use.LITERAL.equals(intf.getSOAPUse())) {
+            if (SOAPBinding.Use.LITERAL != intf.getSOAPUse()) {
                 bindingAnnotation.addElement(new JAnnotationElement("use", intf.getSOAPUse()));
             }
             if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
@@ -86,7 +86,7 @@ public final class BindingAnnotator implements Annotator {
                 && method.getSoapStyle() != null) {
                 soapStyle = method.getSoapStyle();
             }
-            if (SOAPBinding.Style.DOCUMENT.equals(mStyle)) {
+            if (SOAPBinding.Style.DOCUMENT == mStyle) {
                 allRPC = false;
             } else {
                 allDOC = false;

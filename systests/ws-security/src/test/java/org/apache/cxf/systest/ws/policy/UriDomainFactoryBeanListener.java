@@ -31,7 +31,7 @@ public class UriDomainFactoryBeanListener implements FactoryBeanListener {
 
     @Override
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
-        if (ev.equals(Event.START_CREATE)) {
+        if (ev == Event.START_CREATE) {
             // Remove original URIDomainExpressionBuilder to be replaced on custom one
             ExtensionManagerImpl orig = (ExtensionManagerImpl)factory.getBus().getExtension(ExtensionManager.class);
             List<String> names = new ArrayList<>();

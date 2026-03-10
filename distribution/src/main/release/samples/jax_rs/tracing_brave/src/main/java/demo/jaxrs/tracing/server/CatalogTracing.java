@@ -25,12 +25,13 @@ import brave.http.HttpTracing;
 import brave.propagation.ThreadLocalCurrentTraceContext;
 import zipkin2.Span;
 import zipkin2.reporter.AsyncReporter;
-import zipkin2.reporter.Sender;
+import zipkin2.reporter.BytesMessageSender;
+import zipkin2.reporter.brave.ZipkinSpanHandler;
 import zipkin2.reporter.okhttp3.OkHttpSender;
 
 public class CatalogTracing implements AutoCloseable {
     private volatile AsyncReporter<Span> reporter;
-    private volatile Sender sender;
+    private volatile BytesMessageSender sender;
     private volatile HttpTracing httpTracing;
     private final String serviceName;
     
@@ -74,10 +75,10 @@ public class CatalogTracing implements AutoCloseable {
             .currentTraceContext(
                 ThreadLocalCurrentTraceContext
                     .newBuilder()
-                    .addScopeDecorator(MDCScopeDecorator.create()) 
+                    .addScopeDecorator(MDCScopeDecorator.get()) 
                     .build()
               )
-            .spanReporter(reporter)
+            .addSpanHandler(ZipkinSpanHandler.create(reporter))
             .build();
         
         return HttpTracing.create(tracing);

@@ -406,6 +406,24 @@ public class MultipartStore {
     }
 
     @POST
+    @Path("/books/details")
+    @Consumes("multipart/form-data")
+    @Produces("text/xml")
+    public Response addBookWithDetails(@Multipart(value = "book", type = "application/xml") Book book,
+            @Multipart("upfile1Detail") Attachment a1,
+            @Multipart("upfile2Detail") Attachment a2,
+            @Multipart("upfile3Detail") Attachment a3)
+        throws Exception {
+
+        if (a1.equals(a2) || a1.equals(a3) || a2.equals(a3)) {
+            throw new WebApplicationException();
+        }
+
+        book.setName(a1.getContentId() + "," + a2.getContentId() + "," + a3.getContentId());
+        return Response.ok(book).build();
+    }
+
+    @POST
     @Path("/books/jaxb-body")
     @Consumes("multipart/related;type=\"text/xml\"")
     @Produces("text/xml")
@@ -449,6 +467,17 @@ public class MultipartStore {
         @Multipart(value = "rootPart", type = "text/xml") Book2 b1,
         @Multipart(value = "book2", type = "application/json") Book b2) throws Exception {
         return addBookJaxbJson(b1, b2);
+    }
+
+    @POST
+    @Path("/books/audiofiles")
+    @Consumes("multipart/related")
+    @Produces("text/xml")
+    public Book addAudioBook(
+            @Multipart(value = "book", type = "application/json") Book book,
+            @Multipart(value = "audio") Attachment audioFile) throws Exception {
+        String payload = String.valueOf(audioFile.getDataHandler().getContent().toString().getBytes()[0]);
+        return new Book(book.getName() + " - " + payload, book.getId());
     }
 
     @POST

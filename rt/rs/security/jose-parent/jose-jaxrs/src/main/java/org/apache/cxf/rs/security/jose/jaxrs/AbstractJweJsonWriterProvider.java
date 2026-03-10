@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -109,7 +109,7 @@ public class AbstractJweJsonWriterProvider {
         // This set is to find out how many key encryption algorithms are used
         // If only one then save it in the shared protected headers as opposed to
         // per-recipient specific not protected ones
-        Set<KeyAlgorithm> keyAlgos = new HashSet<>();
+        Set<KeyAlgorithm> keyAlgos = EnumSet.noneOf(KeyAlgorithm.class);
         
         List<KeyEncryptionProvider> keyProviders = new LinkedList<>();
         for (int i = 0; i < propLocs.size(); i++) {
@@ -117,7 +117,7 @@ public class AbstractJweJsonWriterProvider {
             ContentAlgorithm currentCtAlgo = JweUtils.getContentEncryptionAlgorithm(m, props, ContentAlgorithm.A128GCM);
             if (ctAlgo == null) {
                 ctAlgo = currentCtAlgo;
-            } else if (currentCtAlgo != null && !ctAlgo.equals(currentCtAlgo)) {
+            } else if (currentCtAlgo != null && ctAlgo != currentCtAlgo) {
                 // ctAlgo must be the same for all the recipients
                 throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
             }

@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
-
-import com.google.common.io.Files;
 
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingProvider;
@@ -68,6 +67,8 @@ import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.CachedOutputStreamCleaner;
+import org.apache.cxf.io.DelayedCachedOutputStreamCleaner;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -126,9 +127,10 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         // set up configuration to enable schema validation
         URL url = ClientServerTest.class.getResource("fault-stack-trace.xml");
+        // Create bus first so it will be shared between the server and clients
+        createStaticBus(url.toString());
         assertNotNull("cannot find test resource", url);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        createStaticBus(url.toString());
     }
 
     @Test
@@ -1014,7 +1016,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testEchoProviderThresholdAsync() throws Exception {
-        final File f = Files.createTempDir();
+        final File f = Files.createTempDirectory(null).toFile();
         LOG.info("Using temp folder: " + f.getAbsolutePath());
         
         System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
@@ -1045,7 +1047,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testEchoProviderThresholdAsyncThrows() throws Exception {
-        final File f = Files.createTempDir();
+        final File f = Files.createTempDirectory(null).toFile();
         LOG.info("Using temp folder: " + f.getAbsolutePath());
         
         System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
@@ -1070,6 +1072,45 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         //give the server side a little time to process it's part and close the files
         if (f.list().length > 0) {
             Thread.sleep(500);
+        }
+        
+        assertEquals("Expected no files but there is at list one", 0, f.list().length);
+        FileUtils.removeDir(f);
+    }
+
+    @Test
+    public void testEchoProviderThresholdTimeout() throws Exception {
+        final File f = Files.createTempDirectory(null).toFile();
+        LOG.info("Using temp folder: " + f.getAbsolutePath());
+        
+        System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory", f.getAbsolutePath());
+        CachedOutputStream.setDefaultThreshold(5);
+        
+        String requestString = "<echo/>";
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, jakarta.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING,
+                        "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider");
+        Dispatch<StreamSource> dispatcher = service.createDispatch(fakePortName,
+                                                                   StreamSource.class,
+                                                                   Service.Mode.PAYLOAD);
+        dispatcher.getRequestContext().put("jakarta.xml.ws.client.receiveTimeout", "1000");
+        dispatcher.getRequestContext().put("jakarta.xml.ws.client.connectionTimeout", "1000");
+        
+        StreamSource request = new StreamSource(new ByteArrayInputStream(requestString.getBytes()));
+        try {
+            // Expecting java.net.SocketTimeoutException: Read timed out
+            StreamSource response = dispatcher.invoke(request);
+            assertEquals(requestString, StaxUtils.toString(response));
+        } catch (final WebServiceException ex) {
+            ((DispatchImpl<StreamSource>)dispatcher).getClient().close();
+        }
+        
+        //give the server side a little time to process it's part and close the files
+        if (f.list().length > 0) {
+            final CachedOutputStreamCleaner cleaner = getBus().getExtension(CachedOutputStreamCleaner.class);
+            if (cleaner instanceof DelayedCachedOutputStreamCleaner) {
+                ((DelayedCachedOutputStreamCleaner) cleaner).forceClean();
+            }
         }
         
         assertEquals("Expected no files but there is at list one", 0, f.list().length);

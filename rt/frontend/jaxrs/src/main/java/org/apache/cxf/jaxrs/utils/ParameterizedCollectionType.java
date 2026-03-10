@@ -19,37 +19,15 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-public final class ParameterizedCollectionType implements ParameterizedType {
-    private final Class<?> collectionMemberClass;
-    private final Type[] typeArgs;
-
+public final class ParameterizedCollectionType extends ParameterizedCollectionBaseType {
     public ParameterizedCollectionType(Class<?> collectionMemberClass) {
-        this.collectionMemberClass = collectionMemberClass;
-        this.typeArgs = new Type[] {collectionMemberClass};
+        super(Collection.class, collectionMemberClass);
     }
-    
+
     public ParameterizedCollectionType(Type pt) {
-        this.collectionMemberClass = InjectionUtils.getRawType(pt);
-        this.typeArgs = new Type[] {pt};
-    }
-
-    public Type[] getActualTypeArguments() {
-        return typeArgs;
-    }
-
-    public Type getOwnerType() {
-        return null;
-    }
-
-    public Type getRawType() {
-        return Collection.class;
-    }
-
-    public String toString() {
-        return "java.util.Collection<" + collectionMemberClass.getName() + ">";
+        super(Collection.class, InjectionUtils.getRawType(pt));
     }
 }

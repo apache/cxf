@@ -280,13 +280,13 @@ public final class XmlSchemaUtils {
         if (attribute.isRef()) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
-        if (attribute.getForm().equals(XmlSchemaForm.QUALIFIED)) {
+        if (attribute.getForm() == XmlSchemaForm.QUALIFIED) {
             return true;
         }
-        if (attribute.getForm().equals(XmlSchemaForm.UNQUALIFIED)) {
+        if (attribute.getForm() == XmlSchemaForm.UNQUALIFIED) {
             return false;
         }
-        return schema.getAttributeFormDefault().equals(XmlSchemaForm.QUALIFIED);
+        return schema.getAttributeFormDefault() == XmlSchemaForm.QUALIFIED;
     }
 
     /**
@@ -331,13 +331,13 @@ public final class XmlSchemaUtils {
         if (element.isRef()) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
-        if (element.getForm().equals(XmlSchemaForm.QUALIFIED)) {
+        if (element.getForm() == XmlSchemaForm.QUALIFIED) {
             return true;
         }
-        if (element.getForm().equals(XmlSchemaForm.UNQUALIFIED)) {
+        if (element.getForm() == XmlSchemaForm.UNQUALIFIED) {
             return false;
         }
-        return schema.getElementFormDefault().equals(XmlSchemaForm.QUALIFIED);
+        return schema.getElementFormDefault() == XmlSchemaForm.QUALIFIED;
     }
 
     /**

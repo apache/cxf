@@ -11,4 +11,4 @@ org.apache.cxf.bus.resource.ResourceManagerImpl:org.apache.cxf.resource.Resource
 org.apache.cxf.catalog.OASISCatalogManager:org.apache.cxf.catalog.OASISCatalogManager:true
 org.apache.cxf.common.util.ASMHelperImpl:org.apache.cxf.common.util.ASMHelper:true
 org.apache.cxf.common.spi.ClassLoaderProxyService:org.apache.cxf.common.spi.ClassLoaderService:true
-
+org.apache.cxf.io.DelayedCachedOutputStreamCleaner:org.apache.cxf.io.CachedOutputStreamCleaner:true

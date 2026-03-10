@@ -47,10 +47,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.spi.ClassGeneratorClassLoader;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.OpcodesProxy;
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.spi.WrapperClassCreator;
+import org.apache.cxf.jaxws.spi.WrapperClassNamingConvention;
+import org.apache.cxf.jaxws.spi.WrapperClassNamingConvention.DefaultWrapperClassNamingConvention;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -60,19 +61,22 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public final class WrapperClassGenerator extends ClassGeneratorClassLoader implements WrapperClassCreator {
-    public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
+    /**
+     * Kept for backwards compatibility only
+     *
+     * @deprecated use {@link WrapperClassNamingConvention#DEFAULT_PACKAGE_NAME} instead
+     */
+    @Deprecated
+    public static final String DEFAULT_PACKAGE_NAME = DefaultWrapperClassNamingConvention.DEFAULT_PACKAGE_NAME;
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
     private final ASMHelper helper;
+    private final WrapperClassNamingConvention wrapperClassNaming;
 
     public WrapperClassGenerator(Bus bus) {
         super(bus);
-        helper = bus.getExtension(ASMHelper.class);
-    }
-
-    private String getPackageName(Method method) {
-        String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
-        return pkg.length() == 0 ? DEFAULT_PACKAGE_NAME : pkg;
+        this.helper = bus.getExtension(ASMHelper.class);
+        this.wrapperClassNaming = bus.getExtension(WrapperClassNamingConvention.class);
     }
 
     private Annotation[] getMethodParameterAnnotations(final MessagePartInfo mpi) {
@@ -169,7 +173,7 @@ public final class WrapperClassGenerator extends ClassGeneratorClassLoader imple
         QName wrapperElement = messageInfo.getName();
         boolean anonymous = factory.getAnonymousWrapperTypes();
 
-        String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
+        String pkg = wrapperClassNaming.getWrapperClassPackageName(method.getDeclaringClass(), anonymous);
         String className = pkg + "."
             + StringUtils.capitalize(op.getName().getLocalPart());
         if (!isRequest) {

@@ -1,0 +1,46 @@
+server:
+  ssl:
+    enabled: true
+    bundle: "cxf-server"
+    client-auth: need   # REQUIRE mutual TLS
+    port: 0
+
+spring:
+  ssl:
+    bundle:
+      jks:
+        cxf-server:
+          alias: "cxf-server"
+          keystore:
+            location: "classpath:keys/Bethal.jks"     # server private key
+            password: "password"
+            type: "JKS"
+          truststore:
+            location: "classpath:keys/Truststore.jks" # trusts the client cert/CA
+            password: "password"
+            type: "JKS"
+          protocol: "TLSv1.2"
+        cxf-client:
+          alias: "client"
+          keystore:
+            location: "classpath:keys/Morpit.jks"     # client private key for mTLS
+            password: "password"
+            type: "JKS"
+          truststore:
+            location: "classpath:keys/Truststore.jks" # trusts the server cert/CA
+            password: "password"
+            type: "JKS"
+          protocol: "TLSv1.2"
+
+# Client-side CXF SSL mapping (bound to CxfClientSslProperties below)
+cxf:
+  path: /ssl
+  jaxrs:
+    component-scan: true
+  client:
+    ssl:
+      enabled: true
+      defaultBundle: cxf-client
+      disable-cn-check: true   # set to false if your server cert has SAN=localhost
+
+

@@ -32,7 +32,7 @@ import jakarta.jws.WebService;
 import jakarta.xml.ws.WebServiceContext;
 import jakarta.xml.ws.handler.MessageContext;
 import org.apache.cxf.systest.Book;
-import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.brave.TestSpanHandler;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
@@ -45,7 +45,7 @@ public class BookStore implements BookStoreService {
     public BookStore() {
         brave = Tracing.newBuilder()
             .localServiceName("book-store")
-            .spanReporter(new TestSpanReporter())
+            .addSpanHandler(new TestSpanHandler())
             .build();
     }
 

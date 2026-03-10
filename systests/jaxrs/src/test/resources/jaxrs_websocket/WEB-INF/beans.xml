@@ -36,6 +36,12 @@
 
     <bean class="org.apache.cxf.systest.jaxrs.websocket.BookStoreWebSocket" id="serviceBean"/>
 
+    <cxf:bus>
+        <cxf:properties>
+            <entry key="skip.jakarta.json.providers.registration" value="true"/>
+        </cxf:properties>
+    </cxf:bus>
+
     <jaxrs:server id="bookserviceWS" address="/websocket" transportId="http://cxf.apache.org/transports/websocket">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

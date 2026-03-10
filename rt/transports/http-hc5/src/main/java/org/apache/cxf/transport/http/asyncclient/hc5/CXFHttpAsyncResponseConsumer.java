@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit.AsyncWrappedOutputStream;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.Header;
@@ -35,7 +34,7 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 
 public class CXFHttpAsyncResponseConsumer implements AsyncResponseConsumer<Boolean> {
     private final SharedInputBuffer buf;
-    private final AsyncWrappedOutputStream outstream;
+    private final AsyncWrappedOutputStreamBase outstream;
     private final CXFResponseCallback responseCallback;
     
     private volatile boolean completed;
@@ -43,7 +42,7 @@ public class CXFHttpAsyncResponseConsumer implements AsyncResponseConsumer<Boole
     private volatile HttpResponse response;
 
     public CXFHttpAsyncResponseConsumer(
-            final AsyncWrappedOutputStream asyncWrappedOutputStream,
+            final AsyncWrappedOutputStreamBase asyncWrappedOutputStream,
             final SharedInputBuffer buf,
             final CXFResponseCallback responseCallback) {
         super();

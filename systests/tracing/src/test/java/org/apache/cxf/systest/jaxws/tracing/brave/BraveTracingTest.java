@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxws.tracing.brave;
 import brave.Tracing;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.brave.TestSpanHandler;
 import org.apache.cxf.systest.brave.jaxws.AbstractBraveTracingTest;
 import org.apache.cxf.testutil.common.AbstractTestServerBase;
 import org.apache.cxf.tracing.brave.BraveClientFeature;
@@ -44,7 +44,7 @@ public class BraveTracingTest extends AbstractBraveTracingTest {
         protected void run() {
             final Tracing brave = Tracing.newBuilder()
                 .localServiceName("book-store")
-                .spanReporter(new TestSpanReporter())
+                .addSpanHandler(new TestSpanHandler())
                 .build();
 
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -68,7 +68,7 @@ public class BraveTracingTest extends AbstractBraveTracingTest {
 
     @After
     public void tearDown() {
-        TestSpanReporter.clear();
+        TestSpanHandler.clear();
     }
 
     @Override

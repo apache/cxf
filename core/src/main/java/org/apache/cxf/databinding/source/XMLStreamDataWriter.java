@@ -67,7 +67,6 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         write(obj, output);
     }
 
-    @SuppressWarnings("PMD.UseTryWithResources")
     public void write(Object obj, XMLStreamWriter writer) {
         Closeable toClose = null;
         try {            

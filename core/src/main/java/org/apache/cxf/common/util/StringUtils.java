@@ -24,13 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
-
-    private static final Predicate<String> NOT_EMPTY = (String s) -> !s.isEmpty();
 
     private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -49,23 +46,11 @@ public final class StringUtils {
         return true;
     }
 
-    public static Predicate<String> notEmpty() {
-        return NOT_EMPTY;
-    }
-
     public static boolean isEmpty(List<String> list) {
         if (list == null || list.isEmpty()) {
             return true;
         }
         return list.size() == 1 && isEmpty(list.get(0));
-    }
-
-    public static String diff(String str1, String str2) {
-        int index = str1.lastIndexOf(str2);
-        if (index > -1) {
-            return str1.substring(str2.length());
-        }
-        return str1;
     }
 
     public static String getFirstFound(String contents, String regex) {

@@ -338,7 +338,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
         code.append("//\n");
 
-        code.append("function "
+        code.append("function " //NOPMD
                     +  opFunctionGlobalName
                     + "("  + responseCallbackParams
                     + ((parameterList.length() > 0 && !currentOperation.isOneWay())

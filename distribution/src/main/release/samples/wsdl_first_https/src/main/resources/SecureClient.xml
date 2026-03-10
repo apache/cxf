@@ -27,11 +27,11 @@
     xsi:schemaLocation="http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="ckpass">
-                <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+            <sec:keyManagers keyPassword="cspass">
+                <sec:keyStore resource="keys/clientstore.jks" password="cspass" type="JKS"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+                <sec:keyStore resource="keys/clientstore.jks" password="cspass" type="JKS"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>

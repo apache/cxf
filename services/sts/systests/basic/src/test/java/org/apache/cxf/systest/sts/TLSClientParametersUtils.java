@@ -34,7 +34,7 @@ public final class TLSClientParametersUtils {
 
     private static final String CLIENTSTORE = "/keys/clientstore.jks";
     private static final String KEYSTORE_PASS = "cspass";
-    private static final String KEY_PASS = "ckpass";
+    private static final String KEY_PASS = "cspass";
 
     private TLSClientParametersUtils() {
     }

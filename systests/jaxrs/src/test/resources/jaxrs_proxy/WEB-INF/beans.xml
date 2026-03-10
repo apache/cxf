@@ -28,9 +28,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:jaxrs="http://cxf.apache.org/jaxrs"
     xmlns:aop="http://www.springframework.org/schema/aop"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <cxf:bus>
+       <cxf:properties>
+           <entry key="skip.jakarta.json.providers.registration" value="true"/>
+       </cxf:properties>
+    </cxf:bus>
     <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
     <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
     <bean id="bookstoreInterface" class="org.apache.cxf.systest.jaxrs.BookStoreWithInterface"/>

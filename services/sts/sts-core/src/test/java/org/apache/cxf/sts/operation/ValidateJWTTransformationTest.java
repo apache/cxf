@@ -338,7 +338,7 @@ public class ValidateJWTTransformationTest {
     }
 
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.getEmptyDocument();
+        Document doc = DOMUtils.createDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;

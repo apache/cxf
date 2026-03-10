@@ -83,7 +83,6 @@ public class BraveFeature extends DelegatingFeature<BraveFeature.Portable> {
         private static HttpTracing newTracer(Tracing tracing) {
             return HttpTracing
                     .newBuilder(tracing)
-                    .serverParser(new HttpServerSpanParser())
                     .build();
         }
 

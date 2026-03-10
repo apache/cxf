@@ -27,6 +27,7 @@ import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.client.RxInvokerProvider;
 import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.ext.ContextResolver;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
@@ -42,6 +43,8 @@ public final class ClientProviderFactory extends ProviderFactory {
         new ArrayList<>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
         new ArrayList<>(1);
+    private List<ProviderInfo<ContextResolver<?>>> contextResolvers =
+            new ArrayList<>();
     private RxInvokerProvider<?> rxInvokerProvider;
     private ClientProviderFactory(Bus bus) {
         super(bus);
@@ -98,6 +101,10 @@ public final class ClientProviderFactory extends ProviderFactory {
             if (RxInvokerProvider.class.isAssignableFrom(providerCls)) {
                 this.rxInvokerProvider = RxInvokerProvider.class.cast(provider.getProvider());
             }
+
+            if (filterContractSupported(provider, providerCls, ContextResolver.class)) {
+                addProviderToList(contextResolvers, provider);
+            }
         }
         Collections.sort(clientRequestFilters,
                          new BindingPriorityComparator(ClientRequestFilter.class, true));
@@ -125,6 +132,7 @@ public final class ClientProviderFactory extends ProviderFactory {
         responseExceptionMappers.clear();
         clientRequestFilters.clear();
         clientResponseFilters.clear();
+        contextResolvers.clear();
     }
 
     public List<ProviderInfo<ClientRequestFilter>> getClientRequestFilters() {
@@ -133,6 +141,10 @@ public final class ClientProviderFactory extends ProviderFactory {
 
     public List<ProviderInfo<ClientResponseFilter>> getClientResponseFilters() {
         return Collections.unmodifiableList(clientResponseFilters);
+    }
+
+    public List<ProviderInfo<ContextResolver<?>>> getContextResolvers() {
+        return Collections.unmodifiableList(contextResolvers);
     }
 
     @Override

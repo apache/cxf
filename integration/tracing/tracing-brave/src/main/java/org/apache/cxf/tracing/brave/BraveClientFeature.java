@@ -48,7 +48,8 @@ public class BraveClientFeature extends DelegatingFeature<BraveClientFeature.Por
             this(
                     HttpTracing
                             .newBuilder(tracing)
-                            .clientParser(new HttpClientSpanParser())
+                            .clientRequestParser(new HttpClientRequestParser())
+                            .clientResponseParser(new HttpClientResponseParser())
                             .build()
             );
         }

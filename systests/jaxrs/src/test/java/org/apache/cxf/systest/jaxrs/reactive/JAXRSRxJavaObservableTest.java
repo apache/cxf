@@ -22,12 +22,11 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.GenericType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

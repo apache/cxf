@@ -78,7 +78,7 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
         this.config = config instanceof ConfigurationImpl
             ? (ConfigurationImpl)config : new ConfigurationImpl(config);
         this.classLoader = Thread.currentThread().getContextClassLoader();
-        restrictedContractTypes = RuntimeType.CLIENT.equals(config.getRuntimeType()) ? RESTRICTED_CLASSES_IN_CLIENT
+        restrictedContractTypes = RuntimeType.CLIENT == config.getRuntimeType() ? RESTRICTED_CLASSES_IN_CLIENT
             : RESTRICTED_CLASSES_IN_SERVER;
     }
 
@@ -240,17 +240,17 @@ public class ConfigurableImpl<C extends Configurable<C>> implements Configurable
             RuntimeType providerRuntime = providerConstraint.value();
             // need to check (1) whether the registration is occurring in the specified runtime type
             // and (2) does the provider implement an invalid interface based on the constrained runtime type
-            if (!providerRuntime.equals(currentRuntime)) {
+            if (providerRuntime != currentRuntime) {
                 LOG.warning("Provider " + provider + " cannot be registered in this " + currentRuntime
                             + " runtime because it is constrained to " + providerRuntime + " runtimes.");
                 return false;
             }
             
-            Class<?>[] restrictedInterfaces = RuntimeType.CLIENT.equals(providerRuntime) ? RESTRICTED_CLASSES_IN_CLIENT
+            Class<?>[] restrictedInterfaces = RuntimeType.CLIENT == providerRuntime ? RESTRICTED_CLASSES_IN_CLIENT
                                                                                          : RESTRICTED_CLASSES_IN_SERVER;
             for (Class<?> restrictedContract : restrictedInterfaces) {
                 if (restrictedContract.isAssignableFrom(providerClass)) {
-                    RuntimeType opposite = RuntimeType.CLIENT.equals(providerRuntime) ? RuntimeType.SERVER
+                    RuntimeType opposite = RuntimeType.CLIENT == providerRuntime ? RuntimeType.SERVER
                                                                                       : RuntimeType.CLIENT;
                     LOG.warning("Provider " + providerClass.getName() + " is invalid - it is constrained to "
                         + providerRuntime + " runtimes but implements a " + opposite + " interface ");

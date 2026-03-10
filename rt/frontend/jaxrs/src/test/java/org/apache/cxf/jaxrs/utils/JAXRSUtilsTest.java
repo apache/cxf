@@ -1113,7 +1113,7 @@ public class JAXRSUtilsTest {
 
     @Test
     public void testWrongType() throws Exception {
-        Class<?>[] argType = {HashMap.class}; //NOPMD
+        Class<?>[] argType = {HashMap.class};
         Method m = Customer.class.getMethod("testWrongType", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");

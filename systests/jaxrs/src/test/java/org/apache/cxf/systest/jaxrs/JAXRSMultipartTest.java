@@ -21,9 +21,11 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -37,10 +39,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.activation.DataHandler;
 import jakarta.mail.util.ByteArrayDataSource;
+import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
@@ -50,6 +51,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
+import org.apache.cxf.Bus;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.FileUtils;
@@ -63,6 +65,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -91,13 +94,18 @@ import static org.junit.Assert.assertTrue;
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = MultipartServer.PORT;
     public static final String PORTINV = allocatePort(JAXRSMultipartTest.class, 1);
-
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(MultipartServer.class, true));
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
 
+    
+    
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/stream";
@@ -419,6 +427,49 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testAddBookWithDetailsAsMultipart() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/details";
+
+        final Client client = ClientBuilder.newClient();
+        try (InputStream is = getClass()
+                .getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/attachmentData")) {
+            final MultipartBody builder = new MultipartBody(Arrays.asList(
+                new AttachmentBuilder()
+                    .mediaType("application/xml")
+                    .id("book")
+                    .object(new Book())
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile1Detail")
+                    .object(is)
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field1\";"))
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile2Detail")
+                    .dataHandler(new DataHandler(
+                        new InputStreamDataSource(new ByteArrayInputStream(new byte[0]), "text/xml")))
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field2\";"))
+                    .build(),
+                new AttachmentBuilder()
+                    .id("upfile3Detail")
+                    .dataHandler(new DataHandler(new InputStreamDataSource(
+                        new ByteArrayInputStream(new byte[0]), "text/xml")))
+                    .contentDisposition(new ContentDisposition("form-data; name=\"field3\";"))
+                    .build()));
+        
+            final Response response = client
+                .target(address)
+                .request("text/xml")
+                .post(Entity.entity(builder, "multipart/form-data"));
+
+            final Book book = response.readEntity(Book.class);
+            assertThat("Unexpected status code for response:" + response, 
+                response.getStatus(), equalTo(200));
+            assertThat(book.getName(), equalTo("upfile1Detail,upfile2Detail,upfile3Detail"));
+        }
+    }
+
+    @Test
     public void testAddBookAsJAXBBody() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxb-body";
         doAddBook(address, "attachmentData", 200);
@@ -465,10 +516,31 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void attachmentIsNotWrappedIntoAnotherAttachment() throws Exception {
+        MultipartStore store =
+                JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+
+        Attachment attachment =
+                new Attachment("audio", MediaType.APPLICATION_OCTET_STREAM, new byte[]{42});
+
+        Book b = store.addAudioBook(new Book("CXF in Action", 125L), attachment);
+        assertEquals(125L, b.getId());
+        assertEquals("CXF in Action - 42", b.getName());
+    }
+
+    @Test
     public void testNullPartProxy() throws Exception {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+
+        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        
         MultipartStore store =
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        WebClient.getConfig(store).getOutInterceptors().add(out);
         assertEquals("nobody home2", store.testNullParts("value1", null));
+        String expected = "Content-Disposition: form-data;name=\"someid\"";
+        assertTrue(output.toString().indexOf(expected) != -1);
     }
 
     @Test
@@ -1106,7 +1178,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testUpdateBookMultipart() {
         final WebTarget target = ClientBuilder
             .newClient()
-            .register(JacksonJsonProvider.class)
             .target("http://localhost:" + PORT + "/bookstore");
 
         final MultipartBody builder = new MultipartBody(Arrays.asList(

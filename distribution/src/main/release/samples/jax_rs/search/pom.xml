@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -78,38 +78,98 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>pre-jdk21</id>
+            <activation>
+                <jdk>[17,21)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <compileSourceRoots>
+                                        <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
+                                        <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
+                                    </compileSourceRoots>
+                                    <outputDirectory>${project.build.outputDirectory}/classes</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jdk21+</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <compileSourceRoots>
+                                        <compileSourceRoot>${project.basedir}/src/main/java</compileSourceRoot>
+                                        <compileSourceRoot>${project.basedir}/src/main/java21</compileSourceRoot>
+                                    </compileSourceRoots>
+                                    <outputDirectory>${project.build.outputDirectory}/classes</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-search</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>                 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-cors</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency> 
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -159,14 +219,14 @@
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-webapp</artifactId>
             <version>${cxf.jetty12.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>

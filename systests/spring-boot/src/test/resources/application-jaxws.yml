@@ -3,3 +3,5 @@ cxf:
   metrics:
     jaxrs:
       enabled: false
+my:
+  address: http://localhost:port/Service/HelloV1

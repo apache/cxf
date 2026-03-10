@@ -29,8 +29,8 @@ import org.apache.cxf.transport.https.InsecureTrustManager;
 
 import org.junit.Test;
 
+import static org.apache.cxf.systest.hc5.IsAsyncHttpConduit.isInstanceOfAsyncHttpConduit;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -38,8 +38,8 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/notFound", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
-        
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
+
         final Response response = client
             .accept("text/plain")
             .path(getContext() + "/web/bookstore/notFound")
@@ -51,7 +51,7 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testBookTraceWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/trace", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
 
         final Response response = client
             .accept("text/plain")
@@ -66,7 +66,7 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testBookWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/booknames", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
         
         final Response response = client
             .accept("text/plain")
@@ -81,7 +81,7 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testBookEncodedWithHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/book%20names", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
         
         final Response response = client
             .accept("text/plain")
@@ -96,7 +96,7 @@ abstract class AbstractApacheClientServerHttp2Test extends AbstractBusClientServ
     @Test
     public void testGetBookStreamHttp2() throws Exception {
         final WebClient client = createWebClient("/web/bookstore/bookstream", true);
-        assertThat(WebClient.getConfig(client).getHttpConduit(), instanceOf(AsyncHTTPConduit.class));
+        assertThat(WebClient.getConfig(client).getHttpConduit(), isInstanceOfAsyncHttpConduit());
         
         final Response response = client
             .accept("application/xml")

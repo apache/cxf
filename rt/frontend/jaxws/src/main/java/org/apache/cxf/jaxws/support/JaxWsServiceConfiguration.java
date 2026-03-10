@@ -521,7 +521,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         WebParam webParam = getWebParam(method, j);
 
-        return webParam == null || (webParam.mode().equals(Mode.IN) || webParam.mode().equals(Mode.INOUT));
+        return webParam == null || (webParam.mode() == Mode.IN || webParam.mode() == Mode.INOUT);
     }
 
     private WebResult getWebResult(Method method) {
@@ -537,7 +537,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         WebParam webParam = getWebParam(method, j);
 
-        if (webParam != null && (webParam.mode().equals(Mode.OUT) || webParam.mode().equals(Mode.INOUT))) {
+        if (webParam != null && (webParam.mode() == Mode.OUT || webParam.mode() == Mode.INOUT)) {
             return Boolean.TRUE;
         }
         return method.getParameterTypes()[j] == Holder.class;
@@ -552,7 +552,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         WebParam webParam = getWebParam(method, j);
 
-        if (webParam != null && webParam.mode().equals(Mode.INOUT)) {
+        if (webParam != null && webParam.mode() == Mode.INOUT) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
@@ -758,11 +758,11 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         SOAPBinding ann = m.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            if (ann.style().equals(Style.RPC)) {
+            if (ann.style() == Style.RPC) {
                 Message message = new Message("SOAPBinding_MESSAGE_RPC", LOG, m.getName());
                 throw new Fault(new JaxWsConfigurationException(message));
             }
-            return !(ann.parameterStyle().equals(ParameterStyle.BARE));
+            return ann.parameterStyle() != ParameterStyle.BARE;
         }
 
         return isWrapped();
@@ -772,7 +772,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isWrapped() {
         SOAPBinding ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return !(ann.parameterStyle().equals(ParameterStyle.BARE) || ann.style().equals(Style.RPC));
+            return !(ann.parameterStyle() == ParameterStyle.BARE || ann.style() == Style.RPC);
         }
         return null;
     }
@@ -800,13 +800,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     private boolean isDocumentBare(Method method) {
         SOAPBinding ann = method.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.DOCUMENT)
-                   && ann.parameterStyle().equals(SOAPBinding.ParameterStyle.BARE);
+            return ann.style() == SOAPBinding.Style.DOCUMENT
+                   && ann.parameterStyle() == SOAPBinding.ParameterStyle.BARE;
         }
         ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.DOCUMENT)
-                   && ann.parameterStyle().equals(SOAPBinding.ParameterStyle.BARE);
+            return ann.style() == SOAPBinding.Style.DOCUMENT
+                   && ann.parameterStyle() == SOAPBinding.ParameterStyle.BARE;
         }
         return false;
     }
@@ -815,11 +815,11 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isRPC(Method method) {
         SOAPBinding ann = method.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.RPC);
+            return ann.style() == SOAPBinding.Style.RPC;
         }
         ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.RPC);
+            return ann.style() == SOAPBinding.Style.RPC;
         }
         return super.isRPC(method);
     }

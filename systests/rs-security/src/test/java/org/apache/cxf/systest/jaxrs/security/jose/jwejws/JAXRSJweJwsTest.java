@@ -20,12 +20,9 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;
@@ -71,6 +68,10 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         JavaUtils.isFIPSEnabled()
         ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
             : "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
+    private static final String CLIENT_SIGN_JWEJWS_PROPERTIES =
+            "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
+    private static final String SERVER_SIGN_JWEJWS_PROPERTIES =
+            "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
     private static final String ENCODED_MAC_KEY = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
         + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     @BeforeClass
@@ -91,8 +92,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJweJwkBookBeanRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
-        BookStore bs = createJweBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -215,8 +215,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);
         bean.setProviders(providers);
-        bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_JWEJWS_PROPERTIES);
-        bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
+        bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_SIGN_JWEJWS_PROPERTIES);
+        bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_SIGN_JWEJWS_PROPERTIES);
         PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
         bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
         BookStore bs = bean.create(BookStore.class);
@@ -294,8 +294,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + PORT + "/jwejwshmac";
         HmacJwsSignatureProvider hmacProvider =
             new HmacJwsSignatureProvider(ENCODED_MAC_KEY, SignatureAlgorithm.HS256);
-        BookStore bs = createJweJwsBookStore(address, hmacProvider,
-                                             Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJweJwsBookStore(address, hmacProvider, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -332,8 +331,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJwkBookHMac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
-        BookStore bs = createJwsBookStore(address,
-                                       Collections.singletonList(new JacksonJsonProvider()));
+        BookStore bs = createJwsBookStore(address, List.of());
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());

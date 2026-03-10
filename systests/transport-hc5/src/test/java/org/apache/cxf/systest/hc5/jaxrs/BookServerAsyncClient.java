@@ -24,8 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
+import java.util.List;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
@@ -41,13 +40,18 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import org.apache.cxf.transport.common.gzip.GZIPFeature;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 public class BookServerAsyncClient extends AbstractServerTestServerBase {
     public static final String PORT = allocatePort(BookServerAsyncClient.class);
 
     @Override
     protected Server createServer(Bus bus) throws Exception {
-        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        final GZIPFeature gzipFeature = new GZIPFeature();
+        gzipFeature.setThreshold(1);
+
+        final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -56,6 +60,7 @@ public class BookServerAsyncClient extends AbstractServerTestServerBase {
         sf.setProvider(new JacksonJsonProvider());
         sf.setProvider(new StreamingResponseProvider<Book>());
         sf.getProperties(true).put("default.content.type", "*/*");
+        sf.setFeatures(List.of(gzipFeature));
         return sf.create();
     }
 

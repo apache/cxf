@@ -67,6 +67,7 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.Configuration;
 import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -175,6 +176,7 @@ public final class JAXRSUtils {
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
     private static final Set<String> STREAMING_LIKE_OUT_TYPES = new HashSet<>(
         Arrays.asList(
+            "jakarta.ws.rs.core.EntityPart",
             "org.apache.cxf.jaxrs.ext.xml.XMLSource", 
             "org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource", 
             "org.apache.cxf.jaxrs.ext.multipart.MultipartBody", 
@@ -326,7 +328,7 @@ public final class JAXRSUtils {
             segments.addAll(
                 Arrays
                     .stream(thePath.substring(start).split("/"))
-                    .filter(StringUtils.notEmpty())
+                    .filter(s -> !s.isEmpty())
                     .map(p -> new PathSegmentImpl(p, decode))
                     .collect(Collectors.toList()));
 
@@ -1160,7 +1162,8 @@ public final class JAXRSUtils {
                 return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.MATRIX, m, false);
             }
             List<String> values = params.get(key);
-            return InjectionUtils.createParameterObject(values,
+            return InjectionUtils.createParameterObject(key,
+                                                        values,
                                                         pClass,
                                                         genericType,
                                                         paramAnns,
@@ -1199,8 +1202,13 @@ public final class JAXRSUtils {
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
-                    MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-                    FormUtils.populateMapFromMultipart(params, body, m, decode);
+                    if (pClass.isAssignableFrom(EntityPart.class)) {
+                        final List<EntityPart> body = EntityPartUtils.getEntityParts(mc);
+                        FormUtils.populateMapFromEntityParts(params, body, m, decode);
+                    } else {
+                        MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+                        FormUtils.populateMapFromMultipart(params, body, m, decode);
+                    }
                 } else {
                     org.apache.cxf.common.i18n.Message errorMsg =
                         new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE",
@@ -1225,7 +1233,8 @@ public final class JAXRSUtils {
         }
         List<String> results = params.get(key);
 
-        return InjectionUtils.createParameterObject(results,
+        return InjectionUtils.createParameterObject(key,
+                                                    results,
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1253,7 +1262,8 @@ public final class JAXRSUtils {
         if (values != null && values.isEmpty()) {
             values = null;
         }
-        return InjectionUtils.createParameterObject(values,
+        return InjectionUtils.createParameterObject(header,
+                                                    values,
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1283,7 +1293,8 @@ public final class JAXRSUtils {
         String value = InjectionUtils.isSupportedCollectionOrArray(pClass)
             && InjectionUtils.getActualType(genericType) == Cookie.class
             ? c.toString() : c.getValue();
-        return InjectionUtils.createParameterObject(Collections.singletonList(value),
+        return InjectionUtils.createParameterObject(cookieName,
+                                                    Collections.singletonList(value),
                                                     pClass,
                                                     genericType,
                                                     paramAnns,
@@ -1420,7 +1431,8 @@ public final class JAXRSUtils {
             return InjectionUtils.handleBean(paramType, paramAnns, values, ParameterType.PATH, m, decoded);
         }
         List<String> results = values.get(parameterName);
-        return InjectionUtils.createParameterObject(results,
+        return InjectionUtils.createParameterObject(parameterName,
+                                                results,
                                                 paramType,
                                                 genericType,
                                                 paramAnns,
@@ -1446,7 +1458,8 @@ public final class JAXRSUtils {
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, queryMap, ParameterType.QUERY, m, false);
         }
-        return InjectionUtils.createParameterObject(queryMap.get(queryName),
+        return InjectionUtils.createParameterObject(queryName,
+                                                    queryMap.get(queryName),
                                                     paramType,
                                                     genericType,
                                                     paramAnns,

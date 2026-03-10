@@ -23,12 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import brave.Tracing;
+import brave.handler.MutableSpan;
+import brave.handler.SpanHandler;
+import brave.propagation.TraceContext;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -56,7 +57,7 @@ public class BraveTraceTest {
     public void testMyService() {
         MyService myService = createProxy(clientLogging);
         myService.echo("test");
-        for (Span span : localReporter.spans) {
+        for (MutableSpan span : localReporter.spans) {
             System.out.println(span);
         }
         Assert.assertEquals(2, localReporter.spans.size());
@@ -84,26 +85,25 @@ public class BraveTraceTest {
         return (MyService)factory.create();
     }
 
-    private static BraveFeature createLoggingFeature(Reporter<Span> reporter) {
+    private static BraveFeature createLoggingFeature(SpanHandler handler) {
         Tracing brave =
-            Tracing.newBuilder().localServiceName("myservice").spanReporter(reporter).build();
+            Tracing.newBuilder().localServiceName("myservice").addSpanHandler(handler).build();
         return new BraveFeature(brave);
     }
 
-    private static BraveClientFeature createClientLoggingFeature(Reporter<Span> reporter) {
+    private static BraveClientFeature createClientLoggingFeature(SpanHandler handler) {
         Tracing brave =
-            Tracing.newBuilder().localServiceName("myservice").spanReporter(reporter).build();
+            Tracing.newBuilder().localServiceName("myservice").addSpanHandler(handler).build();
         return new BraveClientFeature(brave);
     }
 
-    static final class Localreporter implements Reporter<Span> {
-        List<Span> spans = new ArrayList<>();
+    static final class Localreporter extends SpanHandler {
+        List<MutableSpan> spans = new ArrayList<>();
 
         @Override
-        public void report(Span span) {
-            spans.add(span);
+        public boolean end(TraceContext context, MutableSpan span, Cause cause) {
+            return spans.add(span);
         }
-
     }
 
 }

@@ -581,7 +581,7 @@ public final class CryptoUtils {
             if (algorithm.equals("AESWrap")) {
                 int keySize = secretKey.getEncoded().length;
                 algorithm = "AESWrap_" + keySize * 8;
-                secretKey = new SecretKeySpec(secretKey.getEncoded(), 0, keySize, "AES");
+                secretKey = new SecretKeySpec(secretKey.getEncoded(), 0, keySize, "AES"); //NOPMD - false positive
             }
             Cipher c = Cipher.getInstance(algorithm);
             if (keyProps == null || keyProps.getAlgoSpec() == null && keyProps.getSecureRandom() == null) {

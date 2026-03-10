@@ -22,7 +22,6 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit.AsyncWrappedOutputStream;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.Configurable;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -32,17 +31,17 @@ public class CXFHttpRequest extends HttpUriRequestBase implements Configurable {
     private static final long serialVersionUID = 1L;
     
     private HttpEntity entity;
-    private AsyncWrappedOutputStream out;
+    private AsyncWrappedOutputStreamBase out;
     private RequestConfig config;
 
     public CXFHttpRequest(String method, URI uri) {
         super(method, uri);
     }
 
-    public void setOutputStream(AsyncWrappedOutputStream o) {
+    public void setOutputStream(AsyncWrappedOutputStreamBase o) {
         out = o;
     }
-    public AsyncWrappedOutputStream getOutputStream() {
+    public AsyncWrappedOutputStreamBase getOutputStream() {
         return out;
     }
 

@@ -191,18 +191,53 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 LogUtils.log(LOG, Level.INFO, "EXCEPTION_WHILE_CREATING_EXCEPTION", e1, e1.getMessage());
             }
         } else {
-            if (fault.getMessage() != null) {
+            Exception ex = (Exception)e; 
+            final String message = fault.getMessage();
+            if (message != null) {
                 Field f;
                 try {
                     f = Throwable.class.getDeclaredField("detailMessage");
                     ReflectionUtil.setAccessible(f);
-                    f.set(e, fault.getMessage());
+                    f.set(ex, fault.getMessage());
                 } catch (Exception e1) {
-                    //ignore
+                    if (isJdkException(ex.getClass().getPackageName())) {
+                        ex = cloneJdkException(ex, message);
+                    }
                 }
             }
-            msg.setContent(Exception.class, e);
+            msg.setContent(Exception.class, ex);
         }
+    }
+
+    private static Exception cloneJdkException(Exception ex, final String message) {
+        try {
+            // Fallback, try to clone the exception instead of accessing the detailMessage 
+            // over reflection
+            Constructor<? extends Object> constructor = ReflectionUtil.getConstructor(
+                ex.getClass(), String.class, Throwable.class); /* String message, Throwable cause */
+   
+            Exception clone = null;
+            if (constructor != null) {
+                clone = (Exception) constructor.newInstance(message, ex.getCause());
+            } else {
+                constructor = ReflectionUtil.getConstructor(ex.getClass(), String.class); /* String message */
+                if (constructor != null) {
+                    clone = (Exception) constructor.newInstance(message);
+                    clone.initCause(ex.getCause());
+                }
+            }
+
+            if (clone != null) {
+                clone.setStackTrace(ex.getStackTrace());
+                if (ex.getSuppressed().length > 0) {
+                    Arrays.stream(ex.getSuppressed()).forEach(clone::addSuppressed);
+                }
+                return clone;
+            }
+        } catch (Exception e2) {
+            /* nothing to do */
+        }
+        return ex;
     }
 
     private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
@@ -283,7 +318,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         Throwable res = null;
         if (firstLine.indexOf(':') != -1) {
             String cn = firstLine.substring(0, firstLine.indexOf(':')).trim();
-            if (cn.startsWith("java.lang")) {
+            if (isJdkException(cn)) {
                 try {
                     res = (Throwable)Class.forName(cn).getConstructor(String.class)
                             .newInstance(firstLine.substring(firstLine.indexOf(':') + 2));
@@ -308,6 +343,10 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
         res.setStackTrace(stackTraceList.toArray(stackTraceElement));
         return res;
+    }
+
+    private static boolean isJdkException(String pkg) {
+        return pkg.startsWith("java.lang");
     }
 
     private static StackTraceElement parseStackTrackLine(String oneLine) {

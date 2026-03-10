@@ -54,9 +54,9 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     public String getStyle() {
         SOAPBinding sb = getServiceClass().getAnnotation(SOAPBinding.class);
         if (sb != null) {
-            if (sb.style().equals(Style.DOCUMENT)) {
+            if (sb.style() == Style.DOCUMENT) {
                 return "document";
-            } else if (sb.style().equals(Style.RPC)) {
+            } else if (sb.style() == Style.RPC) {
                 return "rpc";
             }
         }
@@ -76,9 +76,9 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     public String getUse() {
         SOAPBinding sb = getServiceClass().getAnnotation(SOAPBinding.class);
         if (sb != null) {
-            if (sb.use().equals(Use.LITERAL)) {
+            if (sb.use() == Use.LITERAL) {
                 return "literal";
-            } else if (sb.use().equals(Use.ENCODED)) {
+            } else if (sb.use() == Use.ENCODED) {
                 return "encoded";
             }
         }

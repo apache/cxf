@@ -21,6 +21,7 @@ package org.apache.cxf.clustering;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.cxf.clustering.FailoverTargetSelector.InvocationContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -168,6 +169,45 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
                                  invocation.getAlternateEndpoints());
         }
         return failoverTarget;
+    }
+    
+    // Some conduits may replace the endpoint address after it has already been prepared
+    // but before the invocation has been done (ex, org.apache.cxf.clustering.LoadDistributorTargetSelector)
+    // which may affect JAX-RS clients where actual endpoint address property may include additional path
+    // segments.
+    protected boolean replaceEndpointAddressPropertyIfNeeded(Message message,
+                                                             String endpointAddress,
+                                                             Conduit cond) {
+        String requestURI = (String)message.get(Message.REQUEST_URI);
+        if (requestURI != null && endpointAddress != null && !requestURI.equals(endpointAddress)) {
+            String basePath = (String)message.get(Message.BASE_PATH);
+            if (basePath.startsWith(endpointAddress)) {
+                endpointAddress = basePath;
+            }
+            if (basePath != null && requestURI.startsWith(basePath)) {
+                String pathInfo = requestURI.substring(basePath.length());
+                message.put(Message.BASE_PATH, endpointAddress);
+                final String slash = "/";
+                boolean startsWithSlash = pathInfo.startsWith(slash);
+                if (endpointAddress.endsWith(slash)) {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo.substring(1) : pathInfo);
+                } else {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo : (slash + pathInfo));
+                }
+                message.put(Message.ENDPOINT_ADDRESS, endpointAddress);
+                message.put(Message.REQUEST_URI, endpointAddress);
+
+                Exchange exchange = message.getExchange();
+                String key = String.valueOf(System.identityHashCode(exchange));
+                InvocationContext invocation = getInvocationContext(key);
+                if (invocation != null) {
+                    overrideAddressProperty(invocation.getContext(),
+                                            cond.getTarget().getAddress().getValue());
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

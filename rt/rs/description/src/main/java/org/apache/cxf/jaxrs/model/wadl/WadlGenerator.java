@@ -153,6 +153,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private static final String JAXB_DEFAULT_NAME = "##default";
     private static final String CLASSPATH_PREFIX = "classpath:";
     private static final String DEFAULT_NS_PREFIX = "prefix";
+    private static final MediaType DEFAULT_REP_MEDIA_TYPE = MediaType.WILDCARD_TYPE;
     private static final Map<ParameterType, Class<? extends Annotation>> PARAMETER_TYPE_MAP;
     static {
         PARAMETER_TYPE_MAP = new EnumMap<>(ParameterType.class);
@@ -195,7 +196,6 @@ public class WadlGenerator implements ContainerRequestFilter {
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultWadlResponseMediaType = MediaType.APPLICATION_XML_TYPE;
-    private final MediaType defaultRepMediaType = MediaType.WILDCARD_TYPE;
     private String stylesheetReference;
     private boolean applyStylesheetLocally;
     private Bus bus;
@@ -600,7 +600,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     // CHECKSTYLE:OFF
-    protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes, //NOPMD
+    @SuppressWarnings("PMD.ExcessiveParameterList")
+    protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
                                       OperationResourceInfo ori, Map<Parameter, Object> classParams,
                                       OperationResourceInfo nextOp, boolean resourceTagOpened,
@@ -1075,7 +1076,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (MultivaluedMap.class.isAssignableFrom(type)) {
             types = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
         } else if (isWildcard(types)) {
-            types = Collections.singletonList(defaultRepMediaType);
+            types = Collections.singletonList(DEFAULT_REP_MEDIA_TYPE);
         }
 
         Method opMethod = getMethod(ori);

@@ -60,7 +60,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
 
     public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
 
-        this (store, true, readOnly, caseInsensitive);
+        this(store, true, readOnly, caseInsensitive);
 
     }
 

@@ -149,7 +149,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-        if (am != null && !am.equals(accessTokenV.getTokenSubject().getAuthenticationMethod())) {
+        if (am != null && am != accessTokenV.getTokenSubject().getAuthenticationMethod()) {
             String message = "The token has been authorized by the resource owner "
                 + "using an unsupported authentication method";
             LOG.warning(message);
@@ -204,14 +204,14 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         String servletPath = request.getServletPath();
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null) {
+        if (StringUtils.isEmpty(pathInfo)) {
             if (servletPath != null) {
                 servletPath += "";
             }
         } else {
             servletPath += pathInfo;
         }
-        if (servletPath == null) {
+        if (StringUtils.isEmpty(servletPath)) {
             servletPath = (String)m.get(Message.PATH_INFO);
         }
         boolean foundValidScope = false;

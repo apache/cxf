@@ -27,7 +27,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSaml1Port" createdFromAPI="true">
@@ -165,7 +165,7 @@
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:trustManagers>
-            <sec:keyManagers keyPassword="ckpass">
+            <sec:keyManagers keyPassword="cspass">
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
         </http:tlsClientParameters>

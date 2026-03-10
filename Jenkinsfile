@@ -15,7 +15,7 @@ pipeline {
   stages {
     stage('Prepare') {
       agent {
-        label 'ubuntu  && !builds55 && !builds56 && !builds57 && !builds58 && !builds59 && !builds60'
+        label 'ubuntu'
       }
       stages {
         stage('Clean up') {
@@ -28,18 +28,18 @@ pipeline {
     stage('Build') {
       matrix {
         agent {
-          label 'ubuntu && !builds55 && !builds56 && !builds57 && !builds58 && !builds59 && !builds60'
+          label 'ubuntu'
         }
         axes {
           axis {
             name 'JAVA_VERSION'
-            values 'jdk_17_latest', 'jdk_21_latest'
+            values 'jdk_17_latest', 'jdk_21_latest', 'jdk_25_latest'
           }
         }
         stages {
           stage('JDK specific build') {
             agent {
-              label 'ubuntu && !builds55 && !builds56 && !builds57 && !builds58 && !builds59 && !builds60'
+              label 'ubuntu'
             }
             tools {
               jdk "${JAVA_VERSION}"

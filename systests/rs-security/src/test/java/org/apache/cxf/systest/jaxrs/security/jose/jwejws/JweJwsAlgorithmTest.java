@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -67,7 +65,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -96,7 +93,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -133,7 +129,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -161,7 +156,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -192,7 +186,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -224,7 +217,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -256,7 +248,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwesmallkey/bookstore/books";
@@ -288,12 +279,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
-
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
         WebClient client =
-            WebClient.create(address, providers, busFile.toString());
+            WebClient.create(address, List.of(), busFile.toString());
         client.type("application/json").accept("application/json");
 
         Map<String, Object> properties = new HashMap<>();
@@ -343,7 +331,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
@@ -372,7 +359,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwepbes/bookstore/books";
@@ -407,7 +393,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -436,7 +421,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -468,7 +452,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -496,7 +479,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -525,7 +507,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
@@ -552,7 +533,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsec/bookstore/books";
@@ -583,12 +563,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
-
         String address = "http://localhost:" + PORT + "/jws/bookstore/books";
         WebClient client =
-            WebClient.create(address, providers, busFile.toString());
+            WebClient.create(address, List.of(), busFile.toString());
         client.type("application/json").accept("application/json");
 
         Map<String, Object> properties = new HashMap<>();
@@ -640,7 +617,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwssmallkey/bookstore/books";
@@ -668,7 +644,6 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         JwsWriterInterceptor writerInterceptor = new JwsWriterInterceptor();
         writerInterceptor.setSignatureProvider(new NoneJwsSignatureProvider());
         providers.add(writerInterceptor);

@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -91,18 +91,18 @@
     </profiles>
     <dependencies>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
+            <groupId>org.apache.artemis</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

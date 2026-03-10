@@ -18,13 +18,11 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing.brave;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import brave.Tracing;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.systest.brave.TestSpanReporter;
+import org.apache.cxf.systest.brave.TestSpanHandler;
 import org.apache.cxf.systest.brave.jaxrs.AbstractBraveTracingTest;
 import org.apache.cxf.systest.jaxrs.tracing.BookStore;
 import org.apache.cxf.systest.jaxrs.tracing.NullPointerExceptionMapper;
@@ -33,6 +31,7 @@ import org.apache.cxf.tracing.brave.BraveClientFeature;
 import org.apache.cxf.tracing.brave.TraceScope;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 import org.apache.cxf.tracing.brave.jaxrs.BraveFeature;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.BeforeClass;
 
@@ -48,7 +47,7 @@ public class BraveTracingTest extends AbstractBraveTracingTest {
         protected void run() {
             final Tracing brave = Tracing
                     .newBuilder()
-                    .spanReporter(new TestSpanReporter())
+                    .addSpanHandler(new TestSpanHandler())
                     .build();
 
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();

@@ -29,7 +29,7 @@
         http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <wsa:addressing/>
         </cxf:features>
     </cxf:bus>

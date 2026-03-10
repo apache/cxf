@@ -142,8 +142,8 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
 
     public void setSchema(XmlSchema schema) {
         this.schema = schema;
-        isElementQualified = schema.getElementFormDefault().equals(XmlSchemaForm.QUALIFIED);
-        isAttributeQualified = schema.getAttributeFormDefault().equals(XmlSchemaForm.QUALIFIED);
+        isElementQualified = schema.getElementFormDefault() == XmlSchemaForm.QUALIFIED;
+        isAttributeQualified = schema.getAttributeFormDefault() == XmlSchemaForm.QUALIFIED;
     }
 
     public String getSystemId() {

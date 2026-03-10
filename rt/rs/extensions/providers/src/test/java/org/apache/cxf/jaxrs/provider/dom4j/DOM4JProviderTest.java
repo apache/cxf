@@ -28,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.Providers;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -190,7 +192,10 @@ public class DOM4JProviderTest {
         org.dom4j.Document dom = readXML(MediaType.APPLICATION_XML_TYPE, "<root><a>1</a></root>");
         DOM4JProvider p = new DOM4JProvider();
 
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+        final Bus bus = new ExtensionManagerBus();
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
+        ProviderFactory factory = ServerProviderFactory.createInstance(bus);
         JSONProvider<Object> provider = new JSONProvider<>();
         provider.setSerializeAsArray(true);
         provider.setDropRootElement(true);
@@ -208,7 +213,11 @@ public class DOM4JProviderTest {
     }
 
     private Message createMessage(boolean suppress) {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+        final Bus bus = new ExtensionManagerBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
+        ProviderFactory factory = ServerProviderFactory.createInstance(bus);
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
@@ -227,7 +236,11 @@ public class DOM4JProviderTest {
     }
 
     private Message createMessageWithJSONProvider() {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+        final Bus bus = new ExtensionManagerBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
+
+        ProviderFactory factory = ServerProviderFactory.createInstance(bus);
         JSONProvider<Object> provider = new JSONProvider<>();
         provider.setDropRootElement(true);
         provider.setIgnoreNamespaces(true);

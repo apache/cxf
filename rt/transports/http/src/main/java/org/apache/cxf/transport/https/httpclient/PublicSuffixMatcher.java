@@ -96,7 +96,7 @@ public final class PublicSuffixMatcher {
         if (domainType == null) {
             return false;
         }
-        return expectedType == null || domainType.equals(expectedType);
+        return expectedType == null || domainType == expectedType;
     }
 
     private boolean hasRule(final String rule, final DomainType expectedType) {

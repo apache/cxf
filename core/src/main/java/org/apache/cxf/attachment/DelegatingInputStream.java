@@ -29,13 +29,18 @@ import org.apache.cxf.io.Transferable;
 
 public class DelegatingInputStream extends InputStream implements Transferable {
     private InputStream is;
-    private AttachmentDeserializer deserializer;
+    private CloseableAttachmentDeserializer deserializer;
     private boolean isClosed;
 
     DelegatingInputStream(InputStream is, AttachmentDeserializer ads) {
+        this(is, ads::markClosed);
+    }
+
+    DelegatingInputStream(InputStream is, CloseableAttachmentDeserializer ads) {
         this.is = is;
         deserializer = ads;
     }
+
     DelegatingInputStream(InputStream is) {
         this.is = is;
         deserializer = null;

@@ -61,7 +61,13 @@ public class MicrometerMetricsProvider implements MetricsProvider {
      */
     @Override
     public MetricsContext createEndpointContext(Endpoint endpoint, boolean asClient, String clientId) {
-        return null;
+        if (asClient) {
+            return null;
+        } else {
+            return new MicrometerServerMetricsContext(registry, tagsProvider, timedAnnotationProvider, tagsCustomizers,
+                micrometerMetricsProperties.getServerRequestsMetricName(), 
+                micrometerMetricsProperties.isAutoTimeRequests());
+        }
     }
 
     /**

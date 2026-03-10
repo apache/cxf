@@ -28,16 +28,6 @@ import static org.junit.Assert.assertTrue;
 public class StringUtilsTest {
 
     @Test
-    public void testDiff() throws Exception {
-        String str1 = "http://local/SoapContext/SoapPort/greetMe/me/CXF";
-        String str2 = "http://local/SoapContext/SoapPort";
-        String str3 = "http://local/SoapContext/SoapPort/";
-        assertEquals("/greetMe/me/CXF", StringUtils.diff(str1, str2));
-        assertEquals("greetMe/me/CXF", StringUtils.diff(str1, str3));
-        assertEquals("http://local/SoapContext/SoapPort/", StringUtils.diff(str3, str1));
-    }
-
-    @Test
     public void testGetFirstFound() throws Exception {
         String regex = "velocity-\\d+\\.\\d+\\.jar";
 

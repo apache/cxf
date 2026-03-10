@@ -56,11 +56,30 @@ public class MaskSensitiveHelperTest {
     private static final String MASKED_LOGGING_CONTENT_XML_WITH_ATTRIBUTE =
             "<user>testUser</user><password myAttribute=\"test\">XXX</password>";
 
+    private static final String SENSITIVE_LOGGING_CONTENT_XML_WITH_MULTILINE =
+        "<user>testUser</user><password>my \nsecret \npassword</password>";
+    private static final String MASKED_LOGGING_CONTENT_XML_WITH_MULTILINE =
+        "<user>testUser</user><password>XXX</password>";
+
+    private static final String SENSITIVE_LOGGING_CONTENT_XML_WITH_WRAPPER =
+        "<passwords><password>my secret password</password></passwords>";
+    private static final String MASKED_LOGGING_CONTENT_XML_WITH_WITH_WRAPPER =
+        "<passwords><password>XXX</password></passwords>";
+
+    private static final String SENSITIVE_LOGGING_XML_EMPTY_TAG_REPEATED =
+       "<user1><password/></user1><user2><password>VALUE</password></user2>";
+    private static final String MASKED_LOGGING_XML_EMPTY_TAG_REPEATED =
+        "<user1><password/></user1><user2><password>XXX</password></user2>";
+
     private static final String SENSITIVE_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"my secret password\"";
     private static final String MASKED_LOGGING_CONTENT_JSON =
             "\"user\":\"testUser\", \"password\": \"XXX\"";
 
+    private static final String SENSITIVE_LOGGING_CONTENT_JSON_ARRAY =
+            "\"user\":\"testUser\", \"password\": [\"G\",\"e\",\"h\",\"e\",\"i\",\"m\",\"1\",\"2\",\"3\",\"!\"]";
+    private static final String MASKED_LOGGING_CONTENT_JSON_ARRAY =
+            "\"user\":\"testUser\", \"password\": [\"X\",\"X\",\"X\"]";
     private static final String SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML =
         "<item><user>testUser1</user><password myAttribute=\"test\">my secret password 1</password></item>"
             + "<item><user>testUser2</user><password>my secret password 2</password></item>";
@@ -73,6 +92,23 @@ public class MaskSensitiveHelperTest {
 
     private static final String MASKED_LOGGING_CONTENT_XML_WITH_NAMESPACE =
             "<ns:user>testUser</ns:user><ns:password>XXX</ns:password>";
+    
+    // attributes with slash characters are supported
+    private static final String SENSITIVE_XML_WITH_NS_URI = "<root xmlns:x=\"http://a/b/c\">"
+            + "<x:password alg=\"http://algo/sha-256\">secret</x:password>"
+                                                            + "</root>";
+    private static final String MASKED_XML_WITH_NS_URI = "<root xmlns:x=\"http://a/b/c\">"
+                                                         + "<x:password alg=\"http://algo/sha-256\">XXX</x:password>"
+                                                         + "</root>";
+
+    // plain attribute value containing slashes
+    private static final String SENSITIVE_XML_WITH_ATTR_URL = "<root><password href=\"https://example.com/path\">"
+        + "secret</password></root>";
+    private static final String MASKED_XML_WITH_ATTR_URL = "<root><password href=\"https://example.com/path\">"
+        + "XXX</password></root>";
+
+    // Self-closing element
+    private static final String SELF_CLOSING_UNCHANGED = "<root><password/></root>";
 
     private static final Set<String> SENSITIVE_ELEMENTS = new HashSet<>(Arrays.asList("password"));
     private static final String APPLICATION_XML = "application/xml";
@@ -93,9 +129,16 @@ public class MaskSensitiveHelperTest {
         return Arrays.asList(new Object[][] {
             {SENSITIVE_LOGGING_CONTENT_XML, MASKED_LOGGING_CONTENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, MASKED_LOGGING_CONTENT_XML_WITH_ATTRIBUTE, APPLICATION_XML},
+            {SENSITIVE_LOGGING_CONTENT_XML_WITH_MULTILINE, MASKED_LOGGING_CONTENT_XML_WITH_MULTILINE, APPLICATION_XML},
+            {SENSITIVE_LOGGING_CONTENT_XML_WITH_WRAPPER, MASKED_LOGGING_CONTENT_XML_WITH_WITH_WRAPPER, APPLICATION_XML},
+            {SENSITIVE_LOGGING_XML_EMPTY_TAG_REPEATED, MASKED_LOGGING_XML_EMPTY_TAG_REPEATED, APPLICATION_XML},
             {SENSITIVE_LOGGING_MULTIPLE_ELEMENT_XML, MASKED_LOGGING_MULTIPLE_ELEMENT_XML, APPLICATION_XML},
             {SENSITIVE_LOGGING_CONTENT_XML_WITH_NAMESPACE, MASKED_LOGGING_CONTENT_XML_WITH_NAMESPACE, APPLICATION_XML},
-            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON}
+            {SENSITIVE_LOGGING_CONTENT_JSON, MASKED_LOGGING_CONTENT_JSON, APPLICATION_JSON},
+            {SENSITIVE_LOGGING_CONTENT_JSON_ARRAY, MASKED_LOGGING_CONTENT_JSON_ARRAY, APPLICATION_JSON},
+            {SENSITIVE_XML_WITH_NS_URI, MASKED_XML_WITH_NS_URI, APPLICATION_XML },
+            {SENSITIVE_XML_WITH_ATTR_URL, MASKED_XML_WITH_ATTR_URL, APPLICATION_XML },
+            {SELF_CLOSING_UNCHANGED, SELF_CLOSING_UNCHANGED, APPLICATION_XML },
         });
     }
 

@@ -32,9 +32,9 @@ public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
 
     private String name;
-    private String address;
+    private String[] addresses;
     private URL configFileURL;
-    private EndpointImpl ep;
+    private EndpointImpl[] eps;
 
     public Server(String[] args) throws Exception {
         this(args[0], args[1], args[2]);
@@ -42,17 +42,17 @@ public class Server extends AbstractBusTestServerBase {
 
     public Server(String n, String addr, String conf) throws Exception {
         name = n;
-        address = addr;
+        addresses = addr.split(",");
         configFileURL = new URL(conf);
-        //System.out.println("Starting " + name
-        //                     + " Server at " + address
-        //                     + " with config " + configFileURL);
-
     }
+
     public void tearDown() throws Exception {
-        if (ep != null) {
-            ep.stop();
-            ep = null;
+        if (eps != null) {
+            for (EndpointImpl ep: eps) {
+                if (ep != null) {
+                    ep.stop();
+                }
+            }
         }
     }
 
@@ -73,17 +73,21 @@ public class Server extends AbstractBusTestServerBase {
         // to match the WSDL file that we are using.
         Object implementor = new GreeterImpl(name);
 
-        // I don't know why this works.
-        ep =
-            new EndpointImpl(
-                    getBus(),
-                    implementor,
-                    nullBindingID,
-                    this.getClass().getResource("greeting.wsdl").toString());
-        // How the hell do I know what the name of the
-        // http-destination is from using this call?
-        ep.setEndpointName(new QName("http://apache.org/hello_world", name));
-        ep.publish(address);
+        eps = new EndpointImpl[addresses.length];
+        for (int i = 0; i < addresses.length; ++i) {
+            // I don't know why this works.
+            final EndpointImpl ep =
+                new EndpointImpl(
+                        getBus(),
+                        implementor,
+                        nullBindingID,
+                        this.getClass().getResource("greeting.wsdl").toString());
+            // How the hell do I know what the name of the
+            // http-destination is from using this call?
+            ep.setEndpointName(new QName("http://apache.org/hello_world", name));
+            ep.publish(addresses[i]);
+            eps[i] = ep;
+        }
     }
 
 

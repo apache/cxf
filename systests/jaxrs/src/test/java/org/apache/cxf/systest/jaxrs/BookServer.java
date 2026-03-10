@@ -64,6 +64,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -90,6 +91,8 @@ public class BookServer extends AbstractServerTestServerBase {
     @Override
     protected Server createServer(Bus bus) throws Exception {
         bus.setProperty(ExceptionMapper.class.getName(), new BusMapperExceptionMapper());
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class, BookStoreRegex.class);

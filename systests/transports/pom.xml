@@ -21,7 +21,7 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -32,6 +32,7 @@
     <url>https://cxf.apache.org</url>
     <properties>
         <cxf.surefire.fork.vmargs>-Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
+        <cxf.surefire.fork.vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED -Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
         <cxf.module.name>org.apache.cxf.systests.transport</cxf.module.name>
     </properties>
     <build>
@@ -84,6 +85,31 @@
                                     <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>forceURLConnection-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>true</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.cxf.transport.http.forceURLConnection>false</org.apache.cxf.transport.http.forceURLConnection>
+                            </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
@@ -147,12 +173,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-servlet</artifactId>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -272,6 +298,10 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -323,7 +353,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.littleshoot</groupId>
+            <groupId>io.github.littleproxy</groupId>
             <artifactId>littleproxy</artifactId>
             <scope>test</scope>
         </dependency>
@@ -333,9 +363,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${cxf.junit6.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${cxf.junit5.version}</version>
+            <version>${cxf.junit6.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -367,20 +403,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>tools.jackson.jakarta.rs</groupId>
+            <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jdk16</id>
-            <activation>
-                <jdk>[16,)</jdk>
-            </activation>
-            <properties>
-                <cxf.surefire.fork.vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED -Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
-            </properties>
-        </profile>
-    </profiles>
 </project>

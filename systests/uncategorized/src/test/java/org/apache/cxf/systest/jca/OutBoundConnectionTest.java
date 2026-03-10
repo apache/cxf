@@ -27,7 +27,6 @@ import javax.xml.namespace.QName;
 import jakarta.resource.spi.ManagedConnection;
 import jakarta.resource.spi.ManagedConnectionFactory;
 import jakarta.xml.ws.Endpoint;
-import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.CXFConnectionRequestInfo;
@@ -44,7 +43,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
@@ -89,7 +87,6 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @org.junit.Ignore
     public void testBasicConnection() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
@@ -108,19 +105,14 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
         Object o = mc.getConnection(subject, cri);
 
         // test for the Object hash()
-        try {
-            o.hashCode();
-            o.toString();
-        } catch (WebServiceException ex) {
-            fail("The connection object should support Object method");
-        }
+        assertNotNull(o.hashCode());
+        assertNotNull(o.toString());
 
         verifyResult(o);
     }
 
 
     @Test
-    @org.junit.Ignore
     public void testGetConnectionFromSEI() throws Exception {
         CXFConnectionRequestInfo requestInfo = new CXFConnectionRequestInfo();
         requestInfo.setInterface(Greeter.class);

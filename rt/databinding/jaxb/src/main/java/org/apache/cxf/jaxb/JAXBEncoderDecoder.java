@@ -413,7 +413,7 @@ public final class JAXBEncoderDecoder {
             }
 
             XmlAccessorOrder xmlAccessorOrder = cls.getAnnotation(XmlAccessorOrder.class);
-            if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)) {
+            if (xmlAccessorOrder != null && xmlAccessorOrder.value() == XmlAccessOrder.ALPHABETICAL) {
                 Collections.sort(combinedMembers, new Comparator<Member>() {
                     public int compare(Member m1, Member m2) {
                         return m1.getName().compareTo(m2.getName());

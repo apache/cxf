@@ -53,6 +53,7 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.jsse.SSLContextServerParameters;
 import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
@@ -61,13 +62,13 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.http.HttpServerEngineSupport;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHandler.Default404Servlet;
-import org.eclipse.jetty.ee10.servlet.ServletHandler.MappedServlet;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
-import org.eclipse.jetty.ee10.servlet.ServletMapping;
-import org.eclipse.jetty.ee10.servlet.SessionHandler;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.servlet.ServletHandler;
+import org.eclipse.jetty.ee11.servlet.ServletHandler.Default404Servlet;
+import org.eclipse.jetty.ee11.servlet.ServletHandler.MappedServlet;
+import org.eclipse.jetty.ee11.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.servlet.ServletMapping;
+import org.eclipse.jetty.ee11.servlet.SessionHandler;
 import org.eclipse.jetty.http.BadMessageException;
 import org.eclipse.jetty.http.HttpFields.Mutable;
 import org.eclipse.jetty.http.HttpStatus;
@@ -536,7 +537,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                                                                                ex.getMessage()
                 });
             }
-            if (servlet != null && servlet instanceof JettyHTTPHandler && servletHolder.isStarted()) {
+            if (servlet instanceof JettyHTTPHandler && servletHolder.isStarted()) {
                 try {
 
                     // the servlet exist with the same path
@@ -854,6 +855,11 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
         return result;
     }
     protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
+        // The full SSL context is provided by SSLContextServerParameters
+        if (tlsServerParameters instanceof SSLContextServerParameters sslContextServerParameters) {
+            return sslContextServerParameters.getSslContext();
+        }
+
         String proto = tlsServerParameters.getSecureSocketProtocol() == null
             ? "TLS" : tlsServerParameters.getSecureSocketProtocol();
 
@@ -1072,7 +1078,7 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                         });
                         continue;
                     }
-                    if (servlet != null && servlet instanceof JettyHTTPHandler
+                    if (servlet instanceof JettyHTTPHandler
                         && (contextName.equals(contextHandler.getContextPath())
                             || (StringUtils.isEmpty(contextName)
                                 && "/".equals(contextHandler.getContextPath())))
@@ -1399,15 +1405,15 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
 
                         switch (type) {
                         case TEXT_HTML:
-                            writeErrorHtml(request, writer, charset, code, message, cause, showStacks);
+                            writeErrorHtml(request, writer, charset, code, message, cause);
                             break;
                         case TEXT_JSON:
                             
                         case APPLICATION_JSON:
-                            writeErrorJson(request, writer, code, message, cause, showStacks);
+                            writeErrorJson(request, writer, code, message, cause);
                             break;
                         case TEXT_PLAIN:
-                            writeErrorPlain(request, writer, code, message, cause, showStacks);
+                            writeErrorPlain(request, writer, code, message, cause);
                             break;
                         default:
                             throw new IllegalStateException();

@@ -40,7 +40,7 @@ public class SpringBeanFactory implements Factory, ApplicationContextAware {
     public SpringBeanFactory(String name) {
         beanName = name;
     }
-    public SpringBeanFactory(Class<?> c, String[] args) {       //NOPMD
+    public SpringBeanFactory(Class<?> c, String[] args) {
         beanName = args[0];
     }
 

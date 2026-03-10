@@ -35,6 +35,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
@@ -89,7 +90,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
 
     private static final Logger LOG = LogUtils.getL7dLogger(AsyncHTTPConduitFactory.class);
-
+    
+    
     public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
 
@@ -149,10 +151,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
     private int ioThreadCount = IOReactorConfig.DEFAULT.getIoThreadCount();
     private long selectInterval = IOReactorConfig.DEFAULT.getSelectInterval().toMilliseconds();
-    private int soLinger = IOReactorConfig.DEFAULT.getSoLinger().toMillisecondsIntBound();
+    private TimeValue soLinger = IOReactorConfig.DEFAULT.getSoLinger();
     private int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout().toMillisecondsIntBound();
-    private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
+    private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepAlive();
     private boolean tcpNoDelay = true;
+
 
     AsyncHTTPConduitFactory() {
         super();
@@ -220,11 +223,13 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         selectInterval = getInt(s.get(SELECT_INTERVAL), 1000);
         changed |= l != selectInterval;
 
-        i = soLinger;
-        soLinger = getInt(s.get(SO_LINGER), -1);
-        changed |= i != soLinger;
+        i = soLinger.toSecondsIntBound();
+        // SO_LINGER timeout is set in seconds 
+        soLinger = TimeValue.ofSeconds(getInt(s.get(SO_LINGER), -1));
+        changed |= i != soLinger.toSecondsIntBound();
 
         i = soTimeout;
+        // SO_TIMEOUT timeout is set in milliseconds
         soTimeout = getInt(s.get(SO_TIMEOUT), 0);
         changed |= i != soTimeout;
 
@@ -276,7 +281,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         if (isShutdown) {
             return null;
         }
-        return new AsyncHTTPConduit(bus, localInfo, target, this);
+        if (HTTPTransportFactory.isForceURLConnectionConduit()) {
+            return new URLConnectionAsyncHTTPConduit(bus, localInfo, target, this);
+        } else {
+            return new AsyncHTTPConduit(bus, localInfo, target, this);
+        }
     }
 
     public void shutdown() {
@@ -331,7 +340,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         final IOReactorConfig config = IOReactorConfig.custom()
             .setIoThreadCount(ioThreadCount)
             .setSelectInterval(TimeValue.ofMilliseconds(selectInterval))
-            .setSoLinger(TimeValue.ofMilliseconds(soLinger))
+            .setSoLinger(soLinger)
             .setSoTimeout(Timeout.ofMilliseconds(soTimeout))
             .setSoKeepAlive(soKeepalive)
             .setTcpNoDelay(tcpNoDelay)
@@ -339,7 +348,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
         
         final Lookup<TlsStrategy> tlsLookupStrategy = RegistryBuilder.<TlsStrategy>create()
-            .register("https", (tlsStrategy != null) ? tlsStrategy : DefaultClientTlsStrategy.getSystemDefault())
+            .register("https", (tlsStrategy != null) ? tlsStrategy : DefaultClientTlsStrategy.createSystemDefault())
             .build();
 
         final PoolingAsyncClientConnectionManager connectionManager = new PoolingAsyncClientConnectionManager(
@@ -399,7 +408,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
     }
 
-    public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c, final TlsStrategy tlsStrategy) 
+    public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c, final TlsStrategy tlsStrategy) 
             throws IOException {
 
         return clients

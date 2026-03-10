@@ -36,7 +36,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,7 @@ import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 public final class JwkUtils {
     private static final Map<KeyType, List<String>> JWK_REQUIRED_FIELDS_MAP;
     static {
-        JWK_REQUIRED_FIELDS_MAP = new HashMap<>();
+        JWK_REQUIRED_FIELDS_MAP = new EnumMap<>(KeyType.class);
         JWK_REQUIRED_FIELDS_MAP.put(KeyType.RSA, Arrays.asList(
             JsonWebKey.RSA_PUBLIC_EXP, JsonWebKey.KEY_TYPE, JsonWebKey.RSA_MODULUS));
         JWK_REQUIRED_FIELDS_MAP.put(KeyType.EC, Arrays.asList(
@@ -565,7 +565,7 @@ public final class JwkUtils {
     }
 
     public static void includeCertChain(JsonWebKey jwk, JoseHeaders headers, String algo) {
-        if (KeyType.RSA.equals(jwk.getKeyType())) {
+        if (KeyType.RSA == jwk.getKeyType()) {
             List<String> chain = CastUtils.cast((List<?>)jwk.getProperty(JsonWebKey.X509_CHAIN));
             if (chain != null) {
                 headers.setX509Chain(chain);
@@ -574,7 +574,7 @@ public final class JwkUtils {
     }
 
     public static void includePublicKey(JsonWebKey jwk, JoseHeaders headers, String algo) {
-        if (KeyType.RSA.equals(jwk.getKeyType())) {
+        if (KeyType.RSA == jwk.getKeyType()) {
             JsonWebKey jwkPublic = JwkUtils.fromRSAPublicKey(JwkUtils.toRSAPublicKey(jwk), algo);
             if (jwk.getKeyId() != null) {
                 jwkPublic.setKeyId(jwk.getKeyId());

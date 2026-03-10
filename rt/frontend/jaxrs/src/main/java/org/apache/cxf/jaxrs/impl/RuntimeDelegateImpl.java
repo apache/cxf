@@ -19,12 +19,16 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -46,6 +50,8 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.Variant.VariantListBuilder;
 import jakarta.ws.rs.ext.RuntimeDelegate;
+import org.apache.cxf.Bus;
+import org.apache.cxf.configuration.jsse.SSLContextServerParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.endpoint.Server;
@@ -53,8 +59,13 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.bootstrap.ConfigurationBuilderImpl;
 import org.apache.cxf.jaxrs.bootstrap.InstanceImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.transport.http.HTTPServerEngineFactoryParametersProvider;
 
 public class RuntimeDelegateImpl extends RuntimeDelegate {
+     // The default value is implementation specific, using non-priviledged default ports
+    private static final int DEFAULT_HTTP_PORT = 8080;
+    private static final int DEFAULT_HTTPS_PORT = 8443;
+
     protected Map<Class<?>, HeaderDelegate<?>> headerProviders = new HashMap<>();
 
     public RuntimeDelegateImpl() {
@@ -144,13 +155,42 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public CompletionStage<Instance> bootstrap(Application application, Configuration configuration) {
         final JAXRSServerFactoryBean factory = ResourceUtils.createApplication(application, false, false, false, null);
-        final URI address = configuration.baseUriBuilder().path(factory.getAddress()).build();
+
+        Configuration.Builder instanceConfigurationBuilder = Configuration.builder().from(configuration);
+        if (!configuration.hasProperty(Configuration.HOST)) { // The default value is "localhost"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.host("localhost");
+        }
+
+        String protocol = "HTTP";
+        if (!configuration.hasProperty(Configuration.PROTOCOL)) { // The default value is "HTTP"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.protocol(protocol);
+        } else if (configuration.property(Configuration.PROTOCOL) instanceof String p) {
+            protocol = p;
+        }
+
+        if (!configuration.hasProperty(Configuration.PORT)) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(getDefaultPort(protocol));
+        } else if (configuration.port() == Configuration.FREE_PORT) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(findFreePort()); /* free port */
+        } else if (configuration.port() == Configuration.DEFAULT_PORT) {
+            instanceConfigurationBuilder = instanceConfigurationBuilder.port(getDefaultPort(protocol)); 
+        }
+
+        if (!configuration.hasProperty(Configuration.ROOT_PATH)) { // The default value is "/"
+            instanceConfigurationBuilder = instanceConfigurationBuilder.rootPath("/");
+        }
+
+        final Configuration instanceConfiguration = instanceConfigurationBuilder.build();
+        final URI address = instanceConfiguration.baseUriBuilder().path(factory.getAddress()).build();
         factory.setAddress(address.toString());
         factory.setStart(true);
         
         if ("https".equalsIgnoreCase(configuration.protocol())) {
-            final TLSServerParameters parameters = new TLSServerParameters();
+            final SSLContext sslContext = configuration.sslContext();
 
+            final TLSServerParameters parameters = (sslContext != null) 
+                ? new SSLContextServerParameters(sslContext) : new TLSServerParameters();
+ 
             final SSLClientAuthentication sslClientAuthentication = configuration.sslClientAuthentication();
             if (sslClientAuthentication != null) {
                 final ClientAuthentication clientAuthentication = new ClientAuthentication();
@@ -164,19 +204,25 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
                 parameters.setClientAuthentication(clientAuthentication);
             }
 
-            final SSLContext sslContext = configuration.sslContext();
-            if (sslContext != null) {
-                parameters.setSecureSocketProtocol(sslContext.getProtocol());
-            }
-
-            // TODO: Support SSL context propagation down to HTTP engine
+            factory.getBus().setExtension(new HTTPServerEngineFactoryParametersProvider() {
+                @Override
+                public Optional<TLSServerParameters> getDefaultTlsServerParameters(Bus bus, String host,
+                        int port, String protocol, String id) {
+                    if ("https".equalsIgnoreCase(protocol) && port == instanceConfiguration.port()) {
+                        return Optional.of(parameters);
+                    } else {
+                        return Optional.empty();
+                    }
+                }
+            }, HTTPServerEngineFactoryParametersProvider.class);
         }
 
         return CompletableFuture
             .supplyAsync(() -> factory.create())
-            .thenApply(s -> new InstanceImpl(s, configuration));
+            .thenApply(s -> new InstanceImpl(s, instanceConfiguration));
     }
 
+    @SuppressWarnings({ "removal", "deprecation" })
     @Override
     public CompletionStage<Instance> bootstrap(Class<? extends Application> clazz, Configuration configuration) {
         try {
@@ -197,5 +243,20 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     @Override
     public EntityPart.Builder createEntityPartBuilder(String partName) throws IllegalArgumentException {
         return new EntityPartBuilderImpl(partName);
+    }
+    
+    private static int getDefaultPort(String protocol) {
+        return (protocol.equalsIgnoreCase("http")) ? DEFAULT_HTTP_PORT : DEFAULT_HTTPS_PORT;
+    }
+
+    @SuppressWarnings({ "removal", "deprecation" })
+    private static int findFreePort() {
+        return AccessController.doPrivileged((PrivilegedAction<Integer>) () -> {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                return socket.getLocalPort();
+            } catch (final IOException e) {
+                return -1;
+            }
+        });
     }
 }

@@ -77,7 +77,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
         List<ArgType> params = new ArrayList<>();
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
-            if (!param.getMode().equals(ModeType.OUT)) {
+            if (param.getMode() != ModeType.OUT) {
                 params.add(param);
             }
         }
@@ -100,7 +100,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
-            if (!param.getMode().equals(ModeType.IN)) {
+            if (param.getMode() != ModeType.IN) {
                 params.add(param);
             }
         }

@@ -35,12 +35,13 @@ import java.util.List;
 public final class Client extends TestCaseBase<WebClient> {
 
     private static final String CLIENT_CONFIG_FILE = "ClientConfig.xml";
-    private static final String BASE_SERVICE_URL =
-        "https://localhost:9000/customerservice/customers";
+    private static final String BASE_SERVICE_URL = ":9000/customerservice/customers";
 
     private int opid;
 
     private String inputString = new String();
+    private String host = "localhost";
+    private String protocol = "https";
     private final int asciiCount = 1024;
 
     public Client(String[] args, boolean warmup) {
@@ -54,6 +55,15 @@ public final class Client extends TestCaseBase<WebClient> {
         packetSize = 1;
         usingTime = true;
         numberOfThreads = 4;
+        for (int x = 0; x < args.length; x++) {
+            if ("-host".equals(args[x])) {
+                host = args[x + 1];
+                x++;
+            } else if ("-protocol".equals(args[x])) {
+                protocol = args[x + 1];
+                x++;
+            }
+        }
     }
 
     @Override
@@ -73,8 +83,9 @@ public final class Client extends TestCaseBase<WebClient> {
             switch (opid) {
                 case 0:
                     //GET
-                    Response respGet = webClient.get();
-                    Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
+                    try (Response respGet = webClient.get()) {
+                        Asserts.check(respGet.getStatus() == 200, "Get should have been OK");
+                    }
                     break;
                 case 1:
                     //POST
@@ -116,9 +127,9 @@ public final class Client extends TestCaseBase<WebClient> {
     @Override
     public synchronized WebClient getPort() {
         if (opid == 0 || opid == 3) {
-            return WebClient.create(BASE_SERVICE_URL + "/123", CLIENT_CONFIG_FILE);
+            return WebClient.create(protocol + "://" + host + BASE_SERVICE_URL + "/123", CLIENT_CONFIG_FILE);
         } else {
-            return WebClient.create(BASE_SERVICE_URL, CLIENT_CONFIG_FILE);
+            return WebClient.create(protocol + "://" + host + BASE_SERVICE_URL, CLIENT_CONFIG_FILE);
         }
     }
 

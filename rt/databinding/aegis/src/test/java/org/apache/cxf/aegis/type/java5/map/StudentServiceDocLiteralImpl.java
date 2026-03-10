@@ -64,7 +64,7 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
     }
 
     //CHECKSTYLE:OFF
-    public void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData) { //NOPMD
+    public void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData) {
         // original failure was explosion on this, no need to bother to fill it in.
     }
 

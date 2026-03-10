@@ -317,12 +317,13 @@ public class ClientProxyImpl extends AbstractClient implements
 
             ClientState newState = getState().newState(uri, subHeaders,
                  getTemplateParametersMap(ori.getURITemplate(), pathParams));
-            ClientProxyImpl proxyImpl =
-                new ClientProxyImpl(newState, proxyLoader, subCri, false, inheritHeaders);
+            ClientProxyImpl proxyImpl = createProxy(newState, proxyLoader, subCri, false, inheritHeaders);
             proxyImpl.setConfiguration(getConfiguration());
             return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         }
-        headers.putAll(paramHeaders);
+
+        // Merge values for same headers
+        paramHeaders.forEach((k, v) -> headers.addAll(k, v));
 
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
 
@@ -349,6 +350,11 @@ public class ClientProxyImpl extends AbstractClient implements
             resetResponseStateImmediatelyIfNeeded();
         }
 
+    }
+
+    protected ClientProxyImpl createProxy(final ClientState newState, final ClassLoader loader,
+            final ClassResourceInfo newCri, final boolean isNewRoot, final boolean newInheritHeaders) {
+        return new ClientProxyImpl(newState, loader, newCri, isNewRoot, newInheritHeaders);
     }
 
     protected void addNonEmptyPath(UriBuilder builder, String pathValue) {
@@ -801,7 +807,11 @@ public class ClientProxyImpl extends AbstractClient implements
             if (part != null) {
                 Object partObject = params[p.getIndex()];
                 if (partObject != null) {
-                    atts.add(new Attachment(part.value(), part.type(), partObject));
+                    if (partObject instanceof Attachment) {
+                        atts.add((Attachment)partObject);
+                    } else {
+                        atts.add(new Attachment(part.value(), part.type(), partObject));
+                    }
                 }
             }
         });

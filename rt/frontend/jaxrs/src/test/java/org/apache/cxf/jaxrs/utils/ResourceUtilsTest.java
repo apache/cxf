@@ -72,7 +72,7 @@ public class ResourceUtilsTest {
     @Test
     public void testClassResourceInfoUserResource() throws Exception {
         UserResource ur = new UserResource();
-        ur.setName(HashMap.class.getName()); //NOPMD
+        ur.setName(HashMap.class.getName());
         ur.setPath("/hashmap");
         UserOperation op = new UserOperation();
         op.setPath("/key/{id}");
@@ -88,7 +88,7 @@ public class ResourceUtilsTest {
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
         Method method =
-            HashMap.class.getMethod("get", new Class[]{Object.class}); //NOPMD
+            HashMap.class.getMethod("get", new Class[]{Object.class});
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(method);
         assertNotNull(ori);
         assertEquals("/key/{id}", ori.getURITemplate().getValue());

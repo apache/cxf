@@ -27,7 +27,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Port" createdFromAPI="true">
@@ -53,7 +53,7 @@
     </jaxws:client>
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="ckpass">
+            <sec:keyManagers keyPassword="cspass">
                 <sec:keyStore type="jks" password="cspass" resource="keys/clientstore.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>

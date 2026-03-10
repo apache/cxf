@@ -49,9 +49,9 @@ public final class DefaultServiceBuilderFactory extends ServiceBuilderFactory {
             throw new ToolException("Unsupported databinding: " + dbn);
         }
         final AbstractServiceFactory builder;
-        if (Style.Jaxws.equals(s)) {
+        if (Style.Jaxws == s) {
             builder = new JaxwsServiceBuilder();
-        } else if (Style.Simple.equals(s)) {
+        } else if (Style.Simple == s) {
             builder = new SimpleServiceBuilder();
         } else {
             throw new ToolException("Unsupported frontend style: " + s);

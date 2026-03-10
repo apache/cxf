@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
+@SuppressWarnings("PMD.UselessPureMethodCall")
 public class AbstractRMInterceptorTest {
     @Test
     public void testAccessors() {

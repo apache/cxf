@@ -31,7 +31,6 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -40,12 +39,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
+import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 
@@ -58,7 +60,6 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -265,7 +266,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
 
     public class AsyncWrappedOutputStream extends WrappedOutputStream
-        implements CopyingOutputStream, WritableByteChannel {
+        implements AsyncWrappedOutputStreamBase {
         final HTTPClientPolicy csPolicy;
 
         CXFHttpRequest entity;
@@ -418,11 +419,16 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             }
             closed = true;
             if (!chunking && wrappedStream instanceof CachedOutputStream) {
-                CachedOutputStream out = (CachedOutputStream)wrappedStream;
-                this.basicEntity.setContentLength(out.size());
-                wrappedStream = null;
-                handleHeadersTrustCaching();
-                out.writeCacheTo(wrappedStream);
+                try (CachedOutputStream out = (CachedOutputStream)wrappedStream) {
+                    this.basicEntity.setContentLength(out.size());
+                    wrappedStream = null;
+                    handleHeadersTrustCaching();
+                    // The wrappedStrem could be null for KNOWN_HTTP_VERBS_WITH_NO_CONTENT or empty
+                    // requests (org.apache.cxf.empty.request)
+                    if (wrappedStream != null) {
+                        out.writeCacheTo(wrappedStream);
+                    }
+                }
             }
             super.close();
         }
@@ -618,7 +624,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                     || lastURL.getPort() != url.getPort();
         }
 
-        protected boolean retrySetHttpResponse(HttpResponse r) {
+        public boolean retrySetHttpResponse(HttpResponse r) {
             if (isAsync) {
                 setHttpResponse(r);
             }
@@ -973,6 +979,13 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         String[] p = findProtocols(protocol, sslengine.getSupportedProtocols());
         if (p != null) {
             sslengine.setEnabledProtocols(p);
+        }
+        
+        final List<String> serverNames = tlsClientParameters.getServerNames();
+        if (serverNames != null && !serverNames.isEmpty()) {
+            final SSLParameters params = new SSLParameters();
+            params.setServerNames(serverNames.stream().map(SNIHostName::new).collect(Collectors.toList()));
+            sslengine.setSSLParameters(params);
         }
     }
 

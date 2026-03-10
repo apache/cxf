@@ -135,6 +135,9 @@
             <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
             <unpack>false</unpack>
             <scope>runtime</scope>
+            <excludes>
+                <exclude>org.apache.cxf:cxf-testutils</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>

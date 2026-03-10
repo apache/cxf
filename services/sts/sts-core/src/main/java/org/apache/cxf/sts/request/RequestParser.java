@@ -226,7 +226,7 @@ public class RequestParser {
         } else if (QNameConstants.ENCRYPT_WITH.equals(jaxbElement.getName())) {
             String encryptWith = (String)jaxbElement.getValue();
             keyRequirements.setEncryptWith(encryptWith);
-        } else if (QNameConstants.REQUEST_TYPE.equals(jaxbElement.getName())) { //NOPMD
+        } else if (QNameConstants.REQUEST_TYPE.equals(jaxbElement.getName())) {
             // Skip the request type.
         } else {
             return false;

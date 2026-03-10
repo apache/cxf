@@ -36,7 +36,7 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     public String getContentType() {
-        return "text/html; charset=UTF-8";
+        return "text/plain; charset=UTF-8";
     }
 
     public void writeServiceList(PrintWriter writer,
@@ -80,14 +80,16 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
             address = StringEscapeUtils.escapeHtml4(address);
 
             boolean wadlAvailable = bus != null
-                && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"));
+                && PropertyUtils.isTrue(bus.getProperty("wadl.service.description.available"));
             boolean swaggerAvailable = bus != null
-                && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"));
+                && PropertyUtils.isTrue(bus.getProperty("swagger.service.description.available"));
             boolean openApiAvailable = bus != null
-                && PropertyUtils.isTrue(bus.getProperty("openapi.service.descrition.available"));
-            if (!wadlAvailable && !swaggerAvailable) {
+                && PropertyUtils.isTrue(bus.getProperty("openapi.service.description.available"));
+            if (!wadlAvailable 
+                && !swaggerAvailable
+                && !openApiAvailable) {
                 writer.write(address + "\n");
-                return;
+                continue;
             }
             if (wadlAvailable) {
                 writer.write(address + "?_wadl\n");

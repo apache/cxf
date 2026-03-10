@@ -24,19 +24,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
-
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.xml.ws.Holder;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvoker;
 import org.apache.cxf.jaxrs.rx2.client.ObservableRxInvokerProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -55,7 +56,9 @@ public class JAXRSRxJava2ObservableTest extends AbstractBusClientServerTestBase 
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(RxJava2ObservableServer.class, true));
-        createStaticBus();
+        final Bus bus = createStaticBus();
+        // Make sure default JSON-P/JSON-B providers are not loaded
+        bus.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
     }
     @Test
     public void testGetHelloWorldText() throws Exception {

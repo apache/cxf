@@ -43,15 +43,15 @@ import org.apache.cxf.spring.boot.autoconfigure.CxfProperties;
 import org.apache.cxf.spring.boot.autoconfigure.CxfProperties.Metrics.Client;
 import org.apache.cxf.spring.boot.autoconfigure.CxfProperties.Metrics.Server;
 import org.apache.cxf.spring.boot.autoconfigure.micrometer.provider.SpringBasedTimedAnnotationProvider;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.metrics.OnlyOnceLoggingDenyMeterFilter;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.micrometer.metrics.MaximumAllowableTagsMeterFilter;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration;
+import org.springframework.boot.micrometer.metrics.autoconfigure.export.simple.SimpleMetricsExportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -117,21 +117,17 @@ public class MicrometerMetricsAutoConfiguration {
     @Bean
     @Order(0)
     public MeterFilter cxfMetricsMaxAllowedServerUriTagsFilter() {
-        String metricName = this.properties.getMetrics().getServer().getRequestsMetricName();
-        MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
-        () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
-        return MeterFilter.maximumAllowableTags(
-                metricName, "uri", this.properties.getMetrics().getServer().getMaxUriTags(), filter);
+        final String metricName = this.properties.getMetrics().getServer().getRequestsMetricName();
+        return new MaximumAllowableTagsMeterFilter(metricName, "uri",
+            this.properties.getMetrics().getServer().getMaxUriTags());
     }
     
     @Bean
     @Order(0)
     public MeterFilter cxfMetricsMaxAllowedClientUriTagsFilter() {
-        String metricName = this.properties.getMetrics().getClient().getRequestsMetricName();
-        MeterFilter filter = new OnlyOnceLoggingDenyMeterFilter(
-        () -> String.format("Reached the maximum number of URI tags for '%s'.", metricName));
-        return MeterFilter.maximumAllowableTags(
-                metricName, "uri", this.properties.getMetrics().getClient().getMaxUriTags(), filter);
+        final String metricName = this.properties.getMetrics().getClient().getRequestsMetricName();
+        return new MaximumAllowableTagsMeterFilter(metricName, "uri",
+            this.properties.getMetrics().getClient().getMaxUriTags());
     }
     
     @Configuration

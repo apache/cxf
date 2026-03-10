@@ -25,8 +25,9 @@ import java.util.logging.Logger;
 
 import brave.Span;
 import brave.Tracer.SpanInScope;
-import brave.http.HttpServerAdapter;
 import brave.http.HttpServerHandler;
+import brave.http.HttpServerRequest;
+import brave.http.HttpServerResponse;
 import brave.http.HttpTracing;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -50,16 +51,10 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
             URI uri, String method) {
 
         final Request request = HttpAdapterFactory.request(requestHeaders, uri, method);
-        final HttpServerAdapter<Request, ?> adapter = HttpServerAdapterFactory.create(request);
+        final HttpServerRequest wrapper = HttpServerAdapterFactory.create(request);
         
-        final HttpServerHandler<Request, ?> handler = HttpServerHandler.create(brave, adapter);
-        
-        Span span = handler.handleReceive(
-            brave
-                .tracing()
-                .propagation()
-                .extractor(adapter::requestHeader), 
-            request);
+        final HttpServerHandler<HttpServerRequest, ?> handler = HttpServerHandler.create(brave);
+        Span span = handler.handleReceive(wrapper);
         
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
@@ -76,6 +71,8 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
                                  final Map<String, List<Object>> responseHeaders,
+                                 final String method,
+                                 final URI uri,
                                  final int responseStatus,
                                  final TraceScopeHolder<TraceScope> holder) {
         if (holder == null) {
@@ -93,11 +90,11 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
                     span = brave.tracing().tracer().joinSpan(scope.getSpan().context());
                 }
     
-                final Response response = HttpAdapterFactory.response(responseStatus);
-                final HttpServerAdapter<?, Response> adapter = HttpServerAdapterFactory.create(response);
+                final Response response = HttpAdapterFactory.response(method, uri.getPath(), responseStatus);
+                final HttpServerResponse wrapper = HttpServerAdapterFactory.create(response);
                 
-                final HttpServerHandler<?, Response> handler = HttpServerHandler.create(brave, adapter);
-                handler.handleSend(response, null, scope.getSpan());
+                final HttpServerHandler<?, HttpServerResponse> handler = HttpServerHandler.create(brave);
+                handler.handleSend(wrapper, scope.getSpan());
             } finally {
                 scope.close();
                 if (span != null) {

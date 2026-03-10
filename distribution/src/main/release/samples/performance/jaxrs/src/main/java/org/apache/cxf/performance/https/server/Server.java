@@ -34,18 +34,28 @@ public class Server implements Runnable {
         BusFactory.setDefaultBus(bus);
     }
 
-    protected Server() throws Exception {
+    protected Server(String[] args) throws Exception {
+        String host = "localhost";
+        String protocol = "https";
+        for (int x = 0; x < args.length; x++) {
+            if ("-host".equals(args[x])) {
+                host = args[x + 1];
+                x++;
+            } else if ("-protocol".equals(args[x])) {
+                protocol = args[x + 1];
+                x++;
+            }
+        }
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CustomerServiceImpl.class);
         sf.setResourceProvider(CustomerServiceImpl.class,
             new SingletonResourceProvider(new CustomerServiceImpl()));
-        sf.setAddress("https://localhost:9000/");
-
+        sf.setAddress(protocol + "://" + host + ":9000/");
         sf.create();
     }
 
     public static void main(String[] args) throws Exception {
-        Server server = new Server();
+        Server server = new Server(args);
         System.out.println("Server ready...");
         boolean wait = true;
 

@@ -142,6 +142,11 @@ public class StaxSource extends SAXSource implements XMLReader {
                         if (nsUri == null) {
                             nsUri = "";
                         }
+                        // see please "com.ctc.wstx.returnNullForDefaultNamespace" property
+                        if (nsPrefix == null) {
+                            nsPrefix = "";
+                        }
+
                         contentHandler.startPrefixMapping(nsPrefix, nsUri);
                     }
                     contentHandler.startElement(uri == null ? "" : uri, localName, qname, getAttributes());

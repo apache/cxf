@@ -98,7 +98,14 @@ public final class LogUtils {
                     // as we'll just use j.u.l and pax-logging will pick it up fine
                     // If we don't call this and there isn't a slf4j impl avail,
                     // you get warnings printed to stderr about NOPLoggers and such
-                    Class.forName("org.slf4j.impl.StaticLoggerBinder");
+                    try {
+                        // SLF4J 2.x
+                        Class.forName("org.slf4j.spi.SLF4JServiceProvider");
+                    } catch (final ClassNotFoundException ex) {
+                        // SLF4J 1.x
+                        Class.forName("org.slf4j.impl.StaticLoggerBinder");
+                    }
+
                     Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
                     Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
                     String clsName = fcls.getName();
@@ -219,6 +226,7 @@ public final class LogUtils {
     /**
      * Create a logger
      */
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     protected static Logger createLogger(Class<?> cls,
                                          String name,
                                          String loggerName) {
@@ -279,10 +287,10 @@ public final class LogUtils {
 
             Logger logger;
             try {
-                logger = Logger.getLogger(loggerName, bundleName); //NOPMD
+                logger = Logger.getLogger(loggerName, bundleName);
             } catch (IllegalArgumentException | MissingResourceException ex) {
                 //likely a mismatch on the bundle name, just return the default
-                logger = Logger.getLogger(loggerName); //NOPMD
+                logger = Logger.getLogger(loggerName);
             }
             
             return logger;

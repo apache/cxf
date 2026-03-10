@@ -34,10 +34,10 @@ public class CommonCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof WSPasswordCallback) { // CXF
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if ("myclientkey".equals(pc.getIdentifier())) {
-                    pc.setPassword("ckpass");
+                    pc.setPassword("cspass");
                     break;
                 } else if ("myservicekey".equals(pc.getIdentifier())) {
-                    pc.setPassword("skpass");
+                    pc.setPassword("sspass");
                     break;
                 } else if ("alice".equals(pc.getIdentifier())) {
                     pc.setPassword("clarinet");
@@ -49,7 +49,7 @@ public class CommonCallbackHandler implements CallbackHandler {
                     pc.setPassword("evekpass");
                     break;
                 } else if ("mystskey".equals(pc.getIdentifier())) {
-                    pc.setPassword("stskpass");
+                    pc.setPassword("stsspass");
                     break;
                 }
             }

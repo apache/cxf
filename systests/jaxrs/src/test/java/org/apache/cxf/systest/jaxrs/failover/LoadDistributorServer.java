@@ -24,12 +24,14 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class LoadDistributorServer extends AbstractBusTestServerBase {
     protected void run()  {
         URL busFile = Server.class.getResource("cxf-lb-service.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
+        busLocal.setProperty(ProviderFactory.SKIP_JAKARTA_JSON_PROVIDERS_REGISTRATION, true);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
 

@@ -47,13 +47,13 @@ public final class ServiceUtils {
         SchemaValidationType validationType = getSchemaValidationType(message);
 
         boolean isRequestor = MessageUtils.isRequestor(message);
-        if (SchemaValidationType.REQUEST.equals(validationType)) {
+        if (SchemaValidationType.REQUEST == validationType) {
             if (isRequestor) {
                 validationType = SchemaValidationType.OUT;
             } else {
                 validationType = SchemaValidationType.IN;
             }
-        } else if (SchemaValidationType.RESPONSE.equals(validationType)) {
+        } else if (SchemaValidationType.RESPONSE == validationType) {
             if (isRequestor) {
                 validationType = SchemaValidationType.IN;
             } else {
@@ -61,9 +61,9 @@ public final class ServiceUtils {
             }
         }
 
-        return validationType.equals(type)
-            || ((SchemaValidationType.IN.equals(type) || SchemaValidationType.OUT.equals(type))
-                && SchemaValidationType.BOTH.equals(validationType));
+        return validationType == type
+            || ((SchemaValidationType.IN == type || SchemaValidationType.OUT == type)
+                && SchemaValidationType.BOTH == validationType);
     }
     /**
      * A convenience method to check for schema validation config in the message context, and then in the service model.

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     
@@ -15,28 +15,28 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
  
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-sse</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.2.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
 
@@ -46,7 +46,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.undertow</groupId>
+            <groupId>io.undertow.ee</groupId>
             <artifactId>undertow-servlet</artifactId>
         </dependency>
     </dependencies>

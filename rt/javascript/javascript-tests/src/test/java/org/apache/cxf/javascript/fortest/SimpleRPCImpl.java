@@ -23,7 +23,7 @@ import jakarta.jws.WebService;
 
 @WebService(targetNamespace = "uri:cxf.apache.org.javascript.rpc",
             endpointInterface = "org.apache.cxf.javascript.fortest.SimpleRPC")
-//@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")
+//@org.apache.cxf.feature.Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class SimpleRPCImpl implements SimpleRPC {
 
     private String lastString;

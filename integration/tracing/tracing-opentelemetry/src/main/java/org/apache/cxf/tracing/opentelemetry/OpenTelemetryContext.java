@@ -57,7 +57,7 @@ public class OpenTelemetryContext implements TracerContext {
             scope = continuation.makeCurrent();
         }
 
-        try { // NOPMD
+        try {
             return traceable.call(new OpenTelemetryContext(tracer));
         } finally {
             if (continuation != null && scope != null) {

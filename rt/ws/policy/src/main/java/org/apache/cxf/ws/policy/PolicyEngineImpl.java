@@ -318,7 +318,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return getEndpointPolicy(ei, false, assertor, m);
     }
 
-    private EndpointPolicy getEndpointPolicy(//NOPMD
+    private EndpointPolicy getEndpointPolicy(
         EndpointInfo ei,
         boolean isRequestor,
         Assertor assertor,

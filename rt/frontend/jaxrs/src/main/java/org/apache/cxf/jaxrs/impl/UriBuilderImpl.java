@@ -293,7 +293,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     //CHECKSTYLE:OFF
-    private String substituteVarargs(URITemplate templ, //NOPMD
+    @SuppressWarnings("PMD.ExcessiveParameterList")
+    private String substituteVarargs(URITemplate templ,
                                      Map<String, Object> alreadyResolvedTs,
                                      Map<String, Object> alreadyResolvedTsPathEnc,
                                      Map<String, Object> alreadyResolvedTsEnc,
@@ -563,7 +564,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 // such empty paths having matrix parameters...
                 int schemeIndex = pathEncoded.indexOf("//");
                 if (schemeIndex != -1) {
-                    int pathComponentStart = pathEncoded.indexOf("/", schemeIndex + 2);
+                    int pathComponentStart = pathEncoded.indexOf('/', schemeIndex + 2);
                     if (pathComponentStart == -1) {
                         this.originalPathEmpty = true;
                         pathComponentStart = pathEncoded.indexOf(';');
@@ -613,7 +614,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public UriBuilder scheme(String s) throws IllegalArgumentException {
-        scheme = s;
+        scheme = (s != null) ? s.toLowerCase() : s;
         return this;
     }
 

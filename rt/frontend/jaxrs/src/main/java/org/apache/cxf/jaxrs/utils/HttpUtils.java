@@ -339,6 +339,20 @@ public final class HttpUtils {
             return -1;
         }
     }
+    
+    // This conversion is needed as some values may not be Strings
+    public static List<String> getHeaderStrings(List<Object> values) {
+        if (values == null) {
+            return null;
+        }
+        List<String> stringValues = new ArrayList<>(values.size());
+        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
+        for (Object value : values) {
+            String actualValue = hd == null ? value.toString() : hd.toString(value);
+            stringValues.add(actualValue);
+        }
+        return stringValues;
+    }
 
     public static String getHeaderString(List<String> values) {
         if (values == null) {
@@ -602,7 +616,7 @@ public final class HttpUtils {
             return defaultEncoding;
         }
         try {
-            "0".getBytes(enc);
+            "0".getBytes(enc); //NOPMD
             return enc;
         } catch (UnsupportedEncodingException ex) {
             String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING",

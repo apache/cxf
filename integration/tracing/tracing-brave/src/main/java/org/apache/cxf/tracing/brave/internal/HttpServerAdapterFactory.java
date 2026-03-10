@@ -20,28 +20,34 @@ package org.apache.cxf.tracing.brave.internal;
 
 import java.util.List;
 
-import brave.http.HttpServerAdapter;
+import brave.http.HttpServerRequest;
+import brave.http.HttpServerResponse;
 
 public interface HttpServerAdapterFactory extends HttpAdapterFactory {
-    static HttpServerAdapter<Request, Response> create(Request request) {
-        return new HttpServerAdapter<Request, Response>() {
+    static HttpServerRequest create(Request request) {
+        return new HttpServerRequest() {
             @Override 
-            public String method(Request request) {
+            public String method() {
                 return request.method();
             }
     
             @Override 
-            public String path(Request request) {
+            public String path() {
                 return request.uri().getPath();
+            }
+
+            @Override
+            public String route() {
+                return path();
             }
     
             @Override 
-            public String url(Request request) {
+            public String url() {
                 return request.uri().toString();
             }
     
             @Override 
-            public String requestHeader(Request request, String name) {
+            public String header(String name) {
                 List<String> value = request.headers().get(name);
     
                 if (value != null && !value.isEmpty()) {
@@ -50,39 +56,34 @@ public interface HttpServerAdapterFactory extends HttpAdapterFactory {
     
                 return null;
             }
-    
-            @Override 
-            public Integer statusCode(Response response) {
-                throw new UnsupportedOperationException("The operation is not supported for request adapter");
+
+            @Override
+            public Request unwrap() {
+                return request;
             }
         };
     }
     
-    static HttpServerAdapter<Request, Response> create(Response response) {
-        return new HttpServerAdapter<Request, Response>() {
-            @Override 
-            public String method(Request request) {
-                throw new UnsupportedOperationException("The operation is not supported for response adapter");
+    static HttpServerResponse create(Response response) {
+        return new HttpServerResponse() {
+            @Override
+            public String method() {
+                return response.method();
             }
-    
-            @Override 
-            public String path(Request request) {
-                throw new UnsupportedOperationException("The operation is not supported for response adapter");
+            
+            @Override
+            public String route() {
+                return response.path();
             }
-    
+            
             @Override 
-            public String url(Request request) {
-                throw new UnsupportedOperationException("The operation is not supported for response adapter");
-            }
-    
-            @Override 
-            public String requestHeader(Request request, String name) {
-                throw new UnsupportedOperationException("The operation is not supported for response adapter");
-            }
-    
-            @Override 
-            public Integer statusCode(Response response) {
+            public int statusCode() {
                 return response.status();
+            }
+
+            @Override
+            public Response unwrap() {
+                return response;
             }
         };
     }

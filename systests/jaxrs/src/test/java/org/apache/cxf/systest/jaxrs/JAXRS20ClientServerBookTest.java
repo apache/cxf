@@ -63,6 +63,7 @@ import jakarta.ws.rs.client.ResponseProcessingException;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.core.GenericEntity;
@@ -99,6 +100,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -153,10 +155,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
 
     @Test
-    public void testGetGenericBookParallel() throws InterruptedException {
+    public void testGetGenericBookManyClientsInParallel() throws InterruptedException {
         final ExecutorService pool = Executors.newFixedThreadPool(100);
         final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
         final AtomicLong httpClientThreads = new AtomicLong(); 
+
+        final Supplier<Long> captureHttpClientSelectorThreads = () ->
+            Arrays
+                .stream(threadMXBean.getAllThreadIds())
+                .mapToObj(id -> threadMXBean.getThreadInfo(id))
+                .filter(Objects::nonNull)
+                .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .filter(t -> t.getThreadName().endsWith("-SelectorManager"))
+                .count();
 
         final Supplier<Long> captureHttpClientThreads = () ->
             Arrays
@@ -166,6 +177,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                 .filter(t -> t.getThreadName().startsWith("HttpClient-"))
                 .count();
 
+        // Capture the number of client threads at start
+        final long expectedHttpClientSelectorThreads = captureHttpClientSelectorThreads.get();
         final Collection<WebClient> clients = new ArrayList<>();
         try {
             final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
@@ -190,7 +203,12 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         } finally {
             pool.shutdown();
             assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
-            assertThat(captureHttpClientThreads.get(), greaterThan(0L));
+            // Since JDK-27, HttpClient selector thread is a virtual thread by default
+            if (Runtime.version().feature() >= 27) {
+                assertThat(captureHttpClientSelectorThreads.get(), equalTo(0L));
+            } else {
+                assertThat(captureHttpClientSelectorThreads.get(), greaterThan(0L));
+            }
             assertThat(httpClientThreads.get(), greaterThan(0L));
             assertThat(httpClientThreads.get(), lessThan(150L)); /* a bit higher that pool size */
         }
@@ -198,8 +216,62 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         clients.forEach(WebClient::close);
     
         // Since JDK-21, HttpClient Implements AutoCloseable
-        if (Runtime.version().feature() > 21) { 
-            assertThat(httpClientThreads.get(), equalTo(0L));
+        if (Runtime.version().feature() >= 21) { 
+            assertThat(captureHttpClientSelectorThreads.get(), lessThanOrEqualTo(expectedHttpClientSelectorThreads));
+        }
+    }
+
+    @Test
+    public void testGetGenericBookSingleClientInParallel() throws InterruptedException {
+        final ExecutorService pool = Executors.newFixedThreadPool(100);
+        final String target = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
+        final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+
+        final Supplier<Long> captureHttpClientThreads = () ->
+            Arrays
+                .stream(threadMXBean.getAllThreadIds())
+                .mapToObj(id -> threadMXBean.getThreadInfo(id))
+                .filter(Objects::nonNull)
+                .filter(t -> t.getThreadName().startsWith("HttpClient-"))
+                .filter(t -> t.getThreadName().endsWith("-SelectorManager"))
+                .count();
+
+        // Capture the number of client threads at start
+        final long expectedHttpClientThreads = captureHttpClientThreads.get();
+        final WebClient client = WebClient.create(target, true);
+        try {
+            final Collection<Future<?>> futures = new ArrayList<>(); 
+            for (int i = 0; i < 100; ++i) {
+                // We are not checking the future completion, but the fact we were able 
+                // to execute this amount of requests without blowing live threads set 
+                futures.add(
+                    pool.submit(() -> {
+                        Book b1 = client.sync().get(Book.class);
+                        assertEquals(124L, b1.getId());
+                    })
+                );
+            }
+
+            // Find any completed future to make sure conduit was initialized
+            while (true) {
+                if (futures.stream().anyMatch(Future::isDone)) {
+                    break;
+                }
+            }
+        } finally {
+            client.close();
+        }
+
+        pool.shutdown();
+        // Since JDK-21, HttpClient Implements AutoCloseable
+        if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() >= 21) {
+            assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
+        } else {
+            pool.shutdownNow();
+            // Since JDK-21, HttpClient Implements AutoCloseable
+            if (pool.awaitTermination(2, TimeUnit.MINUTES) && Runtime.version().feature() >= 21) {
+                assertThat(captureHttpClientThreads.get(), lessThanOrEqualTo(expectedHttpClientThreads));
+            }
         }
     }
 
@@ -261,6 +333,26 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals(124L, book.getId());
         assertEquals("b", r.getHeaderString("a"));
     }
+    
+    @Test
+    public void testRemoveProperty() {
+        String address = "http://localhost:" + PORT + "/bookstore/{a}";
+        Client client = ClientBuilder.newClient();
+        client.property("greeting", "hello");
+        client.property("greeting", null);
+        client.register((Object)ClientFilterClientAndConfigCheck.class);
+        client.register(new BTypeParamConverterProvider());
+        client.property("clientproperty", "somevalue");
+        WebTarget webTarget = client.target(address).path("{b}")
+            .resolveTemplate("a", "bookheaders").resolveTemplate("b", "simple");
+        Invocation.Builder builder = webTarget.request("application/xml").header("a", new BType());
+
+        Response r = builder.get();
+        Book book = r.readEntity(Book.class);
+        assertEquals(124L, book.getId());
+        assertEquals("b", r.getHeaderString("a"));
+    }
+    
     @Test
     public void testGetBookSpec() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
@@ -1064,6 +1156,23 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             + "jakarta.ws.rs.ext.Provider,jakarta.ws.rs.Consumes}"));
     }
     
+    @Test
+    public void testGetCookies() throws Exception {
+        final WebTarget target = ClientBuilder
+            .newClient()
+            .property("org.apache.cxf.http.cookie.separator", ";")
+            .target("http://localhost:" + PORT + "/bookstore/cookies");
+
+        @SuppressWarnings("unchecked")
+        final Response response = target
+            .request().accept("application/json")
+            .cookie(new Cookie("a", "1"))
+            .cookie(new Cookie("b", "2"))
+            .get();
+
+        assertThat(response.getHeaderString(HttpHeaders.SET_COOKIE), equalTo("$Version=1;a=1; $Version=1;b=2"));
+    }
+
     private static final class ReplaceBodyFilter implements ClientRequestFilter {
 
         @Override

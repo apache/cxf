@@ -167,9 +167,6 @@
   "name":"org.apache.cxf.ext.logging.LoggingFactoryBeanListener"
 },
 {
-  "name":"org.apache.cxf.ext.logging.OldLoggingFactoryBeanListener"
-},
-{
   "name":"org.apache.cxf.jaxrs.JAXRSBindingFactory",
   "methods":[{"name":"<init>","parameterTypes":["org.apache.cxf.Bus"] }]
 },

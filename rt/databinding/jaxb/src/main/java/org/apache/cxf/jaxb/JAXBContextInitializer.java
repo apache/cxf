@@ -83,6 +83,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     }
 
     @Override
+    @SuppressWarnings("PMD.UselessPureMethodCall")
     public void begin(MessagePartInfo part) {
         Class<?> clazz = part.getTypeClass();
         if (clazz == null) {
@@ -327,7 +328,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
                 }
                 Object factory = createFactory(claz);
-                unmarshallerProperties.put("com.sun.xml.bind.ObjectFactory", factory);
+                unmarshallerProperties.put("org.glassfish.jaxb.core.ObjectFactory", factory);
                 cls = claz;
             }
             if (null != cls) {
@@ -538,7 +539,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         if (refClass != null) {
             try {
-                return refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass()) //NOPMD
+                return refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass())
                     .newInstance(n, cls, new Annotation[0]);
             } catch (Throwable e) {
                 //ignore

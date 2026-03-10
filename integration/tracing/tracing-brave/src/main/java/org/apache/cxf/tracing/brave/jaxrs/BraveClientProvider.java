@@ -28,7 +28,8 @@ import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.ext.Provider;
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
-import org.apache.cxf.tracing.brave.HttpClientSpanParser;
+import org.apache.cxf.tracing.brave.HttpClientRequestParser;
+import org.apache.cxf.tracing.brave.HttpClientResponseParser;
 import org.apache.cxf.tracing.brave.TraceScope;
 
 @Provider
@@ -39,7 +40,8 @@ public class BraveClientProvider extends AbstractBraveClientProvider
         this(
             HttpTracing
                 .newBuilder(brave)
-                .clientParser(new HttpClientSpanParser())
+                .clientRequestParser(new HttpClientRequestParser())
+                .clientResponseParser(new HttpClientResponseParser())
                 .build()
         );
     }
@@ -64,6 +66,7 @@ public class BraveClientProvider extends AbstractBraveClientProvider
             final ClientResponseContext responseContext) throws IOException {
         final TraceScopeHolder<TraceScope> holder =
             (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN);
-        super.stopTraceSpan(holder, responseContext.getStatus());
+        super.stopTraceSpan(holder, requestContext.getMethod(),
+            requestContext.getUri(), responseContext.getStatus());
     }
 }

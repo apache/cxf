@@ -458,15 +458,17 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception {
                             if (future.isSuccess()) {
-                                handler.whenReady().addListener(new ChannelFutureListener() {
-                                    @Override
-                                    public void operationComplete(ChannelFuture future) throws Exception {
-                                        if (future.isSuccess()) {
-                                            ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
-                                            channelFuture.addListener(writeFailureListener);
+                                handler.whenReady(future.channel())
+                                    .addListener(new ChannelFutureListener() {
+                                        @Override
+                                        public void operationComplete(ChannelFuture future) throws Exception {
+                                            if (future.isSuccess()) {
+                                                ChannelFuture channelFuture = future.channel().writeAndFlush(entity);
+                                                channelFuture.addListener(writeFailureListener);
+                                            }
                                         }
                                     }
-                                });
+                                );
                             }
                         }
                     });
@@ -589,7 +591,10 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         @Override
         protected void handleResponseAsync() throws IOException {
-            isAsync = true;
+            // The response hasn't been handled yet, should be handled asynchronously
+            if (httpResponse == null) {
+                isAsync = true;
+            }
         }
 
         @Override
@@ -606,7 +611,7 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         @Override
         protected InputStream getInputStream() throws IOException {
-            return new ByteBufInputStream(getHttpResponseContent().content());
+            return new ByteBufInputStream(getHttpResponseContent().content(), true);
         }
 
         @Override

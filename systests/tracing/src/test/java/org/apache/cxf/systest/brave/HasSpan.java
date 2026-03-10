@@ -18,20 +18,22 @@
  */
 package org.apache.cxf.systest.brave;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import brave.handler.MutableSpan;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsIterableContaining;
-import zipkin2.Annotation;
-import zipkin2.Span;
 
-public class HasSpan extends IsIterableContaining<Span> {
+public class HasSpan extends IsIterableContaining<MutableSpan> {
     public HasSpan(final String name) {
         this(name, null);
     }
 
-    public HasSpan(final String name, final Matcher<Iterable<? super Annotation>> matcher) {
-        super(new TypeSafeMatcher<Span>() {
+    public HasSpan(final String name, final Matcher<Iterable<? super String>> matcher) {
+        super(new TypeSafeMatcher<MutableSpan>() {
             @Override
             public void describeTo(Description description) {
                 description
@@ -46,13 +48,16 @@ public class HasSpan extends IsIterableContaining<Span> {
             }
 
             @Override
-            protected boolean matchesSafely(Span item) {
+            protected boolean matchesSafely(MutableSpan item) {
                 if (!name.equals(item.name())) {
                     return false;
                 }
 
                 if (matcher != null) {
-                    return matcher.matches(item.annotations());
+                    return matcher.matches(item.annotations()
+                        .stream()
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toList()));
                 }
 
                 return true;
@@ -64,7 +69,7 @@ public class HasSpan extends IsIterableContaining<Span> {
         return new HasSpan(name);
     }
 
-    public static HasSpan hasSpan(final String name, final Matcher<Iterable<? super Annotation>> matcher) {
+    public static HasSpan hasSpan(final String name, final Matcher<Iterable<? super String>> matcher) {
         return new HasSpan(name, matcher);
     }
 }

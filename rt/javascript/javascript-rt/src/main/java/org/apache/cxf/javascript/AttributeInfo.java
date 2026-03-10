@@ -266,7 +266,7 @@ public final class AttributeInfo implements ItemInfo {
     }
 
     public boolean isOptional() {
-        return !use.equals(XmlSchemaUse.REQUIRED);
+        return use != XmlSchemaUse.REQUIRED;
     }
 
     public void setDefaultValue(String value) {

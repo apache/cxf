@@ -22,6 +22,7 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,6 +69,7 @@ public class DigestAuthSupplierSpringTest {
     @Test
     public void test() {
         WebClient client = WebClient.create("http://localhost:" + port, (String) null);
+        WebClient.getConfig(client).getBus().setProperty(AsyncHTTPConduit.USE_ASYNC, true);
 
         assertThrows(NotAuthorizedException.class, () -> client.get(String.class));
 
@@ -90,16 +93,15 @@ public class DigestAuthSupplierSpringTest {
 
     }
 
+    @EnableWebSecurity
     static class SecurityConfig {
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             DigestAuthenticationEntryPoint authenticationEntryPoint = digestAuthenticationEntryPoint();
             return http
-                .authorizeRequests().anyRequest().authenticated()
-                    .and()
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                    .and()
+                .authorizeHttpRequests(c -> c.anyRequest().authenticated())
+                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilter(digestAuthenticationFilter(authenticationEntryPoint))
                 .build();
         }
@@ -109,6 +111,7 @@ public class DigestAuthSupplierSpringTest {
             DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
             digestAuthenticationFilter.setUserDetailsService(userDetailsService());
             digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
+            digestAuthenticationFilter.setCreateAuthenticatedToken(true);
             return digestAuthenticationFilter;
         }
 

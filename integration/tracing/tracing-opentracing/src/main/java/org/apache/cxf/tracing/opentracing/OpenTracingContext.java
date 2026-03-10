@@ -54,7 +54,7 @@ public class OpenTracingContext implements TracerContext {
             scope = tracer.scopeManager().activate(continuation);
         }
 
-        try { //NOPMD
+        try {
             return traceable.call(new OpenTracingContext(tracer));
         } finally {
             if (continuation != null && scope != null) {

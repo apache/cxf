@@ -113,9 +113,9 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             setOutputMode();
             int bytesWritten = 0;
             if (largeWrapper != null || super.hasData()) {
-                if (!buffer().hasRemaining() && largeWrapper != null) {
+                if (!buffer().hasRemaining() && largeWrapper != null && largeWrapper.hasRemaining()) {
                     bytesWritten = channel.write(largeWrapper);
-                } else {
+                } else if (buffer().hasRemaining()) {
                     bytesWritten = channel.write(buffer());
                 }
             }
