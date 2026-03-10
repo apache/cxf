@@ -347,8 +347,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 LOG.log(Level.FINE, "transformPayload with draft={0}", new String(responseDraft));
             }
             AtmosphereRequest request = response.request();
-            if (request.attributes().get(RESPONSE_PARENT) == null) {
-                request.attributes().put(RESPONSE_PARENT, "true");
+            if (request.localAttributes().get(RESPONSE_PARENT) == null) {
+                request.localAttributes().put(RESPONSE_PARENT, "true");
                 return createResponse(response, responseDraft, true);
             }
             return createResponse(response, responseDraft, false);
