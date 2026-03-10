@@ -93,7 +93,9 @@ public class PlugInClassLoader extends SecureClassLoader {
 
         Properties props = new Properties();
 
-        props.load(in);
+        try (InputStream is = in) {
+            props.load(is);
+        }
         LOG.fine("Contents: " + propsFileName + props);
 
         return props;
