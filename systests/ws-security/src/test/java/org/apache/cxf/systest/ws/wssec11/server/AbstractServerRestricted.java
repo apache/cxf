@@ -58,7 +58,7 @@ abstract class AbstractServerRestricted extends AbstractBusTestServerBase {
                   ? new UXPingServiceFips()
                       : new UXPingService());
         doPublish(baseUrl + "/UX-NoTimestampPingService", JavaUtils.isFIPSEnabled()
-                  ? new UXPingServiceFips()
+                  ? new UXNoTimestampPingServiceFips()
                       : new UXNoTimestampPingService());
         doPublish(baseUrl + "/UXDPingService", JavaUtils.isFIPSEnabled()
                   ? new UXDPingServiceFips()
