@@ -511,13 +511,11 @@ public class ClientImpl
                             if (message.getContent(Exception.class) == null) {
                                 // handle the right response
                                 Message inMsg = message.getExchange().getInMessage();
-                                if (inMsg != null) {
-                                    Map<String, Object> ctx = responseContext.get(Thread.currentThread());
-                                    List<Object> resList = CastUtils.cast(inMsg.getContent(List.class));
-                                    Object[] result = resList == null ? null : resList.toArray();
-                                    callback.handleResponse(ctx, result);
-                                    return;
-                                }
+                                Map<String, Object> ctx = responseContext.get(Thread.currentThread());
+                                List<Object> resList = CastUtils.cast(inMsg.getContent(List.class));
+                                Object[] result = resList == null ? null : resList.toArray();
+                                callback.handleResponse(ctx, result);
+                                return;
                             }
                         }
                         outFaultObserver.onMessage(message);
