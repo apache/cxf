@@ -25,6 +25,8 @@ public final class DefaultSignatureConstants {
     public static final String DIGEST_ALGORITHM = "SHA-256";
     public static final String SECURITY_PROVIDER = getDefaultSecurityProvider();
 
+    private DefaultSignatureConstants() { }
+
     private static String getDefaultSecurityProvider() {
         if (JavaUtils.isFIPSEnabled()) {
             String provider = JavaUtils.getFIPSSecurityProvider();
@@ -32,7 +34,5 @@ public final class DefaultSignatureConstants {
         }
         return "SunRsaSign";
     }
-
-    private DefaultSignatureConstants() { }
 
 }
