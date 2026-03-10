@@ -839,7 +839,7 @@ public class IssueSamlUnitTest {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(
                 JavaUtils.isFIPSEnabled() 
-                    ? WSS4JConstants.KEYTRANSPORT_RSA15 
+                    ? WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11
                         : WSS4JConstants.KEYTRANSPORT_RSAOAEP);
 
         KeyGenerator keyGen = KeyUtils.getKeyGenerator(

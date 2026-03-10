@@ -23,8 +23,15 @@ import org.apache.cxf.helpers.JavaUtils;
 public final class DefaultSignatureConstants {
     public static final String SIGNING_ALGORITHM = "rsa-sha256";
     public static final String DIGEST_ALGORITHM = "SHA-256";
-    public static final String SECURITY_PROVIDER 
-        = JavaUtils.isFIPSEnabled() ? "SunPKCS11-NSS-FIPS" : "SunRsaSign";
+    public static final String SECURITY_PROVIDER = getDefaultSecurityProvider();
+
+    private static String getDefaultSecurityProvider() {
+        if (JavaUtils.isFIPSEnabled()) {
+            String provider = JavaUtils.getFIPSSecurityProvider();
+            return provider != null ? provider : "SunPKCS11-NSS-FIPS";
+        }
+        return "SunRsaSign";
+    }
 
     private DefaultSignatureConstants() { }
 

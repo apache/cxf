@@ -187,7 +187,7 @@ public final class JweUtils {
     }
     private static KeyAlgorithm getDefaultPublicKeyAlgorithm(PublicKey key) {
         if (key instanceof RSAPublicKey) {
-            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA_OAEP_256 : KeyAlgorithm.RSA_OAEP;
         } else if (key instanceof ECPublicKey) {
             return KeyAlgorithm.ECDH_ES_A128KW;
         } else {
@@ -196,7 +196,7 @@ public final class JweUtils {
     }
     private static KeyAlgorithm getDefaultPrivateKeyAlgorithm(PrivateKey key) {
         if (key instanceof RSAPrivateKey) {
-            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA_OAEP_256 : KeyAlgorithm.RSA_OAEP;
         } else if (key instanceof ECPrivateKey) {
             return KeyAlgorithm.ECDH_ES_A128KW;
         } else {
@@ -938,7 +938,7 @@ public final class JweUtils {
         if (KeyType.OCTET == keyType) {
             return KeyAlgorithm.A128GCMKW;
         } else if (KeyType.RSA == keyType) {
-            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP;
+            return JavaUtils.isFIPSEnabled() ? KeyAlgorithm.RSA_OAEP_256 : KeyAlgorithm.RSA_OAEP;
         } else {
             return KeyAlgorithm.ECDH_ES_A128KW;
         }

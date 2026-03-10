@@ -135,7 +135,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                 )
             );
 
-            //fips compliant policies
+            // GCM-based policies with RSA 1.5 key wrap (NOT FIPS compliant)
 
             ALGORITHM_SUITE_TYPES.put("Basic256GCMRsa15", new AlgorithmSuiteType(
                     "Basic256GCMRsa15", 

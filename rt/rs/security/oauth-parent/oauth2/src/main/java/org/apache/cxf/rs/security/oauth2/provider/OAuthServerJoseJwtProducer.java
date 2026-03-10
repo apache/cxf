@@ -45,8 +45,8 @@ public class OAuthServerJoseJwtProducer extends OAuthJoseJwtProducer {
             X509Certificate cert =
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             theEncryptionProvider = JweUtils.createJweEncryptionProvider(cert.getPublicKey(),
-                                                                         JavaUtils.isFIPSEnabled() 
-                                                                             ? KeyAlgorithm.RSA1_5 
+                                                                         JavaUtils.isFIPSEnabled()
+                                                                             ? KeyAlgorithm.RSA_OAEP_256
                                                                              : KeyAlgorithm.RSA_OAEP,
                                                                          ContentAlgorithm.A128GCM,
                                                                          null);

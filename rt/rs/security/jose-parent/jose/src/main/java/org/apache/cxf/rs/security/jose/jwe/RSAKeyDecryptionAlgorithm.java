@@ -26,8 +26,8 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {
-        this(privateKey, JavaUtils.isFIPSEnabled() 
-             ? KeyAlgorithm.RSA1_5 : KeyAlgorithm.RSA_OAEP);
+        this(privateKey, JavaUtils.isFIPSEnabled()
+             ? KeyAlgorithm.RSA_OAEP_256 : KeyAlgorithm.RSA_OAEP);
     }
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {
         this(privateKey, supportedAlgo, true);

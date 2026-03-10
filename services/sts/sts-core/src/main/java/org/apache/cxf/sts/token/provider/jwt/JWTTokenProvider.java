@@ -305,7 +305,7 @@ public class JWTTokenProvider implements TokenProvider {
             KeyAlgorithm.getAlgorithm(keyWrapAlgorithm);
         } catch (IllegalArgumentException ex) {
             keyWrapAlgorithm = JavaUtils.isFIPSEnabled()
-                ? KeyAlgorithm.RSA1_5.name() : KeyAlgorithm.RSA_OAEP.name();
+                ? KeyAlgorithm.RSA_OAEP_256.name() : KeyAlgorithm.RSA_OAEP.name();
         }
         encProperties.put(JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM, keyWrapAlgorithm);
 

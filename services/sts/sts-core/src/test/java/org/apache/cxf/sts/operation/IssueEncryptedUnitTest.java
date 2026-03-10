@@ -338,8 +338,8 @@ public class IssueEncryptedUnitTest {
                                                         ? WSS4JConstants.AES_128_GCM
                                                             : WSS4JConstants.AES_128);
         }
-        encryptionProperties.setKeyWrapAlgorithm(JavaUtils.isFIPSEnabled() 
-                                                    ? WSS4JConstants.KEYTRANSPORT_RSA15
+        encryptionProperties.setKeyWrapAlgorithm(JavaUtils.isFIPSEnabled()
+                                                    ? WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11
                                                         : WSS4JConstants.KEYTRANSPORT_RSAOAEP);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
@@ -432,8 +432,8 @@ public class IssueEncryptedUnitTest {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> encryptionAlgorithmType =
             new JAXBElement<String>(
-                QNameConstants.KEYWRAP_ALGORITHM, String.class, JavaUtils.isFIPSEnabled() 
-                                                    ? WSS4JConstants.KEYTRANSPORT_RSA15
+                QNameConstants.KEYWRAP_ALGORITHM, String.class, JavaUtils.isFIPSEnabled()
+                                                    ? WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11
                                                         : WSS4JConstants.KEYTRANSPORT_RSAOAEP
             );
         request.getAny().add(encryptionAlgorithmType);

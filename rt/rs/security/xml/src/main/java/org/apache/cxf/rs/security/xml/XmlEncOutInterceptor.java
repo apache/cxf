@@ -142,7 +142,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             }
 
             String keyEncAlgo = encProps.getEncryptionKeyTransportAlgo() == null
-                ? JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_v1dot5 : XMLCipher.RSA_OAEP
+                ? JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_OAEP_11 : XMLCipher.RSA_OAEP
                     : encProps.getEncryptionKeyTransportAlgo();
             String digestAlgo = encProps.getEncryptionDigestAlgo();
 
