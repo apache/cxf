@@ -184,7 +184,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Predicate doBuildPredicate(ConditionType ct, Path<?> path, Class<?> valueClazz, Object value) {
+    protected Predicate doBuildPredicate(ConditionType ct, Path<?> path, Class<?> valueClazz, Object value) {
 
         Class<? extends Comparable> clazz = (Class<? extends Comparable>)valueClazz;
         Expression<? extends Comparable> exp = path.as(clazz);
@@ -246,7 +246,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Predicate doBuildCollectionPredicate(ConditionType ct, Path<?> path, CollectionCheckInfo collInfo) {
+    protected Predicate doBuildCollectionPredicate(ConditionType ct, Path<?> path, CollectionCheckInfo collInfo) {
         Predicate pred = null;
 
         Expression<Integer> exp = builder.size((Expression<? extends Collection>)path);
