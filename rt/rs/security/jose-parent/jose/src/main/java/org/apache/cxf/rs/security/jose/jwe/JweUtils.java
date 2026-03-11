@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -62,8 +61,6 @@ import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
-
-import static org.apache.cxf.rt.security.rs.RSSecurityConstants.RSSEC_KEY_STORE_ALIAS;
 
 public final class JweUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JweUtils.class);
@@ -430,16 +427,14 @@ public final class JweUtils {
             boolean includeKeyId =
                 JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID);
 
-            if (props.getProperty(RSSEC_KEY_STORE_ALIAS) != null && props.getProperty(RSSEC_KEY_STORE_ALIAS).equals(JoseConstants.USE_REQ_SIG_CERT)) {
-                var publicKey = PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
+            String alias = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
+            if (JoseConstants.USE_REQ_SIG_CERT.equals(alias)) {
+                PublicKey publicKey = (PublicKey)
+                    PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
                 if (publicKey == null) {
                     throw new JweException(JweException.Error.NO_ENCRYPTOR);
                 }
-                keyEncryptionProvider = getPublicKeyEncryptionProvider(
-                        publicKey,
-                        keyAlgo
-                );
-
+                keyEncryptionProvider = getPublicKeyEncryptionProvider(publicKey, keyAlgo);
                 if (includeCert) {
                     headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
                 }
@@ -448,12 +443,7 @@ public final class JweUtils {
                 } else if (includeCertSha256) {
                     KeyManagementUtils.setSha256DigestHeader(headers, m, props);
                 }
-                if (includeKeyId && props.containsKey(RSSEC_KEY_STORE_ALIAS)) {
-                    headers.setKeyId(props.getProperty(RSSEC_KEY_STORE_ALIAS));
-                }
-
-            }
-            else if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+            } else if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
                 if (jwk != null) {
                     keyAlgo = getKeyEncryptionAlgorithm(m, props,
@@ -479,8 +469,7 @@ public final class JweUtils {
                         headers.setKeyId(jwk.getKeyId());
                     }
                 }
-            }
-            else {
+            } else {
                 keyEncryptionProvider = getPublicKeyEncryptionProvider(
                     KeyManagementUtils.loadPublicKey(m, props),
                     props,
