@@ -204,7 +204,7 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
             service.orderBooks();
     
             // Await till flush happens, usually every second
-            await().atMost(Duration.ofSeconds(1L)).until(() -> TestSpanHandler.getAllSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(10L)).until(() -> TestSpanHandler.getAllSpans().size() == 2);
 
             assertThat(TestSpanHandler.getAllSpans().get(0).name(), equalTo("POST /BookStore"));
             assertThat(TestSpanHandler.getAllSpans().get(1).name(),

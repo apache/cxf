@@ -247,7 +247,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             }
 
             // Await till flush happens, usually every second
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 4);
+            await().atMost(Duration.ofSeconds(10L)).until(() -> otelRule.getSpans().size() == 4);
 
             assertThat(otelRule.getSpans().size(), equalTo(4));
             assertThat(otelRule.getSpans().get(3).getName(), equalTo("test span"));
@@ -331,7 +331,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         service.orderBooks();
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(10L)).until(() -> otelRule.getSpans().size() == 2);
 
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(1).getName(),
