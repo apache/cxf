@@ -27,7 +27,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -58,7 +58,7 @@ final class Utils {
     }
 
     private static Collection<Field> getFieldsInternal(Class<?> cls, XmlAccessType accessType) {
-        Set<Field> fields = new HashSet<>();
+        Set<Field> fields = new LinkedHashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached
@@ -79,7 +79,7 @@ final class Utils {
 
     private static Collection<Method> getMethodsInternal(Class<?> cls, XmlAccessType accessType,
             boolean acceptSetters) {
-        Set<Method> methods = new HashSet<>();
+        Set<Method> methods = new LinkedHashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached
