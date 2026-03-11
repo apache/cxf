@@ -436,62 +436,35 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testJweJwsJwkRsaUseReqSigCert(){
+    public void testJweJwsJwkRsaUseReqSigCert() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsjwkreqsigcert";
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
-        Bus springBus = bf.createBus(busFile.toString());
-        bean.setBus(springBus);
-        bean.setServiceClass(BookStore.class);
-        bean.setAddress(address);
-        List<Object> providers = new LinkedList<>();
-
-        // writer
-        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
-        jweWriter.setUseJweOutputStream(true);
-        JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
-        jwsWriter.setUseJwsOutputStream(true);
-        // reader
-        JweClientResponseFilter jweReader = new JweClientResponseFilter();
-        JwsClientResponseFilter jwsReader = new JwsClientResponseFilter();
-
-        providers.add(jweWriter);
-        providers.add(jwsWriter);
-
-        providers.add(jweReader);
-        providers.add(jwsReader);
-        bean.setProviders(providers);
-
-        //CLIENT == ALICE
-        bean.getProperties(true).put(
-                "rs.security.encryption.out.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.out.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.signature.out.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.out.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.encryption.in.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.in.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.signature.in.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.in.properties"
-        );
-
-        bean.getProperties(true).put("jose.debug", true);
-        bean.getProperties(true).put("rs.security.signature.include.public.key", "true");
-
-        BookStore bs = bean.create(BookStore.class);
+        BookStore bs = createUseReqSigCertBookStore(address,
+            "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.out.properties",
+            "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.out.properties",
+            "org/apache/cxf/systest/jaxrs/security/alice.jwk.enc.in.properties",
+            "org/apache/cxf/systest/jaxrs/security/alice.jwk.sign.in.properties",
+            "rs.security.signature.include.public.key");
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
 
     @Test
-    public void testJweJwsRsaUseReqSigCert(){
+    public void testJweJwsRsaUseReqSigCert() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsreqsigcert";
+        BookStore bs = createUseReqSigCertBookStore(address,
+            "org/apache/cxf/systest/jaxrs/security/bob.rs.properties",
+            "org/apache/cxf/systest/jaxrs/security/alice.rs.properties",
+            "org/apache/cxf/systest/jaxrs/security/alice.rs.properties",
+            "org/apache/cxf/systest/jaxrs/security/bob.rs.properties",
+            "rs.security.signature.include.cert");
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+
+    private BookStore createUseReqSigCertBookStore(String address,
+                                                   String encOutProps, String sigOutProps,
+                                                   String encInProps, String sigInProps,
+                                                   String includeKeyProperty) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -500,47 +473,22 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
         List<Object> providers = new LinkedList<>();
-
-        // writer
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
         jweWriter.setUseJweOutputStream(true);
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
         jwsWriter.setUseJwsOutputStream(true);
-        // reader
-        JweClientResponseFilter jweReader = new JweClientResponseFilter();
-        JwsClientResponseFilter jwsReader = new JwsClientResponseFilter();
-
         providers.add(jweWriter);
         providers.add(jwsWriter);
-
-        providers.add(jweReader);
-        providers.add(jwsReader);
+        providers.add(new JweClientResponseFilter());
+        providers.add(new JwsClientResponseFilter());
         bean.setProviders(providers);
-
-        //CLIENT == ALICE
-        bean.getProperties(true).put(
-                "rs.security.encryption.out.properties",
-                "org/apache/cxf/systest/jaxrs/security/bob.rs.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.signature.out.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.rs.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.encryption.in.properties",
-                "org/apache/cxf/systest/jaxrs/security/alice.rs.properties"
-        );
-        bean.getProperties(true).put(
-                "rs.security.signature.in.properties",
-                "org/apache/cxf/systest/jaxrs/security/bob.rs.properties"
-        );
-
+        bean.getProperties(true).put("rs.security.encryption.out.properties", encOutProps);
+        bean.getProperties(true).put("rs.security.signature.out.properties", sigOutProps);
+        bean.getProperties(true).put("rs.security.encryption.in.properties", encInProps);
+        bean.getProperties(true).put("rs.security.signature.in.properties", sigInProps);
         bean.getProperties(true).put("jose.debug", true);
-        bean.getProperties(true).put("rs.security.signature.include.cert", "true");
-
-        BookStore bs = bean.create(BookStore.class);
-        String text = bs.echoText("book");
-        assertEquals("book", text);
+        bean.getProperties(true).put(includeKeyProperty, "true");
+        return bean.create(BookStore.class);
     }
 
     @Test

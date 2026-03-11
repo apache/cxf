@@ -207,7 +207,9 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String ENABLE_UNSIGNED_JWT_PRINCIPAL = "rs.security.enable.unsigned-jwt.principal";
 
     /**
-     * Whether to use request signing certificate to create encryption provider
+     * Magic value for the {@code rs.security.keystore.alias} property that causes the JWE encryption
+     * to use the public key extracted from the inbound JWS signature verification, instead of loading
+     * a key from the configured keystore. This mirrors the WS-Security {@code useReqSigCert} convention.
      */
     public static final String USE_REQ_SIG_CERT = "useReqSigCert";
 

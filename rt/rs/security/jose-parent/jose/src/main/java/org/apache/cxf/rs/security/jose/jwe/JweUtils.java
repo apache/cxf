@@ -435,14 +435,6 @@ public final class JweUtils {
                     throw new JweException(JweException.Error.NO_ENCRYPTOR);
                 }
                 keyEncryptionProvider = getPublicKeyEncryptionProvider(publicKey, keyAlgo);
-                if (includeCert) {
-                    headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
-                }
-                if (includeCertSha1) {
-                    KeyManagementUtils.setSha1DigestHeader(headers, m, props);
-                } else if (includeCertSha256) {
-                    KeyManagementUtils.setSha256DigestHeader(headers, m, props);
-                }
             } else if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
                 if (jwk != null) {
