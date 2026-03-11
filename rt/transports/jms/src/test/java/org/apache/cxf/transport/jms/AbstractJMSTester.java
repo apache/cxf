@@ -260,23 +260,23 @@ public abstract class AbstractJMSTester {
 
 
     protected Message waitForReceiveInMessage() throws InterruptedException {
-        if (null == inMessage.get()) {
-            synchronized (inMessage) {
+        synchronized (inMessage) {
+            if (null == inMessage.get()) {
                 inMessage.wait(MAX_RECEIVE_TIME * 1000L);
             }
-            assertNotNull("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds", inMessage.get());
         }
+        assertNotNull("Can't receive the Conduit Message in " + MAX_RECEIVE_TIME + " seconds", inMessage.get());
         return inMessage.getAndSet(null);
     }
 
     protected Message waitForReceiveDestMessage() throws InterruptedException {
-        if (null == destMessage.get()) {
-            synchronized (destMessage) {
+        synchronized (destMessage) {
+            if (null == destMessage.get()) {
                 destMessage.wait(MAX_RECEIVE_TIME * 1000L);
             }
-            assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME + " seconds",
-                    destMessage.get());
         }
+        assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME + " seconds",
+            destMessage.get());
         return destMessage.getAndSet(null);
     }
 
