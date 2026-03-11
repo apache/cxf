@@ -73,6 +73,7 @@ import io.opentelemetry.semconv.UrlAttributes;
 import io.opentelemetry.semconv.UserAgentAttributes;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -120,6 +121,11 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
                 .create(TraceId.fromLongs(RANDOM.getAndIncrement(), RANDOM.getAndIncrement()),
                         SpanId.fromLong(RANDOM.getAndIncrement()), TraceFlags.getSampled(),
                         TraceState.getDefault())));
+    }
+
+    @Before
+    public void setUp() {
+        otelRule.clearSpans();
     }
 
     @After
@@ -257,7 +263,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             final Response r = withTrace(createWebClient("/bookstore/books/async")).get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            await().atMost(Duration.ofSeconds(10L)).until(() -> otelRule.getSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(10L)).until(() -> otelRule.getSpans().size() >= 2);
 
             final List<SpanData> spans = getSpansSorted();
             assertThat(spans.size(), equalTo(2));

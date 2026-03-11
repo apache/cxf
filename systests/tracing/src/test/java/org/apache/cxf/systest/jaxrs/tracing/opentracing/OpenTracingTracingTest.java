@@ -205,7 +205,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() >= 2);
 
         final List<JaegerSpan> spans = getSpansSorted();
         assertThat(spans.size(), equalTo(2));

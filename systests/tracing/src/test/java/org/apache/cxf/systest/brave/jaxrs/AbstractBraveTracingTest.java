@@ -45,6 +45,7 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -76,6 +77,11 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
         .addSpanHandler(new TestSpanHandler())
         .build();
 
+
+    @Before
+    public void setUp() {
+        TestSpanHandler.clear();
+    }
 
     @After
     public void tearDown() {
