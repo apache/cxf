@@ -29,8 +29,9 @@ public final class DefaultSignatureConstants {
 
     private static String getDefaultSecurityProvider() {
         if (JavaUtils.isFIPSEnabled()) {
-            String provider = JavaUtils.getFIPSSecurityProvider();
-            return provider != null ? provider : "SunPKCS11-NSS-FIPS";
+            // Use the configured FIPS provider, or null to let the JCA framework
+            // select an appropriate provider automatically
+            return JavaUtils.getFIPSSecurityProvider();
         }
         return "SunRsaSign";
     }

@@ -223,6 +223,8 @@ public class JweCompactReaderWriterTest {
     }
     @Test
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
+        // RSA1_5 and CBC are not FIPS-approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         final String specPlainText = "Live long and prosper.";
 
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(JavaUtils.isFIPSEnabled()
@@ -329,8 +331,8 @@ public class JweCompactReaderWriterTest {
             jwtKeyName = AlgorithmUtils.toJwaName(key.getAlgorithm(), key.getEncoded().length * 8);
         }
         KeyEncryptionProvider keyEncryptionAlgo = new RSAKeyEncryptionAlgorithm(publicKey,
-                                                                                 JavaUtils.isFIPSEnabled()  
-                                                                                     ? KeyAlgorithm.RSA1_5 
+                                                                                 JavaUtils.isFIPSEnabled()
+                                                                                     ? KeyAlgorithm.RSA_OAEP_256
                                                                                          : KeyAlgorithm.RSA_OAEP);
         ContentEncryptionProvider contentEncryptionAlgo =
             new AesGcmContentEncryptionAlgorithm(key == null ? null : key.getEncoded(), INIT_VECTOR_A1,

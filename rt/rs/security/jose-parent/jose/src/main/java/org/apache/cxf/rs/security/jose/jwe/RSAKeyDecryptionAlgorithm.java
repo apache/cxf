@@ -45,5 +45,9 @@ public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
         if (!AlgorithmUtils.isRsaKeyWrap(keyAlgo)) {
             reportInvalidKeyAlgorithm(keyAlgo);
         }
+        if (JavaUtils.isFIPSEnabled() && AlgorithmUtils.RSA1_5_ALGO.equals(keyAlgo)) {
+            LOG.warning("RSA1_5 key encryption algorithm is not allowed in FIPS mode");
+            reportInvalidKeyAlgorithm(keyAlgo);
+        }
     }
 }

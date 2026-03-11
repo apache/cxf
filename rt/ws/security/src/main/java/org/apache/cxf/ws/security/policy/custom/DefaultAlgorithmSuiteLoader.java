@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
@@ -206,7 +207,8 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                             SPConstants.SHA256,
                             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                             SPConstants.KW_AES256,
-                            SPConstants.KW_RSA15,
+                            JavaUtils.isFIPSEnabled()
+                                ? SPConstants.KW_RSA_OAEP : SPConstants.KW_RSA15,
                             SPConstants.P_SHA1_L256,
                             SPConstants.P_SHA1_L192,
                             256, 192, 256, 256, 1024, 4096

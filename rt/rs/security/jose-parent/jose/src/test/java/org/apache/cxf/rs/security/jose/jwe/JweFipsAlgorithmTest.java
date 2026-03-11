@@ -40,11 +40,13 @@ import static org.junit.Assert.assertEquals;
 public class JweFipsAlgorithmTest {
 
     private boolean originalFipsEnabled;
+    private String originalFipsProvider;
     private KeyPair rsaKeyPair;
 
     @Before
     public void setUp() throws Exception {
         originalFipsEnabled = JavaUtils.isFIPSEnabled();
+        originalFipsProvider = JavaUtils.getFIPSSecurityProvider();
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(2048);
         rsaKeyPair = kpg.generateKeyPair();
@@ -53,6 +55,7 @@ public class JweFipsAlgorithmTest {
     @After
     public void restoreFipsState() throws Exception {
         setFipsEnabled(originalFipsEnabled);
+        setFipsProvider(originalFipsProvider);
     }
 
     @Test
@@ -113,9 +116,31 @@ public class JweFipsAlgorithmTest {
         return (KeyAlgorithm) method.invoke(null, key);
     }
 
+    @Test(expected = JweException.class)
+    public void testRSA15RejectedInFIPSMode() throws Exception {
+        setFipsEnabled(true);
+        RSAKeyDecryptionAlgorithm decryptor =
+            new RSAKeyDecryptionAlgorithm((RSAPrivateKey) rsaKeyPair.getPrivate(),
+                                          KeyAlgorithm.RSA1_5);
+        JweHeaders headers = new JweHeaders();
+        headers.setKeyEncryptionAlgorithm(KeyAlgorithm.RSA1_5);
+        headers.setContentEncryptionAlgorithm(
+            org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm.A128GCM);
+        JweDecryptionInput input = new JweDecryptionInput(
+            new byte[0], new byte[0], new byte[0], new byte[0],
+            new byte[0], "{}", headers);
+        decryptor.getDecryptedContentEncryptionKey(input);
+    }
+
     private static void setFipsEnabled(boolean enabled) throws Exception {
         Field field = JavaUtils.class.getDeclaredField("isFIPSEnabled");
         field.setAccessible(true);
         field.setBoolean(null, enabled);
+    }
+
+    private static void setFipsProvider(String provider) throws Exception {
+        Field field = JavaUtils.class.getDeclaredField("fipsSecurityProvider");
+        field.setAccessible(true);
+        field.set(null, provider);
     }
 }
