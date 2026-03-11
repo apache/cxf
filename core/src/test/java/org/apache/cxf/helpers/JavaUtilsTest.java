@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.helpers;
 
-import java.lang.reflect.Field;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +40,8 @@ public class JavaUtilsTest {
 
     @After
     public void restoreFipsState() throws Exception {
-        setFipsEnabled(originalFipsEnabled);
-        setFipsProvider(originalFipsProvider);
+        FipsTestUtils.setFipsEnabled(originalFipsEnabled);
+        FipsTestUtils.setFipsProvider(originalFipsProvider);
     }
 
     @Test
@@ -54,10 +52,10 @@ public class JavaUtilsTest {
 
     @Test
     public void testSetFIPSEnabled() throws Exception {
-        setFipsEnabled(true);
+        FipsTestUtils.setFipsEnabled(true);
         assertTrue("FIPS should be enabled after setting the field", JavaUtils.isFIPSEnabled());
 
-        setFipsEnabled(false);
+        FipsTestUtils.setFipsEnabled(false);
         assertFalse("FIPS should be disabled after clearing the field", JavaUtils.isFIPSEnabled());
     }
 
@@ -70,7 +68,7 @@ public class JavaUtilsTest {
 
     @Test
     public void testGetFIPSSecurityProviderCustom() throws Exception {
-        setFipsProvider("BouncyCastleFIPS");
+        FipsTestUtils.setFipsProvider("BouncyCastleFIPS");
         assertEquals("BouncyCastleFIPS", JavaUtils.getFIPSSecurityProvider());
     }
 
@@ -88,17 +86,5 @@ public class JavaUtilsTest {
     public void testMakeNonJavaKeyword() {
         assertEquals("_class", JavaUtils.makeNonJavaKeyword("class"));
         assertEquals("_public", JavaUtils.makeNonJavaKeyword("public"));
-    }
-
-    private static void setFipsEnabled(boolean enabled) throws Exception {
-        Field field = JavaUtils.class.getDeclaredField("isFIPSEnabled");
-        field.setAccessible(true);
-        field.setBoolean(null, enabled);
-    }
-
-    private static void setFipsProvider(String provider) throws Exception {
-        Field field = JavaUtils.class.getDeclaredField("fipsSecurityProvider");
-        field.setAccessible(true);
-        field.set(null, provider);
     }
 }

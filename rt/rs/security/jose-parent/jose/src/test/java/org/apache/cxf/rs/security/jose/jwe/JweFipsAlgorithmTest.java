@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -54,41 +53,41 @@ public class JweFipsAlgorithmTest {
 
     @After
     public void restoreFipsState() throws Exception {
-        setFipsEnabled(originalFipsEnabled);
-        setFipsProvider(originalFipsProvider);
+        FipsTestUtils.setFipsEnabled(originalFipsEnabled);
+        FipsTestUtils.setFipsProvider(originalFipsProvider);
     }
 
     @Test
     public void testDefaultPublicKeyAlgorithmNonFIPS() throws Exception {
-        setFipsEnabled(false);
+        FipsTestUtils.setFipsEnabled(false);
         KeyAlgorithm algo = invokeGetDefaultPublicKeyAlgorithm(rsaKeyPair.getPublic());
         assertEquals(KeyAlgorithm.RSA_OAEP, algo);
     }
 
     @Test
     public void testDefaultPublicKeyAlgorithmFIPS() throws Exception {
-        setFipsEnabled(true);
+        FipsTestUtils.setFipsEnabled(true);
         KeyAlgorithm algo = invokeGetDefaultPublicKeyAlgorithm(rsaKeyPair.getPublic());
         assertEquals(KeyAlgorithm.RSA_OAEP_256, algo);
     }
 
     @Test
     public void testDefaultPrivateKeyAlgorithmNonFIPS() throws Exception {
-        setFipsEnabled(false);
+        FipsTestUtils.setFipsEnabled(false);
         KeyAlgorithm algo = invokeGetDefaultPrivateKeyAlgorithm(rsaKeyPair.getPrivate());
         assertEquals(KeyAlgorithm.RSA_OAEP, algo);
     }
 
     @Test
     public void testDefaultPrivateKeyAlgorithmFIPS() throws Exception {
-        setFipsEnabled(true);
+        FipsTestUtils.setFipsEnabled(true);
         KeyAlgorithm algo = invokeGetDefaultPrivateKeyAlgorithm(rsaKeyPair.getPrivate());
         assertEquals(KeyAlgorithm.RSA_OAEP_256, algo);
     }
 
     @Test
     public void testRSAKeyDecryptionAlgorithmDefaultNonFIPS() throws Exception {
-        setFipsEnabled(false);
+        FipsTestUtils.setFipsEnabled(false);
         RSAKeyDecryptionAlgorithm decryptor =
             new RSAKeyDecryptionAlgorithm((RSAPrivateKey) rsaKeyPair.getPrivate());
         assertEquals(KeyAlgorithm.RSA_OAEP.getJwaName(), decryptor.getAlgorithm().getJwaName());
@@ -96,7 +95,7 @@ public class JweFipsAlgorithmTest {
 
     @Test
     public void testRSAKeyDecryptionAlgorithmDefaultFIPS() throws Exception {
-        setFipsEnabled(true);
+        FipsTestUtils.setFipsEnabled(true);
         RSAKeyDecryptionAlgorithm decryptor =
             new RSAKeyDecryptionAlgorithm((RSAPrivateKey) rsaKeyPair.getPrivate());
         assertEquals(KeyAlgorithm.RSA_OAEP_256.getJwaName(), decryptor.getAlgorithm().getJwaName());
@@ -118,7 +117,7 @@ public class JweFipsAlgorithmTest {
 
     @Test(expected = JweException.class)
     public void testRSA15RejectedInFIPSMode() throws Exception {
-        setFipsEnabled(true);
+        FipsTestUtils.setFipsEnabled(true);
         RSAKeyDecryptionAlgorithm decryptor =
             new RSAKeyDecryptionAlgorithm((RSAPrivateKey) rsaKeyPair.getPrivate(),
                                           KeyAlgorithm.RSA1_5);
@@ -132,15 +131,4 @@ public class JweFipsAlgorithmTest {
         decryptor.getDecryptedContentEncryptionKey(input);
     }
 
-    private static void setFipsEnabled(boolean enabled) throws Exception {
-        Field field = JavaUtils.class.getDeclaredField("isFIPSEnabled");
-        field.setAccessible(true);
-        field.setBoolean(null, enabled);
-    }
-
-    private static void setFipsProvider(String provider) throws Exception {
-        Field field = JavaUtils.class.getDeclaredField("fipsSecurityProvider");
-        field.setAccessible(true);
-        field.set(null, provider);
-    }
 }
