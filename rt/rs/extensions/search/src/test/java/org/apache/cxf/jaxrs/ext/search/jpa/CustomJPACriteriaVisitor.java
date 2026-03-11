@@ -18,11 +18,12 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.metamodel.Attribute;
-import jakarta.persistence.metamodel.Bindable;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.Bindable;
+
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 
