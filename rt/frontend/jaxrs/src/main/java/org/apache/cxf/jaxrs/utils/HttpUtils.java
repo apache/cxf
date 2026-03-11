@@ -99,12 +99,7 @@ public final class HttpUtils {
     private static final Set<String> KNOWN_HTTP_VERBS_WITH_NO_RESPONSE_CONTENT =
         new HashSet<>(Arrays.asList(new String[]{"HEAD", "OPTIONS"}));
 
-    private static final Set<String> HTTP_SCHEMES = new HashSet<>();
-
-    static {
-        HTTP_SCHEMES.add("http");
-        HTTP_SCHEMES.add("https");
-    }
+    private static final String HTTPS_SCHEME = "https";
 
     private HttpUtils() {
     }
@@ -732,6 +727,6 @@ public final class HttpUtils {
     }
 
     public static boolean isHttpScheme(final String scheme) {
-        return scheme != null && HTTP_SCHEMES.contains(scheme.toLowerCase());
+        return HTTP_SCHEME.equalsIgnoreCase(scheme) || HTTPS_SCHEME.equalsIgnoreCase(scheme);
     }
 }

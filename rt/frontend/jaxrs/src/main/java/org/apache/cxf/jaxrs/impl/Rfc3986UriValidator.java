@@ -54,13 +54,6 @@ final class Rfc3986UriValidator {
     public static boolean validate(final URI uri) {
         // Only validate the HTTP(s) URIs
         if (HttpUtils.isHttpScheme(uri.getScheme())) {
-        // If URI.getHost() returns a host name, validate it and
-            // skip the expensive regular expression logic.
-            final String uriHost = uri.getHost();
-            if (uriHost != null) {
-                return !StringUtils.isEmpty(uriHost);
-            }
-
             final Matcher matcher = HTTP_URL.matcher(uri.toString());
             if (matcher.matches()) {
                 final String host = matcher.group(5);
