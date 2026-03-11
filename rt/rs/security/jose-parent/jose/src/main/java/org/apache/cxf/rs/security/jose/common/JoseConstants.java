@@ -43,6 +43,7 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String JWS_HEADER_B64_STATUS_HEADER = "b64";
 
     public static final String TYPE_JWT = "JWT";
+    public static final String TYPE_AT_JWT = "at+jwt";
     public static final String TYPE_JOSE = "JOSE";
     public static final String TYPE_JOSE_JSON = "JOSE+JSON";
     public static final String MEDIA_TYPE_JOSE = "application/jose";
