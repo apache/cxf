@@ -22,6 +22,7 @@ package org.apache.cxf.wsdl11;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class ServiceWSDLBuilder {
     public ServiceWSDLBuilder(Bus b, List<ServiceInfo> services) {
         this.services = services;
         bus = b;
-        ns2prefix = new HashMap<>();
+        ns2prefix = new LinkedHashMap<>();
         nsMan = new NSManager();
     }
 
