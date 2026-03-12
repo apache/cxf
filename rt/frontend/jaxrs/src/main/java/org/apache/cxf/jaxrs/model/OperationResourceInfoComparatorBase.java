@@ -98,8 +98,8 @@ public abstract class OperationResourceInfoComparatorBase {
                 e1.getClassResourceInfo().getServiceClass().getName() + "#" + e1.getMethodToInvoke().getName();
             String m2Name =
                 e2.getClassResourceInfo().getServiceClass().getName() + "#" + e2.getMethodToInvoke().getName();
-            LOG.warning("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
-                        + " which can lead to unpredictable results");
+            LOG.fine("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
+                     + " which can lead to unpredictable results");
         }
         return result;
     }
