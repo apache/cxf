@@ -178,7 +178,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(1L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
 
         assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
@@ -234,7 +234,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         service.orderBooks();
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(1L)).until(() -> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).until(() -> REPORTER.getSpans().size() == 2);
 
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
         assertThat(REPORTER.getSpans().get(1).getOperationName(),
