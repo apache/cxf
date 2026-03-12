@@ -23,12 +23,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.message.Exchange;
@@ -41,6 +46,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -112,6 +118,13 @@ public class TruncatedTest {
 
         interceptor.handleMessage(message);
 
+        // Consume and close the stream to trigger deferred logging (CXF-8096)
+        InputStream is = message.getContent(InputStream.class);
+        if (is != null) {
+            is.transferTo(OutputStream.nullOutputStream());
+            is.close();
+        }
+
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals("T", event.getPayload()); // only the first byte is read!
@@ -143,7 +156,53 @@ public class TruncatedTest {
         assertEquals("T", event.getPayload()); // only the first byte is read!
         assertTrue(event.isTruncated());
     }
-    
 
+    /**
+     * CXF-8096: Verify that LoggingFeature does not block when reading from a streaming
+     * input source. The TeeInputStream approach allows the application to read data
+     * incrementally while logging is deferred until the stream is closed.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+    public void streamingInputShouldNotBlockRead() throws Exception {
+        // Use PipedInputStream to simulate a slow streaming response
+        PipedOutputStream producer = new PipedOutputStream();
+        PipedInputStream slowStream = new PipedInputStream(producer);
+
+        Message message = new MessageImpl();
+        message.setContent(InputStream.class, slowStream);
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        LogEventSenderMock logEventSender = new LogEventSenderMock();
+        LoggingInInterceptor interceptor = new LoggingInInterceptor(logEventSender);
+
+        // Run WireTapIn
+        Collection<PhaseInterceptor<? extends Message>> interceptors = interceptor.getAdditionalInterceptors();
+        for (PhaseInterceptor intercept : interceptors) {
+            intercept.handleMessage(message);
+        }
+
+        // Run LoggingInInterceptor — should NOT block waiting for stream data
+        interceptor.handleMessage(message);
+
+        // At this point, logging should be deferred — no event yet
+        assertNull("Logging should be deferred for streaming input", logEventSender.getLogEvent());
+
+        // Write some data and close the stream
+        producer.write("Hello streaming!".getBytes(StandardCharsets.UTF_8));
+        producer.close();
+
+        // Now consume the stream from the application side
+        InputStream is = message.getContent(InputStream.class);
+        byte[] data = is.readAllBytes();
+        is.close();
+
+        assertEquals("Hello streaming!", new String(data, StandardCharsets.UTF_8));
+
+        // After stream close, deferred logging should have fired
+        LogEvent event = logEventSender.getLogEvent();
+        assertNotNull("Log event should be available after stream is closed", event);
+        assertEquals("Hello streaming!", event.getPayload());
+    }
 
 }

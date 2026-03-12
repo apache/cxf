@@ -21,7 +21,6 @@ package org.apache.cxf.ext.logging;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.SequenceInputStream;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -86,20 +85,20 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
         InputStream bis = is instanceof DelegatingInputStream
             ? ((DelegatingInputStream)is).getInputStream() : is;
 
-        // only copy up to the limit since that's all we need to log
-        // we can stream the rest
-        IOUtils.copyAtLeast(bis, bos, limit == -1 ? Integer.MAX_VALUE : limit);
-        bos.flush();
-        bis = new SequenceInputStream(bos.getInputStream(), bis);
+        // Wrap the stream in a TeeInputStream that copies data to the cache
+        // as it is consumed, up to the configured limit. This avoids blocking
+        // on streaming responses (CXF-8096).
+        int teeLimit = limit == -1 ? Integer.MAX_VALUE : limit;
+        TeeInputStream tee = new TeeInputStream(bis, bos, teeLimit);
 
         // restore the delegating input stream or the input stream
         if (is instanceof DelegatingInputStream) {
-            ((DelegatingInputStream)is).setInputStream(bis);
+            ((DelegatingInputStream)is).setInputStream(tee);
         } else {
-            message.setContent(InputStream.class, bis);
+            message.setContent(InputStream.class, tee);
         }
         message.setContent(CachedOutputStream.class, bos);
-
+        message.setContent(TeeInputStream.class, tee);
     }
 
     public void setLimit(int limit) {

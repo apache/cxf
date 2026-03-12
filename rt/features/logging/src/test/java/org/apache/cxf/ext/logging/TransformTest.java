@@ -136,10 +136,21 @@ public class TransformTest {
         }
         interceptor.handleMessage(message);
 
+        // Consume and close the stream to trigger deferred logging (CXF-8096)
+        try {
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                is.transferTo(OutputStream.nullOutputStream());
+                is.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // Verify
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
-        assertEquals(TRANSFORMED_LOGGING_CONTENT, event.getPayload()); // only the first byte is read!
+        assertEquals(TRANSFORMED_LOGGING_CONTENT, event.getPayload());
     }
 
     @Test

@@ -156,6 +156,7 @@ public class MaskSensitiveHelperTest {
             intercept.handleMessage(message);
         }
         inInterceptor.handleMessage(message);
+        consumeAndCloseInputStream(message);
 
         // Verify
         LogEvent event = logEventSender.getLogEvent();
@@ -177,6 +178,7 @@ public class MaskSensitiveHelperTest {
             intercept.handleMessage(message);
         }
         inInterceptor.handleMessage(message);
+        consumeAndCloseInputStream(message);
 
         // Verify
         LogEvent event = logEventSender.getLogEvent();
@@ -254,6 +256,18 @@ public class MaskSensitiveHelperTest {
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
         return message;
+    }
+
+    private static void consumeAndCloseInputStream(Message message) {
+        try {
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                is.transferTo(OutputStream.nullOutputStream());
+                is.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Message prepareOutMessage() {
