@@ -30,6 +30,8 @@ import jakarta.xml.ws.handler.LogicalHandler;
 import jakarta.xml.ws.handler.LogicalMessageContext;
 import jakarta.xml.ws.handler.MessageContext;
 
+import org.apache.cxf.jaxws.handler.sei.HandlerChainTestSEI;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -137,9 +139,41 @@ public class JakartaAnnotationHandlerChainBuilderTest {
         }
     }
 
+    @Test
+    public void testHandlerChainResolvedFromSEI() {
+        // When @HandlerChain is on the SEI (in a different
+        // package) and the impl class is passed to the builder,
+        // the handler file must be resolved relative to the
+        // SEI, not the impl class.
+        AnnotationHandlerChainBuilder chainBuilder =
+            new AnnotationHandlerChainBuilder();
+        @SuppressWarnings("rawtypes")
+        List<Handler> handlers = chainBuilder
+            .buildHandlerChainFromClass(
+                CrossPackageHandlerTestImpl.class,
+                null, null, null);
+        assertNotNull(handlers);
+        assertEquals(1, handlers.size());
+        assertEquals(TestLogicalHandler.class,
+            handlers.get(0).getClass());
+    }
+
     @WebService()
-    @HandlerChain(file = "./jakarta-handlers.xml", name = "TestHandlerChain")
+    @HandlerChain(file = "./jakarta-handlers.xml",
+                  name = "TestHandlerChain")
     public class JakartaHandlerTestImpl {
 
+    }
+
+    // Impl in this package references SEI in the 'sei'
+    // sub-package where the handler XML file lives.
+    @WebService(endpointInterface
+        = "org.apache.cxf.jaxws.handler.sei"
+        + ".HandlerChainTestSEI")
+    public static class CrossPackageHandlerTestImpl
+        implements HandlerChainTestSEI {
+        public String echo(String input) {
+            return input;
+        }
     }
 }
