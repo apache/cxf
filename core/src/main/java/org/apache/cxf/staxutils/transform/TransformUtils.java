@@ -122,6 +122,7 @@ public final class TransformUtils {
                           inAttributesMap, blockOriginalReader, null);
     }
 
+    //CHECKSTYLE:OFF ParameterNumber
     public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
                                                                 List<String> inDropElements,
@@ -139,6 +140,7 @@ public final class TransformUtils {
 
         return reader;
     }
+    //CHECKSTYLE:ON ParameterNumber
 
     protected static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
