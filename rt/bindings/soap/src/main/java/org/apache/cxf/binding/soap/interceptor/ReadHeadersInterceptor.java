@@ -34,10 +34,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
@@ -234,24 +232,6 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     for (Element elem : elemList) {
                         Element hel = DOMUtils.getFirstElement(elem);
                         while (hel != null) {
-                            // Need to add any attributes that are present on the parent element
-                            // which otherwise would be lost.
-                            if (elem.hasAttributes()) {
-                                NamedNodeMap nnp = elem.getAttributes();
-                                for (int ct = 0; ct < nnp.getLength(); ct++) {
-                                    Node attr = nnp.item(ct);
-                                    Node headerAttrNode = hel.hasAttributes() ? hel.getAttributes()
-                                        .getNamedItemNS(attr.getNamespaceURI(), attr.getLocalName()) : null;
-
-                                    if (headerAttrNode == null) {
-                                        Attr attribute = hel.getOwnerDocument()
-                                            .createAttributeNS(attr.getNamespaceURI(), attr.getNodeName());
-                                        attribute.setNodeValue(attr.getNodeValue());
-                                        hel.setAttributeNodeNS(attribute);
-                                    }
-                                }
-                            }
-
                             HeaderProcessor p = bus == null ? null : bus.getExtension(HeaderManager.class)
                                 .getHeaderProcessor(hel.getNamespaceURI());
 
