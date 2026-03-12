@@ -42,7 +42,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
     HttpServletRequest req;
     HttpServletResponse resp;
     Message inMessage;
-    Servlet3Continuation continuation;
+    Servlet31Continuation continuation;
 
     public Servlet3ContinuationProvider(HttpServletRequest req,
                                         HttpServletResponse resp,
@@ -67,14 +67,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         if (continuation == null) {
-            continuation = new Servlet3Continuation();
+            continuation = new Servlet31Continuation();
         } else {
             continuation.startAsyncAgain();
         }
         return continuation;
     }
 
-    public class Servlet3Continuation implements Continuation, AsyncListener {
+    public class Servlet31Continuation implements Continuation, AsyncListener {
         private static final String BLOCK_RESTART = "org.apache.cxf.continuation.block.restart";
         AsyncContext context;
         volatile boolean isNew = true;
@@ -86,7 +86,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         private ContinuationCallback callback;
         private boolean blockRestart;
         
-        public Servlet3Continuation() {
+        public Servlet31Continuation() {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              inMessage.getExchange().getInMessage());
             callback = inMessage.getExchange().get(ContinuationCallback.class);
