@@ -20,12 +20,17 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -43,7 +48,11 @@ public class ReadHeadersInterceptorTest {
     private static final byte[] TEST_SOAP =
         ("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'"
             + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
-            + " xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:bar='tmp:bar'>"
+            + " xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:bar='tmp:bar'"
+            + " xmlns:x='http://example.com/schema'>"
+            + "<soap:Header testAttr='testValue'>"
+            + "<x:AuthToken>Token</x:AuthToken>"
+            + "</soap:Header>"
             + "<soap:Body>"
             + "<ns2:payload xmlns:ns2='urn:tmp:foo'/>"
             + "</soap:Body>"
@@ -75,6 +84,21 @@ public class ReadHeadersInterceptorTest {
         assertEquals("http://www.w3.org/2001/XMLSchema", nsc.get("xs"));
         assertEquals("tmp:bar", nsc.get("bar"));
 
+    }
+
+    @Test
+    public void testHeaderAttributes() throws Exception {
+        SoapMessage message = setUpMessage();
+        interceptor.handleMessage(message);
+        List<Header> cxfHeaders = message.getHeaders();
+        assertEquals(1, cxfHeaders.size());
+        Element headerElement = (Element) cxfHeaders.get(0).getObject();
+        NamedNodeMap attributes = headerElement.getAttributes();
+
+        assertEquals("AuthToken", headerElement.getLocalName());
+        assertEquals("http://example.com/schema", headerElement.getNamespaceURI());
+        // The test SOAP header attribute "testAttr", must not be transferred to child element "AuthToken"
+        assertEquals(0, attributes.getLength());
     }
 
     private SoapMessage setUpMessage() throws Exception {
