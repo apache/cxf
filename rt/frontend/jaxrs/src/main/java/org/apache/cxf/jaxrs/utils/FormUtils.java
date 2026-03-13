@@ -306,9 +306,7 @@ public final class FormUtils {
     }
 
     public static boolean isFormPostRequest(Message m) {
-        String contentType = (String) m.get(Message.CONTENT_TYPE);
-        return contentType != null
-            && contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED)
+        return MediaType.APPLICATION_FORM_URLENCODED.equals(m.get(Message.CONTENT_TYPE))
             && HttpMethod.POST.equals(m.get(Message.HTTP_REQUEST_METHOD));
     }
 }
