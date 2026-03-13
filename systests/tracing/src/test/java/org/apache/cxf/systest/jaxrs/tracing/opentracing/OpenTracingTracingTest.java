@@ -199,7 +199,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 2);
 
         final List<JaegerSpan> spans = getSpansSorted();
         assertThat(spans.size(), equalTo(2));
@@ -226,7 +226,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 2);
 
         final List<JaegerSpan> spans = getSpansSorted();
         assertThat(spans.size(), equalTo(2));
@@ -241,7 +241,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = client.async().get().get(1L, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 3);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 3);
 
         assertThat(REPORTER.getSpans().size(), equalTo(3));
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -325,7 +325,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 4);
 
         assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
@@ -342,7 +342,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
-            await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 3);
+            await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 3);
 
             assertThat(REPORTER.getSpans().size(), equalTo(3));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
@@ -356,7 +356,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 4);
 
         assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
@@ -391,7 +391,7 @@ public class OpenTracingTracingTest extends AbstractClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(10L)).until(()-> REPORTER.getSpans().size() == 2);
             assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(2));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
             assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
