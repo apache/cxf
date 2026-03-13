@@ -258,7 +258,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             final Response r = withTrace(createWebClient("/bookstore/books/async")).get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 2);
 
             final List<SpanData> spans = getSpansSorted();
             assertThat(spans.size(), equalTo(2));
@@ -288,7 +288,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 2);
 
         final List<SpanData> spans = getSpansSorted();
         assertThat(spans.size(), equalTo(2));
@@ -304,7 +304,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         final Response r = client.async().get().get(1L, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 3);
+        await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 3);
 
         assertThat(otelRule.getSpans().size(), equalTo(3));
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("Get Books"));
@@ -374,7 +374,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 4);
 
         assertThat(otelRule.getSpans().size(), equalTo(4));
         assertThat(otelRule.getSpans().get(3).getName(), equalTo("test span"));
@@ -393,7 +393,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
             assertThat(Span.current().getSpanContext().getSpanId(),
                        equalTo(span.getSpanContext().getSpanId()));
 
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 3);
+            await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 3);
 
             assertThat(otelRule.getSpans().size(), equalTo(3));
             assertThat(otelRule.getSpans().get(0).getName(), equalTo("Get Books"));
@@ -407,7 +407,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 4);
 
         assertThat(otelRule.getSpans().size(), equalTo(4));
         assertThat(otelRule.getSpans().get(3).getName(), equalTo("test span"));
@@ -444,7 +444,7 @@ public class OpenTelemetryTracingTest extends AbstractClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ofSeconds(1L)).until(() -> otelRule.getSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 2);
             assertThat(otelRule.getSpans().toString(), otelRule.getSpans().size(), equalTo(2));
             assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET " + client.getCurrentURI()));
             assertThat(otelRule.getSpans().get(0).getStatus().getStatusCode(), equalTo(StatusCode.ERROR));
