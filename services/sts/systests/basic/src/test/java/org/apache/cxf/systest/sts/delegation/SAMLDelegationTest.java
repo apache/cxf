@@ -63,7 +63,7 @@ import static org.junit.Assert.fail;
  */
 public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
 
-    private static final String STSPORT = allocatePort(STSServer.class);
+    private static final String STSPORT = allocatePort(DelegationSTSServer.class);
 
     private static final String SAML2_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
@@ -80,7 +80,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(STSServer.class, true)
+                   launchServer(DelegationSTSServer.class, true)
         );
     }
 

@@ -49,10 +49,10 @@ import static org.junit.Assert.assertTrue;
 public class CXFFilterTest extends AbstractServletTest {
 
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class CXFFilterEmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(CXFFilterEmbeddedJettyServer.class);
 
-        public EmbeddedJettyServer() {
+        public CXFFilterEmbeddedJettyServer() {
             super("/org/apache/cxf/systest/servlet/web-filter.xml", "/", CONTEXT, PORT);
         }
     }
@@ -60,7 +60,7 @@ public class CXFFilterTest extends AbstractServletTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(CXFFilterEmbeddedJettyServer.class, true));
         createStaticBus();
     }
 
@@ -116,6 +116,6 @@ public class CXFFilterTest extends AbstractServletTest {
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return CXFFilterEmbeddedJettyServer.PORT;
     }
 }

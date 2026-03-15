@@ -39,7 +39,7 @@ under the License.
     <!-- -->
     <!-- Spring-load an HTTPS servant -->
     <!-- -->
-    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" implementor="org.apache.cxf.systest.http.GreeterImpl" address="https://localhost:${testutil.ports.BusServer.5}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" wsdlLocation="/wsdl/hello_world_services.wsdl" depends-on="port-9005-tls-config">
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" implementor="org.apache.cxf.systest.http.GreeterImpl" address="https://localhost:${testutil.ports.HttpsBusServer.5}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" wsdlLocation="/wsdl/hello_world_services.wsdl" depends-on="port-9005-tls-config">
         <jaxws:features>
             <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxws:features>
@@ -50,7 +50,7 @@ under the License.
     <!-- This test exercises the resource attribute in a keyStore element -->
     <!-- -->
     <httpj:engine-factory id="port-9005-tls-config">
-        <httpj:engine port="${testutil.ports.BusServer.5}">
+        <httpj:engine port="${testutil.ports.HttpsBusServer.5}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>

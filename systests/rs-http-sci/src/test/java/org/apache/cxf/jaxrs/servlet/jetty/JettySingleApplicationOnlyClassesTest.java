@@ -32,10 +32,10 @@ import static org.junit.Assert.assertTrue;
 
 public class JettySingleApplicationOnlyClassesTest extends AbstractSciTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class EmbeddedJettySingleApplicationOnlyClassesServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettySingleApplicationOnlyClassesServer.class);
 
-        public EmbeddedJettyServer() {
+        public EmbeddedJettySingleApplicationOnlyClassesServer() {
             super("/",
                 new Resource[] {
                     // Limit the classpath scanning to org.apache.demo.resources package
@@ -51,13 +51,14 @@ public class JettySingleApplicationOnlyClassesTest extends AbstractSciTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly",
+            launchServer(EmbeddedJettySingleApplicationOnlyClassesServer.class, true));
         createStaticBus();
     }
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return EmbeddedJettySingleApplicationOnlyClassesServer.PORT;
     }
 
     @Override

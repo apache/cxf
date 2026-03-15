@@ -38,14 +38,14 @@ import static org.junit.Assert.assertTrue;
 
 public class JSClientServerTest extends AbstractBusClientServerTestBase {
 
-    public static final String JS_PORT = Server.JS_PORT;
-    public static final String JSX_PORT = Server.JSX_PORT;
+    public static final String JS_PORT = JSServer.JS_PORT;
+    public static final String JSX_PORT = JSServer.JSX_PORT;
 
     private static final String NS = "http://apache.org/hello_world_soap_http";
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(JSServer.class, true));
         createStaticBus();
     }
 

@@ -59,10 +59,10 @@ import static org.junit.Assert.assertTrue;
 public class CXF4818Test extends AbstractBusClientServerTestBase {
 
     public static final String ADDRESS
-        = "http://localhost:" + TestUtil.getPortNumber(Server.class)
+        = "http://localhost:" + TestUtil.getPortNumber(CXF4818Server.class)
             + "/AddressProvider/AddressProvider";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CXF4818Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new CXF4818Provider();
@@ -71,7 +71,7 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                CXF4818Server s = new CXF4818Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -84,7 +84,7 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(CXF4818Server.class, true));
     }
 
     @Test

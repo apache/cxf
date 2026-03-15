@@ -29,10 +29,10 @@ import static org.junit.Assert.assertTrue;
 
 public class TomcatWarTest extends AbstractSseTest {
     @Ignore
-    public static class EmbeddedTomcatServer extends AbstractTomcatServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedTomcatServer.class);
+    public static class EmbeddedTomcatWarServer extends AbstractTomcatServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedTomcatWarServer.class);
 
-        public EmbeddedTomcatServer() {
+        public EmbeddedTomcatWarServer() {
             super("/jaxrs_sse", "/", PORT);
         }
     }
@@ -40,13 +40,13 @@ public class TomcatWarTest extends AbstractSseTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedTomcatServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(EmbeddedTomcatWarServer.class, true));
         createStaticBus();
     }
 
     @Override
     protected int getPort() {
-        return EmbeddedTomcatServer.PORT;
+        return EmbeddedTomcatWarServer.PORT;
     }
 
     @Override

@@ -75,11 +75,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(RPCLitServer.class);
 
     private final QName portName = new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RPCLitServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             String address;
@@ -92,7 +92,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                RPCLitServer s = new RPCLitServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -105,7 +105,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(RPCLitServer.class, true));
     }
 
     @Test

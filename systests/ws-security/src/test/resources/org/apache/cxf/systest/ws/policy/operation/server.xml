@@ -34,7 +34,7 @@
         </cxf:features>
     </cxf:bus>
  
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="DoubleItEndpoint" address="http://localhost:${testutil.ports.policy.operation.Server}/DoubleIt" serviceName="s:DoubleItService" endpointName="s:DoubleItPort" implementor="org.apache.cxf.systest.ws.common.DoubleIt2Impl" wsdlLocation="org/apache/cxf/systest/ws/policy/operation/DoubleItPolicyOperation.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="DoubleItEndpoint" address="http://localhost:${testutil.ports.policy.operation.PolicyOperationServer}/DoubleIt" serviceName="s:DoubleItService" endpointName="s:DoubleItPort" implementor="org.apache.cxf.systest.ws.common.DoubleIt2Impl" wsdlLocation="org/apache/cxf/systest/ws/policy/operation/DoubleItPolicyOperation.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
