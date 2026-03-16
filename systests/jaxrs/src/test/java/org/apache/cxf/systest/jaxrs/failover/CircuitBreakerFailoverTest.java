@@ -88,7 +88,7 @@ public class CircuitBreakerFailoverTest extends AbstractFailoverTest {
             }
 
             // Let's wait a bit more than circuit breaker timeout
-            Thread.sleep(4000);
+            Thread.sleep(6000);
         }
     }
 
