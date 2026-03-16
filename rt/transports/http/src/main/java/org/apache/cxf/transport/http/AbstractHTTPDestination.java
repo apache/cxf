@@ -36,7 +36,6 @@ import javax.xml.namespace.QName;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
@@ -120,7 +119,6 @@ public abstract class AbstractHTTPDestination
     protected boolean fixedParameterOrder;
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
-    protected boolean isServlet3;
     protected boolean decodeBasicAuthWithIso8859;
     protected ContinuationProviderFactory cproviderFactory;
     protected boolean enableWebSocket;
@@ -147,12 +145,6 @@ public abstract class AbstractHTTPDestination
         this.bus = b;
         this.registry = registry;
         this.path = path;
-        try {
-            ServletRequest.class.getMethod("isAsyncSupported");
-            isServlet3 = true;
-        } catch (Throwable t) {
-            //servlet 2.5 or earlier, no async support
-        }
         decodeBasicAuthWithIso8859 = PropertyUtils.isTrue(bus.getProperty(DECODE_BASIC_AUTH_WITH_ISO8859));
 
         initConfig();
@@ -513,39 +505,20 @@ public abstract class AbstractHTTPDestination
         return contentType;
     }
     protected Message retrieveFromContinuation(HttpServletRequest req) {
-        if (!isServlet3) {
-            if (cproviderFactory != null) {
-                return cproviderFactory.retrieveFromContinuation(req);
-            }
-            return null;
-        }
-        return retrieveFromServlet3Async(req);
-    }
-
-    protected Message retrieveFromServlet3Async(HttpServletRequest req) {
-        try {
-            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
-        } catch (Throwable ex) {
-            // the request may not implement the Servlet3 API
-        }
-        return null;
+        return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
     }
 
     protected void setupContinuation(Message inMessage,
                                      final HttpServletRequest req,
                                      final HttpServletResponse resp) {
-        try {
-            if (isServlet3 && req.isAsyncSupported()) {
-                inMessage.put(ContinuationProvider.class.getName(),
-                              new Servlet3ContinuationProvider(req, resp, inMessage));
-            } else if (cproviderFactory != null) {
-                ContinuationProvider p = cproviderFactory.createContinuationProvider(inMessage, req, resp);
-                if (p != null) {
-                    inMessage.put(ContinuationProvider.class.getName(), p);
-                }
+        if (req.isAsyncSupported()) {
+            inMessage.put(ContinuationProvider.class.getName(),
+                          new Servlet3ContinuationProvider(req, resp, inMessage));
+        } else if (cproviderFactory != null) {
+            ContinuationProvider p = cproviderFactory.createContinuationProvider(inMessage, req, resp);
+            if (p != null) {
+                inMessage.put(ContinuationProvider.class.getName(), p);
             }
-        } catch (Throwable ex) {
-            // the request may not implement the Servlet3 API
         }
     }
     protected String getBasePath(String contextPath) throws IOException {
