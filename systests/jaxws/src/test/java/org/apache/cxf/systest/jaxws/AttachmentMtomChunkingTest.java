@@ -44,7 +44,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class AttachmentMtomChunkingTest extends AbstractAttachmentChunkingTest {
-    private static final String PORT = allocatePort(DownloadServer.class);
+    private static final String PORT = allocatePort(AttachmentMtomChunkingTest.class);
     private static final Logger LOG = LogUtils.getLogger(AttachmentMtomChunkingTest.class);
 
     public static class DownloadServer extends AbstractBusTestServerBase {
