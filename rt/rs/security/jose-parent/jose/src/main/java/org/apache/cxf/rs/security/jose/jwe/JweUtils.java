@@ -427,7 +427,15 @@ public final class JweUtils {
             boolean includeKeyId =
                 JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_KEY_ID);
 
-            if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+            String alias = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
+            if (JoseConstants.USE_REQ_SIG_CERT.equals(alias)) {
+                PublicKey publicKey = (PublicKey)
+                    PhaseInterceptorChain.getCurrentMessage().getExchange().get(PublicKey.class);
+                if (publicKey == null) {
+                    throw new JweException(JweException.Error.NO_ENCRYPTOR);
+                }
+                keyEncryptionProvider = getPublicKeyEncryptionProvider(publicKey, keyAlgo);
+            } else if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
                 JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.ENCRYPT);
                 if (jwk != null) {
                     keyAlgo = getKeyEncryptionAlgorithm(m, props,

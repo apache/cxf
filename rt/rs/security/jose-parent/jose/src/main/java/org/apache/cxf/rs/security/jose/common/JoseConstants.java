@@ -207,6 +207,13 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String ENABLE_UNSIGNED_JWT_PRINCIPAL = "rs.security.enable.unsigned-jwt.principal";
 
     /**
+     * Magic value for the {@code rs.security.keystore.alias} property that causes the JWE encryption
+     * to use the public key extracted from the inbound JWS signature verification, instead of loading
+     * a key from the configured keystore. This mirrors the WS-Security {@code useReqSigCert} convention.
+     */
+    public static final String USE_REQ_SIG_CERT = "useReqSigCert";
+
+    /**
      * Whether to trace JOSE headers.
      */
     public static final String JOSE_DEBUG = "jose.debug";
