@@ -90,6 +90,29 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
         }
         createExchangeId(message);
+
+        // Check if a TeeInputStream is present (CXF-8096).
+        // Register a close callback to log when the stream is consumed,
+        // rather than eagerly consuming the stream here which would block
+        // on streaming responses.
+        TeeInputStream tee = message.getContent(TeeInputStream.class);
+        if (tee != null) {
+            CachedOutputStream cos = message.getContent(CachedOutputStream.class);
+            if (cos != null && cos.size() > 0) {
+                // Stream was already consumed (e.g. SOAP/JAX-WS where body is read
+                // before PRE_INVOKE). Log immediately.
+                logMessage(message);
+            } else {
+                // Stream not consumed yet — defer logging until stream is closed.
+                tee.setOnClose(() -> logMessage(message));
+            }
+            return;
+        }
+
+        logMessage(message);
+    }
+
+    private void logMessage(Message message) {
         final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
         if (shouldLogContent(event)) {
             addContent(message, event);
