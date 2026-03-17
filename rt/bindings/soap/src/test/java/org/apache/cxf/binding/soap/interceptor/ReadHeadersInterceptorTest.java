@@ -20,6 +20,8 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,6 +48,7 @@ import static org.junit.Assert.assertNull;
 /**
  *
  */
+@RunWith(Parameterized.class)
 public class ReadHeadersInterceptorTest {
     private static final byte[] TEST_SOAP =
         ("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'"
@@ -58,7 +63,29 @@ public class ReadHeadersInterceptorTest {
             + "</soap:Body>"
             + "</soap:Envelope>").getBytes();
 
+    private final Object attributeValue;
+    private final int expectedTransferredAttributeCount;
+    private final boolean expectedAddNSContext;
     private ReadHeadersInterceptor interceptor;
+
+    public ReadHeadersInterceptorTest(Object attribute, int expectedCount, boolean expectedAddNSContext) {
+        this.attributeValue = attribute;
+        this.expectedTransferredAttributeCount = expectedCount;
+        this.expectedAddNSContext = expectedAddNSContext;
+    }
+
+    @Parameterized.Parameters(name = "{index}: attribute={0}, expectedCount={1}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+            {"false", 0, false},
+            {"true", 1, true},
+            {"TRUE", 1, true},
+            {true, 1, true},
+            {false, 0, false},
+            {null, 0, false},
+            {"", 0, false}
+        });
+    }
 
     @Before
     public void setUp() {
@@ -66,29 +93,31 @@ public class ReadHeadersInterceptorTest {
     }
 
     @Test
-    public void testNotAddNSContext() throws Exception {
-        SoapMessage message = setUpMessage();
-        interceptor.handleMessage(message);
-        Map<String, String> nsc = CastUtils.cast((Map<?, ?>)message.get("soap.body.ns.context"));
-        assertNull(nsc);
-    }
-
-    @Test
     public void testAddNSContext() throws Exception {
         SoapMessage message = setUpMessage();
-        message.put("org.apache.cxf.binding.soap.addNamespaceContext", "true");
+        message.put("org.apache.cxf.binding.soap.addNamespaceContext", attributeValue);
         interceptor.handleMessage(message);
         Map<String, String> nsc = CastUtils.cast((Map<?, ?>)message.get("soap.body.ns.context"));
-        assertNotNull(nsc);
-        assertEquals("http://www.w3.org/2001/XMLSchema-instance", nsc.get("xsi"));
-        assertEquals("http://www.w3.org/2001/XMLSchema", nsc.get("xs"));
-        assertEquals("tmp:bar", nsc.get("bar"));
-
+        if (expectedAddNSContext) {
+            assertNotNull(nsc);
+            assertEquals("http://www.w3.org/2001/XMLSchema-instance", nsc.get("xsi"));
+            assertEquals("http://www.w3.org/2001/XMLSchema", nsc.get("xs"));
+            assertEquals("tmp:bar", nsc.get("bar"));
+        } else {
+            assertNull(nsc);
+        }
     }
 
+    /**
+     * Test to verify that SOAP header attributes are not transferred to child elements of the header.
+     * See CXF-9205 for more details.
+     *
+     * @throws Exception may be thrown during test execution
+     */
     @Test
-    public void testHeaderAttributes() throws Exception {
+    public void testHeaderAttributesTransferredToChildren() throws Exception {
         SoapMessage message = setUpMessage();
+        message.put("org.apache.cxf.binding.soap.propagateHeaderAttributes", attributeValue);
         interceptor.handleMessage(message);
         List<Header> cxfHeaders = message.getHeaders();
         assertEquals(1, cxfHeaders.size());
@@ -98,7 +127,7 @@ public class ReadHeadersInterceptorTest {
         assertEquals("AuthToken", headerElement.getLocalName());
         assertEquals("http://example.com/schema", headerElement.getNamespaceURI());
         // The test SOAP header attribute "testAttr", must not be transferred to child element "AuthToken"
-        assertEquals(0, attributes.getLength());
+        assertEquals(expectedTransferredAttributeCount, attributes.getLength());
     }
 
     private SoapMessage setUpMessage() throws Exception {
