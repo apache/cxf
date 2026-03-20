@@ -24,13 +24,16 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class BookServerOAuth2Tls extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2-tls");
     private static final URL SERVER_CONFIG_FILE =
-        BookServerOAuth2Tls.class.getResource("serverTls.xml");
+        BookServerOAuth2Tls.class.getResource(JavaUtils.isFIPSEnabled()
+                                              ? "serverTls-fips.xml"
+                                                  : "serverTls.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

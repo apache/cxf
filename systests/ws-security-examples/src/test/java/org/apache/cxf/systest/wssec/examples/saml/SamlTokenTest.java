@@ -30,6 +30,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.systest.wssec.examples.sts.STSServer;
@@ -44,8 +45,8 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertTrue;
 
 /**
- * A set of tests for SAML Tokens using policies defined in the OASIS spec:
- * "WS-SecurityPolicy Examples Version 1.0".
+ * A set of tests for SAML Tokens using policies defined in the OASIS spec: "WS-SecurityPolicy Examples
+ * Version 1.0".
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
@@ -66,33 +67,26 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
+        assertTrue("Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
-        );
-        assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(STSServer.class, true)
-        );
+                   launchServer(Server.class, true));
+        assertTrue("Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(StaxServer.class, true));
+        assertTrue("Server failed to launch",
+                   // run the server in the same process
+                   // set this to false to fork
+                   launchServer(STSServer.class, true));
     }
 
     @Parameters(name = "{0}")
     public static Collection<TestParam> data() {
 
-        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
-                                              new TestParam(PORT, true),
-                                              new TestParam(STAX_PORT, false),
-                                              new TestParam(STAX_PORT, true),
+        return Arrays.asList(new TestParam[] {
+        new TestParam(PORT, false), new TestParam(PORT, true),
+        new TestParam(STAX_PORT, false), new TestParam(STAX_PORT, true),
         });
     }
 
@@ -114,11 +108,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBearerPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
 
         if (test.isStreaming()) {
@@ -144,11 +138,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         String portNumber = PORT2;
         if (STAX_PORT.equals(test.getPort())) {
             portNumber = STAX_PORT2;
@@ -178,11 +172,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         String portNumber = PORT2;
         if (STAX_PORT.equals(test.getPort())) {
             portNumber = STAX_PORT2;
@@ -212,11 +206,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignedPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
 
         samlPort.doubleIt(25);
@@ -238,11 +232,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricInitiatorPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
 
         if (test.isStreaming()) {
@@ -254,7 +248,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-
 
     /**
      * 2.3.2.1 (WSS1.1) SAML 2.0 Bearer
@@ -269,11 +262,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSaml2BearerPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
 
         if (test.isStreaming()) {
@@ -299,11 +292,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesSaml2Port");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         String portNumber = PORT2;
         if (STAX_PORT.equals(test.getPort())) {
             portNumber = STAX_PORT2;
@@ -333,11 +326,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingSaml2Port");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         String portNumber = PORT2;
         if (STAX_PORT.equals(test.getPort())) {
             portNumber = STAX_PORT2;
@@ -367,11 +360,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSVPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
 
         if (test.isStreaming()) {
@@ -400,11 +393,11 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class
+            .getResource(JavaUtils.isFIPSEnabled() ? "DoubleItSaml-fips.wsdl" : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricIssuedTokenPort");
-        DoubleItPortType samlPort =
-                service.getPort(portQName, DoubleItPortType.class);
+        DoubleItPortType samlPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
         updateSTSPort((BindingProvider)samlPort, STS_PORT);
 
@@ -423,7 +416,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
     private static void updateSTSPort(BindingProvider p, String port) {
         STSClient stsClient = (STSClient)p.getRequestContext()
-                 .get(org.apache.cxf.rt.security.SecurityConstants.STS_CLIENT);
+            .get(org.apache.cxf.rt.security.SecurityConstants.STS_CLIENT);
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
             if (location.contains("8080")) {

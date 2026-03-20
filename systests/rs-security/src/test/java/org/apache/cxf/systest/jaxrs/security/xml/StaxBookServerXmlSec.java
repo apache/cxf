@@ -22,13 +22,16 @@ package org.apache.cxf.systest.jaxrs.security.xml;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class StaxBookServerXmlSec extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-xmlsec-stax");
     private static final String SERVER_CONFIG_FILE =
-        "org/apache/cxf/systest/jaxrs/security/xml/stax-server.xml";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/xml/stax-server-fips.xml"
+            : "org/apache/cxf/systest/jaxrs/security/xml/stax-server.xml";
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

@@ -22,6 +22,7 @@ package org.apache.cxf.systest.ws.security;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class StaxServer extends AbstractBusTestServerBase {
@@ -29,8 +30,9 @@ public class StaxServer extends AbstractBusTestServerBase {
 
     protected void run()  {
         SpringBusFactory factory = new SpringBusFactory();
-        Bus bus = factory.createBus(
-            "org/apache/cxf/systest/ws/security/stax-server.xml"
+        Bus bus = factory.createBus(JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/ws/security/stax-server-fips.xml"
+            : "org/apache/cxf/systest/ws/security/stax-server.xml"
         );
         BusFactory.setDefaultBus(bus);
         setBus(bus);

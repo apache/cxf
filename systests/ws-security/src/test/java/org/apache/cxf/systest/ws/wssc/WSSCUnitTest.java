@@ -45,6 +45,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
@@ -127,7 +128,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        URL wsdl = WSSCUnitTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "DoubleItWSSC-fips.wsdl"
+                                                      : "DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportPort");
         DoubleItPortType port =
@@ -146,7 +149,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEndorsingSecureConverationViaCode() throws Exception {
 
-        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        URL wsdl = WSSCUnitTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "DoubleItWSSC-fips.wsdl"
+                                                      : "DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportPort");
         DoubleItPortType port =
@@ -197,7 +202,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
+        URL wsdl = WSSCUnitTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "DoubleItWSSC-fips.wsdl"
+                                                      : "DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSP12Port");
         DoubleItPortType port =
@@ -350,7 +357,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         algSuitePolicy.addPolicyComponent(algSuitePolicyEa);
         All algSuitePolicyAll = new All();
         algSuitePolicyAll.addAssertion(
-            new PrimitiveAssertion(new QName(SP12Constants.SP_NS, SPConstants.ALGO_SUITE_BASIC128)));
+            new PrimitiveAssertion(new QName(SP12Constants.SP_NS, JavaUtils.isFIPSEnabled()
+                                             ? "Basic128GCMRsa15"
+                                                 : "Basic128")));
         algSuitePolicyEa.addPolicyComponent(algSuitePolicyAll);
         AlgorithmSuite algorithmSuite = new AlgorithmSuite(SPConstants.SPVersion.SP12, algSuitePolicy);
 

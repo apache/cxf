@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
@@ -62,11 +63,17 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            STSSenderVouchesTest.class.getResource("cxf-service.xml")
+            STSSenderVouchesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "cxf-service-fips.xml"
+                                                       : "cxf-service.xml")
         )));
         assertTrue(launchServer(new StaxSTSServer(
-            STSSenderVouchesTest.class.getResource("cxf-sts.xml"),
-            STSSenderVouchesTest.class.getResource("stax-cxf-sts.xml")
+            STSSenderVouchesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "cxf-sts-fips.xml"
+                                                       : "cxf-sts.xml"),
+            STSSenderVouchesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "stax-cxf-sts-fips.xml"
+                                                       : "stax-cxf-sts.xml")
         )));
     }
 
@@ -81,7 +88,9 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
     public void testSAML2SenderVouches() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = STSSenderVouchesTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = STSSenderVouchesTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                          ? "DoubleIt-fips.wsdl"
+                                                              : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
         DoubleItPortType port =

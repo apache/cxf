@@ -51,10 +51,16 @@ public final class JavaUtils {
     private static boolean isJava11Compatible;
     private static boolean isJava9Compatible;
     private static boolean isJava8Before161;
+    private static boolean isFIPSEnabled;
+    private static String fipsSecurityProvider;
     private static Integer javaMajorVersion;
+    private static final String FIPS_ENABLED = "fips.enabled";
+    private static final String FIPS_SECURITY_PROVIDER = "fips.security.provider";
 
     static {
         String version = SystemPropertyAction.getProperty("java.version");
+        isFIPSEnabled = Boolean.parseBoolean(SystemPropertyAction.getProperty(FIPS_ENABLED));
+        fipsSecurityProvider = SystemPropertyAction.getProperty(FIPS_SECURITY_PROVIDER);
         try {
             isJava8Before161 = version.startsWith("1.8.0_")
                 && Integer.parseInt(version.substring(6)) < 161;
@@ -113,6 +119,18 @@ public final class JavaUtils {
 
     public static boolean isJava8Before161() {
         return isJava8Before161;
+    }
+    
+    public static boolean isFIPSEnabled() {
+        return isFIPSEnabled;
+    }
+
+    /**
+     * Returns the FIPS security provider name configured via the
+     * {@code fips.security.provider} system property. If not set, returns {@code null}.
+     */
+    public static String getFIPSSecurityProvider() {
+        return fipsSecurityProvider;
     }
 
     public static void setJavaMajorVersion(Integer javaMajorVersion) {

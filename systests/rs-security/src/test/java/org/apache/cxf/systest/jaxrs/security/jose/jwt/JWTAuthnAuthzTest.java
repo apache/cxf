@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationClientFilter;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -46,6 +47,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Some tests for authentication and authorization using JWT tokens.
  */
+
 public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwtAuthnAuthz.PORT;
 
@@ -81,7 +83,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -158,7 +162,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -199,7 +205,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -240,7 +248,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -279,7 +289,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -315,7 +327,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -352,7 +366,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -393,7 +409,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -434,7 +452,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -471,7 +491,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -508,7 +530,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -545,7 +569,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -584,7 +610,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -626,7 +654,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -663,7 +693,9 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);

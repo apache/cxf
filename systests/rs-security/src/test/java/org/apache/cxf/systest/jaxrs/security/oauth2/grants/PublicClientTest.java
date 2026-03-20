@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
@@ -253,7 +254,9 @@ public class PublicClientTest extends AbstractClientServerTestBase {
 
     public static class BookServerOAuth2GrantsJCacheSession extends AbstractBusTestServerBase {
         protected void run() {
-            setBus(new SpringBusFactory().createBus(getClass().getResource("grants-server-public-session.xml")));
+            setBus(new SpringBusFactory().createBus(getClass().getResource(JavaUtils.isFIPSEnabled()
+                                                                           ? "grants-server-public-session-fips.xml"
+                                                                               : "grants-server-public-session.xml")));
         }
     }
 

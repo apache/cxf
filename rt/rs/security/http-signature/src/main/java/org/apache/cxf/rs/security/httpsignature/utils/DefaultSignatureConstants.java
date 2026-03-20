@@ -18,11 +18,22 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
+import org.apache.cxf.helpers.JavaUtils;
+
 public final class DefaultSignatureConstants {
     public static final String SIGNING_ALGORITHM = "rsa-sha256";
     public static final String DIGEST_ALGORITHM = "SHA-256";
-    public static final String SECURITY_PROVIDER = "SunRsaSign";
+    public static final String SECURITY_PROVIDER = getDefaultSecurityProvider();
 
     private DefaultSignatureConstants() { }
+
+    private static String getDefaultSecurityProvider() {
+        if (JavaUtils.isFIPSEnabled()) {
+            // Use the configured FIPS provider, or null to let the JCA framework
+            // select an appropriate provider automatically
+            return JavaUtils.getFIPSSecurityProvider();
+        }
+        return "SunRsaSign";
+    }
 
 }

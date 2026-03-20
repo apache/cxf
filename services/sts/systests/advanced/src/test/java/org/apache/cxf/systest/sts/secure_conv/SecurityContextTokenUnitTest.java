@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
@@ -54,8 +55,12 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new StaxSTSServer(
-            SecurityContextTokenUnitTest.class.getResource("cxf-sts.xml"),
-            SecurityContextTokenUnitTest.class.getResource("stax-cxf-sts.xml"))));
+            SecurityContextTokenUnitTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                           ? "cxf-sts-fips.xml"
+                                                               : "cxf-sts.xml"),
+            SecurityContextTokenUnitTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                           ? "stax-cxf-sts-fips.xml"
+                                                               : "stax-cxf-sts.xml"))));
     }
 
     @Parameters(name = "{0}")

@@ -39,6 +39,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.sts.TLSClientParametersUtils;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
@@ -91,12 +92,14 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            TransportBindingTest.class.getResource("cxf-service.xml"),
-            TransportBindingTest.class.getResource("cxf-stax-service.xml")))
+            TransportBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-service-fips.xml" : "cxf-service.xml"),
+            TransportBindingTest.class.getResource(
+                JavaUtils.isFIPSEnabled() ? "cxf-stax-service-fips.xml" : "cxf-stax-service.xml")))
         );
         assertTrue(launchServer(new STSServer(
-            "cxf-transport.xml",
-            "stax-cxf-transport.xml"
+            JavaUtils.isFIPSEnabled() ? "cxf-transport-fips.xml" : "cxf-transport.xml",
+            JavaUtils.isFIPSEnabled() ? "stax-cxf-transport-fips.xml" : "stax-cxf-transport.xml"
         )));
     }
 
@@ -118,7 +121,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testSAML1() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
         DoubleItPortType transportSaml1Port =
@@ -140,7 +144,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testSAML2() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
         DoubleItPortType transportSaml2Port =
@@ -161,7 +166,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAML2ViaCode() throws Exception {
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
         DoubleItPortType transportSaml2Port =
@@ -222,7 +228,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testUnknownClient() throws Exception {
         createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
         DoubleItPortType transportSaml1Port =
@@ -249,7 +256,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testSAML1Endorsing() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
         DoubleItPortType transportSaml1Port =
@@ -276,7 +284,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testUnknownAddress() throws Exception {
         createBus(getClass().getResource("cxf-bad-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
         DoubleItPortType transportSaml1Port =
@@ -304,7 +313,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
 
@@ -339,7 +349,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
 
@@ -351,7 +362,10 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         STSClient stsClient = createDispatchSTSClient(bus);
         String location = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport";
         stsClient.setLocation(location);
-        stsClient.setPolicy("classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy.xml");
+        
+        stsClient.setPolicy(JavaUtils.isFIPSEnabled()
+                            ? "classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy-fips.xml"
+                                : "classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy.xml");
 
         // Creating a DOMSource Object for the request
         DOMSource request = createDOMRequest();
@@ -380,7 +394,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2X509EndorsingPort");
         DoubleItPortType transportSaml1Port =
@@ -402,7 +417,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     public void testSAML2SymmetricEndorsing() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingPort");
         DoubleItPortType transportSaml1Port =
@@ -430,7 +446,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
 
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = TransportBindingTest.class.getResource(
+                   JavaUtils.isFIPSEnabled() ? "DoubleIt-fips.wsdl" : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SymmetricEndorsingDerivedPort");
         DoubleItPortType transportSaml1Port =

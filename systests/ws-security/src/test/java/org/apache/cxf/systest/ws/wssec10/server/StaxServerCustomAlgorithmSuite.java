@@ -21,14 +21,16 @@ package org.apache.cxf.systest.ws.wssec10.server;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class StaxServerCustomAlgorithmSuite extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
     static final String SSL_PORT = allocatePort(Server.class, 1);
 
-    private static String configFileName =
-            "org/apache/cxf/systest/ws/wssec10/stax-server_customAlgorithmSuite.xml";
+    private static String configFileName = JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/ws/wssec10/stax-server_customAlgorithmSuite-fips.xml"
+            : "org/apache/cxf/systest/ws/wssec10/stax-server_customAlgorithmSuite.xml";
 
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(configFileName);

@@ -29,6 +29,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -92,7 +93,9 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
     public void testEndorsingSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = EndorsingSupportingTokenTest.class.getResource("endorsing-client.xml");
+        URL busFile = EndorsingSupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                     ? "endorsing-client-fips.xml"
+                                                                         : "endorsing-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -146,7 +149,9 @@ public class EndorsingSupportingTokenTest extends AbstractBusClientServerTestBas
     public void testSignedEndorsingSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = EndorsingSupportingTokenTest.class.getResource("endorsing-client.xml");
+        URL busFile = EndorsingSupportingTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                     ? "endorsing-client-fips.xml"
+                                                                         : "endorsing-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

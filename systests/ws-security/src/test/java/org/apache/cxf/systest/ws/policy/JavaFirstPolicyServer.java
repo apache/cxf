@@ -24,6 +24,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 import org.junit.Assert;
@@ -34,7 +35,10 @@ public class JavaFirstPolicyServer extends AbstractBusTestServerBase {
     public static final String PORT3 = allocatePort(JavaFirstPolicyServer.class, 3);
 
     protected void run()  {
-        URL busFile = JavaFirstPolicyServer.class.getResource("javafirstserver.xml");
+        URL busFile = JavaFirstPolicyServer.class.getResource(
+                          JavaUtils.isFIPSEnabled()
+                          ? "javafirstserver-fips.xml"
+                              : "javafirstserver.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         Assert.assertNotNull(busLocal);

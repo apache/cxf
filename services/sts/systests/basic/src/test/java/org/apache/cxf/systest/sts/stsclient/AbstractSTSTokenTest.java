@@ -34,6 +34,7 @@ import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -80,10 +81,10 @@ public abstract class AbstractSTSTokenTest extends AbstractClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(launchServer(new STSServer(
-            "cxf-transport.xml",
-            "cxf-x509.xml"
-        )));
+        assertTrue(launchServer(new STSServer(JavaUtils.isFIPSEnabled()
+            ? "cxf-transport-fips.xml" : "cxf-transport.xml",
+                                              JavaUtils.isFIPSEnabled()
+            ? "cxf-x509-fips.xml" : "cxf-x509.xml")));
     }
 
     static STSClient initStsClientAsymmeticBinding(Bus bus) {

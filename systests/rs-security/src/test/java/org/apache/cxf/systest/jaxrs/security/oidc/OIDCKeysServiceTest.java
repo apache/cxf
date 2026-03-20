@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.security.oidc;
 import java.net.URL;
 
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -40,7 +41,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class OIDCKeysServiceTest extends AbstractBusClientServerTestBase {
 
-    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer("oidc-keys-jcache");
+    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer(JavaUtils.isFIPSEnabled()
+                                                                                     ? "oidc-keys-jcache-fips"
+                                                                                         : "oidc-keys-jcache");
 
 
     @BeforeClass

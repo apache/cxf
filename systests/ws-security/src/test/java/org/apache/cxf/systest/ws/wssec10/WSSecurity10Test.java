@@ -31,6 +31,7 @@ import jakarta.xml.ws.BindingProvider;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec10.server.StaxServer;
 import org.apache.cxf.test.TestUtilities;
@@ -88,25 +89,43 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
 
     @Parameters(name = "{0}")
     public static Collection<TestParam> data() {
-
-        return Arrays.asList(new TestParam[] {
-            new TestParam("UserName", PORT, false),
-            new TestParam("UserNameOverTransport", SSL_PORT, false),
-            new TestParam("MutualCertificate10SignEncrypt", PORT, false),
-            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false),
-            new TestParam("UserName", PORT, true),
-            new TestParam("UserNameOverTransport", SSL_PORT, true),
-            new TestParam("MutualCertificate10SignEncrypt", PORT, true),
-            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true),
-            new TestParam("UserName", STAX_PORT, false),
-            new TestParam("UserNameOverTransport", STAX_SSL_PORT, false),
-            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false),
-            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false),
-            new TestParam("UserName", STAX_PORT, true),
-            new TestParam("UserNameOverTransport", STAX_SSL_PORT, true),
-            new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true),
-            new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)
-        });
+        if (JavaUtils.isFIPSEnabled()) {
+            //TripleDes not allowed in FIPS mode
+            return Arrays.asList(new TestParam[] {
+                new TestParam("UserName", PORT, false),
+                new TestParam("UserNameOverTransport", SSL_PORT, false),
+                new TestParam("MutualCertificate10SignEncrypt", PORT, false),
+                new TestParam("UserName", PORT, true),
+                new TestParam("UserNameOverTransport", SSL_PORT, true),
+                new TestParam("MutualCertificate10SignEncrypt", PORT, true),
+                new TestParam("UserName", STAX_PORT, false),
+                new TestParam("UserNameOverTransport", STAX_SSL_PORT, false),
+                new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false),
+                new TestParam("UserName", STAX_PORT, true),
+                new TestParam("UserNameOverTransport", STAX_SSL_PORT, true),
+                new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true),
+                
+            });
+        } else {
+            return Arrays.asList(new TestParam[] {
+                new TestParam("UserName", PORT, false),
+                new TestParam("UserNameOverTransport", SSL_PORT, false),
+                new TestParam("MutualCertificate10SignEncrypt", PORT, false),
+                new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, false),
+                new TestParam("UserName", PORT, true),
+                new TestParam("UserNameOverTransport", SSL_PORT, true),
+                new TestParam("MutualCertificate10SignEncrypt", PORT, true),
+                new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", PORT, true),
+                new TestParam("UserName", STAX_PORT, false),
+                new TestParam("UserNameOverTransport", STAX_SSL_PORT, false),
+                new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, false),
+                new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, false),
+                new TestParam("UserName", STAX_PORT, true),
+                new TestParam("UserNameOverTransport", STAX_SSL_PORT, true),
+                new TestParam("MutualCertificate10SignEncrypt", STAX_PORT, true),
+                new TestParam("MutualCertificate10SignEncryptRsa15TripleDes", STAX_PORT, true)
+            });
+        }
     }
 
     @BeforeClass

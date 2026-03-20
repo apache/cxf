@@ -24,13 +24,16 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class BookServerXmlSec extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-xmlsec");
     private static final URL SERVER_CONFIG_FILE =
-        BookServerXmlSec.class.getResource("server.xml");
+        BookServerXmlSec.class.getResource(JavaUtils.isFIPSEnabled()
+                                           ? "server-fips.xml"
+                                               : "server.xml");
 
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();

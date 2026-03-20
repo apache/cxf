@@ -30,6 +30,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -98,7 +99,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSOAPFaultError() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -133,7 +136,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testRequiredParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -178,7 +183,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testRequiredElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -224,7 +231,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSignedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -288,7 +297,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSignedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -334,7 +345,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testEncryptedParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -398,7 +411,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -448,7 +463,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -494,7 +511,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testContentEncryptedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -540,7 +559,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testSignedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -589,7 +610,9 @@ public class PartsTest extends AbstractBusClientServerTestBase {
     public void testEncryptedAttachments() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = PartsTest.class.getResource("client.xml");
+        URL busFile = PartsTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                  ? "client-fips.xml"
+                                                      : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
