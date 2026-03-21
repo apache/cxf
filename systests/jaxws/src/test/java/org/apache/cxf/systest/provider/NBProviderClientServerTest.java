@@ -48,12 +48,12 @@ import static org.junit.Assert.fail;
 
 public class NBProviderClientServerTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS
-        = "http://localhost:" + TestUtil.getPortNumber(Server.class)
+        = "http://localhost:" + TestUtil.getPortNumber(NBProviderServer.class)
             + "/SoapContext/SoapProviderPort";
 
     private static QName sayHi = new QName("http://apache.org/hello_world_soap_http/types", "sayHi");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class NBProviderServer extends AbstractBusTestServerBase {
         Endpoint ep;
 
         protected void run() {
@@ -68,7 +68,7 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                NBProviderServer s = new NBProviderServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -81,7 +81,7 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(NBProviderServer.class, true));
     }
 
     @Test

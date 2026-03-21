@@ -37,12 +37,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class Cxf993Test extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = Cxf993Server.PORT;
     private final QName serviceName = new QName("urn://testnotification", "NotificationService");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Cxf993Server.class));
     }
 
     @Test

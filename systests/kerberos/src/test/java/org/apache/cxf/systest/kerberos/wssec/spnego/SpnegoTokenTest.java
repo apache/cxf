@@ -43,10 +43,10 @@ import org.junit.BeforeClass;
  * A set of tests for Spnego Tokens that use an Apache Kerby instance as the KDC.
  */
 public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = TestUtil.getPortNumber(Server.class);
-    static final String STAX_PORT = TestUtil.getPortNumber(StaxServer.class);
-    static final String PORT2 = TestUtil.getPortNumber(Server.class, 2);
-    static final String STAX_PORT2 = TestUtil.getPortNumber(StaxServer.class, 2);
+    static final String PORT = TestUtil.getPortNumber(SpnegoServer.class);
+    static final String STAX_PORT = TestUtil.getPortNumber(SpnegoStaxServer.class);
+    static final String PORT2 = TestUtil.getPortNumber(SpnegoServer.class, 2);
+    static final String STAX_PORT2 = TestUtil.getPortNumber(SpnegoStaxServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -102,14 +102,14 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractClientServerTestBase.launchServer(Server.class, true)
+            AbstractClientServerTestBase.launchServer(SpnegoServer.class, true)
         );
 
         org.junit.Assert.assertTrue(
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractClientServerTestBase.launchServer(StaxServer.class, true)
+            AbstractClientServerTestBase.launchServer(SpnegoStaxServer.class, true)
         );
     }
 

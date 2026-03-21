@@ -46,14 +46,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = MtomFeatureServer.PORT;
     private final QName serviceName = new QName("http://apache.org/cxf/systest/mtom_feature",
                                                 "HelloService");
     private Hello port = getPort();
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(MtomFeatureServer.class, true));
     }
 
     @Before

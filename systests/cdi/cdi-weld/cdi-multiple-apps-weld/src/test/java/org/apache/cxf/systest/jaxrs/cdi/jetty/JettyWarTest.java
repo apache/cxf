@@ -33,10 +33,10 @@ import static org.junit.Assert.assertTrue;
 
 public class JettyWarTest extends AbstractCdiMultiAppTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class EmbeddedJettyWarServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettyWarServer.class);
 
-        public EmbeddedJettyServer() {
+        public EmbeddedJettyWarServer() {
             super("/jaxrs_cdi", "/", PORT, new Listener());
         }
     }
@@ -45,13 +45,13 @@ public class JettyWarTest extends AbstractCdiMultiAppTest {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         System.setProperty(Container.class.getName(), JettyContainer.class.getName());
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyWarServer.class, true));
         createStaticBus();
     }
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return EmbeddedJettyWarServer.PORT;
     }
 
 }

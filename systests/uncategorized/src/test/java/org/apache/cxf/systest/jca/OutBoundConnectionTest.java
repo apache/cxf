@@ -45,15 +45,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = OutBoundServer.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
                                                 "SOAPService");
 
     private final QName portName = new QName("http://apache.org/hello_world_soap_http",
                                              "SoapPort");
 
-    public static class Server extends AbstractBusTestServerBase {
-        public static final String PORT = allocatePort(Server.class);
+    public static class OutBoundServer extends AbstractBusTestServerBase {
+        public static final String PORT = allocatePort(OutBoundServer.class);
 
         Endpoint ep;
         protected void run() {
@@ -69,7 +69,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                OutBoundServer s = new OutBoundServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -82,7 +82,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(OutBoundServer.class, true));
         createStaticBus();
     }
 

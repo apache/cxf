@@ -32,12 +32,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SOAPFaultRequestTestCase extends AbstractClientServerTestBase {
-    private static final String PORT = Server.PORT;
+    private static final String PORT = SOAPFaultServer.PORT;
     private final QName portName = new QName("http://cxf.apache.org/soapfault", "SoapFaultPortType");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(SOAPFaultServer.class));
     }
 
     @Test

@@ -37,9 +37,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class CXF7990Test extends AbstractClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(CXF7990Server.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CXF7990Server extends AbstractBusTestServerBase {
         protected void run() {
             Object implementor = new EchoServiceImpl();
             String address = "http://localhost:" + PORT + "/echo/service";
@@ -52,7 +52,7 @@ public class CXF7990Test extends AbstractClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                CXF7990Server s = new CXF7990Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -65,7 +65,7 @@ public class CXF7990Test extends AbstractClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(CXF7990Server.class, true));
     }
 
     @Test

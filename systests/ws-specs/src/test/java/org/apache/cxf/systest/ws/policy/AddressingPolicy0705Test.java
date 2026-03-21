@@ -52,20 +52,20 @@ import static org.junit.Assert.fail;
 // REVISIT this class is copied from AddressingPolicyTest to use the wsam-2007/05 namespace
 // consolidate this class with the original
 public class AddressingPolicy0705Test extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingPolicy0705Server.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(AddressingPolicy0705Test.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingPolicy0705Server extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public AddressingPolicy0705Server() {
         }
-        public Server(String dir) {
+        public AddressingPolicy0705Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public AddressingPolicy0705Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -95,7 +95,7 @@ public class AddressingPolicy0705Test extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args[0]);
+                AddressingPolicy0705Server s = new AddressingPolicy0705Server(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -112,7 +112,7 @@ public class AddressingPolicy0705Test extends AbstractBusClientServerTestBase {
         PolicyTestHelper.updatePolicyRef("addr-external0705.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(AddressingPolicy0705Server.class, null,
                                                                    new String[] {TEMPDIR}, true));
     }
 

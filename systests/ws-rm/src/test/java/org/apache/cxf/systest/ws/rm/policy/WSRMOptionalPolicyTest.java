@@ -34,14 +34,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WSRMOptionalPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = WSRMOptionalPolicyServer.PORT;
     private static final URL WSDL = GreetingService.class.getResource("greeting.wsdl");
     private static final QName SERVICE = new QName("http://ws.samples.apache.org/", "GreetingService");
     private static final String ENDPOINT = "http://localhost:" + PORT + "/GreetingServer";
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(WSRMOptionalPolicyServer.class, true));
     }
 
     @Test
