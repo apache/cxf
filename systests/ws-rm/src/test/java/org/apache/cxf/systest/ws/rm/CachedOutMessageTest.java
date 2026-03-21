@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the WS-RM processing with the cached out message (using temporary files).
  */
 public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(CachedOutMessageServer.class);
     public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
 
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
@@ -55,7 +55,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
 
 
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CachedOutMessageServer extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -88,7 +88,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         CachedOutputStream.setDefaultThreshold(16);
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, true));
+                   launchServer(CachedOutMessageServer.class, true));
     }
 
     @AfterClass

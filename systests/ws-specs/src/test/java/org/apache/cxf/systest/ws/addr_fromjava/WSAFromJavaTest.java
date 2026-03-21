@@ -40,7 +40,7 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImpl;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImplService;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumbersException_Exception;
-import org.apache.cxf.systest.ws.addr_fromjava.server.Server;
+import org.apache.cxf.systest.ws.addr_fromjava.server.WSAFromJavaServer;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class WSAFromJavaTest extends AbstractWSATestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(WSAFromJavaServer.class);
 
     @Before
     public void setUp() throws Exception {
@@ -61,7 +61,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(WSAFromJavaServer.class, true));
     }
 
     @Test

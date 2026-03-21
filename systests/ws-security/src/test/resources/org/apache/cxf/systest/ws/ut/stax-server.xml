@@ -38,7 +38,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.ut.StaxServer}">
+        <httpj:engine port="${testutil.ports.ut.UsernameTokenStaxServer}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
@@ -55,45 +55,45 @@
         <property name="enforcePrincipal" value="false"/>
     </bean>
 
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextCreated" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextCreated" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextCreatedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextCreated" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintextCreated" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextCreatedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupporting" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintextSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.actor" value="recipient"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupportingSP11" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextSupportingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextSupportingSP11" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintextSupportingSP11" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextSupportingSP11Port" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Hashed" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTHashed" serviceName="s:DoubleItService" endpointName="s:DoubleItHashedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Hashed" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTHashed" serviceName="s:DoubleItService" endpointName="s:DoubleItHashedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoPassword" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItNoPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="NoPassword" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItNoPasswordPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.enable.ut-no-password.principal" value="true"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEndorsing" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEndorsing" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTSignedEndorsing" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEndorsingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -101,7 +101,7 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncrypted" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedEncrypted" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTSignedEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -109,13 +109,13 @@
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Encrypted" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Encrypted" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTEncrypted" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="InlinePolicy" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTInlinePolicy" serviceName="s:DoubleItService" endpointName="s:DoubleItInlinePolicyPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
@@ -166,7 +166,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="HashedNoBinding" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTDigestNoBinding" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestNoBindingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="HashedNoBinding" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTDigestNoBinding" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestNoBindingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.enable.streaming" value="true"/>
@@ -201,7 +201,7 @@
             </map>
         </property>
     </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextPrincipal" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintextPrincipal" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="ws-security.ut.validator" value-ref="subjectValidator"/>
@@ -220,7 +220,7 @@
             </map>
         </property>
     </bean>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal2" address="https://localhost:${testutil.ports.ut.StaxServer}/DoubleItUTPlaintextPrincipal2" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextPrincipal2" address="https://localhost:${testutil.ports.ut.UsernameTokenStaxServer}/DoubleItUTPlaintextPrincipal2" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPrincipalPort" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="ws-security.validate.token" value="false"/>
             <entry key="ws-security.enable.streaming" value="true"/>

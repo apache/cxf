@@ -42,8 +42,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ClientServerWrappedContinuationTest extends AbstractClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String HTTPS_PORT = allocatePort(Server.class, 1);
+    public static final String PORT = allocatePort(ContinuationServer.class);
+    public static final String HTTPS_PORT = allocatePort(ContinuationServer.class, 1);
 
     private static final String CLIENT_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/cxf.xml";
@@ -52,7 +52,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
     private static final String SERVER_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/jaxws-server.xml";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class ContinuationServer extends AbstractBusTestServerBase {
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -69,7 +69,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                ContinuationServer s = new ContinuationServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -80,7 +80,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(ContinuationServer.class));
     }
 
     @Test

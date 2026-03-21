@@ -60,9 +60,9 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JAXWSClientTest  extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(JAXWSServer.class);
     
-    public static class Server extends AbstractBusTestServerBase {
+    public static class JAXWSServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
@@ -72,7 +72,7 @@ public class JAXWSClientTest  extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                JAXWSServer s = new JAXWSServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -94,7 +94,7 @@ public class JAXWSClientTest  extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(JAXWSServer.class, true));
     }
 
     @AfterClass

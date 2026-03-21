@@ -38,12 +38,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ClientServerVersioningTest extends AbstractClientServerTestBase {
-    private static final String PORT = Server.PORT;
+    private static final String PORT = VersioningServer.PORT;
     private final QName portName = new QName("http://apache.org/hello_world_mixedstyle", "SoapPort");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(VersioningServer.class));
     }
 
     @Test

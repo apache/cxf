@@ -49,10 +49,10 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
-    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
+    static final String PORT = allocatePort(SamlServer.class);
+    static final String STAX_PORT = allocatePort(SamlStaxServer.class);
+    static final String PORT2 = allocatePort(SamlServer.class, 2);
+    static final String STAX_PORT2 = allocatePort(SamlStaxServer.class, 2);
     static final String STS_PORT = allocatePort(STSServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -70,13 +70,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(SamlServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(SamlStaxServer.class, true)
         );
         assertTrue(
             "Server failed to launch",

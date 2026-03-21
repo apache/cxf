@@ -43,13 +43,13 @@ import static org.junit.Assert.assertTrue;
  * Testing the null response behavior of jaxws provider (jaxws 2.2 section 5.1.1)
  */
 public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(NullAsOnewayServer.class);
 
     private static final String ADDRESS1 = "http://localhost:" + PORT + "/test/nullable1";
     private static final String ADDRESS2 = "http://localhost:" + PORT + "/test/nullable2";
     private static final String ADDRESS3 = "http://localhost:" + PORT + "/test/nullable3";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class NullAsOnewayServer extends AbstractBusTestServerBase {
 
         protected void run() {
             // endpoint not interpreting null as oneway
@@ -72,7 +72,7 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
 
         public static void main(String[] args) throws Exception {
             try {
-                Server s = new Server();
+                NullAsOnewayServer s = new NullAsOnewayServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -94,7 +94,7 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(NullAsOnewayServer.class, true));
     }
 
     @Test

@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * expected next interceptor
  */
 public class BasicAuthJAASTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(BasicAuthServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");

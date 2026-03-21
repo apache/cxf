@@ -57,7 +57,7 @@ import static org.junit.Assert.fail;
  * in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class RMPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RMPolicyServer.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(RMPolicyTest.class);
@@ -73,15 +73,15 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
     private static final String GREETER_FAULT_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RMPolicyServer extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public RMPolicyServer() {
         }
-        public Server(String dir) {
+        public RMPolicyServer(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public RMPolicyServer(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -111,7 +111,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
                 if (args.length == 0) {
                     args = new String[] {TEMPDIR};
                 }
-                Server s = new Server(args[0]);
+                RMPolicyServer s = new RMPolicyServer(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -128,7 +128,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         PolicyTestHelper.updatePolicyRef("rm-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(RMPolicyServer.class, null,
                                                                    new String[] {TEMPDIR}));
     }
 

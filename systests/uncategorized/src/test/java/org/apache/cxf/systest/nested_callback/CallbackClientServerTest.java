@@ -40,8 +40,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
-    public static final String CB_PORT = allocatePort(CallbackClientServerTest.class);
+    public static final String PORT = NestedCallbackServer.PORT;
+    public static final String CB_PORT = allocatePort(NestedCallbackServer.class);
 
     private static final QName SERVICE_NAME
         = new QName("http://apache.org/nested_callback", "SOAPService");
@@ -60,7 +60,7 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(NestedCallbackServer.class, true));
     }
 
     @Test

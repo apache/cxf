@@ -36,13 +36,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public final class MTOMProviderSchemaValidationTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = MTOMProviderSchemaValidationServer.PORT;
 
     private final QName serviceName = new QName("http://cxf.apache.org/", "HelloWS");
 
     @BeforeClass
     public static void startservers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(MTOMProviderSchemaValidationServer.class, true));
     }
     @Test
     public void testSchemaValidation() throws Exception {

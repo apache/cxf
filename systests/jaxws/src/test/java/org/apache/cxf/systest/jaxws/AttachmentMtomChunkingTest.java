@@ -45,10 +45,10 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class AttachmentMtomChunkingTest extends AbstractAttachmentChunkingTest {
-    private static final String PORT = allocatePort(DownloadServer.class);
+    private static final String PORT = allocatePort(ChunkingDownloadServer.class);
     private static final Logger LOG = LogUtils.getLogger(AttachmentMtomChunkingTest.class);
 
-    public static class DownloadServer extends AbstractBusTestServerBase {
+    public static class ChunkingDownloadServer extends AbstractBusTestServerBase {
         protected void run() {
             Object implementor = new DownloadImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
@@ -58,7 +58,7 @@ public class AttachmentMtomChunkingTest extends AbstractAttachmentChunkingTest {
 
         public static void main(String[] args) {
             try {
-                DownloadServer s = new DownloadServer();
+                ChunkingDownloadServer s = new ChunkingDownloadServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -71,7 +71,7 @@ public class AttachmentMtomChunkingTest extends AbstractAttachmentChunkingTest {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(DownloadServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(ChunkingDownloadServer.class, true));
     }
     
     @Test

@@ -55,7 +55,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
-    static String serverPort = TestUtil.getPortNumber(Server.class);
+    static String serverPort = TestUtil.getPortNumber(DataSourceServer.class);
 
     static final Logger LOG = LogUtils.getLogger(DataSourceProviderTest.class);
     private static final String BOUNDARY = "----=_Part_4_701508.1145579811786";
@@ -65,7 +65,7 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                launchServer(Server.class, true));
+                launchServer(DataSourceServer.class, true));
     }
 
     @Before

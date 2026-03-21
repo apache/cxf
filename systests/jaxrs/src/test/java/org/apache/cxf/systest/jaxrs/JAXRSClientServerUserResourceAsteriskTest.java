@@ -48,10 +48,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerUserResourceAsteriskTest extends AbstractClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(UserResourceAsteriskServer.class);
     public static final String CONTEXT = "/jetty/*/asterisk";
 
-    public static class Server extends AbstractServerTestServerBase {
+    public static class UserResourceAsteriskServer extends AbstractServerTestServerBase {
         @Override
         protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -94,14 +94,14 @@ public class JAXRSClientServerUserResourceAsteriskTest extends AbstractClientSer
         }
 
         public static void main(String[] args) throws Exception {
-            new Server().start();
+            new UserResourceAsteriskServer().start();
         }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(UserResourceAsteriskServer.class));
     }
 
     @Test

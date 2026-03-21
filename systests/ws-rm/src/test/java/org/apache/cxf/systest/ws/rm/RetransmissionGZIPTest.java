@@ -54,13 +54,13 @@ import static org.junit.Assert.fail;
  * with retransmission.
  */
 public class RetransmissionGZIPTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RetransmissionGZIPServer.class);
     public static final String DECOUPLE_PORT = allocatePort(RetransmissionGZIPTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
     private Bus bus;
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RetransmissionGZIPServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -84,7 +84,7 @@ public class RetransmissionGZIPTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                RetransmissionGZIPServer s = new RetransmissionGZIPServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -98,7 +98,7 @@ public class RetransmissionGZIPTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, true));
+                   launchServer(RetransmissionGZIPServer.class, true));
     }
 
     @Test

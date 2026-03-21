@@ -53,8 +53,8 @@ import static org.junit.Assert.fail;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String STAX_PORT = allocatePort(StaxServer.class);
+    public static final String PORT = allocatePort(CryptoCoverageServer.class);
+    public static final String STAX_PORT = allocatePort(CryptoCoverageStaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -77,13 +77,13 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(CryptoCoverageServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(CryptoCoverageStaxServer.class, true)
         );
     }
 

@@ -48,9 +48,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JAXRSClientServerUserResourceTest extends AbstractClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(UserResourceServer.class);
 
-    public static class Server extends AbstractServerTestServerBase {
+    public static class UserResourceServer extends AbstractServerTestServerBase {
 
         @Override
         protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
@@ -94,7 +94,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractClientServerTestB
         }
 
         public static void main(String[] args) throws Exception {
-            new Server().start();
+            new UserResourceServer().start();
         }
     }
 
@@ -102,7 +102,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractClientServerTestB
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, true));
+                   launchServer(UserResourceServer.class, true));
     }
 
     @Test

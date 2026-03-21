@@ -43,10 +43,10 @@ import static org.junit.Assert.assertTrue;
 
 public class SpringAutoPublishServletTest extends AbstractServletTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class SpringEmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(SpringEmbeddedJettyServer.class);
 
-        public EmbeddedJettyServer() {
+        public SpringEmbeddedJettyServer() {
             super("/org/apache/cxf/systest/servlet/web-spring-auto-launch.xml", "/", CONTEXT, PORT);
         }
     }
@@ -54,7 +54,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(SpringEmbeddedJettyServer.class, true));
         createStaticBus();
     }
 
@@ -129,6 +129,6 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
     
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return SpringEmbeddedJettyServer.PORT;
     }
 }

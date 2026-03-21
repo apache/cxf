@@ -45,14 +45,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ExtSoapHeaderClientServerTest extends AbstractClientServerTestBase {
-    public static final String PORT0 = allocatePort(Server.class, 0);
-    public static final String PORT1 = allocatePort(Server.class, 1);
+    public static final String PORT0 = allocatePort(ExtSoapHeaderServer.class, 0);
+    public static final String PORT1 = allocatePort(ExtSoapHeaderServer.class, 1);
 
     private static SamplePortType client;
 
     private static final QName SERVIVE_NAME = new QName("http://cxf.apache.org/soap_ext_header/ws", "SampleService");
 
-    public static class Server extends AbstractServerTestServerBase {
+    public static class ExtSoapHeaderServer extends AbstractServerTestServerBase {
 
         @Override
         protected org.apache.cxf.endpoint.Server createServer(Bus bus) throws Exception {
@@ -74,13 +74,13 @@ public class ExtSoapHeaderClientServerTest extends AbstractClientServerTestBase 
         }
 
         public static void main(String[] args) throws Exception {
-            new Server().start();
+            new ExtSoapHeaderServer().start();
         }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(ExtSoapHeaderServer.class, true));
 
         initClient();
     }

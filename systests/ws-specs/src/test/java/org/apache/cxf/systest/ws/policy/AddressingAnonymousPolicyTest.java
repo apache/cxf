@@ -50,20 +50,20 @@ import static org.junit.Assert.fail;
  * WS-RM in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingAnonymousPolicyServer.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(AddressingAnonymousPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingAnonymousPolicyServer extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public AddressingAnonymousPolicyServer() {
         }
-        public Server(String dir) {
+        public AddressingAnonymousPolicyServer(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public AddressingAnonymousPolicyServer(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -93,7 +93,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args[0]);
+                AddressingAnonymousPolicyServer s = new AddressingAnonymousPolicyServer(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -109,7 +109,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         PolicyTestHelper.updatePolicyRef("addr-external-anonymous-client.xml", ":9020", ":" + PORT);
         PolicyTestHelper.updatePolicyRef("addr-external-anonymous-server.xml", ":9020", ":" + PORT);
         System.setProperty("client.temp.location", TEMPDIR);
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(AddressingAnonymousPolicyServer.class, null,
                                                                    new String[] {TEMPDIR}));
     }
 

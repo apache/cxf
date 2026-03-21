@@ -40,7 +40,7 @@
     </bean>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UT" 
-        address="http://localhost:${testutil.ports.password.Server}/DoubleItUT" serviceName="s:DoubleItService" 
+        address="http://localhost:${testutil.ports.password.PasswordServer}/DoubleItUT" serviceName="s:DoubleItService" 
         endpointName="s:DoubleItUTPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>
@@ -49,7 +49,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="UTSigned" 
-        address="http://localhost:${testutil.ports.password.Server}/DoubleItUTSigned" serviceName="s:DoubleItService" 
+        address="http://localhost:${testutil.ports.password.PasswordServer}/DoubleItUTSigned" serviceName="s:DoubleItService" 
         endpointName="s:DoubleItUTSignedPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>
@@ -59,7 +59,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" 
-        address="http://localhost:${testutil.ports.password.Server}/DoubleItAsymmetric" serviceName="s:DoubleItService" 
+        address="http://localhost:${testutil.ports.password.PasswordServer}/DoubleItAsymmetric" serviceName="s:DoubleItService" 
         endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity"
         wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
         <jaxws:properties>

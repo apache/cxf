@@ -106,7 +106,7 @@ import static org.junit.Assert.fail;
  * exchange of WS-RM protocol messages.
  */
 public class SequenceTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = RmServer.PORT;
 
     private static final Logger LOG = LogUtils.getLogger(SequenceTest.class);
     private static final QName GREETMEONEWAY_NAME
@@ -135,7 +135,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(RmServer.class));
     }
 
 

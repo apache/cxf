@@ -48,10 +48,10 @@ import static org.junit.Assert.assertTrue;
 public class SpringServletContextTest extends AbstractServletTest {
 
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class SpringServletContexEmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(SpringServletContexEmbeddedJettyServer.class);
 
-        public EmbeddedJettyServer() {
+        public SpringServletContexEmbeddedJettyServer() {
             super("/org/apache/cxf/systest/servlet/web-spring-context.xml", "/", CONTEXT, PORT);
         }
     }
@@ -92,7 +92,7 @@ public class SpringServletContextTest extends AbstractServletTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(SpringServletContexEmbeddedJettyServer.class, true));
         createStaticBus();
     }
 
@@ -116,6 +116,6 @@ public class SpringServletContextTest extends AbstractServletTest {
     
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return SpringServletContexEmbeddedJettyServer.PORT;
     }
 }

@@ -38,7 +38,7 @@ under the License.
     <!-- TLS Port configuration parameters for port 9091 -->
     <!-- -->
     <httpu:engine-factory>
-        <httpu:engine port="${testutil.ports.Server.1}">
+        <httpu:engine port="${testutil.ports.ContinuationServer.1}">
             <httpu:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>

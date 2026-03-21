@@ -33,10 +33,10 @@ import static org.junit.Assert.assertTrue;
 
 public class JettyEmptyPathApplicationTest extends AbstractSciTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class EmbeddedJettyEmptyPathServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedJettyEmptyPathServer.class);
 
-        public EmbeddedJettyServer() {
+        public EmbeddedJettyEmptyPathServer() {
             super("/",
                 new Resource[] {
                     // Limit the classpath scanning to org.apache.demo.resources package
@@ -57,13 +57,13 @@ public class JettyEmptyPathApplicationTest extends AbstractSciTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyEmptyPathServer.class, true));
         createStaticBus();
     }
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return EmbeddedJettyEmptyPathServer.PORT;
     }
 
     @Override

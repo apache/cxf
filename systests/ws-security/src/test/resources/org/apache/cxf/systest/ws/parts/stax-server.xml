@@ -38,7 +38,7 @@
         <property name="enforcePrincipal" value="false"/>
     </bean>
 
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredParts" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItRequiredParts" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredParts" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItRequiredParts" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -52,7 +52,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredParts2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItRequiredParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredParts2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItRequiredParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -66,7 +66,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredElements" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItRequiredElements" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredElements" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItRequiredElements" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -80,7 +80,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredElements2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItRequiredElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="RequiredElements2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItRequiredElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItRequiredElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -94,7 +94,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedParts" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedParts" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -108,7 +108,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -122,7 +122,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts3" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedParts3" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort3" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedParts3" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedParts3" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedPartsPort3" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -136,7 +136,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedElements" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedElements" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -150,7 +150,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedElements2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedElements2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItSignedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -164,7 +164,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedParts" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedParts" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -179,7 +179,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedParts2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -194,7 +194,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts3" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedParts3" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort3" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedParts3" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedParts3" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedPartsPort3" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -209,7 +209,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedElements" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedElements" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -224,7 +224,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedElements2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedElements2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -239,7 +239,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="ContentEncryptedElements" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItContentEncryptedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItContentEncryptedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="ContentEncryptedElements" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItContentEncryptedElements" serviceName="s:DoubleItService" endpointName="s:DoubleItContentEncryptedElementsPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -254,7 +254,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="ContentEncryptedElements2" address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItContentEncryptedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItContentEncryptedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="ContentEncryptedElements2" address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItContentEncryptedElements2" serviceName="s:DoubleItService" endpointName="s:DoubleItContentEncryptedElementsPort2" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.UTPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -271,7 +271,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedAttachments" 
-         address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedAttachments" 
+         address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedAttachments" 
          serviceName="s:DoubleItService" endpointName="s:DoubleItSignedAttachmentsPort" 
          implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
          wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
@@ -290,7 +290,7 @@
         </jaxws:features>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedAttachments2" 
-         address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItSignedAttachments2" 
+         address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItSignedAttachments2" 
          serviceName="s:DoubleItService" endpointName="s:DoubleItSignedAttachmentsPort2" 
          implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
          wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
@@ -309,7 +309,7 @@
         </jaxws:features>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedAttachments" 
-         address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedAttachments" 
+         address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedAttachments" 
          serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedAttachmentsPort" 
          implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
          wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">
@@ -328,7 +328,7 @@
         </jaxws:features>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptedAttachments2" 
-         address="http://localhost:${testutil.ports.parts.StaxServer}/DoubleItEncryptedAttachments2" 
+         address="http://localhost:${testutil.ports.parts.PartsStaxServer}/DoubleItEncryptedAttachments2" 
          serviceName="s:DoubleItService" endpointName="s:DoubleItEncryptedAttachmentsPort2" 
          implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
          wsdlLocation="org/apache/cxf/systest/ws/parts/DoubleItParts.wsdl">

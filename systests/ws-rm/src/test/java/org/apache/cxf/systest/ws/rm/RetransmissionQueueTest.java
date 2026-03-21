@@ -50,13 +50,13 @@ import static org.junit.Assert.fail;
  * the message is queued and retransmission is scheduled.
  */
 public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RetransmissionQueueServer.class);
     public static final String DECOUPLE_PORT = allocatePort(RetransmissionQueueTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
     private Bus bus;
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RetransmissionQueueServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -80,7 +80,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                RetransmissionQueueServer s = new RetransmissionQueueServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -94,7 +94,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, true));
+                   launchServer(RetransmissionQueueServer.class, true));
     }
 
     @Test

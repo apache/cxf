@@ -49,20 +49,20 @@ import static org.junit.Assert.assertTrue;
  * WS-RM in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class AddressingPolicyExternalAttachmentWsdl11Test extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingPolicyExternalAttachmentServer.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(AddressingPolicyExternalAttachmentWsdl11Test.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingPolicyExternalAttachmentServer extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public AddressingPolicyExternalAttachmentServer() {
         }
-        public Server(String dir) {
+        public AddressingPolicyExternalAttachmentServer(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public AddressingPolicyExternalAttachmentServer(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -92,7 +92,7 @@ public class AddressingPolicyExternalAttachmentWsdl11Test extends AbstractBusCli
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args[0]);
+                AddressingPolicyExternalAttachmentServer s = new AddressingPolicyExternalAttachmentServer(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -109,7 +109,7 @@ public class AddressingPolicyExternalAttachmentWsdl11Test extends AbstractBusCli
         PolicyTestHelper.updatePolicyRef("addr-external-wsdl11.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(AddressingPolicyExternalAttachmentServer.class, null,
                                                                    new String[] {TEMPDIR}, true));
     }
 

@@ -53,11 +53,11 @@ import static org.junit.Assert.fail;
  * WS-RM in response to Policies defined for the endpoint via an inline policy in addr-inline-policy.xml.
  */
 public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingInlinePolicyServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(AddressingInlinePolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingInlinePolicyServer extends AbstractBusTestServerBase {
 
         Endpoint ep;
         protected void run()  {
@@ -79,7 +79,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                AddressingInlinePolicyServer s = new AddressingInlinePolicyServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -93,7 +93,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(AddressingInlinePolicyServer.class, true));
     }
 
     @Test

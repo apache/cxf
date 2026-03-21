@@ -44,11 +44,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(NestedAddressingPolicyServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(HTTPServerPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class NestedAddressingPolicyServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -71,7 +71,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                NestedAddressingPolicyServer s = new NestedAddressingPolicyServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -84,7 +84,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(NestedAddressingPolicyServer.class));
     }
 
     @Test

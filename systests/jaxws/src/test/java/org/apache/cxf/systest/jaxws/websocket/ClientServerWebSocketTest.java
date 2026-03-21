@@ -56,7 +56,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(WebSocketServer.class);
 
     static final Logger LOG = LogUtils.getLogger(ClientServerWebSocketTest.class);
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
@@ -68,7 +68,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         // set up configuration to enable schema validation
         //System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(WebSocketServer.class, true));
         createStaticBus();
     }
 

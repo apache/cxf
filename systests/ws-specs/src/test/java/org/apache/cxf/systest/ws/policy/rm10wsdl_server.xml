@@ -38,7 +38,7 @@
         <property name="bus" ref="cxf"/>
         <property name="enabled" value="true"/>
     </bean>
-    <jaxws:endpoint xmlns:ns="http://cxf.apache.org/greeter_control" id="id1" implementor="org.apache.cxf.systest.ws.policy.ReliableGreeterImpl" serviceName="ns:ReliableGreeterService" endpointName="ns:GreeterPort" address="http://localhost:${testutil.ports.Server}/SoapContext/GreeterPort">
+    <jaxws:endpoint xmlns:ns="http://cxf.apache.org/greeter_control" id="id1" implementor="org.apache.cxf.systest.ws.policy.ReliableGreeterImpl" serviceName="ns:ReliableGreeterService" endpointName="ns:GreeterPort" address="http://localhost:${testutil.ports.RM10PolicyServer}/SoapContext/GreeterPort">
         <jaxws:features>
             <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <p:policies>
@@ -46,7 +46,7 @@
             </p:policies>
         </jaxws:features>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:ns="http://cxf.apache.org/greeter_control" id="id2" implementor="org.apache.cxf.systest.ws.policy.ReliableGreeterImpl2" serviceName="ns:ReliableGreeterService" endpointName="ns:GreeterPort2" address="http://localhost:${testutil.ports.Server}/SoapContext/GreeterPort2">
+    <jaxws:endpoint xmlns:ns="http://cxf.apache.org/greeter_control" id="id2" implementor="org.apache.cxf.systest.ws.policy.ReliableGreeterImpl2" serviceName="ns:ReliableGreeterService" endpointName="ns:GreeterPort2" address="http://localhost:${testutil.ports.RM10PolicyServer}/SoapContext/GreeterPort2">
         <jaxws:features>
             <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <p:policies>

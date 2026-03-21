@@ -44,11 +44,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class CXF6655Test extends AbstractClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(CXF6655Server.class);
     static final int PROXY_PORT = Integer.parseInt(allocatePort(CXF6655Test.class));
     static HttpProxyServer proxy;
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CXF6655Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new HelloImpl();
@@ -58,7 +58,7 @@ public class CXF6655Test extends AbstractClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                CXF6655Server s = new CXF6655Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -77,7 +77,7 @@ public class CXF6655Test extends AbstractClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(CXF6655Server.class, true));
         proxy = DefaultHttpProxyServer.bootstrap().withPort(PROXY_PORT).start();
     }
 

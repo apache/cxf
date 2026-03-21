@@ -63,7 +63,7 @@ import static org.junit.Assert.fail;
  * the use of multiple compatible or incompatible assertions.
  */
 public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(HTTPClientPolicyServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(HTTPClientPolicyTest.class);
     private static final String POLICY_ENGINE_ENABLED_CFG =
@@ -73,7 +73,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
     private static final QName GREETER_QNAME =
         new QName("http://cxf.apache.org/greeter_control", "BasicGreeterService");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class HTTPClientPolicyServer extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -99,7 +99,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                HTTPClientPolicyServer s = new HTTPClientPolicyServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -112,7 +112,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(HTTPClientPolicyServer.class));
     }
 
     @Test

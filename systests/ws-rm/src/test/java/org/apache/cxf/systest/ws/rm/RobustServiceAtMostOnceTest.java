@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  * exchange of WS-RM protocol messages.
  */
 public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RobustServiceAtMostOnceServer.class);
     public static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final Logger LOG = LogUtils.getLogger(RobustServiceAtMostOnceTest.class);
@@ -54,7 +54,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
     private Greeter greeter;
 
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RobustServiceAtMostOnceServer extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -87,7 +87,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(RobustServiceAtMostOnceServer.class, true));
     }
 
     @Test

@@ -35,18 +35,18 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
-    public static final int PORT = SpringServer.PORT;
+    public static final int PORT = SpringUriInfoServer.PORT;
     @BeforeClass
     public static void beforeClass() throws Exception {
         // must be 'in-process' to communicate with inner class in single JVM
         // and to spawn class SpringServer w/o using main() method
-        launchServer(SpringServer.class, true);
+        launchServer(SpringUriInfoServer.class, true);
     }
 
     @Ignore
-    public static class SpringServer extends AbstractSpringServer {
-        public static final int PORT = allocatePortAsInt(SpringServer.class);
-        public SpringServer() {
+    public static class SpringUriInfoServer extends AbstractSpringServer {
+        public static final int PORT = allocatePortAsInt(SpringUriInfoServer.class);
+        public SpringUriInfoServer() {
             super("/jaxrs_uriinfo", "/app", PORT);
         }
     }

@@ -45,10 +45,10 @@ import static org.junit.Assert.assertTrue;
 
 public class SpringServletTest extends AbstractServletTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class SpringServletEmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(SpringServletEmbeddedJettyServer.class);
 
-        public EmbeddedJettyServer() {
+        public SpringServletEmbeddedJettyServer() {
             super("/org/apache/cxf/systest/servlet/web-spring.xml", "/", CONTEXT, PORT);
         }
     }
@@ -56,7 +56,7 @@ public class SpringServletTest extends AbstractServletTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(SpringServletEmbeddedJettyServer.class, true));
     }
 
     @AfterClass
@@ -153,6 +153,6 @@ public class SpringServletTest extends AbstractServletTest {
     
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return SpringServletEmbeddedJettyServer.PORT;
     }
 }

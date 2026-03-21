@@ -57,20 +57,20 @@ import static org.junit.Assert.fail;
  * WS-RM in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingOptionalPolicyServer.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(AddressingOptionalPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingOptionalPolicyServer extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public AddressingOptionalPolicyServer() {
         }
-        public Server(String dir) {
+        public AddressingOptionalPolicyServer(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public AddressingOptionalPolicyServer(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -100,7 +100,7 @@ public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBas
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args[0]);
+                AddressingOptionalPolicyServer s = new AddressingOptionalPolicyServer(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -116,7 +116,7 @@ public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBas
         TestUtil.getNewPortNumber("decoupled");
         PolicyTestHelper.updatePolicyRef("addr-optional-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(AddressingOptionalPolicyServer.class, null,
                                                                    new String[] {TEMPDIR}));
     }
 

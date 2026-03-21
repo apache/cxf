@@ -48,9 +48,9 @@ import static org.junit.Assert.fail;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SupportingTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(SupportingTokenServer.class);
     static final String TLS_PORT = allocatePort(TLSServer.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String STAX_PORT = allocatePort(SupportingTokenStaxServer.class);
     static final String TLS_STAX_PORT = allocatePort(TLSStaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -68,7 +68,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(SupportingTokenServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
@@ -80,7 +80,7 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(SupportingTokenStaxServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",

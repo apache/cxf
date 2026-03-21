@@ -59,8 +59,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class WSAPureWsdlTest extends AbstractWSATestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 1);
+    static final String PORT = allocatePort(WSAPureWsdlServer.class);
+    static final String PORT2 = allocatePort(WSAPureWsdlServer.class, 1);
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
@@ -72,7 +72,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(WSAPureWsdlServer.class, true));
     }
 
     @Test

@@ -51,20 +51,20 @@ import static org.junit.Assert.fail;
  * WS-RM in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(AddressingPolicyServer.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(AddressingPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class AddressingPolicyServer extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
         Endpoint ep;
-        public Server() {
+        public AddressingPolicyServer() {
         }
-        public Server(String dir) {
+        public AddressingPolicyServer(String dir) {
             tmpDir = dir;
         }
-        public Server(String[] args) {
+        public AddressingPolicyServer(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
@@ -94,7 +94,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args[0]);
+                AddressingPolicyServer s = new AddressingPolicyServer(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -111,7 +111,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
         PolicyTestHelper.updatePolicyRef("addr-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
-        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+        assertTrue("server did not launch correctly", launchServer(AddressingPolicyServer.class, null,
                                                                    new String[] {TEMPDIR}, true));
     }
 

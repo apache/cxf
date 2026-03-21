@@ -100,13 +100,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientServerTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String BARE_PORT = allocatePort(Server.class, 1);
-    static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
+    static final String PORT = allocatePort(JAXWSServer.class);
+    static final String BARE_PORT = allocatePort(JAXWSServer.class, 1);
+    static final String BOGUS_REAL_PORT = allocatePort(JAXWSServer.class, 2);
 
-    static final String BOGUS_PORT = allocatePort(Server.class, 3);
-    static final String PUB_PORT = allocatePort(Server.class, 4);
-    static final String CLIENT_PORT = allocatePort(Server.class, 5);
+    static final String BOGUS_PORT = allocatePort(JAXWSServer.class, 3);
+    static final String PUB_PORT = allocatePort(JAXWSServer.class, 4);
+    static final String CLIENT_PORT = allocatePort(JAXWSServer.class, 5);
 
 
 
@@ -131,7 +131,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         // Create bus first so it will be shared between the server and clients
         createStaticBus(url.toString());
         assertNotNull("cannot find test resource", url);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(JAXWSServer.class, true));
     }
 
     @Test

@@ -72,7 +72,7 @@ import static org.junit.Assert.fail;
  *
  */
 public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(InterceptorFaultServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(InterceptorFaultTest.class);
 
@@ -96,7 +96,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
      * QOS interceptors such as the RM, addressing and policy interceptors).
      *
      */
-    public static class Server extends AbstractBusTestServerBase {
+    public static class InterceptorFaultServer extends AbstractBusTestServerBase {
 
         Endpoint ep;
         protected void run() {
@@ -121,7 +121,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                InterceptorFaultServer s = new InterceptorFaultServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -145,7 +145,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + PORT, "true");
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(InterceptorFaultServer.class, true));
         createStaticBus();
     }
     @AfterClass

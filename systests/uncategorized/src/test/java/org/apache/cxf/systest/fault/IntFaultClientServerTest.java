@@ -46,13 +46,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = IntFaultServer.PORT;
     private final QName serviceName = new QName("http://apache.org/intfault",
                                                 "SOAPService");
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus();
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(IntFaultServer.class, true));
     }
 
     @Test

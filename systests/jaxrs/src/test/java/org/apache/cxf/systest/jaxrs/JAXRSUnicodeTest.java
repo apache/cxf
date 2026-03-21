@@ -32,18 +32,18 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class JAXRSUnicodeTest extends AbstractBusClientServerTestBase {
-    public static final int PORT = SpringServer.PORT;
+    public static final int PORT = SpringUnicodeServer.PORT;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         // must be 'in-process' to communicate with inner class in single JVM
         // and to spawn class SpringServer w/o using main() method
-        launchServer(SpringServer.class, true);
+        launchServer(SpringUnicodeServer.class, true);
     }
     @Ignore
-    public static class SpringServer extends AbstractSpringServer {
-        public static final int PORT = allocatePortAsInt(SpringServer.class);
-        public SpringServer() {
+    public static class SpringUnicodeServer extends AbstractSpringServer {
+        public static final int PORT = allocatePortAsInt(SpringUnicodeServer.class);
+        public SpringUnicodeServer() {
             super("/jaxrs_unicode", PORT);
         }
     }

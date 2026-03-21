@@ -45,8 +45,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class WSAFromWSDLTest extends AbstractWSATestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String INVALID_PORT = allocatePort(Server.class, 1);
+    static final String PORT = allocatePort(WSAFromWSDLServer.class);
+    static final String INVALID_PORT = allocatePort(WSAFromWSDLServer.class, 1);
 
     private static final String BASE_URI = "http://apache.org/cxf/systest/ws/addr_feature/"
         + "AddNumbersPortType/";
@@ -61,7 +61,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(WSAFromWSDLServer.class));
     }
 
     @Test

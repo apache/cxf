@@ -35,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SoapUDPTest extends AbstractBusClientServerTestBase {
-    private static final String PORT = Server.PORT;
+    private static final String PORT = SoapUDPServer.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
                                             "SOAPService");
     private final QName localPortName = new QName("http://apache.org/hello_world_soap_http",
@@ -47,7 +47,7 @@ public class SoapUDPTest extends AbstractBusClientServerTestBase {
         staticBus = BusFactory.getDefaultBus();
         new LoggingFeature().initialize(staticBus);
         BusFactory.setThreadDefaultBus(staticBus);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(SoapUDPServer.class, true));
     }
 
     @Test

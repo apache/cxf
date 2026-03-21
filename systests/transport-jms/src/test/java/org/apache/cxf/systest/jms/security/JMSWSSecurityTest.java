@@ -65,7 +65,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         broker = new EmbeddedJMSBrokerLauncher("tcp://localhost:" + PORT);
         launchServer(broker);
-        launchServer(new Server(broker));
+        launchServer(new JMSWSSecurityServer(broker));
         createStaticBus();
     }
 

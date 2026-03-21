@@ -44,7 +44,7 @@
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.5}">
+	 <httpj:engine port="${testutil.ports.HttpsBusServer.5}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 

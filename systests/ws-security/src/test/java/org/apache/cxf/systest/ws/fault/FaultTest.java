@@ -54,7 +54,7 @@ import static org.junit.Assert.fail;
  * A set of tests for (signing and encrypting) SOAP Faults.
  */
 public class FaultTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(FaultServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -65,7 +65,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(FaultServer.class, true)
         );
     }
 

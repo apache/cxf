@@ -72,10 +72,10 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(JAXWSAsyncServer.class);
     static ScheduledExecutorService executor;
     
-    public static class Server extends AbstractBusTestServerBase {
+    public static class JAXWSAsyncServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
@@ -85,7 +85,7 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                JAXWSAsyncServer s = new JAXWSAsyncServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -119,7 +119,7 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(JAXWSAsyncServer.class, true));
         executor = Executors.newScheduledThreadPool(5);
     }
 

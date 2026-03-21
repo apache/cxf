@@ -79,7 +79,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
-    private static String port = TestUtil.getPortNumber(Server.class);
+    private static String port = TestUtil.getPortNumber(HandlersServer.class);
 
     private final QName serviceName = new QName("http://apache.org/handler_test", "HandlerTestService");
     private final QName portName = new QName("http://apache.org/handler_test", "SoapPort");
@@ -96,7 +96,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         //System.setProperty(SAAJFactoryResolver.SOAP_FACTORY_KEY,
         //    "com.ibm.ws.webservices.engine.xmlsoap.SOAPFactory");
         createStaticBus();
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(HandlersServer.class, true));
     }
 
     @Before

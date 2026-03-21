@@ -74,11 +74,11 @@ public class CustomizedMicrometerProviderClientServerTest extends AbstractBusCli
     
     
     public static final MeterRegistry METER_REGISTER = new SimpleMeterRegistry();
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(CustomizedMicrometerProviderServer.class);
     
     private final QName portName = new QName("http://cxf.apache.org/jaxws/schemavalidation", "servicePort");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CustomizedMicrometerProviderServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             var jaxwsTags = new JaxwsTags();
@@ -117,7 +117,7 @@ public class CustomizedMicrometerProviderClientServerTest extends AbstractBusCli
     @BeforeClass
     public static void startServers() {
         createStaticBus();
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(CustomizedMicrometerProviderServer.class, true));
     }
 
     @Test

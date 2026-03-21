@@ -49,7 +49,7 @@ import static org.junit.Assert.assertTrue;
  * Tests the redelivery of the message upon a delivery error.
  */
 public class RedeliveryTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RedeliveryServer.class);
     private static final Logger LOG = LogUtils.getLogger(RedeliveryTest.class);
 
     private static GreeterRecorderImpl serverGreeter;
@@ -57,12 +57,12 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
     private Greeter greeter;
 
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class RedeliveryServer extends AbstractBusTestServerBase {
         String port;
         String pfx;
         Endpoint ep;
 
-        public Server(String[] args) {
+        public RedeliveryServer(String[] args) {
             port = args[0];
             pfx = args[1];
         }
@@ -98,7 +98,7 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server(args);
+                RedeliveryServer s = new RedeliveryServer(args);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -113,7 +113,7 @@ public class RedeliveryTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("redlv-server", true);
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, null, new String[]{PORT, "redlv"}, true));
+                   launchServer(RedeliveryServer.class, null, new String[]{PORT, "redlv"}, true));
     }
 
     @AfterClass

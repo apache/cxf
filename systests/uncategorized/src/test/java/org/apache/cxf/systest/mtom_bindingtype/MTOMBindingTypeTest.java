@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = MTOMBindingServer.PORT;
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/mtom_feature",
                                                 "HelloService");
@@ -59,7 +59,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(MTOMBindingServer.class, true));
     }
 
     protected ByteArrayOutputStream setupInLogging() {

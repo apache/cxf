@@ -42,11 +42,11 @@
 
   <http:destination 
          name="{http://apache.org/hello_world}Gordy.http-destination">
-    <http:server RedirectURL="https://localhost:${testutil.ports.BusServer.4}/Bethal"/>
+    <http:server RedirectURL="https://localhost:${testutil.ports.HttpsBusServer.4}/Bethal"/>
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="${testutil.ports.BusServer.3}">
+	 <httpj:engine port="${testutil.ports.HttpsBusServer.3}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 

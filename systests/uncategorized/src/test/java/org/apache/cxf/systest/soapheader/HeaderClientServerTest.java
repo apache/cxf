@@ -47,13 +47,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = SoapHeaderServer.PORT;
 
     private final QName serviceName = new QName("http://cxf.apache.org/pizza", "PizzaService");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(SoapHeaderServer.class, true));
     }
 
     @Test

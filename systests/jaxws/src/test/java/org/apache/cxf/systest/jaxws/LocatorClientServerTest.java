@@ -41,12 +41,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(MyServer.class);
+    static final String PORT = allocatePort(LocatorServer.class);
 
     static final Logger LOG = LogUtils.getLogger(LocatorClientServerTest.class);
     private final QName serviceName = new QName("http://apache.org/locator", "LocatorService");
 
-    public static class MyServer extends AbstractBusTestServerBase {
+    public static class LocatorServer extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new LocatorServiceImpl();
@@ -57,7 +57,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                MyServer s = new MyServer();
+                LocatorServer s = new LocatorServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -70,7 +70,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(MyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(LocatorServer.class, true));
     }
 
     @Test

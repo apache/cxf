@@ -58,7 +58,7 @@ public class JMSSoapActionTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         broker = new EmbeddedJMSBrokerLauncher("tcp://localhost:" + PORT);
         launchServer(broker);
-        launchServer(new Server(broker));
+        launchServer(new JMSSoapActionServer(broker));
         createStaticBus();
     }
 

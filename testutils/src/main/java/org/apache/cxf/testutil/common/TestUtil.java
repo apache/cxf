@@ -29,8 +29,10 @@ import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.ws.BindingProvider;
@@ -44,6 +46,7 @@ public final class TestUtil {
     private static final Logger LOG = LogUtils.getL7dLogger(TestUtil.class);
     private static int portNum = -1;
     private static Properties ports = new Properties();
+    private static Map<String, String> names = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unused")
     private static ServerSocket lock;
@@ -144,6 +147,12 @@ public final class TestUtil {
     }
 
     private static void applyNames(String fullName, String simpleName, String p) {
+        final String existing = names.putIfAbsent(simpleName, fullName);
+        if (existing != null && !existing.equalsIgnoreCase(fullName)) {
+            throw new IllegalArgumentException("The port naming conflict detected. "
+                + "Attempt to register named port [" + simpleName + "] for [" + fullName 
+                    + "] but it is already associated with [" + existing + "]");
+        }
         ports.setProperty("testutil.ports." + fullName, p);
         ports.setProperty("testutil.ports." + simpleName, p);
         System.setProperty("testutil.ports." + fullName, p);
