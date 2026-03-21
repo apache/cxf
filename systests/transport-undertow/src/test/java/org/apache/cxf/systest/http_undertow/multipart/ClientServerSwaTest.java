@@ -50,8 +50,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(value = Parameterized.class)
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
-    static String serverPort = TestUtil.getPortNumber(Server.class);
-    static String serverPortInvalid = TestUtil.getPortNumber(Server.class, 1);
+    static String serverPort = TestUtil.getPortNumber(MultipartServer.class);
+    static String serverPortInvalid = TestUtil.getPortNumber(MultipartServer.class, 1);
     
     static class TestParam {
         private final String port;
@@ -84,7 +84,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(MultipartServer.class, true));
     }
 
     private String getFullStackTrace(Exception ex) {

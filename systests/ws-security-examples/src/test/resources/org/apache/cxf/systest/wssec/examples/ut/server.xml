@@ -33,28 +33,28 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Plaintext" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTPlaintext" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextNoPassword" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTPlaintextNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextNoPasswordPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="PlaintextNoPassword" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTPlaintextNoPassword" serviceName="s:DoubleItService" endpointName="s:DoubleItPlaintextNoPasswordPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.enable.ut-no-password.principal" value="true"/>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Digest" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTDigest" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Digest" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTDigest" serviceName="s:DoubleItService" endpointName="s:DoubleItDigestPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSSupporting" address="https://localhost:${testutil.ports.ut.Server.2}/DoubleItUTTLSSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSSupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl" depends-on="tls-settings">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TLSSupporting" address="https://localhost:${testutil.ports.ut.UsernameTokenServer.2}/DoubleItUTTLSSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItTLSSupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSESupporting" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTAsymmetricSESupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSESupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricSESupporting" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTAsymmetricSESupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricSESupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -62,13 +62,13 @@
             <entry key="security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricEncrSupporting" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTAsymmetricEncrSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricEncrSupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricEncrSupporting" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTAsymmetricEncrSupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricEncrSupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut/DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSESupporting" address="http://localhost:${testutil.ports.ut.Server}/DoubleItUTSymmetricSESupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSESupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut//DoubleItUt.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricSESupporting" address="http://localhost:${testutil.ports.ut.UsernameTokenServer}/DoubleItUTSymmetricSESupporting" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricSESupportingPort" implementor="org.apache.cxf.systest.wssec.examples.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/wssec/examples/ut//DoubleItUt.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -80,7 +80,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.ut.Server.2}">
+        <httpj:engine port="${testutil.ports.ut.UsernameTokenServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>

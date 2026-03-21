@@ -40,7 +40,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.wssc.Server.2}">
+        <httpj:engine port="${testutil.ports.wssc.WSSCServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
@@ -51,7 +51,7 @@
     </httpj:engine-factory>
     
     <httpj:engine-factory id="tls-settings-stax">
-        <httpj:engine port="${testutil.ports.wssc.StaxServer.2}">
+        <httpj:engine port="${testutil.ports.wssc.WSSCStaxServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>

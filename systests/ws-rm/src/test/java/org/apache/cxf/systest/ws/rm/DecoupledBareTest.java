@@ -50,12 +50,12 @@ import static org.junit.Assert.assertTrue;
  * exchange of WS-RM protocol messages.
  */
 public class DecoupledBareTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(DecoupledBareServer.class);
     public static final String DECOUPLE_PORT = allocatePort(DecoupledBareTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(DecoupledBareTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class DecoupledBareServer extends AbstractBusTestServerBase {
 
         Endpoint ep;
         protected void run()  {
@@ -81,7 +81,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(DecoupledBareServer.class, true));
     }
 
     @Test

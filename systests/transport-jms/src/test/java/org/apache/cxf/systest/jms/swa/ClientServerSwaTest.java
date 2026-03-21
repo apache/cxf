@@ -50,7 +50,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
     static EmbeddedJMSBrokerLauncher broker;
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class SwaServer extends AbstractBusTestServerBase {
         protected void run() {
             try {
                 JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -74,7 +74,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         broker = new EmbeddedJMSBrokerLauncher();
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
-        launchServer(new Server());
+        launchServer(new SwaServer());
         createStaticBus();
     }
     @AfterClass

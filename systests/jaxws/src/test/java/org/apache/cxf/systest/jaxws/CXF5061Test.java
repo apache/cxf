@@ -38,7 +38,7 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
         = "http://localhost:" + TestUtil.getPortNumber("org.apache.cxf.systest.jaxws.CXF5061Test")
             + "/cxf5061";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class CXF5061Server extends AbstractBusTestServerBase {
 
         protected void run() {
             new SpringBusFactory().createBus("org/apache/cxf/systest/jaxws/springWebService.xml");
@@ -46,7 +46,7 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                CXF5061Server s = new CXF5061Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -59,7 +59,7 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(CXF5061Server.class, true));
     }
 
     @Test

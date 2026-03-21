@@ -73,8 +73,8 @@ import static org.junit.Assert.fail;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String STAX_PORT = allocatePort(StaxServer.class);
+    public static final String PORT = allocatePort(WSSecurityServer.class);
+    public static final String STAX_PORT = allocatePort(WSSecurityStaxServer.class);
     public static final String DEC_PORT = allocatePort(WSSecurityClientTest.class);
 
     private static final java.net.URL WSDL_LOC;
@@ -120,13 +120,13 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(WSSecurityServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(WSSecurityStaxServer.class, true)
         );
         createStaticBus();
     }

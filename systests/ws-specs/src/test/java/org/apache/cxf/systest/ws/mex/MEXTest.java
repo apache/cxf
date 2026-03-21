@@ -37,10 +37,10 @@ import static org.junit.Assert.assertTrue;
  *
  */
 public class MEXTest extends AbstractWSATestBase {
-    static final String PORT = Server.PORT;
+    static final String PORT = MEXServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(MEXServer.class, true));
         createStaticBus();
     }
 

@@ -64,12 +64,12 @@ import static org.junit.Assert.assertTrue;
  *
  */
 public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
-    public static final int PORT = SpringServer.PORT;
+    public static final int PORT = SpringCrossOriginSimpleServer.PORT;
     private WebClient configClient;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(SpringServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(SpringCrossOriginSimpleServer.class, true));
     }
 
     @Before
@@ -573,10 +573,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     }
 
     @Ignore
-    public static class SpringServer extends AbstractSpringServer {
-        public static final int PORT = allocatePortAsInt(SpringServer.class);
+    public static class SpringCrossOriginSimpleServer extends AbstractSpringServer {
+        public static final int PORT = allocatePortAsInt(SpringCrossOriginSimpleServer.class);
 
-        public SpringServer() {
+        public SpringCrossOriginSimpleServer() {
             super("/jaxrs_cors", PORT);
         }
     }

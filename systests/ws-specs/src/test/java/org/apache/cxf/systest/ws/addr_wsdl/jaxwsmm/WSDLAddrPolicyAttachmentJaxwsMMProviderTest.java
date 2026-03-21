@@ -47,7 +47,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(PolicyAttachmentServer.class);
     public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);
@@ -57,7 +57,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
     private static final String WSDL_ADDRESS = ADDRESS + "?wsdl";
     private static final QName ENDPOINT_NAME = new QName("http://messaging/", "AsyncMessagingService");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class PolicyAttachmentServer extends AbstractBusTestServerBase {
 
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
@@ -77,7 +77,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                PolicyAttachmentServer s = new PolicyAttachmentServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -90,7 +90,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(PolicyAttachmentServer.class, true));
     }
 
     private static void testInterceptors(Bus b) {

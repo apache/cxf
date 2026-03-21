@@ -41,10 +41,10 @@ import static org.junit.Assert.assertTrue;
 
 public class JsFrontEndServletTest extends AbstractServletTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class JsFrontEndEmbeddedJettyServer extends AbstractJettyServer {
+        public static final int PORT = allocatePortAsInt(JsFrontEndEmbeddedJettyServer.class);
 
-        public EmbeddedJettyServer() {
+        public JsFrontEndEmbeddedJettyServer() {
             super("/org/apache/cxf/systest/servlet/web-js.xml", "/", CONTEXT, PORT);
         }
     }
@@ -52,7 +52,7 @@ public class JsFrontEndServletTest extends AbstractServletTest {
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(JsFrontEndEmbeddedJettyServer.class, true));
         createStaticBus();
     }
 
@@ -88,6 +88,6 @@ public class JsFrontEndServletTest extends AbstractServletTest {
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return JsFrontEndEmbeddedJettyServer.PORT;
     }
 }

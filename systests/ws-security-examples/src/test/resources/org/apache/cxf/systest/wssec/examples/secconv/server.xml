@@ -38,7 +38,7 @@
         <property name="enforcePrincipal" value="false"/>
     </bean>
 
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SecureConversation" address="http://localhost:${testutil.ports.secconv.Server}/DoubleItSecureConversation" serviceName="s:DoubleItService" endpointName="s:DoubleItSecureConversationPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/wssec/examples/secconv/DoubleItSecConv.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SecureConversation" address="http://localhost:${testutil.ports.secconv.SecureConversationServer}/DoubleItSecureConversation" serviceName="s:DoubleItService" endpointName="s:DoubleItSecureConversationPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/wssec/examples/secconv/DoubleItSecConv.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler.sct" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
             <entry key="security.signature.properties.sct" value="bob.properties"/>

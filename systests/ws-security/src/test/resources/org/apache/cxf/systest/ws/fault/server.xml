@@ -33,44 +33,44 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap11" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap11" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap12" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap12" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12Port" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12Dispatch" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap12Dispatch" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12DispatchPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12Dispatch" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap12Dispatch" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12DispatchPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12Mtom" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap12Mtom" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12MtomPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap12Mtom" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap12Mtom" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap12MtomPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
             <entry key="mtom-enabled" value="true"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11PolicyWithParts" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap11PolicyWithParts" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11PolicyWithPartsPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11PolicyWithParts" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap11PolicyWithParts" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11PolicyWithPartsPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="JavaFirst" address="http://localhost:${testutil.ports.fault.Server}/DoubleItJavaFirst" serviceName="s:DoubleItService" endpointName="s:DoubleItJavaFirstPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImplJavaFirst" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="JavaFirst" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItJavaFirst" serviceName="s:DoubleItService" endpointName="s:DoubleItJavaFirstPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImplJavaFirst" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11Unsecured" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap11Unsecured" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11UnsecuredPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11Unsecured" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap11Unsecured" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11UnsecuredPort" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
@@ -95,7 +95,7 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11Unsecured2" address="http://localhost:${testutil.ports.fault.Server}/DoubleItSoap11Unsecured2" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11UnsecuredPort2" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Soap11Unsecured2" address="http://localhost:${testutil.ports.fault.FaultServer}/DoubleItSoap11Unsecured2" serviceName="s:DoubleItService" endpointName="s:DoubleItSoap11UnsecuredPort2" implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>

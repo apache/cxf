@@ -46,12 +46,12 @@ import org.junit.BeforeClass;
  * A set of tests for Kerberos Tokens that use an Apache Kerby instance as the KDC.
  */
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = TestUtil.getPortNumber(Server.class);
-    static final String STAX_PORT = TestUtil.getPortNumber(StaxServer.class);
-    static final String PORT2 = TestUtil.getPortNumber(Server.class, 2);
-    static final String STAX_PORT2 = TestUtil.getPortNumber(StaxServer.class, 2);
+    static final String PORT = TestUtil.getPortNumber(KerberosServer.class);
+    static final String STAX_PORT = TestUtil.getPortNumber(KerberosStaxServer.class);
+    static final String PORT2 = TestUtil.getPortNumber(KerberosServer.class, 2);
+    static final String STAX_PORT2 = TestUtil.getPortNumber(KerberosStaxServer.class, 2);
 
-    static final String PORT3 = TestUtil.getPortNumber(Server.class, 3);
+    static final String PORT3 = TestUtil.getPortNumber(KerberosServer.class, 3);
     static final String STSPORT = TestUtil.getPortNumber(STSServer.class);
     static final String STAX_STSPORT = TestUtil.getPortNumber(StaxSTSServer.class);
 
@@ -117,14 +117,14 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractClientServerTestBase.launchServer(Server.class, true)
+            AbstractClientServerTestBase.launchServer(KerberosServer.class, true)
         );
 
         org.junit.Assert.assertTrue(
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            AbstractClientServerTestBase.launchServer(StaxServer.class, true)
+            AbstractClientServerTestBase.launchServer(KerberosStaxServer.class, true)
         );
 
         org.junit.Assert.assertTrue(
