@@ -18,14 +18,15 @@
  */
 package org.apache.cxf.systest.http_undertow.multipart;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import javax.activation.DataHandler;
 import javax.jws.WebService;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.swa_nomime.SwAServiceInterface;

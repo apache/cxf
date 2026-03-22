@@ -28,6 +28,7 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
+
 import org.apache.cxf.jaxws.handler.sei.HandlerChainTestSEI;
 
 import org.junit.Before;
