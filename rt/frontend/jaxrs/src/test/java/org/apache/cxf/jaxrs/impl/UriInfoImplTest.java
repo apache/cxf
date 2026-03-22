@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -41,6 +42,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
 import org.junit.Test;
@@ -431,6 +433,12 @@ public class UriInfoImplTest {
         }
 
         @GET
+        @Path("one/{name:[a-zA-Z][a-zA-Z_0-9]*}")
+        public Response getTemplate() {
+            return null;
+        }
+
+        @GET
         @Path("bar")
         public Response getSubMethod() {
             return null;
@@ -561,6 +569,62 @@ public class UriInfoImplTest {
         assertEquals("foo/sub/subSub", matchedUris.get(0));
         assertEquals("foo/sub", matchedUris.get(1));
         assertEquals("foo", matchedUris.get(2));
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplateIncludesApplicationPathAndTemplateVariables() throws Exception {
+        Message m = mockMessage("http://localhost:8080/app", "/foo/one/abc");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getTemplate");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/one/{name:[a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplateStripsServletContextPath() throws Exception {
+        Message m = mockMessage("http://localhost:8080/context/app", "/foo/bar");
+
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getContextPath()).thenReturn("/context");
+        m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
+
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getSubMethod");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/bar", u.getMatchedResourceTemplate());
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplateSubResourceWithoutClassPath() throws Exception {
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSub");
+
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/sub", u.getMatchedResourceTemplate());
     }
 
     private Message mockMessage(String baseAddress, String pathInfo) {

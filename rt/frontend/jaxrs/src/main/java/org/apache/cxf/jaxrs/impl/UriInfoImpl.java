@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriBuilder;
@@ -40,6 +41,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -246,22 +248,30 @@ public class UriInfoImpl implements UriInfo {
     @Override
     public String getMatchedResourceTemplate() {
         if (stack != null) {
-            final List<URITemplate> templates = new LinkedList<>();
+            String matchedResourceTemplate = getBaseUri().getPath();
+
+            if (HttpUtils.isHttpRequest(message)) {
+                final HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
+                matchedResourceTemplate = matchedResourceTemplate.substring(req.getContextPath().length());
+            }
+
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-                templates.add(ori.getClassResourceInfo().getURITemplate());
-                templates.add(ori.getURITemplate());
+
+                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
+                        matchedResourceTemplate, getValue(ori.getClassResourceInfo().getURITemplate()));
+
+                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
+                        matchedResourceTemplate, getValue(ori.getURITemplate()));
             }
-            
-            if (!templates.isEmpty()) {
-                UriBuilder builder = UriBuilder.fromPath(templates.get(0).getValue());
-                for (int i = 1; i < templates.size(); ++i) {
-                    builder = builder.path(templates.get(i).getValue());
-                }
-                return builder.build().toString();
-            }
+            return matchedResourceTemplate;
         }
+
         LOG.fine("No resource stack information, returning empty template");
         return "";
+    }
+
+    private String getValue(URITemplate uriTemplate) {
+        return uriTemplate == null ? null : uriTemplate.getValue();
     }
 }
