@@ -48,6 +48,6 @@ public final class PatternBuilder {
         String regexp = value.replace(".", "\\.");
         regexp = regexp.replace("*", ".*");
 
-        return Pattern.compile(regexp);
+        return Pattern.compile(regexp,  Pattern.CASE_INSENSITIVE);
     }
 }
