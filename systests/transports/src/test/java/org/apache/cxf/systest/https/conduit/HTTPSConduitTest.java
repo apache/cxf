@@ -64,6 +64,7 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.https.BusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -427,7 +428,10 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             ctx.init(
                 keyManagers,
                 new TrustManager[] {trustManager},
-                SecureRandom.getInstance("SHA1PRNG")
+                JavaUtils.isFIPSEnabled() 
+                    ? SecureRandom.getInstance("PKCS11")
+                    //SHA1PRNG isn't approved in FIPS
+                    : SecureRandom.getInstance("SHA1PRNG")
             );
         }
 

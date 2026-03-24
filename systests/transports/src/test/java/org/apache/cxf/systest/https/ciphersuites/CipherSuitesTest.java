@@ -296,7 +296,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client-tlsv12.xml");
+        URL busFile = JavaUtils.isFIPSEnabled() 
+            //FIPS: CBC Cipher not approved
+            ? CipherSuitesTest.class.getResource("ciphersuites-client-tlsv12-fips.xml")
+            : CipherSuitesTest.class.getResource("ciphersuites-client-tlsv12.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
@@ -358,8 +361,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         tlsParams.setDisableCNCheck(true);
 
         tlsParams.setSecureSocketProtocol("TLSv1.2");
-        tlsParams.setCipherSuites(Collections.singletonList("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"));
-
+        if (JavaUtils.isFIPSEnabled()) {
+            //FIPS: CBC Cipher not approved
+            tlsParams.setCipherSuites(Collections.singletonList("TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"));
+        } else {
+            tlsParams.setCipherSuites(Collections.singletonList("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"));
+        }
         conduit.setTlsClientParameters(tlsParams);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");

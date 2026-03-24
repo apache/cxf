@@ -31,7 +31,7 @@
     <cxf:bus>
         <cxf:features>
             <p:policies/>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
 
@@ -189,7 +189,6 @@
                         <entry key="action" value="Encrypt"/>
                         <entry key="decryptionPropFile" value="bob.properties"/>
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
-                        <entry key="allowRsa15KeyTransportAlgorithm" value="true"/>
                     </map>
                 </constructor-arg>
             </bean>

@@ -134,7 +134,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
                            : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -151,7 +151,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithm() throws Exception {
-        //fips : OAEP not supported
+        //fips : RSA1_5 not supported
         Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JWTAlgorithmTest.class.getResource("client.xml");
 
@@ -231,7 +231,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.content.algorithm", "A192GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -278,7 +278,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
                            : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }

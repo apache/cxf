@@ -28,7 +28,7 @@
     <cxf:bus>
         <cxf:features>
             <p:policies/>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleIt3DESEncryptionPort" createdFromAPI="true">
@@ -190,6 +190,7 @@
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="signatureKeyIdentifier" value="X509KeyIdentifier"/>
                         <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+                        <entry key="encryptionKeyTransportAlgorithm" value="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
                     </map>
                 </constructor-arg>
             </bean>
@@ -223,6 +224,7 @@
                         <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
                         <entry key="signatureKeyIdentifier" value="X509KeyIdentifier"/>
                         <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+                        <entry key="encryptionKeyTransportAlgorithm" value="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
                     </map>
                 </constructor-arg>
             </bean>
@@ -249,7 +251,6 @@
                         <entry key="action" value="Encrypt"/>
                         <entry key="encryptionUser" value="bob"/>
                         <entry key="encryptionPropFile" value="bob.properties"/>
-                        <entry key="encryptionKeyTransportAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
                     </map>
                 </constructor-arg>
             </bean>

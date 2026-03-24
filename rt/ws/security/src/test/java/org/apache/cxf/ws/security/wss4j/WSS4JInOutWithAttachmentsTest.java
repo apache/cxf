@@ -104,6 +104,8 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
     @Test
     public void testEncryptWithAgreementHKDFWithXECAndEDKeys() throws Exception {
         Assume.assumeTrue(getJDKVersion() >= 16);
+        //XDH (X25519/X448) is not FIPS 140-2 approved,
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         testEncryptWithAgreementMethod("ed25519", "x25519",
                 WSS4JConstants.AGREEMENT_METHOD_X25519, WSS4JConstants.KEYDERIVATION_HKDF);
     }

@@ -28,7 +28,7 @@
     <cxf:bus>
         <cxf:features>
             <p:policies/>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricPort" createdFromAPI="true">
@@ -160,7 +160,7 @@
                         <sp:OnlySignEntireHeadersAndBody/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
@@ -189,7 +189,7 @@
                         <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
@@ -231,7 +231,7 @@
                         <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>

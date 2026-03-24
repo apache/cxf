@@ -69,9 +69,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
             : "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
     private static final String CLIENT_SIGN_JWEJWS_PROPERTIES =
-            "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
     private static final String SERVER_SIGN_JWEJWS_PROPERTIES =
-            "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
     private static final String ENCODED_MAC_KEY = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
         + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     @BeforeClass
@@ -261,7 +265,6 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).put("rs.security.decryption.key.password.provider", provider);
         if (JavaUtils.isFIPSEnabled()) {
             bean.getProperties(true).put("rs.security.encryption.content.algorithm", "A128GCM");
-            bean.getProperties(true).put("rs.security.encryption.key.algorithm", "RSA1_5");
         }
         BookStore bs = bean.create(BookStore.class);
 

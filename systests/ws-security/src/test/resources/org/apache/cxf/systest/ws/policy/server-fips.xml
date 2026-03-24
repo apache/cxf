@@ -30,7 +30,7 @@
     <cxf:bus>
         <cxf:features>
             <p:policies/>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <!-- -->
@@ -175,7 +175,7 @@
                                     <sp:OnlySignEntireHeadersAndBody/>
                                     <sp:AlgorithmSuite>
                                         <wsp:Policy>
-                                            <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                            <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                                         </wsp:Policy>
                                     </sp:AlgorithmSuite>
                                 </wsp:Policy>
@@ -207,7 +207,7 @@
                         <sp:IncludeTimestamp/>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>
@@ -240,7 +240,7 @@
                         </sp:TransportToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>

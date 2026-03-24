@@ -28,7 +28,7 @@ under the License.
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     
@@ -48,7 +48,7 @@ under the License.
             <entry key="rs.security.keystore.file" 
                    value="org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"/>
             <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
-            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA-OAEP-256"/>
        </jaxrs:properties>
    </jaxrs:server>
    
@@ -68,7 +68,7 @@ under the License.
             <entry key="rs.security.keystore.password" value="password"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="passwordProvider"/>
             <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
-            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA-OAEP-256"/>
        </jaxrs:properties>
    </jaxrs:server>
    

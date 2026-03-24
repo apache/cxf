@@ -358,7 +358,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         All algSuitePolicyAll = new All();
         algSuitePolicyAll.addAssertion(
             new PrimitiveAssertion(new QName(SP12Constants.SP_NS, JavaUtils.isFIPSEnabled()
-                                             ? "Basic128GCMRsa15"
+                                             ? "Basic128GCM"
                                                  : "Basic128")));
         algSuitePolicyEa.addPolicyComponent(algSuitePolicyAll);
         AlgorithmSuite algorithmSuite = new AlgorithmSuite(SPConstants.SPVersion.SP12, algSuitePolicy);

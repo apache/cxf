@@ -78,7 +78,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
                            : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -110,7 +110,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -150,7 +150,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -183,7 +183,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/bob.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -223,7 +223,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }

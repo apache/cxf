@@ -19,6 +19,7 @@
 package org.apache.cxf.helpers;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +47,7 @@ public class JavaUtilsTest {
 
     @Test
     public void testIsFIPSEnabledDefaultFalse() {
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled()); //ignore this test when running in FIPS mode
         // Without the fips.enabled system property, FIPS should be disabled
         assertFalse("FIPS should be disabled by default", JavaUtils.isFIPSEnabled());
     }

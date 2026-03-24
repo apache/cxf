@@ -29,8 +29,10 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -67,6 +69,25 @@ import org.apache.cxf.helpers.JavaUtils;
  * Encryption helpers
  */
 public final class CryptoUtils {
+
+    static {
+        if (JavaUtils.isFIPSEnabled()) {
+            Provider currentProvider = Security.getProvider(JavaUtils.getFIPSSecurityProvider() != null
+                                           ? JavaUtils.getFIPSSecurityProvider() : "BCFIPS");
+            if (currentProvider == null) {
+                try {
+                    Class<? extends Provider> clazz = 
+                        (Class<? extends Provider>)CryptoUtils.class.getClassLoader()
+                        .loadClass("org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider");
+                    Provider provider = clazz.getDeclaredConstructor().newInstance();
+                    Security.addProvider(provider);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    
+                }
+            }
+        }
+    }
 
     private CryptoUtils() {
     }

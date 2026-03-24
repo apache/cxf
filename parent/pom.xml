@@ -2058,7 +2058,17 @@
             <dependency>
                 <groupId>org.apache.wss4j</groupId>
                 <artifactId>wss4j-ws-security-common</artifactId>
-                <version>${cxf.jakarta.wss4j.version}</version>
+		<version>${cxf.jakarta.wss4j.version}</version>
+		<exclusions>
+                    <exclusion>
+                        <groupId>org.ehcache</groupId>
+                        <artifactId>ehcache</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -2384,7 +2394,14 @@
                 <property>
                     <name>fips.enabled</name>
                 </property>
-            </activation>
+	    </activation>
+	    <dependencies>
+                <dependency>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bc-fips</artifactId>
+                    <version>2.1.2</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -2393,8 +2410,8 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <org.apache.xml.security.securerandom.algorithm>PKCS11</org.apache.xml.security.securerandom.algorithm>
-                                <fips.enabled>true</fips.enabled>
-                            </systemPropertyVariables>
+				<fips.enabled>true</fips.enabled>
+			    </systemPropertyVariables>
                             <excludes>
                                 <!--fips: need to regenerate keys for systests/microprofile/client/weld tests which are out of CXF codebase-->
                                 <exclude>**/SslContextTest.java</exclude>

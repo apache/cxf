@@ -429,7 +429,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = UsernameTokenPolicyTest.class.getResource("policy-client.xml");
+        URL busFile = UsernameTokenPolicyTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "policy-client-fips.xml"
+                                                                    : "policy-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

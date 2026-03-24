@@ -108,7 +108,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
                            : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         if (JavaUtils.isFIPSEnabled()) {
-            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
         } else {
             properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         }
@@ -124,7 +124,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithm() throws Exception {
-        //fips : OAEP not supported
+        //fips : RSA1_5 not supported
         Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
@@ -151,7 +151,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithmKeyIncluded() throws Exception {
-        //fips : OAEP not supported
+        //fips : RSA1_5 not supported
         Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
@@ -573,15 +573,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         String header = "eyJhbGciOiJSUzI1NiIsImN0eSI6Impzb24ifQ";
         String payload = "eyJCb29rIjp7ImlkIjoxMjMsIm5hbWUiOiJib29rIn19";
-        String sig = JavaUtils.isFIPSEnabled()
-                        ? "Oj-AycEOibcu7Nrd5IY0hffVpfj_evt_nu8JAiDiqHvVYPS-b" 
-            + "3XdO8NV33r9j5libpjMY7O4ANo8F7ypuwlNvHPO8K2MeJI41zUtRVSBl"
-            + "3BOctWaZHb_TPZAxQQ0drThkwYoEy1Di2Mzp1qCENe8zL4SUsH26Zmef"
-            + "kxLPmTolfSeeSIBEPDM4ZKafoeAAaZ4IsY7lUWB10rBKfn3l5VS0OXOt"
-            + "lN2cyr-sTVK43c9etpKY8wqoKrHK9Tr9vO2NDzUFxY5SzNtQMBcqXpgo"
-            + "RP4v77ERdWQO4GDTQx6m_36rjNHEuh7CQWPbr0EnoyDaM7mdPUyjjLp5"
-            + "fYJ2wc_Z2bXPQ" 
-            : "mZJVPy83atFNxQMeJqkVbR8t1srr9LgKBGT0hgiymjNepRgqedvFG5B8E8UPAzfzNLsos91gGdneUEKrWauU4GoDPTzngX"
+        String sig = "mZJVPy83atFNxQMeJqkVbR8t1srr9LgKBGT0hgiymjNepRgqedvFG5B8E8UPAzfzNLsos91gGdneUEKrWauU4GoDPTzngX"
                 + "798aDP6lsn5bUoTMKLfaWp9uzHDIzLMjGkabn92nrIpdK4JKDYNjdSUJIT2L97jggg0aoLhJQHVw2LdF1fpYdM-HCyccNW"
                 + "HQbAR7bDZdITZFnDi8b22QfHCqeLV7m4mBvNDtNX337wtoUKyjPYBMoWc12hHDCwQyu_gfW6zFioF5TGx-Ifg8hrFlnyUr"
                 + "vnSdP-FUtXiGeWBIvE_L6gD7DfM4u9hkK757vTjjMR_pF2CW3pfSH-Ha8v0A";

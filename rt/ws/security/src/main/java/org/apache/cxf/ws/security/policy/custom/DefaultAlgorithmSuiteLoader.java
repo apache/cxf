@@ -101,7 +101,8 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes128-gcm",
                     SPConstants.KW_AES128,
-                    SPConstants.KW_RSA_OAEP,
+                    JavaUtils.isFIPSEnabled() ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                        : SPConstants.KW_RSA_OAEP,
                     SPConstants.P_SHA1_L128,
                     SPConstants.P_SHA1_L128,
                     128, 128, 128, 256, 1024, 4096
@@ -115,7 +116,8 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes192-gcm",
                     SPConstants.KW_AES192,
-                    SPConstants.KW_RSA_OAEP,
+                    JavaUtils.isFIPSEnabled() ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                        : SPConstants.KW_RSA_OAEP,
                     SPConstants.P_SHA1_L192,
                     SPConstants.P_SHA1_L192,
                     192, 192, 192, 256, 1024, 4096
@@ -129,7 +131,8 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                     SPConstants.KW_AES256,
-                    SPConstants.KW_RSA_OAEP,
+                    JavaUtils.isFIPSEnabled() ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                        : SPConstants.KW_RSA_OAEP,
                     SPConstants.P_SHA1_L256,
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
@@ -208,7 +211,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                             SPConstants.KW_AES256,
                             JavaUtils.isFIPSEnabled()
-                                ? SPConstants.KW_RSA_OAEP : SPConstants.KW_RSA15,
+                                ? "http://www.w3.org/2009/xmlenc11#rsa-oaep" : SPConstants.KW_RSA15,
                             SPConstants.P_SHA1_L256,
                             SPConstants.P_SHA1_L192,
                             256, 192, 256, 256, 1024, 4096

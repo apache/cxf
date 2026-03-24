@@ -35,7 +35,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -130,7 +130,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -225,7 +225,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -320,7 +320,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -417,7 +417,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -513,7 +513,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -600,7 +600,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -687,7 +687,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -774,7 +774,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -863,7 +863,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -951,7 +951,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1048,7 +1048,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1144,7 +1144,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic128GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic128GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1241,7 +1241,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1436,7 +1436,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1535,7 +1535,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>
@@ -1635,7 +1635,7 @@
                         </sp:ProtectionToken>
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
-                                <sp-cxf:Basic256GCMRsa15 xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
+                                <sp-cxf:Basic256GCM xmlns:sp-cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                         <sp:Layout>

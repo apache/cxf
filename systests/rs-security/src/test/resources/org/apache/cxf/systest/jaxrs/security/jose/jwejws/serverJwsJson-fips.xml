@@ -28,7 +28,7 @@ under the License.
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <httpj:engine-factory id="port-9095-tls-config">
@@ -48,7 +48,7 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonContainerRequestFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsJsonWriterInterceptor"/>
-    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+    <bean id="jackson" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-json}/jwsjsonhmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

@@ -28,7 +28,7 @@ under the License.
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <httpj:engine-factory id="port-9095-tls-config">
@@ -143,7 +143,7 @@ under the License.
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
-            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA-OAEP-256"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaCertInHeaders">
@@ -164,10 +164,10 @@ under the License.
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
             <entry key="rs.security.encryption.content.algorithm" value="A128GCM"/>
-            <entry key="rs.security.encryption.key.algorithm" value="RSA1_5"/>
+            <entry key="rs.security.encryption.key.algorithm" value="RSA-OAEP-256"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <bean id="jackson" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider"/>
+    <bean id="jackson" class="tools.jackson.jakarta.rs.json.JacksonJsonProvider"/>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwkrsa">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
