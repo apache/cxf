@@ -27,21 +27,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -248,12 +249,7 @@ public class UriInfoImpl implements UriInfo {
     @Override
     public String getMatchedResourceTemplate() {
         if (stack != null) {
-            String matchedResourceTemplate = getBaseUri().getPath();
-
-            if (HttpUtils.isHttpRequest(message)) {
-                final HttpServletRequest req = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-                matchedResourceTemplate = matchedResourceTemplate.substring(req.getContextPath().length());
-            }
+            String matchedResourceTemplate = getApplicationPath();
 
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
@@ -273,5 +269,21 @@ public class UriInfoImpl implements UriInfo {
 
     private String getValue(URITemplate uriTemplate) {
         return uriTemplate == null ? null : uriTemplate.getValue();
+    }
+
+    private String getApplicationPath() {
+        ApplicationInfo appInfo = (ApplicationInfo) message.getExchange().getEndpoint()
+                .get(Application.class.getName());
+
+        if (appInfo == null) {
+            return "/";
+        }
+
+        String applicationPath = ResourceUtils.locateApplicationPath(appInfo.getProvider().getClass()).value();
+        if (!applicationPath.startsWith("/")) {
+            applicationPath = "/" + applicationPath;
+        }
+
+        return applicationPath;
     }
 }
