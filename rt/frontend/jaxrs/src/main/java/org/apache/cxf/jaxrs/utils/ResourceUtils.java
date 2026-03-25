@@ -965,6 +965,7 @@ public final class ResourceUtils {
             bean.getProperties(true).putAll(appProps);
         }
         bean.setApplication(app);
+        bean.getProperties(true).put(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH, address);
         return bean;
     }
 

@@ -24,22 +24,20 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -465,10 +463,6 @@ public class UriInfoImplTest {
         }
     }
 
-    @ApplicationPath("app")
-    public static class TestApplication extends Application {
-    }
-
     private static ClassResourceInfo getCri(Class<?> clazz, boolean setUriTemplate) {
         ClassResourceInfo cri = new ClassResourceInfo(clazz);
         Path path = AnnotationUtils.getClassAnnotation(clazz, Path.class);
@@ -580,7 +574,7 @@ public class UriInfoImplTest {
     @Test
     public void testGetMatchedResourceTemplateIncludesApplicationPathAndTemplateVariables() throws Exception {
         Message m = mockMessage("http://localhost:8080/app", "/foo/one/abc");
-        setApplication(m, new TestApplication());
+        setApplicationPath(m, "/app");
         OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
         ClassResourceInfo cri = getCri(RootResource.class, true);
         OperationResourceInfo ori = getOri(cri, "getTemplate");
@@ -594,9 +588,9 @@ public class UriInfoImplTest {
     }
 
     @Test
-    public void testGetMatchedResourceTemplateUsesApplicationPathAnnotation() throws Exception {
-        Message m = mockMessage("http://localhost:8080/context/service/app", "/foo/bar");
-        setApplication(m, new TestApplication());
+    public void testGetMatchedResourceTemplateIgnoresPathBeforeApplicationPath() throws Exception {
+        Message m = mockMessage("http://localhost:8080/context/service", "/foo/bar");
+        setApplicationPath(m, "/service");
 
         OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
         ClassResourceInfo cri = getCri(RootResource.class, true);
@@ -607,13 +601,13 @@ public class UriInfoImplTest {
         m.put(OperationResourceInfoStack.class, oriStack);
 
         UriInfoImpl u = new UriInfoImpl(m);
-        assertEquals("/app/foo/bar", u.getMatchedResourceTemplate());
+        assertEquals("/service/foo/bar", u.getMatchedResourceTemplate());
     }
 
     @Test
     public void testGetMatchedResourceTemplateSubResourceWithoutClassPath() throws Exception {
         Message m = mockMessage("http://localhost:8080/app", "/foo/sub");
-        setApplication(m, new TestApplication());
+        setApplicationPath(m, "/");
         OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
         ClassResourceInfo rootCri = getCri(RootResource.class, true);
         OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
@@ -629,16 +623,16 @@ public class UriInfoImplTest {
         m.put(OperationResourceInfoStack.class, oriStack);
 
         UriInfoImpl u = new UriInfoImpl(m);
-        assertEquals("/app/foo/sub", u.getMatchedResourceTemplate());
+        assertEquals("/foo/sub", u.getMatchedResourceTemplate());
     }
 
     private Message mockMessage(String baseAddress, String pathInfo) {
         return mockMessage(baseAddress, pathInfo, null, null);
     }
 
-    private void setApplication(Message m, Application app) {
+    private void setApplicationPath(Message m, String applicationPath) {
         Endpoint endpoint = mock(Endpoint.class);
-        when(endpoint.get(Application.class.getName())).thenReturn(new ApplicationInfo(app, null));
+        when(endpoint.get(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH)).thenReturn(applicationPath);
         m.getExchange().put(Endpoint.class, endpoint);
     }
 

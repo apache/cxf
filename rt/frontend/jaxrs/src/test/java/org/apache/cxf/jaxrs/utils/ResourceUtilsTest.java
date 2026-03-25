@@ -333,6 +333,7 @@ public class ResourceUtilsTest {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(
                                                  new SuperApplication(), false, false, false, null);
         assertEquals("/base", application.getAddress());
+        assertEquals("/base", application.getProperties().get(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH));
     }
 
     @Test
@@ -340,6 +341,16 @@ public class ResourceUtilsTest {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(
                                                  new CustomApplication(), false, false, false, null);
         assertEquals("/custom", application.getAddress());
+        assertEquals("/custom",
+                     application.getProperties().get(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH));
+    }
+
+    @Test
+    public void shouldCreateApplicationWhichIgnoresApplicationPath() throws Exception {
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(
+                                                 new SuperApplication(), true, false, false, null);
+        assertEquals("/", application.getAddress());
+        assertEquals("/", application.getProperties().get(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH));
     }
 
     public interface IProductResource {
