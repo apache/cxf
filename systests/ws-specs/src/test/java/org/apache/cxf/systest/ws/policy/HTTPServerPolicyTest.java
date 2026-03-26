@@ -54,11 +54,11 @@ import static org.junit.Assert.fail;
  * the use of multiple compatible or incompatible assertions.
  */
 public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(HTTPServerPolicyServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(HTTPServerPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class HTTPServerPolicyServer extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -84,7 +84,7 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                HTTPServerPolicyServer s = new HTTPServerPolicyServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -97,7 +97,7 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(HTTPServerPolicyServer.class));
     }
 
     @Test

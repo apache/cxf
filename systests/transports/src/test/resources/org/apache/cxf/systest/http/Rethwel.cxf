@@ -42,7 +42,7 @@
 
   <http:destination name="{http://apache.org/hello_world}Rethwel.http-destination">
 
-    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.0}/Mortimer"/>
+    <http:server RedirectURL="http://localhost:${testutil.ports.HttpBusServer.0}/Mortimer"/>
   </http:destination>
   
 </beans>

@@ -73,6 +73,9 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
     public static final String BODY_EVENTS = "body.events";
     public static final String ENVELOPE_PREFIX = "envelope.prefix";
     public static final String BODY_PREFIX = "body.prefix";
+    private static final String SOAP_ADD_NAMESPACE_CONTEXT = "org.apache.cxf.binding.soap.addNamespaceContext";
+    private static final String SOAP_PROPAGATE_ATTRIBUTES = "org.apache.cxf.binding.soap.propagateHeaderAttributes";
+
     /**
      *
      */
@@ -195,7 +198,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 } else {
                     final boolean addNC =
                         MessageUtils.getContextualBoolean(
-                            message, "org.apache.cxf.binding.soap.addNamespaceContext", false);
+                            message, SOAP_ADD_NAMESPACE_CONTEXT, false);
                     Map<String, String> bodyNC = addNC ? new HashMap<String, String>() : null;
                     if (addNC) {
                         // add the Envelope-Level declarations
@@ -230,26 +233,15 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     soapBody = DOMUtils.getChildrenWithName(element,
                                                                                  body.getNamespaceURI(),
                                                                                  body.getLocalPart());
-                    
-                    for (Element elem : elemList) {
+
+                final boolean copyParentAttributes = MessageUtils.getContextualBoolean(
+                            message, SOAP_PROPAGATE_ATTRIBUTES, false);
+
+                for (Element elem : elemList) {
                         Element hel = DOMUtils.getFirstElement(elem);
                         while (hel != null) {
-                            // Need to add any attributes that are present on the parent element
-                            // which otherwise would be lost.
-                            if (elem.hasAttributes()) {
-                                NamedNodeMap nnp = elem.getAttributes();
-                                for (int ct = 0; ct < nnp.getLength(); ct++) {
-                                    Node attr = nnp.item(ct);
-                                    Node headerAttrNode = hel.hasAttributes() ? hel.getAttributes()
-                                        .getNamedItemNS(attr.getNamespaceURI(), attr.getLocalName()) : null;
-
-                                    if (headerAttrNode == null) {
-                                        Attr attribute = hel.getOwnerDocument()
-                                            .createAttributeNS(attr.getNamespaceURI(), attr.getNodeName());
-                                        attribute.setNodeValue(attr.getNodeValue());
-                                        hel.setAttributeNodeNS(attribute);
-                                    }
-                                }
+                            if (elem.hasAttributes() && copyParentAttributes){
+                                propagateHeaderAttributes(elem, hel);
                             }
 
                             HeaderProcessor p = bus == null ? null : bus.getExtension(HeaderManager.class)
@@ -308,6 +300,34 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e,
                                         message.getVersion().getSender());
+                }
+            }
+        }
+    }
+
+    /**
+     * Copies the attributes of the SOAP header element to its child elements, if
+     * those attributes are not already present on the child.
+     *
+     * This method is retained for backward‑compatibility and should not be used
+     * in new code, as it invalidates the signatures on the child elements.
+     *
+     * @param soapHeaderEl the SOAP header element
+     * @param child the child element of the SOAP header element
+     */
+    private static void propagateHeaderAttributes(Element soapHeaderEl, Element child) {
+        if (soapHeaderEl.hasAttributes()) {
+            NamedNodeMap nnp = soapHeaderEl.getAttributes();
+            for (int ct = 0; ct < nnp.getLength(); ct++) {
+                Node attr = nnp.item(ct);
+                Node headerAttrNode = child.hasAttributes() ? child.getAttributes()
+                    .getNamedItemNS(attr.getNamespaceURI(), attr.getLocalName()) : null;
+
+                if (headerAttrNode == null) {
+                    Attr attribute = child.getOwnerDocument()
+                        .createAttributeNS(attr.getNamespaceURI(), attr.getNodeName());
+                    attribute.setNodeValue(attr.getNodeValue());
+                    child.setAttributeNodeNS(attribute);
                 }
             }
         }

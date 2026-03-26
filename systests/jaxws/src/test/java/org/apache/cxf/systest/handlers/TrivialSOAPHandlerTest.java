@@ -41,10 +41,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
     static String address = "http://localhost:"
-        + TestUtil.getPortNumber(Server.class)
+        + TestUtil.getPortNumber(TrivialSOAPHandlerServer.class)
         + "/SoapContext/GreeterPort";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class TrivialSOAPHandlerServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             Object implementor = new TrivialSOAPHandlerAnnotatedGreeterImpl();
@@ -54,7 +54,7 @@ public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                TrivialSOAPHandlerServer s = new TrivialSOAPHandlerServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -69,7 +69,7 @@ public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class));
+                   launchServer(TrivialSOAPHandlerServer.class));
     }
 
     @Test

@@ -78,7 +78,8 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
 
             try {
 
-                URL handlerFileURL = resolveHandlerChainFile(clz, hcAnn.getFileName());
+                URL handlerFileURL = resolveHandlerChainFile(
+                    hcAnn.getDeclaringClass(), hcAnn.getFileName());
                 if (handlerFileURL == null) {
                     throw new WebServiceException(new Message("HANDLER_CFG_FILE_NOT_FOUND_EXC", BUNDLE, hcAnn
                         .getFileName()).toString());

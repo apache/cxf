@@ -24,8 +24,8 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class StaxServerCustomAlgorithmSuite extends AbstractBusTestServerBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String SSL_PORT = allocatePort(Server.class, 1);
+    static final String PORT = allocatePort(WSSecurity10Server.class);
+    static final String SSL_PORT = allocatePort(WSSecurity10Server.class, 1);
 
     private static String configFileName =
             "org/apache/cxf/systest/ws/wssec10/stax-server_customAlgorithmSuite.xml";

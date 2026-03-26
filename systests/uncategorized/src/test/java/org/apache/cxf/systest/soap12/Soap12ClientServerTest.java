@@ -54,7 +54,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = Soap12Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap12_http",
                                                 "SOAPService");
@@ -62,7 +62,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(Soap12Server.class, true));
     }
 
     @Test

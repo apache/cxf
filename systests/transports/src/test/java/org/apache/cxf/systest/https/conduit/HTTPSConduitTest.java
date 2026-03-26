@@ -65,7 +65,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.systest.https.BusServer;
+import org.apache.cxf.systest.https.HttpsBusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
@@ -155,12 +155,12 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
 
 
     public static String getPort(String s) {
-        return BusServer.PORTMAP.get(s);
+        return HttpsBusServer.PORTMAP.get(s);
     }
 
     @BeforeClass
     public static void allocatePorts() {
-        BusServer.resetPortMap();
+        HttpsBusServer.resetPortMap();
         addrMap.clear();
         addrMap.put("Mortimer", List.of("http://localhost:" + getPort("PORT0") + "/"));
         addrMap.put("Tarpin",   List.of("https://localhost:" + getPort("PORT1") + "/"));
@@ -189,10 +189,10 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
         Bus bus = BusFactory.getThreadDefaultBus(false);
         URL serverC =
-            Server.class.getResource(name + ".cxf");
+            HttpsServer.class.getResource(name + ".cxf");
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
-        boolean server = launchServer(Server.class, null,
+        boolean server = launchServer(HttpsServer.class, null,
                 new String[] {
                     name,
                     addrMap.get(name).stream().collect(Collectors.joining(",")),

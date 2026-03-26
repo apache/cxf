@@ -44,7 +44,7 @@ import static org.junit.Assert.fail;
  * clients against the DOM server.
  */
 public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(AlgorithmSuiteServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -55,7 +55,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(AlgorithmSuiteServer.class, true)
         );
     }
 

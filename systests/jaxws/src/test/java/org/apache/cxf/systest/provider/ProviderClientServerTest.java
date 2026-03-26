@@ -48,10 +48,10 @@ import static org.junit.Assert.fail;
 
 public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS
-        = "http://localhost:" + TestUtil.getPortNumber(Server.class)
+        = "http://localhost:" + TestUtil.getPortNumber(ProviderServer.class)
             + "/SoapContext/SoapProviderPort";
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class ProviderServer extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new HWSoapMessageDocProvider();
@@ -67,7 +67,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                ProviderServer s = new ProviderServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -80,7 +80,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(ProviderServer.class, true));
     }
 
     @Test

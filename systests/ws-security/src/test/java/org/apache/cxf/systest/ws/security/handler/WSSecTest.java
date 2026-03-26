@@ -35,11 +35,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WSSecTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(WSSecServer.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("Server failed to launch", launchServer(Server.class));
+        assertTrue("Server failed to launch", launchServer(WSSecServer.class));
     }
 
     @org.junit.AfterClass

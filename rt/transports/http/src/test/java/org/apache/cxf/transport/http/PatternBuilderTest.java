@@ -31,44 +31,68 @@ import static org.junit.Assert.assertTrue;
 public class PatternBuilderTest {
 
     @Test
-    public void testPatternBuilder() {
-
-        // Simple matching
+    public void buildPatternWithSimpleHostname() {
         Pattern pattern = PatternBuilder.build("localhost");
 
         assertTrue(pattern.matcher("localhost").matches());
+        assertTrue(pattern.matcher("LOCALHOST").matches());
         assertFalse(pattern.matcher("localhost-after").matches());
         assertFalse(pattern.matcher("before-localhost").matches());
+    }
 
-        // List matching
-        pattern = PatternBuilder.build("localhost|othername");
+    @Test
+    public void buildPatternWithPipelineDelimitedHostnames() {
+        Pattern pattern = PatternBuilder.build("localhost|othername");
 
         assertTrue(pattern.matcher("localhost").matches());
+        assertTrue(pattern.matcher("LOCALHOST").matches());
         assertTrue(pattern.matcher("othername").matches());
         assertFalse(pattern.matcher("somename").matches());
+    }
 
-        // Name with dots matching
-        pattern = PatternBuilder.build("www.apache.org");
+    @Test
+    public void buildPatternWithDotsInTheHostname() {
+        Pattern pattern = PatternBuilder.build("www.apache.org");
 
         assertTrue(pattern.matcher("www.apache.org").matches());
+        assertTrue(pattern.matcher("WWW.apache.ORG").matches());
         assertFalse(pattern.matcher("www1apache1org").matches());
+    }
 
-        // Wildcards matching 1/2
-        pattern = PatternBuilder.build("*.apache.org");
+    @Test
+    public void buildPatternWithLeadingWildcardInTheHostname() {
+        Pattern pattern = PatternBuilder.build("*.apache.org");
 
         assertTrue(pattern.matcher("www.apache.org").matches());
         assertTrue(pattern.matcher("svn.apache.org").matches());
         assertFalse(pattern.matcher("apache.org").matches());
         assertTrue(pattern.matcher(".apache.org").matches()); // not very useful ...
+    }
 
-        // Wildcards matching 2/2
-        pattern = PatternBuilder.build("www.apache.*");
+    @Test
+    public void buildPatternWithTrailingWildcardInTheHostname() {
+        Pattern pattern = PatternBuilder.build("www.apache.*");
 
         assertTrue(pattern.matcher("www.apache.org").matches());
         assertTrue(pattern.matcher("www.apache.net").matches());
         assertFalse(pattern.matcher("www.apache").matches());
         assertTrue(pattern.matcher("www.apache.").matches()); // not very useful ...
-
     }
 
+    @Test
+    public void buildPatternWithUppercaseLettersInTheSimpleHostname() {
+        Pattern pattern = PatternBuilder.build("APACHE.ORG");
+
+        assertTrue(pattern.matcher("apache.org").matches());
+        assertTrue(pattern.matcher("APACHE.ORG").matches());
+    }
+
+    @Test
+    public void buildPatternWithUppercaseLettersInTheLeadingWildcardHostname() {
+        Pattern pattern = PatternBuilder.build("*.APACHE.ORG");
+
+        assertTrue(pattern.matcher("www.apache.org").matches());
+        assertTrue(pattern.matcher("svn.apache.org").matches());
+        assertFalse(pattern.matcher("apache.org").matches());
+    }
 }

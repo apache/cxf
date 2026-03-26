@@ -31,11 +31,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class SchemaImportTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = SchemaImportServer.PORT;
 
     @BeforeClass
     public static void startservers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(SchemaImportServer.class, true));
     }
 
     @Test

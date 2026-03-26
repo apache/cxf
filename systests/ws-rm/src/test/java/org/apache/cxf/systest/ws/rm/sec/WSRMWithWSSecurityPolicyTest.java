@@ -50,10 +50,10 @@ import static org.junit.Assert.assertTrue;
  * Tests the correct interaction of ws-rm calls with security.when policy validator verifies the calls.
  */
 public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(WSRMWithWSSecurityPolicyServer.class);
     private static final Logger LOG = LogUtils.getLogger(WSRMWithWSSecurityPolicyTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class WSRMWithWSSecurityPolicyServer extends AbstractBusTestServerBase {
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/sec/server-policy.xml");
@@ -64,7 +64,7 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(WSRMWithWSSecurityPolicyServer.class, true));
     }
 
     @Test

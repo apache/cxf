@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
  */
 public class CorbaTest extends AbstractBusClientServerTestBase {
 
-    public static final String PORT = Server.PERSIST_PORT;
+    public static final String PORT = CorbaServer.PERSIST_PORT;
 
     private static final QName SERVICE_NAME =
         new QName("http://cxf.apache.org/hello_world_corba",
@@ -53,7 +53,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue(
             "Server failed to launch",
-            launchServer(Server.class)
+            launchServer(CorbaServer.class)
         );
     }
 
