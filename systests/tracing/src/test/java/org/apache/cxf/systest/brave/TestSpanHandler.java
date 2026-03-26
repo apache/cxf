@@ -18,15 +18,15 @@
  */
 package org.apache.cxf.systest.brave;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import brave.handler.MutableSpan;
 import brave.handler.SpanHandler;
 import brave.propagation.TraceContext;
 
 public class TestSpanHandler extends SpanHandler {
-    private static final List<MutableSpan> SPANS = new ArrayList<>(12);
+    private static final List<MutableSpan> SPANS = new CopyOnWriteArrayList<>();
 
     @Override
     public boolean end(TraceContext context, MutableSpan span, Cause cause) {
