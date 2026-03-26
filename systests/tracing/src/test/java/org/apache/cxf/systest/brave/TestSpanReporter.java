@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.systest.brave;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import zipkin2.Span;
 import zipkin2.reporter.Reporter;
 
 public class TestSpanReporter implements Reporter<Span> {
-    private static final List<Span> SPANS = new ArrayList<>(12);
+    private static final List<Span> SPANS = new CopyOnWriteArrayList<>();
 
     @Override
     public void report(Span span) {
