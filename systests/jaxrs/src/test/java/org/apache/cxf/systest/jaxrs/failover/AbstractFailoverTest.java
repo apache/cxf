@@ -63,7 +63,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                    launchServer(Server.class, true));
         boolean activeReplica1Started = false;
         boolean activeReplica2Started = false;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             if (!activeReplica1Started) {
                 activeReplica1Started = checkReplica(Server.ADDRESS2);
             }
@@ -73,7 +73,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             if (activeReplica1Started && activeReplica2Started) {
                 break;
             }
-            Thread.sleep(100L);
+            Thread.sleep(200L);
         }
     }
 
