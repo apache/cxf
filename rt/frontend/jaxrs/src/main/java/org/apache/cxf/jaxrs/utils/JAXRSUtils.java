@@ -2160,7 +2160,7 @@ public final class JAXRSUtils {
      * @param child child URI template
      * @return the URI template combined from the parent and child
      */
-    private static String combineUriTemplates(final String parent, final String child) {
+    public static String combineUriTemplates(final String parent, final String child) {
         if (StringUtils.isEmpty(child)) {
             return parent;
         }

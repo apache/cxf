@@ -27,17 +27,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -246,22 +249,41 @@ public class UriInfoImpl implements UriInfo {
     @Override
     public String getMatchedResourceTemplate() {
         if (stack != null) {
-            final List<URITemplate> templates = new LinkedList<>();
+            String matchedResourceTemplate = getApplicationPath();
+
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-                templates.add(ori.getClassResourceInfo().getURITemplate());
-                templates.add(ori.getURITemplate());
+
+                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
+                        matchedResourceTemplate, getValue(ori.getClassResourceInfo().getURITemplate()));
+
+                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
+                        matchedResourceTemplate, getValue(ori.getURITemplate()));
             }
-            
-            if (!templates.isEmpty()) {
-                UriBuilder builder = UriBuilder.fromPath(templates.get(0).getValue());
-                for (int i = 1; i < templates.size(); ++i) {
-                    builder = builder.path(templates.get(i).getValue());
-                }
-                return builder.build().toString();
-            }
+            return matchedResourceTemplate;
         }
+
         LOG.fine("No resource stack information, returning empty template");
         return "";
+    }
+
+    private String getValue(URITemplate uriTemplate) {
+        return uriTemplate == null ? null : uriTemplate.getValue();
+    }
+
+    private String getApplicationPath() {
+        ApplicationInfo appInfo = (ApplicationInfo) message.getExchange().getEndpoint()
+                .get(Application.class.getName());
+
+        if (appInfo == null) {
+            return "/";
+        }
+
+        String applicationPath = ResourceUtils.locateApplicationPath(appInfo.getProvider().getClass()).value();
+        if (!applicationPath.startsWith("/")) {
+            applicationPath = "/" + applicationPath;
+        }
+
+        return applicationPath;
     }
 }

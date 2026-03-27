@@ -24,12 +24,16 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -431,6 +435,12 @@ public class UriInfoImplTest {
         }
 
         @GET
+        @Path("one/{name:[a-zA-Z][a-zA-Z_0-9]*}")
+        public Response getTemplate() {
+            return null;
+        }
+
+        @GET
         @Path("bar")
         public Response getSubMethod() {
             return null;
@@ -453,6 +463,10 @@ public class UriInfoImplTest {
         public Response getFromSubSub() {
             return null;
         }
+    }
+
+    @ApplicationPath("app")
+    public static class TestApplication extends Application {
     }
 
     private static ClassResourceInfo getCri(Class<?> clazz, boolean setUriTemplate) {
@@ -563,8 +577,69 @@ public class UriInfoImplTest {
         assertEquals("foo", matchedUris.get(2));
     }
 
+    @Test
+    public void testGetMatchedResourceTemplateIncludesApplicationPathAndTemplateVariables() throws Exception {
+        Message m = mockMessage("http://localhost:8080/app", "/foo/one/abc");
+        setApplication(m, new TestApplication());
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getTemplate");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/one/{name:[a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplateUsesApplicationPathAnnotation() throws Exception {
+        Message m = mockMessage("http://localhost:8080/context/service/app", "/foo/bar");
+        setApplication(m, new TestApplication());
+
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getSubMethod");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/bar", u.getMatchedResourceTemplate());
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplateSubResourceWithoutClassPath() throws Exception {
+        Message m = mockMessage("http://localhost:8080/app", "/foo/sub");
+        setApplication(m, new TestApplication());
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo rootCri = getCri(RootResource.class, true);
+        OperationResourceInfo rootOri = getOri(rootCri, "getSubResourceLocator");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(rootOri, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+
+        ClassResourceInfo subCri = getCri(SubResource.class, false);
+        OperationResourceInfo subOri = getOri(subCri, "getFromSub");
+
+        miInfo = new MethodInvocationInfo(subOri, SubResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/app/foo/sub", u.getMatchedResourceTemplate());
+    }
+
     private Message mockMessage(String baseAddress, String pathInfo) {
         return mockMessage(baseAddress, pathInfo, null, null);
+    }
+
+    private void setApplication(Message m, Application app) {
+        Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.get(Application.class.getName())).thenReturn(new ApplicationInfo(app, null));
+        m.getExchange().put(Endpoint.class, endpoint);
     }
 
     private Message mockMessage(String baseAddress, String pathInfo, String query) {
