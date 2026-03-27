@@ -199,10 +199,11 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + REPORTER.getSpans(),
+            REPORTER.getSpans().size(), equalTo(2)));
 
         final List<JaegerSpan> spans = getSpansSorted();
-        assertThat(spans.size(), equalTo(2));
         assertEquals("Processing books", spans.get(0).getOperationName());
         assertEquals("GET /bookstore/books/async", spans.get(1).getOperationName());
         assertThat(spans.get(1).getReferences(), not(empty()));
@@ -226,10 +227,11 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + REPORTER.getSpans(),
+            REPORTER.getSpans().size(), equalTo(2)));
 
         final List<JaegerSpan> spans = getSpansSorted();
-        assertThat(spans.size(), equalTo(2));
         assertThat(spans.get(0).getOperationName(), equalTo("Processing books"));
         assertThat(spans.get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
     }
@@ -241,9 +243,10 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         final Response r = client.async().get().get(1L, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 3);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + REPORTER.getSpans(),
+            REPORTER.getSpans().size(), equalTo(3)));
 
-        assertThat(REPORTER.getSpans().size(), equalTo(3));
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
         assertThat(REPORTER.getSpans().get(1).getTags(), hasItem(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER));
@@ -325,9 +328,10 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + REPORTER.getSpans(),
+            REPORTER.getSpans().size(), equalTo(4)));
 
-        assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
         assertThat(REPORTER.getSpans().get(3).getReferences(), empty());
     }
@@ -342,9 +346,10 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
-            await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 3);
+            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+                "Unexpected span count. Spans: " + REPORTER.getSpans(),
+                REPORTER.getSpans().size(), equalTo(3)));
 
-            assertThat(REPORTER.getSpans().size(), equalTo(3));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("Get Books"));
             assertThat(REPORTER.getSpans().get(0).getReferences(), not(empty()));
             assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
@@ -356,9 +361,10 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + REPORTER.getSpans(),
+            REPORTER.getSpans().size(), equalTo(4)));
 
-        assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
         assertThat(REPORTER.getSpans().get(3).getReferences(), empty());
     }
@@ -391,8 +397,9 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 2);
-            assertThat(REPORTER.getSpans().toString(), REPORTER.getSpans().size(), equalTo(2));
+            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+                "Unexpected span count. Spans: " + REPORTER.getSpans(),
+                REPORTER.getSpans().size(), equalTo(2)));
             assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
             assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
             assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
