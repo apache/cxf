@@ -265,9 +265,10 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ofSeconds(5L)).until(()-> TestSpanHandler.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + TestSpanHandler.getAllSpans(),
+            TestSpanHandler.getAllSpans().size(), equalTo(4)));
 
-        assertThat(TestSpanHandler.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanHandler.getAllSpans().get(3).name(), equalTo("test span"));
     }
 
@@ -292,9 +293,10 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
         }
 
         // Await till flush happens, usually a second is enough
-        await().atMost(Duration.ofSeconds(5L)).until(()-> TestSpanHandler.getAllSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+            "Unexpected span count. Spans: " + TestSpanHandler.getAllSpans(),
+            TestSpanHandler.getAllSpans().size(), equalTo(4)));
 
-        assertThat(TestSpanHandler.getAllSpans().size(), equalTo(4));
         assertThat(TestSpanHandler.getAllSpans().get(3).name(), equalTo("test span"));
     }
 
@@ -340,8 +342,9 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
         try {
             client.get();
         } finally {
-            await().atMost(Duration.ofSeconds(5L)).until(()-> TestSpanHandler.getAllSpans().size() == 2);
-            assertThat(TestSpanHandler.getAllSpans().size(), equalTo(2));
+            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(
+                "Unexpected span count. Spans: " + TestSpanHandler.getAllSpans(),
+                TestSpanHandler.getAllSpans().size(), equalTo(2)));
             assertThat(TestSpanHandler.getAllSpans().get(0).name(), equalTo("GET " + client.getCurrentURI()));
             assertThat(TestSpanHandler.getAllSpans().get(0).tags(), hasKey("error"));
             assertThat(TestSpanHandler.getAllSpans().get(1).name(), equalTo("GET /bookstore/books/long"));
