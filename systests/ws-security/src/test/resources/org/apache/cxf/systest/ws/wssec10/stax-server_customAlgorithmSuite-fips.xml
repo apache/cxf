@@ -39,7 +39,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="${testutil.ports.wssec10.server.StaxServer.1}">
+        <httpj:engine port="${testutil.ports.wssec10.server.WSSecurity10StaxServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="pkcs12" password="password" resource="certs/bob.pkcs12"/>
@@ -56,7 +56,7 @@
     <!-- -->
     <!-- Custom alg suite, test #01 see WSSecurity10CustomAlgorithmSuiteTest for more information -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt01_IPingService" id="Customizable10SignEncrypt01" address="http://localhost:${testutil.ports.wssec10.server.StaxServer}/Customizable10SignEncrypt01" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt01_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt01_IPingService" id="Customizable10SignEncrypt01" address="http://localhost:${testutil.ports.wssec10.server.WSSecurity10StaxServer}/Customizable10SignEncrypt01" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt01_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
@@ -69,7 +69,7 @@
     <!-- -->
     <!-- Custom alg suite, test #02 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt02_IPingService" id="Customizable10SignEncrypt02" address="http://localhost:${testutil.ports.wssec10.server.StaxServer}/Customizable10SignEncrypt02" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt02_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt02_IPingService" id="Customizable10SignEncrypt02" address="http://localhost:${testutil.ports.wssec10.server.WSSecurity10StaxServer}/Customizable10SignEncrypt02" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt02_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
@@ -85,7 +85,7 @@
     <!-- -->
     <!-- Custom alg suite, test #03 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt03_IPingService" id="Customizable10SignEncrypt03" address="http://localhost:${testutil.ports.wssec10.server.StaxServer}/Customizable10SignEncrypt03" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt03_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt03_IPingService" id="Customizable10SignEncrypt03" address="http://localhost:${testutil.ports.wssec10.server.WSSecurity10StaxServer}/Customizable10SignEncrypt03" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt03_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>
@@ -98,7 +98,7 @@
     <!-- -->
     <!-- Custom alg suite, test #04 - see WSSecurity10CustomAlgorithmSuiteTest for more information -->
     <!-- -->
-    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt04_IPingService" id="Customizable10SignEncrypt04" address="http://localhost:${testutil.ports.wssec10.server.StaxServer}/Customizable10SignEncrypt04" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt04_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
+    <jaxws:endpoint name="{http://WSSec/wssec10}Customizable10SignEncrypt04_IPingService" id="Customizable10SignEncrypt04" address="http://localhost:${testutil.ports.wssec10.server.WSSecurity10StaxServer}/Customizable10SignEncrypt04" serviceName="interop:PingService" endpointName="interop:Customizable10SignEncrypt04_IPingService" implementor="org.apache.cxf.systest.ws.wssec10.server.Custom10SignEncrypt01">
         <jaxws:properties>
             <entry key="security.username" value="Alice"/>
             <entry key="security.signature.properties" value="bob-customAlgSuite.properties"/>

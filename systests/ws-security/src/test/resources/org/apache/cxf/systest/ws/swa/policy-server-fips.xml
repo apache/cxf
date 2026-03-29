@@ -36,7 +36,7 @@
     </cxf:bus>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureContentPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWASignatureContentPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWASignatureContentPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureContentPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -47,7 +47,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureCompletePolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWASignatureCompletePolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWASignatureCompletePolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureCompletePolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -58,7 +58,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWAEncryptionPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWAEncryptionPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -69,7 +69,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWAEncryptionContentPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWAEncryptionContentPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -80,7 +80,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWACombinedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -91,7 +91,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedDerivedPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedDerivedPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWACombinedDerivedPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedDerivedPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -102,7 +102,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CombinedAsymmetricPolicy" 
-        address="http://localhost:${testutil.ports.swa.PolicyServer}/DoubleItSWACombinedAsymmetricPolicy" 
+        address="http://localhost:${testutil.ports.swa.SWAPolicyServer}/DoubleItSWACombinedAsymmetricPolicy" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWACombinedAsymmetricPolicyPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">

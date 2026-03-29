@@ -39,14 +39,14 @@
         <property name="enforcePrincipal" value="false"/>
     </bean>
 
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CacheSymmetric" address="http://localhost:${testutil.ports.cache.Server}/DoubleItCacheSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CacheSymmetric" address="http://localhost:${testutil.ports.cache.CachingServer}/DoubleItCacheSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.crypto" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CachePerProxySymmetric" address="http://localhost:${testutil.ports.cache.Server}/DoubleItCachePerProxySymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="CachePerProxySymmetric" address="http://localhost:${testutil.ports.cache.CachingServer}/DoubleItCachePerProxySymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItCacheSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/cache/DoubleItCache-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.crypto" value="bob.properties"/>

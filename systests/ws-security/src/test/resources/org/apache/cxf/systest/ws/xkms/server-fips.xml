@@ -39,13 +39,13 @@
         <property name="enforcePrincipal" value="false"/>
     </bean>
 
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.xkms.Server}/DoubleItXKMSSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/xkms/DoubleItXKMS-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.xkms.NonXKMSServer}/DoubleItXKMSSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/xkms/DoubleItXKMS-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
         </jaxws:properties>
     </jaxws:endpoint>
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.xkms.Server}/DoubleItXKMSAsymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/xkms/DoubleItXKMS-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.xkms.NonXKMSServer}/DoubleItXKMSAsymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/xkms/DoubleItXKMS-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>

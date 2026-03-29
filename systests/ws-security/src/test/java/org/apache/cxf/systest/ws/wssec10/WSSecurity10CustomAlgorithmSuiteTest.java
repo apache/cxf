@@ -30,7 +30,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
-import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec10.server.ServerCustomAlgorithmSuite;
 import org.apache.cxf.systest.ws.wssec10.server.StaxServerCustomAlgorithmSuite;
 import org.apache.cxf.systest.ws.wssec10.server.WSSecurity10Server;

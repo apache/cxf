@@ -40,7 +40,7 @@
     </bean>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedMTOM" 
-        address="http://localhost:${testutil.ports.mtom.Server}/DoubleItSignedMTOMInline" 
+        address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItSignedMTOMInline" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSignedMTOMInlinePort" 
         implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
@@ -73,7 +73,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignedMTOMAction" 
-        address="http://localhost:${testutil.ports.mtom.Server}/DoubleItSignedMTOMAction" 
+        address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItSignedMTOMAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSignedMTOMActionPort" 
         implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
@@ -105,7 +105,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509Asymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -115,7 +115,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509Symmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Symmetric" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509Symmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -123,7 +123,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Action" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509Action" serviceName="s:DoubleItService" endpointName="s:DoubleItActionPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Action" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509Action" serviceName="s:DoubleItService" endpointName="s:DoubleItActionPort" implementor="#doubleItNoSecurity" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:outInterceptors>
             <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
                 <constructor-arg>
@@ -153,7 +153,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinary" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509AsymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinary" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509AsymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -163,7 +163,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinaryEncryptBeforeSigning" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509AsymmetricBinaryEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="AsymmetricBinaryEncryptBeforeSigning" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509AsymmetricBinaryEncryptBeforeSigning" serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricBinaryEncryptBeforeSigningPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>
@@ -173,7 +173,7 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
-    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricBinary" address="http://localhost:${testutil.ports.mtom.Server}/DoubleItX509SymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricBinary" address="http://localhost:${testutil.ports.mtom.MTOMServer}/DoubleItX509SymmetricBinary" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricBinaryPort" implementor="org.apache.cxf.systest.ws.mtom.DoubleIt4Impl" wsdlLocation="org/apache/cxf/systest/ws/mtom/DoubleItMtom-fips.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.properties" value="bob.properties"/>

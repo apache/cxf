@@ -40,7 +40,7 @@ under the License.
     <!-- -->
     <!-- Spring-load an HTTPS servant -->
     <!-- -->
-    <jaxws:server xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" address="https://localhost:${testutil.ports.BusServer.6}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9006-tls-config">
+    <jaxws:server xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" address="https://localhost:${testutil.ports.HttpsBusServer.6}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9006-tls-config">
         <jaxws:serviceBean>
             <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
@@ -49,7 +49,7 @@ under the License.
     <!-- TLS Port configuration parameters for port 9006 -->
     <!-- -->
     <httpj:engine-factory id="port-9006-tls-config">
-        <httpj:engine port="${testutil.ports.BusServer.6}">
+        <httpj:engine port="${testutil.ports.HttpsBusServer.6}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="pkcs12" password="password" resource="keys/Bethal-fips.p12"/>

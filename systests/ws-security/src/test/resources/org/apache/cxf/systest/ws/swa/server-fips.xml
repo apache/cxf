@@ -36,7 +36,7 @@
     </cxf:bus>
 
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureContentAction" 
-        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureContentAction" 
+        address="http://localhost:${testutil.ports.swa.SWAActionServer}/DoubleItSWASignatureContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureContentActionPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -66,7 +66,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureCompleteAction" 
-        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureCompleteAction" 
+        address="http://localhost:${testutil.ports.swa.SWAActionServer}/DoubleItSWASignatureCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureCompleteActionPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -96,7 +96,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionContentAction" 
-        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionContentAction" 
+        address="http://localhost:${testutil.ports.swa.SWAActionServer}/DoubleItSWAEncryptionContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionContentActionPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -126,7 +126,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="EncryptionCompleteAction" 
-        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWAEncryptionCompleteAction" 
+        address="http://localhost:${testutil.ports.swa.SWAActionServer}/DoubleItSWAEncryptionCompleteAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWAEncryptionCompleteActionPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">
@@ -156,7 +156,7 @@
     </jaxws:endpoint>
     
      <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SignatureEncryptionContentAction" 
-        address="http://localhost:${testutil.ports.swa.Server}/DoubleItSWASignatureEncryptionContentAction" 
+        address="http://localhost:${testutil.ports.swa.SWAActionServer}/DoubleItSWASignatureEncryptionContentAction" 
         serviceName="s:DoubleItService" endpointName="s:DoubleItSWASignatureEncryptionContentActionPort" 
         implementor="org.apache.cxf.systest.ws.common.DoubleIt3Impl" 
         wsdlLocation="org/apache/cxf/systest/ws/swa/DoubleItSwa-fips.wsdl">

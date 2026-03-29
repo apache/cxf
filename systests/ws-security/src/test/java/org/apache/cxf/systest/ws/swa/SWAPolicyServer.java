@@ -35,8 +35,8 @@ public class SWAPolicyServer extends AbstractBusTestServerBase {
 
     protected void run()  {
         URL busFile = SWAPolicyServer.class.getResource(JavaUtils.isFIPSEnabled()
-                                               ? "server-fips.xml"
-                                                   : "server.xml");
+                                               ? "policy-server-fips.xml"
+                                                   : "policy-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

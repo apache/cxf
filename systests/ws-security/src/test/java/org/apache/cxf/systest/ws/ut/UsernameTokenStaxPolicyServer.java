@@ -35,8 +35,8 @@ public class UsernameTokenStaxPolicyServer extends AbstractBusTestServerBase {
 
     protected void run()  {
         URL busFile = UsernameTokenStaxPolicyServer.class.getResource(JavaUtils.isFIPSEnabled()
-                                                   ? "stax-server-fips.xml"
-                                                       : "stax-server.xml");
+                                                   ? "stax-policy-server-fips.xml"
+                                                       : "stax-policy-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
