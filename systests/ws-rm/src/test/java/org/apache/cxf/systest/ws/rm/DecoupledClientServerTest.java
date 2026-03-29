@@ -49,12 +49,12 @@ import static org.junit.Assert.assertTrue;
  * exchange of WS-RM protocol messages.
  */
 public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(DecoupledServer.class);
     public static final String DECOUPLE_PORT = allocatePort(DecoupledClientServerTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(DecoupledClientServerTest.class);
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class DecoupledServer extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
@@ -90,7 +90,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, true));
+                   launchServer(DecoupledServer.class, true));
     }
 
     @Test

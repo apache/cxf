@@ -66,11 +66,11 @@ public class SchemaValidationMetricsClientServerTest extends AbstractBusClientSe
     
     
     private static final MeterRegistry METER_REGISTER = new SimpleMeterRegistry();
-    private static final String PORT = allocatePort(Server.class);
+    private static final String PORT = allocatePort(SchemaValidationMetricsServer.class);
     
     private final QName portName = new QName("http://cxf.apache.org/jaxws/schemavalidation", "servicePort");
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class SchemaValidationMetricsServer extends AbstractBusTestServerBase {
 
         protected void run()  {
             var jaxwsTags = new JaxwsTags();
@@ -108,7 +108,7 @@ public class SchemaValidationMetricsClientServerTest extends AbstractBusClientSe
     @BeforeClass
     public static void startServers() {
         createStaticBus();
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(SchemaValidationMetricsServer.class, true));
     }
 
     @Test

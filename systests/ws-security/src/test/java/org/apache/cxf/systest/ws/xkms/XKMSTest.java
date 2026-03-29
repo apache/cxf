@@ -66,8 +66,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class XKMSTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String STAX_PORT = allocatePort(StaxServer.class);
+    public static final String PORT = allocatePort(NonXKMSServer.class);
+    public static final String STAX_PORT = allocatePort(XKMSStaxServer.class);
     static final String PORT2 = allocatePort(XKMSServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -85,13 +85,13 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(NonXKMSServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(XKMSStaxServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",

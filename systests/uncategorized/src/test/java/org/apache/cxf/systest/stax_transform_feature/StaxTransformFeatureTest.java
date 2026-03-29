@@ -57,7 +57,7 @@ import static org.junit.Assert.fail;
  *
  */
 public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(StaxTransformServer.class);
     private static final Logger LOG = LogUtils.getLogger(StaxTransformFeatureTest.class);
     private static final String GREETER_PORT_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
 
@@ -69,7 +69,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     private Greeter greeter;
 
 
-    public static class Server extends AbstractBusTestServerBase {
+    public static class StaxTransformServer extends AbstractBusTestServerBase {
 
         Endpoint ep;
         protected void run() {
@@ -109,7 +109,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                StaxTransformServer s = new StaxTransformServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -125,7 +125,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         // force the info logging for this test
         LOG.setLevel(Level.INFO);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(StaxTransformServer.class, true));
     }
 
     @AfterClass

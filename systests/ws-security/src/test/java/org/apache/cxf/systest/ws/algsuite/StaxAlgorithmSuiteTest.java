@@ -45,7 +45,7 @@ import static org.junit.Assert.fail;
  * clients against the StAX server.
  */
 public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(StaxServer.class);
+    static final String PORT = allocatePort(AlgorithmSuiteStaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -56,7 +56,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(StaxServer.class, true)
+            launchServer(AlgorithmSuiteStaxServer.class, true)
         );
     }
 

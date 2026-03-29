@@ -44,12 +44,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class GenericExceptionTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = GenericServer.PORT;
     private final QName serviceName = new QName("http://cxf.apache.org/test/HelloService", "HelloService");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(GenericServer.class));
 
     }
 

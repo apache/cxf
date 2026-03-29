@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SWAPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(PolicyServer.class);
+    public static final String PORT = allocatePort(SWAPolicyServer.class);
     public static final String STAX_PORT = allocatePort(StaxPolicyServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -68,7 +68,7 @@ public class SWAPolicyTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(PolicyServer.class, true)
+                launchServer(SWAPolicyServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",

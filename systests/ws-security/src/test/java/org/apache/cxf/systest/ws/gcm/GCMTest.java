@@ -48,8 +48,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class GCMTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
+    static final String PORT = allocatePort(GcmServer.class);
+    static final String STAX_PORT = allocatePort(GcmStaxServer.class);
     static final String MGF_PORT = allocatePort(MGFServer.class);
     static final String MGF_STAX_PORT = allocatePort(MGFStaxServer.class);
 
@@ -71,13 +71,13 @@ public class GCMTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(GcmServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(GcmStaxServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",

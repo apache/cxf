@@ -75,8 +75,8 @@ import static org.junit.Assert.fail;
  * A set of tests for WS-Security actions (i.e. the non WS-SecurityPolicy approach).
  */
 public class ActionTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String PORT2 = allocatePort(Server.class, 2);
+    public static final String PORT = allocatePort(ActionServer.class);
+    public static final String PORT2 = allocatePort(ActionServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -90,13 +90,13 @@ public class ActionTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(ActionServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(UTServer.class, true)
+                   launchServer(UTActionServer.class, true)
         );
     }
 
@@ -168,7 +168,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         // Here the Server is adding the WSS4JInInterceptor in code
         portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, UTServer.PORT);
+        updateAddressPort(port, UTActionServer.PORT);
 
         assertEquals(50, port.doubleIt(25));
 

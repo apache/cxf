@@ -56,7 +56,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class OOBHeaderTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = OOBServer.PORT;
     public static final String CONFIG_FILE = "org/apache/cxf/systest/outofband/header/cxf.xml";
 
     public static final String TEST_HDR_NS = "http://cxf.apache.org/outofband/Header";
@@ -74,7 +74,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         System.setProperty("cxf.config.file", "org/apache/cxf/systest/outofband/header/cxf.xml");
 
         createStaticBus(CONFIG_FILE);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(OOBServer.class, true));
     }
 
     private void addOutOfBoundHeader(PutLastTradedPricePortType portType, boolean invalid, boolean mu) {

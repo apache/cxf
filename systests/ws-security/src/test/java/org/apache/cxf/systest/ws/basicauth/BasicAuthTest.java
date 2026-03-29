@@ -47,7 +47,7 @@ import static org.junit.Assert.fail;
  * the WS-SecurityPolicy enforcement of whether the credentials are present or not.
  */
 public class BasicAuthTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    static final String PORT = allocatePort(BasicAuthServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -58,7 +58,7 @@ public class BasicAuthTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(BasicAuthServer.class, true)
         );
     }
 

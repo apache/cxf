@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class RespectBindingFeatureClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = Cxf2006Server.PORT;
     private final QName portName = new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");
     private SOAPServiceRPCLit service = new SOAPServiceRPCLit();
     private ServerLauncher serverLauncher;
@@ -51,7 +51,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
     private void startServers(String wsdlLocation) throws Exception {
         String[] args = new String[] {wsdlLocation};
 
-        serverLauncher = new ServerLauncher(Server.class.getName(), null, args, true);
+        serverLauncher = new ServerLauncher(Cxf2006Server.class.getName(), null, args, true);
         boolean isServerReady = serverLauncher.launchServer();
 
         assertTrue("server did not launch correctly", isServerReady);

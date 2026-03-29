@@ -65,10 +65,10 @@ import static org.junit.Assert.fail;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
-    static final String STAX_PORT2 = allocatePort(StaxServer.class, 2);
+    static final String PORT = allocatePort(SamlTokenServer.class);
+    static final String STAX_PORT = allocatePort(SamlTokenStaxServer.class);
+    static final String PORT2 = allocatePort(SamlTokenServer.class, 2);
+    static final String STAX_PORT2 = allocatePort(SamlTokenStaxServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -85,13 +85,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(SamlTokenServer.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(SamlTokenStaxServer.class, true)
         );
     }
 

@@ -89,12 +89,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
 
     public static String getPort(String s) {
-        return BusServer.PORTMAP.get(s);
+        return HttpBusServer.PORTMAP.get(s);
     }
 
     @BeforeClass
     public static void allocatePorts() {
-        BusServer.resetPortMap();
+        HttpBusServer.resetPortMap();
         addrMap.clear();
         addrMap.put("Mortimer", "http://localhost:" + getPort("PORT0") + "/");
         addrMap.put("Rethwel",  "http://localhost:" + getPort("PORT1") + "/");
@@ -119,10 +119,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         }
         Bus bus = BusFactory.getThreadDefaultBus(false);
         URL serverC =
-            Server.class.getResource(name + ".cxf");
+            HttpServer.class.getResource(name + ".cxf");
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
-        boolean server = launchServer(Server.class, null,
+        boolean server = launchServer(HttpServer.class, null,
                 new String[] {
                     name,
                     addrMap.get(name),

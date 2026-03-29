@@ -46,8 +46,8 @@ import static org.junit.Assert.assertTrue;
  * A set of secured MTOM
  */
 public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String STAX_PORT = allocatePort(StaxServer.class);
+    public static final String PORT = allocatePort(MTOMServer.class);
+    public static final String STAX_PORT = allocatePort(MTOMStaxServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -58,13 +58,13 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
                 "Server failed to launch",
                 // run the server in the same process
                 // set this to false to fork
-                launchServer(Server.class, true)
+                launchServer(MTOMServer.class, true)
         );
         assertTrue(
                  "Server failed to launch",
                  // run the server in the same process
                  // set this to false to fork
-                 launchServer(StaxServer.class, true)
+                 launchServer(MTOMStaxServer.class, true)
         );
     }
 

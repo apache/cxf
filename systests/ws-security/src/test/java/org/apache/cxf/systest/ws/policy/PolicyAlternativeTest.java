@@ -49,8 +49,8 @@ import static org.junit.Assert.fail;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String PORT2 = allocatePort(Server.class, 2);
+    static final String PORT = allocatePort(PolicyAlternativeServer.class);
+    static final String PORT2 = allocatePort(PolicyAlternativeServer.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -67,7 +67,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(PolicyAlternativeServer.class, true)
         );
     }
 

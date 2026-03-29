@@ -68,14 +68,14 @@ public class MaskSensitiveHelper {
     private final Set<ReplacementPair> replacementsJSON = new HashSet<>();
     private final Set<ReplacementPair> replacementsXMLAttributes = new HashSet<>();
 
-    public void setSensitiveElementNames(final Set<String> inSensitiveElementNames) {
+    public void setSensitiveElementNames(final Set<String> sensitiveElementNames) {
         replacementsXMLElements.clear();
         replacementsJSON.clear();
-        addSensitiveElementNames(inSensitiveElementNames);
+        addSensitiveElementNames(sensitiveElementNames);
     }
 
-    public void addSensitiveElementNames(final Set<String> inSensitiveElementNames) {
-        for (final String sensitiveName : inSensitiveElementNames) {
+    public void addSensitiveElementNames(final Set<String> sensitiveElementNames) {
+        for (final String sensitiveName : sensitiveElementNames) {
             addReplacementPair(MATCH_PATTERN_XML_TEMPLATE, REPLACEMENT_XML_TEMPLATE,
                 sensitiveName, replacementsXMLElements);
             addReplacementPair(MATCH_PATTERN_JSON_TEMPLATE_ARRAY, REPLACEMENT_JSON_TEMPLATE_ARRAY,
@@ -86,11 +86,11 @@ public class MaskSensitiveHelper {
     }
     
     /** Adds attribute names to be masked in XML/HTML logs (values replaced with "XXX"). */
-    public void addSensitiveAttributeNames(final Set<String> inSensitiveAttirbuteNames) {
-        if (inSensitiveAttirbuteNames == null || inSensitiveAttirbuteNames.isEmpty()) {
+    public void addSensitiveAttributeNames(final Set<String> sensitiveAttributeNames) {
+        if (sensitiveAttributeNames == null || sensitiveAttributeNames.isEmpty()) {
             return;
         }
-        for (final String attr : inSensitiveAttirbuteNames) {
+        for (final String attr : sensitiveAttributeNames) {
             final String match = MATCH_PATTERN_XML_ATTR_TEMPLATE.replace(ATTR_NAME_TEMPLATE, Pattern.quote(attr));
             final String repl  = REPLACEMENT_XML_ATTR_TEMPLATE.replace(ATTR_NAME_TEMPLATE, escapeForReplacement(attr));
             replacementsXMLAttributes.add(new ReplacementPair(match, repl));
@@ -98,9 +98,9 @@ public class MaskSensitiveHelper {
     }
 
     /** Optional convenience resetter if you want it. */
-    public void setSensitiveAttributeNames(final Set<String> inSensitiveAttributeNames) {
+    public void setSensitiveAttributeNames(final Set<String> sensitiveAttributeNames) {
         replacementsXMLAttributes.clear();
-        addSensitiveAttributeNames(inSensitiveAttributeNames);
+        addSensitiveAttributeNames(sensitiveAttributeNames);
     }
 
     private void addReplacementPair(final String matchPatternTemplate,

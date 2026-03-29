@@ -47,7 +47,7 @@ import static org.junit.Assert.fail;
  * A set of tests for CXF-4629.
  */
 public class HTTPGetTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(HTTPGetServer.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -59,7 +59,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(HTTPGetServer.class, true)
         );
     }
 

@@ -32,8 +32,9 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec10.server.ServerCustomAlgorithmSuite;
-import org.apache.cxf.systest.ws.wssec10.server.StaxServer;
 import org.apache.cxf.systest.ws.wssec10.server.StaxServerCustomAlgorithmSuite;
+import org.apache.cxf.systest.ws.wssec10.server.WSSecurity10Server;
+import org.apache.cxf.systest.ws.wssec10.server.WSSecurity10StaxServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -56,10 +57,10 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSecurity10CustomAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
-    static final String SSL_PORT = allocatePort(Server.class, 1);
-    static final String STAX_SSL_PORT = allocatePort(StaxServer.class, 1);
+    static final String PORT = allocatePort(WSSecurity10Server.class);
+    static final String STAX_PORT = allocatePort(WSSecurity10StaxServer.class);
+    static final String SSL_PORT = allocatePort(WSSecurity10Server.class, 1);
+    static final String STAX_SSL_PORT = allocatePort(WSSecurity10StaxServer.class, 1);
 
     private static final String INPUT = "foo";
 

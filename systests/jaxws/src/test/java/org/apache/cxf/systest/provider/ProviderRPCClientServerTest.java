@@ -44,11 +44,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase {
-    private static final String PORT = Server.PORT;
+    private static final String PORT = ProviderRPCServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(ProviderRPCServer.class, true));
     }
 
     @Test

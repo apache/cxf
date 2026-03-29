@@ -38,14 +38,14 @@ under the License.
     <!-- -->
     <!-- Spring-load an HTTPS servant -->
     <!-- -->
-    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" implementor="org.apache.cxf.systest.http.GreeterImpl" address="https://localhost:${testutil.ports.BusServer.1}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9001-tls-config"/>
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" xmlns:s="http://apache.org/hello_world/services" id="JaxwsHttpsEndpoint" implementor="org.apache.cxf.systest.http.GreeterImpl" address="https://localhost:${testutil.ports.HttpsBusServer.1}/SoapContext/HttpsPort" serviceName="s:SOAPService" endpointName="e:HttpsPort" depends-on="port-9001-tls-config"/>
     <!-- -->
     <!-- TLS Port configuration parameters for port 9001 -->
     <!-- -->
     <bean id="serverKeyManagers" class="org.apache.cxf.systest.https.conduit.HTTPSClientTest$ServerManagersFactory" factory-method="getKeyManagers"/>
     <bean id="serverTrustManagers" class="org.apache.cxf.systest.https.conduit.HTTPSClientTest$ServerManagersFactory" factory-method="getTrustManagers"/>
     <httpj:engine-factory id="port-9001-tls-config">
-        <httpj:engine port="${testutil.ports.BusServer.1}">
+        <httpj:engine port="${testutil.ports.HttpsBusServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers ref="serverKeyManagers"/>
                 <sec:trustManagers ref="serverTrustManagers"/>

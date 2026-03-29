@@ -42,6 +42,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,7 +78,13 @@ public class UndertowHTTPServerEngineTest {
 
         factory = new UndertowHTTPServerEngineFactory();
         factory.setBus(bus);
+    }
 
+    @After
+    public void tearDown() throws Exception {
+        UndertowHTTPServerEngineFactory.destroyForPort(PORT1);
+        UndertowHTTPServerEngineFactory.destroyForPort(PORT2);
+        UndertowHTTPServerEngineFactory.destroyForPort(PORT3);
     }
 
 
@@ -90,8 +97,6 @@ public class UndertowHTTPServerEngineTest {
         assertTrue(
             "Engine references for the same port should point to the same instance",
             engine == factory.retrieveUndertowHTTPServerEngine(PORT1));
-
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT1);
     }
 
     @Test
@@ -129,10 +134,6 @@ public class UndertowHTTPServerEngineTest {
         engine = factory.createUndertowHTTPServerEngine(PORT3, "https");
         assertTrue("Protocol must be https",
                    "https".equals(engine.getProtocol()));
-
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT1);
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT2);
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT3);
     }
 
     @Test
@@ -186,9 +187,6 @@ public class UndertowHTTPServerEngineTest {
         engine.shutdown();
         response = getResponse(urlStr2);
         assertEquals("The undertow http handler did not take effect", response, "string2");
-        // set the get request
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT1);
-
     }
 
     /**
@@ -233,9 +231,6 @@ public class UndertowHTTPServerEngineTest {
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.xnio:type=Xnio,provider=\"nio\",worker=\"*\""), null));
         assertEquals("Could not find 0 Undertow Server: " + s, 0, s.size());
-
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT1);
-        UndertowHTTPServerEngineFactory.destroyForPort(PORT2);
     }
 
     private static String getResponse(String target) throws Exception {

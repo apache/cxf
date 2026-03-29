@@ -54,10 +54,10 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSecurity10Test extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
-    static final String STAX_PORT = allocatePort(StaxServer.class);
-    static final String SSL_PORT = allocatePort(Server.class, 1);
-    static final String STAX_SSL_PORT = allocatePort(StaxServer.class, 1);
+    static final String PORT = allocatePort(WSSecurity10Server.class);
+    static final String STAX_PORT = allocatePort(WSSecurity10StaxServer.class);
+    static final String SSL_PORT = allocatePort(WSSecurity10Server.class, 1);
+    static final String STAX_SSL_PORT = allocatePort(WSSecurity10StaxServer.class, 1);
 
     private static final String INPUT = "foo";
     private static boolean unrestrictedPoliciesInstalled;
@@ -135,13 +135,13 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(Server.class, true)
+            launchServer(WSSecurity10Server.class, true)
         );
         assertTrue(
                    "Server failed to launch",
                    // run the server in the same process
                    // set this to false to fork
-                   launchServer(StaxServer.class, true)
+                   launchServer(WSSecurity10StaxServer.class, true)
         );
         if (unrestrictedPoliciesInstalled) {
             createStaticBus("org/apache/cxf/systest/ws/wssec10/client.xml");

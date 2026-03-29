@@ -33,7 +33,7 @@ import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
-import org.apache.cxf.systest.https.BusServer;
+import org.apache.cxf.systest.https.HttpsBusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
@@ -71,7 +71,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void setupPorts() {
-        BusServer.resetPortMap();
+        HttpsBusServer.resetPortMap();
     }
 
     protected void startServers() throws Exception {
@@ -79,7 +79,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork a new process
-            launchServer(BusServer.class, true)
+            launchServer(HttpsBusServer.class, true)
         );
     }
 
@@ -145,34 +145,34 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     @Test
     public final void testJaxwsServer() throws Exception {
         testSuccessfulCall("jaxws-server.xml",
-                           "https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(2) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testJaxwsServerChangeHttpsToHttp() throws Exception {
         testSuccessfulCall("jaxws-server.xml",
-                            "http://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpPort");
+                            "http://localhost:" + HttpsBusServer.getPort(3) + "/SoapContext/HttpPort");
     }
     @Test
     public final void testJaxwsEndpoint() throws Exception {
         testSuccessfulCall("jaxws-publish.xml",
-                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testJaxwsEndpointCallback() throws Exception {
         testSuccessfulCall("jaxws-publish-callback.xml",
-                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testJaxwsTLSRefsEndpoint() throws Exception {
         testSuccessfulCall("jaxws-tlsrefs-publish.xml",
-                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testPKCS12Endpoint() throws Exception {
         testSuccessfulCall(JavaUtils.isFIPSEnabled()
                            ? "pkcs12-fips.xml"
                                : "pkcs12.xml",
-                           "https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(6) + "/SoapContext/HttpsPort");
     }
 
     @Test
@@ -180,15 +180,15 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         testSuccessfulCall(JavaUtils.isFIPSEnabled()
                            ? "resource-key-spec-fips.xml"
                                : "resource-key-spec.xml",
-                           "https://localhost:" + BusServer.getPort(4) + "/SoapContext/HttpsPort");
+                           "https://localhost:" + HttpsBusServer.getPort(4) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
         testSuccessfulCall(JavaUtils.isFIPSEnabled()
                            ? "resource-key-spec-url-fips.xml"
                                : "resource-key-spec-url.xml",
-                           "https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort",
-                           new URL("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
+                           "https://localhost:" + HttpsBusServer.getPort(5) + "/SoapContext/HttpsPort",
+                           new URL("https://localhost:" + HttpsBusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
                            true);
 
     }

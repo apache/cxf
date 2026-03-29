@@ -45,15 +45,15 @@ import static org.junit.Assert.fail;
  */
 public class RM12PolicyWsdlTest extends RMPolicyWsdlTestBase {
 
-    public static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(RM12PolicyServer.class);
 
     private static final Logger LOG = LogUtils.getLogger(RM12PolicyWsdlTest.class);
 
-    public static class Server extends ServerBase {
+    public static class RM12PolicyServer extends ServerBase {
 
         public static void main(String[] args) {
             try {
-                Server s = new Server();
+                RM12PolicyServer s = new RM12PolicyServer();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -73,7 +73,7 @@ public class RM12PolicyWsdlTest extends RMPolicyWsdlTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(RM12PolicyServer.class, true));
     }
 
     @Test
