@@ -21,6 +21,7 @@ package org.apache.cxf.ws.transfer.validationtransformation;
 
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -61,7 +62,15 @@ public class XSLTResourceTransformer implements ResourceTransformer {
     public XSLTResourceTransformer(Source xsl, ResourceValidator validator) {
         this.validator = validator;
         try {
-            templates = TransformerFactory.newInstance().newTemplates(xsl);
+            final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            try {
+                transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            } catch (IllegalArgumentException ex) {
+                // ignore
+            }
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            templates = transformerFactory.newTemplates(xsl);
         } catch (TransformerConfigurationException e) {
             LOG.severe(e.getLocalizedMessage());
             throw new SoapFault("Internal error", getSoapVersion().getReceiver());
