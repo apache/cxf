@@ -89,9 +89,22 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
             ctx.addContext((MetricsContext)o);
         }
     }
+    
+    private boolean isJaxRsEndpoint(Endpoint endpoint) {
+        if (endpoint == null || endpoint.getEndpointInfo() == null
+            || endpoint.getEndpointInfo().getBinding() == null) {
+            return false;
+        }
+        return "http://apache.org/cxf/binding/jaxrs"
+            .equals(endpoint.getEndpointInfo().getBinding().getBindingId());
+    }
 
     private Object createEndpointMetrics(Message m) {
         final Endpoint ep = m.getExchange().getEndpoint();
+        if (isJaxRsEndpoint(ep)) {
+            //shouldn't create endpoint context for JAX-RS endpoints
+            return null;
+        }
         Object o = ep.get(MetricsContext.class.getName());
         if (o == null) {
             List<MetricsContext> contexts = new ArrayList<>();
@@ -163,6 +176,8 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         if (o != null) {
             return o;
         }
+        
+
         List<MetricsContext> contexts = new ArrayList<>();
         for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
             MetricsContext c = p.createResourceContext(message.getExchange().getEndpoint(),
