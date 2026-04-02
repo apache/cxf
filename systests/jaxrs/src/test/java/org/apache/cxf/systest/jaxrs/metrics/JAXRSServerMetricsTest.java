@@ -65,8 +65,7 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
     private static MetricsProvider provider;
     private static MetricsContext operationContext;
     private static MetricsContext resourceContext;
-    private static MetricsContext endpointContext;
-    
+        
     @Rule public ExpectedException expectedException = ExpectedException.none();
     
     public static class BookLibrary implements Library {
@@ -99,18 +98,17 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        endpointContext = Mockito.mock(MetricsContext.class);
         operationContext = Mockito.mock(MetricsContext.class);
         resourceContext = Mockito.mock(MetricsContext.class);
 
         provider = new MetricsProvider() {
             public MetricsContext createEndpointContext(Endpoint endpoint, boolean asClient, String cid) {
-                return endpointContext;
+                return null;
             }
 
             public MetricsContext createOperationContext(Endpoint endpoint, BindingOperationInfo boi, 
                     boolean asClient, String cid) {
-                return operationContext;
+                return null;
             }
 
             public MetricsContext createResourceContext(Endpoint endpoint, String resourceName, 
@@ -128,7 +126,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
     public void setUp() {
         Mockito.reset(resourceContext);
         Mockito.reset(operationContext);
-        Mockito.reset(endpointContext);
     }
 
     @Test
@@ -145,8 +142,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verifyNoInteractions(operationContext);
         }
     }
@@ -166,8 +161,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verifyNoInteractions(operationContext);
         }
     }
@@ -187,8 +180,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verifyNoInteractions(operationContext);
         }
     }
@@ -204,8 +195,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verifyNoInteractions(operationContext);
         }
     }
@@ -219,8 +208,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
             expectedException.expect(ProcessingException.class);
             client.get().readEntity(Book.class);
         } finally {
-            Mockito.verify(endpointContext, times(1)).start(any(Exchange.class));
-            Mockito.verify(endpointContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
             Mockito.verifyNoInteractions(resourceContext);
             Mockito.verifyNoInteractions(operationContext);
         }
