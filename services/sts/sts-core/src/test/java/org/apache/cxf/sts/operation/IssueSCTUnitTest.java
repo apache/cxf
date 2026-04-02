@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -177,7 +178,9 @@ public class IssueSCTUnitTest {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(JavaUtils.isFIPSEnabled() 
+                                                        ? WSS4JConstants.AES_128_GCM
+                                                            : WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));

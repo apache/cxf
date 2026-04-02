@@ -36,6 +36,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -78,13 +79,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testSoap11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11Port");
         DoubleItPortType utPort =
@@ -129,13 +133,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12Port");
         DoubleItPortType utPort =
@@ -162,13 +169,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSoap12Mtom() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12MtomPort");
         DoubleItPortType utPort =
@@ -196,7 +206,9 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testSoap12Dispatch() throws Exception {
         createBus();
         BusFactory.setDefaultBus(getBus());
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12DispatchPort");
 
@@ -252,13 +264,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testSoap11PolicyWithParts() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11PolicyWithPartsPort");
         DoubleItPortType utPort =
@@ -288,13 +303,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testJavaFirst() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItJavaFirstPort");
         DoubleItPortType utPort =
@@ -323,13 +341,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testUnsecuredSoap11Action() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11UnsecuredPort");
         DoubleItPortType utPort =
@@ -351,13 +372,16 @@ public class FaultTest extends AbstractBusClientServerTestBase {
     public void testUnsecuredSoap11ActionStAX() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = FaultTest.class.getResource("client.xml");
+        URL busFile = FaultTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "client-fips.xml" : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        URL wsdl = FaultTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                               ? "DoubleItFault-fips.wsdl"
+                                                   : "DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11UnsecuredPort2");
         DoubleItPortType utPort =

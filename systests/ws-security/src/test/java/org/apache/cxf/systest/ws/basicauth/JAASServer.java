@@ -31,6 +31,7 @@ import javax.security.auth.login.Configuration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -41,7 +42,9 @@ public class JAASServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = JAASServer.class.getResource("server-continuation.xml");
+        URL busFile = JAASServer.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "server-continuation-fips.xml"
+                                                       : "server-continuation.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         busLocal.getInInterceptors().add(this.createTestJaasLoginInterceptor());

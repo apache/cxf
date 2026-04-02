@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
@@ -34,10 +35,10 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
-import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
 
 /**
  * This class retrieves the default AlgorithmSuites plus a custom AlgorithmSuite with the RSA SHA-512
@@ -74,24 +75,75 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
     public static class SHA512AlgorithmSuite extends AlgorithmSuite {
 
         static {
-            ALGORITHM_SUITE_TYPES.put(
-                "Basic128RsaSha512",
-                new AlgorithmSuiteType(
-                    "Basic128RsaSha512",
-                    "http://www.w3.org/2001/04/xmlenc#sha512",
-                    WSS4JConstants.AES_128,
-                    SPConstants.KW_AES128,
-                    SPConstants.KW_RSA_OAEP,
-                    SPConstants.P_SHA1_L128,
-                    SPConstants.P_SHA1_L128,
-                    128, 128, 128, 512, 1024, 4096
-                )
-            );
+            ALGORITHM_SUITE_TYPES
+                .put("Basic128RsaSha512",
+                     new AlgorithmSuiteType("Basic128RsaSha512", "http://www.w3.org/2001/04/xmlenc#sha512",
+                                            "http://www.w3.org/2009/xmlenc11#aes128-gcm",
+                                            SPConstants.KW_AES128, SPConstants.KW_RSA15,
+                                            SPConstants.P_SHA1_L128, SPConstants.P_SHA1_L128, 128, 128, 128,
+                                            512, 1024, 4096));
+            ALGORITHM_SUITE_TYPES.put("Basic256GCM",
+                                      new AlgorithmSuiteType("Basic256GCM", SPConstants.SHA1,
+                                                             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                                                             SPConstants.KW_AES256, 
+                                                             JavaUtils.isFIPSEnabled() 
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L256, SPConstants.P_SHA1_L192,
+                                                             256, 192, 256, 256, 1024, 4096));
+            ALGORITHM_SUITE_TYPES.put("Basic192GCM",
+                                      new AlgorithmSuiteType("Basic192GCM", SPConstants.SHA1,
+                                                             "http://www.w3.org/2009/xmlenc11#aes192-gcm",
+                                                             SPConstants.KW_AES192, 
+                                                             JavaUtils.isFIPSEnabled() 
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L192, SPConstants.P_SHA1_L192,
+                                                             192, 192, 192, 256, 1024, 4096));
+            ALGORITHM_SUITE_TYPES.put("Basic128GCM",
+                                      new AlgorithmSuiteType("Basic128GCM", SPConstants.SHA1,
+                                                             "http://www.w3.org/2009/xmlenc11#aes128-gcm",
+                                                             SPConstants.KW_AES128,
+                                                             JavaUtils.isFIPSEnabled() 
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L128, SPConstants.P_SHA1_L128,
+                                                             128, 128, 128, 256, 1024, 4096));
+
+            ALGORITHM_SUITE_TYPES.put("Basic256GCMSha256",
+                                      new AlgorithmSuiteType("Basic256GCMSha256", SPConstants.SHA256,
+                                                             "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                                                             SPConstants.KW_AES256, 
+                                                             JavaUtils.isFIPSEnabled()
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L256, SPConstants.P_SHA1_L192,
+                                                             256, 192, 256, 256, 1024, 4096));
+            ALGORITHM_SUITE_TYPES.put("Basic192GCMSha256",
+                                      new AlgorithmSuiteType("Basic192GCMSha256", SPConstants.SHA256,
+                                                             "http://www.w3.org/2009/xmlenc11#aes192-gcm",
+                                                             SPConstants.KW_AES192,
+                                                             JavaUtils.isFIPSEnabled()
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L192, SPConstants.P_SHA1_L192,
+                                                             192, 192, 192, 256, 1024, 4096));
+            ALGORITHM_SUITE_TYPES.put("Basic128GCMSha256",
+                                      new AlgorithmSuiteType("Basic128GCMSha256", SPConstants.SHA256,
+                                                             "http://www.w3.org/2009/xmlenc11#aes128-gcm",
+                                                             SPConstants.KW_AES128, 
+                                                             JavaUtils.isFIPSEnabled()
+                                                                 ? "http://www.w3.org/2009/xmlenc11#rsa-oaep"
+                                                                 : SPConstants.KW_RSA_OAEP,
+                                                             SPConstants.P_SHA1_L128, SPConstants.P_SHA1_L128,
+                                                             128, 128, 128, 256, 1024, 4096));
+
         }
 
         SHA512AlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
-            getAlgorithmSuiteType().setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+            getAlgorithmSuiteType()
+                .setAsymmetricSignature("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
         }
 
         @Override
@@ -106,13 +158,29 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
             if (!"http://cxf.apache.org/custom/security-policy".equals(assertionNamespace)) {
                 return;
             }
-
             if ("Basic128RsaSha512".equals(assertionName)) {
                 setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic128RsaSha512"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic256GCM".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCM"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic192GCM".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic192GCM"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic128GCM".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic128GCM"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic256GCMSha256".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCMSha256"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic192GCMSha256".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic192GCMSha256"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic128GCMSha256".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic128GCMSha256"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }
     }
-
 
 }

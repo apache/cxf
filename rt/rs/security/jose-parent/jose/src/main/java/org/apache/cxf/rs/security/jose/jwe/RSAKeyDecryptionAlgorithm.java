@@ -20,12 +20,14 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.security.interfaces.RSAPrivateKey;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {
-        this(privateKey, KeyAlgorithm.RSA_OAEP);
+        this(privateKey, JavaUtils.isFIPSEnabled()
+             ? KeyAlgorithm.RSA_OAEP_256 : KeyAlgorithm.RSA_OAEP);
     }
     public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {
         this(privateKey, supportedAlgo, true);
@@ -41,6 +43,10 @@ public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
         super.validateKeyEncryptionAlgorithm(keyAlgo);
         if (!AlgorithmUtils.isRsaKeyWrap(keyAlgo)) {
+            reportInvalidKeyAlgorithm(keyAlgo);
+        }
+        if (JavaUtils.isFIPSEnabled() && AlgorithmUtils.RSA1_5_ALGO.equals(keyAlgo)) {
+            LOG.warning("RSA1_5 key encryption algorithm is not allowed in FIPS mode");
             reportInvalidKeyAlgorithm(keyAlgo);
         }
     }

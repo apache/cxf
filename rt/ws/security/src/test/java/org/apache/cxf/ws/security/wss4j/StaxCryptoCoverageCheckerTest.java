@@ -29,6 +29,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -77,7 +78,10 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         actions.add(XMLSecurityConstants.ENCRYPTION);
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(
+                                             JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -178,7 +182,9 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         );
         properties.setEncryptionUser("myalias");
         properties.setTokenUser("username");
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
@@ -424,7 +430,9 @@ public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
         properties.setActions(actions);
         properties.setEncryptionUser("myalias");
         properties.setSignatureUser("myalias");
-        properties.setEncryptionSymAlgorithm(XMLSecurityConstants.NS_XENC_AES128);
+        properties.setEncryptionSymAlgorithm(JavaUtils.isFIPSEnabled() 
+                                             ? XMLSecurityConstants.NS_XENC11_AES128_GCM
+                                                 : XMLSecurityConstants.NS_XENC_AES128);
 
         Properties outCryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());

@@ -24,6 +24,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class MGFServer extends AbstractBusTestServerBase {
@@ -33,7 +34,9 @@ public class MGFServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = MGFServer.class.getResource("mgf-server.xml");
+        URL busFile = MGFServer.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                  ? "mgf-server-fips.xml"
+                                                      : "mgf-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

@@ -32,6 +32,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.sts.deployment.DoubleItServer;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -72,10 +73,14 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(launchServer(new DoubleItServer(
-            ServerCachingTest.class.getResource("cxf-service.xml")
+            ServerCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                ? "cxf-service-fips.xml"
+                                                    : "cxf-service.xml")
         )));
         assertTrue(launchServer(new DoubleItServer(
-            ServerCachingTest.class.getResource("cxf-caching-service.xml")
+            ServerCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                ? "cxf-caching-service-fips.xml"
+                                                    : "cxf-caching-service.xml")
         )));
 
         assertTrue(launchServer(new STSServer()));
@@ -85,7 +90,9 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
     public void testServerSideSAMLTokenCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = ServerCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                       ? "DoubleIt-fips.wsdl"
+                                                           : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1AlternativePort");
         DoubleItPortType port =
@@ -130,7 +137,9 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
     public void testServerSideUsernameTokenCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = ServerCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                       ? "DoubleIt-fips.wsdl"
+                                                           : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
         DoubleItPortType transportUTPort =
@@ -162,7 +171,9 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
     public void testServerSideBinarySecurityTokenCaching() throws Exception {
         createBus(getClass().getResource("cxf-client.xml").toString());
 
-        URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
+        URL wsdl = ServerCachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                       ? "DoubleIt-fips.wsdl"
+                                                           : "DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
         DoubleItPortType bstPort =

@@ -37,6 +37,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -197,7 +198,9 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = XKMSTest.class.getResource("DoubleItXKMS.wsdl");
+        URL wsdl = XKMSTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                              ? "DoubleItXKMS-fips.wsdl"
+                                                  : "DoubleItXKMS.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
         DoubleItPortType port =
@@ -227,7 +230,9 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = XKMSTest.class.getResource("DoubleItXKMS.wsdl");
+        URL wsdl = XKMSTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                              ? "DoubleItXKMS-fips.wsdl"
+                                                  : "DoubleItXKMS.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =

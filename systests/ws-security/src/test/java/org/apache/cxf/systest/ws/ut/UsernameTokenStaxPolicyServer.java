@@ -24,6 +24,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class UsernameTokenStaxPolicyServer extends AbstractBusTestServerBase {
@@ -33,7 +34,9 @@ public class UsernameTokenStaxPolicyServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = UsernameTokenStaxPolicyServer.class.getResource("stax-policy-server.xml");
+        URL busFile = UsernameTokenStaxPolicyServer.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "stax-policy-server-fips.xml"
+                                                       : "stax-policy-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

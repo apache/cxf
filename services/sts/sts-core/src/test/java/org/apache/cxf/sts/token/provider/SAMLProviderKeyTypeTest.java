@@ -25,6 +25,7 @@ import java.util.Random;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -602,14 +603,18 @@ public class SAMLProviderKeyTypeTest {
             createProviderParameters(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.SYMMETRIC_KEY_KEYTYPE);
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
 
-        keyRequirements.setEncryptWith(WSS4JConstants.AES_128);
+        keyRequirements.setEncryptWith(JavaUtils.isFIPSEnabled() 
+                                                        ? WSS4JConstants.AES_128_GCM
+                                                            : WSS4JConstants.AES_128);
         keyRequirements.setKeySize(92);
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         keyRequirements.setKeySize(128);
-        keyRequirements.setEncryptWith(WSS4JConstants.AES_256);
+        keyRequirements.setEncryptWith(JavaUtils.isFIPSEnabled() 
+                                       ? WSS4JConstants.AES_256_GCM
+                                           : WSS4JConstants.AES_256);
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -706,7 +711,9 @@ public class SAMLProviderKeyTypeTest {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "x509.p12");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "x509-fips.p12"
+                           : "x509.p12");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.type", "pkcs12");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.private.password", "security");
 

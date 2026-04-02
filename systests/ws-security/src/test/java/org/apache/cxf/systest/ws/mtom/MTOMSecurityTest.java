@@ -31,6 +31,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItMtomPortType;
 import org.example.contract.doubleit.DoubleItPortType;
@@ -83,7 +84,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMInlinePort");
         DoubleItMtomPortType port =
@@ -111,7 +114,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMActionPort");
         DoubleItMtomPortType port =
@@ -139,7 +144,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType port =
@@ -163,7 +170,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
         DoubleItPortType port =
@@ -187,7 +196,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItActionPort");
         DoubleItPortType port =
@@ -213,7 +224,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryPort");
         DoubleItMtomPortType port =
@@ -239,7 +252,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryPort");
         DoubleItMtomPortType port =
@@ -265,7 +280,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryEncryptBeforeSigningPort");
         DoubleItMtomPortType port =
@@ -291,7 +308,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricBinaryPort");
         DoubleItMtomPortType port =
@@ -317,7 +336,9 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        URL wsdl = MTOMSecurityTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                      ? "DoubleItMtom-fips.wsdl"
+                                                          : "DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricBinaryPort");
         DoubleItMtomPortType port =

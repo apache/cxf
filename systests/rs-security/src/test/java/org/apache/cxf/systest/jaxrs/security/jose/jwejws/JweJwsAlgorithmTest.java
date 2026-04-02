@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
@@ -34,6 +35,7 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
@@ -72,7 +74,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.encryption.properties",
-                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -99,9 +103,15 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP-256");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -114,7 +124,8 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithm() throws Exception {
-
+        //fips : RSA1_5 not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
@@ -131,6 +142,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -139,7 +151,8 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testWrongKeyEncryptionAlgorithmKeyIncluded() throws Exception {
-
+        //fips : RSA1_5 not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
@@ -156,6 +169,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        
         properties.put("rs.security.encryption.include.public.key", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -182,9 +196,15 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A192GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -207,9 +227,15 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "AliceCert");
-        properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+        properties.put("rs.security.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -236,7 +262,11 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file",
             "org/apache/cxf/systest/jaxrs/security/certs/smallkeysize.jks");
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
-        properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        if (JavaUtils.isFIPSEnabled()) {
+            properties.put("rs.security.encryption.key.algorithm", "RSA1_5");
+        } else {
+            properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
+        }
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -245,7 +275,8 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testManualEncryption() throws Exception {
-
+        //fips : OAEP not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         URL busFile = JweJwsAlgorithmTest.class.getResource("client.xml");
 
         String address = "http://localhost:" + PORT + "/jweoaepgcm/bookstore/books";
@@ -255,7 +286,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.encryption.properties",
-                       "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         String header = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJqc29uIn0";
@@ -369,7 +402,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
-                       "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+                       JavaUtils.isFIPSEnabled() 
+                       ? "org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"
+                           : "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("book", 123L));
@@ -397,7 +432,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -426,7 +463,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "PS256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -451,7 +490,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "PS256");
         properties.put("rs.security.signature.include.public.key", true);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -503,7 +544,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "ECKey");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "ES256");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -531,9 +574,10 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         String header = "eyJhbGciOiJSUzI1NiIsImN0eSI6Impzb24ifQ";
         String payload = "eyJCb29rIjp7ImlkIjoxMjMsIm5hbWUiOiJib29rIn19";
         String sig = "mZJVPy83atFNxQMeJqkVbR8t1srr9LgKBGT0hgiymjNepRgqedvFG5B8E8UPAzfzNLsos91gGdneUEKrWauU4GoDPTzngX"
-            + "798aDP6lsn5bUoTMKLfaWp9uzHDIzLMjGkabn92nrIpdK4JKDYNjdSUJIT2L97jggg0aoLhJQHVw2LdF1fpYdM-HCyccNW"
-            + "HQbAR7bDZdITZFnDi8b22QfHCqeLV7m4mBvNDtNX337wtoUKyjPYBMoWc12hHDCwQyu_gfW6zFioF5TGx-Ifg8hrFlnyUr"
-            + "vnSdP-FUtXiGeWBIvE_L6gD7DfM4u9hkK757vTjjMR_pF2CW3pfSH-Ha8v0A";
+                + "798aDP6lsn5bUoTMKLfaWp9uzHDIzLMjGkabn92nrIpdK4JKDYNjdSUJIT2L97jggg0aoLhJQHVw2LdF1fpYdM-HCyccNW"
+                + "HQbAR7bDZdITZFnDi8b22QfHCqeLV7m4mBvNDtNX337wtoUKyjPYBMoWc12hHDCwQyu_gfW6zFioF5TGx-Ifg8hrFlnyUr"
+                + "vnSdP-FUtXiGeWBIvE_L6gD7DfM4u9hkK757vTjjMR_pF2CW3pfSH-Ha8v0A";
+                
 
         // Successful test
         Response response = client.post(header + "." + payload + "." + sig);
@@ -605,7 +649,9 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
-                       "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
+                       JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "none");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 

@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
@@ -152,7 +153,8 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private void configureEncryption(Message message, XMLSecurityProperties properties)
         throws Exception {
         String symEncAlgo = encryptionProperties.getEncryptionSymmetricKeyAlgo() == null
-            ? XMLCipher.AES_256 : encryptionProperties.getEncryptionSymmetricKeyAlgo();
+            ? JavaUtils.isFIPSEnabled() ? XMLCipher.AES_256_GCM : XMLCipher.AES_256 
+                : encryptionProperties.getEncryptionSymmetricKeyAlgo();
         properties.setEncryptionSymAlgorithm(symEncAlgo);
         properties.setEncryptionKey(getSymmetricKey(symEncAlgo));
         if (encryptSymmetricKey) {

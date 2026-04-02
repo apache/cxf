@@ -28,6 +28,7 @@ import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
@@ -49,6 +50,7 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -59,13 +61,21 @@ import static org.junit.Assert.assertTrue;
 public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwt.PORT;
     private static final String CLIENT_JWEJWS_PROPERTIES =
-        "org/apache/cxf/systest/jaxrs/security/bob.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/bob.rs.properties";
     private static final String SERVER_JWEJWS_PROPERTIES =
-        "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/alice.rs.properties";
     private static final String CLIENT_SIGN_JWEJWS_PROPERTIES =
-            "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/bob-jwejws.rs.properties";
     private static final String SERVER_SIGN_JWEJWS_PROPERTIES =
-            "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
+        JavaUtils.isFIPSEnabled()
+        ? "org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"
+            : "org/apache/cxf/systest/jaxrs/security/alice-jwejws.rs.properties";
     private static final String ENCODED_MAC_KEY = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75"
         + "aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     @BeforeClass
@@ -102,7 +112,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
-        jweWriter.setUseJweOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jweWriter.setUseJweOutputStream(true);
+        }
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         if (mbProviders != null) {
@@ -110,9 +122,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         }
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.encryption.out.properties",
-                                     "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+                                     JavaUtils.isFIPSEnabled()
+                                         ? "org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"
+                                             : "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         bean.getProperties(true).put("rs.security.encryption.in.properties",
-                                     "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+                                     JavaUtils.isFIPSEnabled()
+                                     ? "org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"
+                                         : "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         return bean.create(BookStore.class);
     }
 
@@ -141,11 +157,15 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testJweJwkAesCbcHMacInlineSet() throws Exception {
-        doTestJweJwkAesCbcHMac("org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlineset.properties");
+        doTestJweJwkAesCbcHMac(JavaUtils.isFIPSEnabled()
+                               ? "org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlineset-fips.properties"
+                                   : "org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlineset.properties");
     }
     @Test
     public void testJweJwkAesCbcHMacInlineSingleKey() throws Exception {
-        doTestJweJwkAesCbcHMac("org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlinejwk.properties");
+        doTestJweJwkAesCbcHMac(JavaUtils.isFIPSEnabled()
+                               ? "org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlinejwk-fips.properties"
+                                   : "org/apache/cxf/systest/jaxrs/security/secret.aescbchmac.inlinejwk.properties");
     }
     private void doTestJweJwkAesCbcHMac(String propFile) throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkaescbchmac";
@@ -191,7 +211,9 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new EncrSignJweWriterInterceptor();
-        jweWriter.setUseJweOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jweWriter.setUseJweOutputStream(true);
+        }
         providers.add(jweWriter);
         JwsWriterInterceptor jwsWriter = new EncrSignJwsWriterInterceptor();
         jwsWriter.setUseJwsOutputStream(true);
@@ -219,22 +241,31 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
-        jweWriter.setUseJweOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jweWriter.setUseJweOutputStream(true);
+        }
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
-        jwsWriter.setUseJwsOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jwsWriter.setUseJwsOutputStream(true);
+        }
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());
 
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.keystore.file",
-                                     "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
+                                     JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet-fips.txt"
+                           : "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
         bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
         bean.getProperties(true).put("rs.security.encryption.in.properties", CLIENT_JWEJWS_PROPERTIES);
         PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
         bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
         bean.getProperties(true).put("rs.security.decryption.key.password.provider", provider);
+        if (JavaUtils.isFIPSEnabled()) {
+            bean.getProperties(true).put("rs.security.encryption.content.algorithm", "A128GCM");
+        }
         BookStore bs = bean.create(BookStore.class);
 
         WebClient.getConfig(bs).getRequestContext().put("rs.security.keystore.alias.jwe.out", "AliceCert");
@@ -242,6 +273,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
+    
     @Test
     public void testJweRsaJwsRsaCertInHeaders() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsaCertInHeaders";
@@ -354,9 +386,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsClientResponseFilter());
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.signature.out.properties",
-            "org/apache/cxf/systest/jaxrs/security/jws.ec.private.properties");
+            JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/jaxrs/security/jws.ec.private-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/jws.ec.private.properties");
         bean.getProperties(true).put("rs.security.signature.in.properties",
-            "org/apache/cxf/systest/jaxrs/security/jws.ec.public.properties");
+            JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/jaxrs/security/jws.ec.public-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/jws.ec.public.properties");
         BookStore bs = bean.create(BookStore.class);
         String text = bs.echoText("book");
         assertEquals("book", text);
@@ -390,9 +426,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsClientResponseFilter());
         bean.setProviders(providers);
         bean.getProperties(true).put("rs.security.signature.out.properties",
-            "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+                                     JavaUtils.isFIPSEnabled() 
+                                     ? "org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"
+                                         : "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         bean.getProperties(true).put("rs.security.signature.in.properties",
-            "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
+                                     JavaUtils.isFIPSEnabled() 
+            ? "org/apache/cxf/systest/jaxrs/security/bob.jwk-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         if (includePublicKey) {
             bean.getProperties(true).put("rs.security.signature.include.public.key", true);
         }
@@ -415,14 +455,18 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<>();
         JweWriterInterceptor jweWriter = new JweWriterInterceptor();
-        jweWriter.setUseJweOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jweWriter.setUseJweOutputStream(true);
+        }
         providers.add(jweWriter);
         providers.add(new JweClientResponseFilter());
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
         if (jwsSigProvider != null) {
             jwsWriter.setSignatureProvider(jwsSigProvider);
         }
-        jwsWriter.setUseJwsOutputStream(true);
+        if (!JavaUtils.isFIPSEnabled()) {
+            jwsWriter.setUseJwsOutputStream(true);
+        }
         providers.add(jwsWriter);
         providers.add(new JwsClientResponseFilter());
         if (mbProviders != null) {
@@ -470,6 +514,8 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testJweAesCbcHmac() throws Exception {
+        //fips: CBC mode not supported
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         String address = "https://localhost:" + PORT + "/jweaescbchmac";
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
