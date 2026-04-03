@@ -183,7 +183,7 @@ public class EntityPartProvider extends AbstractConfigurableProvider
     }
 
     private static <T> List<Attachment> convertToDataHandlers(final List<EntityPart> parts, final  Class<T> type,
-            final Type genericType, final Annotation[] anns)  throws IOException {
+            final Type genericType, final Annotation[] anns) {
         final List<Attachment> attachments = new ArrayList<>(parts.size());
         for (EntityPart part: parts) {
             attachments.add(createDataHandler(part, type, genericType, anns));
@@ -192,7 +192,7 @@ public class EntityPartProvider extends AbstractConfigurableProvider
     }
 
     private static <T> Attachment createDataHandler(final EntityPart part, final Class<T> type,
-            final Type genericType, final Annotation[] anns) throws IOException {
+            final Type genericType, final Annotation[] anns) {
 
         final String mt = Objects
             .requireNonNullElse(part.getMediaType(), MediaType.APPLICATION_OCTET_STREAM_TYPE)
@@ -205,7 +205,8 @@ public class EntityPartProvider extends AbstractConfigurableProvider
 
         return part.getFileName()
             .map(fileName -> {
-                final ContentDisposition cd = new ContentDisposition("form-data;name=file;filename=" + fileName);
+                final ContentDisposition cd = new ContentDisposition(
+                        "form-data; name=\"file\"; filename=\"" + fileName + "\"");
                 return new Attachment(part.getName(), part.getContent(), cd);
             })
             .orElseGet(() -> {

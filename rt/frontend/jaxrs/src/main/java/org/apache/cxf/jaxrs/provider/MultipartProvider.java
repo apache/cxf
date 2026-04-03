@@ -346,7 +346,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else if (File.class.isAssignableFrom(obj.getClass())) {
             File f = (File)obj;
             ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA)
-                ? new ContentDisposition("form-data;name=file;filename=" + f.getName()) :  null;
+                ? new ContentDisposition("form-data; name=\"file\"; filename=\"" + f.getName() + "\"") :  null;
             return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, Files.newInputStream(f.toPath()), cd);
         } else if (Attachment.class.isAssignableFrom(obj.getClass())) {
             Attachment att = (Attachment)obj;
@@ -357,14 +357,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                      att.getObject().getClass(), new Annotation[]{},
                                      att.getContentType().toString(), id);
             MediaType mediaType = httpHeaders.getMediaType();
-            Attachment ret = null;
+            Attachment ret;
             if (MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType)
                 && att.getHeader("Content-Disposition") == null) {
                 ContentDisposition cd = new 
-                    ContentDisposition("form-data;name=\"" 
+                    ContentDisposition("form-data; name=\""
                         + att.getContentId() + "\"");
-                MultivaluedMap<String, String> newHeaders = 
-                    new MetadataMap<String, String>(att.getHeaders(), false, true);
+                MultivaluedMap<String, String> newHeaders =
+                        new MetadataMap<>(att.getHeaders(), false, true);
                 newHeaders.putSingle("Content-Disposition", cd.toString());
                 ret = new Attachment(att.getContentId(), dh, newHeaders);
             } else {
@@ -450,12 +450,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
     }
 
     private static class MessageBodyWriterDataHandler<T> extends DataHandler {
-        private MessageBodyWriter<T> writer;
-        private T obj;
-        private Class<T> cls;
-        private Type genericType;
-        private Annotation[] anns;
-        private MediaType contentType;
+        private final MessageBodyWriter<T> writer;
+        private final T obj;
+        private final Class<T> cls;
+        private final Type genericType;
+        private final Annotation[] anns;
+        private final MediaType contentType;
         MessageBodyWriterDataHandler(MessageBodyWriter<T> writer,
                                      T obj,
                                      Class<T> cls,
@@ -475,7 +475,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         public void writeTo(OutputStream os) {
             try {
                 writer.writeTo(obj, cls, genericType, anns, contentType,
-                               new MetadataMap<String, Object>(), os);
+                        new MetadataMap<>(), os);
             } catch (IOException ex) {
                 throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
