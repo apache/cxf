@@ -205,6 +205,7 @@ public abstract class HTTPConduit
     private static final String AUTO_REDIRECT_ALLOW_REL_URI = "http.redirect.relative.uri";
     private static final String AUTO_REDIRECT_ALLOWED_URI = "http.redirect.allowed.uri";
     private static final String AUTO_REDIRECT_MAX_SAME_URI_COUNT = "http.redirect.max.same.uri.count";
+    private static final String AUTO_REDIRECT_FORCE_GET = "http.redirect.force.GET";
 
     private static final String HTTP_POST_METHOD = "POST";
     private static final String HTTP_GET_METHOD = "GET";
@@ -1545,6 +1546,16 @@ public abstract class HTTPConduit
 
             if (newURL != null) {
                 new Headers(outMessage).removeAuthorizationHeaders();
+
+                // RFC 7231 Sections 6.4.2/6.4.3: For historical reasons, a user agent MAY
+                // change the request method from POST to GET for 301/302 redirects.
+                // This is enabled via the "http.redirect.force.GET" property.
+                int responseCode = getResponseCode();
+                if ((responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                        || responseCode == HttpURLConnection.HTTP_MOVED_TEMP)
+                        && MessageUtils.getContextualBoolean(outMessage, AUTO_REDIRECT_FORCE_GET)) {
+                    outMessage.put(Message.HTTP_REQUEST_METHOD, HTTP_GET_METHOD);
+                }
 
                 // If user configured this Conduit with preemptive authorization
                 // it is meant to make it to the end. (Too bad that information
