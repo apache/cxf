@@ -246,26 +246,25 @@ public class UriInfoImpl implements UriInfo {
     @Override
     public String getMatchedResourceTemplate() {
         if (stack != null) {
-            String matchedResourceTemplate = (String) message.getExchange().getEndpoint()
-                    .get(JAXRSUtils.MATCHED_RESOURCE_TEMPLATE_BASE_PATH);
-
+            final List<URITemplate> templates = new LinkedList<>();
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-
-                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
-                        matchedResourceTemplate, getValue(ori.getClassResourceInfo().getURITemplate()));
-
-                matchedResourceTemplate = JAXRSUtils.combineUriTemplates(
-                        matchedResourceTemplate, getValue(ori.getURITemplate()));
+                final URITemplate classUriTemplate = ori.getClassResourceInfo().getURITemplate();
+                if (classUriTemplate != null) {
+                    templates.add(classUriTemplate);
+                }
+                templates.add(ori.getURITemplate());
             }
-            return matchedResourceTemplate;
+            
+            if (!templates.isEmpty()) {
+                UriBuilder builder = UriBuilder.fromPath(templates.get(0).getValue());
+                for (int i = 1; i < templates.size(); ++i) {
+                    builder = builder.path(templates.get(i).getValue());
+                }
+                return builder.toTemplate();
+            }
         }
-
         LOG.fine("No resource stack information, returning empty template");
         return "";
-    }
-
-    private String getValue(URITemplate uriTemplate) {
-        return uriTemplate == null ? null : uriTemplate.getValue();
     }
 }

@@ -157,8 +157,6 @@ public final class JAXRSUtils {
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String EXCEPTION_FROM_MAPPER = "exception.from.mapper";
     public static final String SECOND_JAXRS_EXCEPTION = "second.jaxrs.exception";
-    public static final String MATCHED_RESOURCE_TEMPLATE_BASE_PATH =
-        "org.apache.cxf.jaxrs.matched-resource-template-base-path";
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK =
         "media.subtype.partial.check";
     public static final String DOC_LOCATION = "wadl.location";
@@ -2162,7 +2160,7 @@ public final class JAXRSUtils {
      * @param child child URI template
      * @return the URI template combined from the parent and child
      */
-    public static String combineUriTemplates(final String parent, final String child) {
+    private static String combineUriTemplates(final String parent, final String child) {
         if (StringUtils.isEmpty(child)) {
             return parent;
         }
