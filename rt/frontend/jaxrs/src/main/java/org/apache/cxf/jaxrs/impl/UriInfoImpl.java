@@ -249,7 +249,10 @@ public class UriInfoImpl implements UriInfo {
             final List<URITemplate> templates = new LinkedList<>();
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-                templates.add(ori.getClassResourceInfo().getURITemplate());
+                final URITemplate classUriTemplate = ori.getClassResourceInfo().getURITemplate();
+                if (classUriTemplate != null) {
+                    templates.add(classUriTemplate);
+                }
                 templates.add(ori.getURITemplate());
             }
             
@@ -258,7 +261,7 @@ public class UriInfoImpl implements UriInfo {
                 for (int i = 1; i < templates.size(); ++i) {
                     builder = builder.path(templates.get(i).getValue());
                 }
-                return builder.build().toString();
+                return builder.toTemplate();
             }
         }
         LOG.fine("No resource stack information, returning empty template");

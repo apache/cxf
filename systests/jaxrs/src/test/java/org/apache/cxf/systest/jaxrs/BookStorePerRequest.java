@@ -31,6 +31,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 @Path("/bookstore2")
 public class BookStorePerRequest {
@@ -85,6 +86,12 @@ public class BookStorePerRequest {
     @Path("/book%20headers/")
     public Book getBookByHeader2() throws Exception {
         return getBookByHeader();
+    }
+    
+    @GET
+    @Path("/book%20template/{name:[a-zA-Z][a-zA-Z_0-9]*}")
+    public String getBookTemplate(@Context final UriInfo info) throws Exception {
+        return info.getMatchedResourceTemplate();
     }
 
     @GET

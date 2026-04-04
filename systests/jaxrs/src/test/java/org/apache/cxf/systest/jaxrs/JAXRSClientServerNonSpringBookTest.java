@@ -44,6 +44,8 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -201,6 +203,14 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     public void testGetBook123TwoApplications() throws Exception {
         doTestPerRequest("http://localhost:" + PORT + "/application6/thebooks/bookstore2/bookheaders");
         doTestPerRequest("http://localhost:" + PORT + "/application6/the%20books2/bookstore2/book%20headers");
+    }
+    
+    @Test
+    public void testGetMatchedResourceTemplate() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT
+                                        + "/application6/the%20books2/bookstore2/book%20template/abc");
+        assertThat(wc.accept("*/*").get(String.class),
+            equalTo("/bookstore2/book%20template/{name:[a-zA-Z][a-zA-Z_0-9]*}"));
     }
 
     @SafeVarargs
