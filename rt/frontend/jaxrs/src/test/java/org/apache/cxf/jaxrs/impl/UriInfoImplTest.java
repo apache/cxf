@@ -437,6 +437,12 @@ public class UriInfoImplTest {
         }
 
         @GET
+        @Path("one/{name: [a-zA-Z][a-zA-Z_0-9]*}")
+        public Response getTemplateSpaces() {
+            return null;
+        }
+
+        @GET
         @Path("bar")
         public Response getSubMethod() {
             return null;
@@ -582,6 +588,21 @@ public class UriInfoImplTest {
 
         UriInfoImpl u = new UriInfoImpl(m);
         assertEquals("/foo/one/{name:[a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
+    }
+
+    @Test
+    public void testGetMatchedResourceTemplatePreserveSpacesInTemplateVariables() throws Exception {
+        Message m = mockMessage("http://localhost:8080/app", "/foo/one/abc");
+        OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
+        ClassResourceInfo cri = getCri(RootResource.class, true);
+        OperationResourceInfo ori = getOri(cri, "getTemplateSpaces");
+
+        MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
+        oriStack.push(miInfo);
+        m.put(OperationResourceInfoStack.class, oriStack);
+
+        UriInfoImpl u = new UriInfoImpl(m);
+        assertEquals("/foo/one/{name: [a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
     }
 
     @Test

@@ -471,6 +471,7 @@ public final class URITemplate {
         private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\w[-\\w\\.]*[ ]*)(\\:(.+))?");
         private String name;
         private Pattern pattern;
+        private String template;
 
         private Variable() {
             // empty constructor
@@ -488,14 +489,16 @@ public final class URITemplate {
                 return null;
             }
             if (CurlyBraceTokenizer.insideBraces(uriChunk)) {
-                uriChunk = CurlyBraceTokenizer.stripBraces(uriChunk).trim();
-                Matcher matcher = VARIABLE_PATTERN.matcher(uriChunk);
+                String trimmedUriChunk = CurlyBraceTokenizer.stripBraces(uriChunk).trim();
+                Matcher matcher = VARIABLE_PATTERN.matcher(trimmedUriChunk);
                 if (matcher.matches()) {
                     newVariable.name = matcher.group(1).trim();
                     if (matcher.group(2) != null && matcher.group(3) != null) {
                         String patternExpression = matcher.group(3).trim();
                         newVariable.pattern = Pattern.compile(patternExpression);
                     }
+                    // Store the exact variable template
+                    newVariable.template = uriChunk.trim();
                     return newVariable;
                 }
             }
@@ -526,10 +529,7 @@ public final class URITemplate {
 
         @Override
         public String getValue() {
-            if (pattern != null) {
-                return "{" + name + ":" + pattern + "}";
-            }
-            return "{" + name + "}";
+            return template;
         }
     }
 
