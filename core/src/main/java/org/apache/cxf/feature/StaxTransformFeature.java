@@ -28,15 +28,13 @@ import org.apache.cxf.interceptor.transform.TransformInInterceptor;
 import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 
 /**
- * <pre>
- * <![CDATA[
+ * <pre>{@code
     <jaxws:endpoint ...>
       <jaxws:features>
        <bean class="org.apache.cxf.feature.StaxTransformFeature"/>
       </jaxws:features>
     </jaxws:endpoint>
-  ]]>
-  </pre>
+ * }</pre>
  */
 @NoJSR250Annotations
 public class StaxTransformFeature extends DelegatingFeature<StaxTransformFeature.Portable> {

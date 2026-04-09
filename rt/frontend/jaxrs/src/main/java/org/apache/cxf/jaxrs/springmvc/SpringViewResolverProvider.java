@@ -44,17 +44,17 @@ import org.springframework.web.servlet.ViewResolver;
  * CXF view provider that delegates view rendering to Spring MVC Views.
  *
  * Sample usage in a spring application:
- * <pre>
- @Bean
- public SpringViewResolverProvider springViewProvider(ViewResolver viewResolver) {
-     SpringViewResolverProvider viewProvider = new SpringViewResolverProvider(viewResolver,
-            new AcceptHeaderLocaleResolver());
-     viewProvider.setUseClassNames(true);
-     viewProvider.setBeanName("model");
-     viewProvider.setResourcePaths(Collections.singletonMap("/remove", "registeredClients"));
-     return viewProvider;
- }
- * </pre>
+ * <pre>{@code
+ *  @Bean
+ *  public SpringViewResolverProvider springViewProvider(ViewResolver viewResolver) {
+ *      SpringViewResolverProvider viewProvider = new SpringViewResolverProvider(viewResolver,
+ *             new AcceptHeaderLocaleResolver());
+ *      viewProvider.setUseClassNames(true);
+ *      viewProvider.setBeanName("model");
+ *      viewProvider.setResourcePaths(Collections.singletonMap("/remove", "registeredClients"));
+ *      return viewProvider;
+ *  }
+ * }</pre>
  */
 public class SpringViewResolverProvider extends AbstractResponseViewProvider {
 

@@ -37,15 +37,13 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * By attaching this feature to an endpoint, you
  * can specify logging. If this feature is present, an endpoint will log input
  * and output of ordinary and log messages.
- * <pre>
- * <![CDATA[
+ * <pre>{@code
     <jaxws:endpoint ...>
       <jaxws:features>
        <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
       </jaxws:features>
     </jaxws:endpoint>
-  ]]>
-  </pre>
+ * }</pre>
  */
 @NoJSR250Annotations
 @Provider(value = Type.Feature)

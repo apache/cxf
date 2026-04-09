@@ -170,9 +170,9 @@ public class JAXRSCdiResourceExtension implements Extension {
     /**
      * For any {@link AnnotatedType} that includes a {@link Context} injection point, this method replaces
      * the field with the following code:
-     * <pre>
+     * <pre>{@code
      *     @Inject @ContextResolved T field;
-     * </pre>
+     * }</pre>
      * For any usage of T that is a valid context object in JAX-RS.
      *
      * It also has a side effect of capturing the context object type, in case no

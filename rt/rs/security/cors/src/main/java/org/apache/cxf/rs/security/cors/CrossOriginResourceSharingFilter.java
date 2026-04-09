@@ -64,9 +64,9 @@ import org.apache.cxf.phase.Phase;
  * This class will perform preflight processing even if there is a resource method annotated
  * to handle @OPTIONS,
  * <em>unless</em> that method is annotated as follows:
- * <pre>
+ * <pre>{@code
  *   @LocalPreflight
- * </pre>
+ * }</pre>
  * or unless the <tt>defaultOptionsMethodsHandlePreflight</tt> property of this class is set to <tt>true</tt>.
  */
 @Provider

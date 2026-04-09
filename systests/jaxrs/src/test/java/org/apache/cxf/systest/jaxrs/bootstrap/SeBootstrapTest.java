@@ -56,8 +56,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
 /**
- * Some tests are taken from {@linkplain https://github.com/jakartaee/rest/blob/tck-3.1.2/jaxrs-tck
- * /src/main/java/ee/jakarta/tck/ws/rs/sebootstrap/SeBootstrapIT.java}
+ * Some tests are taken from
+ * <a href="https://github.com/jakartaee/rest/blob/tck-3.1.2/jaxrs-tck
+ * /src/main/java/ee/jakarta/tck/ws/rs/sebootstrap/SeBootstrapIT.java">SeBootstrapIT.java</a>
  */
 public class SeBootstrapTest {
     private static Bus bus;

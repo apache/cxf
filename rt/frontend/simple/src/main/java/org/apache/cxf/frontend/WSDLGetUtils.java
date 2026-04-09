@@ -807,7 +807,7 @@ public class WSDLGetUtils {
      * Retrieve the map of known xsd SchemaReference objects for this endpoint.
      *
      * @param endpointInfo information for a web service 'port' inside of a service
-     * @return Map<String, SchemaReference>
+     * @return {@link Map<String, SchemaReference>}
      */
     protected Map<String, SchemaReference> getSchemaKeySchemaReference(EndpointInfo endpointInfo) {
         Map<String, SchemaReference> smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
@@ -825,7 +825,7 @@ public class WSDLGetUtils {
      * Retrieve the map of known wsdl Definition objects for this endpoint.
      *
      * @param endpointInfo  information for a web service 'port' inside of a service
-     * @return Map<String, Definition>
+     * @return {@link Map<String, Definition>}
      */
     protected Map<String, Definition> getWSDLKeyDefinition(EndpointInfo endpointInfo) {
         Map<String, Definition> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()

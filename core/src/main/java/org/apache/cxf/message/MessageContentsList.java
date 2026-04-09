@@ -36,7 +36,8 @@ public class MessageContentsList extends ArrayList<Object> {
      * indexes within this list when some preceding elements
      * are not populated or deleted.
      * 
-     * @see {@link #get(MessagePartInfo)}, {@link #remove(MessagePartInfo)}
+     * @see MessageContentsList#get(MessagePartInfo)
+     * @see MessageContentsList#remove(MessagePartInfo)
      */
     public static final Object REMOVED_MARKER = new Object();
     private static final long serialVersionUID = -5780720048950696258L;

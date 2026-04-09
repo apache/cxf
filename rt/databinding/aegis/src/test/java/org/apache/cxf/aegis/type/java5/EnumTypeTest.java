@@ -163,7 +163,7 @@ public class EnumTypeTest extends AbstractAegisTest {
     }
     
     /**
-     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+     * <a href="https://issues.apache.org/jira/browse/CXF-7188">CXF-7188</a>
      */
     @Test
     public void testTypeWithJaxbAnnotations() throws Exception {
@@ -179,7 +179,7 @@ public class EnumTypeTest extends AbstractAegisTest {
     }
     
     /**
-     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+     * <a href="https://issues.apache.org/jira/browse/CXF-7188">CXF-7188</a>
     */
     @Test
     public void testWsdlFromJaxbAnnotations() throws Exception {

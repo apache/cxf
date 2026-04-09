@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * A cache value for EHCache. It's just a wrapper for Map<String, String>.
+ * A cache value for EHCache. It's just a wrapper for {@link Map<String, String>}.
  */
 public class EHCacheIdentityValue implements Serializable {
 

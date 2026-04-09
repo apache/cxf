@@ -536,7 +536,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
      * Get the {@link Client} reference
      * @param params request parameters
      * @return Client the client reference
-     * @throws {@link jakarta.ws.rs.WebApplicationException} if no matching Client is found,
+     * @throws jakarta.ws.rs.WebApplicationException if no matching Client is found,
      *         the error is returned directly to the end user without
      *         following the redirect URI if any
      */

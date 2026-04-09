@@ -28,8 +28,8 @@ public interface WorkQueue extends Executor {
      * @param work the workitem to submit for execution.
      * @param timeout the maximum amount of time (in milliseconds) to wait for it to be accepted.
      *
-     * @throws <code>RejectedExecutionException</code> if this work item cannot be accepted for execution.
-     * @throws <code>NullPointerException</code> if work item is null.
+     * @throws RejectedExecutionException if this work item cannot be accepted for execution.
+     * @throws NullPointerException if work item is null.
      */
     void execute(Runnable work, long timeout);
 
@@ -39,8 +39,8 @@ public interface WorkQueue extends Executor {
      * @param work the task to submit for execution.
      * @param delay the delay before the task is executed
      *
-     * @throws <code>RejectedExecutionException</code> if this task cannot be accepted for execution.
-     * @throws <code>NullPointerException</code> if task is null.
+     * @throws RejectedExecutionException if this task cannot be accepted for execution.
+     * @throws NullPointerException if task is null.
      */
     void schedule(Runnable work, long delay);
 }

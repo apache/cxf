@@ -33,7 +33,7 @@ public final class SecurityContextFactory {
      * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and
      * create a SecurityContext from it.
      * For more info see Jira Issue CXF-2055
-     * {@link https://issues.apache.org/jira/browse/CXF-2055}
+     * <a href="https://issues.apache.org/jira/browse/CXF-2055">CXF-2055</a>
      *
      * @param message jms message to retrieve user information from
      * @return SecurityContext that contains the user of the producer of the message as the Principal

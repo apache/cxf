@@ -35,15 +35,13 @@ import org.apache.cxf.message.Message;
  * compressed requests, and will cause outgoing responses to be compressed if
  * the client indicates (via the Accept-Encoding header) that it can handle
  * them.
- * <pre>
- * <![CDATA[
+ * <pre>{@code
  * <jaxws:endpoint ...>
  *   <jaxws:features>
  *     <bean class="org.apache.cxf.transport.common.gzip.GZIPFeature"/>
  *   </jaxws:features>
  * </jaxws:endpoint>
- * ]]>
- * </pre>
+ * }</pre>
  * Attaching this feature to a client will cause outgoing request messages
  * to be compressed and incoming compressed responses to be uncompressed.
  * Accept-Encoding header is sent to let the service know

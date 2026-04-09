@@ -48,7 +48,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Runs the same tests as JPAOAuthDataProviderTest but within a Spring Managed Transaction.
  *
- * Spring spawns a transaction before each call to <code><oauthProvider</code>.
+ * Spring spawns a transaction before each call to {@code oauthProvider}.
  *
  * Note : this test needs <code>@DirtiesContext</code>, otherwise
  * spring tests cache and reuse emf across test classes

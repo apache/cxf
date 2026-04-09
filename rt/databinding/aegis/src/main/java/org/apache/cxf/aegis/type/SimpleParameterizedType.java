@@ -24,10 +24,10 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 
 /**
- * When an XML file tells is that it wants a List to be a List<x> or a Map to be
- * a Map<x, y>, we create one of these. We do not tolerate nesting. If we really
+ * When an XML file tells is that it wants a List to be a {@link List<?>} or a {@link Map} to be
+ * a {@link Map<?, ?>}, we create one of these. We do not tolerate nesting. If we really
  * wanted the entire apparatus, asm would be more appropriate. This is good enough
- * to allow us to probe a hash table hashed on Type objects where List<x> might
+ * to allow us to probe a hash table hashed on Type objects where {@link List<?>} might
  * be in there.
  */
 class SimpleParameterizedType implements ParameterizedType {

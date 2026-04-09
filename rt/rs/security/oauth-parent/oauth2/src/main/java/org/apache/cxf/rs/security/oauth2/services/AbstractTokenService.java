@@ -238,7 +238,7 @@ public class AbstractTokenService extends AbstractOAuthService {
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference
-     * @throws {@link jakarta.ws.rs.WebApplicationException} if no matching Client is found
+     * @throws jakarta.ws.rs.WebApplicationException if no matching Client is found
      */
     protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
         return getClient(clientId, params.getFirst(OAuthConstants.CLIENT_SECRET), params);

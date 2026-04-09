@@ -68,8 +68,8 @@ public class Outer implements Serializable {
     /**
      * Any pre-computed inners for the name.
      *
-     * @@uml.property name="inners"
-     * @@uml.associationEnd multiplicity="(0 -1)"
+     * @uml.property name="inners"
+     * @uml.associationEnd multiplicity="(0 -1)"
      */
     Inner[] inners;
 
