@@ -41,13 +41,15 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 public class TLSClientParameters extends TLSParameterBase {
     /**
      * Provide an option to ignore https.protocols setting, see please
-     * {@link https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https}
+     * <a href="https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https">
+     * Diagnosing TLS, SSL, and HTTPS</a>
      */
     static final String IGNORE_CONFIGURED_HTTPS_PROTOCOLS = "https.protocols.ignore"; 
 
     /**
      * Consult https.protocols setting for preferred client HTTPs protocols, see please
-     * {@link https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https}
+     * <a href="https://blogs.oracle.com/java/post/diagnosing-tls-ssl-and-https">
+     * Diagnosing TLS, SSL, and HTTPS</a>
      */
     static final String CONFIGURED_HTTPS_PROTOCOLS = "https.protocols";
 

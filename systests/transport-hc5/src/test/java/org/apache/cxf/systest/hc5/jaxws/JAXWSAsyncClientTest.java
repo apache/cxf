@@ -218,7 +218,7 @@ public class JAXWSAsyncClientTest  extends AbstractBusClientServerTestBase {
      *   at org.apache.cxf.jaxws.JaxwsResponseCallback.get(JaxwsResponseCallback.java:48)
      *   at org.apache.cxf.systest.hc5.jaxws.JAXWSAsyncClientTest.testAsyncWsdl(JAXWSAsyncClientTest.java:193)
      *
-     * @see https://issues.apache.org/jira/browse/CXF-9007
+     * @see <a href="https://issues.apache.org/jira/browse/CXF-9007">CXF-9007</a>
      */
     @Test
     public void testAsyncWsdl() throws Exception {

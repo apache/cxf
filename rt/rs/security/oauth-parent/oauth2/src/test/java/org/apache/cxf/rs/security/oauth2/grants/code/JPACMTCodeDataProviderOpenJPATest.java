@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 /**
  * Runs the same tests as JPACodeDataProviderTest but within a Spring Managed Transaction.
  *
- * Spring spawns a transaction before each call to <code><oauthProvider</code>.
+ * Spring spawns a transaction before each call to {@code oauthProvider}.
  *
  * Note : this test needs <code>@DirtiesContext</code>, otherwise
  * spring tests cache and reuse emf across test classes

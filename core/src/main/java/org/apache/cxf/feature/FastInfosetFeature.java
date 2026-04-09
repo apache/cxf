@@ -26,15 +26,13 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 
 
 /**
- * <pre>
- * <![CDATA[
+ * <pre>{@code
     <jaxws:endpoint ...>
       <jaxws:features>
        <bean class="org.apache.cxf.feature.FastInfosetFeature"/>
       </jaxws:features>
     </jaxws:endpoint>
-  ]]>
-  </pre>
+ * }</pre>
  */
 @NoJSR250Annotations
 public class FastInfosetFeature extends DelegatingFeature<FastInfosetFeature.Portable> {

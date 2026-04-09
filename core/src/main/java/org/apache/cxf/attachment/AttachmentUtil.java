@@ -396,7 +396,7 @@ public final class AttachmentUtil {
     }
 
     /**
-     * @deprecated use createAttachment(InputStream stream, Map<String, List<String>> headers, Message message)
+     * @deprecated use {@code createAttachment(InputStream stream, Map<String, List<String>> headers, Message message)}
      */
     public static Attachment createAttachment(InputStream stream, Map<String, List<String>> headers) 
             throws IOException {

@@ -50,14 +50,14 @@ public final class IdlPreprocessorReader extends Reader {
     /**
      * GNU standard preprocessor output flag for signalling a new file.
      *
-     * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
+     * @see <a href="http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html">Preprocessor Output</a>
      */
     private static final char PUSH = '1';
 
     /**
      * GNU standard preprocessor output flag for signalling returning to a file.
      *
-     * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
+     * @see <a href="http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html">Preprocessor Output</a>
      */
     private static final char POP = '2';
 
@@ -368,7 +368,7 @@ public final class IdlPreprocessorReader extends Reader {
     /**
      * Creates GNU standard preprocessor flag for signalling a file change.
      *
-     * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
+     * @see <a href="http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html">Preprocessor-Output</a>
      */
     private void signalFileChange(String location, int lineNumber, char flag) {
         buf.append("# ").append(lineNumber).append(' ').append(location).append(' ').append(flag).append(LF);

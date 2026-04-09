@@ -83,7 +83,7 @@ public abstract class AbstractOAuthService {
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference
-     * @throws {@link OAuthServiceExcepption} if no matching Client is found
+     * @throws OAuthServiceException if no matching Client is found
      */
     protected Client getValidClient(String clientId, MultivaluedMap<String, String> params)
         throws OAuthServiceException {

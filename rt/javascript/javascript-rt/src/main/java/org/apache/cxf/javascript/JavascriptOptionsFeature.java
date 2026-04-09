@@ -30,17 +30,15 @@ import org.apache.cxf.feature.DelegatingFeature;
 /**
  * This class provides configuration options to the JavaScript client generator.
  * Attach this feature to control namespace mapping and other options.
- * <pre>
- * <![CDATA[
+ * <pre>{@code
     <jaxws:endpoint ...>
       <jaxws:features>
        <bean class="org.apache.cxf.javascript.JavascriptOptionsFeature">
        </bean>
       </jaxws:features>
     </jaxws:endpoint>
-  ]]>
-  </pre>
-  * At this time, there is no corresponding WSDL extension for this information.
+ * }</pre>
+ * At this time, there is no corresponding WSDL extension for this information.
  */
 @NoJSR250Annotations
 public class JavascriptOptionsFeature extends DelegatingFeature<JavascriptOptionsFeature.Portable> {

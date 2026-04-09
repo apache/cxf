@@ -29,8 +29,7 @@ import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
- * <pre>
- * <![CDATA[
+ * <pre>{@code
     <jaxws:endpoint ...>
       <jaxws:features>
        <bean class="org.apache.cxf.transport.https.CertConstraintsFeature">
@@ -52,8 +51,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
        </bean>
       </jaxws:features>
     </jaxws:endpoint>
-  ]]>
-  </pre>
+ * }</pre>
  */
 @NoJSR250Annotations
 public class CertConstraintsFeature extends DelegatingFeature<CertConstraintsFeature.Portable> {

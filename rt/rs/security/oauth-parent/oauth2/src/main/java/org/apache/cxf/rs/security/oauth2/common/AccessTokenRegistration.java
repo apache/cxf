@@ -88,7 +88,7 @@ public class AccessTokenRegistration {
     }
 
     /**
-     * Sets the {@link UserSubject) instance capturing
+     * Sets the {@link UserSubject} instance capturing
      * the information about the end user
      * @param subject the end user subject
      */
@@ -97,7 +97,7 @@ public class AccessTokenRegistration {
     }
 
     /**
-     * Gets the {@link UserSubject) instance capturing
+     * Gets the {@link UserSubject} instance capturing
      * the information about the end user
      * @return the subject
      */

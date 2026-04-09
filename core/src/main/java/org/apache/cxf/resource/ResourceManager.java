@@ -48,7 +48,7 @@ public interface ResourceManager {
      *
      * @param name name of resource to resolve.
      * @param type type of resource to resolve.
-     * @param resolvers list of <code>ResourceResolvers</codea> to search.
+     * @param resolvers list of {@code ResourceResolvers} to search.
      * @return the resolved resource or null if nothing found.
      */
     <T> T resolveResource(String name, Class<T> type, List<ResourceResolver> resolvers);
