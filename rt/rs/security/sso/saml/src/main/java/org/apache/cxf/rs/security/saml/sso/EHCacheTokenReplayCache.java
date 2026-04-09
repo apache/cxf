@@ -82,18 +82,23 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
             // ignore
         }
 
-        XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
-        CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
-                xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_KEY,
-                        String.class, EHCacheValue.class);
-        // Note, we don't require strong random values here
-        String diskKey = CACHE_KEY + "-" + Math.abs(new Random().nextInt());
-        cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withCache(CACHE_KEY, configurationBuilder)
-                .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
-
-        cacheManager.init();
-        cache = cacheManager.getCache(CACHE_KEY, String.class, EHCacheValue.class);
-
+        try {
+            XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
+            CacheConfigurationBuilder<String, EHCacheValue> configurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(CACHE_KEY,
+                            String.class, EHCacheValue.class);
+            // Note, we don't require strong random values here
+            String diskKey = CACHE_KEY + "-" + Math.abs(new Random().nextInt());
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .withCache(CACHE_KEY, configurationBuilder)
+                    .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey)))
+                    .build();
+    
+            cacheManager.init();
+            cache = cacheManager.getCache(CACHE_KEY, String.class, EHCacheValue.class);
+        } catch (final ReflectiveOperationException ex) {
+            throw (IllegalAccessException) new IllegalAccessException(ex.getMessage()).initCause(ex);
+        }
     }
 
     private URL getConfigFileURL(URL suppliedConfigFileURL) {

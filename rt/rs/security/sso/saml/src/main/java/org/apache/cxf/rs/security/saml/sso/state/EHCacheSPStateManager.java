@@ -79,32 +79,38 @@ public class EHCacheSPStateManager implements SPStateManager {
             // ignore
         }
 
-        XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
-        CacheConfigurationBuilder<String, RequestState> requestConfigurationBuilder =
-                xmlConfig.newCacheConfigurationBuilderFromTemplate(REQUEST_CACHE_KEY,
-                        String.class, RequestState.class);
+        try {
+            XmlConfiguration xmlConfig = new XmlConfiguration(getConfigFileURL(configFileURL));
+            CacheConfigurationBuilder<String, RequestState> requestConfigurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(REQUEST_CACHE_KEY,
+                            String.class, RequestState.class);
 
-        // Note, we don't require strong random values here
-        String diskKey = REQUEST_CACHE_KEY + "-" + Math.abs(new Random().nextInt());
-        requestCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(REQUEST_CACHE_KEY, requestConfigurationBuilder)
-                .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
+            // Note, we don't require strong random values here
+            String diskKey = REQUEST_CACHE_KEY + "-" + Math.abs(new Random().nextInt());
+            requestCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .withCache(REQUEST_CACHE_KEY, requestConfigurationBuilder)
+                    .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey)))
+                    .build();
+    
+            requestCacheManager.init();
+            requestCache = requestCacheManager.getCache(REQUEST_CACHE_KEY, String.class, RequestState.class);
+        
+            CacheConfigurationBuilder<String, ResponseState> responseConfigurationBuilder =
+                    xmlConfig.newCacheConfigurationBuilderFromTemplate(RESPONSE_CACHE_KEY,
+                            String.class, ResponseState.class);
 
-        requestCacheManager.init();
-        requestCache = requestCacheManager.getCache(REQUEST_CACHE_KEY, String.class, RequestState.class);
-
-        CacheConfigurationBuilder<String, ResponseState> responseConfigurationBuilder =
-                xmlConfig.newCacheConfigurationBuilderFromTemplate(RESPONSE_CACHE_KEY,
-                        String.class, ResponseState.class);
-
-        // Note, we don't require strong random values here
-        diskKey = RESPONSE_CACHE_KEY + "-" + Math.abs(new Random().nextInt());
-        responseCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(RESPONSE_CACHE_KEY, responseConfigurationBuilder)
-                .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey))).build();
-
-        responseCacheManager.init();
-        responseCache = responseCacheManager.getCache(RESPONSE_CACHE_KEY, String.class, ResponseState.class);
+            // Note, we don't require strong random values here
+            diskKey = RESPONSE_CACHE_KEY + "-" + Math.abs(new Random().nextInt());
+            responseCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .withCache(RESPONSE_CACHE_KEY, responseConfigurationBuilder)
+                    .with(CacheManagerBuilder.persistence(new File(System.getProperty("java.io.tmpdir"), diskKey)))
+                    .build();
+    
+            responseCacheManager.init();
+            responseCache = responseCacheManager.getCache(RESPONSE_CACHE_KEY, String.class, ResponseState.class);
+        } catch (final ReflectiveOperationException ex) {
+            throw (IllegalAccessException) new IllegalAccessException(ex.getMessage()).initCause(ex);
+        }
     }
 
     private URL getConfigFileURL(URL suppliedConfigFileURL) {
