@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -94,15 +95,15 @@ import static org.junit.Assert.assertTrue;
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = MultipartServer.PORT;
     public static final String PORTINV = allocatePort(JAXRSMultipartTest.class, 1);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(MultipartServer.class, true));
     }
 
-    
-    
+
+
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/stream";
@@ -526,7 +527,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testNullPartProxy() throws Exception {
+    public void testNullPartProxy() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(output, true);
 
@@ -536,8 +537,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
         WebClient.getConfig(store).getOutInterceptors().add(out);
         assertEquals("nobody home2", store.testNullParts("value1", null));
-        String expected = "Content-Disposition: form-data;name=\"someid\"";
-        assertTrue(output.toString().indexOf(expected) != -1);
+        String expected = "Content-Disposition: form-data; name=\"someid\"";
+        assertTrue(output.toString().contains(expected));
     }
 
     @Test
@@ -1029,23 +1030,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testUploadImageFromForm2() throws Exception {
-        File file =
-            new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg")
-                               .toURI().getPath());
-        String address = "http://localhost:" + PORT + "/bookstore/books/formimage2";
-        WebClient client = WebClient.create(address);
-        client.type("multipart/form-data").accept("multipart/form-data");
-        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
-                                                            "true");
-        MultipartBody body2 = client.post(file, MultipartBody.class);
-        InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertArrayEquals(image1, image2);
-        ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
-        assertEquals("form-data;name=file;filename=java.jpg", cd2.toString());
-        assertEquals("java.jpg", cd2.getParameter("filename"));
+        this.uploadImageFromForm2("java.jpg");
+    }
+
+    @Test
+    public void testUploadImageFromForm2WithSemicolon() throws Exception {
+        this.uploadImageFromForm2("java;test.jpg");
     }
 
     @Test
@@ -1165,7 +1155,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
         Attachment att = new Attachment(headers, handler, null);
         try (Response response = client.post(att)) {
-            assertEquals(response.getStatus(), 200);
+            assertEquals(200, response.getStatus());
         }
 
         client.close();
@@ -1275,6 +1265,26 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             str = str.substring(index + 2);
         }
         return str;
+    }
+
+    private void uploadImageFromForm2(String filename) throws URISyntaxException, IOException {
+        File file =
+                new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/" + filename)
+                        .toURI().getPath());
+        String address = "http://localhost:" + PORT + "/bookstore/books/formimage2";
+        WebClient client = WebClient.create(address);
+        client.type("multipart/form-data").accept("multipart/form-data");
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
+                "true");
+        MultipartBody body2 = client.post(file, MultipartBody.class);
+        InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
+        byte[] image1 = IOUtils.readBytesFromStream(
+                getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + filename));
+        byte[] image2 = IOUtils.readBytesFromStream(is2);
+        assertArrayEquals(image1, image2);
+        ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
+        assertEquals("form-data; name=\"file\"; filename=\"" + filename + "\"", cd2.toString());
+        assertEquals(filename, cd2.getParameter("filename"));
     }
 
     /**
