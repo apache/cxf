@@ -19,9 +19,13 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.SequenceInputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -29,9 +33,9 @@ import jakarta.ws.rs.core.EntityPart;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.utils.ParameterizedListType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -49,8 +53,7 @@ import static org.junit.Assert.assertTrue;
 
 public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
     public static final String PORT = EntityPartServer.PORT;
-    public static final String PORTINV = allocatePort(JAXRSEntityPartTest.class, 1);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(EntityPartServer.class, true));
@@ -59,33 +62,37 @@ public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testUploadImage() throws Exception {
+        this.uploadImage("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+    }
+
+    @Test
+    public void testUploadImageWithSemicolon() throws Exception {
+        this.uploadImage("/org/apache/cxf/systest/jaxrs/resources/java;test.jpg");
+    }
+
+    @Test
+    public void testContentDispositionInRequestIsWhitespaceSeparated() throws URISyntaxException, IOException {
         final File file = new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg")
                 .toURI().getPath());
         final String address = "http://localhost:" + PORT + "/bookstore/books/images";
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+
         final WebClient client = WebClient.create(address);
+        client.getConfiguration().getOutInterceptors().add(out);
         client.type(MediaType.MULTIPART_FORM_DATA).accept(MediaType.MULTIPART_FORM_DATA);
 
         try (InputStream is = Files.newInputStream(file.toPath())) {
             final EntityPart part = EntityPart
-                .withFileName(file.getName())
-                .content(is)
-                .build();
+                    .withFileName(file.getName())
+                    .content(is)
+                    .build();
 
-            try (Response response = client.postCollection(List.of(part), EntityPart.class)) {
-                assertThat(response.getStatus(), equalTo(200));
-
-                @SuppressWarnings("unchecked")
-                final List<EntityPart> parts = (List<EntityPart>) response
-                    .readEntity(new GenericType<>(new ParameterizedListType(EntityPart.class)));
-
-                assertThat(parts, hasSize(1));
-                assertThat(parts.get(0), is(not(nullValue())));
-
-                assertThat(parts.get(0).getFileName().isPresent(), is(true));
-                assertThat(parts.get(0).getFileName().get(), equalTo(part.getFileName().get()));
-
-                assertArrayEquals(IOUtils.readBytesFromStream(parts.get(0).getContent()), 
-                    IOUtils.readBytesFromStream(Files.newInputStream(file.toPath())));
+            try (Response ignored = client.postCollection(List.of(part), EntityPart.class)) {
+                String expected = "Content-Disposition: form-data; name=\"file\"; filename=\"java.jpg\"";
+                assertTrue(output.toString().contains(expected));
             }
         }
     }
@@ -151,5 +158,36 @@ public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
             str = str.substring(index + 2);
         }
         return str;
+    }
+
+    private void uploadImage(String path) throws URISyntaxException, IOException {
+        final File file = new File(getClass().getResource(path)
+                .toURI().getPath());
+        final String address = "http://localhost:" + PORT + "/bookstore/books/images";
+
+        final WebClient client = WebClient.create(address);
+        client.type(MediaType.MULTIPART_FORM_DATA).accept(MediaType.MULTIPART_FORM_DATA);
+
+        try (InputStream is = Files.newInputStream(file.toPath())) {
+            final EntityPart part = EntityPart
+                    .withFileName(file.getName())
+                    .content(is)
+                    .build();
+
+            try (Response response = client.postCollection(List.of(part), EntityPart.class)) {
+                assertThat(response.getStatus(), equalTo(200));
+
+                final List<EntityPart> parts = response.readEntity(new GenericType<>() { });
+
+                assertThat(parts, hasSize(1));
+                assertThat(parts.get(0), is(not(nullValue())));
+
+                assertThat(parts.get(0).getFileName().isPresent(), is(true));
+                assertThat(parts.get(0).getFileName().get(), equalTo(part.getFileName().get()));
+
+                assertArrayEquals(IOUtils.readBytesFromStream(parts.get(0).getContent()),
+                        IOUtils.readBytesFromStream(Files.newInputStream(file.toPath())));
+            }
+        }
     }
 }

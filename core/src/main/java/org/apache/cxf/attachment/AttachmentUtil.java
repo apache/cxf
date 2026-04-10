@@ -556,7 +556,7 @@ public final class AttachmentUtil {
             if (f.exists() && f.isFile()) {
                 file = f.getName();
             }
-            att.setHeader("Content-Disposition", "attachment;name=\"" + file + "\"");
+            att.setHeader("Content-Disposition", "attachment; name=\"" + file + "\"");
         }
         att.setXOP(isXop);
         return att;
