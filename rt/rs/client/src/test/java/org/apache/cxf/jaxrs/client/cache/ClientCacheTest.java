@@ -50,6 +50,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ClientCacheTest {
@@ -204,6 +205,25 @@ public class ClientCacheTest {
         }
     }
 
+    @Test
+    public void testGetNonCacheBook() {
+        try (CacheControlFeature feature = new CacheControlFeature()) {
+            final WebTarget base = ClientBuilder.newBuilder().register(feature).build().target(ADDRESS);
+            final Invocation.Builder cached =
+                    setAsLocal(base.request("text/xml")).header(HttpHeaders.CACHE_CONTROL, "public");
+            final Response r = cached.get();
+            assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
+            final Book b1 = r.readEntity(Book.class);
+            assertEquals("JNonCache", b1.getName());
+            assertNotNull(b1.getId());
+            waitABit();
+            final Response r2 = cached.get();
+            final Book b2 = r2.readEntity(Book.class);
+            assertNotEquals(b1, b2);
+            assertEquals(b1.getName(), b2.getName());
+        }
+    }
+
     private static Invocation.Builder setAsLocal(final Invocation.Builder client) {
         WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         return client;
@@ -232,6 +252,14 @@ public class ClientCacheTest {
             b.setId(System.currentTimeMillis());
             b.setName("JCache");
             return Response.ok(b).tag("123").cacheControl(CacheControl.valueOf("max-age=50000")).build();
+        }
+        @GET
+        @Produces("text/xml")
+        public Response getNonCacheBook() {
+            Book b = new Book();
+            b.setId(System.currentTimeMillis());
+            b.setName("JNonCache");
+            return Response.ok(b).tag("123").build();
         }
     }
     @XmlRootElement
