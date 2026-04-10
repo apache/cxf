@@ -69,9 +69,9 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>jdk24</id>
+            <id>jdk17</id>
             <activation>
-                <jdk>[24,)</jdk>
+                <jdk>[17,)</jdk>
             </activation>
             <build>
                 <plugins>
