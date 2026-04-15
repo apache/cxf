@@ -42,6 +42,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.bus.managers.PhaseManagerImpl;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
@@ -88,6 +89,8 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
     @Test
     public void testEncryptWithAgreementConcatKDFWithXECAndEDKeys() throws Exception {
         Assume.assumeTrue(getJDKVersion() >= 16);
+        //ed25519 isn't compliant in FIPS mode
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         testEncryptWithAgreementMethod("ed25519", "x25519",
                 WSS4JConstants.AGREEMENT_METHOD_X25519, WSS4JConstants.KEYDERIVATION_CONCATKDF);
     }
@@ -101,6 +104,8 @@ public class WSS4JInOutWithAttachmentsTest extends AbstractSecurityTest {
     @Test
     public void testEncryptWithAgreementHKDFWithXECAndEDKeys() throws Exception {
         Assume.assumeTrue(getJDKVersion() >= 16);
+        //XDH (X25519/X448) is not FIPS 140-2 approved,
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         testEncryptWithAgreementMethod("ed25519", "x25519",
                 WSS4JConstants.AGREEMENT_METHOD_X25519, WSS4JConstants.KEYDERIVATION_HKDF);
     }

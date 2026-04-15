@@ -32,6 +32,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -72,7 +73,9 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     public void testBinarySecurityToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = BinarySecurityTokenTest.class.getResource("client.xml");
+        URL busFile = BinarySecurityTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                                ? "client-fips.xml"
+                                                                    : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

@@ -49,6 +49,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -253,7 +254,9 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTimestampSignEncrypt() throws Exception {
         Bus b = new SpringBusFactory()
-            .createBus("org/apache/cxf/systest/ws/security/client.xml");
+            .createBus(JavaUtils.isFIPSEnabled()
+                       ? "org/apache/cxf/systest/ws/security/client-fips.xml"
+                           : "org/apache/cxf/systest/ws/security/client.xml");
         BusFactory.setDefaultBus(b);
         final jakarta.xml.ws.Service svc = jakarta.xml.ws.Service.create(
             WSDL_LOC,

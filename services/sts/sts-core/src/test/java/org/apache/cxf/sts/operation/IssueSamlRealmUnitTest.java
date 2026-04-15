@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 
 import jakarta.xml.bind.JAXBElement;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -538,7 +539,9 @@ public class IssueSamlRealmUnitTest {
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "x509.p12");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", JavaUtils.isFIPSEnabled()
+                       ? "x509-fips.p12"
+                           : "x509.p12");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.type", "pkcs12");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.private.password", "security");
 

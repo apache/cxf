@@ -24,6 +24,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class SamlTokenServer extends AbstractBusTestServerBase {
@@ -33,7 +34,9 @@ public class SamlTokenServer extends AbstractBusTestServerBase {
     }
 
     protected void run()  {
-        URL busFile = SamlTokenServer.class.getResource("server.xml");
+        URL busFile = SamlTokenServer.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "stax-server-fips.xml"
+                                                       : "stax-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);

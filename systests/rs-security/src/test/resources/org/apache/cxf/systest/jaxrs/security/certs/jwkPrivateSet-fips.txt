@@ -1,0 +1,43 @@
+{"keys":
+       [
+         {"kty":"RSA",
+          "n":"oahUIoWw0K0usKNuOR6H4wkf4oBUXHTxRvgb48E-BVvxkeDNjbC4he8rUWcJoZmds2h7M70imEVhRU5djINXtqllXI4DFqcI1DgjT9LewND8MW2Krf3Spsk_ZkoFnilakGygTwpZ3uesH-PFABNIUYpOiN15dsQRkgr0vEhxN92i2asbOenSZeyaxziK72UwxrrKoExv6kc5twXTq4h-QChLOln0_mtUZwfsRaMStPs6mS6XrgxnxbWhojf663tuEQueGC-FCMfra36C9knDFGzKsNa7LZK2djYgyD3JR_MB_4NUJW_TqOQtwHYbxevoJArm-L5StowjzGy-_bq6Gw",
+          "e":"AQAB",
+          "d":"kLdtIj6GbDks_ApCSTYQtelcNttlKiOyPzMrXHeI-yk1F7-kpDxY4-WY5NWV5KntaEeXS1j82E375xxhWMHXyvjYecPT9fpwR_M9gV8n9Hrh2anTpTD93Dt62ypW3yDsJzBnTnrYu1iwWRgBKrEYY46qAZIrA2xAwnm2X7uGR1hghkqDp0Vqj3kbSCz1XyfCs6_LehBwtxHIyh8Ripy40p24moOAbgxVw3rxT_vlt3UVe4WO3JkJOzlpUf-KTVI2Ptgm-dARxTEtE-id-4OJr0h-K-VFs3VSndVTIznSxfyrj8ILL6MG_Uv8YAu7VILSB3lOW085-4qE3DzgrTjgyQ",
+          "kid":"2011-04-29"},
+          
+         {"kty":"oct",
+          "alg":"A128KW",
+          "k":"GawgguFyGrWKav7AX4VKUg",
+          "kid":"AesWrapKey"},
+          
+          {"kty":"oct",
+          "alg":"A128KW",
+          "k":"GawgguFyGrWKav7AX4VKUg",
+          "kid":"AesWrapKey2"},
+          
+          {"kty":"oct",
+          "alg":"A128GCM",
+          "k":"GawgguFyGrWKav7AX4VKUg",
+          "kid":"AesGcmKey"},
+          
+          
+          {"kty":"oct",
+          "alg":"HS256",
+          "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
+          "kid":"HMACKey"},
+          
+          {"kty":"oct",
+           "alg":"HS512",
+           "k":"SFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC5IUzUxMlNlY3JldEtleVRvU2lnbkNvbnRlbnQuSFM1MTJTZWNyZXRLZXlUb1NpZ25Db250ZW50LkhTNTEyU2VjcmV0S2V5VG9TaWduQ29udGVudC4",
+           "kid":"HMAC512Key"},
+          
+          {"kty":"EC",
+          "crv":"P-256",
+          "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+          "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+          "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+          "use":"enc",
+          "kid":"ECKey"} 
+       ]
+     }

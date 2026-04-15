@@ -27,6 +27,7 @@ import jakarta.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -71,7 +72,10 @@ public class BasicAuthJAASTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = BasicAuthJAASTest.class.getResource("DoubleItBasicAuth.wsdl");
+        URL wsdl = BasicAuthJAASTest.class.getResource(
+                                                       JavaUtils.isFIPSEnabled()
+                                                       ? "DoubleItBasicAuth-fips.wsdl"
+                                                           : "DoubleItBasicAuth.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort");
         DoubleItPortType utPort =

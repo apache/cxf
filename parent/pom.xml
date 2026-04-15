@@ -505,7 +505,6 @@
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                             <org.apache.cxf.transport.http.async.usePolicy>ASYNC_ONLY</org.apache.cxf.transport.http.async.usePolicy>
                             <org.apache.cxf.transport.websocket.atmosphere.disabled>${org.apache.cxf.transport.websocket.atmosphere.disabled}</org.apache.cxf.transport.websocket.atmosphere.disabled>
-                            <org.apache.xml.security.securerandom.algorithm>SHA1PRNG</org.apache.xml.security.securerandom.algorithm>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -2059,7 +2058,17 @@
             <dependency>
                 <groupId>org.apache.wss4j</groupId>
                 <artifactId>wss4j-ws-security-common</artifactId>
-                <version>${cxf.jakarta.wss4j.version}</version>
+		<version>${cxf.jakarta.wss4j.version}</version>
+		<exclusions>
+                    <exclusion>
+                        <groupId>org.ehcache</groupId>
+                        <artifactId>ehcache</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -2358,6 +2367,10 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <argLine>${cxf.jacoco.argLine} ${cxf.surefire.fork.vmargs} -D${cxf.jaxb.context.class.property}=${cxf.jaxb.context.class}</argLine>
+                            <systemPropertyVariables>
+                                 <!-- https://github.com/bcgit/bc-java/issues/589  -->
+                                 <jdk.tls.namedGroups>secp256r1,secp384r1,secp521r1,sect283k1,sect283r1,sect409k1,sect409r1,sect571k1,sect571r1,secp256k1,ffdhe2048,ffdhe3072,ffdhe4096,ffdhe6144,ffdhe8192</jdk.tls.namedGroups>
+                            </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -2374,6 +2387,46 @@
                 <cxf.grizzly.version>4.0.2</cxf.grizzly.version>
                 <cxf.checkstyle.version>12.3.1</cxf.checkstyle.version>
             </properties>
+        </profile>
+        <profile>
+            <id>fips</id>
+            <activation>
+                <property>
+                    <name>fips.enabled</name>
+                </property>
+	    </activation>
+	    <dependencies>
+                <dependency>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bc-fips</artifactId>
+                    <version>2.1.2</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.xml.security.securerandom.algorithm>PKCS11</org.apache.xml.security.securerandom.algorithm>
+				<fips.enabled>true</fips.enabled>
+			    </systemPropertyVariables>
+                            <excludes>
+                                <!--fips: need to regenerate keys for systests/microprofile/client/weld tests which are out of CXF codebase-->
+                                <exclude>**/SslContextTest.java</exclude>
+                                <exclude>**/SslHostnameVerifierTest.java</exclude>
+                                <exclude>**/SslMutualTest.java</exclude>
+                                <exclude>**/SslTrustStoreTest.java</exclude>
+                                <!--fips: Kerberos are not supported on fips mode -->
+                                <exclude>**/JAXRSKerberosBookTest.java</exclude>
+                                <exclude>**/KerberosTokenTest.java</exclude>
+                                <exclude>**/SpnegoTokenTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.jose.jwa;
 
+import org.apache.cxf.helpers.JavaUtils;
+
+import org.junit.Assume;
 import org.junit.Test;
 
 public abstract class JwaDecryptRfcConformanceTest extends AbstractDecryptTest {
@@ -99,31 +102,43 @@ public abstract class JwaDecryptRfcConformanceTest extends AbstractDecryptTest {
 
     @Test
     public void testRsa15A128GcmCompact() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128gcm.compact.jwe");
     }
 
     @Test
     public void testRsa15A128GcmJsonFlattened() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128gcm.json.flattened.jwe");
     }
 
     @Test
     public void testRsa15A128GcmJson() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128gcm.json.jwe");
     }
 
     @Test
     public void testRsa15A128CbcJweCompact() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128cbc-hs256.compact.jwe");
     }
 
     @Test
     public void testRsa15A128CbcJweJsonFlattened() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128cbc-hs256.json.flattened.jwe");
     }
 
     @Test
     public void testRsa15A128CbcJweJson() throws Exception {
+        //RSA15 is not FIPS 140-2 approved
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         test("/jwe/rsa.2048.rsa1_5.a128cbc-hs256.json.jwe");
     }
 

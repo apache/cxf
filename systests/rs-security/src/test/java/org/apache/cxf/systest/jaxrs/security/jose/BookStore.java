@@ -29,6 +29,7 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -105,12 +106,16 @@ public class BookStore {
         JweJsonConsumer consumer = new JweJsonConsumer(jweJson);
         
         // Recipient 1
-        final String recipient1PropLoc = "org/apache/cxf/systest/jaxrs/security/jwejson1.properties";
+        final String recipient1PropLoc = JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/jaxrs/security/jwejson1-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/jwejson1.properties";
         final String recipient1Kid = "AesWrapKey";
         String recipient1DecryptedText = getRecipientText(consumer, recipient1PropLoc, recipient1Kid);
         
         // Recipient 2
-        final String recipient2PropLoc = "org/apache/cxf/systest/jaxrs/security/jwejson2.properties";
+        final String recipient2PropLoc = JavaUtils.isFIPSEnabled()
+            ? "org/apache/cxf/systest/jaxrs/security/jwejson2-fips.properties"
+                : "org/apache/cxf/systest/jaxrs/security/jwejson2.properties";
         final String recipient2Kid = "AesWrapKey2";
         String recipient2DecryptedText = getRecipientText(consumer, recipient2PropLoc, recipient2Kid);
         return recipient1DecryptedText + recipient2DecryptedText;

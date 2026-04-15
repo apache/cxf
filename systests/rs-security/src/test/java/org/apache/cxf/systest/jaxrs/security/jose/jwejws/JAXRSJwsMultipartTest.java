@@ -26,6 +26,7 @@ import java.util.List;
 import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsDetachedSignatureProvider;
@@ -131,7 +132,9 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     private BookStore createJwsBookStoreRSA(String address) throws Exception {
         JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, false, false);
         bean.getProperties(true).put("rs.security.signature.properties",
-            "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
+                                     JavaUtils.isFIPSEnabled() 
+                                     ? "org/apache/cxf/systest/jaxrs/security/alice.jwk-fips.properties"
+                                         : "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         return bean.create(BookStore.class);
     }
     private JAXRSClientFactoryBean createJAXRSClientFactoryBean(String address,

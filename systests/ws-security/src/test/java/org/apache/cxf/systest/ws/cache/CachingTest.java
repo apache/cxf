@@ -32,6 +32,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -113,7 +114,9 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = CachingTest.class.getResource("DoubleItCache.wsdl");
+        URL wsdl = CachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                 ? "DoubleItCache-fips.wsdl"
+                                                     : "DoubleItCache.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCacheSymmetricPort");
 
@@ -176,7 +179,9 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = CachingTest.class.getResource("DoubleItCache.wsdl");
+        URL wsdl = CachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                 ? "DoubleItCache-fips.wsdl"
+                                                     : "DoubleItCache.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCacheSymmetricPort");
 
@@ -240,7 +245,9 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = CachingTest.class.getResource("DoubleItCache.wsdl");
+        URL wsdl = CachingTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                 ? "DoubleItCache-fips.wsdl"
+                                                     : "DoubleItCache.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCachePerProxySymmetricPort");
 

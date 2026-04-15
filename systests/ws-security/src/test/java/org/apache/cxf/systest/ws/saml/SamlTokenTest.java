@@ -35,6 +35,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
@@ -113,13 +114,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1OverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
         DoubleItPortType saml1Port =
@@ -183,13 +188,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1Supporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1SupportingPort");
         DoubleItPortType saml1Port =
@@ -222,13 +231,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SupportingSelfSigned() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1SupportingPort");
         DoubleItPortType saml1Port =
@@ -271,13 +284,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1ElementOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
         DoubleItPortType saml1Port =
@@ -313,13 +330,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricPort");
         DoubleItPortType saml2Port =
@@ -366,13 +387,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricSoap12() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSoap12Port");
         DoubleItPortType saml2Port =
@@ -420,13 +445,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricSupporting() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSupportingPort");
         DoubleItPortType saml2Port =
@@ -457,13 +486,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetric() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricPort");
         DoubleItPortType saml2Port =
@@ -523,13 +556,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportPort");
         DoubleItPortType saml1Port =
@@ -558,13 +595,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml1SelfSignedOverTransportSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportSP11Port");
         DoubleItPortType saml1Port =
@@ -593,13 +634,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAsymmetricSamlInitiator() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorPort");
         DoubleItPortType saml2Port =
@@ -631,13 +676,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSamlInitiatorProtectTokensPort");
         DoubleItPortType saml2Port =
@@ -664,13 +713,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverSymmetricSignedElements() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2SymmetricSignedElementsPort");
         DoubleItPortType saml2Port =
@@ -699,13 +752,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
         DoubleItPortType saml2Port =
@@ -737,13 +794,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingPKOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
         DoubleItPortType saml2Port =
@@ -776,13 +837,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingOverTransportSP11() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportSP11Port");
         DoubleItPortType saml2Port =
@@ -814,13 +879,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricSignedEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricSignedEncryptedPort");
         DoubleItPortType saml2Port =
@@ -845,13 +914,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricSignedEncryptedEncryptBeforeSigning() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName =
             new QName(NAMESPACE, "DoubleItSaml2AsymmetricSignedEncryptedEncryptBeforeSigningPort");
@@ -880,13 +953,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2OverAsymmetricEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricEncryptedPort");
         DoubleItPortType saml2Port =
@@ -913,13 +990,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2EndorsingEncryptedOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingEncryptedTransportPort");
         DoubleItPortType saml2Port =
@@ -951,13 +1032,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testNoSamlToken() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
         DoubleItPortType saml2Port =
@@ -991,13 +1076,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2PEP() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2PEPPort");
         DoubleItPortType saml2Port =
@@ -1039,13 +1128,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2Replay() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
         DoubleItPortType saml2Port =
@@ -1104,13 +1197,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAudienceRestriction() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
         DoubleItPortType saml2Port =
@@ -1159,13 +1256,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testAudienceRestrictionServiceName() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
         DoubleItPortType saml2Port =
@@ -1198,13 +1299,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testDisableAudienceRestrictionValidation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort2");
         DoubleItPortType saml2Port =
@@ -1263,13 +1368,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     public void testSaml2DifferentAlgorithms() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SamlTokenTest.class.getResource("client.xml");
+        URL busFile = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled() 
+                                                      ? "client-fips.xml"
+                                                          : "client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        URL wsdl = SamlTokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                   ? "DoubleItSaml-fips.wsdl"
+                                                       : "DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
         DoubleItPortType saml2Port =
