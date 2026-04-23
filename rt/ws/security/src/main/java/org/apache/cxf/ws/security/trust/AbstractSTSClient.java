@@ -208,6 +208,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected List<Feature> features;
 
     protected TLSClientParameters tlsClientParameters;
+    protected boolean allowMexMetadataSchemaLocation;
 
     public AbstractSTSClient(Bus b) {
         bus = b;
@@ -247,6 +248,14 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     public void setTlsClientParameters(TLSClientParameters tlsClientParameters) {
         this.tlsClientParameters = tlsClientParameters;
+    }
+
+    public boolean isAllowMexMetadataSchemaLocation() {
+        return allowMexMetadataSchemaLocation;
+    }
+
+    public void setAllowMexMetadataSchemaLocation(boolean allowMexMetadataSchemaLocation) {
+        this.allowMexMetadataSchemaLocation = allowMexMetadataSchemaLocation;
     }
 
     /**
@@ -542,19 +551,16 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         definition =
                             bus.getExtension(WSDLManager.class).getDefinition((Element)s.getAny());
                     } else if ("http://www.w3.org/2001/XMLSchema".equals(s.getDialect())) {
-                        Element schemaElement = (Element)s.getAny();
-                        if (schemaElement ==  null) {
-                            String schemaLocation = s.getLocation();
-                            LOG.info("XSD schema location: " + schemaLocation);
-                            schemaElement = downloadSchema(schemaLocation);
+                        Element schemaElement = getSchemaElement(s);
+                        if (schemaElement != null) {
+                            QName schemaName =
+                                new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
+                            WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
+                            ExtensibilityElement
+                                exElement = wsdlManager.getExtensionRegistry().createExtension(Types.class, schemaName);
+                            ((Schema)exElement).setElement(schemaElement);
+                            schemas.add((Schema)exElement);
                         }
-                        QName schemaName =
-                            new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
-                        WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
-                        ExtensibilityElement
-                            exElement = wsdlManager.getExtensionRegistry().createExtension(Types.class, schemaName);
-                        ((Schema)exElement).setElement(schemaElement);
-                        schemas.add((Schema)exElement);
                     }
                 }
 
@@ -614,7 +620,22 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
     }
 
-    private Element downloadSchema(String schemaLocation) throws Exception {
+    protected Element getSchemaElement(MetadataSection s) throws Exception {
+        Element schemaElement = (Element)s.getAny();
+        if (schemaElement == null) {
+            if (!allowMexMetadataSchemaLocation) {
+                LOG.info("Loading a schema from WS-MEX MetadataSection Location is disabled by "
+                    + " default. Enable allowMexMetadataSchemaLocation to allow it.");
+            } else {
+                String schemaLocation = s.getLocation();
+                LOG.info("XSD schema location: " + schemaLocation);
+                schemaElement = downloadSchema(schemaLocation);
+            }
+        }
+        return schemaElement;
+    }
+
+    protected Element downloadSchema(String schemaLocation) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
