@@ -44,7 +44,7 @@ public class AbstractSTSClientTest {
         section.setLocation("http://example.org/schema.xsd");
 
         assertFalse(client.isAllowMexMetadataSchemaLocation());
-        assertTrue(client.getSchemaElement(section) == null);
+        assertTrue(client.getSchemaElement((Element)section.getAny(), section.getLocation()) == null);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class AbstractSTSClientTest {
 
         client.setAllowMexMetadataSchemaLocation(true);
 
-        Element schemaElement = client.getSchemaElement(section);
+        Element schemaElement = client.getSchemaElement((Element)section.getAny(), section.getLocation());
         assertEquals(1, client.getDownloadSchemaInvocations());
         assertEquals("http://example.org/schema.xsd", client.getLastDownloadedLocation());
         assertEquals(XMLConstants.W3C_XML_SCHEMA_NS_URI, schemaElement.getNamespaceURI());
@@ -73,7 +73,7 @@ public class AbstractSTSClientTest {
         Element inlineSchema = document.createElementNS(XMLConstants.W3C_XML_SCHEMA_NS_URI, "xsd:schema");
         section.setAny(inlineSchema);
 
-        Element schemaElement = client.getSchemaElement(section);
+        Element schemaElement = client.getSchemaElement((Element)section.getAny(), section.getLocation());
         assertSame(inlineSchema, schemaElement);
         assertEquals(0, client.getDownloadSchemaInvocations());
     }
