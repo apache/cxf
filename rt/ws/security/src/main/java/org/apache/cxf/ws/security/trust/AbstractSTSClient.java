@@ -549,7 +549,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
                         definition =
                             bus.getExtension(WSDLManager.class).getDefinition((Element)s.getAny());
                     } else if ("http://www.w3.org/2001/XMLSchema".equals(s.getDialect())) {
-                        Element schemaElement = getSchemaElement(s);
+                        Element schemaElement = getSchemaElement((Element)s.getAny(), s.getLocation());
                         if (schemaElement != null) {
                             QName schemaName =
                                 new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
@@ -618,14 +618,12 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         }
     }
 
-    protected Element getSchemaElement(MetadataSection s) throws Exception {
-        Element schemaElement = (Element)s.getAny();
+    protected Element getSchemaElement(Element schemaElement, String schemaLocation) throws Exception {
         if (schemaElement == null) {
             if (!allowMexMetadataSchemaLocation) {
                 LOG.info("Loading a schema from WS-MEX MetadataSection Location is disabled by "
                     + " default. Enable allowMexMetadataSchemaLocation to allow it.");
             } else {
-                String schemaLocation = s.getLocation();
                 LOG.info("XSD schema location: " + schemaLocation);
                 schemaElement = downloadSchema(schemaLocation);
             }
