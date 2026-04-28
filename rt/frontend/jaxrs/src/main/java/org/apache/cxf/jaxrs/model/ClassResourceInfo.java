@@ -62,6 +62,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private Set<String> nameBindings = Collections.emptySet();
     private ClassResourceInfo parent;
     private Set<String> injectedSubInstances = new HashSet<>();
+    private ApplicationInfo applicationInfo;
+
     public ClassResourceInfo(ClassResourceInfo cri) {
         super(cri.getBus());
         if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
@@ -361,5 +363,13 @@ public class ClassResourceInfo extends BeanResourceInfo {
                 InjectionUtils.injectContexts(realResourceObject, this, inMessage);
             }
         }
+    }
+    
+    public ApplicationInfo getApplicationInfo() {
+        return applicationInfo;
+    }
+    
+    public void setApplicationInfo(ApplicationInfo applicationInfo) {
+        this.applicationInfo = applicationInfo;
     }
 }

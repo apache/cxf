@@ -104,6 +104,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             Set<String> clsNameBindings = new LinkedHashSet<>(appNameBindings);
             clsNameBindings.addAll(AnnotationUtils.getNameBindings(bus, cri.getServiceClass()));
             cri.setNameBindings(clsNameBindings);
+            cri.setApplicationInfo(provider);
         }
     }
 

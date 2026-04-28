@@ -22,12 +22,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class ApplicationInfo extends ProviderInfo<Application> {
     private Map<String, Object> overridingProps = Collections.emptyMap();
+    private final ApplicationPath applicationPath;
+    
     public ApplicationInfo(Application provider, Bus bus) {
         this(provider, null, bus);
     }
@@ -35,6 +39,7 @@ public class ApplicationInfo extends ProviderInfo<Application> {
                         Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus) {
         super(provider, constructorProxies, bus, true);
+        this.applicationPath = ResourceUtils.locateApplicationPath(provider.getClass());
     }
 
     public Map<String, Object> getProperties() {
@@ -46,7 +51,12 @@ public class ApplicationInfo extends ProviderInfo<Application> {
         props.putAll(overridingProps);
         return props;
     }
+
     public void setOverridingProps(Map<String, Object> overridingProps) {
         this.overridingProps = overridingProps;
+    }
+
+    public ApplicationPath getApplicationPath() {
+        return applicationPath;
     }
 }

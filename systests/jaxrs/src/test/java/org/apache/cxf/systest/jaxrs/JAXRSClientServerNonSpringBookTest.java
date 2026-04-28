@@ -210,7 +210,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         WebClient wc = WebClient.create("http://localhost:" + PORT
                                         + "/application6/the%20books2/bookstore2/book%20template/abc");
         assertThat(wc.accept("*/*").get(String.class),
-            equalTo("/bookstore2/book%20template/{name:[a-zA-Z][a-zA-Z_0-9]*}"));
+            equalTo("/the%20books2/bookstore2/book%20template/{name:[a-zA-Z][a-zA-Z_0-9]*}"));
     }
 
     @SafeVarargs

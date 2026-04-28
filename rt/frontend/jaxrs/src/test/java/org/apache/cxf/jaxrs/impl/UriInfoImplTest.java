@@ -24,12 +24,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -577,9 +580,14 @@ public class UriInfoImplTest {
 
     @Test
     public void testGetMatchedResourceTemplateIncludesApplicationPathAndTemplateVariables() throws Exception {
+        @ApplicationPath("/app") 
+        class App extends Application {
+        }
+
         Message m = mockMessage("http://localhost:8080/app", "/foo/one/abc");
         OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
         ClassResourceInfo cri = getCri(RootResource.class, true);
+        cri.setApplicationInfo(new ApplicationInfo(new App(), null));
         OperationResourceInfo ori = getOri(cri, "getTemplate");
 
         MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
@@ -587,7 +595,7 @@ public class UriInfoImplTest {
         m.put(OperationResourceInfoStack.class, oriStack);
 
         UriInfoImpl u = new UriInfoImpl(m);
-        assertEquals("/foo/one/{name:[a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
+        assertEquals("/app/foo/one/{name:[a-zA-Z][a-zA-Z_0-9]*}", u.getMatchedResourceTemplate());
     }
 
     @Test
@@ -607,10 +615,15 @@ public class UriInfoImplTest {
 
     @Test
     public void testGetMatchedResourceTemplateIgnoresPathBeforeApplicationPath() throws Exception {
+        @ApplicationPath("/service") 
+        class App extends Application {
+        }
+
         Message m = mockMessage("http://localhost:8080/context/service", "/foo/bar");
 
         OperationResourceInfoStack oriStack = new OperationResourceInfoStack();
         ClassResourceInfo cri = getCri(RootResource.class, true);
+        cri.setApplicationInfo(new ApplicationInfo(new App(), null));
         OperationResourceInfo ori = getOri(cri, "getSubMethod");
 
         MethodInvocationInfo miInfo = new MethodInvocationInfo(ori, RootResource.class, new ArrayList<String>());
@@ -618,7 +631,7 @@ public class UriInfoImplTest {
         m.put(OperationResourceInfoStack.class, oriStack);
 
         UriInfoImpl u = new UriInfoImpl(m);
-        assertEquals("/foo/bar", u.getMatchedResourceTemplate());
+        assertEquals("/service/foo/bar", u.getMatchedResourceTemplate());
     }
 
     @Test

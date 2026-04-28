@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
@@ -40,6 +42,8 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+
+import io.micrometer.common.util.StringUtils;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -246,10 +250,15 @@ public class UriInfoImpl implements UriInfo {
     @Override
     public String getMatchedResourceTemplate() {
         if (stack != null) {
+            ApplicationPath applicationPath = null;
             final List<URITemplate> templates = new LinkedList<>();
             for (MethodInvocationInfo invocation : stack) {
-                OperationResourceInfo ori = invocation.getMethodInfo();
-                final URITemplate classUriTemplate = ori.getClassResourceInfo().getURITemplate();
+                final OperationResourceInfo ori = invocation.getMethodInfo();
+                final ClassResourceInfo cri = ori.getClassResourceInfo();
+                if (cri.getApplicationInfo() != null && applicationPath == null) {
+                    applicationPath = cri.getApplicationInfo().getApplicationPath();
+                }
+                final URITemplate classUriTemplate = cri.getURITemplate();
                 if (classUriTemplate != null) {
                     templates.add(classUriTemplate);
                 }
@@ -257,9 +266,17 @@ public class UriInfoImpl implements UriInfo {
             }
             
             if (!templates.isEmpty()) {
-                UriBuilder builder = UriBuilder.fromPath(templates.get(0).getValue());
-                for (int i = 1; i < templates.size(); ++i) {
-                    builder = builder.path(templates.get(i).getValue());
+                UriBuilder builder = null;
+                if (applicationPath != null && !StringUtils.isBlank(applicationPath.value())) {
+                    builder = UriBuilder.fromPath(applicationPath.value());
+                    for (int i = 0; i < templates.size(); ++i) {
+                        builder = builder.path(templates.get(i).getValue());
+                    }
+                } else {
+                    builder = UriBuilder.fromPath(templates.get(0).getValue());
+                    for (int i = 1; i < templates.size(); ++i) {
+                        builder = builder.path(templates.get(i).getValue());
+                    }
                 }
                 return builder.toTemplate();
             }

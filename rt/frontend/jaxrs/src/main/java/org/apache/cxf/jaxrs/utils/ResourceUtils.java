@@ -1033,7 +1033,7 @@ public final class ResourceUtils {
 
     public static ApplicationPath locateApplicationPath(Class<?> appClass) {
         ApplicationPath appPath = appClass.getAnnotation(ApplicationPath.class);
-        if (appPath == null && appClass.getSuperclass() != Application.class) {
+        if (appPath == null && appClass.getSuperclass() != null && appClass.getSuperclass() != Application.class) {
             return locateApplicationPath(appClass.getSuperclass());
         }
         return appPath;
