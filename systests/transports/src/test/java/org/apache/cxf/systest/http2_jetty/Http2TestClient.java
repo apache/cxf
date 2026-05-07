@@ -50,8 +50,9 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 public class Http2TestClient implements AutoCloseable {
     private final HTTP2Client client;
     private final SslContextFactory.Client sslContextFactory;
+    private final int port;
     
-    public Http2TestClient(boolean secure) throws Exception {
+    public Http2TestClient(boolean secure, int port) throws Exception {
         client = new HTTP2Client();
         if (secure) {
             sslContextFactory = new SslContextFactory.Client(true);
@@ -60,6 +61,7 @@ public class Http2TestClient implements AutoCloseable {
             sslContextFactory = null;
         }
         client.start();
+        this.port = port;
     }
     
     public static class ClientResponse {
@@ -140,7 +142,7 @@ public class Http2TestClient implements AutoCloseable {
 
         final HttpFields.Mutable requestFields = HttpFields.build();
         requestFields.add(HttpHeader.ACCEPT, accept);
-        requestFields.add(HttpHeader.HOST, "localhost");
+        requestFields.add(HttpHeader.HOST, "localhost:" + port);
 
         final MetaData.Request request = new MetaData.Request(method, HttpURI.build(address + path), 
             version, requestFields);
