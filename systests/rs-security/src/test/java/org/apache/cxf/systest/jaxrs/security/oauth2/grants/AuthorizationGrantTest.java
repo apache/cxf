@@ -129,6 +129,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client);
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
@@ -136,6 +137,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -168,6 +170,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         String location = OAuth2TestUtils.getLocation(client, authzData, null);
         String code =  OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
@@ -175,6 +178,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -193,6 +197,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client);
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
@@ -217,6 +222,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -235,6 +241,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
@@ -261,6 +268,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
         assertEquals("read_balance", accessToken.getApprovedScope());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -280,6 +288,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
@@ -305,6 +314,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
 //        assertEquals("read_balance", accessToken.getApprovedScope());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -323,6 +333,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
@@ -330,6 +341,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
     }
 
     @org.junit.Test
@@ -346,6 +358,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         String code = OAuth2TestUtils.getAuthorizationCode(client, "read_balance", "consumer-id",
                                                            null, state);
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, "consumer-id", "this-is-a-secret", null);
@@ -353,6 +366,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
     }
 
     @org.junit.Test
@@ -367,6 +381,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         // Get Authorization Code
         String code = OAuth2TestUtils.getAuthorizationCode(client, null, "consumer-id-aud");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(address, "consumer-id-aud", "this-is-a-secret", null);
@@ -386,6 +401,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code,
                                                                 "consumer-id-aud", audience);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
     }
 
     @org.junit.Test
@@ -417,10 +433,15 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         form.param("oauthDecision", "allow");
 
         Response response = client.post(form);
-
-        String location = response.getHeaderString("Location");
+        String location;
+        try {
+            location = response.getHeaderString("Location");
+        } finally {
+            response.close();
+        }
         String accessToken = OAuth2TestUtils.getSubstring(location, "access_token");
         assertNotNull(accessToken);
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken);
@@ -445,6 +466,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -467,6 +489,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -494,6 +517,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());
@@ -522,6 +546,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         ClientAccessToken accessToken = client.post(form, ClientAccessToken.class);
         assertNotNull(accessToken.getTokenKey());
         assertNotNull(accessToken.getRefreshToken());
+        client.close();
 
         if (isAccessTokenInJWTFormat()) {
             validateAccessToken(accessToken.getTokenKey());

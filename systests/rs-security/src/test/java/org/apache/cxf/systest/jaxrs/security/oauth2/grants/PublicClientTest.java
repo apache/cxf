@@ -112,6 +112,8 @@ public class PublicClientTest extends AbstractClientServerTestBase {
             fail("Failure expected on a missing (registered) redirectURI");
         } catch (Exception ex) {
             // expected
+        } finally {
+            client.close();
         }
     }
 
@@ -167,12 +169,14 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         String location = OAuth2TestUtils.getLocation(client, parameters);
         String code = OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(tokenServiceAddress, busFile.toString());
         ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code, "consumer-id", null, codeVerifier);
         assertNotNull(accessToken.getTokenKey());
+        client.close();
     }
 
     private void testPKCEMissingVerifier(CodeVerifierTransformer transformer) {
@@ -197,6 +201,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         String location = OAuth2TestUtils.getLocation(client, parameters);
         String code = OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(tokenServiceAddress, busFile.toString());
@@ -205,6 +210,8 @@ public class PublicClientTest extends AbstractClientServerTestBase {
             fail("Failure expected on a missing verifier");
         } catch (OAuthServiceException ex) {
             assertFalse(ex.getError().getError().isEmpty());
+        } finally {
+            client.close();
         }
     }
 
@@ -230,6 +237,7 @@ public class PublicClientTest extends AbstractClientServerTestBase {
         String location = OAuth2TestUtils.getLocation(client, parameters);
         String code = OAuth2TestUtils.getSubstring(location, "code");
         assertNotNull(code);
+        client.close();
 
         // Now get the access token
         client = WebClient.create(tokenServiceAddress, busFile.toString());
@@ -240,6 +248,8 @@ public class PublicClientTest extends AbstractClientServerTestBase {
             fail("Failure expected on a different verifier");
         } catch (OAuthServiceException ex) {
             assertFalse(ex.getError().getError().isEmpty());
+        } finally {
+            client.close();
         }
     }
 

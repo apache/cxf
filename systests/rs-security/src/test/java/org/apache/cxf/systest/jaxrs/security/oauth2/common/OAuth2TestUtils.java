@@ -125,8 +125,12 @@ public final class OAuth2TestUtils {
 
         client.path(parameters.getPath());
         Response response = client.get();
-
-        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+        OAuthAuthorizationData authzData;
+        try {
+            authzData = response.readEntity(OAuthAuthorizationData.class);
+        } finally {
+            response.close();
+        }
         return getLocation(client, authzData, parameters.getState());
     }
 
@@ -159,7 +163,12 @@ public final class OAuth2TestUtils {
         form.param("oauthDecision", "allow");
 
         Response response = client.post(form);
-        String location = response.getHeaderString("Location");
+        String location;
+        try {
+            location = response.getHeaderString("Location");
+        } finally {
+            response.close();
+        }
         if (state != null) {
             Assert.assertTrue(location.contains("state=" + state));
         }
