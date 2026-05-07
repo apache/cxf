@@ -66,6 +66,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasAttribute.hasAttribute;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -247,9 +248,8 @@ public class JaxwsOpenTelemetryTracingTest extends AbstractClientServerTestBase 
             }
 
             // Await till flush happens, usually every second
-            await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 4);
+            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(otelRule.getSpans(), hasSize(4)));
 
-            assertThat(otelRule.getSpans().size(), equalTo(4));
             assertThat(otelRule.getSpans().get(3).getName(), equalTo("test span"));
             assertThat(otelRule.getSpans().get(3).getParentSpanContext().isValid(), equalTo(false));
         }
@@ -331,7 +331,7 @@ public class JaxwsOpenTelemetryTracingTest extends AbstractClientServerTestBase 
         service.orderBooks();
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(() -> otelRule.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(otelRule.getSpans(), hasSize(2)));
 
         assertThat(otelRule.getSpans().get(0).getName(), equalTo("POST /BookStore"));
         assertThat(otelRule.getSpans().get(1).getName(),
