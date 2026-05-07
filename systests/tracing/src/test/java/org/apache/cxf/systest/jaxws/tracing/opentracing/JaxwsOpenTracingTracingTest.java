@@ -57,6 +57,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.IsTagContaining.hasItem;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -178,9 +179,8 @@ public class JaxwsOpenTracingTracingTest extends AbstractClientServerTestBase {
         }
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(()-> REPORTER.getSpans().size() == 4);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(REPORTER.getSpans(), hasSize(4)));
 
-        assertThat(REPORTER.getSpans().size(), equalTo(4));
         assertThat(REPORTER.getSpans().get(3).getOperationName(), equalTo("test span"));
         assertThat(REPORTER.getSpans().get(3).getReferences(), empty());
     }
@@ -234,7 +234,7 @@ public class JaxwsOpenTracingTracingTest extends AbstractClientServerTestBase {
         service.orderBooks();
 
         // Await till flush happens, usually every second
-        await().atMost(Duration.ofSeconds(5L)).until(() -> REPORTER.getSpans().size() == 2);
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(REPORTER.getSpans(), hasSize(2)));
 
         assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("POST /BookStore"));
         assertThat(REPORTER.getSpans().get(1).getOperationName(),

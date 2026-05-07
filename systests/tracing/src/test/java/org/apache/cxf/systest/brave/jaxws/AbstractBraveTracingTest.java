@@ -45,6 +45,7 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
 import org.junit.Test;
 
+import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SAMPLED_NAME;
 import static org.apache.cxf.systest.brave.BraveTestSupport.SPAN_ID_NAME;
@@ -204,7 +205,8 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
             service.orderBooks();
     
             // Await till flush happens, usually every second
-            await().atMost(Duration.ofSeconds(5L)).until(() -> TestSpanHandler.getAllSpans().size() == 2);
+            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() ->
+                assertThat(TestSpanHandler.getAllSpans(), hasSize(2)));
 
             assertThat(TestSpanHandler.getAllSpans().get(0).name(), equalTo("POST /BookStore"));
             assertThat(TestSpanHandler.getAllSpans().get(1).name(),
