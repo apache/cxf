@@ -22,7 +22,8 @@ package org.apache.cxf.rs.security.jose.common;
 public enum JoseType {
     JOSE(JoseConstants.TYPE_JOSE),
     JOSE_JSON(JoseConstants.TYPE_JOSE_JSON),
-    JWT(JoseConstants.TYPE_JWT);
+    JWT(JoseConstants.TYPE_JWT),
+    AT_JWT(JoseConstants.TYPE_AT_JWT);
 
     private final String type;
     JoseType(String type) {
@@ -33,6 +34,8 @@ public enum JoseType {
             return null;
         } else if (JoseConstants.TYPE_JOSE_JSON.equals(type)) {
             return JOSE_JSON;
+        } else if (JoseConstants.TYPE_AT_JWT.equals(type)) {
+            return AT_JWT;
         } else {
             return valueOf(type);
         }

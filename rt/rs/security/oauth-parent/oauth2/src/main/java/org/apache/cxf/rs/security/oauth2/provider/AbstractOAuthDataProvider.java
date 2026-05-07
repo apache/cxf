@@ -27,6 +27,7 @@ import java.util.Map;
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -669,7 +670,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         // It will JWS-sign (default) and/or JWE-encrypt
         OAuthJoseJwtProducer processor =
             getJwtAccessTokenProducer() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenProducer();
-        return processor.processJwt(new JwtToken(jwtCliams));
+        JwtToken jwt = new JwtToken(jwtCliams);
+        // RFC 9068 Section 2.1: JWT access tokens MUST set typ to "at+jwt"
+        jwt.getJwsHeaders().setType(JoseType.AT_JWT);
+        jwt.getJweHeaders().setType(JoseType.AT_JWT);
+        return processor.processJwt(jwt);
     }
 
     public Map<String, String> getJwtAccessTokenClaimMap() {
