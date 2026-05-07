@@ -24,12 +24,18 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.UUID;
 
 import javax.naming.NamingException;
 
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.xkms.handlers.Applications;
+import org.apache.cxf.xkms.handlers.XKMSConstants;
+import org.apache.cxf.xkms.model.xkms.LocateRequestType;
+import org.apache.cxf.xkms.model.xkms.QueryKeyBindingType;
+import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
+import org.apache.cxf.xkms.x509.handlers.X509Locator;
 import org.apache.cxf.xkms.x509.repo.CertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapCertificateRepo;
 import org.apache.cxf.xkms.x509.repo.ldap.LdapSchemaConfig;
@@ -61,6 +67,8 @@ public class LDAPCertificateRepoTest {
     private static final String ROOT_DN = "dc=example,dc=com";
     private static final String EXPECTED_SUBJECT_DN2 = "cn=newuser,ou=users";
     private static final String EXPECTED_SERVICE_URI = "http://myservice.apache.org/MyServiceName";
+    private static final String LOCATOR_SERVICE_URI = "http://x509locator.test/MyServiceName";
+    private static final String LOCATOR_ENDPOINT_URI = "http://x509locator.test/endpoint";
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -132,6 +140,213 @@ public class LDAPCertificateRepoTest {
         // Search by UID
         foundCert = persistenceManager.findByServiceName(cert.getSubjectX500Principal().getName());
         assertNotNull(foundCert);
+    }
+
+    @Test
+    public void testX509LocatorFindBySubjectDn() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+        X509Locator locator = new X509Locator(persistenceManager);
+
+        LocateRequestType request = createLocateRequest(Applications.PKIX, EXPECTED_SUBJECT_DN);
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNotNull(result);
+        assertNotNull(result.getKeyInfo());
+    }
+
+    @Test
+    public void testX509LocatorFindBySubjectDnLDAPInjection() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+        X509Locator locator = new X509Locator(persistenceManager);
+
+        LocateRequestType request = createLocateRequest(Applications.PKIX, "cn=*");
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testX509LocatorReturnsNullForUnknownSubjectDn() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+        X509Locator locator = new X509Locator(persistenceManager);
+
+        LocateRequestType request = createLocateRequest(Applications.PKIX, "cn=nobody,ou=users");
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testX509LocatorFindByServiceName() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert under a service name first
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.SERVICE_NAME.getUri());
+        key.setIdentifier(LOCATOR_SERVICE_URI);
+        persistenceManager.saveCertificate(cert, key);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createLocateRequest(Applications.SERVICE_NAME, LOCATOR_SERVICE_URI);
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNotNull(result);
+        assertNotNull(result.getKeyInfo());
+    }
+
+    @Test
+    public void testX509LocatorFindByServiceNameLDAPInjection() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert under a service name first
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.SERVICE_NAME.getUri());
+        // Ensure this test can be rerun in the same JVM without DN collisions.
+        key.setIdentifier(LOCATOR_SERVICE_URI + "/" + UUID.randomUUID());
+        persistenceManager.saveCertificate(cert, key);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createLocateRequest(Applications.SERVICE_NAME, "cn=*");
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testX509LocatorFindByEndpoint() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert with a service endpoint attribute first
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.SERVICE_ENDPOINT.getUri());
+        String identifier = LOCATOR_ENDPOINT_URI + UUID.randomUUID();
+        key.setIdentifier(identifier);
+        persistenceManager.saveCertificate(cert, key);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createLocateRequest(Applications.SERVICE_ENDPOINT, identifier);
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNotNull(result);
+        assertNotNull(result.getKeyInfo());
+    }
+
+    @Test
+    public void testX509LocatorFindByEndpointLDAPInjection() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert with a service endpoint attribute first
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.SERVICE_ENDPOINT.getUri());
+        String identifier = LOCATOR_ENDPOINT_URI + UUID.randomUUID();
+        key.setIdentifier(identifier);
+        persistenceManager.saveCertificate(cert, key);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createLocateRequest(Applications.SERVICE_ENDPOINT, "*");
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testX509LocatorFindByIssuerSerial() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert so its issuer/serial attributes are written to LDAP
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.PKIX.getUri());
+        key.setIdentifier("cn=issuerserialtest,ou=users");
+        persistenceManager.saveCertificate(cert, key);
+
+        String issuer = cert.getIssuerX500Principal().getName();
+        String serial = cert.getSerialNumber().toString(16);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createIssuerSerialLocateRequest(issuer, serial);
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNotNull(result);
+        assertNotNull(result.getKeyInfo());
+    }
+
+    @Test
+    public void testX509LocatorFindByIssuerSerialLDAPInjection() throws Exception {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+
+        // Save a cert so its issuer/serial attributes are written to LDAP
+        URL url = this.getClass().getResource("cert1.cer");
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) factory.generateCertificate(url.openStream());
+        UseKeyWithType key = new UseKeyWithType();
+        key.setApplication(Applications.PKIX.getUri());
+        // Ensure this test does not collide with the non-injection issuer/serial test entry.
+        key.setIdentifier("cn=issuerserialtest-" + UUID.randomUUID() + ",ou=users");
+        persistenceManager.saveCertificate(cert, key);
+
+        String serial = cert.getSerialNumber().toString(16);
+
+        X509Locator locator = new X509Locator(persistenceManager);
+        LocateRequestType request = createIssuerSerialLocateRequest("*", serial);
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+    }
+
+    private LocateRequestType createIssuerSerialLocateRequest(String issuer, String serial) {
+        org.apache.cxf.xkms.model.xkms.ObjectFactory xkmsOf =
+            new org.apache.cxf.xkms.model.xkms.ObjectFactory();
+
+        UseKeyWithType issuerKey = xkmsOf.createUseKeyWithType();
+        issuerKey.setApplication(Applications.ISSUER.getUri());
+        issuerKey.setIdentifier(issuer);
+
+        UseKeyWithType serialKey = xkmsOf.createUseKeyWithType();
+        serialKey.setApplication(Applications.SERIAL.getUri());
+        serialKey.setIdentifier(serial);
+
+        QueryKeyBindingType queryKeyBinding = xkmsOf.createQueryKeyBindingType();
+        queryKeyBinding.getUseKeyWith().add(issuerKey);
+        queryKeyBinding.getUseKeyWith().add(serialKey);
+
+        LocateRequestType request = xkmsOf.createLocateRequestType();
+        request.setQueryKeyBinding(queryKeyBinding);
+        request.setService(XKMSConstants.XKMS_ENDPOINT_NAME);
+        request.setId(UUID.randomUUID().toString());
+        return request;
+    }
+
+    private LocateRequestType createLocateRequest(Applications application, String identifier) {
+        org.apache.cxf.xkms.model.xkms.ObjectFactory xkmsOf =
+            new org.apache.cxf.xkms.model.xkms.ObjectFactory();
+
+        UseKeyWithType useKeyWithType = xkmsOf.createUseKeyWithType();
+        useKeyWithType.setApplication(application.getUri());
+        useKeyWithType.setIdentifier(identifier);
+
+        QueryKeyBindingType queryKeyBinding = xkmsOf.createQueryKeyBindingType();
+        queryKeyBinding.getUseKeyWith().add(useKeyWithType);
+
+        LocateRequestType request = xkmsOf.createLocateRequestType();
+        request.setQueryKeyBinding(queryKeyBinding);
+        request.setService(XKMSConstants.XKMS_ENDPOINT_NAME);
+        request.setId(UUID.randomUUID().toString());
+        return request;
     }
 
     private CertificateRepo createLdapCertificateRepo() throws CertificateException {
