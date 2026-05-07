@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 abstract class AbstractJettyClientServerHttp2Test extends AbstractBusClientServerTestBase {
     @Test
     public void testBookNotFoundWithHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
+        final Http2TestClient client = new Http2TestClient(isSecure(), getPort());
         
         final ClientResponse response = client
             .request(getAddress())
@@ -53,7 +53,7 @@ abstract class AbstractJettyClientServerHttp2Test extends AbstractBusClientServe
 
     @Test
     public void testBookWithHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
+        final Http2TestClient client = new Http2TestClient(isSecure(), getPort());
         
         final ClientResponse response = client
             .request(getAddress())
@@ -69,7 +69,7 @@ abstract class AbstractJettyClientServerHttp2Test extends AbstractBusClientServe
 
     @Test
     public void testGetBookStreamHttp2() throws Exception {
-        final Http2TestClient client = new Http2TestClient(isSecure());
+        final Http2TestClient client = new Http2TestClient(isSecure(), getPort());
         
         final ClientResponse response = client
             .request(getAddress())
@@ -142,6 +142,7 @@ abstract class AbstractJettyClientServerHttp2Test extends AbstractBusClientServe
 
     protected abstract String getAddress();
     protected abstract String getContext();
+    protected abstract int getPort();
 
     protected boolean isSecure() {
         return getAddress().startsWith("https");
