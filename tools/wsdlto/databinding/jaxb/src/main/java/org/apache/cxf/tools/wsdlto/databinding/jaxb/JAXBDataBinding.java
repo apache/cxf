@@ -72,6 +72,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.CodeWriter;
+import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -126,6 +127,8 @@ import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
+import org.apache.ws.commons.schema.XmlSchemaType;
+
 
 public class JAXBDataBinding implements DataBindingProfile {
     static final String XJCVERSION;
@@ -833,6 +836,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
 
             JCodeModel jcodeModel = schem2JavaJaxbModel.generateCode(null, null);
+            fixXmlTypeNamespacesForSharedPackages(schem2JavaJaxbModel, jcodeModel);
 
             if (!isSuppressCodeGen()) {
                 jcodeModel.build(fileCodeWriter);
@@ -848,6 +852,90 @@ public class JAXBDataBinding implements DataBindingProfile {
         } catch (IOException e) {
             Message msg = new Message("FAIL_TO_GENERATE_TYPES", LOG);
             throw new ToolException(msg, e);
+        }
+    }
+
+
+    private void fixXmlTypeNamespacesForSharedPackages(S2JJAXBModel model, JCodeModel codeModel) {
+        Map<String, Set<String>> packageToNamespaces = new HashMap<>();
+        for (Map.Entry<String, String> entry : context.getNamespacePackageMap().entrySet()) {
+            packageToNamespaces.computeIfAbsent(entry.getValue(), k -> new HashSet<>()).add(entry.getKey());
+        }
+
+        Set<String> sharedPackageNamespaces = new HashSet<>();
+        for (Set<String> namespaces : packageToNamespaces.values()) {
+            if (namespaces.size() > 1) {
+                sharedPackageNamespaces.addAll(namespaces);
+            }
+        }
+        if (sharedPackageNamespaces.isEmpty()) {
+            return;
+        }
+
+        SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
+        if (schemas == null) {
+            return;
+        }
+
+        Map<String, String> classToNamespace = new HashMap<>();
+        for (XmlSchema schema : schemas.getXmlSchemas()) {
+            String namespace = schema.getTargetNamespace();
+            if (StringUtils.isEmpty(namespace) || !sharedPackageNamespaces.contains(namespace)) {
+                continue;
+            }
+            for (QName typeName : schema.getSchemaTypes().keySet()) {
+                XmlSchemaType schemaType = schema.getTypeByName(typeName);
+                if (schemaType == null) {
+                    continue;
+                }
+                TypeAndAnnotation type = model.getJavaType(typeName);
+                if (type != null && type.getTypeClass() instanceof JDefinedClass) {
+                    JDefinedClass cls = (JDefinedClass)type.getTypeClass();
+                    classToNamespace.put(cls.fullName(), namespace);
+                }
+            }
+        }
+
+        for (Map.Entry<String, String> entry : classToNamespace.entrySet()) {
+            JDefinedClass cls = codeModel._getClass(entry.getKey());
+            if (cls == null) {
+                continue;
+            }
+            JAnnotationUse xmlType = getAnnotation(cls, "jakarta.xml.bind.annotation.XmlType");
+            if (xmlType == null) {
+                xmlType = getAnnotation(cls, "javax.xml.bind.annotation.XmlType");
+            }
+            if (xmlType != null && !hasAnnotationMember(xmlType, "namespace")) {
+                xmlType.param("namespace", entry.getValue());
+            }
+        }
+    }
+
+    private JAnnotationUse getAnnotation(JDefinedClass cls, String annotationClassName) {
+        for (JAnnotationUse annotation : cls.annotations()) {
+            if (annotation.getAnnotationClass().fullName().equals(annotationClassName)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+
+    private boolean hasAnnotationMember(JAnnotationUse annotation, String name) {
+        try {
+            return annotation.getAnnotationMembers().containsKey(name);
+        } catch (NoSuchMethodError ex) {
+            return hasAnnotationMemberUsingReflection(annotation, name);
+        }
+    }
+
+    private boolean hasAnnotationMemberUsingReflection(JAnnotationUse annotation, String name) {
+        try {
+            Field f = annotation.getClass().getDeclaredField("memberValues");
+            ReflectionUtil.setAccessible(f);
+            Map<?, ?> map = (Map<?, ?>)f.get(annotation);
+            return map.containsKey(name);
+        } catch (IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+            return false;
         }
     }
 
