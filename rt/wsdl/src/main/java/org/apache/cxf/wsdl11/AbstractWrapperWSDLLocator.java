@@ -21,21 +21,14 @@ package org.apache.cxf.wsdl11;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import javax.wsdl.xml.WSDLLocator;
 
 import org.xml.sax.InputSource;
 
-public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
-    private static final List<String> ALLOWED_SCHEMES;
+import org.apache.cxf.resource.URIResolver;
 
-    static {
-        List<String> schemes = Arrays.asList("file", "http", "https", "classpath", "jar");
-        ALLOWED_SCHEMES = Collections.unmodifiableList(schemes);
-    }
+public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
 
     protected WSDLLocator parent;
     String wsdlUrl;
@@ -98,7 +91,7 @@ public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
         // Do a check on the scheme to see if it's anything that could be a security risk
         try {
             URI url = new URI(importLocation);
-            if (!(url.getScheme() == null || ALLOWED_SCHEMES.contains(url.getScheme()))) {
+            if (!(url.getScheme() == null || URIResolver.getAllowedSchemes().contains(url.getScheme()))) {
                 throw new IllegalArgumentException("The " + url.getScheme() + " URI scheme is not allowed");
             }
         } catch (URISyntaxException e) {
