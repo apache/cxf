@@ -902,9 +902,6 @@ public class JAXBDataBinding implements DataBindingProfile {
                 continue;
             }
             JAnnotationUse xmlType = getAnnotation(cls, "jakarta.xml.bind.annotation.XmlType");
-            if (xmlType == null) {
-                xmlType = getAnnotation(cls, "javax.xml.bind.annotation.XmlType");
-            }
             if (xmlType != null && !hasAnnotationMember(xmlType, "namespace")) {
                 xmlType.param("namespace", entry.getValue());
             }
