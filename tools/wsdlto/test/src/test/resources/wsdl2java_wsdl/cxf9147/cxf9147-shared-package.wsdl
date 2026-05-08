@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://cxf.apache.org/cxf9147/service"
+    xmlns:req="http://cxf.apache.org/cxf9147/request"
+    xmlns:ps="http://cxf.apache.org/cxf9147/data/PermissionSet"
+    targetNamespace="http://cxf.apache.org/cxf9147/service"
+    name="Cxf9147Service">
+
+    <wsdl:types>
+        <xs:schema
+            targetNamespace="http://cxf.apache.org/cxf9147/data/PermissionSet"
+            xmlns:tns="http://cxf.apache.org/cxf9147/data/PermissionSet"
+            elementFormDefault="qualified">
+            <xs:complexType name="PermissionSet">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ArrayOfPermissionSet">
+                <xs:sequence>
+                    <xs:element name="permissionSet" type="tns:PermissionSet"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+
+        <xs:schema
+            targetNamespace="http://cxf.apache.org/cxf9147/data/Permission"
+            xmlns:tns="http://cxf.apache.org/cxf9147/data/Permission"
+            elementFormDefault="qualified">
+            <xs:complexType name="Permission">
+                <xs:sequence>
+                    <xs:element name="value" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+
+        <xs:schema
+            targetNamespace="http://cxf.apache.org/cxf9147/data/UserPermission"
+            xmlns:tns="http://cxf.apache.org/cxf9147/data/UserPermission"
+            elementFormDefault="qualified">
+            <xs:complexType name="UserPermission">
+                <xs:sequence>
+                    <xs:element name="user" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+
+        <xs:schema
+            targetNamespace="http://cxf.apache.org/cxf9147/request"
+            xmlns:tns="http://cxf.apache.org/cxf9147/request"
+            xmlns:ps="http://cxf.apache.org/cxf9147/data/PermissionSet"
+            elementFormDefault="qualified">
+            <xs:import namespace="http://cxf.apache.org/cxf9147/data/PermissionSet"/>
+            <xs:element name="getPermissions" type="tns:GetPermissions"/>
+            <xs:element name="getPermissionsResponse" type="tns:GetPermissionsResponse"/>
+            <xs:complexType name="GetPermissions">
+                <xs:sequence>
+                    <xs:element name="id" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GetPermissionsResponse">
+                <xs:sequence>
+                    <xs:element name="permissionSets" type="ps:ArrayOfPermissionSet" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+
+    <wsdl:message name="GetPermissionsRequest">
+        <wsdl:part name="parameters" element="req:getPermissions"/>
+    </wsdl:message>
+    <wsdl:message name="GetPermissionsResponse">
+        <wsdl:part name="parameters" element="req:getPermissionsResponse"/>
+    </wsdl:message>
+
+    <wsdl:portType name="Cxf9147PortType">
+        <wsdl:operation name="getPermissions">
+            <wsdl:input message="tns:GetPermissionsRequest"/>
+            <wsdl:output message="tns:GetPermissionsResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="Cxf9147Binding" type="tns:Cxf9147PortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getPermissions">
+            <soap:operation soapAction="urn:getPermissions"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="Cxf9147Service">
+        <wsdl:port name="Cxf9147Port" binding="tns:Cxf9147Binding">
+            <soap:address location="http://localhost/cxf9147"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
