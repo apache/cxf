@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractUntypedSearchConditionVisitor;
 
 
+@Deprecated(forRemoval = true)
 public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<T, String> {
 
     private String primaryTable;
