@@ -47,6 +47,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 abstract class AbstractOAuthDataProviderTest {
     private static KeyPair keyPair;
@@ -257,6 +258,59 @@ abstract class AbstractOAuthDataProviderTest {
     }
 
     @Test
+    public void testRevokeAccessTokenIdorAcrossUsersOfSharedClient() {
+        // A multi-user shared client (e.g. a public mobile app with a known client_id).
+        // Its resourceOwnerSubject is intentionally null — many users share this client.
+        Client sharedClient = new Client();
+        sharedClient.setRedirectUris(Collections.singletonList("http://client/redirect"));
+        sharedClient.setClientId("103");
+        sharedClient.setClientSecret("secret");
+        getProvider().setClient(sharedClient);
+
+        // Alice obtains an access token via the shared client.
+        AccessTokenRegistration aliceReg = new AccessTokenRegistration();
+        aliceReg.setClient(sharedClient);
+        aliceReg.setApprovedScope(Collections.singletonList("a"));
+        aliceReg.setSubject(new UserSubject("alice"));
+        ServerAccessToken aliceToken = getProvider().createAccessToken(aliceReg);
+        assertNotNull(getProvider().getAccessToken(aliceToken.getTokenKey()));
+
+        // Bob obtains a separate access token via the same shared client.
+        AccessTokenRegistration bobReg = new AccessTokenRegistration();
+        bobReg.setClient(sharedClient);
+        bobReg.setApprovedScope(Collections.singletonList("a"));
+        bobReg.setSubject(new UserSubject("bob"));
+        ServerAccessToken bobToken = getProvider().createAccessToken(bobReg);
+        assertNotNull(getProvider().getAccessToken(bobToken.getTokenKey()));
+
+        // IDOR attempt: Bob (authenticated only as the shared client) submits Alice's token
+        // key to the revocation endpoint. The subject-aware revokeToken overload is called
+        // with Bob's identity, which must not match Alice's subject.
+        // The data provider must reject this with OAuthServiceException; the HTTP layer
+        // (TokenRevocationService) swallows it per RFC 7009 and returns 200 anyway.
+        try {
+            getProvider().revokeToken(sharedClient, new UserSubject("bob"), aliceToken.getTokenKey(),
+                                      OAuthConstants.ACCESS_TOKEN);
+            // Reaching here means the cross-user revocation was NOT blocked — fail the test.
+            fail(
+                "IDOR: revokeToken should have thrown OAuthServiceException when Bob tried to "
+                + "revoke Alice's token, but it succeeded silently"
+            );
+        } catch (OAuthServiceException expected) {
+            // Expected: the subject mismatch guard correctly rejected the request.
+        }
+
+        // Alice's token must still be intact after the blocked revocation attempt.
+        assertNotNull(
+            "Alice's token must survive a cross-user revocation attempt",
+            getProvider().getAccessToken(aliceToken.getTokenKey())
+        );
+
+        // Bob's own token must remain unaffected regardless.
+        assertNotNull(getProvider().getAccessToken(bobToken.getTokenKey()));
+    }
+
+    @Test
     public void testAddGetDeleteRefreshToken() {
         Client c = addClient("101", "bob");
 
@@ -330,6 +384,8 @@ abstract class AbstractOAuthDataProviderTest {
 
     protected void tearDownClients() {
         tearDownClient("101");
+        tearDownClient("102");
+        tearDownClient("103");
         tearDownClient("12345");
         tearDownClient("56789");
         tearDownClient("09876");
