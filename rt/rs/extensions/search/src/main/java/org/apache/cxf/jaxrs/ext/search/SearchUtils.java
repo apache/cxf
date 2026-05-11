@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -115,12 +114,6 @@ public final class SearchUtils {
     public static boolean isTimeZoneSupported(Map<String, String> properties, Boolean defaultValue) {
         String tzProperty = properties.get(SearchUtils.TIMEZONE_SUPPORT_PROPERTY);
         return tzProperty == null ? defaultValue : Boolean.valueOf(tzProperty);
-    }
-
-    public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {
-        SQLPrinterVisitor<T> visitor = new SQLPrinterVisitor<>(table, columns);
-        sc.accept(visitor);
-        return visitor.getQuery();
     }
 
     public static String toSqlWildcardString(String value, boolean alwaysWildcard) {

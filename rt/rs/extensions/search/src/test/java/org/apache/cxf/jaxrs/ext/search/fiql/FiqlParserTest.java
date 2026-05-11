@@ -390,14 +390,6 @@ public class FiqlParserTest {
     }
 
     @Test
-    public void testSQL1() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
-        String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
-                   || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami%')".equals(sql));
-    }
-
-    @Test
     public void testParseComplex2() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         assertEquals(ConditionType.OR, filter.getConditionType());
@@ -418,47 +410,12 @@ public class FiqlParserTest {
     }
 
     @Test
-    public void testSQL2() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
-        String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') OR (level > '10')".equals(sql)
-                   || "SELECT * FROM table WHERE (level > '10') OR (name LIKE 'ami%')".equals(sql));
-    }
-
-    @Test
     public void testParseComplex3() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         assertTrue(filter.isMet(new Condition("fooooo", 0, null)));
         assertTrue(filter.isMet(new Condition("fooooobar", 20, null)));
         assertFalse(filter.isMet(new Condition("fooobar", 0, null)));
         assertFalse(filter.isMet(new Condition("bar", 20, null)));
-    }
-
-    @Test
-    public void testSQL3() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
-        String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
-                    + "OR (level > '10'))").equals(sql)
-                   || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
-                       + "((level > '10') OR (name NOT LIKE '%bar'))").equals(sql));
-    }
-
-    @Test
-    public void testSQL4() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
-        String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
-                    + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
-                   || ("SELECT * FROM table WHERE ((name = 'test1') OR (level <> '19'))"
-                       + " AND ((name = 'test') OR (level = '18'))").equals(sql));
-    }
-
-    @Test
-    public void testSQL5() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==test");
-        String sql = SearchUtils.toSQL(filter, "table");
-        assertEquals("SELECT * FROM table WHERE name = 'test'", sql);
     }
 
     @Test

@@ -308,10 +308,6 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         return result;
     }
 
-    public String toSQL(String table, String... columns) {
-        return SearchUtils.toSQL(this, table, columns);
-    }
-
     @Override
     public PrimitiveStatement getStatement() {
         if (scts.size() == 1) {

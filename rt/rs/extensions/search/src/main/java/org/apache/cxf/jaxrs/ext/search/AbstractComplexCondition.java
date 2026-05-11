@@ -67,10 +67,6 @@ public abstract class AbstractComplexCondition<T> implements SearchCondition<T> 
         return null;
     }
 
-    public String toSQL(String table, String... columns) {
-        return SearchUtils.toSQL(this, table, columns);
-    }
-
     public void accept(SearchConditionVisitor<T, ?> visitor) {
         visitor.visit(this);
     }
