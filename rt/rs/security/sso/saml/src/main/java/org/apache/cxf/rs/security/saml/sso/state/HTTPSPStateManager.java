@@ -30,6 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Path("state")
+@Deprecated(forRemoval = true)
 public class HTTPSPStateManager implements SPStateManager {
     private SPStateManager manager = new MemorySPStateManager();
 
