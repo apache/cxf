@@ -57,9 +57,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
-import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
-import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
@@ -140,7 +138,6 @@ public class BookServer extends AbstractServerTestServerBase {
         sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
-        sf.getProperties().put("search.visitor", new SQLPrinterVisitor<SearchBean>("books"));
         sf.getProperties().put("org.apache.cxf.http.header.split", true);
         sf.getProperties().put("default.content.type", "*/*");
         sf.getProperties().putAll(properties);

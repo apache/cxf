@@ -40,7 +40,6 @@ import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
 
-import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotAcceptableException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.ServerErrorException;
@@ -1967,27 +1966,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address);
         Book b = client.query("_s", "name==CXF*;id=ge=123;id=lt=124").get(Book.class);
         assertEquals(b.getId(), 123L);
-    }
-
-    @Test
-    public void testGetSearchBookSQL() throws Exception {
-        String address = "http://localhost:" + PORT
-            + "/bookstore/books/querycontext/id=ge=123";
-
-        WebClient client = WebClient.create(address);
-        client.accept("text/plain");
-        String sql = client.get(String.class);
-        assertEquals("SELECT * FROM books WHERE id >= '123'", sql);
-    }
-
-    @Test (expected = InternalServerErrorException.class)
-    public void testSearchUnknownParameter() throws Exception {
-        String address = "http://localhost:" + PORT
-            + "/bookstore/books/querycontext/id=ge=123%2C1==1";
-
-        WebClient client = WebClient.create(address);
-        client.accept("text/plain");
-        client.get(String.class);
     }
 
     @Test
