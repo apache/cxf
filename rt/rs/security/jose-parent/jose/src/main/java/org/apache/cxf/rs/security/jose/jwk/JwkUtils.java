@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -105,12 +104,6 @@ public final class JwkUtils {
     }
     public static List<String> getRequiredFields(KeyType keyType) {
         return JWK_REQUIRED_FIELDS_MAP.get(keyType);
-    }
-    public static JsonWebKey readJwkKey(URI uri) throws IOException {
-        return readJwkKey(uri.toURL().openStream());
-    }
-    public static JsonWebKeys readJwkSet(URI uri) throws IOException {
-        return readJwkSet(uri.toURL().openStream());
     }
     public static JsonWebKey readJwkKey(InputStream is) throws IOException {
         return readJwkKey(IOUtils.readStringFromStream(is));
