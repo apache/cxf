@@ -295,29 +295,30 @@ public final class OAuthClientUtils {
             // in this case the AccessToken service is expected to find a mapping between
             // the authenticated credentials and the client registration id
         }
-        Response response = accessTokenService.form(form);
-        final Map<String, String> map;
-        try {
-            map = response.getMediaType() == null
-                    || response.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)
-                            ? new OAuthJSONProvider().readJSONResponse((InputStream) response.getEntity())
-                            : Collections.emptyMap();
-        } catch (Exception ex) {
-            throw new ResponseProcessingException(response, ex);
-        }
-        if (200 == response.getStatus()) {
-            ClientAccessToken token = fromMapToClientToken(map, defaultTokenType);
-            if (token == null) {
-                throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+        try (Response response = accessTokenService.form(form)) {
+            final Map<String, String> map;
+            try {
+                map = response.getMediaType() == null
+                        || response.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)
+                                ? new OAuthJSONProvider().readJSONResponse((InputStream) response.getEntity())
+                                : Collections.emptyMap();
+            } catch (Exception ex) {
+                throw new ResponseProcessingException(response, ex);
             }
-            return token;
-        } else if (response.getStatus() >= 400 && map.containsKey(OAuthConstants.ERROR_KEY)) {
-            OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
-                                              map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
-            error.setErrorUri(map.get(OAuthConstants.ERROR_URI_KEY));
-            throw new OAuthServiceException(error);
+            if (200 == response.getStatus()) {
+                ClientAccessToken token = fromMapToClientToken(map, defaultTokenType);
+                if (token == null) {
+                    throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+                }
+                return token;
+            } else if (response.getStatus() >= 400 && map.containsKey(OAuthConstants.ERROR_KEY)) {
+                OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
+                                                  map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
+                error.setErrorUri(map.get(OAuthConstants.ERROR_URI_KEY));
+                throw new OAuthServiceException(error);
+            }
+            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
         }
-        throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
     }
 
     public static ClientAccessToken fromMapToClientToken(Map<String, String> map) {
