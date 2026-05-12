@@ -91,11 +91,11 @@ public class AuthorizationMetadata extends JsonMapObject {
     }
 
     public URL getJwksURL() {
-        return getURLProperty(JWKS_URI);
+        return checkHttpsScheme(getURLProperty(JWKS_URI), JWKS_URI);
     }
 
     public void setJwksURL(URL jwksURL) {
-        setURLProperty(JWKS_URI, jwksURL);
+        setURLProperty(JWKS_URI, checkHttpsScheme(jwksURL, JWKS_URI));
     }
 
     public URL getRegistrationEndpoint() {
@@ -261,6 +261,13 @@ public class AuthorizationMetadata extends JsonMapObject {
 
     protected void setURLProperty(String name, URL url) {
         super.setProperty(name, url != null ? url.toString() : null);
+    }
+
+    private static URL checkHttpsScheme(URL url, String name) {
+        if (url != null && !"https".equalsIgnoreCase(url.getProtocol())) {
+            throw new IllegalArgumentException(name + " must use HTTPS scheme");
+        }
+        return url;
     }
 
 }
