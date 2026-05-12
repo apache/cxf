@@ -79,6 +79,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.service.Service;
@@ -640,7 +641,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 
         DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-        Document document = documentBuilder.parse(schemaLocation);
+        Document document;
+        try (URIResolver resolver = new URIResolver(schemaLocation)) {
+            document = documentBuilder.parse(resolver.getInputStream());
+        }
         return document.getDocumentElement();
     }
 
