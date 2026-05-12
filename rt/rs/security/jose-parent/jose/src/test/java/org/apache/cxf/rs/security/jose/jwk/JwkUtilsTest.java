@@ -39,6 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class JwkUtilsTest {
@@ -205,6 +206,19 @@ public class JwkUtilsTest {
             fail();
         } catch (JwkException e) {
             assertNull(e.getCause());
+        }
+    }
+
+    @Test
+    public void testLoadPublicJwkSetRejectsHttpUrl() throws Exception {
+        final Properties props = new Properties();
+        props.setProperty(JoseConstants.RSSEC_KEY_STORE_FILE, "http://example.com/keys.jwks");
+        try {
+            JwkUtils.loadPublicJwkSet(null, props);
+            fail();
+        } catch (JwkException e) {
+            assertNotNull(e.getCause());
+            assertTrue(e.getCause().getMessage().contains("must use HTTPS"));
         }
     }
 

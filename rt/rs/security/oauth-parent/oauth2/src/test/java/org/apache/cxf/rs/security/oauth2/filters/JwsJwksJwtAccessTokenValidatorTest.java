@@ -87,4 +87,9 @@ public class JwsJwksJwtAccessTokenValidatorTest {
         new JwsJwksJwtAccessTokenValidator().getInitializedSignatureVerifier(new JwsHeaders());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetJwksURLRejectsHttp() {
+        new JwsJwksJwtAccessTokenValidator().setJwksURL("http://any.url");
+    }
+
 }
