@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AbstractSTSClientTest {
 
@@ -78,6 +79,18 @@ public class AbstractSTSClientTest {
         assertEquals(0, client.getDownloadSchemaInvocations());
     }
 
+    @Test
+    public void testFtpProtocolAttemptedDownload() throws Exception {
+        DownloadingAbstractSTSClient client = new DownloadingAbstractSTSClient(null);
+        try {
+            client.downloadSchemaWithDefaultResolver("ftp://example.org/schema.xsd");
+            fail("Expected an exception for disallowed ftp:// scheme");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("ftp"));
+            assertTrue(ex.getMessage().contains("not permitted"));
+        }
+    }
+
     private static final class TestableAbstractSTSClient extends AbstractSTSClient {
         private int downloadSchemaInvocations;
         private String lastDownloadedLocation;
@@ -100,6 +113,16 @@ public class AbstractSTSClientTest {
 
         String getLastDownloadedLocation() {
             return lastDownloadedLocation;
+        }
+    }
+
+    private static final class DownloadingAbstractSTSClient extends AbstractSTSClient {
+        DownloadingAbstractSTSClient(Bus bus) {
+            super(bus);
+        }
+
+        Element downloadSchemaWithDefaultResolver(String schemaLocation) throws Exception {
+            return super.downloadSchema(schemaLocation);
         }
     }
 }
