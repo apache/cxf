@@ -141,8 +141,13 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (clientSecretVerifier != null) {
             return clientSecretVerifier.validateClientSecret(client, providedClientSecret);
         }
+<<<<<<< HEAD
         return client.getClientSecret() != null && providedClientSecret != null
             && MessageDigest.isEqual(client.getClientSecret().getBytes(StandardCharsets.UTF_8),
+=======
+        return client.getClientSecret() != null && providedClientSecret != null 
+            && MessageDigest.isEqual(client.getClientSecret().getBytes(StandardCharsets.UTF_8), 
+>>>>>>> 2dadd0d5af (Wire the STSClient through to URIResolver (#3106))
                                      providedClientSecret.getBytes(StandardCharsets.UTF_8));
     }
     protected boolean isValidPublicClient(Client client, String clientId) {
