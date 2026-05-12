@@ -19,6 +19,8 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -139,7 +141,9 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (clientSecretVerifier != null) {
             return clientSecretVerifier.validateClientSecret(client, providedClientSecret);
         }
-        return client.getClientSecret() != null && client.getClientSecret().equals(providedClientSecret);
+        return client.getClientSecret() != null && providedClientSecret != null
+            && MessageDigest.isEqual(client.getClientSecret().getBytes(StandardCharsets.UTF_8),
+                                     providedClientSecret.getBytes(StandardCharsets.UTF_8));
     }
     protected boolean isValidPublicClient(Client client, String clientId) {
         return canSupportPublicClients
