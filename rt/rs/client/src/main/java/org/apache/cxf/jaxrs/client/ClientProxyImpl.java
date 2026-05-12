@@ -88,6 +88,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -921,6 +922,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 outMessage.put(PROXY_METHOD_PARAM_BODY_INDEX, bodyIndex);
             }
             outMessage.getInterceptorChain().add(bodyWriter);
+            outMessage.put(URITemplate.URI_TEMPLATE, JAXRSUtils.getUriTemplate(outMessage, cri, ori));
 
             Map<String, Object> reqContext = getRequestContext(outMessage);
             reqContext.put(OperationResourceInfo.class.getName(), ori);

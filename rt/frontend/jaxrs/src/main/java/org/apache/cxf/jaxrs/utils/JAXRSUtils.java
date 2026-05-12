@@ -47,6 +47,7 @@ import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.namespace.QName;
@@ -206,6 +207,7 @@ public final class JAXRSUtils {
             "java.util.concurrent.CompletionStage"
         ));
     private static final LazyLoadedClass DATA_SOURCE_CLASS = new LazyLoadedClass("jakarta.activation.DataSource");
+    private static final Pattern URI_SCHEME = Pattern.compile("^([a-zA-Z]{2,20}):\\/\\/", Pattern.CASE_INSENSITIVE);
 
     // Class to lazily call the ClassLoaderUtil.loadClass, but do it once
     // and cache the result.  Then use the class to create instances as needed.
@@ -2114,14 +2116,27 @@ public final class JAXRSUtils {
         String template = basePath;
         if (StringUtils.isEmpty(template)) {
             template = "/";
-        } else if (!template.startsWith("/")) {
+        } else if (!template.startsWith("/") && !hasScheme(template)) {
             template = "/" + template;
         }
         
         template = combineUriTemplates(template, classPathTemplate);
         return combineUriTemplates(template, methodPathTemplate);
     }
-    
+
+    /**
+     * Checks if the URI string is absolute with the scheme
+     * @param uriStr URI string
+     * @return "true" if the URI string is absolute with the scheme, "false" otherwise
+     */
+    private static boolean hasScheme(String uriStr) {
+        if (uriStr == null) {
+            return false;
+        } else {
+            return URI_SCHEME.matcher(uriStr).find();
+        }
+    }
+
     /**
      * Gets the URI template of the operation from its resource info
      * to assemble final URI template 
