@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.filters;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,7 +58,7 @@ public class JwsJwksJwtAccessTokenValidator extends JwtAccessTokenValidator {
     }
 
     public void setJwksURL(String jwksURL) {
-        this.jwksURL = jwksURL;
+        this.jwksURL = validateJwksURL(jwksURL);
     }
 
     @Override
@@ -87,6 +89,20 @@ public class JwsJwksJwtAccessTokenValidator extends JwtAccessTokenValidator {
     JsonWebKeys getJsonWebKeys() {
         return WebClient.create(jwksURL, Collections.singletonList(new JsonWebKeysProvider()))
             .accept(MediaType.APPLICATION_JSON).get(JsonWebKeys.class);
+    }
+
+    private static String validateJwksURL(String theJwksURL) {
+        Objects.requireNonNull(theJwksURL, "JWK Set URL must be specified");
+        final URL url;
+        try {
+            url = new URL(theJwksURL);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException("Invalid JWK Set URL: " + theJwksURL, ex);
+        }
+        if (!"https".equalsIgnoreCase(url.getProtocol())) {
+            throw new IllegalArgumentException("JWK Set URL must use HTTPS scheme");
+        }
+        return theJwksURL;
     }
 
     // from Java 11

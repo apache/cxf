@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -173,7 +174,7 @@ public final class JoseUtils {
         } else {
             try {
                 url = new URL(loc);
-            } catch (Exception ex) {
+            } catch (MalformedURLException ex) {
                 // it can be either a classpath or file resource without a scheme
                 url = JoseUtils.getClasspathResourceURL(loc, JoseUtils.class, bus);
                 if (url == null) {
@@ -183,11 +184,29 @@ public final class JoseUtils {
                     }
                 }
             }
+            if (url != null) {
+                checkSupportedResourceUrlScheme(url, loc);
+            }
         }
         if (url == null) {
             LOG.warning("No resource " + loc + " is available");
         }
         return url;
+    }
+
+    private static void checkSupportedResourceUrlScheme(URL url, String loc) throws IOException {
+        String scheme = url.getProtocol();
+        if ("https".equalsIgnoreCase(scheme)
+            || "file".equalsIgnoreCase(scheme)
+            || "jar".equalsIgnoreCase(scheme)
+            || "zip".equalsIgnoreCase(scheme)
+            || "wsjar".equalsIgnoreCase(scheme)) {
+            return;
+        }
+        if ("http".equalsIgnoreCase(scheme)) {
+            throw new IOException("URL resource must use HTTPS: " + loc);
+        }
+        throw new IOException("URL scheme '" + scheme + "' is not supported for JOSE resource loading: " + loc);
     }
 
     public static URL getClasspathResourceURL(String path, Class<?> callingClass, Bus bus) {

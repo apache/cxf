@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.httpsignature.utils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -203,7 +204,7 @@ public final class KeyManagementUtils {
         } else {
             try {
                 url = new URL(loc);
-            } catch (Exception ex) {
+            } catch (MalformedURLException ex) {
                 // it can be either a classpath or file resource without a scheme
                 url = getClasspathResourceURL(loc, KeyManagementUtils.class, bus);
                 if (url == null) {
@@ -213,11 +214,30 @@ public final class KeyManagementUtils {
                     }
                 }
             }
+            if (url != null) {
+                checkSupportedResourceUrlScheme(url, loc);
+            }
         }
         if (url == null) {
             LOG.warning("No resource " + loc + " is available");
         }
         return url;
+    }
+
+    private static void checkSupportedResourceUrlScheme(URL url, String loc) {
+        String scheme = url.getProtocol();
+        if ("https".equalsIgnoreCase(scheme)
+            || "file".equalsIgnoreCase(scheme)
+            || "jar".equalsIgnoreCase(scheme)
+            || "zip".equalsIgnoreCase(scheme)
+            || "wsjar".equalsIgnoreCase(scheme)) {
+            return;
+        }
+        if ("http".equalsIgnoreCase(scheme)) {
+            throw new SignatureException("URL resource must use HTTPS: " + loc);
+        }
+        throw new SignatureException("URL scheme '" + scheme
+                                     + "' is not supported for HTTP signature resource loading: " + loc);
     }
 
     private static URL getClasspathResourceURL(String path, Class<?> callingClass, Bus bus) {
