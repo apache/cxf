@@ -38,6 +38,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapName;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.xkms.handlers.Applications;
@@ -168,11 +169,10 @@ public class LdapCertificateRepo implements CertificateRepo {
     public X509Certificate findBySubjectDn(String id) {
         X509Certificate cert = null;
         try {
-            String dn = id;
-            if (rootDN != null && !rootDN.isEmpty()) {
-                dn = dn + "," + rootDN;
+            String dn = toPkixLookupDn(id);
+            if (dn != null) {
+                cert = getCertificateForDn(dn);
             }
-            cert = getCertificateForDn(dn);
         } catch (NamingException e) {
              // Not found
         }
@@ -356,7 +356,7 @@ public class LdapCertificateRepo implements CertificateRepo {
         final String dn;
         Map<String, String> attrs = new HashMap<>();
         if (application == Applications.PKIX) {
-            dn = key.getIdentifier() + "," + rootDN;
+            dn = toPkixRegistrationDn(key.getIdentifier());
         } else if (application == Applications.SERVICE_NAME) {
             dn = getDnForIdentifier(key.getIdentifier());
         } else if (application == Applications.SERVICE_ENDPOINT) {
@@ -366,6 +366,36 @@ public class LdapCertificateRepo implements CertificateRepo {
             throw new IllegalArgumentException("Unsupported Application " + application);
         }
         saveCertificate(cert, dn, attrs);
+    }
+
+    private String toPkixLookupDn(String identifier) {
+        if (identifier == null || identifier.indexOf('=') < 0 || identifier.indexOf('/') >= 0) {
+            return null;
+        }
+        try {
+            String normalized = new LdapName(identifier).toString();
+            if (rootDN != null && !rootDN.isEmpty()) {
+                normalized = normalized + "," + rootDN;
+            }
+            return new LdapName(normalized).toString();
+        } catch (NamingException ex) {
+            return null;
+        }
+    }
+
+    private String toPkixRegistrationDn(String identifier) {
+        if (identifier == null || identifier.indexOf('/') >= 0) {
+            throw new IllegalArgumentException("Invalid PKIX DN identifier");
+        }
+        try {
+            String normalized = new LdapName(identifier).toString();
+            if (rootDN != null && !rootDN.isEmpty()) {
+                normalized = normalized + "," + rootDN;
+            }
+            return new LdapName(normalized).toString();
+        } catch (NamingException ex) {
+            throw new IllegalArgumentException("Invalid PKIX DN identifier", ex);
+        }
     }
 
 }
