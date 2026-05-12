@@ -166,6 +166,18 @@ public class LDAPCertificateRepoTest {
     }
 
     @Test
+    public void testX509LocatorFindBySubjectDnUsesEscapedDn() throws Exception {
+        CapturingFindLdapCertificateRepo persistenceManager = new CapturingFindLdapCertificateRepo();
+        X509Locator locator = new X509Locator(persistenceManager);
+
+        LocateRequestType request = createLocateRequest(Applications.PKIX, "cn=bad,ou=admins");
+        UnverifiedKeyBindingType result = locator.locate(request);
+
+        assertNull(result);
+        org.junit.Assert.assertEquals("cn=bad,ou=admins,dc=example,dc=com", persistenceManager.getLookedUpDn());
+    }
+
+    @Test
     public void testX509LocatorReturnsNullForUnknownSubjectDn() throws Exception {
         CertificateRepo persistenceManager = createLdapCertificateRepo();
         X509Locator locator = new X509Locator(persistenceManager);
@@ -356,6 +368,30 @@ public class LDAPCertificateRepoTest {
         LdapSchemaConfig ldapSchemaConfig = new LdapSchemaConfig();
         ldapSchemaConfig.setAttrCrtBinary("userCertificate");
         return new LdapCertificateRepo(ldapSearch, ldapSchemaConfig, ROOT_DN);
+    }
+
+    private static class CapturingFindLdapCertificateRepo extends LdapCertificateRepo {
+        private String lookedUpDn;
+
+        CapturingFindLdapCertificateRepo() {
+            super(new LdapSearch("ldap://localhost:389", "UID=admin,DC=example,DC=com", "ldap_su", 1),
+                new LdapSchemaConfig(), ROOT_DN);
+        }
+
+        @Override
+        protected X509Certificate getCertificateForDn(String dn) {
+            this.lookedUpDn = dn;
+            return null;
+        }
+
+        @Override
+        protected X509Certificate getCertificateForUIDAttr(String uid) {
+            return null;
+        }
+
+        String getLookedUpDn() {
+            return lookedUpDn;
+        }
     }
 
 }
