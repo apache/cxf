@@ -1,4 +1,4 @@
-Apache CXF 3.6.9 Release Notes
+Apache CXF 3.6.11 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.9 fixes over 12 issues/tasks reported by users.
+3.6.11 fixes over 8 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -68,16 +68,20 @@ for caveats when upgrading.
 
 
 ** Bug
-    * [CXF-8691] - Logging Feature - Sensitive element with arrays
-    * [CXF-8938] - CXF forces XOP for SwA SOAP services
-    * [CXF-9007] - NullPointerException in XMLStreamDataWriter.writeNode
-    * [CXF-9152] - Adding @Timed annotation to JaxWS WebService class breaks Micrometer integration
-    * [CXF-9160] - Add support for JBoss Remoting protocols in JNDI
-    * [CXF-9162] - Reusing a Client with a HttpClientHTTPConduit is not threadsafe in regards to finalization
-    * [CXF-9168] - No Micrometer Metric for requests failing schema validation on jax-ws endpoints
-    * [CXF-9170] - Server requests counted twice after fixing CXF-9168
-    * [CXF-9171] - DelayedCachedOutputStreamCleaner thread accumulation after CVE-2025-23184 fix
-    * [CXF-9173] - Default SO_LINGER induce TCP RST on each connection closure
+    * [CXF-8748] - nonProxyHosts is case sensitive
+    * [CXF-9205] - The org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor invalidates the signed SOAP Header elemements
+    * [CXF-9206] - Duplicated value of 'cxf.server.requests' metric for JAX RS Server
+    * [CXF-9210] - JAX-RS Client Fails When CacheControlFeature is used but Server Doesn't return Cache-Control Header
+
+
+
+
+** Improvement
+    * [CXF-9174] - Allow overriding buildPredicate in JPACriteriaQueryVisitor for custom predicates
+    * [CXF-9197] - Replace new URL(...) in client.vm in wsldto to avoid deprecation issues in Java 20+
+    * [CXF-9207] - Improve multipart Content-Disposition formatting (optional space after form-data;) for better interoperability with strict WAFs
+    * [CXF-9211] - [JAX-RS proxy clients] Use template URL instead of actual path values for JAX-RS micrometer metrics
+
 
 
 
