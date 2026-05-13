@@ -1,33 +1,42 @@
-Apache CXF 4.1.4 Release Notes
+Apache CXF 4.2.1 Release Notes
 
 1. Overview
 
-The 4.1.x versions of Apache CXF is a significant new version of CXF
+The 4.2.x versions of Apache CXF is a significant new version of CXF
 that provides several new features and enhancements.  
 
 New features include:
-    * The release is based on JakartaEE 10
-    * Support of Spring Framework 6.1 / Spring Boot 3.3 /  Spring Security 6.3
-    * Support of OpenZipkin Brave 6.0
-    * Jetty 12
-    * Weld 5
-    * Spring LDAP 3.2
-    * Hazelcast 5.4.0
-    * Woodstox 7.0.0
-    * Hibernate 6.5
-    * Hibernate Validator 8
-    * AsyncHttpClient (AHC) 3.0.0
+    * The release is based on JakartaEE 11
+    * Support of Spring Framework 7 / Spring Boot 4 /  Spring Security 7
+    * Jetty 12.1
+    * Weld 6
+    * Spring LDAP 4
+    * Hibernate 7.2
+    * Hibernate Validator 9.1
+    * Apache Tika 3.2
+    * Jackson 3.0
+    * Tomcat 11
+    * Undertow 2.4
+    * Apache Lucene 10 (needs JDK-21)
+    * JUnit 6
+    * Apache Mina 3
+    * Apache HttpClient 5.5
+    * AssertJ 4.0
+    * Micrometer 1.16.0 / Micrometer Tracing 1.6.0
+    * Apache HttpClient5 5.6 (compression changes)
+    * JSpecify annotations (instead of jakarta.* equivalents)
+    * Glassfish Grizzly Http Server 5.0.0 (needs JDK-21)
 
 Important notes:
-* CXF 4.1 now requires Java 17 as minimum
+* CXF 4.2 now requires Java 17 as minimum
 
 Users are encouraged to review the migration guide at:
-https://cxf.apache.org/docs/41-migration-guide.html
+https://cxf.apache.org/docs/42-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.4 fixes over 13 JIRA issues reported by users and the community.
+4.2.1 fixes over 14 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -64,45 +73,31 @@ http://issues.apache.org/jira/browse/CXF
 6. Migration notes:
 
 See the migration guide at:
-http://cxf.apache.org/docs/41-migration-guide.html
+http://cxf.apache.org/docs/42-migration-guide.html
 for caveats when upgrading.
 
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8691] - Logging Feature - Sensitive element with arrays
-    * [CXF-8938] - CXF forces XOP for SwA SOAP services
-    * [CXF-9136] - Add EntityPart MessageBodyReader / MessageBodyWriter support
-    * [CXF-9152] - Adding @Timed annotation to JaxWS WebService class breaks Micrometer integration
-    * [CXF-9160] - Add support for JBoss Remoting protocols in JNDI
-    * [CXF-9162] - Reusing a Client with a HttpClientHTTPConduit is not threadsafe in regards to finalization
-    * [CXF-9168] - No Micrometer Metric for requests failing schema validation on jax-ws endpoints
-    * [CXF-9170] - Server requests counted twice after fixing CXF-9168
-    * [CXF-9171] - DelayedCachedOutputStreamCleaner thread accumulation after CVE-2025-23184 fix
-    * [CXF-9173] - Default SO_LINGER induce TCP RST on each connection closure
+    * [CXF-8748] - nonProxyHosts is case sensitive
+    * [CXF-9054] - LocalDate before April 1893 incorrectly parsed
+    * [CXF-9147] - WSDL to Java: Missing namespace since 4.1.*
+    * [CXF-9189] - Exceptions Not Logged When Using SseEventSink in JAX-RS SSE Endpoint
+    * [CXF-9200] - Regression with respect to security context propagation
+    * [CXF-9204] - FailoverFeature NPE in ClientImpl.onMessage with Undertow 2.4.0.RC1
+    * [CXF-9205] - The org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor invalidates the signed SOAP Header elemements
+    * [CXF-9206] - Duplicated value of 'cxf.server.requests' metric for JAX RS Server
+    * [CXF-9209] - UriInfoImpl#getMatchedResourceTemplate does not work for Paths with variables
+    * [CXF-9210] - JAX-RS Client Fails When CacheControlFeature is used but Server Doesn't return Cache-Control Header
 
 
 
-
-** Improvement
-    * [CXF-9157] - remove jetty server from rs-sse-undertow
-    * [CXF-9165] - Remove unnecessary JDK 8 hacks
-
-
-** Wish
-    * [CXF-9159] - Support spring boot SSL bundles
-
-
-
+** New Feature
+    * [CXF-9008] - FIPS support
 
 ** Improvement
-    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
-    * [CXF-9151] - use io.github.littleproxy:littleproxy instead of org.littleshoot:littleproxy
-
-
-
-** Task
-    * [CXF-9142] - Change async tracing tests to be order-agnostic
-
+    * [CXF-9174] - Allow overriding buildPredicate in JPACriteriaQueryVisitor for custom predicates
+    * [CXF-9207] - Improve multipart Content-Disposition formatting (optional space after form-data;) for better interoperability with strict WAFs
+    * [CXF-9211] - [JAX-RS proxy clients] Use template URL instead of actual path values for JAX-RS micrometer metrics
 
 
