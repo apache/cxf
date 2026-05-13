@@ -386,7 +386,7 @@ public class SpringJaxrsTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBook"),
-                entry("uri", "http://localhost:" + port + "/api/library/100"),
+                entry("uri", "http://localhost:" + port + "/api/library/{id}"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
     }

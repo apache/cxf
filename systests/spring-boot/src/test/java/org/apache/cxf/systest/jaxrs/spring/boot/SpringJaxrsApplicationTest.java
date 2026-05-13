@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs.spring.boot;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
@@ -416,7 +417,7 @@ public class SpringJaxrsApplicationTest {
                 entry("exception", "None"),
                 entry("method", "GET"),
                 entry("operation", "getBook"),
-                entry("uri", "http://localhost:" + port + "/api/app/library/100"),
+                entry("uri", "http://localhost:" + port + "/api/app/library/{id}"),
                 entry("outcome", "CLIENT_ERROR"),
                 entry("status", "404"));
     }
@@ -449,10 +450,51 @@ public class SpringJaxrsApplicationTest {
                 entry("status", "UNKNOWN"));
     }
     
+    @Test
+    public void testJaxrsProxySubresourceSuccessMetric() {
+        final LibraryApi api = createApi(port);
+        
+        final Collection<Book> books = api.catalog().getCatalog("cxf");
+        assertThat(books).hasSize(1);
+        
+        await()
+            .atMost(Duration.ofSeconds(1))
+            .ignoreException(MeterNotFoundException.class)
+            .until(() -> registry.get("cxf.server.requests").timers(), not(empty()));
+        RequiredSearch serverRequestMetrics = registry.get("cxf.server.requests");
+
+        Map<Object, Object> serverTags = serverRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(serverTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "catalog"),
+                entry("uri", "/api/app/library/catalog/{catalog}"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+        
+        RequiredSearch clientRequestMetrics = registry.get("cxf.client.requests");
+
+        Map<Object, Object> clientTags = clientRequestMetrics.timer().getId().getTags().stream()
+                .collect(toMap(Tag::getKey, Tag::getValue));
+
+        assertThat(clientTags)
+            .containsOnly(
+                entry("exception", "None"),
+                entry("method", "GET"),
+                entry("operation", "getCatalog"),
+                entry("uri", "http://localhost:" + port + "/api/app/library/catalog/{catalog}"),
+                entry("outcome", "SUCCESS"),
+                entry("status", "200"));
+    }
+
     private LibraryApi createApi(int portToUse) {
         final JAXRSClientFactoryBean factory = new JAXRSClientFactoryBean();
         factory.setAddress("http://localhost:" + portToUse + "/api/app/library");
         factory.setFeatures(Arrays.asList(new MetricsFeature(metricsProvider)));
+        factory.setProvider(new JacksonJsonProvider());
         factory.setResourceClass(LibraryApi.class);
         return factory.create(LibraryApi.class);
     }
