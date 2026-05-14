@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.6 fixes over 9 JIRA issues reported by users and the community.
+4.1.6 fixes over 10 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -76,7 +76,7 @@ for caveats when upgrading.
     * [CXF-9205] - The org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor invalidates the signed SOAP Header elemements
     * [CXF-9206] - Duplicated value of 'cxf.server.requests' metric for JAX RS Server
     * [CXF-9210] - JAX-RS Client Fails When CacheControlFeature is used but Server Doesn't return Cache-Control Header
-
+    * [CXF-9212] - Restrict valid URL protocols in TLSParameterJaxBUtils and URIResolver
 
 
 
@@ -84,29 +84,6 @@ for caveats when upgrading.
     * [CXF-9174] - Allow overriding buildPredicate in JPACriteriaQueryVisitor for custom predicates
     * [CXF-9207] - Improve multipart Content-Disposition formatting (optional space after form-data;) for better interoperability with strict WAFs
     * [CXF-9211] - [JAX-RS proxy clients] Use template URL instead of actual path values for JAX-RS micrometer metrics
-
-
-
-
-** Improvement
-    * [CXF-9157] - remove jetty server from rs-sse-undertow
-    * [CXF-9165] - Remove unnecessary JDK 8 hacks
-
-
-** Wish
-    * [CXF-9159] - Support spring boot SSL bundles
-
-
-
-
-** Improvement
-    * [CXF-9145] - Inconcise handling of logging features logMulitpart and logBinary
-    * [CXF-9151] - use io.github.littleproxy:littleproxy instead of org.littleshoot:littleproxy
-
-
-
-** Task
-    * [CXF-9142] - Change async tracing tests to be order-agnostic
 
 
 
