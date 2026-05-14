@@ -39,6 +39,8 @@ import static org.junit.Assert.fail;
 
 public class URIResolverTest {
 
+    private static final String TEST_PROTOCOL_HANDLER_PACKAGE = "org.apache.cxf.resource.protocol";
+
     private URIResolver uriResolver;
 
     private URL resourceURL = getClass().getResource("resources/helloworld.bpr");
@@ -228,6 +230,31 @@ public class URIResolverTest {
             t.join(5000);
             assertFalse("HTTP server thread did not finish in time", t.isAlive());
             assertNull(checkingThreadThrowable);
+        }
+    }
+
+    @Test
+    public void testVfsProtocolAllowedAndResolved() throws Exception {
+        String oldHandlers = System.getProperty("java.protocol.handler.pkgs");
+        try {
+            if (oldHandlers == null || oldHandlers.isEmpty()) {
+                System.setProperty("java.protocol.handler.pkgs", TEST_PROTOCOL_HANDLER_PACKAGE);
+            } else if (!oldHandlers.contains(TEST_PROTOCOL_HANDLER_PACKAGE)) {
+                System.setProperty("java.protocol.handler.pkgs", oldHandlers + "|" + TEST_PROTOCOL_HANDLER_PACKAGE);
+            }
+
+            URIResolver resolver = new URIResolver("vfs://test/path/schema.xsd");
+            assertTrue(resolver.isResolved());
+            assertNotNull(resolver.getInputStream());
+            String content = IOUtils.toString(resolver.getInputStream());
+            assertEquals("vfs-test-content", content);
+            resolver.close();
+        } finally {
+            if (oldHandlers == null) {
+                System.clearProperty("java.protocol.handler.pkgs");
+            } else {
+                System.setProperty("java.protocol.handler.pkgs", oldHandlers);
+            }
         }
     }
 
