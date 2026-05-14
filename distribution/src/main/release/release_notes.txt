@@ -36,7 +36,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.2.1 fixes over 14 JIRA issues reported by users and the community.
+4.2.1 fixes over 15 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -89,6 +89,7 @@ for caveats when upgrading.
     * [CXF-9206] - Duplicated value of 'cxf.server.requests' metric for JAX RS Server
     * [CXF-9209] - UriInfoImpl#getMatchedResourceTemplate does not work for Paths with variables
     * [CXF-9210] - JAX-RS Client Fails When CacheControlFeature is used but Server Doesn't return Cache-Control Header
+    * [CXF-9212] - Restrict valid URL protocols in TLSParameterJaxBUtils and URIResolver
 
 
 
