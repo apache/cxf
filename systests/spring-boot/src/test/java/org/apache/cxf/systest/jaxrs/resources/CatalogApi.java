@@ -19,35 +19,17 @@
 
 package org.apache.cxf.systest.jaxrs.resources;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
+import java.util.Collection;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.ext.TRACE;
-
-public interface LibraryApi {
+public interface CatalogApi {
     @Produces({ MediaType.APPLICATION_JSON })
+    @Path("{catalog}")
     @GET
-    Response getBooks(@QueryParam("page") @DefaultValue("1") int page);
-
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("{id}")
-    @GET
-    Response getBook(@PathParam("id") String id);
-    
-    @DELETE
-    void deleteBooks();
-    
-    @Path("/catalog")
-    CatalogApi catalog(); 
-    
-    @TRACE
-    @Produces({ MediaType.APPLICATION_JSON })
-    Response traceBooks();
+    Collection<Book> getCatalog(@PathParam("catalog") String catalog);
 }

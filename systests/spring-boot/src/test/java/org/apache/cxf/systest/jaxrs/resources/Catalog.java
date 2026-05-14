@@ -22,17 +22,9 @@ package org.apache.cxf.systest.jaxrs.resources;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-public class Catalog {
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("{catalog}")
-    @GET
-    public Collection<Book> getCatalog(@PathParam("catalog") String catalog) {
+public class Catalog implements CatalogApi {
+    @Override
+    public Collection<Book> getCatalog(String catalog) {
         return Collections.singletonList(new Book(catalog, "John Smith"));
     }
 }
