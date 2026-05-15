@@ -45,4 +45,9 @@ public class JettyClientServerHttp2Test extends AbstractJettyClientServerHttp2Te
     protected String getContext() {
         return "/http2";
     }
+    
+    @Override
+    protected int getPort() {
+        return Integer.valueOf(PORT);
+    }
 }
