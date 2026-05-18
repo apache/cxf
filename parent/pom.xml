@@ -122,7 +122,7 @@
         <cxf.glassfish.json.version>2.0.1</cxf.glassfish.json.version>
         <cxf.grizzly.version>5.0.1</cxf.grizzly.version>
         <cxf.hamcrest.version>3.0</cxf.hamcrest.version>
-        <cxf.hazelcast.version>5.6.0</cxf.hazelcast.version>
+        <cxf.hazelcast.version>5.7.0</cxf.hazelcast.version>
         <cxf.hibernate.em.version>7.3.4.Final</cxf.hibernate.em.version>
         <cxf.hibernate.validator.version>9.1.0.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.4</cxf.hsqldb.version>
