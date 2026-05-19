@@ -101,7 +101,7 @@ under the License.
    <bean id="tokenIntrospectionService" class="org.apache.cxf.rs.security.oauth2.services.TokenIntrospectionService">
        <property name="dataProvider" ref="oauthProvider"/>
    </bean>
-   
+
    <bean id="callbackHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.CallbackHandlerImpl"/>
    <bean id="basicAuthFilter" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.WSS4JBasicAuthFilter">
        <property name="callbackHandler" ref="callbackHandler"/>
@@ -118,6 +118,14 @@ under the License.
        <jaxrs:providers>
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
+   </jaxrs:server>
+
+   <jaxrs:server
+       depends-on="tls-config"
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-introspection-jcache}/introspection">
+       <jaxrs:serviceBeans>
+           <ref bean="tokenIntrospectionService"/>
+       </jaxrs:serviceBeans>
    </jaxrs:server>
    
 
