@@ -229,6 +229,44 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testTokenIntrospectionUnauthorizedClient() throws Exception {
+        URL busFile = IntrospectionServiceTest.class.getResource("client.xml");
+
+        String address = "https://localhost:" + port + "/services/";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        // Get Authorization Code
+        String code = OAuth2TestUtils.getAuthorizationCode(client);
+        assertNotNull(code);
+
+        // Now get the access token
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                  "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(client).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken = OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Here we're calling a separate introspection service with no validators, just to confirm that
+        // it rejects the request by default
+        address = "https://localhost:" + port + "/introspection/";
+        client = WebClient.create(address, OAuth2TestUtils.setupProviders(), busFile.toString());
+        client.accept("application/json").type("application/x-www-form-urlencoded");
+        Form form = new Form();
+        form.param("token", accessToken.getTokenKey());
+        client.path("introspect/");
+        Response response = client.post(form);
+
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    @org.junit.Test
     public void testRefreshedToken() throws Exception {
         URL busFile = AuthorizationGrantTest.class.getResource("client.xml");
 

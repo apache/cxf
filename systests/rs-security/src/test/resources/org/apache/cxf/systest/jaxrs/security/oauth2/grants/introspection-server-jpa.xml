@@ -132,6 +132,14 @@ under the License.
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
    </jaxrs:server>
+
+   <jaxrs:server
+       depends-on="tls-config"
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-introspection-jpa}/introspection">
+       <jaxrs:serviceBeans>
+           <ref bean="tokenIntrospectionService"/>
+       </jaxrs:serviceBeans>
+   </jaxrs:server>
    
 
 </beans>
