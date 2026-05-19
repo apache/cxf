@@ -132,6 +132,24 @@ under the License.
            <entry key="rs.security.signature.algorithm" value="RS256" />
        </jaxrs:properties>
    </jaxrs:server>
+
+   <jaxrs:server
+       depends-on="tls-config"
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-introspection-jcache-jwt-non-persist}/introspection">
+       <jaxrs:serviceBeans>
+           <ref bean="tokenIntrospectionService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:properties>
+           <entry key="security.signature.properties"
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+           <entry key="rs.security.keystore.type" value="jks" />
+           <entry key="rs.security.keystore.alias" value="alice"/>
+           <entry key="rs.security.keystore.password" value="password"/>
+           <entry key="rs.security.key.password" value="password"/>
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
+           <entry key="rs.security.signature.algorithm" value="RS256" />
+       </jaxrs:properties>
+   </jaxrs:server>
    
 
 </beans>
