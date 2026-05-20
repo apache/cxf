@@ -69,7 +69,9 @@ under the License.
     
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImpl"/>
-    <bean id="dataProviderJwt" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImplJwt"/>
+    <bean id="dataProviderJwt" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImplJwt">
+        <property name="issuer" value="Some-Issuer"/>
+    </bean>
     <bean id="rsService" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     
     <bean id="accessTokenService1" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
