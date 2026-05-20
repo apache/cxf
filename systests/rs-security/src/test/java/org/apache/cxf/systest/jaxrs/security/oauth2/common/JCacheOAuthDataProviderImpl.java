@@ -78,25 +78,10 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
             redirectUris.add("https://localhost:" + partnerPort + "/partnerservice/bookstore/books");
         }
         client.setRedirectUris(redirectUris);
-
-        client.getAllowedGrantTypes().add("authorization_code");
-        client.getAllowedGrantTypes().add("refresh_token");
-        client.getAllowedGrantTypes().add("implicit");
-        client.getAllowedGrantTypes().add("hybrid");
-        client.getAllowedGrantTypes().add("password");
-        client.getAllowedGrantTypes().add("client_credentials");
-        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:saml2-bearer");
-        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
-
-        client.getRegisteredScopes().add("read_balance");
-        client.getRegisteredScopes().add("create_balance");
-        client.getRegisteredScopes().add("read_data");
-        client.getRegisteredScopes().add("read_book");
-        client.getRegisteredScopes().add("create_book");
-        client.getRegisteredScopes().add("create_image");
-        client.getRegisteredScopes().add("openid");
+        configureDefaultClientGrantsAndScopes(client);
 
         this.setClient(client);
+        addClientIpTestClients(createPublicClients, redirectUris);
 
         // OIDC filters test client
         client = createPublicClients ? new Client("consumer-id-oidc", null, false)
@@ -184,6 +169,41 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
             return CryptoUtils.loadCertificate(is, "password".toCharArray(), "morpit", null);
         }
+    }
+
+    private static void configureDefaultClientGrantsAndScopes(Client client) {
+        client.getAllowedGrantTypes().add("authorization_code");
+        client.getAllowedGrantTypes().add("refresh_token");
+        client.getAllowedGrantTypes().add("implicit");
+        client.getAllowedGrantTypes().add("hybrid");
+        client.getAllowedGrantTypes().add("password");
+        client.getAllowedGrantTypes().add("client_credentials");
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:saml2-bearer");
+        client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
+
+        client.getRegisteredScopes().add("read_balance");
+        client.getRegisteredScopes().add("create_balance");
+        client.getRegisteredScopes().add("read_data");
+        client.getRegisteredScopes().add("read_book");
+        client.getRegisteredScopes().add("create_book");
+        client.getRegisteredScopes().add("create_image");
+        client.getRegisteredScopes().add("openid");
+    }
+
+    private void addClientIpTestClients(boolean createPublicClients, List<String> redirectUris) {
+        Client ipPassClient = createPublicClients ? new Client("consumer-id-ip-pass", null, false)
+            : new Client("consumer-id-ip-pass", "this-is-a-secret", true);
+        ipPassClient.setRedirectUris(new ArrayList<>(redirectUris));
+        configureDefaultClientGrantsAndScopes(ipPassClient);
+        ipPassClient.setClientIpAddress("127.0.0.1");
+        this.setClient(ipPassClient);
+
+        Client ipFailClient = createPublicClients ? new Client("consumer-id-ip-fail", null, false)
+            : new Client("consumer-id-ip-fail", "this-is-a-secret", true);
+        ipFailClient.setRedirectUris(new ArrayList<>(redirectUris));
+        configureDefaultClientGrantsAndScopes(ipFailClient);
+        ipFailClient.setClientIpAddress("203.0.113.10");
+        this.setClient(ipFailClient);
     }
 
     @Override
