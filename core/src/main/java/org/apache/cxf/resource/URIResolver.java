@@ -65,7 +65,8 @@ public class URIResolver implements AutoCloseable {
         "org.apache.cxf.resource.uriresolver.allowedSchemes";
     private static final Set<String> DEFAULT_ALLOWED_URL_SCHEMES =
         Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs")));
+            new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
+                    "resource")));
 
     private Map<String, LoadingByteArrayOutputStream> cache = new HashMap<>();
     private File file;
@@ -490,7 +491,7 @@ public class URIResolver implements AutoCloseable {
     public boolean isResolved() {
         return is != null;
     }
-    
+
     @Override
     public void close() throws IOException {
         if (isResolved()) {
