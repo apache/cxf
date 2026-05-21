@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status.Family;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
@@ -98,14 +99,65 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress);
     }
 
+    @org.junit.Test
+    public void testServiceWithJwtTokenAndClientIpMatch() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
+        String rsAddress = "https://127.0.0.1:" + PORT + "/secured/bookstore/books";
+        doTestServiceWithJwtTokenAndScope(oauthServiceAddress, rsAddress, "consumer-id-ip-pass");
+    }
+
+    @org.junit.Test
+    public void testServiceWithJwtTokenAndClientIpMismatch() throws Exception {
+        String oauthServiceAddress = "https://localhost:" + OAUTH_PORT + "/services/";
+        String rsAddress = "https://127.0.0.1:" + PORT + "/secured/bookstore/books";
+
+        final AuthorizationMetadata authorizationMetadata =
+            OAuthClientUtils.getAuthorizationMetadata(oauthServiceAddress);
+        final String scope = "create_book";
+        final String clientId = "consumer-id-ip-fail";
+
+        final URI authorizationURI = OAuthClientUtils.getAuthorizationURI(
+            authorizationMetadata.getAuthorizationEndpoint().toString(),
+            clientId, null, null, scope);
+
+        WebClient oauthClient = WebClient.create(authorizationURI.toString(), OAuth2TestUtils.setupProviders(),
+                                                 "alice", "security", null);
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        final String location = OAuth2TestUtils.getLocation(oauthClient,
+            oauthClient.accept(MediaType.APPLICATION_JSON).get(OAuthAuthorizationData.class),
+            null);
+        final String code = OAuth2TestUtils.getSubstring(location, "code");
+        assertNotNull(code);
+
+        final ClientAccessToken accessToken = OAuthClientUtils.getAccessToken(
+            authorizationMetadata.getTokenEndpoint().toString(),
+            new Consumer(clientId, "this-is-a-secret"),
+            new AuthorizationCodeGrant(code),
+            true);
+        assertNotNull(accessToken.getTokenKey());
+
+        WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders())
+            .authorization(new ClientAccessToken(BEARER_AUTHORIZATION_SCHEME, accessToken.getTokenKey()));
+        Response response = client.type("application/xml").post(new Book("book", 123L));
+        assertEquals(Family.CLIENT_ERROR, response.getStatusInfo().getFamily());
+    }
+
     private void doTestServiceWithJwtTokenAndScope(String oauthService, String rsAddress) throws Exception {
+        doTestServiceWithJwtTokenAndScope(oauthService, rsAddress, "consumer-id");
+    }
+
+    private void doTestServiceWithJwtTokenAndScope(String oauthService,
+                                                   String rsAddress,
+                                                   String clientId) throws Exception {
         final AuthorizationMetadata authorizationMetadata = OAuthClientUtils.getAuthorizationMetadata(oauthService);
 
         final String scope = "create_book";
 
         final URI authorizationURI = OAuthClientUtils.getAuthorizationURI(
             authorizationMetadata.getAuthorizationEndpoint().toString(),
-            "consumer-id", null, null, scope);
+            clientId, null, null, scope);
 
         // Get Authorization Code
         WebClient oauthClient = WebClient.create(authorizationURI.toString(), OAuth2TestUtils.setupProviders(),
@@ -123,7 +175,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         // Now get the access token
         final ClientAccessToken accessToken = OAuthClientUtils.getAccessToken(
             authorizationMetadata.getTokenEndpoint().toString(),
-            new Consumer("consumer-id", "this-is-a-secret"),
+            new Consumer(clientId, "this-is-a-secret"),
             new AuthorizationCodeGrant(code),
             true);
         assertNotNull(accessToken.getTokenKey());
@@ -133,7 +185,7 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
             "org/apache/cxf/systest/jaxrs/security/alice.rs.properties", null);
         assertTrue(jwtConsumer.verifySignatureWith(verifier));
         JwtClaims claims = jwtConsumer.getJwtClaims();
-        assertEquals("consumer-id", claims.getStringProperty(OAuthConstants.CLIENT_ID));
+        assertEquals(clientId, claims.getStringProperty(OAuthConstants.CLIENT_ID));
         assertEquals("alice", claims.getStringProperty("username"));
         assertTrue(claims.getStringProperty(OAuthConstants.SCOPE).contains(scope));
         // Now invoke on the service with the access token
