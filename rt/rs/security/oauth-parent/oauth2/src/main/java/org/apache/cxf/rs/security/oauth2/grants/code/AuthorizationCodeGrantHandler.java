@@ -41,6 +41,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
     private List<CodeVerifierTransformer> codeVerifierTransformers = Collections.emptyList();
+    private CodeVerifierTransformer defaultCodeVerifierTransformer = new DigestCodeVerifier();
     private boolean expectCodeVerifierForPublicClients;
     private boolean requireCodeVerifier;
 
@@ -174,9 +175,13 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                     return false;
                 }
             }
-            // Fall back to plain
+
+            // Fall back to configured default transformer
             if (codeVerifierTransformer == null) {
-                codeVerifierTransformer = new PlainCodeVerifier();
+                if (defaultCodeVerifierTransformer == null) {
+                    return false;
+                }
+                codeVerifierTransformer = defaultCodeVerifierTransformer;
             }
             String transformedCodeVerifier = codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
             return clientCodeChallenge.equals(transformedCodeVerifier);
@@ -190,8 +195,17 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     public void setCodeVerifierTransformers(List<CodeVerifierTransformer> codeVerifierTransformers) {
         if (codeVerifierTransformers == null) {
             this.codeVerifierTransformers = Collections.emptyList();
+        } else {
+            this.codeVerifierTransformers = new ArrayList<>(codeVerifierTransformers);
         }
-        this.codeVerifierTransformers = new ArrayList<>(codeVerifierTransformers);
+    }
+
+    /**
+     * Set a default code verifier transformer used when no specific challenge method transformer is matched.
+     * @param defaultCodeVerifierTransformer default code verifier transformer
+     */
+    public void setDefaultCodeVerifierTransformer(CodeVerifierTransformer defaultCodeVerifierTransformer) {
+        this.defaultCodeVerifierTransformer = defaultCodeVerifierTransformer;
     }
 
     /**
