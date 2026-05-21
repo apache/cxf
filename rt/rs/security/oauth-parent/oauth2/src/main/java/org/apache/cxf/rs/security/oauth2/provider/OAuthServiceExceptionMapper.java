@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+@Deprecated(forRemoval = true)
 public class OAuthServiceExceptionMapper implements ExceptionMapper<OAuthServiceException> {
 
     @Override
