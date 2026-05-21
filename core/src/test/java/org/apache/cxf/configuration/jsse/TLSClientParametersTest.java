@@ -53,8 +53,7 @@ public class TLSClientParametersTest {
     
     @Test
     public void testDefaultHttpsProtocols() {
-        assertThat(TLSClientParameters.getPreferredClientProtocols(), arrayContainingInAnyOrder("TLSv1", 
-            "TLSv1.1", 
+        assertThat(TLSClientParameters.getPreferredClientProtocols(), arrayContainingInAnyOrder(
             "TLSv1.2", 
             "TLSv1.3"));
     }
@@ -69,8 +68,7 @@ public class TLSClientParametersTest {
     public void testIgnoreConfiguredHttpsProtocols() {
         System.setProperty(TLSClientParameters.IGNORE_CONFIGURED_HTTPS_PROTOCOLS, "true");
         System.setProperty(TLSClientParameters.CONFIGURED_HTTPS_PROTOCOLS, "SSLv3,");
-        assertThat(TLSClientParameters.getPreferredClientProtocols(), arrayContainingInAnyOrder("TLSv1", 
-            "TLSv1.1", 
+        assertThat(TLSClientParameters.getPreferredClientProtocols(), arrayContainingInAnyOrder(
             "TLSv1.2", 
             "TLSv1.3"));
     }

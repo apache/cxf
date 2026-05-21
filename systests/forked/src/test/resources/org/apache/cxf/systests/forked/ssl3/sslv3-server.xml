@@ -97,8 +97,6 @@
                 <sec:clientAuthentication want="true" required="false"/>
                 <sec:excludeProtocols>
                     <sec:excludeProtocol>TLS</sec:excludeProtocol>
-                    <sec:excludeProtocol>TLSv1</sec:excludeProtocol>
-                    <sec:excludeProtocol>TLSv1.1</sec:excludeProtocol>
                     <sec:excludeProtocol>TLSv1.2</sec:excludeProtocol>
                 </sec:excludeProtocols>
                 <sec:cipherSuitesFilter>
