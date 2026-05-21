@@ -35,7 +35,7 @@ under the License.
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
         <cxf:properties> 
           <entry key="org.apache.cxf.jaxrs.bus.providers" value-ref="busProviders"/> 
@@ -124,10 +124,10 @@ under the License.
            <ref bean="basicAuthFilter"/>
        </jaxrs:providers>
        <jaxrs:properties>
-           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
-           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
@@ -182,10 +182,10 @@ under the License.
            <ref bean="digestTokenService"/>
        </jaxrs:serviceBeans>
        <jaxrs:properties>
-           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
-           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
@@ -198,10 +198,10 @@ under the License.
            <ref bean="digestOnlyTokenService"/>
        </jaxrs:serviceBeans>
        <jaxrs:properties>
-           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
-           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
-           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+           <entry key="rs.security.signature.out.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
+           <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.encryption.out.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs-fips.properties"/>
+           <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs-fips.properties"/>
            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
        </jaxrs:properties>
