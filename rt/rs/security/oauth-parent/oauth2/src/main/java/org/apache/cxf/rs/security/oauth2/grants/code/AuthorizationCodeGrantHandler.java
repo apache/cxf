@@ -173,9 +173,9 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                     return false;
                 }
             }
-            // Fall back to plain
+            // Fall back to digest
             if (codeVerifierTransformer == null) {
-                codeVerifierTransformer = new PlainCodeVerifier();
+                codeVerifierTransformer = new DigestCodeVerifier();
             }
             String transformedCodeVerifier = codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
             return clientCodeChallenge.equals(transformedCodeVerifier);
