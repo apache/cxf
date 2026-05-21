@@ -41,7 +41,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
 
     private List<CodeVerifierTransformer> codeVerifierTransformers = Collections.emptyList();
-    private CodeVerifierTransformer defaultCodeVerifierTransformer = new DigestCodeVerifier();
+    private CodeVerifierTransformer defaultCodeVerifierTransformer = new PlainCodeVerifier();
     private boolean expectCodeVerifierForPublicClients;
     private boolean requireCodeVerifier;
 
