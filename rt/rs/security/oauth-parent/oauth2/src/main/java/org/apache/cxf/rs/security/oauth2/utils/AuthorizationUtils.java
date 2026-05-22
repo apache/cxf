@@ -106,7 +106,7 @@ public final class AuthorizationUtils {
         }
         if (sb.length() > 0) {
             if (realm != null) {
-                sb.append(" realm=\"").append(realm).append('"');
+                sb.append(" realm=\"").append(stripControlCharacters(realm)).append('"');
             }
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }
@@ -114,5 +114,9 @@ public final class AuthorizationUtils {
             rb.entity(cause.getMessage());
         }
         throw ExceptionUtils.toNotAuthorizedException(cause, rb.build());
+    }
+
+    public static String stripControlCharacters(String value) {
+        return value.replaceAll("[\\p{Cntrl}&&[^\\t]]", "_");
     }
 }
