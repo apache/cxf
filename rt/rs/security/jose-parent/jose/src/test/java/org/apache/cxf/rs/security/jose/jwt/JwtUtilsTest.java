@@ -174,4 +174,44 @@ public class JwtUtilsTest {
         }
     }
 
+    @org.junit.Test
+    public void testInfiniteExpiryTokenRejected() {
+        try {
+            String claimsJson = "{\"sub\":\"alice\",\"iss\":\"DoubleItSTSIssuer\","
+                + "\"exp\":Infinity}";
+            JwtClaims claims = JwtUtils.jsonToClaims(claimsJson);
+            JwtUtils.validateJwtExpiry(claims, 0, true);
+            fail("Failure expected on a token with infinite expiry");
+        } catch (JwtException | NumberFormatException ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
+    public void testInfiniteNotBeforeTokenRejected() {
+        try {
+            String claimsJson = "{\"sub\":\"alice\",\"iss\":\"DoubleItSTSIssuer\","
+                + "\"nbf\":Infinity}";
+            JwtClaims claims = JwtUtils.jsonToClaims(claimsJson);
+            JwtUtils.validateJwtNotBefore(claims, 0, true);
+            fail("Failure expected on a token with infinite not before");
+        } catch (JwtException | NumberFormatException ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
+    public void testInfiniteIssuedAtTokenRejected() {
+        try {
+            String claimsJson = "{\"sub\":\"alice\",\"iss\":\"DoubleItSTSIssuer\","
+                + "\"iat\":Infinity}";
+            JwtClaims claims = JwtUtils.jsonToClaims(claimsJson);
+            JwtUtils.validateJwtIssuedAt(claims, 0, 0, true);
+            fail("Failure expected on a token with infinite issued at");
+        } catch (JwtException | NumberFormatException ex) {
+            // expected
+        }
+    }
+
+
 }
