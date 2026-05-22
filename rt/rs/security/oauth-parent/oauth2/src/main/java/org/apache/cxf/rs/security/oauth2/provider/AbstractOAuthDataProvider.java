@@ -224,6 +224,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> restrictedScopes) throws OAuthServiceException {
+        if (!recycleRefreshTokens) {
+            synchronized (refreshTokenLock) {
+                return doRefreshAccessToken(client, refreshTokenKey, restrictedScopes);
+            }
+        }
+        return doRefreshAccessToken(client, refreshTokenKey, restrictedScopes);
+    }
+
+    private ServerAccessToken doRefreshAccessToken(Client client, String refreshTokenKey,
+                                                   List<String> restrictedScopes) {
         RefreshToken currentRefreshToken = recycleRefreshTokens
             ? revokeRefreshToken(client, refreshTokenKey) : getRefreshToken(refreshTokenKey);
         if (currentRefreshToken == null) {
