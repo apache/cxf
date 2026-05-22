@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -102,6 +103,35 @@ public class AuthorizationUtilsTest {
     }
 
     @Test
+    public void testThrowAuthorizationFailureWithRealm() {
+        try {
+            AuthorizationUtils.throwAuthorizationFailure(Collections.singleton("Basic"), "oauth");
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            Response r = ex.getResponse();
+            assertEquals(401, r.getStatus());
+            String value = r.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
+            assertNotNull(value);
+            assertEquals("Basic realm=\"oauth\"", value);
+        }
+    }
+
+    @Test
+    public void testThrowAuthorizationFailureWithRealmInvalidCharacters() {
+        String realm = "oauth\r\n\r\n\r\nX-Injected: true";
+        try {
+            AuthorizationUtils.throwAuthorizationFailure(Collections.singleton("Basic"), realm);
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            Response r = ex.getResponse();
+            assertEquals(401, r.getStatus());
+            String value = r.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
+            assertNotNull(value);
+            assertEquals("Basic realm=" + "\"" + AuthorizationUtils.stripControlCharacters(realm) + "\"", value);
+        }
+    }
+
+    @Test
     public void getAuthorizationParts() {
         String type = "type";
         String credentials = "credentials";
@@ -122,6 +152,64 @@ public class AuthorizationUtilsTest {
                 AuthorizationUtils.getAuthorizationParts(mc, Collections.singleton("*")));
         assertArrayEquals(expected,
                 AuthorizationUtils.getAuthorizationParts(mc, new HashSet<>(Arrays.asList("another", type))));
+    }
+
+    @Test
+    public void testGetAuthorizationPartsWithMultipleHeadersFails() {
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, Collections.singletonMap(HttpHeaders.AUTHORIZATION,
+                Arrays.asList("Basic YWxpY2U6c2VjcmV0", "Bearer token")));
+        MessageContext mc = new MessageContextImpl(m);
+
+        try {
+            AuthorizationUtils.getAuthorizationParts(mc);
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(401, ex.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void testGetBasicAuthParts() {
+        String basicAuthData = Base64.getEncoder().encodeToString("alice:secret".getBytes());
+
+        String[] parts = AuthorizationUtils.getBasicAuthParts(basicAuthData);
+        assertArrayEquals(new String[] {"alice", "secret"}, parts);
+    }
+
+    @Test
+    public void testGetBasicAuthPartsInvalidBase64() {
+        try {
+            AuthorizationUtils.getBasicAuthParts("not-base64");
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(401, ex.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void testGetBasicAuthPartsMissingSeparator() {
+        String basicAuthData = Base64.getEncoder().encodeToString("alice".getBytes());
+
+        try {
+            AuthorizationUtils.getBasicAuthParts(basicAuthData);
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(401, ex.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void testGetBasicAuthUserInfo() {
+        String basicAuthData = Base64.getEncoder().encodeToString("alice:secret".getBytes());
+
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, Collections.singletonMap(HttpHeaders.AUTHORIZATION,
+                Collections.singletonList("Basic " + basicAuthData)));
+        MessageContext mc = new MessageContextImpl(m);
+
+        String[] userInfo = AuthorizationUtils.getBasicAuthUserInfo(mc);
+        assertArrayEquals(new String[] {"alice", "secret"}, userInfo);
     }
 
 }
