@@ -37,8 +37,6 @@ import org.apache.cxf.configuration.security.FiltersType;
 public class TLSParameterBase {
     protected static final Collection<String> DEFAULT_HTTPS_PROTOCOLS = 
         Arrays.asList(
-            "TLSv1", 
-            "TLSv1.1", 
             "TLSv1.2", 
             "TLSv1.3" 
         ); 
