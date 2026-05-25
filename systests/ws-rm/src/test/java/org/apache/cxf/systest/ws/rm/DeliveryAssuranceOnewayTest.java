@@ -76,6 +76,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     private Endpoint endpoint;
     private Bus greeterBus;
     private Greeter greeter;
+    private ExecutorService executorService;
 
     @After
     public void tearDown() throws Exception {
@@ -88,6 +89,13 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             stopServer();
         } catch (Throwable t) {
             //ignore
+        }
+        if (executorService != null) {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+            executorService = null;
         }
         Thread.sleep(100);
     }
@@ -380,6 +388,9 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         if (null != executor) {
             gs.setExecutor(executor);
+            if (executor instanceof ExecutorService) {
+                this.executorService = (ExecutorService) executor;
+            }
         }
 
         greeter = gs.getGreeterPort();

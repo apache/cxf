@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +82,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     private Bus greeterBus;
     private Greeter greeter;
     private RecordingMessageCallback callback;
+    private ExecutorService executorService;
 
     @After
     public void tearDown() throws Exception {
@@ -93,6 +95,13 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             stopServer();
         } catch (Throwable t) {
             //ignore
+        }
+        if (executorService != null) {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+            executorService = null;
         }
     }
 
@@ -216,6 +225,9 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
 
         if (null != executor) {
             gs.setExecutor(executor);
+            if (executor instanceof ExecutorService) {
+                this.executorService = (ExecutorService) executor;
+            }
         }
 
         greeter = gs.getGreeterPort();
