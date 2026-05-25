@@ -196,6 +196,49 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals("a\\", entry.getValue());
     }
 
+    /**
+     * Regression test for a bug in {@code getNextSepCharIndex}: the method only checks whether
+     * the single character immediately before a {@code "} is a backslash when deciding whether
+     * the quote is escaped.  That single-character look-back is wrong when a string ends with
+     * {@code \\} (an escaped backslash): the second {@code \} is mistaken for an escape prefix
+     * of the closing {@code "}, so the parser never exits "in-string" mode, swallows the
+     * subsequent comma, and absorbs the rest of the JSON (including any following keys) into
+     * the value of the preceding key.
+     *
+     * <p>Correct behaviour: {@code "\\"} in JSON is a string whose value is a single backslash
+     * {@code \}.  The {@code "} that closes it must <em>not</em> be treated as escaped.
+     */
+    @Test
+    public void testReadStringValueEndingWithEscapedBackslashNotLastKey() throws Exception {
+        // JSON: {"a":"\\","b":"w"}
+        // "a" has value \ (single backslash); "b" has value w.
+        // Bug: getNextSepCharIndex sees \ before the closing " of "\\" and skips
+        // that quote, causing "b" to be swallowed into the value of "a".
+        String json = "{\"a\":\"\\\\\",\"b\":\"w\"}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(2, map.size());
+        assertEquals("\\", map.get("a"));
+        assertEquals("w", map.get("b"));
+    }
+
+    /**
+     * Same bug as {@link #testReadStringValueEndingWithEscapedBackslashNotLastKey} but with a
+     * security-relevant follow-on key, matching the attack scenario described in the audit:
+     * a crafted value ending in {@code \\} causes a subsequent key such as {@code "admin"} to
+     * disappear from the parsed map.
+     */
+    @Test
+    public void testReadStringValueEndingWithEscapedBackslashDropsSubsequentKey() throws Exception {
+        // JSON: {"role":"user\\","admin":true}
+        // "role" value is user\ (user + single backslash); "admin" value is Boolean.TRUE.
+        // Bug: "admin" key is consumed as part of the "role" value and absent from the result.
+        String json = "{\"role\":\"user\\\\\",\"admin\":true}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(2, map.size());
+        assertEquals("user\\", map.get("role"));
+        assertEquals(Boolean.TRUE, map.get("admin"));
+    }
+
     @Test
     public void testAlreadyEscapedBackslash() throws Exception {
         JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
