@@ -30,6 +30,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.clustering.FailoverFeature;
+import org.apache.cxf.clustering.FailoverStrategy;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.RetryStrategy;
@@ -376,12 +377,45 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
     private static final class CustomRetryStrategy extends RetryStrategy {
         private int totalCount;
         private Map<String, Integer> map = new HashMap<>();
+
+        @Override
+        public FailoverStrategy newStrategy() {
+            // Return a per-invocation delegate whose retry counter is isolated but
+            // whose tracking (totalCount, map) accumulates on this shared instance.
+            final CustomRetryStrategy master = this;
+            RetryStrategy delegate = new RetryStrategy() {
+                @Override
+                protected <T> T getNextAlternate(List<T> alternates) {
+                    master.totalCount++;
+                    T next = super.getNextAlternate(alternates);
+                    if (next != null) {
+                        String address = (String) next;
+                        Integer count = master.map.get(address);
+                        if (count == null) {
+                            count = master.map.isEmpty() ? 1 /* count first call */ : 0;
+                        }
+                        count++;
+                        master.map.put(address, count);
+                    }
+                    return next;
+                }
+            };
+            delegate.setMaxNumberOfRetries(getMaxNumberOfRetries());
+            List<String> addresses = getAlternateAddresses(null);
+            if (addresses != null) {
+                delegate.setAlternateAddresses(addresses);
+            }
+            delegate.setDelayBetweenRetries(getDelayBetweenRetries());
+            return delegate;
+        }
+
+        // Direct use (outside FailoverTargetSelector) keeps original behaviour.
         @Override
         protected <T> T getNextAlternate(List<T> alternates) {
             totalCount++;
             T next = super.getNextAlternate(alternates);
             if (next != null) {
-                String address = (String)next;
+                String address = (String) next;
                 Integer count = map.get(address);
                 if (count == null) {
                     count = map.isEmpty() ? 1 /* count first call */ : 0;
