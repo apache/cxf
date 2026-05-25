@@ -309,7 +309,17 @@ public class JsonMapObjectReaderWriter {
                 nextCurlyBracketIndex = i;
                 break;
             } else if (currentChar == DQUOTE) {
-                if (i > from && json.charAt(i - 1) == ESCAPE) {
+                // Count how many consecutive backslashes precede this quote.
+                // An odd count means the quote itself is escaped (e.g. \");
+                // an even count means the backslashes are paired escape sequences
+                // and the quote is a real string delimiter (e.g. \\" = escaped \ + closing ").
+                int backslashCount = 0;
+                int k = i - 1;
+                while (k >= from && json.charAt(k) == ESCAPE) {
+                    backslashCount++;
+                    k--;
+                }
+                if (backslashCount % 2 != 0) {
                     continue;
                 }
                 inString = !inString;
