@@ -190,9 +190,10 @@ public class JsonMapObjectReaderWriter {
                 continue;
             }
 
-            int closingQuote = json.indexOf(DQUOTE, i + 1);
+            int closingQuote = json.charAt(i) == DQUOTE
+                    ? findClosingQuote(json, i) : json.indexOf(DQUOTE, i + 1);
             int from = json.charAt(i) == DQUOTE ? i + 1 : i;
-            String name = json.substring(from, closingQuote);
+            String name = unescapeKeyName(json.substring(from, closingQuote));
             int sepIndex = json.indexOf(COLON, closingQuote + 1);
             if (sepIndex == -1) {
                 throw new UncheckedIOException(new IOException("Error in parsing json"));
@@ -396,6 +397,47 @@ public class JsonMapObjectReaderWriter {
             return this;
         }
 
+    }
+
+    /**
+     * Returns the index of the closing {@code "} that matches the opening quote at
+     * {@code openQuoteIndex}, correctly skipping over escaped quotes ({@code \"}) and
+     * escaped backslashes ({@code \\}) inside the string by counting consecutive
+     * backslashes immediately before each candidate {@code "}: an odd count means the
+     * quote is escaped; an even count means it is a real string delimiter.
+     */
+    private static int findClosingQuote(String json, int openQuoteIndex) {
+        for (int i = openQuoteIndex + 1; i < json.length(); i++) {
+            if (json.charAt(i) == DQUOTE) {
+                int backslashCount = 0;
+                int k = i - 1;
+                while (k > openQuoteIndex && json.charAt(k) == ESCAPE) {
+                    backslashCount++;
+                    k--;
+                }
+                if (backslashCount % 2 == 0) {
+                    return i;
+                }
+            }
+        }
+        return json.length(); // malformed — treat end-of-string as sentinel
+    }
+
+    /**
+     * Decodes the JSON escape sequences that may appear in a key name:
+     * {@code \/} → {@code /}, {@code \"} → {@code "}, {@code \\} → {@code \}.
+     */
+    private static String unescapeKeyName(String name) {
+        if (name.contains("\\/")) {
+            name = name.replace("\\/", "/");
+        }
+        if (name.contains("\\\"")) {
+            name = name.replace("\\\"", "\"");
+        }
+        if (name.contains("\\\\")) {
+            name = name.replace("\\\\", "\\");
+        }
+        return name;
     }
 
     private String escapeJson(String value) {

@@ -239,6 +239,33 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals(Boolean.TRUE, map.get("admin"));
     }
 
+    /**
+     * Regression test for "Key Names With Escaped Quotes Parsed Incorrectly".
+     *
+     * <p>{@code readJsonObjectAsSettable} extracts a key name with a plain
+     * {@code json.indexOf(DQUOTE, i + 1)}, which stops at the first {@code "} it finds
+     * regardless of whether that quote is escaped.  A key that contains an embedded
+     * escaped quote — e.g. {@code "foo\"bar"} — is therefore truncated: the method
+     * finds the {@code "} in {@code \"} and returns {@code foo\} instead of
+     * {@code foo"bar}.
+     *
+     * <p>The parser then searches for the value separator {@code :} starting from the
+     * wrong offset, so the remainder of the key ({@code bar}) and the colon are
+     * consumed as a suffix of the (wrong) key name.  The resulting map contains an
+     * entry with the wrong key and the test assertion on {@code map.get("foo\"bar")}
+     * returns {@code null}.
+     */
+    @Test
+    public void testKeyWithEscapedQuoteIsParsedCorrectly() throws Exception {
+        // JSON: {"foo\"bar":"value"}  — key contains an embedded double-quote character
+        // Bug: indexOf('"') stops at the \" inside the key, producing truncated key "foo\"
+        // instead of the correct key foo"bar.
+        String json = "{\"foo\\\"bar\":\"value\"}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(1, map.size());
+        assertEquals("value", map.get("foo\"bar"));
+    }
+
     @Test
     public void testAlreadyEscapedBackslash() throws Exception {
         JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
