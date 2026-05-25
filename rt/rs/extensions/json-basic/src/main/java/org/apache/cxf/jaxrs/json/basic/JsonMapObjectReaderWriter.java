@@ -258,7 +258,11 @@ public class JsonMapObjectReaderWriter {
             try {
                 value = Long.valueOf(valueStr);
             } catch (NumberFormatException ex) {
-                value = Double.valueOf(valueStr);
+                Double doubleValue = Double.valueOf(valueStr);
+                if (doubleValue.isInfinite() || doubleValue.isNaN()) {
+                    throw new NumberFormatException("Non-finite numeric value is not allowed");
+                }
+                value = doubleValue;
             }
         }
 

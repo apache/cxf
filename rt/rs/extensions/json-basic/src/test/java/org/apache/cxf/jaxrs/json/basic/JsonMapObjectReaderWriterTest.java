@@ -33,6 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JsonMapObjectReaderWriterTest {
 
@@ -208,6 +209,27 @@ public class JsonMapObjectReaderWriterTest {
         Map.Entry<String, Object> entry = map.entrySet().iterator().next();
         assertEquals("userInput", entry.getKey());
         assertEquals("a\\", entry.getValue());
+    }
+
+    @Test
+    public void testRejectInfinityNumericValue() {
+        assertInvalidNumericLiteral("Infinity");
+        assertInvalidNumericLiteral("-Infinity");
+    }
+
+    @Test
+    public void testRejectNaNNumericValue() {
+        assertInvalidNumericLiteral("NaN");
+    }
+
+    private void assertInvalidNumericLiteral(String value) {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        try {
+            jsonMapObjectReaderWriter.fromJson("{\"exp\":" + value + "}");
+            fail("Expected NumberFormatException for invalid numeric value: " + value);
+        } catch (NumberFormatException ex) {
+            // expected
+        }
     }
 
 }

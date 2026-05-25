@@ -50,9 +50,14 @@ public final class JwtUtils {
             return;
         }
         Instant now = Instant.now();
-        Instant expires = Instant.ofEpochMilli(expiryTime * 1000L);
-        if (clockOffset != 0) {
-            expires = expires.plusSeconds(clockOffset);
+        Instant expires;
+        try {
+            expires = Instant.ofEpochSecond(expiryTime);
+            if (clockOffset != 0) {
+                expires = expires.plusSeconds(clockOffset);
+            }
+        } catch (RuntimeException ex) {
+            throw new JwtException("The token has expired", ex);
         }
         if (expires.isBefore(now)) {
             throw new JwtException("The token has expired");
@@ -69,10 +74,15 @@ public final class JwtUtils {
         }
 
         Instant validCreation = Instant.now();
-        if (clockOffset != 0) {
-            validCreation = validCreation.plusSeconds(clockOffset);
+        Instant notBeforeDate;
+        try {
+            if (clockOffset != 0) {
+                validCreation = validCreation.plusSeconds(clockOffset);
+            }
+            notBeforeDate = Instant.ofEpochSecond(notBeforeTime);
+        } catch (RuntimeException ex) {
+            throw new JwtException("The token cannot be accepted yet", ex);
         }
-        Instant notBeforeDate = Instant.ofEpochMilli(notBeforeTime * 1000L);
 
         // Check to see if the not before time is in the future
         if (notBeforeDate.isAfter(validCreation)) {
@@ -89,11 +99,20 @@ public final class JwtUtils {
             return;
         }
 
-        Instant createdDate = Instant.ofEpochMilli(issuedAtInSecs * 1000L);
+        Instant createdDate;
+        try {
+            createdDate = Instant.ofEpochSecond(issuedAtInSecs);
+        } catch (RuntimeException ex) {
+            throw new JwtException("Invalid issuedAt", ex);
+        }
 
         Instant validCreation = Instant.now();
-        if (clockOffset != 0) {
-            validCreation = validCreation.plusSeconds(clockOffset);
+        try {
+            if (clockOffset != 0) {
+                validCreation = validCreation.plusSeconds(clockOffset);
+            }
+        } catch (RuntimeException ex) {
+            throw new JwtException("Invalid issuedAt", ex);
         }
 
         // Check to see if the IssuedAt time is in the future
