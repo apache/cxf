@@ -281,6 +281,52 @@ public class JsonMapObjectReaderWriterTest {
         assertEquals("a\\", entry.getValue());
     }
 
+    /**
+     * Regression test for "[MEDIUM] Unicode Escapes Not Decoded — Potential Bypass".
+     *
+     * <p>RFC 8259 section 7 requires that four-digit hex Unicode escape sequences
+     * (backslash + u + four hex digits) be decoded to the corresponding character.
+     * {@code readPrimitiveValue} only handles {@code \/}, {@code \"}, and {@code \\};
+     * four-digit hex escapes and single-character escapes ({@code \n}, {@code \r},
+     * {@code \t}, etc.) are returned as the raw literal escape text rather than the
+     * decoded character.
+     *
+     * <p>Security impact: a JWT whose {@code alg} header is written using four-digit hex
+     * escapes that spell {@code none} passes CXF's own algorithm check (the literal
+     * un-decoded sequence is not equal to {@code "none"}), while a downstream
+     * RFC-compliant consumer decodes the escapes and may skip signature verification
+     * entirely — a parser-differential bypass.
+     */
+    @Test
+    public void testUnicodeEscapeInValueDecodedCorrectly() throws Exception {
+        // JSON: {"alg":"<none-as-4-digit-hex-escapes>"} — each character of "none" is written
+        // as its four-digit hex Unicode escape.  A correct parser decodes them to "none".
+        // Bug: readPrimitiveValue does not decode four-digit hex escapes; the value is
+        // returned as the 24-character literal sequence rather than "none".
+        String json = "{\"alg\":\"\\u006e\\u006f\\u006e\\u0065\"}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(1, map.size());
+        assertEquals("none", map.get("alg"));
+    }
+
+    /**
+     * Simpler companion to {@link #testUnicodeEscapeInValueDecodedCorrectly}: verifies
+     * that a four-digit hex Unicode escape embedded in the middle of a value string is
+     * decoded to the target character rather than kept as the raw escape text.
+     *
+     * <p>The letter {@code l} is U+006C; JSON {@code "hello"} should therefore
+     * produce the five-character string {@code hello}.
+     */
+    @Test
+    public void testUnicodeEscapeEmbeddedInString() throws Exception {
+        // JSON: {"a":"hel<U+006C>o"} — U+006C is 'l', so the decoded value is "hello".
+        // Bug: the six-character literal sequence is returned instead of the decoded char.
+        String json = "{\"a\":\"hel\\u006co\"}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(1, map.size());
+        assertEquals("hello", map.get("a"));
+    }
+
     @Test
     public void testRejectInfinityNumericValue() {
         assertInvalidNumericLiteral("Infinity");
