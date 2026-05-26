@@ -268,18 +268,7 @@ public class JsonMapObjectReaderWriter {
         }
 
         if (value instanceof String) {
-            if (((String) value).contains("\\/")) {
-                // Escape an encoded forward slash
-                value = ((String) value).replace("\\/", "/");
-            }
-            if (((String) value).contains("\\\"")) {
-                // Escape an encoded quotation mark
-                value = ((String) value).replace("\\\"", "\"");
-            }
-            if (((String) value).contains("\\\\")) {
-                // Escape an encoded backslash
-                value = ((String) value).replace("\\\\", "\\");
-            }
+            value = decodeEscapeSequences((String) value);
         }
         return value;
     }
@@ -400,6 +389,69 @@ public class JsonMapObjectReaderWriter {
     }
 
     /**
+     * Decodes all RFC 8259 section 7 JSON string escape sequences in a single
+     * left-to-right pass, producing the logical string value.
+     *
+     * <p>Recognised sequences: {@code \"}, {@code \\}, {@code \/}, {@code \b},
+     * {@code \f}, {@code \n}, {@code \r}, {@code \t}, and four-digit hex Unicode
+     * escapes (backslash + {@code u} + four hex digits).
+     *
+     * <p>A single pass is used deliberately: sequential {@code String.replace} calls
+     * applied in separate passes can interact incorrectly (e.g. a raw {@code \\"}
+     * sequence would have its {@code \"} consumed by a "decode quotes" pass before
+     * the {@code \\} is consumed by a "decode backslashes" pass, yielding the wrong
+     * result).
+     */
+    private static String decodeEscapeSequences(String s) {
+        int backslashIdx = s.indexOf(ESCAPE);
+        if (backslashIdx == -1) {
+            return s; // fast path: nothing to decode
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        sb.append(s, 0, backslashIdx);
+        int i = backslashIdx;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c != ESCAPE || i + 1 >= s.length()) {
+                sb.append(c);
+                i++;
+                continue;
+            }
+            char next = s.charAt(i + 1);
+            switch (next) {
+            case '"':  sb.append('"');  i += 2; break;
+            case '\\': sb.append('\\'); i += 2; break;
+            case '/':  sb.append('/');  i += 2; break;
+            case 'b':  sb.append('\b'); i += 2; break;
+            case 'f':  sb.append('\f'); i += 2; break;
+            case 'n':  sb.append('\n'); i += 2; break;
+            case 'r':  sb.append('\r'); i += 2; break;
+            case 't':  sb.append('\t'); i += 2; break;
+            case 'u':
+                if (i + 5 < s.length()) {
+                    String hex = s.substring(i + 2, i + 6);
+                    try {
+                        sb.append((char) Integer.parseInt(hex, 16));
+                        i += 6;
+                        break;
+                    } catch (NumberFormatException ignored) {
+                        // not a valid four-digit hex sequence — fall through and keep '\'
+                    }
+                }
+                sb.append(c);
+                i++;
+                break;
+            default:
+                // unrecognised escape — keep the backslash as-is
+                sb.append(c);
+                i++;
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Returns the index of the closing {@code "} that matches the opening quote at
      * {@code openQuoteIndex}, correctly skipping over escaped quotes ({@code \"}) and
      * escaped backslashes ({@code \\}) inside the string by counting consecutive
@@ -424,20 +476,11 @@ public class JsonMapObjectReaderWriter {
     }
 
     /**
-     * Decodes the JSON escape sequences that may appear in a key name:
-     * {@code \/} → {@code /}, {@code \"} → {@code "}, {@code \\} → {@code \}.
+     * Decodes the JSON escape sequences that may appear in a key name by delegating
+     * to the same single-pass decoder used for string values.
      */
     private static String unescapeKeyName(String name) {
-        if (name.contains("\\/")) {
-            name = name.replace("\\/", "/");
-        }
-        if (name.contains("\\\"")) {
-            name = name.replace("\\\"", "\"");
-        }
-        if (name.contains("\\\\")) {
-            name = name.replace("\\\\", "\\");
-        }
-        return name;
+        return decodeEscapeSequences(name);
     }
 
     private String escapeJson(String value) {
