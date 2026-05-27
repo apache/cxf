@@ -33,6 +33,7 @@ import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -42,8 +43,6 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-
-import io.micrometer.common.util.StringUtils;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -267,7 +266,7 @@ public class UriInfoImpl implements UriInfo {
             
             if (!templates.isEmpty()) {
                 UriBuilder builder = null;
-                if (applicationPath != null && !StringUtils.isBlank(applicationPath.value())) {
+                if (applicationPath != null && !StringUtils.isEmpty(applicationPath.value())) {
                     builder = UriBuilder.fromPath(applicationPath.value());
                     for (int i = 0; i < templates.size(); ++i) {
                         builder = builder.path(templates.get(i).getValue());
