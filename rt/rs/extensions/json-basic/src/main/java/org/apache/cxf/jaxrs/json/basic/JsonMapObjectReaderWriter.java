@@ -30,6 +30,13 @@ import org.apache.cxf.helpers.IOUtils;
 
 
 public class JsonMapObjectReaderWriter {
+    /**
+     * Maximum JSON nesting depth accepted by the parser, matching Jettison's default
+     * {@code RECURSION_DEPTH_LIMIT} of 500.  Payloads nested more deeply than this
+     * throw an {@link java.io.UncheckedIOException} rather than exhausting the JVM
+     * thread stack with unbounded recursion.
+     */
+    static final int MAX_RECURSION_DEPTH = 500;
     private static final Set<Character> ESCAPED_CHARS;
     private static final char DQUOTE = '"';
     private static final char COMMA = ',';
@@ -185,6 +192,14 @@ public class JsonMapObjectReaderWriter {
         return internalFromJsonAsList(name, theJson.substring(1, theJson.length() - 1));
     }
     protected void readJsonObjectAsSettable(Settable values, String json) {
+        readJsonObjectAsSettable(values, json, 0);
+    }
+
+    private void readJsonObjectAsSettable(Settable values, String json, int depth) {
+        if (depth > MAX_RECURSION_DEPTH) {
+            throw new UncheckedIOException(new IOException(
+                    "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
+        }
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
                 continue;
@@ -207,13 +222,13 @@ public class JsonMapObjectReaderWriter {
                 int closingIndex = getClosingIndex(json, OBJECT_START, OBJECT_END, sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
                 MapSettable nextMap = new MapSettable();
-                readJsonObjectAsSettable(nextMap, newJson);
+                readJsonObjectAsSettable(nextMap, newJson, depth + 1);
                 values.put(name, nextMap.map);
                 i = closingIndex + 1;
             } else if (json.charAt(sepIndex + j) == ARRAY_START) {
                 int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, sepIndex + j);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
-                values.put(name, internalFromJsonAsList(name, newJson));
+                values.put(name, internalFromJsonAsList(name, newJson, depth + 1));
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, sepIndex + j);
@@ -224,7 +239,16 @@ public class JsonMapObjectReaderWriter {
 
         }
     }
+
     protected List<Object> internalFromJsonAsList(String name, String json) {
+        return internalFromJsonAsList(name, json, 0);
+    }
+
+    private List<Object> internalFromJsonAsList(String name, String json, int depth) {
+        if (depth > MAX_RECURSION_DEPTH) {
+            throw new UncheckedIOException(new IOException(
+                    "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
+        }
         List<Object> values = new LinkedList<>();
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
@@ -233,7 +257,7 @@ public class JsonMapObjectReaderWriter {
             if (json.charAt(i) == OBJECT_START) {
                 int closingIndex = getClosingIndex(json, OBJECT_START, OBJECT_END, i);
                 MapSettable nextMap = new MapSettable();
-                readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex));
+                readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex), depth + 1);
                 values.add(nextMap.map);
                 i = closingIndex + 1;
             } else {
