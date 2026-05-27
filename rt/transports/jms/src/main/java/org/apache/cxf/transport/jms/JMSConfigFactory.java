@@ -190,6 +190,7 @@ public final class JMSConfigFactory {
         if (transactionManagerJndiName == null) {
             return null;
         }
+        JndiHelper.validateJndiName(transactionManagerJndiName);
         try {
             InitialContext ictx = new InitialContext();
             return (TransactionManager)ictx.lookup(transactionManagerJndiName);
