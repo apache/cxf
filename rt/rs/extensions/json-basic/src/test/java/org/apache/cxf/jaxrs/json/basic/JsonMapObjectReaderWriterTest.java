@@ -392,4 +392,42 @@ public class JsonMapObjectReaderWriterTest {
         }
     }
 
+    /**
+     * Add a test to check an exception is thrown on parsing deeply nested JSON structures that exceed the 
+     * recursion depth limit.
+     */
+    @Test(expected = UncheckedIOException.class)
+    public void testDepthLimitExceededThrowsUncheckedIOException() {
+        int levels = JsonMapObjectReaderWriter.MAX_RECURSION_DEPTH + 2;
+        StringBuilder sb = new StringBuilder(levels * 8);
+        for (int i = 0; i < levels; i++) {
+            sb.append("{\"a\":");
+        }
+        sb.append("\"v\"");
+        for (int i = 0; i < levels; i++) {
+            sb.append('}');
+        }
+        new JsonMapObjectReaderWriter().fromJson(sb.toString());
+    }
+
+    /**
+     * A payload with exactly {@code MAX_RECURSION_DEPTH + 1} brace levels reaches a
+     * maximum internal depth of {@code MAX_RECURSION_DEPTH} — right at the boundary —
+     * and must parse successfully.
+     */
+    @Test
+    public void testDepthLimitNotExceededParsesSuccessfully() {
+        int levels = JsonMapObjectReaderWriter.MAX_RECURSION_DEPTH + 1;
+        StringBuilder sb = new StringBuilder(levels * 8);
+        for (int i = 0; i < levels; i++) {
+            sb.append("{\"a\":");
+        }
+        sb.append("\"v\"");
+        for (int i = 0; i < levels; i++) {
+            sb.append('}');
+        }
+        // Should not throw
+        new JsonMapObjectReaderWriter().fromJson(sb.toString());
+    }
+
 }
