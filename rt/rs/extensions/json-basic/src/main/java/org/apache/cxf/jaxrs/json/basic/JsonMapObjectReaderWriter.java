@@ -487,8 +487,18 @@ public class JsonMapObjectReaderWriter {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
+            if (c < 0x20) {
+                // RFC 8259 section 7: all control characters (U+0000–U+001F) MUST be escaped.
+                switch (c) {
+                case '\b': sb.append("\\b");  break;
+                case '\t': sb.append("\\t");  break;
+                case '\n': sb.append("\\n");  break;
+                case '\f': sb.append("\\f");  break;
+                case '\r': sb.append("\\r");  break;
+                default:   sb.append(String.format("\\u%04x", (int) c)); break;
+                }
             // If we have " and the previous char was not \ then escape it
-            if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
+            } else if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
                 sb.append('\\').append(c);
             // If we have \ and the previous char was not \ and the next char is not an escaped char, then escape it
             } else if (c == '\\' && (i == 0 || value.charAt(i - 1) != '\\')

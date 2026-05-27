@@ -31,6 +31,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -325,6 +326,49 @@ public class JsonMapObjectReaderWriterTest {
         Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
         assertEquals(1, map.size());
         assertEquals("hello", map.get("a"));
+    }
+
+    /**
+     * RFC 8259 section 7 requires that all control characters (U+0000–U+001F) in string
+     * values be escaped in JSON output.  {@code escapeJson} only escapes {@code "} and
+     * {@code \}; every other control character is emitted verbatim, producing JSON that
+     * violates the specification and may be rejected or mishandled by strict parsers.
+     *
+     * <p>The three tests below cover the most security-relevant cases:
+     * <ol>
+     *   <li>A raw line-feed (U+000A) must be escaped as {@code \n}.</li>
+     *   <li>A raw horizontal-tab (U+0009) must be escaped as {@code \t}.</li>
+     *   <li>A raw CR+LF sequence must have both bytes escaped — an unescaped CR+LF in a
+     *       JSON value that is subsequently placed in an HTTP response header enables
+     *       HTTP response splitting (header injection).</li>
+     * </ol>
+     */
+    @Test
+    public void testRawNewlineInValueIsEscapedInOutput() throws Exception {
+        // Bug: escapeJson passes U+000A through verbatim; correct output is \n (two chars).
+        Map<String, Object> map = Collections.singletonMap("msg", "line1\nline2");
+        String json = new JsonMapObjectReaderWriter().toJson(map);
+        assertFalse("Raw newline must not appear verbatim in JSON output", json.contains("\n"));
+        assertEquals("{\"msg\":\"line1\\nline2\"}", json);
+    }
+
+    @Test
+    public void testRawTabInValueIsEscapedInOutput() throws Exception {
+        // Bug: escapeJson passes U+0009 through verbatim; correct output is \t (two chars).
+        Map<String, Object> map = Collections.singletonMap("msg", "col1\tcol2");
+        String json = new JsonMapObjectReaderWriter().toJson(map);
+        assertFalse("Raw tab must not appear verbatim in JSON output", json.contains("\t"));
+        assertEquals("{\"msg\":\"col1\\tcol2\"}", json);
+    }
+
+    @Test
+    public void testCrLfInValueDoesNotEnableHttpResponseSplitting() throws Exception {
+        // Bug: neither \r nor \n is escaped, so a crafted value can inject arbitrary
+        // HTTP headers when the JSON output is placed in a response header field.
+        Map<String, Object> map = Collections.singletonMap("v", "ok\r\nX-Injected: evil");
+        String json = new JsonMapObjectReaderWriter().toJson(map);
+        assertFalse("Raw CR must not appear verbatim in JSON output", json.contains("\r"));
+        assertFalse("Raw LF must not appear verbatim in JSON output", json.contains("\n"));
     }
 
     @Test
