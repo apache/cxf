@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.naming.Context;
@@ -44,6 +45,32 @@ public class JndiHelper {
      */
     private static final String DEFAULT_JMS_PROTOCOLS = "vm,tcp,nio,ssl,http,https,ws,wss";
     private static final List<String> ALLOWED_PROTOCOLS;
+
+    /**
+     * JNDI environment properties that must not be supplied from untrusted input.
+     * <p>
+     * Note: {@code java.naming.factory.initial} (INITIAL_CONTEXT_FACTORY) is intentionally
+     * absent. It is a first-class, documented configuration parameter — every JNDI-based JMS
+     * deployment sets it to the broker's context factory (e.g. ActiveMQ, Artemis, WebLogic).
+     * It is safe to allow because any attempt to redirect lookups to a remote host via a
+     * substitute factory still requires setting PROVIDER_URL to a non-JMS scheme, which the
+     * protocol allowlist check below independently rejects.
+     * </p>
+     * <ul>
+     *   <li>{@code java.naming.factory.object} — object factories reconstruct objects returned
+     *       by a lookup and can deserialize remote payloads.</li>
+     *   <li>{@code java.naming.factory.state} — state factories run during bind/rebind and
+     *       can trigger arbitrary serialization logic.</li>
+     *   <li>{@code java.naming.factory.url.pkgs} — injects packages for URL context factory
+     *       resolution and could register a handler for an otherwise-allowed scheme.</li>
+     * </ul>
+     */
+    private static final Set<String> BLOCKED_ENV_KEYS = Set.of(
+        "java.naming.factory.object",
+        "java.naming.factory.state",
+        "java.naming.factory.url.pkgs"
+    );
+
     private Properties environment;
 
     static {
@@ -68,6 +95,13 @@ public class JndiHelper {
     public JndiHelper(Properties environment) {
         this.environment = environment;
 
+        // Reject properties that could be used to redirect or hijack the JNDI lookup
+        for (String blocked : BLOCKED_ENV_KEYS) {
+            if (environment.containsKey(blocked)) {
+                throw new IllegalArgumentException("Disallowed JNDI environment property: " + blocked);
+            }
+        }
+
         // Avoid unsafe protocols if they are somehow misconfigured
         String providerUrl = environment.getProperty(Context.PROVIDER_URL);
         if (providerUrl != null && !providerUrl.isEmpty()
@@ -76,8 +110,19 @@ public class JndiHelper {
         }
     }
 
+    /**
+     * Rejects lookup names that contain a URL scheme (e.g. ldap://, rmi://), which would
+     * redirect the lookup to a remote server and enable JNDI injection.
+     */
+    public static void validateJndiName(String name) {
+        if (name != null && name.contains("://")) {
+            throw new IllegalArgumentException("JNDI name must not contain a URL: " + name);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T lookup(final String name, Class<T> requiredType) throws NamingException {
+        validateJndiName(name);
         Context ctx = createInitialContext();
         try {
             Object located = ctx.lookup(name);
