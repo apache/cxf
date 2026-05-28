@@ -75,13 +75,13 @@ public class JsonMapObjectReaderWriter {
 
     public String toJson(Map<String, Object> map) {
         StringBuilder sb = new StringBuilder();
-        toJsonInternal(new StringBuilderOutput(sb), map);
+        toJsonInternal(new StringBuilderOutput(sb), map, 0);
         return sb.toString();
     }
 
     public String toJson(List<Object> list) {
         StringBuilder sb = new StringBuilder();
-        toJsonInternal(new StringBuilderOutput(sb), list);
+        toJsonInternal(new StringBuilderOutput(sb), list, 0);
         return sb.toString();
     }
 
@@ -90,29 +90,49 @@ public class JsonMapObjectReaderWriter {
     }
 
     public void toJson(Map<String, Object> map, OutputStream os) {
-        toJsonInternal(new StreamOutput(os), map);
+        toJsonInternal(new StreamOutput(os), map, 0);
     }
 
     protected void toJsonInternal(Output out, Map<String, Object> map) {
+        toJsonInternal(out, map, 0);
+    }
+
+    private void toJsonInternal(Output out, Map<String, Object> map, int depth) {
+        if (depth > MAX_RECURSION_DEPTH) {
+            throw new UncheckedIOException(new IOException(
+                "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
+        }
         out.append(OBJECT_START);
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
             out.append(DQUOTE).append(escapeJson(entry.getKey())).append(DQUOTE);
             out.append(COLON);
-            toJsonInternal(out, entry.getValue(), it.hasNext());
+            toJsonInternal(out, entry.getValue(), it.hasNext(), depth);
         }
         out.append(OBJECT_END);
     }
 
     protected void toJsonInternal(Output out, Object[] array) {
-        toJsonInternal(out, Arrays.asList(array));
+        toJsonInternal(out, array, 0);
+    }
+
+    private void toJsonInternal(Output out, Object[] array, int depth) {
+        toJsonInternal(out, Arrays.asList(array), depth);
     }
 
     protected void toJsonInternal(Output out, Collection<?> coll) {
+        toJsonInternal(out, coll, 0);
+    }
+
+    private void toJsonInternal(Output out, Collection<?> coll, int depth) {
+        if (depth > MAX_RECURSION_DEPTH) {
+            throw new UncheckedIOException(new IOException(
+                "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
+        }
         out.append(ARRAY_START);
         formatIfNeeded(out);
         for (Iterator<?> iter = coll.iterator(); iter.hasNext();) {
-            toJsonInternal(out, iter.next(), iter.hasNext());
+            toJsonInternal(out, iter.next(), iter.hasNext(), depth);
         }
         formatIfNeeded(out);
         out.append(ARRAY_END);
@@ -120,16 +140,21 @@ public class JsonMapObjectReaderWriter {
 
     @SuppressWarnings("unchecked")
     protected void toJsonInternal(Output out, Object value, boolean hasNext) {
+        toJsonInternal(out, value, hasNext, 0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void toJsonInternal(Output out, Object value, boolean hasNext, int depth) {
         if (value == null) {
             out.append(null);
         } else if (JsonMapObject.class.isAssignableFrom(value.getClass())) {
-            out.append(toJson((JsonMapObject)value));
+            toJsonInternal(out, ((JsonMapObject)value).asMap(), depth + 1);
         } else if (value.getClass().isArray()) {
-            toJsonInternal(out, (Object[])value);
+            toJsonInternal(out, (Object[])value, depth + 1);
         } else if (Collection.class.isAssignableFrom(value.getClass())) {
-            toJsonInternal(out, (Collection<?>)value);
+            toJsonInternal(out, (Collection<?>)value, depth + 1);
         } else if (Map.class.isAssignableFrom(value.getClass())) {
-            toJsonInternal(out, (Map<String, Object>)value);
+            toJsonInternal(out, (Map<String, Object>)value, depth + 1);
         } else {
             boolean quotesNeeded = checkQuotesNeeded(value);
             if (quotesNeeded) {
