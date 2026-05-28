@@ -20,75 +20,15 @@ package org.apache.cxf.transport.http;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.cxf.transports.http.configuration.ProxyServerType;
 
 public class ProxyFactory {
-    /**
-     * JVM/System property name holding the hostname of the http proxy.
-     */
-    private static final String HTTP_PROXY_HOST = "http.proxyHost";
-
-    /**
-     * JVM/System property name holding the port of the http proxy.
-     */
-    private static final String HTTP_PROXY_PORT = "http.proxyPort";
-
-    /**
-     * JVM/System property name holding the list of hosts/patterns that
-     * should not use the proxy configuration.
-     */
-    private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
-
-    /**
-     * This field holds ONLY the static System proxy configuration:
-     * + http.proxyHost
-     * + http.proxyPort (default 8080)
-     * + http.nonProxyHosts (default null)
-     * It is initialized at the instance creation (and may be null
-     * if there is no appropriate System properties)
-     */
-    private HTTPClientPolicy systemProxyConfiguration;
-
-    public ProxyFactory() {
-        this.systemProxyConfiguration = createSystemProxyConfiguration();
-    }
-
-    private static HTTPClientPolicy createSystemProxyConfiguration() {
-        // Retrieve system properties (if any)
-        HTTPClientPolicy systemProxyConfiguration = null;
-        String proxyHost = SystemPropertyAction.getPropertyOrNull(HTTP_PROXY_HOST);
-        if (StringUtils.isEmpty(proxyHost)) {
-            proxyHost = null;
-        }
-        if (proxyHost != null) {
-            // System is configured with a proxy, use it
-
-            systemProxyConfiguration = new HTTPClientPolicy();
-            systemProxyConfiguration.setProxyServer(proxyHost);
-            systemProxyConfiguration.setProxyServerType(ProxyServerType.HTTP);
-
-            // 8080 is the default proxy port value as per some documentation
-            String proxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT, "8080");
-            if (StringUtils.isEmpty(proxyPort)) {
-                proxyPort = "8080";
-            }
-
-            systemProxyConfiguration.setProxyServerPort(Integer.parseInt(proxyPort));
-
-            // Load non proxy hosts
-            String nonProxyHosts = SystemPropertyAction.getPropertyOrNull(HTTP_NON_PROXY_HOSTS);
-            if (!StringUtils.isEmpty(nonProxyHosts)) {
-                systemProxyConfiguration.setNonProxyHosts(nonProxyHosts);
-            }
-        }
-        return systemProxyConfiguration;
-    }
 
     /**
      * This method returns the Proxy server should it be set on the
@@ -97,29 +37,30 @@ public class ProxyFactory {
      * @return The proxy server or null, if not set.
      */
     public Proxy createProxy(HTTPClientPolicy policy, URI currentUrl) {
-        if (policy != null) {
-            // Maybe the user has provided some proxy information
-            if (policy.isSetProxyServer()
+        if (policy != null && policy.isSetProxyServer()
                 && !StringUtils.isEmpty(policy.getProxyServer())) {
-                return getProxy(policy, currentUrl.getHost());
-            }
-            // There is a policy but no Proxy configuration,
-            // fallback on the system proxy configuration
-            return getSystemProxy(currentUrl.getHost());
+            return getProxy(policy, currentUrl.getHost());
         }
-        // Use system proxy configuration
-        return getSystemProxy(currentUrl.getHost());
+        return getSystemProxy(currentUrl);
     }
 
     /**
-     * Get the system proxy (if any) for the given URL's host.
+     * Delegate to the configured {@link ProxySelector} so that custom
+     * implementations (e.g. wrappers around {@code DefaultProxySelector})
+     * are honoured rather than bypassed.
      */
-    private Proxy getSystemProxy(String hostname) {
-        if (systemProxyConfiguration != null) {
-            return getProxy(systemProxyConfiguration, hostname);
+    private Proxy getSystemProxy(URI uri) {
+        ProxySelector selector = ProxySelector.getDefault();
+        if (selector == null) {
+            return null;
         }
-
-        // No proxy configured
+        List<Proxy> proxies = selector.select(uri);
+        if (proxies != null && !proxies.isEmpty()) {
+            Proxy proxy = proxies.get(0);
+            if (proxy != Proxy.NO_PROXY) {
+                return proxy;
+            }
+        }
         return null;
     }
 
@@ -128,15 +69,11 @@ public class ProxyFactory {
      */
     private Proxy getProxy(final HTTPClientPolicy policy, final String hostname) {
         if (policy.isSetNonProxyHosts()) {
-
-            // Try to match the URL hostname with the exclusion pattern
             Pattern pattern = PatternBuilder.build(policy.getNonProxyHosts());
             if (pattern.matcher(hostname).matches()) {
-                // Excluded hostname -> no proxy
                 return Proxy.NO_PROXY;
             }
         }
-        // Either nonProxyHosts is not set or the pattern did not match
         return createProxy(policy);
     }
 
