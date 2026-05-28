@@ -430,4 +430,20 @@ public class JsonMapObjectReaderWriterTest {
         new JsonMapObjectReaderWriter().fromJson(sb.toString());
     }
 
+    @Test(expected = UncheckedIOException.class)
+    public void testWriterPathDeeplyNestedMapThrowsUncheckedIOException() {
+        new JsonMapObjectReaderWriter().toJson(createNestedMap(20000));
+    }
+
+    private Map<String, Object> createNestedMap(int depth) {
+        Map<String, Object> root = new HashMap<>();
+        Map<String, Object> current = root;
+        for (int i = 0; i < depth; i++) {
+            Map<String, Object> child = new HashMap<>();
+            current.put("k", child);
+            current = child;
+        }
+        return root;
+    }
+
 }
