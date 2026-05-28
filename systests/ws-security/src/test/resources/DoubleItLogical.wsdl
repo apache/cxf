@@ -51,6 +51,21 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="DoubleIt5">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="numberToDouble" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DoubleIt5Response">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="streamData" type="xsd:base64Binary"
+                            xmime:expectedContentTypes="application/octet-stream"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="DoubleItResponse">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -81,6 +96,12 @@
     </wsdl:message>
     <wsdl:message name="DoubleIt4Request">
         <wsdl:part element="di:DoubleIt4" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleIt5Request">
+        <wsdl:part element="di:DoubleIt5" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="DoubleIt5Response">
+        <wsdl:part element="di:DoubleIt5Response" name="parameters"/>
     </wsdl:message>
     <wsdl:message name="DoubleItRequestHeader">
         <wsdl:part element="di:DoubleIt" name="parameters"/>
@@ -136,6 +157,13 @@
         <wsdl:operation name="DoubleIt4">
             <wsdl:input message="tns:DoubleIt4Request"/>
             <wsdl:output message="tns:DoubleIt4Response"/>
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:portType name="DoubleItStreamingMtomPortType">
+        <wsdl:operation name="DoubleIt5">
+            <wsdl:input message="tns:DoubleIt5Request"/>
+            <wsdl:output message="tns:DoubleIt5Response"/>
             <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault"/>
         </wsdl:operation>
     </wsdl:portType>

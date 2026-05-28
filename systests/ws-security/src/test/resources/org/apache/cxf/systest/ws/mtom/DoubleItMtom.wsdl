@@ -139,7 +139,22 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
-    
+    <wsdl:binding name="DoubleItStreamingMtomBinding" type="tns:DoubleItStreamingMtomPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt5">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSignedMTOMInlinePort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSignedMTOMInline"/>
@@ -164,6 +179,18 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSymmetricBinaryPort" binding="tns:DoubleItSymmetricBinaryBinding">
             <soap:address location="http://localhost:9001/DoubleItX509SymmetricBinary"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItStreamingMtomPort" binding="tns:DoubleItStreamingMtomBinding">
+            <soap:address location="http://localhost:9001/DoubleItStreamingMtom"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItStreamingMtomSignedPort" binding="tns:DoubleItStreamingMtomBinding">
+            <soap:address location="http://localhost:9001/DoubleItStreamingMtomSigned"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItStreamingMtomLargePort" binding="tns:DoubleItStreamingMtomBinding">
+            <soap:address location="http://localhost:9001/DoubleItStreamingMtomLarge"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItStreamingMtomLargeSignedPort" binding="tns:DoubleItStreamingMtomBinding">
+            <soap:address location="http://localhost:9001/DoubleItStreamingMtomLargeSigned"/>
         </wsdl:port>
     </wsdl:service>
     
