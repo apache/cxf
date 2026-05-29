@@ -207,6 +207,30 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (passwordEncryptor != null) {
             msg.put(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
         }
+
+        Object expandXOP = SecurityUtils.getSecurityPropertyValue(SecurityConstants.EXPAND_XOP_INCLUDE, msg);
+        if (expandXOP != null) {
+            msg.put(ConfigurationConstants.EXPAND_XOP_INCLUDE,
+                    Boolean.parseBoolean(expandXOP.toString()) ? "true" : "false");
+        } else {
+            // Also propagate the WSS4J-level key from the options map so that SAAJInInterceptor
+            // can skip attachment caching when expandXOPInclude=false is configured directly.
+            String expandXOPOption = (String) getOption(ConfigurationConstants.EXPAND_XOP_INCLUDE);
+            if (expandXOPOption != null) {
+                msg.put(ConfigurationConstants.EXPAND_XOP_INCLUDE, expandXOPOption);
+            }
+        }
+        Object storeBytes =
+            SecurityUtils.getSecurityPropertyValue(SecurityConstants.STORE_BYTES_IN_ATTACHMENT, msg);
+        if (storeBytes != null) {
+            msg.put(ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT,
+                    Boolean.parseBoolean(storeBytes.toString()) ? "true" : "false");
+        } else {
+            String storeBytesOption = (String) getOption(ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT);
+            if (storeBytesOption != null) {
+                msg.put(ConfigurationConstants.STORE_BYTES_IN_ATTACHMENT, storeBytesOption);
+            }
+        }
     }
 
     @Override
