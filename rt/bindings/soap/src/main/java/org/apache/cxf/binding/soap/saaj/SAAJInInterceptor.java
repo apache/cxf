@@ -205,7 +205,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             message.setContent(Node.class, soapMessage.getSOAPPart());
 
             Collection<Attachment> atts = message.getAttachments();
-            if (atts != null) {
+            if (atts != null && !"false".equals(message.get("expandXOPInclude"))) {
                 for (Attachment a : atts) {
                     if (a.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                         try {

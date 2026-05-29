@@ -170,5 +170,28 @@
             <entry key="mtom-enabled" value="true"/>
         </jaxws:properties>
     </jaxws:client>
-    
+
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItStreamingMtomPort" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="true"/>
+        </jaxws:properties>
+    </jaxws:client>
+
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItStreamingMtomSignedPort" createdFromAPI="true">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="action" value="Signature"/>
+                        <entry key="signatureVerificationPropFile" value="bob.properties"/>
+                        <entry key="expandXOPInclude" value="false"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </jaxws:inInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="true"/>
+        </jaxws:properties>
+    </jaxws:client>
+
 </beans>
