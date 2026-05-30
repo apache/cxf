@@ -38,6 +38,8 @@ import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Document;
 
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -65,6 +67,15 @@ public class ExtendedDocumentBuilder {
     public void setValidating(boolean validate) {
         if (validate) {
             this.schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            try {
+                schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+                LOG.log(Level.WARNING, "The properties '" + XMLConstants.FEATURE_SECURE_PROCESSING + "', '"
+                    + XMLConstants.ACCESS_EXTERNAL_DTD  + "', '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA 
+                    + "' are not supported.");
+            }
             try {
                 this.schema = schemaFactory.newSchema(new StreamSource(getSchemaLocation()));
             } catch (SAXException e) {

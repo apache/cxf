@@ -51,6 +51,8 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -488,6 +490,16 @@ public final class EndpointReferenceUtils {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            try {
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+                LOG.log(Level.WARNING, "The properties '" + XMLConstants.FEATURE_SECURE_PROCESSING + "', '"
+                    + XMLConstants.ACCESS_EXTERNAL_DTD  + "', '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA 
+                    + "' are not supported.");
+            }
+
             Map<String, byte[]> schemaSourcesMap = new LinkedHashMap<>();
             Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<>();
 
