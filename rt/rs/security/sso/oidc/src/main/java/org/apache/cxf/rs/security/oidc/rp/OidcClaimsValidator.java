@@ -69,16 +69,20 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
                 throw new OAuthServiceException("Invalid subject");
             }
 
-            // validate authorized party
-            String authorizedParty = (String)claims.getClaim(IdToken.AZP_CLAIM);
-            if (authorizedParty != null && !authorizedParty.equals(clientId)) {
-                throw new OAuthServiceException("Invalid authorized party");
-            }
             // validate audience
             List<String> audiences = claims.getAudiences();
             if (StringUtils.isEmpty(audiences) && validateClaimsAlways
                 || !StringUtils.isEmpty(audiences) && !audiences.contains(clientId)) {
                 throw new OAuthServiceException("Invalid audience");
+            }
+            // validate authorized party. An azp claim is required when the token has more than
+            // one audience, and when present it must match the client id (OIDC Core 3.1.3.7).
+            String authorizedParty = (String)claims.getClaim(IdToken.AZP_CLAIM);
+            if (authorizedParty == null && audiences != null && audiences.size() > 1) {
+                throw new OAuthServiceException("Invalid authorized party");
+            }
+            if (authorizedParty != null && !authorizedParty.equals(clientId)) {
+                throw new OAuthServiceException("Invalid authorized party");
             }
 
             // If strict time validation: if no issuedTime claim is set then an expiresAt claim must be set
