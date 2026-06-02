@@ -20,6 +20,7 @@ package org.apache.cxf.attachment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
@@ -667,6 +668,28 @@ public class AttachmentDeserializerTest {
         ins.close();
     }
 
+    @Test
+    public void testManyAttachmentHeaders() throws Exception {
+        StringBuilder sb = new StringBuilder(10000);
+        // Add many attachment headers
+        sb.append("------=_Part_34950_1098328613.1263781527359\n");
+        IntStream.range(0, 1000).forEach(i -> sb.append("Header-").append(i).append(": foo").append(i).append('\n'));
+        sb.append("Content-Type: text/xml; charset=UTF-8\n")
+            .append("Content-Transfer-Encoding: binary\n")
+            .append("Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n")
+            .append('\n')
+            .append("<envelope/>\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+
+        assertThrows("Failure expected on too many attachment headers", IOException.class, 
+            () -> ad.initializeAttachments());
+    }
+
+    
     @Test
     public void testManyAttachments() throws Exception {
         StringBuilder sb = new StringBuilder(1000);
