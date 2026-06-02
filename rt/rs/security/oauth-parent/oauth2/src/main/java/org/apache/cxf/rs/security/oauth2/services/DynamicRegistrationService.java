@@ -76,7 +76,7 @@ public class DynamicRegistrationService {
     protected void checkInitialAuthentication() {
         if (initialAccessToken != null) {
             String accessToken = getRequestAccessToken();
-            if (!initialAccessToken.equals(accessToken)) {
+            if (!OAuthUtils.compareTokens(initialAccessToken, accessToken)) {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);
             }
         } else {
@@ -105,7 +105,7 @@ public class DynamicRegistrationService {
     protected void checkRegistrationAccessToken(Client c, String accessToken) {
         String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
 
-        if (regAccessToken == null || !regAccessToken.equals(accessToken)) {
+        if (!OAuthUtils.compareTokens(regAccessToken, accessToken)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }

@@ -88,6 +88,13 @@ public final class OAuthUtils {
         }
     }
 
+    public static boolean compareTokens(String token1, String token2) {
+        if (token1 == null || token2 == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(StringUtils.toBytesUTF8(token1), StringUtils.toBytesUTF8(token2));
+    }
+
     public static boolean compareCertificateThumbprints(X509Certificate cert, String encodedThumbprint) {
         try {
             byte[] thumbprint = createCertificateThumbprint(cert);
