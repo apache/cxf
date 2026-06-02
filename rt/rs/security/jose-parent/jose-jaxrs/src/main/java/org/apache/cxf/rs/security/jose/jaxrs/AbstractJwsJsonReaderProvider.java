@@ -74,6 +74,21 @@ public class AbstractJwsJsonReaderProvider {
         JAXRSUtils.getCurrentMessage().put(JwsJsonConsumer.class, c);
     }
 
+    protected JwsJsonSignatureEntry getValidatedSignatureEntry(JwsJsonConsumer c) {
+        @SuppressWarnings("unchecked")
+        List<JwsJsonSignatureEntry> remaining =
+            (List<JwsJsonSignatureEntry>)JAXRSUtils.getCurrentMessage().get("jws.json.remaining.entries");
+        if (remaining != null) {
+            for (JwsJsonSignatureEntry sigEntry : c.getSignatureEntries()) {
+                if (!remaining.contains(sigEntry)) {
+                    return sigEntry;
+                }
+            }
+        }
+        // If there are no recorded remaining entries then the first (or only) entry is valid.
+        return c.getSignatureEntries().get(0);
+    }
+
     public Map<String, Object> getEntryProps() {
         return entryProps;
     }
