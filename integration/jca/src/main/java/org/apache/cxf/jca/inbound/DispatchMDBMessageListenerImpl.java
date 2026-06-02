@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import javax.ejb.MessageDrivenBean;
 import javax.ejb.MessageDrivenContext;
 import javax.naming.InitialContext;
+import org.apache.cxf.jca.core.resourceadapter.JndiNameValidator;
 
 /**
  * DispatchMDBMessageListenerImpl supports dispatching of calls to a
@@ -49,6 +50,7 @@ public class DispatchMDBMessageListenerImpl
      * Looks up the target object by EJB local reference.
      */
     public Object lookupTargetObject(String targetJndiName) throws Exception {
+        JndiNameValidator.validateJndiName(targetJndiName);
         Object home = new InitialContext().lookup(targetJndiName);
         Method method = home.getClass().getMethod("create", new Class[0]);
         return method.invoke(home, new Object[0]);
