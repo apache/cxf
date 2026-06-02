@@ -285,6 +285,10 @@ public class JsonMapObjectReaderWriter {
                 readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex), depth + 1);
                 values.add(nextMap.map);
                 i = closingIndex + 1;
+            } else if (json.charAt(i) == ARRAY_START) {
+                int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, i);
+                values.add(internalFromJsonAsList(name, json.substring(i + 1, closingIndex), depth + 1));
+                i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
                 Object value = readPrimitiveValue(name, json, i, commaIndex);
