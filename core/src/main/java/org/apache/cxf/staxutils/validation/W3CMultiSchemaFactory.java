@@ -66,6 +66,7 @@ import org.codehaus.stax2.validation.XMLValidationSchema;
  * Legacy implementation for Woostox 5.x. For Woodstox 6.2+, use W3CMultiSchemaFactory in
  * Woodstox itself.
  */
+@Deprecated(forRemoval = true, since = "4.2.1")
 public class W3CMultiSchemaFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(W3CMultiSchemaFactory.class);
             
@@ -149,10 +150,14 @@ public class W3CMultiSchemaFactory {
         parserFactory = SAXParserFactory.newInstance();
         try {
             parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e) {
+            LOG.log(Level.WARNING, "The property '" + XMLConstants.FEATURE_SECURE_PROCESSING + "', is not supported.");
+        }
+        try {
             parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e) {
-            LOG.log(Level.WARNING, "The properties '" + XMLConstants.FEATURE_SECURE_PROCESSING 
-                + "', 'http://apache.org/xml/features/disallow-doctype-decl' are not supported.");
+            LOG.log(Level.WARNING, "The property 'http://apache.org/xml/features/disallow-doctype-decl'"
+                    + " is not supported.");
         }
         parserFactory.setNamespaceAware(true);
 
