@@ -68,6 +68,13 @@ public class AttachmentDeserializer {
     public static final String ATTACHMENT_MAX_COUNT = "attachment-max-count";
 
     /**
+     * The maximum number of attachment headers permitted in a message. The default is 500.
+     */
+    public static final String ATTACHMENT_HEADERS_MAX_COUNT = "attachment-headers-max-count";
+    public static final int DEFAULT_ATTACHMENT_HEADERS_MAX_COUNT =
+        SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-headers-count", 500);
+
+    /**
      * The maximum MIME Header Length. The default is 300.
      */
     public static final String ATTACHMENT_MAX_HEADER_SIZE = "attachment-max-header-size";
@@ -102,6 +109,7 @@ public class AttachmentDeserializer {
     private List<String> supportedTypes;
 
     private int maxHeaderLength = DEFAULT_MAX_HEADER_SIZE;
+    private int maxHeadersCount = DEFAULT_ATTACHMENT_HEADERS_MAX_COUNT;
 
     public AttachmentDeserializer(Message message) {
         this(message, Collections.singletonList("multipart/related"));
@@ -114,6 +122,9 @@ public class AttachmentDeserializer {
         // Get the maximum Header length from configuration
         maxHeaderLength = MessageUtils.getContextualInteger(message, ATTACHMENT_MAX_HEADER_SIZE,
                                                             DEFAULT_MAX_HEADER_SIZE);
+        // Get the maximum headers count
+        maxHeadersCount = MessageUtils.getContextualInteger(message, ATTACHMENT_HEADERS_MAX_COUNT,
+                                                            DEFAULT_ATTACHMENT_HEADERS_MAX_COUNT);
     }
 
     public void initializeAttachments() throws IOException {
@@ -160,7 +171,8 @@ public class AttachmentDeserializer {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
 
-            Map<String, List<String>> ih = AttachmentDeserializerUtil.loadPartHeaders(stream, maxHeaderLength);
+            final Map<String, List<String>> ih = AttachmentDeserializerUtil
+                .loadPartHeaders(stream, maxHeaderLength, maxHeadersCount);
             message.put(ATTACHMENT_PART_HEADERS, ih);
             String val = AttachmentUtil.getHeader(ih, "Content-Type", "; ");
             if (!StringUtils.isEmpty(val)) {
@@ -225,7 +237,8 @@ public class AttachmentDeserializer {
         }
         stream.unread(v);
 
-        Map<String, List<String>> headers = AttachmentDeserializerUtil.loadPartHeaders(stream, maxHeaderLength);
+        final Map<String, List<String>> headers = AttachmentDeserializerUtil
+            .loadPartHeaders(stream, maxHeaderLength, maxHeadersCount);
         return (AttachmentImpl)createAttachment(headers);
     }
 
