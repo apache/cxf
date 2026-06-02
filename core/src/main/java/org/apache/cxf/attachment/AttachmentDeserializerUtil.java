@@ -80,7 +80,8 @@ final class AttachmentDeserializerUtil {
     }
 
 
-    static Map<String, List<String>> loadPartHeaders(InputStream in, int maxHeaderLength) throws IOException {
+    static Map<String, List<String>> loadPartHeaders(InputStream in, int maxHeaderLength, 
+            int maxHeadersCount) throws IOException {
         StringBuilder buffer = new StringBuilder(128);
         StringBuilder b = new StringBuilder(128);
         Map<String, List<String>> heads = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -98,7 +99,7 @@ final class AttachmentDeserializerUtil {
             } else {
                 // if we have a line pending in the buffer, flush it
                 if (buffer.length() > 0) {
-                    addHeaderLine(heads, buffer);
+                    addHeaderLine(heads, buffer, maxHeadersCount);
                     buffer.setLength(0);
                 }
                 // add this to the accumulator
@@ -108,7 +109,7 @@ final class AttachmentDeserializerUtil {
 
         // if we have a line pending in the buffer, flush it
         if (buffer.length() > 0) {
-            addHeaderLine(heads, buffer);
+            addHeaderLine(heads, buffer, maxHeadersCount);
         }
         return heads;
     }
@@ -142,7 +143,8 @@ final class AttachmentDeserializerUtil {
         return buffer.length() != 0;
     }
 
-    private static void addHeaderLine(Map<String, List<String>> heads, StringBuilder line) {
+    private static void addHeaderLine(Map<String, List<String>> heads, StringBuilder line, 
+            int maxHeadersCount) throws IOException {
         // null lines are a nop
         final int size = line.length();
         if (size == 0) {
@@ -166,6 +168,10 @@ final class AttachmentDeserializerUtil {
                 separator++;
             }
             value = line.substring(separator);
+        }
+        
+        if (heads.size() >= maxHeadersCount) {
+            throw new IOException("The attachment contains more headers than are permitted");
         }
         List<String> v = heads.computeIfAbsent(name, k -> new ArrayList<>(1));
         v.add(value);

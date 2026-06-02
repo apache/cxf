@@ -38,12 +38,17 @@ public class AttachmentBoundaryDeserializer {
     private static final int PUSHBACK_AMOUNT = 2048;
     
     private final int maxHeaderLength;
+    private final int maxHeadersCount;
     private final Message message;
 
     public AttachmentBoundaryDeserializer(Message message) {
         this.message = message;
         this.maxHeaderLength = MessageUtils.getContextualInteger(message, 
             AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE, AttachmentDeserializer.DEFAULT_MAX_HEADER_SIZE);
+        // Get the maximum headers count
+        this.maxHeadersCount = MessageUtils.getContextualInteger(message,
+            AttachmentDeserializer.ATTACHMENT_HEADERS_MAX_COUNT, 
+                AttachmentDeserializer.DEFAULT_ATTACHMENT_HEADERS_MAX_COUNT);
     }
 
     public Attachment read(InputStream body) throws IOException {
@@ -60,7 +65,8 @@ public class AttachmentBoundaryDeserializer {
             throw new IOException("Couldn't find MIME boundary: " + boundaryString);
         }
 
-        Map<String, List<String>> ih = AttachmentDeserializerUtil.loadPartHeaders(stream, maxHeaderLength);
+        final Map<String, List<String>> ih = AttachmentDeserializerUtil
+            .loadPartHeaders(stream, maxHeaderLength, maxHeadersCount);
         String val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
 
         MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT);

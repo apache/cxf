@@ -529,7 +529,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         if (StringUtils.isEmpty(sessionToken)) {
             return false;
         }
-        return requestToken.equals(sessionToken);
+        return OAuthUtils.compareTokens(requestToken, sessionToken);
     }
 
     /**

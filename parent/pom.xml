@@ -112,7 +112,7 @@
         <cxf.dom4j.version>2.2.0</cxf.dom4j.version>
         <cxf.dropwizard3.version>3.2.6</cxf.dropwizard3.version>
         <cxf.dropwizard4.version>4.2.38</cxf.dropwizard4.version>
-        <cxf.dropwizard5.version>5.0.6</cxf.dropwizard5.version>
+        <cxf.dropwizard5.version>5.0.7</cxf.dropwizard5.version>
         <cxf.ehcache3.version>3.12.0</cxf.ehcache3.version>
         <cxf.el-api.version>6.0.1</cxf.el-api.version>
         <cxf.jvnet.jaxb.version>4.0.14</cxf.jvnet.jaxb.version>
@@ -190,7 +190,7 @@
         <cxf.msv.version>2022.7</cxf.msv.version>
         <cxf.neethi.version>3.2.2</cxf.neethi.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
-        <cxf.netty.version>4.2.14.Final</cxf.netty.version>
+        <cxf.netty.version>4.2.15.Final</cxf.netty.version>
         <cxf.netty.tcnative.version>2.0.69.Final</cxf.netty.tcnative.version>
         <cxf.olingo.version>2.0.13</cxf.olingo.version>
         <cxf.openjpa.version>4.1.1</cxf.openjpa.version>

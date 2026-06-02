@@ -245,6 +245,7 @@ public class JsonMapObjectReaderWriter {
             }
             if (json.charAt(sepIndex + j) == OBJECT_START) {
                 int closingIndex = getClosingIndex(json, OBJECT_START, OBJECT_END, sepIndex + j);
+                closingIndex = requireClosingIndex(closingIndex, OBJECT_START, OBJECT_END);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
                 MapSettable nextMap = new MapSettable();
                 readJsonObjectAsSettable(nextMap, newJson, depth + 1);
@@ -252,6 +253,7 @@ public class JsonMapObjectReaderWriter {
                 i = closingIndex + 1;
             } else if (json.charAt(sepIndex + j) == ARRAY_START) {
                 int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, sepIndex + j);
+                closingIndex = requireClosingIndex(closingIndex, ARRAY_START, ARRAY_END);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
                 values.put(name, internalFromJsonAsList(name, newJson, depth + 1));
                 i = closingIndex + 1;
@@ -281,9 +283,15 @@ public class JsonMapObjectReaderWriter {
             }
             if (json.charAt(i) == OBJECT_START) {
                 int closingIndex = getClosingIndex(json, OBJECT_START, OBJECT_END, i);
+                closingIndex = requireClosingIndex(closingIndex, OBJECT_START, OBJECT_END);
                 MapSettable nextMap = new MapSettable();
                 readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex), depth + 1);
                 values.add(nextMap.map);
+                i = closingIndex + 1;
+            } else if (json.charAt(i) == ARRAY_START) {
+                int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, i);
+                closingIndex = requireClosingIndex(closingIndex, ARRAY_START, ARRAY_END);
+                values.add(internalFromJsonAsList(name, json.substring(i + 1, closingIndex), depth + 1));
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
@@ -335,6 +343,15 @@ public class JsonMapObjectReaderWriter {
         while (nextOpenIndex != -1 && nextOpenIndex < closingIndex) {
             nextOpenIndex = getNextSepCharIndex(json, openChar, nextOpenIndex + 1);
             closingIndex = getNextSepCharIndex(json, closeChar, closingIndex + 1);
+        }
+        return closingIndex;
+    }
+
+    private static int requireClosingIndex(int closingIndex, char openChar, char closeChar) {
+        if (closingIndex == -1) {
+            throw new UncheckedIOException(new IOException(
+                    "Error in parsing json: missing closing '" + closeChar
+                    + "' for '" + openChar + "'"));
         }
         return closingIndex;
     }
