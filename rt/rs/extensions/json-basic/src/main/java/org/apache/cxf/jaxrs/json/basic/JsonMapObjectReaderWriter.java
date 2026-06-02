@@ -534,7 +534,8 @@ public class JsonMapObjectReaderWriter {
 
     private String escapeJson(String value) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < value.length(); i++) {
+        int i = 0;
+        while (i < value.length()) {
             char c = value.charAt(i);
             if (c < 0x20) {
                 // RFC 8259 section 7: all control characters (U+0000–U+001F) MUST be escaped.
@@ -546,15 +547,20 @@ public class JsonMapObjectReaderWriter {
                 case '\r': sb.append("\\r");  break;
                 default:   sb.append(String.format("\\u%04x", (int) c)); break;
                 }
-            // If we have " and the previous char was not \ then escape it
-            } else if (c == '"' && (i == 0 || value.charAt(i - 1) != '\\')) {
+                i++;
+            // A \ that introduces an existing escape sequence (\" \\ \/ \b \f \n \r \t) is
+            // consumed together with the following char so it is not re-escaped. Looking only
+            // at the previous char misclassifies a " or \ that follows a complete \\ pair as
+            // already escaped, leaving it raw and breaking out of the JSON string.
+            } else if (c == '\\' && i + 1 < value.length() && isEscapedChar(value.charAt(i + 1))) {
+                sb.append(c).append(value.charAt(i + 1));
+                i += 2;
+            } else if (c == '"' || c == '\\') {
                 sb.append('\\').append(c);
-            // If we have \ and the previous char was not \ and the next char is not an escaped char, then escape it
-            } else if (c == '\\' && (i == 0 || value.charAt(i - 1) != '\\')
-                    && (i == value.length() - 1 || !isEscapedChar(value.charAt(i + 1)))) {
-                sb.append('\\').append(c);
+                i++;
             } else {
                 sb.append(c);
+                i++;
             }
         }
         return sb.toString();

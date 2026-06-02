@@ -283,6 +283,26 @@ public class JsonMapObjectReaderWriterTest {
     }
 
     /**
+     * Writer-side counterpart of {@link #testReadStringValueEndingWithEscapedBackslashDropsSubsequentKey}.
+     * {@code escapeJson} only looked at the single character before a {@code "}/{@code \} to decide
+     * whether it was already escaped, so a value ending in an escaped backslash pair ({@code \\})
+     * followed by content left the next quote raw, breaking out of the JSON string.
+     */
+    @Test
+    public void testEscapeQuoteAfterEscapedBackslash() throws Exception {
+        JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
+        Map<String, Object> content = new LinkedHashMap<>();
+        // value is: \ (escaped backslash) followed by a raw quote and an injected key
+        content.put("role", "user\\\\\",\"admin\":true");
+        String json = jsonMapObjectReaderWriter.toJson(content);
+
+        Map<String, Object> map = jsonMapObjectReaderWriter.fromJson(json);
+        assertEquals(1, map.size());
+        assertEquals("user\\\",\"admin\":true", map.get("role"));
+        assertNull(map.get("admin"));
+    }
+
+    /**
      * Regression test for "[MEDIUM] Unicode Escapes Not Decoded — Potential Bypass".
      *
      * <p>RFC 8259 section 7 requires that four-digit hex Unicode escape sequences
