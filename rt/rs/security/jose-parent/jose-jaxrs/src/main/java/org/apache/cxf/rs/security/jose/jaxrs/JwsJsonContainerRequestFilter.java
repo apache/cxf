@@ -62,8 +62,7 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
 
-        // the list is guaranteed to be non-empty
-        JwsJsonSignatureEntry sigEntry = c.getSignatureEntries().get(0);
+        JwsJsonSignatureEntry sigEntry = getValidatedSignatureEntry(c);
         String ct = JoseUtils.checkContentType(sigEntry.getUnionHeader().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
