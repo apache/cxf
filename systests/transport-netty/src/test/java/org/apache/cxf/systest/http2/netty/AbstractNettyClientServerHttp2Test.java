@@ -25,7 +25,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.netty.client.NettyHttpConduit;
-import org.apache.cxf.transport.https.InsecureTrustManager;
+
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 import org.junit.Test;
 
@@ -161,7 +162,7 @@ abstract class AbstractNettyClientServerHttp2Test extends AbstractBusClientServe
             }
 
             // Create TrustManager instance which trusts all clients and servers
-            params.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers()); 
+            params.setTrustManagers(InsecureTrustManagerFactory.INSTANCE.getTrustManagers()); 
             params.setDisableCNCheck(true);
         }
         
