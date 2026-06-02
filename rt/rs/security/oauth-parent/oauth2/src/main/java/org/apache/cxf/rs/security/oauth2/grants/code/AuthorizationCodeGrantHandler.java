@@ -19,6 +19,8 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -183,7 +185,9 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 codeVerifierTransformer = defaultCodeVerifierTransformer;
             }
             String transformedCodeVerifier = codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
-            return clientCodeChallenge.equals(transformedCodeVerifier);
+            return transformedCodeVerifier != null
+                && MessageDigest.isEqual(clientCodeChallenge.getBytes(StandardCharsets.UTF_8),
+                                         transformedCodeVerifier.getBytes(StandardCharsets.UTF_8));
         }
     }
 
