@@ -382,6 +382,13 @@ public class JsonMapObjectReaderWriterTest {
         assertInvalidNumericLiteral("NaN");
     }
 
+    @Test
+    public void testNestedArrayValueParsesSuccessfully() {
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson("{\"a\":[[]]}");
+        assertEquals(1, map.size());
+        assertEquals(Collections.singletonList(Collections.emptyList()), map.get("a"));
+    }
+
     private void assertInvalidNumericLiteral(String value) {
         JsonMapObjectReaderWriter jsonMapObjectReaderWriter = new JsonMapObjectReaderWriter();
         try {
