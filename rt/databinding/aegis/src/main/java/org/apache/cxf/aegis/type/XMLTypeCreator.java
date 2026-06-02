@@ -126,6 +126,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         try (InputStream is = XMLTypeCreator.class.getResourceAsStream(path)) {
             if (is != null) {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
                 Schema aegisSchema = schemaFactory.newSchema(new StreamSource(is));
                 AEGIS_DOCUMENT_BUILDER_FACTORY.setSchema(aegisSchema);
             }
