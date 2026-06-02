@@ -385,6 +385,7 @@ public class RMEndpoint {
         if (rmSchema == null) {
             try {
                 SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
                 javax.xml.transform.Source ad = new StreamSource(RMEndpoint.class
                                              .getResource("/schemas/wsdl/addressing.xsd")
                                              .openStream(),
