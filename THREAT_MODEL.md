@@ -28,7 +28,7 @@ limitations under the License.
   (**build-time codegen / build tooling** — out of the *runtime* threat model; see §3).
 - **Modelled against:** `apache/cxf` `main`/HEAD (2026-05-31), covering supported lines 3.6.x / 4.0.x /
   4.1.x *(documented — SECURITY.md)*.
-- **Status:** **DRAFT — v0, not yet reviewed by the CXF PMC.** Produced by the ASF Security team via the
+- **Status:** **DRAFT** Produced by the ASF Security team via the
   `threat-model-producer` rubric (<https://gist.github.com/potiuk/da14a826283038ddfe38cc9fe6310573>).
 - **Version binding:** versioned with the project; reports triaged against the model as it stood at the
   affected release. Existing advisories: <https://cxf.apache.org/security-advisories.html> *(documented)*.
