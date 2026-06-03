@@ -25,6 +25,7 @@ import java.io.UncheckedIOException;
 import java.util.*;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.IOUtils;
 
 
@@ -37,6 +38,10 @@ public class JsonMapObjectReaderWriter {
      * thread stack with unbounded recursion.
      */
     static final int MAX_RECURSION_DEPTH = 500;
+    static final int DEFAULT_MAX_OBJECT_KEYS = 10_000;
+    static final int DEFAULT_MAX_ARRAY_ELEMENTS = 10_000;
+    static final String MAX_OBJECT_KEYS_PROPERTY = "org.apache.cxf.jaxrs.json.basic.maxObjectKeys";
+    static final String MAX_ARRAY_ELEMENTS_PROPERTY = "org.apache.cxf.jaxrs.json.basic.maxArrayElements";
     private static final Set<Character> ESCAPED_CHARS;
     private static final char DQUOTE = '"';
     private static final char COMMA = ',';
@@ -48,6 +53,8 @@ public class JsonMapObjectReaderWriter {
     private static final char ESCAPE = '\\';
     private static final String NULL_VALUE = "null";
     private boolean format;
+    private final int maxObjectKeys;
+    private final int maxArrayElements;
 
     static {
         Set<Character> chars = new HashSet<>();
@@ -63,10 +70,25 @@ public class JsonMapObjectReaderWriter {
     }
 
     public JsonMapObjectReaderWriter() {
-
+        this(false);
     }
     public JsonMapObjectReaderWriter(boolean format) {
         this.format = format;
+        this.maxObjectKeys = readConfiguredPositiveLimit(MAX_OBJECT_KEYS_PROPERTY, DEFAULT_MAX_OBJECT_KEYS);
+        this.maxArrayElements = readConfiguredPositiveLimit(MAX_ARRAY_ELEMENTS_PROPERTY, DEFAULT_MAX_ARRAY_ELEMENTS);
+    }
+
+    private static int readConfiguredPositiveLimit(String propertyName, int defaultValue) {
+        String configured = SystemPropertyAction.getPropertyOrNull(propertyName);
+        if (configured == null) {
+            return defaultValue;
+        }
+        try {
+            int parsed = Integer.parseInt(configured.trim());
+            return parsed > 0 ? parsed : defaultValue;
+        } catch (NumberFormatException ex) {
+            return defaultValue;
+        }
     }
 
     public String toJson(JsonMapObject obj) {
@@ -138,7 +160,6 @@ public class JsonMapObjectReaderWriter {
         out.append(ARRAY_END);
     }
 
-    @SuppressWarnings("unchecked")
     protected void toJsonInternal(Output out, Object value, boolean hasNext) {
         toJsonInternal(out, value, hasNext, 0);
     }
@@ -225,6 +246,7 @@ public class JsonMapObjectReaderWriter {
             throw new UncheckedIOException(new IOException(
                     "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
         }
+        int keyCount = 0;
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
                 continue;
@@ -250,18 +272,26 @@ public class JsonMapObjectReaderWriter {
                 MapSettable nextMap = new MapSettable();
                 readJsonObjectAsSettable(nextMap, newJson, depth + 1);
                 values.put(name, nextMap.map);
+                keyCount++;
                 i = closingIndex + 1;
             } else if (json.charAt(sepIndex + j) == ARRAY_START) {
                 int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, sepIndex + j);
                 closingIndex = requireClosingIndex(closingIndex, ARRAY_START, ARRAY_END);
                 String newJson = json.substring(sepIndex + j + 1, closingIndex);
                 values.put(name, internalFromJsonAsList(name, newJson, depth + 1));
+                keyCount++;
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, sepIndex + j);
                 Object value = readPrimitiveValue(name, json, sepIndex + j, commaIndex);
                 values.put(name, value);
+                keyCount++;
                 i = commaIndex + 1;
+            }
+
+            if (keyCount > maxObjectKeys) {
+                throw new UncheckedIOException(new IOException(
+                    "JSON object key count exceeds maximum of " + maxObjectKeys));
             }
 
         }
@@ -277,6 +307,7 @@ public class JsonMapObjectReaderWriter {
                     "JSON nesting depth exceeds maximum of " + MAX_RECURSION_DEPTH));
         }
         List<Object> values = new LinkedList<>();
+        int elementCount = 0;
         for (int i = 0; i < json.length(); i++) {
             if (Character.isWhitespace(json.charAt(i))) {
                 continue;
@@ -287,17 +318,25 @@ public class JsonMapObjectReaderWriter {
                 MapSettable nextMap = new MapSettable();
                 readJsonObjectAsSettable(nextMap, json.substring(i + 1, closingIndex), depth + 1);
                 values.add(nextMap.map);
+                elementCount++;
                 i = closingIndex + 1;
             } else if (json.charAt(i) == ARRAY_START) {
                 int closingIndex = getClosingIndex(json, ARRAY_START, ARRAY_END, i);
                 closingIndex = requireClosingIndex(closingIndex, ARRAY_START, ARRAY_END);
                 values.add(internalFromJsonAsList(name, json.substring(i + 1, closingIndex), depth + 1));
+                elementCount++;
                 i = closingIndex + 1;
             } else {
                 int commaIndex = getCommaIndex(json, i);
                 Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
+                elementCount++;
                 i = commaIndex;
+            }
+
+            if (elementCount > maxArrayElements) {
+                throw new UncheckedIOException(new IOException(
+                    "JSON array element count exceeds maximum of " + maxArrayElements));
             }
         }
 
