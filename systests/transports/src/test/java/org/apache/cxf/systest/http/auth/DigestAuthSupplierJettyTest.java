@@ -59,7 +59,8 @@ public class DigestAuthSupplierJettyTest extends AbstractClientServerTestBase {
 
     @Test
     public void test() {
-        WebClient client = WebClient.create("http://localhost:" + DigestAuthSupplierJettyServer.PORT, (String) null);
+        final WebClient client = WebClient
+            .create("http://localhost:" + DigestAuthSupplierJettyServer.PORT + "/", (String) null);
 
         assertThrows(NotAuthorizedException.class, () -> client.get(String.class));
 
