@@ -442,6 +442,64 @@ public class JsonMapObjectReaderWriterTest {
         new JsonMapObjectReaderWriter().toJson(createNestedMap(20000));
     }
 
+    @Test(expected = UncheckedIOException.class)
+    public void testObjectKeyLimitExceededThrowsUncheckedIOException() {
+        StringBuilder sb = new StringBuilder(JsonMapObjectReaderWriter.DEFAULT_MAX_OBJECT_KEYS * 10);
+        sb.append('{');
+        for (int i = 0; i <= JsonMapObjectReaderWriter.DEFAULT_MAX_OBJECT_KEYS; i++) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append('"').append('k').append(i).append('"').append(':').append('1');
+        }
+        sb.append('}');
+
+        new JsonMapObjectReaderWriter().fromJson(sb.toString());
+    }
+
+    @Test(expected = UncheckedIOException.class)
+    public void testArrayElementLimitExceededThrowsUncheckedIOException() {
+        StringBuilder sb = new StringBuilder(JsonMapObjectReaderWriter.DEFAULT_MAX_ARRAY_ELEMENTS * 3);
+        sb.append('{').append('"').append('a').append('"').append(':').append('[');
+        for (int i = 0; i <= JsonMapObjectReaderWriter.DEFAULT_MAX_ARRAY_ELEMENTS; i++) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append('1');
+        }
+        sb.append(']').append('}');
+
+        new JsonMapObjectReaderWriter().fromJson(sb.toString());
+    }
+
+    @Test
+    public void testConfiguredObjectAndArrayLimits() {
+        System.setProperty(JsonMapObjectReaderWriter.MAX_OBJECT_KEYS_PROPERTY, "2");
+        System.setProperty(JsonMapObjectReaderWriter.MAX_ARRAY_ELEMENTS_PROPERTY, "2");
+        try {
+            JsonMapObjectReaderWriter rw = new JsonMapObjectReaderWriter();
+            rw.fromJson("{\"a\":1,\"b\":2}");
+            rw.fromJson("{\"a\":[1,2]}");
+
+            try {
+                rw.fromJson("{\"a\":1,\"b\":2,\"c\":3}");
+                fail("Expected object key count limit exception");
+            } catch (UncheckedIOException ex) {
+                // expected
+            }
+
+            try {
+                rw.fromJson("{\"a\":[1,2,3]}");
+                fail("Expected array element count limit exception");
+            } catch (UncheckedIOException ex) {
+                // expected
+            }
+        } finally {
+            System.clearProperty(JsonMapObjectReaderWriter.MAX_OBJECT_KEYS_PROPERTY);
+            System.clearProperty(JsonMapObjectReaderWriter.MAX_ARRAY_ELEMENTS_PROPERTY);
+        }
+    }
+
     private Map<String, Object> createNestedMap(int depth) {
         Map<String, Object> root = new HashMap<>();
         Map<String, Object> current = root;
