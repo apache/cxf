@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.clustering;
 
 import java.util.List;
@@ -25,44 +24,73 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 
 /**
- * This strategy simply retries the invocation using the same Endpoint (CXF-2036).
+ * Retry strategy that retries the same endpoint for a configured number of
+ * attempts before advancing to the next alternate (CXF-2036).
+ *
+ * <p>This class implements {@link PerInvocationFailoverStrategy}: when used
+ * via {@link FailoverTargetSelector}, a fresh instance is created per
+ * top-level invocation through {@link #newStrategy()}, so the shared
+ * singleton bean is never mutated and concurrent invocations are fully
+ * isolated (CXF-9213).  The per-invocation instance carries its own retry
+ * counter as a plain instance field
+ *
+ * <p>Subclasses that accumulate cross-invocation state (e.g. call counters)
+ * should override {@link #newStrategy()} to return a delegate that writes
+ * that state back to the shared instance while keeping its own retry counter.
  */
-public class RetryStrategy extends SequentialStrategy {
+public class RetryStrategy extends SequentialStrategy implements PerInvocationFailoverStrategy {
 
     private int maxNumberOfRetries;
-    private int counter;
+    private int count;
 
-    /* (non-Javadoc)
-     * @see org.apache.cxf.clustering.AbstractStaticFailoverStrategy#getAlternateEndpoints(
-     * org.apache.cxf.message.Exchange)
-     */
     @Override
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
-        return getEndpoints(exchange, stillTheSameAddress());
+        return getEndpoints(exchange, stillTheSameAddress(exchange));
     }
 
     @Override
     protected <T> T getNextAlternate(List<T> alternates) {
-        // is the amount of retries for the first alternate already exceeded?
         if (!stillTheSameAddress() && !alternates.isEmpty()) {
             alternates.remove(0);
         }
         return alternates.isEmpty() ? null : alternates.get(0);
     }
 
+    /**
+     * Exchange-aware variant; delegates to {@link #stillTheSameAddress()} so
+     * subclasses may override either form.
+     */
+    protected boolean stillTheSameAddress(Exchange exchange) {
+        return stillTheSameAddress();
+    }
+
     protected boolean stillTheSameAddress() {
         if (maxNumberOfRetries == 0) {
             return true;
         }
-        // let the target selector move to the next address
-        // and then stay on the same address for maxNumberOfRetries
-        if (++counter <= maxNumberOfRetries) {
+        if (++count <= maxNumberOfRetries) {
             return true;
         }
-        counter = 0;
+        count = 0;
         return false;
     }
 
+    /**
+     * Returns a new {@link RetryStrategy} with the same configuration but a
+     * zeroed counter.  Subclasses that need to accumulate state on the shared
+     * instance should override this method and return a delegating wrapper.
+     */
+    @Override
+    public FailoverStrategy newStrategy() {
+        RetryStrategy copy = new RetryStrategy();
+        copy.maxNumberOfRetries = this.maxNumberOfRetries;
+        List<String> addresses = getAlternateAddresses(null);
+        if (addresses != null) {
+            copy.setAlternateAddresses(addresses);
+        }
+        copy.setDelayBetweenRetries(getDelayBetweenRetries());
+        return copy;
+    }
 
     public void setMaxNumberOfRetries(int maxNumberOfRetries) {
         if (maxNumberOfRetries < 0) {
@@ -71,9 +99,7 @@ public class RetryStrategy extends SequentialStrategy {
         this.maxNumberOfRetries = maxNumberOfRetries;
     }
 
-
     public int getMaxNumberOfRetries() {
         return maxNumberOfRetries;
     }
-
 }

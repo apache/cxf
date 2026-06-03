@@ -53,6 +53,8 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
     protected FailoverStrategy failoverStrategy;
     private ConcurrentHashMap<String, InvocationContext> inProgress = new ConcurrentHashMap<>();
+    // CXF-9213: per-invocation strategy instances for PerInvocationFailoverStrategy implementations.
+    private ConcurrentHashMap<String, FailoverStrategy> inProgressStrategies = new ConcurrentHashMap<>();
     private boolean supportNotAvailableErrorsOnly = true;
     private String clientBootstrapAddress;
 
@@ -113,6 +115,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                                       params,
                                       context);
             inProgress.putIfAbsent(key, invocation);
+            // CXF-9213: create a fresh per-invocation instance for strategies that carry state.
+            if (getStrategy() instanceof PerInvocationFailoverStrategy) {
+                inProgressStrategies.putIfAbsent(key,
+                    ((PerInvocationFailoverStrategy) getStrategy()).newStrategy());
+            }
         }
     }
 
@@ -179,6 +186,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
         if (!failover) {
             inProgress.remove(key);
+            inProgressStrategies.remove(key);
             doComplete(exchange);
         }
     }
@@ -316,21 +324,19 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     protected Endpoint getFailoverTarget(Exchange exchange,
                                        InvocationContext invocation) {
+        String key = getInvocationKey(exchange);
+        FailoverStrategy strategy = getStrategy(key);
         List<String> alternateAddresses = updateContextAlternatives(exchange, invocation);
         Endpoint failoverTarget = null;
         if (alternateAddresses != null) {
-            String alternateAddress =
-                getStrategy().selectAlternateAddress(alternateAddresses);
+            String alternateAddress = strategy.selectAlternateAddress(alternateAddresses);
             if (alternateAddress != null) {
                 // re-use current endpoint
-                //
                 failoverTarget = getEndpoint();
-
                 failoverTarget.getEndpointInfo().setAddress(alternateAddress);
             }
         } else {
-            failoverTarget = getStrategy().selectAlternateEndpoint(
-                                 invocation.getAlternateEndpoints());
+            failoverTarget = strategy.selectAlternateEndpoint(invocation.getAlternateEndpoints());
         }
         return failoverTarget;
     }
@@ -346,19 +352,32 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         final List<String> alternateAddresses;
         if (!invocation.hasAlternates()) {
             // no previous failover attempt on this invocation
-            //
-            alternateAddresses =
-                getStrategy().getAlternateAddresses(exchange);
+            FailoverStrategy strategy = getStrategy(getInvocationKey(exchange));
+            alternateAddresses = strategy.getAlternateAddresses(exchange);
             if (alternateAddresses != null) {
                 invocation.setAlternateAddresses(alternateAddresses);
             } else {
-                invocation.setAlternateEndpoints(
-                    getStrategy().getAlternateEndpoints(exchange));
+                invocation.setAlternateEndpoints(strategy.getAlternateEndpoints(exchange));
             }
         } else {
             alternateAddresses = invocation.getAlternateAddresses();
         }
         return alternateAddresses;
+    }
+
+    /**
+     * Returns the per-invocation {@link FailoverStrategy} for the given key if one
+     * was registered by {@link PerInvocationFailoverStrategy#newStrategy()}, otherwise
+     * returns the shared strategy.
+     */
+    protected FailoverStrategy getStrategy(String key) {
+        if (key != null) {
+            FailoverStrategy perInvocation = inProgressStrategies.get(key);
+            if (perInvocation != null) {
+                return perInvocation;
+            }
+        }
+        return getStrategy();
     }
 
     /**
