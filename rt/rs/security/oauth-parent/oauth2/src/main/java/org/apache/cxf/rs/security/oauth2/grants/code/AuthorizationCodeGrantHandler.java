@@ -183,7 +183,7 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 codeVerifierTransformer = defaultCodeVerifierTransformer;
             }
             String transformedCodeVerifier = codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
-            return clientCodeChallenge.equals(transformedCodeVerifier);
+            return OAuthUtils.compareTokens(clientCodeChallenge, transformedCodeVerifier);
         }
     }
 

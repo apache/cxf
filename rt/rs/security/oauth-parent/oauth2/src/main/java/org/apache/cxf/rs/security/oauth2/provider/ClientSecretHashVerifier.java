@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 /**
@@ -31,7 +32,7 @@ public class ClientSecretHashVerifier implements ClientSecretVerifier {
     public boolean validateClientSecret(Client client, String clientSecret) {
         String hash = MessageDigestUtils.generate(StringUtils.toBytesUTF8(clientSecret),
                                                   hashAlgorithm);
-        return hash.equals(client.getClientSecret());
+        return OAuthUtils.compareTokens(hash, client.getClientSecret());
     }
     public void setHashAlgorithm(String hashAlgorithm) {
         this.hashAlgorithm = hashAlgorithm;
