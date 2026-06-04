@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.ws.security.trust;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
@@ -331,7 +334,7 @@ public class STSStaxTokenValidator
         }
 
         String passDigest = UsernameTokenUtil.doPasswordDigest(nonceVal, created, pwCb.getPassword());
-        if (!passwordType.getValue().equals(passDigest)) {
+        if (!constantTimeEquals(passwordType.getValue(), passDigest)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         passwordType.setValue(pwCb.getPassword());
@@ -359,10 +362,20 @@ public class STSStaxTokenValidator
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
-        if (!passwordType.getValue().equals(pwCb.getPassword())) {
+        if (!constantTimeEquals(passwordType.getValue(), pwCb.getPassword())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         passwordType.setValue(pwCb.getPassword());
+    }
+
+    // Compare a client-supplied password (or password digest) against the expected value without
+    // leaking, through the time taken to fail, how many leading characters matched.
+    private static boolean constantTimeEquals(String provided, String expected) {
+        if (provided == null || expected == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(provided.getBytes(StandardCharsets.UTF_8),
+                                     expected.getBytes(StandardCharsets.UTF_8));
     }
 
     // Convert to DOM to send the token to the STS - it does not copy Nonce/Created/Iteration
