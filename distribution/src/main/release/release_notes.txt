@@ -1,4 +1,4 @@
-Apache CXF 4.2.1 Release Notes
+Apache CXF 4.2.2 Release Notes
 
 1. Overview
 
@@ -36,7 +36,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.2.1 fixes over 15 JIRA issues reported by users and the community.
+4.2.2 fixes over 5 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -79,26 +79,15 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-8748] - nonProxyHosts is case sensitive
-    * [CXF-9054] - LocalDate before April 1893 incorrectly parsed
-    * [CXF-9147] - WSDL to Java: Missing namespace since 4.1.*
-    * [CXF-9189] - Exceptions Not Logged When Using SseEventSink in JAX-RS SSE Endpoint
-    * [CXF-9200] - Regression with respect to security context propagation
-    * [CXF-9204] - FailoverFeature NPE in ClientImpl.onMessage with Undertow 2.4.0.RC1
-    * [CXF-9205] - The org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor invalidates the signed SOAP Header elemements
-    * [CXF-9206] - Duplicated value of 'cxf.server.requests' metric for JAX RS Server
-    * [CXF-9209] - UriInfoImpl#getMatchedResourceTemplate does not work for Paths with variables
-    * [CXF-9210] - JAX-RS Client Fails When CacheControlFeature is used but Server Doesn't return Cache-Control Header
-    * [CXF-9212] - Restrict valid URL protocols in TLSParameterJaxBUtils and URIResolver
+    * [CXF-9129] - Chunked attachment streaming not working when using ws-security
 
 
 
-** New Feature
-    * [CXF-9008] - FIPS support
 
 ** Improvement
-    * [CXF-9174] - Allow overriding buildPredicate in JPACriteriaQueryVisitor for custom predicates
-    * [CXF-9207] - Improve multipart Content-Disposition formatting (optional space after form-data;) for better interoperability with strict WAFs
-    * [CXF-9211] - [JAX-RS proxy clients] Use template URL instead of actual path values for JAX-RS micrometer metrics
+    * [CXF-9213] - RetryStrategy is a stateful class whose objects shouldn't be reused
+    * [CXF-9214] - WSDLs and XSDs cannot be loaded from class path on GraalVM
+    * [CXF-9216] - Switch default OAuth2 code verifier to Digest
+    * [CXF-9218] - Respect configured ProxySelector instead of hard-wiring system proxy properties
 
 
