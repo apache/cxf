@@ -34,22 +34,19 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
-    @Rule public ExpectedException expectedException = ExpectedException.none();
-    
     private MetricsProvider provider;
     private MetricsContext operationContext;
     private MetricsContext resourceContext;
@@ -107,8 +104,7 @@ public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
         
         try {
             final Client client = factory.create();
-            expectedException.expect(SoapFault.class);
-            client.invoke("getBook", 11);
+            assertThrows(SoapFault.class, () -> client.invoke("getBook", 11));
         } finally {
             Mockito.verify(operationContext, times(1)).start(any(Exchange.class));
             Mockito.verify(operationContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -127,8 +123,7 @@ public class JAXWSClientMetricsTest extends AbstractCXFSpringTest {
         
         try {
             final Client client = factory.create();
-            expectedException.expect(UncheckedException.class);
-            client.invoke("getBooks");
+            assertThrows(UncheckedException.class, () -> client.invoke("getBooks"));
         } finally {
             Mockito.verifyNoInteractions(endpointContext);
             Mockito.verifyNoInteractions(operationContext);

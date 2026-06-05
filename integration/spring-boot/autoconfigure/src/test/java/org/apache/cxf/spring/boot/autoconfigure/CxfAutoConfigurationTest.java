@@ -36,9 +36,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -50,6 +48,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -58,9 +57,6 @@ import static org.junit.Assert.assertTrue;
  * @author Vedran Pavic
  */
 public class CxfAutoConfigurationTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     private AnnotationConfigWebApplicationContext context;
 
@@ -80,13 +76,13 @@ public class CxfAutoConfigurationTest {
 
     @Test
     public void customPathMustBeginWithASlash() {
-        this.thrown.expect(UnsatisfiedDependencyException.class);
-        this.thrown.expectCause(
+        UnsatisfiedDependencyException exception = assertThrows(UnsatisfiedDependencyException.class,
+            () -> load(CxfAutoConfiguration.class, "cxf.path=invalid"));
+        assertThat(exception.getCause(),
             allOf(instanceOf(ConfigurationPropertiesBindException.class), hasProperty("cause", 
                 allOf(instanceOf(BindException.class), hasProperty("cause",
                     allOf(instanceOf(BindValidationException.class), 
                         hasProperty("message", containsString("Path must start with /"))))))));
-        load(CxfAutoConfiguration.class, "cxf.path=invalid");
     }
 
     @Test

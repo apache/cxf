@@ -33,20 +33,16 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPException;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase {
-    @Rule public final ExpectedException exception = ExpectedException.none();
-
     private final QName serviceName =
         new QName("http://apache.org/hello_world", "SOAPService");
       
@@ -68,11 +64,9 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
 
         try (Client client = (Client)greeter) {
             client.getRequestContext().put(HTTPConduit.NO_IO_EXCEPTIONS, true);
-            
-            exception.expect(SOAPFaultException.class);
-            exception.expectMessage("Go away");
-            
-            greeter.sayHi();
+
+            SOAPFaultException ex = assertThrows(SOAPFaultException.class, () -> greeter.sayHi());
+            assertTrue(ex.getMessage().contains("Go away"));
         }
     }
 
@@ -80,54 +74,24 @@ public class HTTPConduitIoExceptionsTest extends AbstractBusClientServerTestBase
     public void testServiceUnavailable() throws Exception {
         final Greeter greeter = getGreeter();
 
-        exception.expect(WebServiceException.class);
-        exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private static final String message = "HTTP response '503: Service Unavailable' when "
-                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
-
-            @Override
-            public void describeTo(Description description) {
-                description
-                    .appendValue(HTTPException.class)
-                    .appendText(" and message ")
-                    .appendValue(message);
-            }
-
-            @Override
-            protected boolean matchesSafely(Throwable item) {
-                return item instanceof HTTPException && item.getMessage().equals(message);
-            }
-        });
-        
-        
-        greeter.sayHi();
+        WebServiceException ex = assertThrows(WebServiceException.class, () -> greeter.sayHi());
+        final String message = "HTTP response '503: Service Unavailable' when "
+            + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
+        Throwable cause = ex.getCause();
+        assertTrue(cause instanceof HTTPException);
+        assertEquals(message, cause.getMessage());
     }
 
     @Test
     public void testNotFound() throws Exception {
         final Greeter greeter = getGreeter();
 
-        exception.expect(WebServiceException.class);
-        exception.expectCause(new TypeSafeMatcher<Throwable>() {
-            private static final String message = "HTTP response '404: Not Found' when "
-                + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
-
-            @Override
-            public void describeTo(Description description) {
-                description
-                    .appendValue(HTTPException.class)
-                    .appendText(" and message ")
-                    .appendValue(message);
-            }
-
-            @Override
-            protected boolean matchesSafely(Throwable item) {
-                return item instanceof HTTPException && item.getMessage().equals(message);
-            }
-        });
-        
-        
-        greeter.greetMe("Test");
+        WebServiceException ex = assertThrows(WebServiceException.class, () -> greeter.greetMe("Test"));
+        final String message = "HTTP response '404: Not Found' when "
+            + "communicating with http://localhost:" + BadServer.PORT + "/Mortimer";
+        Throwable cause = ex.getCause();
+        assertTrue(cause instanceof HTTPException);
+        assertEquals(message, cause.getMessage());
     }
     
     private Greeter getGreeter() throws MalformedURLException {

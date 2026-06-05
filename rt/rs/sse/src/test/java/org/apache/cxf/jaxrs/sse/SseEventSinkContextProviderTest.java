@@ -37,20 +37,17 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SseEventSinkContextProviderTest {
     private static final OutboundSseEvent EVENT = new OutboundSseEventImpl.BuilderImpl().build();
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     
     private SseEventSinkContextProvider provider;
     private Message message;
@@ -96,11 +93,10 @@ public class SseEventSinkContextProviderTest {
         // The buffer overflow should trigger message rejection and exceptional completion
         final CompletableFuture<?> overflow = sink.send(EVENT).toCompletableFuture();
         assertThat(overflow.isCompletedExceptionally(), equalTo(true));
-        
-        exception.expect(CompletionException.class);
-        exception.expectMessage("The buffer is full (10000), unable to queue SSE event for send.");
 
-        overflow.join();
+        final CompletionException ex = assertThrows(CompletionException.class, overflow::join);
+        assertThat(ex.getCause().getMessage(),
+            startsWith("The buffer is full (10000)"));
     }
     
     @Test
@@ -118,10 +114,9 @@ public class SseEventSinkContextProviderTest {
         // The buffer overflow should trigger message rejection and exceptional completion
         final CompletableFuture<?> overflow = sink.send(EVENT).toCompletableFuture();
         assertThat(overflow.isCompletedExceptionally(), equalTo(true));
-        
-        exception.expect(CompletionException.class);
-        exception.expectMessage("The buffer is full (20000), unable to queue SSE event for send."); 
 
-        overflow.join();
+        final CompletionException ex = assertThrows(CompletionException.class, overflow::join);
+        assertThat(ex.getCause().getMessage(),
+            startsWith("The buffer is full (20000)"));
     }
 }
