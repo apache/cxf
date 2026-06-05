@@ -203,8 +203,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         } finally {
             pool.shutdown();
             assertThat(pool.awaitTermination(1, TimeUnit.MINUTES), is(true));
-            // Since JDK-27, HttpClient selector thread is a virtual thread by default
-            if (Runtime.version().feature() >= 27) {
+            // Since JDK-26, HttpClient selector thread is a virtual thread by default
+            if (Runtime.version().feature() >= 26) {
                 assertThat(captureHttpClientSelectorThreads.get(), equalTo(0L));
             } else {
                 assertThat(captureHttpClientSelectorThreads.get(), greaterThan(0L));
