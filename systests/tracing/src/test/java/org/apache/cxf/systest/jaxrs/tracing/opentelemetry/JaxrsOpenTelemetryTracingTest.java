@@ -75,9 +75,7 @@ import io.opentelemetry.semconv.UserAgentAttributes;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.jaxrs.tracing.opentelemetry.HasAttribute.hasAttribute;
@@ -90,6 +88,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JaxrsOpenTelemetryTracingTest extends AbstractClientServerTestBase {
@@ -99,9 +98,6 @@ public class JaxrsOpenTelemetryTracingTest extends AbstractClientServerTestBase 
     public static OpenTelemetryRule otelRule = OpenTelemetryRule.create();
 
     private static final AtomicLong RANDOM = new AtomicLong();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void startServers() {
@@ -434,15 +430,12 @@ public class JaxrsOpenTelemetryTracingTest extends AbstractClientServerTestBase 
         httpClientPolicy.setReceiveTimeout(100);
         WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
 
-        expectedException.expect(ProcessingException.class);
-        try {
-            client.get();
-        } finally {
-            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(otelRule.getSpans(), hasSize(2)));
-            assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET " + client.getCurrentURI()));
-            assertThat(otelRule.getSpans().get(0).getStatus().getStatusCode(), equalTo(StatusCode.ERROR));
-            assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books/long"));
-        }
+        assertThrows(ProcessingException.class, () -> client.get());
+
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(otelRule.getSpans(), hasSize(2)));
+        assertThat(otelRule.getSpans().get(0).getName(), equalTo("GET " + client.getCurrentURI()));
+        assertThat(otelRule.getSpans().get(0).getStatus().getStatusCode(), equalTo(StatusCode.ERROR));
+        assertThat(otelRule.getSpans().get(1).getName(), equalTo("GET /bookstore/books/long"));
     }
 
     @Test

@@ -44,13 +44,12 @@ import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -63,8 +62,6 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
     private static MetricsProvider provider;
     private static MetricsContext operationContext;
     private static MetricsContext resourceContext;
-        
-    @Rule public ExpectedException expectedException = ExpectedException.none();
     
     public static class BookLibrary implements Library {
         @Override
@@ -135,8 +132,7 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
         
         try {
             final Library client = factory.create(Library.class);
-            expectedException.expect(NotFoundException.class);
-            client.getBook(10);
+            assertThrows(NotFoundException.class, () -> client.getBook(10));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -151,11 +147,11 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
             .register(JacksonJsonProvider.class);
 
         try {
-            expectedException.expect(ProcessingException.class);
-            client
-                .target("http://localhost:" + PORT + "/books/10")
-                .request(MediaType.APPLICATION_JSON).get()
-                .readEntity(Book.class);
+            assertThrows(ProcessingException.class,
+                () -> client
+                    .target("http://localhost:" + PORT + "/books/10")
+                    .request(MediaType.APPLICATION_JSON).get()
+                    .readEntity(Book.class));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -188,8 +184,7 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
             Arrays.asList(JacksonJsonProvider.class));
         
         try {
-            expectedException.expect(ProcessingException.class);
-            client.get().readEntity(Book.class);
+            assertThrows(ProcessingException.class, () -> client.get().readEntity(Book.class));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -203,8 +198,7 @@ public class JAXRSServerMetricsTest extends AbstractClientServerTestBase {
             Arrays.asList(JacksonJsonProvider.class));
         
         try {
-            expectedException.expect(ProcessingException.class);
-            client.get().readEntity(Book.class);
+            assertThrows(ProcessingException.class, () -> client.get().readEntity(Book.class));
         } finally {
             Mockito.verifyNoInteractions(resourceContext);
             Mockito.verifyNoInteractions(operationContext);
