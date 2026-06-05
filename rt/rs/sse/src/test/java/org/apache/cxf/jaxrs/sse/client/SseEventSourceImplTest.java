@@ -51,15 +51,14 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 
 public class SseEventSourceImplTest {
@@ -108,9 +107,6 @@ public class SseEventSourceImplTest {
     private static final String LOCAL_ADDRESS = "local://";
 
     private static final Map<Type, Server> SERVERS = new EnumMap<>(Type.class);
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     private final List<InboundSseEvent> events = new ArrayList<>();
     private final List<Throwable> errors = new ArrayList<>();
@@ -207,8 +203,8 @@ public class SseEventSourceImplTest {
             // The attempt to open the SSE connection in another thread at the same
             // time should fail
             final Future<?> future = executor.submit(() -> eventSource.open());
-            exception.expectCause(instanceOf(IllegalStateException.class));
-            assertThat(future.get(), equalTo(null));
+            final ExecutionException ex = assertThrows(ExecutionException.class, future::get);
+            assertThat(ex.getCause(), instanceOf(IllegalStateException.class));
 
             assertThat(eventSource.isOpen(), equalTo(true));
             assertThat(events.size(), equalTo(1));

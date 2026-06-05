@@ -24,9 +24,10 @@ import java.lang.reflect.Proxy;
 import java.net.SocketException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class ThreadLocalInvocationHandlerTest {
 
@@ -36,13 +37,6 @@ public class ThreadLocalInvocationHandlerTest {
     private static final String THROWABLE_MSG = "Throwing a throwable.";
 
     private TestIface testIface;
-
-    private ExpectedException expectedException = ExpectedException.none();
-
-    @Rule
-    public ExpectedException getExpectedExceptionRule() {
-        return expectedException;
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -55,34 +49,30 @@ public class ThreadLocalInvocationHandlerTest {
 
     @Test
     public void testCheckedExceptionPropagation() throws Exception {
-        expectedException.expect(SocketException.class);
-        expectedException.expectMessage(CHECKED_EXCEPTION_MSG);
-
-        testIface.throwCheckedException();
+        SocketException ex = assertThrows(SocketException.class,
+                () -> testIface.throwCheckedException());
+        assertEquals(CHECKED_EXCEPTION_MSG, ex.getMessage());
     }
 
     @Test
     public void testUncheckedExceptionPropagation() {
-        expectedException.expect(IndexOutOfBoundsException.class);
-        expectedException.expectMessage(UNCHECKED_EXCEPTION_MSG);
-
-        testIface.throwUncheckedException();
+        IndexOutOfBoundsException ex = assertThrows(IndexOutOfBoundsException.class,
+                () -> testIface.throwUncheckedException());
+        assertEquals(UNCHECKED_EXCEPTION_MSG, ex.getMessage());
     }
 
     @Test
     public void testErrorPropagation() {
-        expectedException.expect(AnnotationFormatError.class);
-        expectedException.expectMessage(ERROR_MSG);
-
-        testIface.throwError();
+        AnnotationFormatError ex = assertThrows(AnnotationFormatError.class,
+                () -> testIface.throwError());
+        assertEquals(ERROR_MSG, ex.getMessage());
     }
 
     @Test
     public void testThrowablePropagation() throws Throwable {
-        expectedException.expect(Throwable.class);
-        expectedException.expectMessage(THROWABLE_MSG);
-
-        testIface.throwThrowable();
+        Throwable ex = assertThrows(Throwable.class,
+                () -> testIface.throwThrowable());
+        assertEquals(THROWABLE_MSG, ex.getMessage());
     }
 
     private interface TestIface {

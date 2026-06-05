@@ -45,9 +45,7 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.brave.BraveTestSupport.PARENT_SPAN_ID_NAME;
@@ -65,13 +63,11 @@ import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 
 public abstract class AbstractBraveTracingTest extends AbstractClientServerTestBase {
 
     private static final AtomicLong RANDOM = new AtomicLong();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private final Tracing brave = Tracing.newBuilder()
         .addSpanHandler(new TestSpanHandler())
@@ -337,16 +333,13 @@ public abstract class AbstractBraveTracingTest extends AbstractClientServerTestB
         httpClientPolicy.setReceiveTimeout(100);
         WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
 
-        expectedException.expect(ProcessingException.class);
-        try {
-            client.get();
-        } finally {
-            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() ->
-                assertThat(TestSpanHandler.getAllSpans(), hasSize(2)));
-            assertThat(TestSpanHandler.getAllSpans().get(0).name(), equalTo("GET " + client.getCurrentURI()));
-            assertThat(TestSpanHandler.getAllSpans().get(0).tags(), hasKey("error"));
-            assertThat(TestSpanHandler.getAllSpans().get(1).name(), equalTo("GET /bookstore/books/long"));
-        }
+        assertThrows(ProcessingException.class, () -> client.get());
+
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() ->
+            assertThat(TestSpanHandler.getAllSpans(), hasSize(2)));
+        assertThat(TestSpanHandler.getAllSpans().get(0).name(), equalTo("GET " + client.getCurrentURI()));
+        assertThat(TestSpanHandler.getAllSpans().get(0).tags(), hasKey("error"));
+        assertThat(TestSpanHandler.getAllSpans().get(1).name(), equalTo("GET /bookstore/books/long"));
     }
 
     @Test

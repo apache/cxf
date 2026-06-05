@@ -67,9 +67,7 @@ import io.opentracing.tag.Tags;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.apache.cxf.systest.HasSize.hasSize;
 import static org.apache.cxf.systest.jaxrs.tracing.opentracing.HasSpan.hasSpan;
@@ -81,6 +79,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
@@ -89,9 +88,6 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
     private static final AtomicLong RANDOM = new AtomicLong();
 
     private static final InMemoryReporter REPORTER = new InMemoryReporter();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private final Tracer tracer = new JaegerTracer.Builder("tracer-jaxrs")
         .withSampler(new ConstSampler(true))
@@ -383,15 +379,12 @@ public class JaxrsOpenTracingTracingTest extends AbstractClientServerTestBase {
         httpClientPolicy.setReceiveTimeout(100);
         WebClient.getConfig(client).getHttpConduit().setClient(httpClientPolicy);
 
-        expectedException.expect(ProcessingException.class);
-        try {
-            client.get();
-        } finally {
-            await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(REPORTER.getSpans(), hasSize(2)));
-            assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
-            assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
-            assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
-        }
+        assertThrows(ProcessingException.class, () -> client.get());
+
+        await().atMost(Duration.ofSeconds(5L)).untilAsserted(() -> assertThat(REPORTER.getSpans(), hasSize(2)));
+        assertThat(REPORTER.getSpans().get(0).getOperationName(), equalTo("GET " + client.getCurrentURI()));
+        assertThat(REPORTER.getSpans().get(0).getTags(), hasItem(Tags.ERROR.getKey(), Boolean.TRUE));
+        assertThat(REPORTER.getSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/long"));
     }
 
     @Test

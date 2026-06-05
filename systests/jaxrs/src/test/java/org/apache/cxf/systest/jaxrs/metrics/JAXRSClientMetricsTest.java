@@ -42,7 +42,6 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -53,6 +52,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -60,7 +60,6 @@ import static org.mockito.Mockito.times;
 @RunWith(MockitoJUnitRunner.class)
 public class JAXRSClientMetricsTest {
     @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
-    @Rule public ExpectedException expectedException = ExpectedException.none();
     
     private MetricsProvider provider;
     private MetricsContext operationContext;
@@ -102,8 +101,7 @@ public class JAXRSClientMetricsTest {
 
         try {
             final Library client = factory.create(Library.class);
-            expectedException.expect(NotFoundException.class);
-            client.getBook(10);
+            assertThrows(NotFoundException.class, () -> client.getBook(10));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -123,11 +121,11 @@ public class JAXRSClientMetricsTest {
                 .withStatus(404)));
 
         try {
-            expectedException.expect(ProcessingException.class);
-            client
-                .target("http://localhost:" + wireMockRule.port() + "/books/10")
-                .request(MediaType.APPLICATION_JSON).get()
-                .readEntity(Book.class);
+            assertThrows(ProcessingException.class,
+                () -> client
+                    .target("http://localhost:" + wireMockRule.port() + "/books/10")
+                    .request(MediaType.APPLICATION_JSON).get()
+                    .readEntity(Book.class));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -145,12 +143,12 @@ public class JAXRSClientMetricsTest {
             .register(JacksonJsonProvider.class);
 
         try {
-            expectedException.expect(ProcessingException.class);
-            client
-                .target("http://localhost:" + port + "/books/10")
-                .request(MediaType.APPLICATION_JSON)
-                .get()
-                .readEntity(Book.class);
+            assertThrows(ProcessingException.class,
+                () -> client
+                    .target("http://localhost:" + port + "/books/10")
+                    .request(MediaType.APPLICATION_JSON)
+                    .get()
+                    .readEntity(Book.class));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
@@ -195,8 +193,7 @@ public class JAXRSClientMetricsTest {
                 .withStatus(404)));
 
         try {
-            expectedException.expect(ProcessingException.class);
-            client.get().readEntity(Book.class);
+            assertThrows(ProcessingException.class, () -> client.get().readEntity(Book.class));
         } finally {
             Mockito.verify(resourceContext, times(1)).start(any(Exchange.class));
             Mockito.verify(resourceContext, times(1)).stop(anyLong(), anyLong(), anyLong(), any(Exchange.class));
