@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -130,6 +131,28 @@ public class JAXRSEntityPartTest extends AbstractBusClientServerTestBase {
     public void testBookJaxbForm() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbform";
         doAddFormBook(address, "attachmentFormJaxb", "bookXML", MediaType.APPLICATION_XML, 200);
+    }
+
+    @Test
+    public void testMultipartRequestTooLarge() throws Exception {
+        final String address = "http://localhost:" + PORT + "/bookstore/books/images";
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+
+        final WebClient client = WebClient.create(address);
+        client.getConfiguration().getOutInterceptors().add(out);
+        client.type(MediaType.MULTIPART_FORM_DATA).accept(MediaType.MULTIPART_FORM_DATA);
+
+        final EntityPart part = EntityPart
+                .withFileName("testfile.png")
+                .content(new ByteArrayInputStream(new byte[1024 * 11]))
+                .build();
+
+        try (Response response = client.postCollection(List.of(part), EntityPart.class)) {
+            assertEquals(413, response.getStatus());
+        }
     }
 
     private void doAddFormBook(String address, String resourceName, 

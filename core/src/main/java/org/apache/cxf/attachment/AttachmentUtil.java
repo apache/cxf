@@ -214,24 +214,25 @@ public final class AttachmentUtil {
         }
 
         Object maxSize = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
-        if (maxSize != null) {
-            if (maxSize instanceof Number) {
-                long size = ((Number) maxSize).longValue();
-                if (size >= 0) {
-                    bos.setMaxSize(size);
-                } else {
-                    LOG.warning("Max size value overflowed long. Do not set max size!");
-                }
-            } else if (maxSize instanceof String) {
-                try {
-                    bos.setMaxSize(Long.parseLong((String) maxSize));
-                } catch (NumberFormatException e) {
-                    throw new IOException("Provided threshold String is not a number", e);
-                }
+        if (maxSize == null) {
+            maxSize = AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_SIZE;
+        }
+        if (maxSize instanceof Number) {
+            long size = ((Number) maxSize).longValue();
+            if (size >= 0) {
+                bos.setMaxSize(size);
             } else {
-                throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
-                        + " should be either an instance of Number or String");
+                LOG.warning("Max size value overflowed long. Do not set max size!");
             }
+        } else if (maxSize instanceof String) {
+            try {
+                bos.setMaxSize(Long.parseLong((String) maxSize));
+            } catch (NumberFormatException e) {
+                throw new IOException("Provided max size String is not a number", e);
+            }
+        } else {
+            throw new IOException("The value set as " + AttachmentDeserializer.ATTACHMENT_MAX_SIZE
+                    + " should be either an instance of Number or String");
         }
     }
 
