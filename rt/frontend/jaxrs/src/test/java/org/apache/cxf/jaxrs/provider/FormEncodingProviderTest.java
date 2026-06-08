@@ -25,20 +25,35 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -141,6 +156,40 @@ public class FormEncodingProviderTest {
             HttpUtils.urlDecode("line1%0D%0Aline+2"), mvMap.get("bar").get(0));
         assertEquals("Wrong entry for baz", "4", mvMap.getFirst("baz"));
 
+    }
+    
+    @Test
+    public void testWriteMultipartTooLarge() throws Exception {
+        final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.add("Content-Transfer-Encoding", "binary");
+
+        final Bus bus = new ExtensionManagerBus();
+        final Message m = new MessageImpl();
+        m.put(AttachmentDeserializer.ATTACHMENT_PART_HEADERS, headers);
+        m.put(Message.CONTENT_TYPE, "multipart/related");
+
+        final ExchangeImpl exchange = new ExchangeImpl();
+        m.setExchange(exchange);
+        exchange.setInMessage(m);
+
+        FormEncodingProvider<MultipartBody> ferp = new FormEncodingProvider<>();
+        InjectionUtils.injectContextFields(ferp, new ProviderInfo<>(ferp, bus, false), m);
+        
+        final byte[] messageBytes = ("------=_Part_1\n\nJJJJ\n------=_Part_1\n\n"
+                + "Content-Transfer-Encoding: binary\n\n" +  LongStream
+                    .range(0, AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_SIZE / 3 + 1)
+                    .mapToObj(i -> "=3D")
+                    .collect(Collectors.joining())
+                + "\n------=_Part_1\n").getBytes();
+        try (ByteArrayInputStream in = new ByteArrayInputStream(messageBytes)) {
+            m.setContent(InputStream.class, in);
+   
+            final WebApplicationException ex = assertThrows(WebApplicationException.class, 
+                () -> ferp.readFrom(MultipartBody.class, null, new Annotation[]{}, 
+                    MediaType.MULTIPART_FORM_DATA_TYPE, null, in));
+            
+            assertThat(ex.getResponse().getStatus(), equalTo(413) /* Request Entity Too Large */); 
+        }
     }
 
     @Test
