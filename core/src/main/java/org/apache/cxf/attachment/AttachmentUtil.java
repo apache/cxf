@@ -222,7 +222,7 @@ public final class AttachmentUtil {
             if (size >= 0) {
                 bos.setMaxSize(size);
             } else {
-                LOG.warning("Max size value overflowed long. Do not set max size!");
+                LOG.warning("The max size value is set to unlimited.");
             }
         } else if (maxSize instanceof String) {
             try {
