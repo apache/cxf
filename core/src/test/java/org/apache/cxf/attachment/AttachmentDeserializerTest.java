@@ -31,7 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -41,6 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import jakarta.activation.DataSource;
 import jakarta.activation.URLDataSource;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -376,6 +379,25 @@ public class AttachmentDeserializerTest {
         assertEquals(-1, m.read(new byte[1000]));
         assertEquals(-1, m.read(new byte[1000]));
         m.close();
+    }
+    
+    @Test
+    public void testDefaultAttachmentMaxSize() throws Exception {
+        final byte[] messageBytes = ("------=_Part_1\n\nJJJJ\n------=_Part_1\n\n"
+                + "Content-Transfer-Encoding: binary\n\n" +  LongStream
+                    .range(0, AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_SIZE / 3 + 1)
+                    .mapToObj(i -> "=3D")
+                    .collect(Collectors.joining())
+                + "\n------=_Part_1\n").getBytes();
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(messageBytes));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+
+        // Force it to load the attachments
+        assertThrows(CacheSizeExceededException.class, () -> msg.getAttachments().size());
     }
 
     @Test
