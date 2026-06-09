@@ -39,7 +39,7 @@
         <glassfish.container.version>8.0.3</glassfish.container.version>
         <glassfish.home>${project.build.directory}/glassfish8</glassfish.home>
         <jakarta.platform.version>11.0.0</jakarta.platform.version>
-        <junit.jupiter.version>6.0.2</junit.jupiter.version>
+        <junit.jupiter.version>6.1.0</junit.jupiter.version>
         <jakarta.rest.version>4.0.0</jakarta.rest.version>
         <tck.artifactId>jakarta-restful-ws-tck</tck.artifactId>
         <arquillian.version>1.10.2.Final</arquillian.version>
