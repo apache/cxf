@@ -38,7 +38,7 @@
     </cxf.osgi.import>
     <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
     <!-- (openJPA loadtime weaving) -->
-    <cxf.surefire.fork.vmargs.extra>-javaagent:${org.apache.openjpa:openjpa:jar}</cxf.surefire.fork.vmargs.extra>
+    <cxf.surefire.fork.vmargs.extra>-javaagent:${org.apache.openjpa:openjpa:jar:jakarta}</cxf.surefire.fork.vmargs.extra>
   </properties>
   <dependencies>
     <dependency>

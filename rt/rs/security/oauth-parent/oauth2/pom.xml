@@ -41,7 +41,7 @@
     <compilerArguments>-Aopenjpa.source=8 -Aopenjpa.metamodel=true</compilerArguments>
     <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
     <!-- (openJPA loadtime weaving) -->
-    <cxf.surefire.fork.vmargs.extra>-javaagent:${org.apache.openjpa:openjpa:jar} -javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
+    <cxf.surefire.fork.vmargs.extra>-javaagent:${org.apache.openjpa:openjpa:jar:jakarta} -javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
   </properties>
   <dependencies>
     <dependency>
@@ -246,20 +246,19 @@
           </execution>
         </executions>
       </plugin>
-        <!-- this tells maven to set a property pointing to the openjpa agent jar -->
-        <!-- where surefire can see it -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>generate-test-resources</phase>
-                    <goals>
-                        <goal>properties</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+      <!-- this tells maven to set a property pointing to the openjpa agent jar -->
+      <!-- where surefire can see it -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+              <goals>
+                <goal>properties</goal>
+              </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
