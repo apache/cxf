@@ -39,6 +39,9 @@
       jakarta.persistence*;resolution:=optional
     </cxf.osgi.import>
     <compilerArguments>-Aopenjpa.source=8 -Aopenjpa.metamodel=true</compilerArguments>
+    <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
+    <!-- (openJPA loadtime weaving) -->
+    <cxf.surefire.fork.vmargs.extra>-javaagent:${org.apache.openjpa:openjpa:jar} -javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
   </properties>
   <dependencies>
     <dependency>
@@ -256,16 +259,6 @@
                 </execution>
             </executions>
         </plugin>
-      <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
-      <!-- (openJPA loadtime weaving) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-javaagent:${org.apache.openjpa:openjpa:jar} ${cxf.surefire.fork.vmargs}</argLine>
-          <workingDirectory>${project.build.directory}</workingDirectory>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>
