@@ -31,8 +31,7 @@
     <description>Apache CXF Transport System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.surefire.fork.vmargs>-Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
-        <cxf.surefire.fork.vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED -Djdk.http.auth.tunneling.disabledSchemes=""</cxf.surefire.fork.vmargs>
+        <cxf.surefire.fork.vmargs.extra>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED -Djdk.http.auth.tunneling.disabledSchemes="" -javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
         <cxf.module.name>org.apache.cxf.systests.transport</cxf.module.name>
     </properties>
     <build>
@@ -114,6 +113,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <phase>generate-test-resources</phase>
+                         <goals>
+                             <goal>properties</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
         </plugins>
     </build>
     <dependencies>

@@ -36,6 +36,7 @@
             jakarta.servlet*;version="${cxf.osgi.jakarta.servlet.version}",
             jakarta.xml.bind*;version="${cxf.osgi.jakarta.bind.version}"
         </cxf.osgi.import>
+        <cxf.surefire.fork.vmargs.extra>-javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
     </properties>
     <dependencies>
         <dependency>
@@ -87,6 +88,18 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <phase>generate-test-resources</phase>
+                         <goals>
+                             <goal>properties</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
         </plugins>
     </build>
 </project>

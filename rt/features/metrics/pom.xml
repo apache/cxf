@@ -13,6 +13,7 @@
 
     <properties>
         <cxf.module.name>org.apache.cxf.metrics</cxf.module.name>
+        <cxf.surefire.fork.vmargs.extra>-javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
     </properties>
 
     <dependencies>
@@ -61,4 +62,20 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <phase>generate-test-resources</phase>
+                         <goals>
+                             <goal>properties</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
+        </plugins>
+    </build>
 </project>

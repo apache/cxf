@@ -19,6 +19,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>cxf-rt-rs-security-http-signature</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime Http-Signature</name>
     <description>
@@ -33,9 +34,9 @@
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>cxf-rt-rs-security-http-signature</artifactId>
     <properties>
         <cxf.module.name>org.apache.cxf.rs.security.http.signature</cxf.module.name>
+        <cxf.surefire.fork.vmargs.extra>-javaagent:${org.mockito:mockito-core:jar}</cxf.surefire.fork.vmargs.extra>
     </properties>
 
     <dependencies>
@@ -77,4 +78,20 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+                 <executions>
+                     <execution>
+                         <phase>generate-test-resources</phase>
+                         <goals>
+                             <goal>properties</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
+        </plugins>
+    </build>
 </project>
