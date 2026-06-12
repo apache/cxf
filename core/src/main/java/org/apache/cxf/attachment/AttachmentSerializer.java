@@ -266,11 +266,11 @@ public class AttachmentSerializer {
                 || "Content-Transfer-Encoding".equalsIgnoreCase(name)) {
                 continue;
             }
-            writer.write(name);
+            writer.write(stripLineBreaks(name));
             writer.write(": ");
             List<String> values = entry.getValue();
             for (int i = 0; i < values.size(); i++) {
-                writer.write(values.get(i));
+                writer.write(stripLineBreaks(values.get(i)));
                 if (i + 1 < values.size()) {
                     writer.write(",");
                 }
@@ -279,6 +279,23 @@ public class AttachmentSerializer {
         }
 
         writer.write("\r\n");
+    }
+
+    // A part header value such as the Content-Disposition filename can carry an
+    // attacker-supplied name. Bare CR or LF in it would otherwise terminate the
+    // header line and let extra part headers be injected into the MIME stream.
+    private static String stripLineBreaks(String value) {
+        if (value == null || (value.indexOf('\r') < 0 && value.indexOf('\n') < 0)) {
+            return value;
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c != '\r' && c != '\n') {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private static String checkAngleBrackets(String value) {
