@@ -74,28 +74,26 @@ public class BookStore2 extends BookStoreClientCloseable {
     public void forBook(@Context SseEventSink sink, @PathParam("id") final String id,
             @HeaderParam(HttpHeaders.LAST_EVENT_ID_HEADER) @DefaultValue("0") final String lastEventId) {
 
-        new Thread() {
-            public void run() {
-                try {
-                    final Integer id = Integer.valueOf(lastEventId);
-                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
+        new Thread(() -> {
+            try {
+                final Integer lastId = Integer.valueOf(lastEventId);
+                final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
-                    sink.send(createEvent(builder.name("book"), id + 1));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 2));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 3));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 4));
-                    Thread.sleep(200);
-                    sink.close();
-                } catch (final InterruptedException ex) {
-                    LOG.error("Communication error", ex);
-                } catch (final IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
+                sink.send(createEvent(builder.name("book"), lastId + 1));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 2));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 3));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 4));
+                Thread.sleep(200);
+                sink.close();
+            } catch (final InterruptedException ex) {
+                LOG.error("Communication error", ex);
+            } catch (final IOException ex) {
+                throw new UncheckedIOException(ex);
             }
-        }.start();
+        }).start();
     }
     
     @POST
@@ -104,28 +102,26 @@ public class BookStore2 extends BookStoreClientCloseable {
     @Consumes(MediaType.TEXT_PLAIN)
     public void forBookPOST(@Context SseEventSink sink, @PathParam("id") final String id,
             final String lastEventId) {
-        new Thread() {
-            public void run() {
-                try {
-                    final Integer id = Integer.valueOf(lastEventId);
-                    final OutboundSseEvent.Builder builder = sse.newEventBuilder();
+        new Thread(() -> {
+            try {
+                final Integer lastId = Integer.valueOf(lastEventId);
+                final OutboundSseEvent.Builder builder = sse.newEventBuilder();
 
-                    sink.send(createEvent(builder.name("book"), id + 1));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 2));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 3));
-                    Thread.sleep(200);
-                    sink.send(createEvent(builder.name("book"), id + 4));
-                    Thread.sleep(200);
-                    sink.close();
-                } catch (final InterruptedException ex) {
-                    LOG.error("Communication error", ex);
-                } catch (final IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
+                sink.send(createEvent(builder.name("book"), lastId + 1));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 2));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 3));
+                Thread.sleep(200);
+                sink.send(createEvent(builder.name("book"), lastId + 4));
+                Thread.sleep(200);
+                sink.close();
+            } catch (final InterruptedException ex) {
+                LOG.error("Communication error", ex);
+            } catch (final IOException ex) {
+                throw new UncheckedIOException(ex);
             }
-        }.start();
+        }).start();
     }
     
     @GET
@@ -218,18 +214,16 @@ public class BookStore2 extends BookStoreClientCloseable {
     @Path("/filtered/sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void filtered(@Context SseEventSink sink) {
-        new Thread() {
-            public void run() {
-                try {
-                    Thread.sleep(200);
-                    sink.close();
-                } catch (final InterruptedException ex) {
-                    LOG.error("Communication error", ex);
-                } catch (final IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
+        new Thread(() -> {
+            try {
+                Thread.sleep(200);
+                sink.close();
+            } catch (final InterruptedException ex) {
+                LOG.error("Communication error", ex);
+            } catch (final IOException ex) {
+                throw new UncheckedIOException(ex);
             }
-        }.start();
+        }).start();
     }
     
     @GET
@@ -245,9 +239,6 @@ public class BookStore2 extends BookStoreClientCloseable {
     public void failOnRequestThread(@Context SseEventSink sink) {
         throw new RuntimeException("CXF-9189-MARKER: exception from SSE resource method should be logged");
     }
-
-    
-    
 
     @PUT
     @Path("/filtered/stats")

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class AegisElementProviderTest {
     @Test
     public void testReadFrom() throws Exception {
         MessageBodyReader<AegisTestBean> p = new AegisElementProvider<>();
-        byte[] simpleBytes = simpleBeanXml.getBytes("utf-8");
+        byte[] simpleBytes = simpleBeanXml.getBytes(StandardCharsets.UTF_8);
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(simpleBytes));
         assertEquals("hovercraft", bean.getStrValue());
@@ -89,7 +90,7 @@ public class AegisElementProviderTest {
     @Test
     public void testNoNamespaceReadFrom() throws Exception {
         MessageBodyReader<AegisTestBean> p = new NoNamespaceAegisElementProvider<>();
-        byte[] bytes = noNamespaceXml.getBytes("utf-8");
+        byte[] bytes = noNamespaceXml.getBytes(StandardCharsets.UTF_8);
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(bytes));
         assertEquals("hovercraft", bean.getStrValue());
@@ -107,7 +108,7 @@ public class AegisElementProviderTest {
                   MediaType.APPLICATION_OCTET_STREAM_TYPE,
                   new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
-        String xml = new String(bytes, "utf-8");
+        String xml = new String(bytes, StandardCharsets.UTF_8);
         assertEquals(simpleBeanXml, xml);
     }
 
@@ -122,7 +123,7 @@ public class AegisElementProviderTest {
                   MediaType.APPLICATION_OCTET_STREAM_TYPE,
                   new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
-        String xml = new String(bytes, "utf-8");
+        String xml = new String(bytes, StandardCharsets.UTF_8);
         assertEquals(noNamespaceXml, xml);
     }
 
@@ -151,10 +152,10 @@ public class AegisElementProviderTest {
                        MediaType.APPLICATION_OCTET_STREAM_TYPE,
                        new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
-        String xml = new String(bytes, "utf-8");
+        String xml = new String(bytes, StandardCharsets.UTF_8);
         MessageBodyReader<Map<AegisTestBean, AegisSuperBean>> reader
             = new AegisElementProvider<>();
-        byte[] simpleBytes = xml.getBytes("utf-8");
+        byte[] simpleBytes = xml.getBytes(StandardCharsets.UTF_8);
 
         Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, new Annotation[]{},
                                                                   MediaType.APPLICATION_OCTET_STREAM_TYPE,

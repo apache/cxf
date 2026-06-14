@@ -389,6 +389,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         return client;
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     public class CloseIdleConnectionThread extends Thread {
 
         private final PoolingNHttpClientConnectionManager connMgr;

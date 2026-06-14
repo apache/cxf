@@ -46,6 +46,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -85,14 +86,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         AddNumberImpl port = getPort();
 
-        try {
-            port.addNumbers(-1, 2);
-        } catch (AddNumbersException_Exception e) {
-            assert true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
-        }
+        assertThrows(AddNumbersException_Exception.class, () -> port.addNumbers(-1, 2));
 
         assertTrue(output.toString().indexOf("http://cxf.apache.org/input") != -1);
         String expectedFault =
@@ -126,14 +120,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         AddNumberImpl port = getPort();
 
-        try {
-            port.addNumbers3(-1, 2);
-        } catch (AddNumbersException_Exception e) {
-            assert true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
-        }
+        assertThrows(AddNumbersException_Exception.class, () -> port.addNumbers3(-1, 2));
 
         assertTrue(output.toString(), output.toString().indexOf("http://cxf.apache.org/input") != -1);
         assertTrue(input.toString(), input.toString().indexOf("http://cxf.apache.org/fault3") != -1);

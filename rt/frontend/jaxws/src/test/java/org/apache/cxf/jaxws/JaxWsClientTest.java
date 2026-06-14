@@ -150,15 +150,13 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         requestContext.put(key, "ho");
 
         final Object[] result = new Object[2];
-        Thread t = new Thread() {
-            public void run() {
-                //requestContext in main thread shouldn't affect the requestContext in this thread
-                Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
-                result[0] = requestContext.get(key);
-                requestContext.remove(key);
-                result[1] = requestContext.get(key);
-            }
-        };
+        Thread t = new Thread(() -> {
+            //requestContext in main thread shouldn't affect the requestContext in this thread
+            Map<String, Object> rc = ((BindingProvider)handler).getRequestContext();
+            result[0] = rc.get(key);
+            rc.remove(key);
+            result[1] = rc.get(key);
+        });
         t.start();
         t.join();
 
@@ -190,15 +188,13 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         requestContext.put(key, "ho");
 
         final Object[] result = new Object[2];
-        Thread t = new Thread() {
-            public void run() {
-                //requestContext in main thread shouldn't affect the requestContext in this thread
-                Map<String, Object> requestContext = disp.getRequestContext();
-                result[0] = requestContext.get(key);
-                requestContext.remove(key);
-                result[1] = requestContext.get(key);
-            }
-        };
+        Thread t = new Thread(() -> {
+            //requestContext in main thread shouldn't affect the requestContext in this thread
+            Map<String, Object> rc = disp.getRequestContext();
+            result[0] = rc.get(key);
+            rc.remove(key);
+            result[1] = rc.get(key);
+        });
         t.start();
         t.join();
 

@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -269,8 +270,8 @@ public class BookStoreSpring {
     public Book getBookISO() throws Exception {
         String eWithAcute = "\u00E9";
         String helloStringUTF16 = "F" + eWithAcute + "lix";
-        byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
-        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        byte[] iso88591bytes = helloStringUTF16.getBytes(StandardCharsets.ISO_8859_1);
+        String helloStringISO88591 = new String(iso88591bytes, StandardCharsets.ISO_8859_1);
         return new Book(helloStringISO88591, 333L);
     }
 

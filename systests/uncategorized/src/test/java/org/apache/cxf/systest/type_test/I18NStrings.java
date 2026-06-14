@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.type_test;
 
+import java.nio.charset.StandardCharsets;
+
 public final class I18NStrings {
 
     public static final String JAP_SIMPLE_STRING;
@@ -33,7 +35,7 @@ public final class I18NStrings {
                 (byte)0x0, (byte)0x65, (byte)0x69, (byte)0x1c, (byte)0x7d, (byte)0x22,
                 (byte)0x69, (byte)0x1c, (byte)0x7d, (byte)0x22, (byte)0x30, (byte)0xaa,
                 (byte)0x30, (byte)0xd7, (byte)0x30, (byte)0xb7, (byte)0x30, (byte)0xe7,
-                (byte)0x30, (byte)0xf3, }, "utf-16");
+                (byte)0x30, (byte)0xf3, }, StandardCharsets.UTF_16);
         } catch (Exception ex) {
             tmp = null;
         }
@@ -167,7 +169,7 @@ public final class I18NStrings {
                 (byte)0xff, (byte)0x44, (byte)0xff, (byte)0x45, (byte)0xff, (byte)0x46,
                 (byte)0xff, (byte)0x47, (byte)0xff, (byte)0x48, (byte)0xff, (byte)0x49,
                 (byte)0xff, (byte)0x4a, (byte)0xff, (byte)0x4b, (byte)0xff, (byte)0x4c,
-                (byte)0xff, (byte)0x4d, (byte)0xff, (byte)0x4e}, "utf-16");
+                (byte)0xff, (byte)0x4d, (byte)0xff, (byte)0x4e}, StandardCharsets.UTF_16);
         } catch (Exception ex) {
             tmp = null;
         }

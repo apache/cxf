@@ -22,6 +22,7 @@ package org.apache.cxf.transport.websocket;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -250,7 +251,7 @@ public final class WebSocketUtils {
 
         public ByteArrayBuilder append(String s) {
             try {
-                baos.write(s.getBytes("utf-8"));
+                baos.write(s.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
                 // ignore
             }

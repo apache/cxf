@@ -21,10 +21,10 @@ package org.apache.cxf.transport.websocket.jetty12;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -377,12 +377,8 @@ public class Jetty12WebSocketDestination extends JettyHTTPDestination implements
 
         @org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage
         public void onMessage(String message) {
-            try {
-                byte[] bdata = message.getBytes("utf-8");
-                onBinaryMessage(ByteBuffer.wrap(bdata), null);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            byte[] bdata = message.getBytes(StandardCharsets.UTF_8);
+            onBinaryMessage(ByteBuffer.wrap(bdata), null);
         }
         
         @org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage

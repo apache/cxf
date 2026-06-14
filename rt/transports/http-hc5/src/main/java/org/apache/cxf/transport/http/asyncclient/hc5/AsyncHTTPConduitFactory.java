@@ -420,6 +420,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         return maxConnections;
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     public class CloseIdleConnectionThread extends Thread {
         private final PoolingAsyncClientConnectionManager connMgr;
         private final CloseableHttpAsyncClient client;

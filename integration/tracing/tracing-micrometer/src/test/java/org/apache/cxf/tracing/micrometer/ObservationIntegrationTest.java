@@ -34,7 +34,7 @@ import io.micrometer.tracing.test.simple.SpansAssert;
 import org.junit.jupiter.api.AfterEach;
 
 
-public class ObservationIntegrationTest extends SampleTestRunner {
+class ObservationIntegrationTest extends SampleTestRunner {
 
     private static final String ADDRESS = "http://localhost:9282";
     private Server server;

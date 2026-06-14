@@ -117,7 +117,7 @@ public class JAXBElementProviderTest {
         String bookStringUTF16 = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
                                  + "<Book><name>" + nameStringUTF16 + "</name></Book>";
 
-        byte[] iso88591bytes = bookStringUTF16.getBytes("ISO-8859-1");
+        byte[] iso88591bytes = bookStringUTF16.getBytes(StandardCharsets.ISO_8859_1);
 
         JAXBElementProvider<Book> p = new JAXBElementProvider<>();
         Book book = p.readFrom(Book.class, null,

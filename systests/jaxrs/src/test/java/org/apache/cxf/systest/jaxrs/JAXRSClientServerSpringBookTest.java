@@ -348,7 +348,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient wc = WebClient.create(address);
         wc.accept("application/json" + (charset == null ? "" : ";charset=ISO-8859-1"));
         byte[] iso88591bytes = wc.get(byte[].class);
-        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        String helloStringISO88591 = new String(iso88591bytes, StandardCharsets.ISO_8859_1);
 
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("\"name\":\"") + "\"name\":\"".length(),
@@ -362,7 +362,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         wc.accept("application/xml" + (charset == null ? "" : ";charset=ISO-8859-1"));
         byte[] iso88591bytes = wc.get(byte[].class);
-        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        String helloStringISO88591 = new String(iso88591bytes, StandardCharsets.ISO_8859_1);
 
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("<name>") + "<name>".length(),
@@ -374,7 +374,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     private void compareNames(String name) throws Exception  {
         String eWithAcute = "\u00E9";
         String nameUTF16 = "F" + eWithAcute + "lix";
-        String nameExpected = new String(nameUTF16.getBytes("ISO-8859-1"), "ISO-8859-1");
+        String nameExpected = new String(nameUTF16.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1);
         assertEquals(nameExpected, name);
     }
 

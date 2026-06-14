@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -299,8 +300,8 @@ class ClassReader extends ByteArrayInputStream {
                 pos = cpoolIndex[i];
                 int len = readShort();
                 skipFully(len);
-                cpool[i] = new String(buf, pos - len, len, "utf-8");
-                s = new String(buf, pos - len, len, "utf-8");
+                cpool[i] = new String(buf, pos - len, len, StandardCharsets.UTF_8);
+                s = new String(buf, pos - len, len, StandardCharsets.UTF_8);
             }
             return s;
         } finally {

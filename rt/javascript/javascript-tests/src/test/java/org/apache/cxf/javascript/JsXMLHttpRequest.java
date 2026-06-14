@@ -325,16 +325,14 @@ public class JsXMLHttpRequest extends ScriptableObject {
         notifyReadyStateChangeListener();
 
         if (storedAsync) {
-            new Thread() {
-                public void run() {
-                    try {
-                        Context cx = ContextFactory.getGlobal().enterContext();
-                        communicate(cx);
-                    } finally {
-                        Context.exit();
-                    }
+            new Thread(() -> {
+                try {
+                    Context cx = ContextFactory.getGlobal().enterContext();
+                    communicate(cx);
+                } finally {
+                    Context.exit();
                 }
-            } .start();
+            }).start();
         } else {
             communicate(Context.getCurrentContext());
         }
