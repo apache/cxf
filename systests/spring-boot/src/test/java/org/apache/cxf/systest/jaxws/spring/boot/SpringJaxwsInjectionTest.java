@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     webEnvironment = WebEnvironment.RANDOM_PORT,
     classes = SpringJaxwsInjectionTest.TestConfig.class)
 @ActiveProfiles("jaxws")
-public class SpringJaxwsInjectionTest {
+class SpringJaxwsInjectionTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
             + "<name>Elan</name>"
@@ -82,7 +82,7 @@ public class SpringJaxwsInjectionTest {
     }
 
     @Test
-    public void testJaxwsWebServiceContext() throws MalformedURLException {
+    void testJaxwsWebServiceContext() throws MalformedURLException {
         // given in setUp
 
         // when

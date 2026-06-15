@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jakarta.ws.rs.Consumes;
@@ -101,7 +102,7 @@ public class BookServerAsyncClient extends AbstractServerTestServerBase {
         public void writeTo(Boolean t, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                             OutputStream os) throws IOException, WebApplicationException {
-            byte[] bytes = t.toString().getBytes("UTF-8");
+            byte[] bytes = t.toString().getBytes(StandardCharsets.UTF_8);
             os.write(bytes);
 
         }

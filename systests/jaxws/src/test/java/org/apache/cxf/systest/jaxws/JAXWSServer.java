@@ -136,19 +136,17 @@ public class JAXWSServer extends AbstractBusTestServerBase {
         public Future<?> greetMeAsync(final String requestType,
                                       final AsyncHandler<GreetMeResponse> asyncHandler) {
             final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<>();
-            new Thread() {
-                public void run() {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        //ignore
-                    }
-                    GreetMeResponse resp = new GreetMeResponse();
-                    resp.setResponseType("Hello " + requestType);
-                    r.set(resp);
-                    asyncHandler.handleResponse(r);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    //ignore
                 }
-            } .start();
+                GreetMeResponse resp = new GreetMeResponse();
+                resp.setResponseType("Hello " + requestType);
+                r.set(resp);
+                asyncHandler.handleResponse(r);
+            }).start();
             return r;
         }
     }
@@ -165,17 +163,15 @@ public class JAXWSServer extends AbstractBusTestServerBase {
 
         public Future<?> invokeAsync(final StreamSource s, final AsyncHandler<Source> asyncHandler) {
             final ServerAsyncResponse<Source> r = new ServerAsyncResponse<>();
-            new Thread() {
-                public void run() {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        // ignore
-                    }
-                    r.set(s);
-                    asyncHandler.handleResponse(r);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // ignore
                 }
-            } .start();
+                r.set(s);
+                asyncHandler.handleResponse(r);
+            }).start();
             return r;
         }
     }

@@ -62,10 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = SpringClientSslBundleTest.TestCfg.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ssl")
-
-
-
-public class SpringClientSslBundleTest {
+class SpringClientSslBundleTest {
 
     interface HelloApi {
         @GET 
@@ -140,8 +137,6 @@ public class SpringClientSslBundleTest {
 
         SSLContext ctx = clientBundle.createSslContext();
         assertThat(ctx).isNotNull();
-
-        
 
         String resp = api.hello();
         assertThat(resp).isEqualTo("hello");

@@ -42,6 +42,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class WSAFromWSDLTest extends AbstractWSATestBase {
@@ -121,14 +122,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
 
         AddNumbersPortType port = getPort();
 
-        try {
-            port.addNumbers(-1, 2);
-        } catch (AddNumbersFault_Exception ex) {
-            assert true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
-        }
+        assertThrows(AddNumbersFault_Exception.class, () -> port.addNumbers(-1, 2));
 
         String expectedOut = BASE_URI + "addNumbersRequest";
         String expectedIn = BASE_URI + "addNumbers/Fault/addNumbersFault";
@@ -144,14 +138,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
 
         try (AddNumbersPortTypeProxy port = getPort()) {
 
-            try {
-                port.addNumbers3(-1, 2);
-            } catch (AddNumbersFault_Exception ex) {
-                assert true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                assert false;
-            }
+            assertThrows(AddNumbersFault_Exception.class, () -> port.addNumbers3(-1, 2));
 
             String expectedOut = "3in";
             String expectedIn = "3fault";

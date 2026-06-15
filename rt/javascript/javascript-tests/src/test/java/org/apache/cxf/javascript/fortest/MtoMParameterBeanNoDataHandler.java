@@ -19,7 +19,7 @@
 
 package org.apache.cxf.javascript.fortest;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.xml.bind.annotation.XmlMimeType;
 import jakarta.xml.bind.annotation.XmlType;
@@ -40,15 +40,11 @@ public class MtoMParameterBeanNoDataHandler {
     }
 
     @XmlMimeType("text/plain;charset=utf-8")
-    public byte[] getNotXml10() throws UnsupportedEncodingException {
-        return notXml10.getBytes("utf-8");
+    public byte[] getNotXml10() {
+        return notXml10.getBytes(StandardCharsets.UTF_8);
     }
     public void setNotXml10(byte[] notXml10) {
-        try {
-            this.notXml10 = new String(notXml10, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        this.notXml10 = new String(notXml10, StandardCharsets.UTF_8);
     }
     public void setNotXml10(String notXml10) {
         this.notXml10 = notXml10;

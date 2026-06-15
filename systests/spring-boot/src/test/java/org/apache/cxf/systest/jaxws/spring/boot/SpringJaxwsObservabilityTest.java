@@ -74,7 +74,7 @@ import static org.hamcrest.Matchers.hasSize;
 @ActiveProfiles("jaxws")
 @AutoConfigureMetrics
 @AutoConfigureTracing
-public class SpringJaxwsObservabilityTest {
+class SpringJaxwsObservabilityTest {
 
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
             + "<name>Elan</name>"
@@ -152,7 +152,7 @@ public class SpringJaxwsObservabilityTest {
     }
 
     @Test
-    public void testJaxwsObservation() throws MalformedURLException {
+    void testJaxwsObservation() throws MalformedURLException {
         // given in setUp
 
         // when

@@ -417,7 +417,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         }
         byte[] data = new byte[(int)fileSize];
         this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data);
-        String stringValue = new String(data, "utf-8");
+        String stringValue = new String(data, StandardCharsets.UTF_8);
         XopStringType xsv = new XopStringType();
         xsv.setAttachinfo(stringValue);
         xsv.setName("eman");

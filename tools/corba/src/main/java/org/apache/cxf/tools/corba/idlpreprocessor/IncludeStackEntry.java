@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Provides information about a file that
@@ -37,7 +38,7 @@ class IncludeStackEntry {
     IncludeStackEntry(URL link, String loc) throws IOException {
         this.url = link;
         this.location = loc;
-        this.reader = new LineNumberReader(new InputStreamReader(url.openStream(), "ISO-8859-1"));
+        this.reader = new LineNumberReader(new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1));
         this.reader.setLineNumber(1);
     }
 

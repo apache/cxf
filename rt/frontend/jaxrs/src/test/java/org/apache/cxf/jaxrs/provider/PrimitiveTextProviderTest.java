@@ -194,10 +194,10 @@ public class PrimitiveTextProviderTest {
                   String.class, String.class, null, MediaType.valueOf("text/plain;charset=ISO-8859-1"),
                   headers, os);
 
-        byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
-        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        byte[] iso88591bytes = helloStringUTF16.getBytes(StandardCharsets.ISO_8859_1);
+        String helloStringISO88591 = new String(iso88591bytes, StandardCharsets.ISO_8859_1);
 
-        assertEquals(helloStringISO88591, os.toString("ISO-8859-1"));
+        assertEquals(helloStringISO88591, os.toString(StandardCharsets.ISO_8859_1));
     }
 
     @Test
