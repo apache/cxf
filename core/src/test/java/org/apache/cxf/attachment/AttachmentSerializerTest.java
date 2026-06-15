@@ -263,6 +263,48 @@ public class AttachmentSerializerTest {
 
     }
 
+    @Test
+    public void testHeaderValueLineBreaksAreStripped() throws Exception {
+        MessageImpl msg = new MessageImpl();
+
+        Collection<Attachment> atts = new ArrayList<>();
+        AttachmentImpl a = new AttachmentImpl("test.xml");
+        InputStream is = getClass().getResourceAsStream("my.wav");
+        ByteArrayDataSource ds = new ByteArrayDataSource(is, "application/octet-stream");
+        a.setDataHandler(new DataHandler(ds));
+        // a filename carrying CR/LF, e.g. taken from an uploaded part name
+        a.setHeader("Content-Disposition",
+            "attachment; filename=\"evil\r\nX-Injected: yes\"");
+        atts.add(a);
+        msg.setAttachments(atts);
+
+        msg.put(Message.CONTENT_TYPE, "application/soap+xml");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        msg.setContent(OutputStream.class, out);
+
+        AttachmentSerializer serializer = new AttachmentSerializer(msg);
+        serializer.writeProlog();
+        out.write("<soap:Body/>".getBytes());
+        serializer.writeAttachments();
+        out.flush();
+
+        String wire = out.toString();
+        assertTrue("the line break must not survive into the MIME stream",
+            wire.contains("filename=\"evilX-Injected: yes\""));
+
+        String ct = (String) msg.get(Message.CONTENT_TYPE);
+        DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
+        MimeMultipart mpart = new MimeMultipart(source);
+        Session session = Session.getDefaultInstance(new Properties());
+        MimeMessage inMsg = new MimeMessage(session);
+        inMsg.setContent(mpart);
+        inMsg.addHeaderLine("Content-Type: " + ct);
+        MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
+        MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(1);
+        assertEquals(null, part.getHeader("X-Injected"));
+    }
+
     private static String escapeQuotes(String s) {
         return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;
     }
