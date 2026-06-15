@@ -56,22 +56,19 @@ public class WebServiceContextImplTest {
 
         assertSame(ctx, wsci.getMessageContext());
 
-        Thread t = new Thread() {
-                public void run() {
-                    WebServiceContextImpl threadLocalWSCI = new WebServiceContextImpl();
+        Thread t = new Thread(() -> {
+            WebServiceContextImpl threadLocalWSCI = new WebServiceContextImpl();
 
-                    assertNull(threadLocalWSCI.getMessageContext());
+            assertNull(threadLocalWSCI.getMessageContext());
 
-                    MessageImpl msg1 = new MessageImpl();
-                    MessageContext threadLocalCtx = new WrappedMessageContext(msg1);
-                    WebServiceContextImpl.setMessageContext(threadLocalCtx);
+            MessageImpl msg1 = new MessageImpl();
+            MessageContext threadLocalCtx = new WrappedMessageContext(msg1);
+            WebServiceContextImpl.setMessageContext(threadLocalCtx);
 
 
-                    assertSame(threadLocalCtx, threadLocalWSCI.getMessageContext());
-                    assertTrue(ctx !=  threadLocalWSCI.getMessageContext());
-
-                }
-            };
+            assertSame(threadLocalCtx, threadLocalWSCI.getMessageContext());
+            assertTrue(ctx !=  threadLocalWSCI.getMessageContext());
+        });
 
         t.start();
 

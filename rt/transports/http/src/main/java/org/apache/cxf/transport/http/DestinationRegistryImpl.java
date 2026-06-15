@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.transport.http;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,25 +52,17 @@ public class DestinationRegistryImpl implements DestinationRegistry, ServletConf
         if (dest != null && dest != destination) {
             throw new RuntimeException("Already a destination on " + path);
         }
-        try {
-            String path2 = URLDecoder.decode(path, "UTF-8");
-            if (!path.equals(path2)) {
-                decodedDestinations.put(path2, destination);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Unsupported Encoding", e);
+        String path2 = URLDecoder.decode(path, StandardCharsets.UTF_8);
+        if (!path.equals(path2)) {
+            decodedDestinations.put(path2, destination);
         }
     }
 
     public synchronized void removeDestination(String path) {
         destinations.remove(path);
-        try {
-            String path2 = URLDecoder.decode(path, "UTF-8");
-            if (!path.equals(path2)) {
-                decodedDestinations.remove(path2);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Unsupported Encoding", e);
+        String path2 = URLDecoder.decode(path, StandardCharsets.UTF_8);
+        if (!path.equals(path2)) {
+            decodedDestinations.remove(path2);
         }
     }
 

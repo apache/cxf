@@ -301,8 +301,8 @@ public class FormEncodingProviderTest {
         String eWithAcute = "\u00E9";
         String helloStringUTF16 = "name=F" + eWithAcute + "lix";
 
-        byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
-        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
+        byte[] iso88591bytes = helloStringUTF16.getBytes(StandardCharsets.ISO_8859_1);
+        String helloStringISO88591 = new String(iso88591bytes, StandardCharsets.ISO_8859_1);
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
             = new FormEncodingProvider<>();

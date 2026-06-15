@@ -26,6 +26,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
@@ -135,7 +136,7 @@ public class IdlPreprocessorReaderTest {
         LineNumberReader oReader = new LineNumberReader(includeReader);
         InputStream resolved = findTestResource(expectedResultLocation).openStream();
         try (LineNumberReader rReader
-            = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"))) {
+            = new LineNumberReader(new InputStreamReader(resolved, StandardCharsets.ISO_8859_1))) {
             boolean eof;
             do {
                 int line = rReader.getLineNumber() + 1;

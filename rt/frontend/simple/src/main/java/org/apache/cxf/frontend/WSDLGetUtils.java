@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -147,10 +148,10 @@ public class WSDLGetUtils {
 
             //
             if (params.containsKey("wsdl")) {
-                String wsdl = URLDecoder.decode(params.get("wsdl"), "utf-8");
+                String wsdl = URLDecoder.decode(params.get("wsdl"), StandardCharsets.UTF_8);
                 doc = writeWSDLDocument(message, mp, smp, wsdl, base, endpointInfo);
             } else if (params.get("xsd") != null) {
-                String xsd = URLDecoder.decode(params.get("xsd"), "utf-8");
+                String xsd = URLDecoder.decode(params.get("xsd"), StandardCharsets.UTF_8);
                 doc = readXSDDocument(bus, xsd, smp, base);
                 updateDoc(doc, base, mp, smp, message, xsd);
             }
@@ -175,11 +176,11 @@ public class WSDLGetUtils {
                 // resolve requested location with relative import path
                 key = new URI(xsd).resolve(loc).toString();
 
-                SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+                SchemaReference ref = smp.get(URLDecoder.decode(key, StandardCharsets.UTF_8));
                 if (ref == null) {
                     // if the result is not known, check if we can resolve it into something known
                     String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key, base);
-                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
+                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, StandardCharsets.UTF_8))) {
                         // if it is resolvable, we can use it
                         return base + "?xsd=" + key.replace(" ", "%20");
                     }
@@ -190,20 +191,20 @@ public class WSDLGetUtils {
         } catch (URISyntaxException e) {
            //ignore
         }
-        SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+        SchemaReference ref = smp.get(URLDecoder.decode(key, StandardCharsets.UTF_8));
         if (ref == null && resolvedXsd != null) {
             try {
                 String key2 = new URI(resolvedXsd).resolve(loc).toString();
-                SchemaReference ref2 = smp.get(URLDecoder.decode(key2, "utf-8"));
+                SchemaReference ref2 = smp.get(URLDecoder.decode(key2, StandardCharsets.UTF_8));
                 if (ref2 == null) {
                     // if the result is not known, check if we can resolve it into something known
                     String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key2, base);
-                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
+                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, StandardCharsets.UTF_8))) {
                         // if it is resolvable, we can use it
-                        ref = smp.get(URLDecoder.decode(resolved, "utf-8"));
+                        ref = smp.get(URLDecoder.decode(resolved, StandardCharsets.UTF_8));
                     }
                 } else {
-                    ref = smp.get(URLDecoder.decode(key2, "utf-8"));
+                    ref = smp.get(URLDecoder.decode(key2, StandardCharsets.UTF_8));
                 }
             } catch (URISyntaxException e) {
                 //ignore, ref can remain null
@@ -285,7 +286,7 @@ public class WSDLGetUtils {
                 } catch (URISyntaxException e) {
                     //ignore
                 }
-                if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
+                if (mp.containsKey(URLDecoder.decode(sl, StandardCharsets.UTF_8))) {
                     el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
                 }
             }
@@ -396,19 +397,9 @@ public class WSDLGetUtils {
             List<Import> impLst = CastUtils.cast(lst);
             for (Import imp : impLst) {
                 String start = imp.getLocationURI();
-                String decodedStart;
                 // Always use the URL decoded version to ensure that we have a
                 // canonical representation of the import URL for lookup.
-
-                try {
-                    decodedStart = URLDecoder.decode(start, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    throw new WSDLQueryException(
-                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
-                            LOG,
-                            start), e);
-                }
-
+                String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
 
                 if (resolvedSchemaLocation == null) {
@@ -418,7 +409,7 @@ public class WSDLGetUtils {
                     } catch (MalformedURLException e) {
                         try {
                             start = getLocationURI(start, docBase);
-                            decodedStart = URLDecoder.decode(start, "utf-8");
+                            decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
                         } catch (Exception e1) {
                             //ignore
                         }
@@ -538,19 +529,10 @@ public class WSDLGetUtils {
         String origLocation = schemaReference.getSchemaLocationURI();
 
         if (start != null) {
-            String decodedStart;
-            String decodedOrigLocation;
             // Always use the URL decoded version to ensure that we have a
             // canonical representation of the import URL for lookup.
-            try {
-                decodedStart = URLDecoder.decode(start, "utf-8");
-                decodedOrigLocation = URLDecoder.decode(origLocation, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new WSDLQueryException(
-                        new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
-                                LOG,
-                                start), e);
-            }
+            String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
+            String decodedOrigLocation = URLDecoder.decode(origLocation, StandardCharsets.UTF_8);
 
             final SchemaReference doneSchema = doneSchemas.get(decodedStart);
             if (doneSchema == null || !doneSchema.getSchemaLocationURI().equals(

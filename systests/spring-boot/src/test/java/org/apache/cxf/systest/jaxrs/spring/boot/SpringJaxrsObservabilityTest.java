@@ -62,7 +62,7 @@ import static org.hamcrest.Matchers.hasSize;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsObservabilityTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
 @AutoConfigureObservability
-public class SpringJaxrsObservabilityTest {
+class SpringJaxrsObservabilityTest {
 
     @Autowired
     private MeterRegistry registry;
@@ -118,7 +118,7 @@ public class SpringJaxrsObservabilityTest {
     }
 
     @Test
-    public void testJaxrsSuccessMetric() {
+    void testJaxrsSuccessMetric() {
         final WebTarget target = createWebTarget();
         
         try (Response r = target.request().get()) {

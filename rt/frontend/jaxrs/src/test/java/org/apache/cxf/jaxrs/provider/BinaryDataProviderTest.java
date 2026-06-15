@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -101,7 +102,7 @@ public class BinaryDataProviderTest {
     @Test
     public void testReadBytesFromUtf8() throws Exception {
         MessageBodyReader p = new BinaryDataProvider();
-        byte[] utf8Bytes = "世界ーファイル".getBytes("UTF-16");
+        byte[] utf8Bytes = "世界ーファイル".getBytes(StandardCharsets.UTF_16);
         byte[] readBytes = (byte[])p.readFrom(byte[].class, byte[].class, new Annotation[]{},
                                           MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                           new MetadataMap<String, Object>(),

@@ -68,7 +68,7 @@ import static org.hamcrest.Matchers.empty;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringJaxrsApplicationTest.TestConfig.class)
 @ActiveProfiles("jaxrs")
-public class SpringJaxrsApplicationTest {
+class SpringJaxrsApplicationTest {
 
     @Autowired
     private MeterRegistry registry;
@@ -104,7 +104,7 @@ public class SpringJaxrsApplicationTest {
     }
 
     @Test
-    public void testJaxrsSuccessMetric() {
+    void testJaxrsSuccessMetric() {
         final WebTarget target = createWebTarget();
         
         try (Response r = target.request().get()) {
@@ -145,7 +145,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsSubresourceSuccessMetric() {
+    void testJaxrsSubresourceSuccessMetric() {
         final WebTarget target = createWebTarget().path("catalog").path("cxf");
         
         try (Response r = target.request().get()) {
@@ -186,7 +186,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsFailedMetric() {
+    void testJaxrsFailedMetric() {
         final WebTarget target = createWebTarget();
         
         assertThatThrownBy(() -> target.path("100").request().get(Book.class))
@@ -227,7 +227,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsExceptionMetric() {
+    void testJaxrsExceptionMetric() {
         final WebTarget target = createWebTarget();
         
         assertThatThrownBy(() -> target.request().delete(String.class))
@@ -268,7 +268,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsClientExceptionMetric() {
+    void testJaxrsClientExceptionMetric() {
         final int fakePort = Integer.parseInt(TestUtil.getPortNumber("client-exception"));
         
         final WebTarget target = ClientBuilder
@@ -300,7 +300,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsProxySuccessMetric() {
+    void testJaxrsProxySuccessMetric() {
         final LibraryApi api = createApi(port);
         
         try (Response r = api.getBooks(1)) {
@@ -341,7 +341,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsProxyExceptionMetric() {
+    void testJaxrsProxyExceptionMetric() {
         final LibraryApi api = createApi(port);
         
         assertThatThrownBy(() -> api.deleteBooks())
@@ -382,7 +382,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsProxyFailedMetric() {
+    void testJaxrsProxyFailedMetric() {
         final LibraryApi api = createApi(port);
 
         try (Response r = api.getBook("100")) {
@@ -423,7 +423,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsProxyClientExceptionMetric() {
+    void testJaxrsProxyClientExceptionMetric() {
         final int fakePort = Integer.parseInt(TestUtil.getPortNumber("proxy-client-exception"));
         final LibraryApi api = createApi(fakePort);
 
@@ -451,7 +451,7 @@ public class SpringJaxrsApplicationTest {
     }
     
     @Test
-    public void testJaxrsProxySubresourceSuccessMetric() {
+    void testJaxrsProxySubresourceSuccessMetric() {
         final LibraryApi api = createApi(port);
         
         final Collection<Book> books = api.catalog().getCatalog("cxf");

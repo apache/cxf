@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     webEnvironment = WebEnvironment.RANDOM_PORT
 )
 @SpringBootApplication
-public class DigestAuthSupplierSpringTest {
+class DigestAuthSupplierSpringTest {
 
     private static final String USER = "alice";
     private static final String PWD = "ecila";
@@ -65,7 +65,7 @@ public class DigestAuthSupplierSpringTest {
     private int port;
 
     @Test
-    public void test() {
+    void test() {
         WebClient client = WebClient.create("http://localhost:" + port, (String) null);
 
         assertThrows(NotAuthorizedException.class, () -> client.get(String.class));

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.activation.DataHandler;
 import jakarta.jws.WebService;
@@ -45,7 +46,7 @@ public class MtoMImpl implements MtoM {
         InputStream someData =
             getClass().getClassLoader().getResourceAsStream("org/apache/cxf/javascript/cxf-utils.js");
         try (StringWriter sw = new StringWriter()) {
-            InputStreamReader isr = new InputStreamReader(someData, "utf-8");
+            InputStreamReader isr = new InputStreamReader(someData, StandardCharsets.UTF_8);
             IOUtils.copy(isr, sw, 4096);
             returnData = sw.toString();
         } catch (IOException e) {
