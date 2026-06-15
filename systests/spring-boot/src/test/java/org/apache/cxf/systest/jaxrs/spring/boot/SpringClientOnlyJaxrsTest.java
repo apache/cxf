@@ -63,7 +63,7 @@ import static org.assertj.core.api.Assertions.entry;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringClientOnlyJaxrsTest.TestConfig.class)
 @ActiveProfiles("client")
-public class SpringClientOnlyJaxrsTest {
+class SpringClientOnlyJaxrsTest {
 
     @Autowired
     private MeterRegistry registry;
@@ -115,7 +115,7 @@ public class SpringClientOnlyJaxrsTest {
     }
 
     @Test
-    public void testJaxrsClientSuccessMetric() {
+    void testJaxrsClientSuccessMetric() {
         final WebTarget target = createWebTarget();
         
         final Builder builder = target.request().header(HttpHeaders.CONTENT_TYPE, "text/plain"); 
@@ -143,7 +143,7 @@ public class SpringClientOnlyJaxrsTest {
     }
     
     @Test
-    public void testJaxrsClientExceptionMetric() {
+    void testJaxrsClientExceptionMetric() {
         final WebTarget target = ClientBuilder
             .newClient()
             .register(new MetricsFeature(metricsProvider))

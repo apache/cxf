@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +89,7 @@ public final class ValidatorUtil {
         }
         synchronized (document) {
             // URL might need encoding for special characters.
-            baseURI = URLEncoder.encode(baseURI, "utf-8");
+            baseURI = URLEncoder.encode(baseURI, StandardCharsets.UTF_8);
             SchemaCollection schemaCol = new SchemaCollection();
             schemaCol.setBaseUri(baseURI);
 

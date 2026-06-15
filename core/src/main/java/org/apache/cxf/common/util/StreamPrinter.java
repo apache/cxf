@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+@SuppressWarnings("PMD.OverridingThreadRun")
 class StreamPrinter extends Thread {
     private InputStream is;
     private String msg;

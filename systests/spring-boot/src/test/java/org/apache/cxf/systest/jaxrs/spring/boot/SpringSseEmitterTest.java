@@ -51,7 +51,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = SpringSseEmitterTest.LibraryController.class)
-public class SpringSseEmitterTest {
+class SpringSseEmitterTest {
     private static final int CNT = 5;
     @LocalServerPort
     private int port;
@@ -82,7 +82,7 @@ public class SpringSseEmitterTest {
     }
     
     @Test
-    public void testSseEvents() throws InterruptedException {
+    void testSseEvents() throws InterruptedException {
         final WebTarget target = createWebTarget();
         final Collection<Book> books = new ArrayList<>(CNT);
         final AtomicReference<Throwable> throwable = new AtomicReference<>();

@@ -255,6 +255,7 @@ public class ServerLauncher {
         return ret;
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     private class OutputMonitorThread extends Thread {
         InputStream in;
         StringBuilder serverOutputAll = new StringBuilder();

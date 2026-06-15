@@ -161,6 +161,7 @@ public class ThreadLocalClientState implements ClientState {
         }
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     private class CleanupThread extends Thread {
         private Thread thread;
         private long originalTime;

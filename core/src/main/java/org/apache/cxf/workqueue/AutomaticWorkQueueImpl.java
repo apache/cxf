@@ -287,6 +287,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     class WatchDog extends Thread {
         DelayQueue<DelayedTaskWrapper> delayQueue;
         AtomicBoolean shutdown = new AtomicBoolean(false);

@@ -83,8 +83,7 @@ import static org.hamcrest.Matchers.empty;
             "cxf.metrics.server.max-uri-tags=2"
         })
 @ActiveProfiles("jaxws")
-public class SpringJaxwsTest {
-
+class SpringJaxwsTest {
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
             + "<name>Elan</name>"
             + "</q0:sayHello>";
@@ -143,7 +142,7 @@ public class SpringJaxwsTest {
     }
 
     @Test
-    public void testJaxwsSuccessMetric() throws MalformedURLException {
+    void testJaxwsSuccessMetric() throws MalformedURLException {
         // given in setUp
 
         // when
@@ -191,7 +190,7 @@ public class SpringJaxwsTest {
     }
 
     @Test
-    public void testJaxwsFailedMetric() {
+    void testJaxwsFailedMetric() {
         // given
         String requestBody = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\"></q0:sayHello>";
 
@@ -241,7 +240,7 @@ public class SpringJaxwsTest {
 
     @Test
     @ExtendWith(OutputCaptureExtension.class)
-    public void testAfterMaxUrisReachedFurtherUrisAreDenied(CapturedOutput output) throws MalformedURLException {
+    void testAfterMaxUrisReachedFurtherUrisAreDenied(CapturedOutput output) throws MalformedURLException {
         // given in setUp
 
         // when
@@ -256,7 +255,7 @@ public class SpringJaxwsTest {
 
     @Test
     @ExtendWith(OutputCaptureExtension.class)
-    public void testDoesNotDenyNorLogIfMaxUrisIsNotReached(CapturedOutput output) throws MalformedURLException {
+    void testDoesNotDenyNorLogIfMaxUrisIsNotReached(CapturedOutput output) throws MalformedURLException {
         // given in setUp
 
         // when
@@ -268,7 +267,7 @@ public class SpringJaxwsTest {
     }
 
     @Test
-    public void testJaxwsProxySuccessMetric() throws MalformedURLException {
+    void testJaxwsProxySuccessMetric() throws MalformedURLException {
         final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
         assertThat(api.sayHello("Elan")).isEqualTo("Hello, Elan");
 
@@ -308,7 +307,7 @@ public class SpringJaxwsTest {
     }
     
     @Test
-    public void testJaxwsProxyFailedMetric() {
+    void testJaxwsProxyFailedMetric() {
         final HelloService api = createApi(port, HELLO_SERVICE_NAME_V1); 
 
         // then
@@ -352,7 +351,7 @@ public class SpringJaxwsTest {
     }
 
     @Test
-    public void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
+    void testJaxwsProxyClientExceptionMetric() throws MalformedURLException {
         final int fakePort = SocketUtils.findAvailableTcpPort();
         final HelloService api = createApi(fakePort, HELLO_SERVICE_NAME_V1); 
         

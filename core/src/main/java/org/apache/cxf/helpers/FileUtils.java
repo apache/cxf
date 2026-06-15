@@ -89,12 +89,7 @@ public final class FileUtils {
             if (shutdownHook != null) {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
             }
-            shutdownHook = new Thread() {
-                @Override
-                public void run() {
-                    removeDir(defaultTempDir, true);
-                }
-            };
+            shutdownHook = new Thread(() -> removeDir(defaultTempDir, true));
             Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         }
@@ -175,12 +170,7 @@ public final class FileUtils {
         }
         if (addHook) {
             final File f2 = newTmpDir;
-            Thread hook = new Thread() {
-                @Override
-                public void run() {
-                    removeDir(f2, true);
-                }
-            };
+            Thread hook = new Thread(() -> removeDir(f2, true));
             Runtime.getRuntime().addShutdownHook(hook);
         }
         return newTmpDir;

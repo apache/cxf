@@ -266,6 +266,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
 
     protected abstract void doNotify(Notify notify);
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     class TerminationThread extends Thread {
         public void run() {
             while (checkTermination) {

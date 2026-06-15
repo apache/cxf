@@ -489,6 +489,7 @@ public class AutomaticWorkQueueTest {
         void workItemCompleted(String name);
     }
 
+    @SuppressWarnings("PMD.OverridingThreadRun")
     public static class DeadLockThread extends Thread implements Callback {
         public static final long DEFAULT_WORK_TIME = 10L;
         public static final int DEFAULT_WORK_ITEMS = 200;

@@ -75,8 +75,7 @@ import static org.hamcrest.Matchers.empty;
             "cxf.metrics.server.max-uri-tags=2"
         })
 @ActiveProfiles("jaxws")
-public class SpringJaxwsTimedTest {
-
+class SpringJaxwsTimedTest {
     private static final String DUMMY_REQUEST_BODY = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\">"
             + "<name>Elan</name>"
             + "</q0:sayHello>";
@@ -128,7 +127,7 @@ public class SpringJaxwsTimedTest {
     }
 
     @Test
-    public void testJaxwsTimedSuccessMetric() throws MalformedURLException {
+    void testJaxwsTimedSuccessMetric() throws MalformedURLException {
         // given in setUp
 
         // when
@@ -191,7 +190,7 @@ public class SpringJaxwsTimedTest {
     }
     
     @Test
-    public void testJaxwsEmptyTimedSuccessMetric() throws MalformedURLException {
+    void testJaxwsEmptyTimedSuccessMetric() throws MalformedURLException {
         // given in setUp
 
         // when

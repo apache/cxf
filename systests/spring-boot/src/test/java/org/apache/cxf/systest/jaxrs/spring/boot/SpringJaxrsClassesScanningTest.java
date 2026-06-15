@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxrsClassesScanningTest.TestConfig.class)
 @ActiveProfiles("jaxrs-classes-scan")
-public class SpringJaxrsClassesScanningTest {
+class SpringJaxrsClassesScanningTest {
     @Autowired
     private AbstractJaxrsClassesScanServer scanner;
 
@@ -45,7 +45,7 @@ public class SpringJaxrsClassesScanningTest {
     }
 
     @Test
-    public void testCxfClassesScan() {
+    void testCxfClassesScan() {
         // No features are registered since class scanner only looks for JAX-RS's 
         // @Provider annotations, not JAX-RS/CXF Features.
         assertThat(scanner.getFeatures()).isEmpty();

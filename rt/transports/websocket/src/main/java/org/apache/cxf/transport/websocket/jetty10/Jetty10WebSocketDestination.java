@@ -341,6 +341,4 @@ public class Jetty10WebSocketDestination extends JettyHTTPDestination implements
             }
         }
     }
-
-
 }

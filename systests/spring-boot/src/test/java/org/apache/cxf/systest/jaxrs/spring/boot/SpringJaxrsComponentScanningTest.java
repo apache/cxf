@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
         classes = SpringJaxrsComponentScanningTest.TestConfig.class)
 @ActiveProfiles("jaxrs-component-scan")
-public class SpringJaxrsComponentScanningTest {
+class SpringJaxrsComponentScanningTest {
     @Autowired
     private AbstractSpringComponentScanServer scanner;
 
@@ -50,7 +50,7 @@ public class SpringJaxrsComponentScanningTest {
     }
 
     @Test
-    public void testCxfComponentScan() {
+    void testCxfComponentScan() {
         // The component scanner only looks for CXF's @Provider annotations, 
         // not JAX-RS Features/@Provider.
         assertThat(scanner.getFeatures())
