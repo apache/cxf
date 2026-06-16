@@ -22,23 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class QuotedPrintableDecoderStream extends InputStream {
-    private static final byte[] ENCODING_TABLE = {
-        (byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7', (byte)'8',
-        (byte)'9', (byte)'A', (byte)'B', (byte)'C', (byte)'D', (byte)'E', (byte)'F'
-    };
-
-    /*
-     * set up the decoding table.
-     */
-    private static final byte[] DECODING_TABLE = new byte[128];
-
-    static {
-        // initialize the decoding table
-        for (int i = 0; i < ENCODING_TABLE.length; i++) {
-            DECODING_TABLE[ENCODING_TABLE[i]] = (byte)i;
-        }
-    }
-
     private int deferredWhitespace;
     private int cachedCharacter = -1;
     private final InputStream in;
@@ -66,9 +49,16 @@ public class QuotedPrintableDecoderStream extends InputStream {
             return read();
         }
         // this is a hex pair we need to convert back to a single byte.
-        b[0] = DECODING_TABLE[b[0]];
-        b[1] = DECODING_TABLE[b[1]];
-        return (b[0] << 4) | b[1];
+        return (decodeHexDigit(b[0]) << 4) | decodeHexDigit(b[1]);
+    }
+
+    private static int decodeHexDigit(byte b) throws IOException {
+        // mask to an unsigned value first so a high-bit byte does not index negatively
+        int value = Character.digit(b & 0xff, 16);
+        if (value < 0) {
+            throw new IOException("Invalid quoted printable encoding");
+        }
+        return value;
     }
 
     @Override
