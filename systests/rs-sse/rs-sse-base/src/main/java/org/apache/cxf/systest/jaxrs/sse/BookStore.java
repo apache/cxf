@@ -211,7 +211,7 @@ public class BookStore extends BookStoreClientCloseable {
     @Path("/headers/sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void headers(@Context SseEventSink sink) {
-    new Thread(() -> {
+        new Thread(() -> {
             try {
                 Thread.sleep(200);
                 sink.close();
