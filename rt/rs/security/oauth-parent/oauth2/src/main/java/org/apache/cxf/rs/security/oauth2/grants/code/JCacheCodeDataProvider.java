@@ -111,9 +111,9 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = getCodeGrant(code);
-        if (grant != null) {
-            grantCache.remove(code);
+        ServerAuthorizationCodeGrant grant = grantCache.getAndRemove(code);
+        if (grant != null && isExpired(grant)) {
+            return null;
         }
         return grant;
     }
