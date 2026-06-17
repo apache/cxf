@@ -672,6 +672,8 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(client, code);
         assertNotNull(accessToken.getTokenKey());
         assertTrue(accessToken.getApprovedScope().contains("openid"));
+        assertEquals(OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE,
+                     accessToken.getParameters().get(OAuthConstants.RESPONSE_TYPE));
 
         // Check id_token from the token endpoint
         idToken = accessToken.getParameters().get("id_token");

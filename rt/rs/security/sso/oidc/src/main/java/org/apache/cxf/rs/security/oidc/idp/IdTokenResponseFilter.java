@@ -56,6 +56,9 @@ public class IdTokenResponseFilter extends OAuthServerJoseJwtProducer implements
         if (ct.getApprovedScope() == null || !ct.getApprovedScope().contains(OidcUtils.OPENID_SCOPE)) {
             return;
         }
+        if (st.getResponseType() != null) {
+            ct.getParameters().put(OAuthConstants.RESPONSE_TYPE, st.getResponseType());
+        }
         String idToken = getProcessedIdToken(st);
         if (idToken != null) {
             ct.getParameters().put(OidcUtils.ID_TOKEN, idToken);
