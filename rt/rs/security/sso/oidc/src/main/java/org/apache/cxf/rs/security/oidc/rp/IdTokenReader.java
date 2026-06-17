@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oidc.rp;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
@@ -44,7 +45,11 @@ public class IdTokenReader extends OidcClaimsValidator {
         String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
         JwtToken jwt = getIdJwtToken(idJwtToken, client);
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
-        OidcUtils.validateCodeHash(code, jwt, requireCodeHash);
+        if (code != null) {
+            // The spec requires c_hash to be present in the id_token for hybrid flows,
+            // but we allow it to be optional for token endpoint id_tokens
+            OidcUtils.validateCodeHash(code, jwt, requireCodeHash || isHybridFlow(at));
+        }
         return jwt;
     }
     public JwtToken getIdJwtToken(ClientAccessToken at, Consumer client) {
@@ -55,6 +60,13 @@ public class IdTokenReader extends OidcClaimsValidator {
         validateJwtClaims(jwt.getClaims(), client.getClientId(), true);
         return jwt;
     }
+
+    private boolean isHybridFlow(ClientAccessToken at) {
+        String responseType = at.getParameters().get(OAuthConstants.RESPONSE_TYPE);
+        return OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE.equals(responseType)
+            || OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType);
+    }
+
     private IdToken getIdTokenFromJwt(JwtToken jwt) {
         return new IdToken(jwt.getClaims().asMap());
     }
