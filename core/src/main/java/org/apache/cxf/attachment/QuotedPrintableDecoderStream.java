@@ -20,6 +20,7 @@ package org.apache.cxf.attachment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HexFormat;
 
 public class QuotedPrintableDecoderStream extends InputStream {
     private int deferredWhitespace;
@@ -53,12 +54,12 @@ public class QuotedPrintableDecoderStream extends InputStream {
     }
 
     private static int decodeHexDigit(byte b) throws IOException {
-        // mask to an unsigned value first so a high-bit byte does not index negatively
-        int value = Character.digit(b & 0xff, 16);
-        if (value < 0) {
-            throw new IOException("Invalid quoted printable encoding");
+        // mask to an unsigned value first so a high-bit byte is treated as a codepoint rather than indexing negatively
+        try {
+            return HexFormat.fromHexDigit(b & 0xff);
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid quoted printable encoding", e);
         }
-        return value;
     }
 
     @Override
