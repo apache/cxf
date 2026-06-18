@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
@@ -42,20 +43,20 @@ public class QuotedPrintableDecoderStreamTest {
 
     @Test
     public void testDecodesHexPair() throws Exception {
-        assertArrayEquals("hello world".getBytes("US-ASCII"),
-                          decode("hello=20world".getBytes("US-ASCII")));
+        assertArrayEquals("hello world".getBytes(StandardCharsets.US_ASCII),
+                          decode("hello=20world".getBytes(StandardCharsets.US_ASCII)));
     }
 
     @Test
     public void testDecodesLowerCaseHex() throws Exception {
         // a lower case hex pair must decode to the same byte as the upper case form
-        assertArrayEquals(new byte[] {(byte)0xe2}, decode("=e2".getBytes("US-ASCII")));
-        assertArrayEquals(new byte[] {(byte)0xe2}, decode("=E2".getBytes("US-ASCII")));
+        assertArrayEquals(new byte[] {(byte)0xe2}, decode("=e2".getBytes(StandardCharsets.US_ASCII)));
+        assertArrayEquals(new byte[] {(byte)0xe2}, decode("=E2".getBytes(StandardCharsets.US_ASCII)));
     }
 
     @Test
     public void testRejectsNonHexCharacters() {
-        assertThrows(IOException.class, () -> decode("=GG".getBytes("US-ASCII")));
+        assertThrows(IOException.class, () -> decode("=GG".getBytes(StandardCharsets.US_ASCII)));
     }
 
     @Test
