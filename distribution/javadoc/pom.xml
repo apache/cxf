@@ -194,6 +194,12 @@
         <dependency>
             <groupId>org.apache.artemis</groupId>
             <artifactId>artemis-jakarta-server</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
