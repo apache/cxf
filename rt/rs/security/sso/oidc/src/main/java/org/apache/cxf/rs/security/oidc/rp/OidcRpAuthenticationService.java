@@ -57,16 +57,40 @@ public class OidcRpAuthenticationService {
         URI redirectUri = null;
         MultivaluedMap<String, String> state = oidcContext.getState();
         String location = state != null ? state.getFirst("state") : null;
-        if (location == null && defaultLocation != null) {
+        if (location != null) {
+            URI requestedUri = URI.create(UrlUtils.urlDecode(location));
+            if (isSameOrigin(requestedUri)) {
+                redirectUri = requestedUri;
+            }
+        }
+        if (redirectUri == null && defaultLocation != null) {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
-        } else if (location != null) {
-            redirectUri = URI.create(UrlUtils.urlDecode(location));
         }
         if (redirectUri != null) {
             return Response.seeOther(redirectUri).build();
         }
         return Response.ok(oidcContext).build();
+    }
+
+    // The location is taken from the request state, so it can only be trusted as long as it
+    // stays within this application's own origin. An absolute value pointing at a different
+    // host (or a protocol-relative "//host" reference) would turn sign-in completion into an
+    // open redirect, so anything that is not same-origin is ignored here.
+    private boolean isSameOrigin(URI location) {
+        if (location.getScheme() == null && location.getAuthority() == null) {
+            // a path-only reference is resolved by the browser against the current request
+            return true;
+        }
+        String basePath = (String)mc.get("http.base.path");
+        if (basePath == null) {
+            return false;
+        }
+        URI base = URI.create(basePath);
+        return location.getScheme() != null
+            && location.getScheme().equalsIgnoreCase(base.getScheme())
+            && location.getAuthority() != null
+            && location.getAuthority().equalsIgnoreCase(base.getAuthority());
     }
 
     public void setDefaultLocation(String defaultLocation) {
