@@ -18,7 +18,18 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+
 import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JCacheOAuthDataProviderTest extends AbstractOAuthDataProviderTest {
 
@@ -29,4 +40,25 @@ public class JCacheOAuthDataProviderTest extends AbstractOAuthDataProviderTest {
         setProvider(provider);
     }
 
+    @Test
+    public void testAddGetExpiredAccessToken() throws InterruptedException {
+        Client c = addClient("102", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        getProvider().setAccessTokenLifetime(2 /* 2 seconds */); 
+        getProvider().createAccessToken(atr);
+        List<ServerAccessToken> tokens = getProvider().getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(1, tokens.size());
+
+        Thread.sleep(3000); /* 3 seconds, token definitely expires */
+        tokens = getProvider().getAccessTokens(c, null);
+        assertEquals(0, tokens.size());
+
+        getProvider().removeClient(c.getClientId());
+    }
 }
