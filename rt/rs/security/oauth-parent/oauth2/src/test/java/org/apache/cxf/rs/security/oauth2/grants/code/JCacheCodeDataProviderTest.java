@@ -87,6 +87,32 @@ public class JCacheCodeDataProviderTest {
         assertNotNull(grants);
         assertEquals(0, grants.size());
     }
+    
+    @Test
+    public void testAddGetExpiredCodeGrants() throws InterruptedException {
+        Client c = addClient("111", "bob");
+
+        AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        provider.setCodeLifetime(2 /* 2 seconds */);
+        provider.createCodeGrant(atr);
+
+        List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertNotNull(grants);
+        assertEquals(1, grants.size());
+
+        Thread.sleep(3000); /* 3 seconds, grant definitely expires */
+        grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertEquals(0, grants.size());
+
+        provider.removeClient(c.getClientId());
+        grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
+        assertNotNull(grants);
+        assertEquals(0, grants.size());
+    }
 
     private Client addClient(String clientId, String userLogin) {
         Client c = new Client();

@@ -32,6 +32,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.JCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     implements AuthorizationCodeDataProvider {
@@ -133,7 +134,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     }
 
     protected static boolean isExpired(ServerAuthorizationCodeGrant grant) {
-        return System.currentTimeMillis() < (grant.getIssuedAt() + grant.getExpiresIn());
+        return OAuthUtils.isExpired(grant.getIssuedAt(), grant.getExpiresIn());
     }
 
     @Override
