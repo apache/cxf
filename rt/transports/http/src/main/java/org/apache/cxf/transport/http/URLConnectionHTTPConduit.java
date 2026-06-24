@@ -32,6 +32,8 @@ import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -57,12 +59,19 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
     public static final String HTTPURL_CONNECTION_METHOD_REFLECTION = "use.httpurlconnection.method.reflection";
     public static final String SET_REASON_PHRASE_NOT_NULL = "set.reason.phrase.not.null";
 
+    // Shared daemon pool so we pay thread-creation cost once, not once per request (CXF-8926).
+    private static final ExecutorService SOCKET_COPIER_POOL = Executors.newCachedThreadPool(r -> {
+        Thread t = new Thread(r, "cxf-urlconn-socket-writer");
+        t.setDaemon(true);
+        return t;
+    });
+
     private static final boolean DEFAULT_USE_REFLECTION;
     private static final boolean SET_REASON_PHRASE;
     static {
         DEFAULT_USE_REFLECTION =
             Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_REFLECTION, "false"));
-        SET_REASON_PHRASE = 
+        SET_REASON_PHRASE =
             Boolean.valueOf(SystemPropertyAction.getProperty(SET_REASON_PHRASE_NOT_NULL, "false"));
     }
 
@@ -211,6 +220,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
 
     class URLConnectionWrappedOutputStream extends WrappedOutputStream {
         HttpURLConnection connection;
+        private java.util.concurrent.Future<?> socketCopier;
+        private volatile IOException copierException;
         URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
                                          boolean needToCacheRequest, boolean isChunking,
                                          int chunkThreshold, String conduitName) throws URISyntaxException {
@@ -279,12 +290,80 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     throw e;
                 }
             }
-            if (cachingForRetransmission) {
-                cachedStream =
-                    new CacheAndWriteOutputStream(cout);
+
+            // CXF-8926: HttpURLConnection has no socket write timeout. When the network
+            // stalls, writes to cout block indefinitely. Use a TimedBlockingPipe so the
+            // CXF writer thread times out after receiveTimeout. A background copier drains
+            // the pipe and pushes bytes to the socket. The pipe's output wrapper blocks
+            // on close() until the copier finishes, ensuring the server receives EOF
+            // before handleResponse() reads the reply.
+            HTTPClientPolicy cp = URLConnectionHTTPConduit.this.getClient(outMessage);
+            long writeTimeout = cp != null ? cp.getReceiveTimeout() : 0L;
+
+            if (writeTimeout > 0 && !cachingForRetransmission) {
+                final OutputStream socketOut = cout;
+                final HttpClientHTTPConduit.TimedBlockingPipe pipe =
+                    new HttpClientHTTPConduit.TimedBlockingPipe(4096, writeTimeout);
+                final InputStream pipedIn = pipe.newInputStream();
+                final OutputStream pipedOut = pipe.newOutputStream();
+                socketCopier = SOCKET_COPIER_POOL.submit(() -> {
+                    try {
+                        IOUtils.copyAndCloseInput(pipedIn, socketOut);
+                        socketOut.flush();
+                        socketOut.close();
+                    } catch (IOException e) {
+                        copierException = e;
+                    }
+                });
+                // Wraps pipedOut: close() signals EOF to copier then waits for it to
+                // finish, so handleResponse() runs only after the request is fully sent.
+                wrappedStream = new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        pipedOut.write(b);
+                    }
+                    @Override
+                    public void write(byte[] b, int off, int len) throws IOException {
+                        pipedOut.write(b, off, len);
+                    }
+                    @Override
+                    public void flush() throws IOException {
+                        pipedOut.flush();
+                    }
+                    @Override
+                    public void close() throws IOException {
+                        pipedOut.close();
+                        joinSocketCopier(writeTimeout);
+                    }
+                };
+            } else if (cachingForRetransmission) {
+                cachedStream = new CacheAndWriteOutputStream(cout);
                 wrappedStream = cachedStream;
             } else {
                 wrappedStream = cout;
+            }
+        }
+
+        private void joinSocketCopier(long joinTimeoutMs) throws IOException {
+            java.util.concurrent.Future<?> f = socketCopier;
+            if (f == null) {
+                return;
+            }
+            socketCopier = null;
+            try {
+                long waitMs = joinTimeoutMs > 0 ? joinTimeoutMs : 60_000L;
+                f.get(waitMs, java.util.concurrent.TimeUnit.MILLISECONDS);
+            } catch (java.util.concurrent.TimeoutException e) {
+                f.cancel(true);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (java.util.concurrent.ExecutionException e) {
+                // copierException field captures the IOException from inside the task
+            }
+            IOException ce = copierException;
+            copierException = null;
+            if (ce != null && f.isDone()) {
+                throw ce;
             }
         }
 
