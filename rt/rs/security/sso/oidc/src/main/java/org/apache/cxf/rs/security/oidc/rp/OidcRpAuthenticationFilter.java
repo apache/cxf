@@ -115,7 +115,36 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             rc.setEntityStream(new ByteArrayInputStream(StringUtils.toBytesUTF8(body)));
 
         }
+        // The "state" carried here is read back by the sign-in completion service and returned
+        // as a redirect Location, so a caller-supplied value collides with the redirect query
+        // the filter itself writes. Anything that is not within this application's own origin is
+        // dropped, otherwise completion would become an open redirect.
+        String location = requestState.getFirst("state");
+        if (location != null && !isSameOrigin(location)) {
+            requestState.remove("state");
+        }
         return requestState;
+    }
+    private boolean isSameOrigin(String location) {
+        final URI uri;
+        try {
+            uri = URI.create(location);
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+        if (uri.getScheme() == null && uri.getAuthority() == null) {
+            // a path-only reference is resolved by the browser against the current request
+            return true;
+        }
+        String basePath = (String)mc.get("http.base.path");
+        if (basePath == null) {
+            return false;
+        }
+        URI base = URI.create(basePath);
+        return uri.getScheme() != null
+            && uri.getScheme().equalsIgnoreCase(base.getScheme())
+            && uri.getAuthority() != null
+            && uri.getAuthority().equalsIgnoreCase(base.getAuthority());
     }
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
