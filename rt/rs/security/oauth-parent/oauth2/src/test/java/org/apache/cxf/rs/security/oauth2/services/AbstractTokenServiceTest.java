@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;

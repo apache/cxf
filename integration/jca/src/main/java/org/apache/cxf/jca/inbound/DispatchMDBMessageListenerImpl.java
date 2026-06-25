@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import javax.ejb.MessageDrivenBean;
 import javax.ejb.MessageDrivenContext;
 import javax.naming.InitialContext;
+
 import org.apache.cxf.jca.core.resourceadapter.JndiNameValidator;
 
 /**
