@@ -20,8 +20,8 @@ package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.lang.reflect.Field;
 
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
