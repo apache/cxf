@@ -57,6 +57,12 @@ public class OidcRpAuthenticationFilterTest {
     }
 
     @Test
+    public void testDropsNoAuthority() {
+        MultivaluedMap<String, String> state = requestState("http:/");
+        assertFalse(state.containsKey("state"));
+    }
+
+    @Test
     public void testKeepsSameOriginState() {
         MultivaluedMap<String, String> state = requestState("https://app.example.com:8080/services/protected");
         assertTrue(state.containsKey("state"));
