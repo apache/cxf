@@ -18,10 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
-import java.util.Collections;
 import java.util.List;
-
-import org.apache.cxf.rs.security.oauth2.common.Client;
 
 import org.junit.Test;
 
@@ -35,35 +32,13 @@ public class OAuthUtilsTest {
     public void testValidateScopesStrict() {
         List<String> requestScopes = OAuthUtils.parseScope("a c b");
         List<String> registeredScopes = OAuthUtils.parseScope("a b c d");
-        assertTrue(OAuthUtils.validateScopes(requestScopes, registeredScopes, false));
+        assertTrue(OAuthUtils.validateScopes(requestScopes, registeredScopes));
     }
     @Test
     public void testValidateScopesStrictFail() {
         List<String> requestScopes = OAuthUtils.parseScope("a b c d");
         List<String> registeredScopes = OAuthUtils.parseScope("a b d");
-        assertFalse(OAuthUtils.validateScopes(requestScopes, registeredScopes, false));
-    }
-
-    @Test
-    public void testValidateScopesPartial() {
-        List<String> requestScopes = OAuthUtils.parseScope("a b c-1");
-        List<String> registeredScopes = OAuthUtils.parseScope("a b c");
-        assertTrue(OAuthUtils.validateScopes(requestScopes, registeredScopes, true));
-    }
-
-    @Test
-    public void testValidateScopesPartialFail() {
-        List<String> requestScopes = OAuthUtils.parseScope("a b c");
-        List<String> registeredScopes = OAuthUtils.parseScope("a b");
-        assertFalse(OAuthUtils.validateScopes(requestScopes, registeredScopes, true));
-    }
-
-    @Test
-    public void testGetRequestedScopesRegistered() {
-        Client c = new Client();
-        List<String> scopes = Collections.singletonList("a");
-        c.setRegisteredScopes(scopes);
-        assertEquals(scopes, OAuthUtils.getRequestedScopes(c, "", false, false));
+        assertFalse(OAuthUtils.validateScopes(requestScopes, registeredScopes));
     }
 
     @Test
@@ -71,6 +46,24 @@ public class OAuthUtilsTest {
         assertTrue(OAuthUtils.parseScope(null).isEmpty());
         assertTrue(OAuthUtils.parseScope("").isEmpty());
         assertTrue(OAuthUtils.parseScope(" ").isEmpty());
+    }
+
+    @Test
+    public void testParseScopeWithExtraSpaces() {
+        List<String> scopes = OAuthUtils.parseScope("  read   write  admin ");
+        assertEquals(3, scopes.size());
+        assertEquals("read", scopes.get(0));
+        assertEquals("write", scopes.get(1));
+        assertEquals("admin", scopes.get(2));
+    }
+
+    @Test
+    public void testParseScopeWithDuplicates() {
+        List<String> scopes = OAuthUtils.parseScope("a a b");
+        assertEquals(3, scopes.size());
+        assertEquals("a", scopes.get(0));
+        assertEquals("a", scopes.get(1));
+        assertEquals("b", scopes.get(2));
     }
 
 }
