@@ -120,12 +120,12 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         // the filter itself writes. Anything that is not within this application's own origin is
         // dropped, otherwise completion would become an open redirect.
         String location = requestState.getFirst("state");
-        if (location != null && !isSameOrigin(location)) {
+        if (location != null && !isSameOrigin(rc, location)) {
             requestState.remove("state");
         }
         return requestState;
     }
-    private boolean isSameOrigin(String location) {
+    private boolean isSameOrigin(ContainerRequestContext rc, String location) {
         final URI uri;
         try {
             uri = URI.create(location);
@@ -136,11 +136,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             // a path-only reference is resolved by the browser against the current request
             return true;
         }
-        String basePath = (String)mc.get("http.base.path");
-        if (basePath == null) {
-            return false;
-        }
-        URI base = URI.create(basePath);
+        URI base = rc.getUriInfo().getAbsolutePath();
         return uri.getScheme() != null
             && uri.getScheme().equalsIgnoreCase(base.getScheme())
             && uri.getAuthority() != null

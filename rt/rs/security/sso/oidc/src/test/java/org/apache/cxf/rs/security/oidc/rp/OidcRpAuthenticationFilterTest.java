@@ -18,15 +18,13 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
-
-import org.apache.cxf.jaxrs.ext.MessageContext;
 
 import org.junit.Test;
 
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 public class OidcRpAuthenticationFilterTest {
 
-    private static final String BASE_PATH = "https://app.example.com:8080/services/";
+    private static final URI ABSOLUTE_PATH = URI.create("https://app.example.com:8080/services/rp/complete");
 
     @Test
     public void testDropsCrossOriginState() {
@@ -78,18 +76,13 @@ public class OidcRpAuthenticationFilterTest {
 
         UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getQueryParameters(true)).thenReturn(query);
+        when(uriInfo.getAbsolutePath()).thenReturn(ABSOLUTE_PATH);
 
         ContainerRequestContext rc = mock(ContainerRequestContext.class);
         when(rc.getUriInfo()).thenReturn(uriInfo);
         when(rc.getMediaType()).thenReturn(null);
 
-        MessageContext messageContext = mock(MessageContext.class);
-        when(messageContext.get("http.base.path")).thenReturn(BASE_PATH);
-
-        OidcRpAuthenticationFilter filter = new OidcRpAuthenticationFilter();
-        setMessageContext(filter, messageContext);
-
-        return invokeToRequestState(filter, rc);
+        return invokeToRequestState(new OidcRpAuthenticationFilter(), rc);
     }
 
     @SuppressWarnings("unchecked")
@@ -100,16 +93,6 @@ public class OidcRpAuthenticationFilterTest {
                                                                               ContainerRequestContext.class);
             method.setAccessible(true);
             return (MultivaluedMap<String, String>)method.invoke(filter, rc);
-        } catch (ReflectiveOperationException ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
-
-    private static void setMessageContext(OidcRpAuthenticationFilter filter, MessageContext messageContext) {
-        try {
-            Field field = OidcRpAuthenticationFilter.class.getDeclaredField("mc");
-            field.setAccessible(true);
-            field.set(filter, messageContext);
         } catch (ReflectiveOperationException ex) {
             throw new IllegalStateException(ex);
         }
