@@ -321,15 +321,13 @@ public final class OAuthUtils {
 
     public static List<String> getRequestedScopes(Client client,
                                                   String scopeParameter,
-                                                  boolean useAllClientScopes,
-                                                  boolean partialMatchScopeValidation) {
-        return getRequestedScopes(client, scopeParameter, useAllClientScopes, partialMatchScopeValidation, true);
+                                                  boolean useAllClientScopes) {
+        return getRequestedScopes(client, scopeParameter, useAllClientScopes, true);
     }
 
     public static List<String> getRequestedScopes(Client client,
                                                   String scopeParameter,
                                                   boolean useAllClientScopes,
-                                                  boolean partialMatchScopeValidation,
                                                   boolean defaultToRegisteredScopes) {
         List<String> requestScopes = parseScope(scopeParameter);
         List<String> registeredScopes = client.getRegisteredScopes();
@@ -339,7 +337,7 @@ public final class OAuthUtils {
             }
             return requestScopes;
         }
-        if (!validateScopes(requestScopes, registeredScopes, partialMatchScopeValidation)) {
+        if (!validateScopes(requestScopes, registeredScopes)) {
             throw new OAuthServiceException("Unexpected scope");
         }
         if (useAllClientScopes) {
@@ -353,26 +351,10 @@ public final class OAuthUtils {
         return requestScopes;
     }
 
-    public static boolean validateScopes(List<String> requestScopes, List<String> registeredScopes,
-                                         boolean partialMatchScopeValidation) {
+    public static boolean validateScopes(List<String> requestScopes, List<String> registeredScopes) {
         if (!registeredScopes.isEmpty()) {
-            // if it is a strict validation then pre-registered scopes have to contains all
-            // the current request scopes
-            if (!partialMatchScopeValidation) {
-                return registeredScopes.containsAll(requestScopes);
-            }
-            for (String requestScope : requestScopes) {
-                boolean match = false;
-                for (String registeredScope : registeredScopes) {
-                    if (requestScope.startsWith(registeredScope)) {
-                        match = true;
-                        break;
-                    }
-                }
-                if (!match) {
-                    return false;
-                }
-            }
+            // pre-registered scopes have to contains all the current request scopes
+            return registeredScopes.containsAll(requestScopes);
         }
         return true;
     }

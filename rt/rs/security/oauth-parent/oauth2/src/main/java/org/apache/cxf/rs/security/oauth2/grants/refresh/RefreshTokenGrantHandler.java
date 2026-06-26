@@ -33,7 +33,6 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
 
     private OAuthDataProvider dataProvider;
-    private boolean partialMatchScopeValidation;
     private boolean useAllClientScopes;
 
     public void setDataProvider(OAuthDataProvider dataProvider) {
@@ -50,14 +49,10 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         List<String> requestedScopes = OAuthUtils.getRequestedScopes(client,
                                             params.getFirst(OAuthConstants.SCOPE),
                                             useAllClientScopes,
-                                            partialMatchScopeValidation, false);
+                                            false);
         final ServerAccessToken st = dataProvider.refreshAccessToken(client, refreshToken, requestedScopes);
         st.setGrantType(OAuthConstants.REFRESH_TOKEN_GRANT);
         return st;
-    }
-
-    public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
-        this.partialMatchScopeValidation = partialMatchScopeValidation;
     }
 
     public void setUseAllClientScopes(boolean useAllClientScopes) {

@@ -144,8 +144,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                       String requestedGrant,
                                                       List<String> requestedScopes,
                                                       List<String> audiences) {
-        if (!OAuthUtils.validateScopes(requestedScopes, client.getRegisteredScopes(),
-                                       partialMatchScopeValidation)) {
+        if (!OAuthUtils.validateScopes(requestedScopes, client.getRegisteredScopes())) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));
         }
         if (!OAuthUtils.validateAudiences(audiences, client.getRegisteredAudiences())) {
