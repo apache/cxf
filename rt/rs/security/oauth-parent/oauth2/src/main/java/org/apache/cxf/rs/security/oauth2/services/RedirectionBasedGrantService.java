@@ -61,7 +61,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private Set<String> supportedResponseTypes;
     private String supportedGrantType;
     private boolean useAllClientScopes;
-    private boolean partialMatchScopeValidation;
     private boolean useRegisteredRedirectUriIfPossible = true;
     private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
     private SubjectCreator subjectCreator;
@@ -180,8 +179,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         try {
             requestedScope = OAuthUtils.getRequestedScopes(client,
                                                            providedScope,
-                                                           useAllClientScopes,
-                                                           partialMatchScopeValidation);
+                                                           useAllClientScopes);
             requestedPermissions = getDataProvider().convertScopeToPermissions(client, requestedScope);
         } catch (OAuthServiceException ex) {
             LOG.log(Level.FINE, "Error processing scopes", ex);
@@ -401,8 +399,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                 approvedScope.add(rScope);
             }
         }
-        if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(),
-                                         partialMatchScopeValidation)) {
+        if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes())) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         getMessageContext().put(AUTHORIZATION_REQUEST_PARAMETERS, params);
@@ -569,10 +566,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     public void setResourceOwnerNameProvider(ResourceOwnerNameProvider resourceOwnerNameProvider) {
         this.resourceOwnerNameProvider = resourceOwnerNameProvider;
-    }
-
-    public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
-        this.partialMatchScopeValidation = partialMatchScopeValidation;
     }
 
     public void setUseAllClientScopes(boolean useAllClientScopes) {
