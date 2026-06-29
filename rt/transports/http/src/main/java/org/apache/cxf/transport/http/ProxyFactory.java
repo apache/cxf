@@ -22,6 +22,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -50,7 +52,8 @@ public class ProxyFactory {
      * are honoured rather than bypassed.
      */
     private Proxy getSystemProxy(URI uri) {
-        ProxySelector selector = ProxySelector.getDefault();
+        ProxySelector selector = AccessController.doPrivileged(
+            (PrivilegedAction<ProxySelector>) ProxySelector::getDefault);
         if (selector == null) {
             return null;
         }
