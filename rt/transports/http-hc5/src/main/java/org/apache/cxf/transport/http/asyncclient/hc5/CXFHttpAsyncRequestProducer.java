@@ -94,24 +94,7 @@ public class CXFHttpAsyncRequestProducer implements AsyncRequestProducer {
 
     @Override
     public int available() {
-        if (content != null) {
-            final ByteBuffer b = buffer;
-            if (b != null && b.hasRemaining()) {
-                return b.remaining();
-            } 
-            final InputStream in = fis;
-            if (in != null) {
-                try {
-                    return in.available();
-                } catch (final IOException ex) {
-                    /* Nothing to do */
-                }
-            }
-        } else if (buf != null && buf.hasData()) {
-            return buf.length(); /* returns remaining */
-        }
-
-        return 0; /* no more data */
+        return Integer.MAX_VALUE;
     }
 
     @Override
