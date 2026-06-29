@@ -94,7 +94,7 @@ public class CXFHttpAsyncRequestProducer implements AsyncRequestProducer {
 
     @Override
     public int available() {
-        return 0;
+        return Integer.MAX_VALUE;
     }
 
     @Override
