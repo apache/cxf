@@ -22,6 +22,11 @@ package org.apache.cxf.ws.addressing;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +34,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -51,6 +57,28 @@ public final class ContextUtils {
 
     public static final ObjectFactory WSA_OBJECT_FACTORY = new ObjectFactory();
     public static final String ACTION = ContextUtils.class.getName() + ".ACTION";
+
+    /**
+     * System property whose value overrides the comma-separated list of URI scheme
+     * prefixes permitted in wsa:ReplyTo / wsa:FaultTo decoupled-destination addresses.
+     * Example: {@code -Dorg.apache.cxf.ws.addressing.decoupled.allowedSchemes=http://,https://,jms:}
+     */
+    public static final String ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY =
+        "org.apache.cxf.ws.addressing.decoupled.allowedSchemes";
+
+    /**
+     * Default set of URI scheme prefixes permitted in wsa:ReplyTo / wsa:FaultTo
+     * decoupled-destination addresses. Schemes that can open arbitrary filesystem or
+     * OS resources (file://, corba:, IOR:, etc.) are intentionally excluded.
+     */
+    public static final Set<String> DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES =
+        Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
+            "http://", "https://",
+            "jms://", "jms:",
+            "ws://", "wss://",
+            "hc://", "hc5://",
+            "local://"
+        )));
 
     private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = new EndpointReferenceType();
 
@@ -561,47 +589,106 @@ public final class ContextUtils {
         return msg;
     }
 
+    /**
+     * Returns {@code true} if the scheme of {@code uri} is permitted as a
+     * wsa:ReplyTo / wsa:FaultTo decoupled-destination address. The permitted set is
+     * read from the system property {@value #ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY}
+     * (comma-separated prefix list) and falls back to
+     * {@link #DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES} when the property is absent.
+     */
+    public static boolean isDecoupledDestinationAllowed(String uri) {
+        if (uri == null) {
+            return false;
+        }
+        // Normalize the URI to lowercase for case-insensitive scheme comparison
+        // (RFC 3986 §3.1: scheme is case-insensitive).
+        String normalizedUri = uri.toLowerCase(Locale.ROOT);
+        String prop = SystemPropertyAction.getPropertyOrNull(ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY);
+        Set<String> allowed = (prop != null)
+            ? new LinkedHashSet<>(Arrays.asList(prop.split(",")))
+            : DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES;
+        for (String prefix : allowed) {
+            String trimmedPrefix = prefix.trim().toLowerCase(Locale.ROOT);
+            // Skip empty tokens that arise from leading/trailing/consecutive commas in
+            // the system property (e.g. ",http://" or "http://,,https://").
+            // An empty prefix would make startsWith("") return true for every URI,
+            // effectively disabling the SSRF allowlist.
+            if (trimmedPrefix.isEmpty()) {
+                continue;
+            }
+            if (normalizedUri.startsWith(trimmedPrefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Destination createDecoupledDestination(Exchange exchange,
                                                          final EndpointReferenceType reference) {
         final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
-        return new Destination() {
-            public EndpointReferenceType getAddress() {
-                return reference;
+        return new DecoupledDestination(ei, reference);
+    }
+
+    private static final class DecoupledDestination implements Destination {
+        private final EndpointInfo ei;
+        private final EndpointReferenceType reference;
+
+        DecoupledDestination(EndpointInfo ei, EndpointReferenceType reference) {
+            this.ei = ei;
+            this.reference = reference;
+        }
+
+        public EndpointReferenceType getAddress() {
+            return reference;
+        }
+
+        public Conduit getBackChannel(Message inMessage) throws IOException {
+            if (isNoneAddress(reference)) {
+                return null;
             }
-            public Conduit getBackChannel(Message inMessage) throws IOException {
-                Bus bus = inMessage.getExchange().getBus();
-                //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
-                //we don't wait for a response.
-                inMessage.getExchange().setOneWay(true);
-                ConduitInitiator conduitInitiator
-                    = bus.getExtension(ConduitInitiatorManager.class)
-                        .getConduitInitiatorForUri(reference.getAddress().getValue());
-                if (conduitInitiator != null) {
-                    Conduit c = conduitInitiator.getConduit(ei, reference, bus);
-                    //ensure decoupled back channel input stream is closed
-                    c.setMessageObserver(new MessageObserver() {
-                        public void onMessage(Message m) {
-                            InputStream is = m.getContent(InputStream.class);
-                            if (is != null) {
-                                try {
-                                    is.close();
-                                } catch (Exception e) {
-                                    //ignore
-                                }
+            final String destinationUri = reference.getAddress().getValue();
+            if (!isDecoupledDestinationAllowed(destinationUri)) {
+                LOG.log(Level.WARNING,
+                    "Rejected wsa:ReplyTo/FaultTo address with disallowed scheme: {0}. "
+                    + "Override permitted schemes with system property {1}",
+                    new Object[] {destinationUri, ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                return null;
+            }
+            Bus bus = inMessage.getExchange().getBus();
+            //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
+            //we don't wait for a response.
+            inMessage.getExchange().setOneWay(true);
+            ConduitInitiator conduitInitiator
+                = bus.getExtension(ConduitInitiatorManager.class)
+                    .getConduitInitiatorForUri(destinationUri);
+            if (conduitInitiator != null) {
+                Conduit c = conduitInitiator.getConduit(ei, reference, bus);
+                //ensure decoupled back channel input stream is closed
+                c.setMessageObserver(new MessageObserver() {
+                    public void onMessage(Message m) {
+                        InputStream is = m.getContent(InputStream.class);
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (Exception e) {
+                                //ignore
                             }
                         }
-                    });
-                    return c;
-                }
-                return null;
+                    }
+                });
+                return c;
             }
-            public MessageObserver getMessageObserver() {
-                return null;
-            }
-            public void shutdown() {
-            }
-            public void setMessageObserver(MessageObserver observer) {
-            }
-        };
+            return null;
+        }
+
+        public MessageObserver getMessageObserver() {
+            return null;
+        }
+
+        public void shutdown() {
+        }
+
+        public void setMessageObserver(MessageObserver observer) {
+        }
     }
 }
