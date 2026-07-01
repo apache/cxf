@@ -94,13 +94,21 @@ final class InternalContextUtils {
             if (ContextUtils.isNoneAddress(reference)) {
                 return null;
             }
+            final String destinationUri = reference.getAddress().getValue();
+            if (!ContextUtils.isDecoupledDestinationAllowed(destinationUri)) {
+                LOG.log(Level.WARNING,
+                    "Rejected wsa:ReplyTo/FaultTo address with disallowed scheme: {0}. "
+                    + "Override the permitted schemes with system property {1}",
+                    new Object[] {destinationUri, ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                return null;
+            }
             Bus bus = inMessage.getExchange().getBus();
             //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
             //we don't wait for a response.
             inMessage.getExchange().setOneWay(true);
             ConduitInitiator conduitInitiator
                 = bus.getExtension(ConduitInitiatorManager.class)
-                    .getConduitInitiatorForUri(reference.getAddress().getValue());
+                    .getConduitInitiatorForUri(destinationUri);
             if (conduitInitiator != null) {
                 Conduit c = conduitInitiator.getConduit(ei, reference, bus);
                 // ensure decoupled back channel input stream is closed
@@ -139,7 +147,6 @@ final class InternalContextUtils {
     */
     private InternalContextUtils() {
     }
-
 
     /**
      * Rebase response on replyTo
