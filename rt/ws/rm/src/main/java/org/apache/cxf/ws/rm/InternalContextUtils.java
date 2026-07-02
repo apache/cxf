@@ -78,13 +78,17 @@ final class InternalContextUtils {
             if (ContextUtils.isNoneAddress(reference)) {
                 return null;
             }
+            final String destinationUri = reference.getAddress().getValue();
+            if (!ContextUtils.isDecoupledDestinationAllowed(destinationUri)) {
+                return null;
+            }
             Bus bus = inMessage.getExchange().getBus();
             //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
             //we don't wait for a response.
             inMessage.getExchange().setOneWay(true);
             ConduitInitiator conduitInitiator
                 = bus.getExtension(ConduitInitiatorManager.class)
-                    .getConduitInitiatorForUri(reference.getAddress().getValue());
+                    .getConduitInitiatorForUri(destinationUri);
             if (conduitInitiator != null) {
                 Conduit c = conduitInitiator.getConduit(ei, reference, bus);
                 // ensure decoupled back channel input stream is closed
@@ -216,7 +220,7 @@ final class InternalContextUtils {
     }
     //CHECKSTYLE:ON
 
-    private static Destination createDecoupledDestination(
+    static Destination createDecoupledDestination(
         Exchange exchange, final EndpointReferenceType reference) {
         final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new DecoupledDestination(ei, reference);
