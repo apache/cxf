@@ -21,10 +21,10 @@ package org.apache.cxf.rs.security.oidc.rp;
 import java.lang.reflect.Method;
 import java.net.URI;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.UriInfo;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.junit.Test;
 
