@@ -79,7 +79,7 @@ final class InternalContextUtils {
                 return null;
             }
             final String destinationUri = reference.getAddress().getValue();
-            if (!ContextUtils.isDecoupledDestinationAllowed(destinationUri)) {
+            if (!ContextUtils.isDecoupledDestinationSchemeAllowed(destinationUri)) {
                 return null;
             }
             Bus bus = inMessage.getExchange().getBus();

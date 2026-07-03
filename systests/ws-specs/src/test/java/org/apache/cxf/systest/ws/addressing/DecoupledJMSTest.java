@@ -78,7 +78,8 @@ public class DecoupledJMSTest extends MAPTestBase {
                                                                    props, null));
 
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, null,
+                   launchServer(Server.class,
+                                Map.of("org.apache.cxf.ws.addressing.decoupled.enabled", "true"),
                                 new String[] {ADDRESS, GreeterImpl.class.getName()}, false));
     }
 

@@ -103,11 +103,17 @@ public class MAPAggregatorTest {
 
     @Before
     public void setUp() {
+        // Tests in this class exercise both anonymous and non-anonymous (decoupled)
+        // WS-Addressing destinations. Enable decoupled so the legitimate decoupled
+        // tests are not rejected by the SSRF guard.
+        System.setProperty(
+            ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         aggregator = new MAPAggregatorImpl();
     }
 
     @After
     public void tearDown() {
+        System.clearProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY);
         expectedMAPs = null;
         expectedTo = null;
         expectedReplyTo = null;

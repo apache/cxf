@@ -39,6 +39,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -112,9 +113,16 @@ public class AddressingPolicy0705Test extends AbstractBusClientServerTestBase {
         TestUtil.getNewPortNumber("decoupled");
         PolicyTestHelper.updatePolicyRef("addr-external0705.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
+        System.setProperty("org.apache.cxf.ws.addressing.decoupled.enabled", "true");
 
         assertTrue("server did not launch correctly", launchServer(AddressingPolicy0705Server.class, null,
                                                                    new String[] {TEMPDIR}, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty("temp.location");
+        System.clearProperty("org.apache.cxf.ws.addressing.decoupled.enabled");
     }
 
     @Test
