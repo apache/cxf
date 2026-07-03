@@ -63,7 +63,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
-import org.apache.cxf.transport.http.HTTPException;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.HttpClientHTTPConduit;
 import org.apache.cxf.transport.http.asyncclient.hc5.AsyncHTTPConduitFactory.UseAsyncPolicy;
@@ -73,6 +72,8 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScheme;
 import org.apache.hc.client5.http.auth.AuthSchemeFactory;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
@@ -80,6 +81,7 @@ import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.BasicFuture;
@@ -301,7 +303,6 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
         private Object sessionLock = new Object();
         private boolean closed;
-        private HttpClientContext ctx;
 
         public AsyncWrappedOutputStream(Message message, boolean needToCacheRequest, boolean isChunking,
                 int chunkThreshold, String conduitName, URI uri) {
@@ -533,7 +534,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                 entity.setEntity(null);
             }
 
-            ctx = HttpClientContext.create();
+            HttpClientContext ctx = HttpClientContext.create();
 
             BasicCredentialsProvider credsProvider = new BasicCredentialsProvider() {
                 @Override
@@ -555,6 +556,26 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             };
 
             ctx.setCredentialsProvider(credsProvider);
+            if (proxyAuthorizationPolicy != null && proxyAuthorizationPolicy.getUserName() != null) {
+                // We only support BasicAuth
+                ctx.setAuthCache(new AuthCache() {
+                    @Override
+                    public void remove(HttpHost host) {
+                    }
+
+                    @Override
+                    public void put(HttpHost host, AuthScheme authScheme) {
+                    }
+                    @Override
+                    public AuthScheme get(HttpHost host) {
+                        return new BasicScheme();
+                    }
+
+                    @Override
+                    public void clear() {
+                    }
+                });
+            }
 
             TlsStrategy tlsStrategy = null;
             if ("https".equals(url.getScheme())) {
@@ -675,12 +696,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             while (httpResponse == null) {
                 if (exception == null) { //already have an exception, skip waiting
                     try {
-                        long timeout = csPolicy.getReceiveTimeout();
-                        if (timeout > 0) {
-                            wait(timeout);
-                        } else {
-                            wait();
-                        }
+                        wait();
                     } catch (InterruptedException e) {
                         throw new IOException(e);
                     }
@@ -693,32 +709,10 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                         if (exception instanceof IOException) {
                             throw (IOException)exception;
                         } else if (exception instanceof RuntimeException) {
-                            // HC5 async calls failed() with RuntimeException
-                            // when proxy auth is exhausted, not 407 via
-                            // consumeResponse(). Check context for 407.
-                            if (ctx != null && ctx.getResponse() != null
-                                    && ctx.getResponse().getCode()
-                                        == HttpURLConnection.HTTP_PROXY_AUTH) {
-                                throw new HTTPException(
-                                    HttpURLConnection.HTTP_PROXY_AUTH,
-                                    ctx.getResponse().getReasonPhrase(),
-                                    url.toURL());
-                            }
-                            throw new IOException(exception);
+                            throw (RuntimeException)exception;
                         }
-
+                        
                         throw new IOException(exception);
-                    }
-
-                    // Timed out waiting for HC5 callback; check if proxy
-                    // returned 407 during its internal auth handling.
-                    if (ctx != null && ctx.getResponse() != null
-                            && ctx.getResponse().getCode()
-                                == HttpURLConnection.HTTP_PROXY_AUTH) {
-                        throw new HTTPException(
-                            HttpURLConnection.HTTP_PROXY_AUTH,
-                            ctx.getResponse().getReasonPhrase(),
-                            url.toURL());
                     }
 
                     throw new SocketTimeoutException("Read Timeout");
