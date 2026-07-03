@@ -35,6 +35,7 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -61,9 +62,19 @@ import static org.mockito.Mockito.when;
  */
 public class DecoupledDestinationProtocolTest {
 
+    @Before
+    public void clearSystemPropertiesBeforeTest() {
+        clearDecoupledDestinationSystemProperties();
+    }
+
     @After
-    public void clearSystemProperty() {
+    public void clearSystemPropertiesAfterTest() {
+        clearDecoupledDestinationSystemProperties();
+    }
+
+    private static void clearDecoupledDestinationSystemProperties() {
         System.clearProperty(ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY);
+        System.clearProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY);
     }
 
     // -------------------------------------------------------------------------
@@ -76,6 +87,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testFileSchemeReplyToIsRejected() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String attackerReplyTo = "file:///etc/passwd";
 
         Bus bus = mock(Bus.class);
@@ -106,6 +118,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testFileSchemeViaFaultToIsRejected() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String attackerFaultTo = "file:///var/log/app.log";
 
         Bus bus = mock(Bus.class);
@@ -139,6 +152,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testHttpSchemeReplyToIsAllowed() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String replyTo = "http://callback.example.com/reply";
 
         Bus bus = mock(Bus.class);
@@ -181,6 +195,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testJmsSchemeReplyToIsAllowed() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String replyTo = "jms:queue:replies?timeToLive=1000";
 
         Bus bus = mock(Bus.class);
@@ -222,6 +237,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testFileSchemeAllowedViaSystemProperty() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         System.setProperty(
             ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY, "file://,http://");
 
@@ -263,6 +279,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testSystemPropertyReplacesDefaults() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         System.setProperty(
             ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY, "jms:");
 
@@ -296,6 +313,7 @@ public class DecoupledDestinationProtocolTest {
 
     @Test
     public void testIsReplyToSchemeAllowedDefaults() {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         // Allowed by default
         for (String allowed : ContextUtils.DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES) {
             assertEquals("Expected allowed: " + allowed,
@@ -316,6 +334,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testEmptyPropertyTokensDoNotBypassAllowlist() {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         // Leading comma — produces an empty first token
         System.setProperty(ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY,
             ",http://");
@@ -356,6 +375,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testContextUtilsFaultToFileSchemeIsRejected() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String attackerFaultTo = "file:///etc/passwd";
 
         Bus bus = mock(Bus.class);
@@ -386,6 +406,7 @@ public class DecoupledDestinationProtocolTest {
      */
     @Test
     public void testContextUtilsFaultToHttpSchemeIsAllowed() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         final String faultTo = "http://callback.example.com/fault";
 
         Bus bus = mock(Bus.class);
@@ -415,6 +436,19 @@ public class DecoupledDestinationProtocolTest {
 
         assertNotNull("http:// FaultTo via ContextUtils must be allowed", backChannel);
         assertSame(mockConduit, backChannel);
+    }
+
+    /**
+     * With no system properties set, ALL decoupled destinations must be rejected
+     * regardless of scheme. This is the new secure-by-default behaviour.
+     */
+    @Test
+    public void testDecoupledAddressingDisabledByDefault() {
+        assertEquals(false, ContextUtils.isDecoupledDestinationAllowed("http://callback.example.com/"));
+        assertEquals(false, ContextUtils.isDecoupledDestinationAllowed("https://callback.example.com/"));
+        assertEquals(false, ContextUtils.isDecoupledDestinationAllowed("jms:queue:replies"));
+        assertEquals(false, ContextUtils.isDecoupledDestinationAllowed("file:///etc/passwd"));
+        assertEquals(false, ContextUtils.isDecoupledDestinationAllowed(null));
     }
 
     // -------------------------------------------------------------------------

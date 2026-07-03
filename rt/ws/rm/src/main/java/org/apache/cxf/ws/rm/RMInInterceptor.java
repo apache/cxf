@@ -161,6 +161,11 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             return;
         }
 
+        // Pre-approve decoupled wsa:ReplyTo/wsa:FaultTo destinations for this exchange.
+        // MAPAggregator performs the early fail-fast check; this exchange flag ensures
+        // the later decoupled backchannel creation path honors RM callbacks as well.
+        message.getExchange().put(ContextUtils.DECOUPLED_DESTINATION_APPROVED_PROPERTY, Boolean.TRUE);
+
         Object originalRequestor = message.get(RMMessageConstants.ORIGINAL_REQUESTOR_ROLE);
         if (null != originalRequestor) {
             LOG.fine("Restoring original requestor role to: " + originalRequestor);

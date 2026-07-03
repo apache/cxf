@@ -44,6 +44,7 @@ import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.selector.MinimalAlternativeSelector;
 import org.apache.cxf.ws.rm.RMUtils;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -113,12 +114,18 @@ public class AddressingOptionalPolicyTest extends AbstractBusClientServerTestBas
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
+        System.setProperty("org.apache.cxf.ws.addressing.decoupled.enabled", "true");
         PolicyTestHelper.updatePolicyRef("addr-optional-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
         assertTrue("server did not launch correctly", launchServer(AddressingOptionalPolicyServer.class, null,
                                                                    new String[] {TEMPDIR}));
     }
 
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty("temp.location");
+        System.clearProperty("org.apache.cxf.ws.addressing.decoupled.enabled");
+    }
 
     @Test
     public void testUsingAddressing() throws Exception {
