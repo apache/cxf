@@ -37,7 +37,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.ws.addressing.ContextUtils;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -89,8 +91,14 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         assertTrue("server did not launch correctly",
                    launchServer(DecoupledServer.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY);
     }
 
     @Test

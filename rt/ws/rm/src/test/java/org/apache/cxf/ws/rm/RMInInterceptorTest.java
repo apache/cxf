@@ -100,7 +100,7 @@ public class RMInInterceptorTest {
 
         interceptor.handle(message);
         verify(rme, times(1)).receivedControlMessage();
-        verify(message, times(2)).getExchange();
+        verify(message, times(3)).getExchange();
     }
 
     @Test
@@ -118,7 +118,7 @@ public class RMInInterceptorTest {
         interceptor.handle(message);
         verify(rme, times(1)).receivedControlMessage();
         verify(proxy, times(1)).createSequenceResponse(csr, ProtocolVariation.RM10WSA200408);
-        verify(message, times(2)).getExchange();
+        verify(message, times(3)).getExchange();
     }
 
     @Test
@@ -140,7 +140,7 @@ public class RMInInterceptorTest {
         interceptor.handle(message);
         verify(rme, times(1)).receivedControlMessage();
         verify(interceptor, times(1)).processAcknowledgments(rme, rmps, ProtocolVariation.RM10WSA200408);
-        verify(message, times(2)).getExchange();
+        verify(message, times(3)).getExchange();
     }
 
     @Test
@@ -159,7 +159,7 @@ public class RMInInterceptorTest {
         when(message.get(AssertionInfoMap.class)).thenReturn(null);
 
         interceptor.handle(message);
-        verify(message, times(2)).getExchange();
+        verify(message, times(3)).getExchange();
         verify(rme, times(1)).receivedControlMessage();
     }
 
