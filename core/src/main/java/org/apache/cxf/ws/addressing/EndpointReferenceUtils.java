@@ -27,6 +27,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -199,7 +201,15 @@ public final class EndpointReferenceUtils {
                     systemId = publicId;
                 }
                 if (systemId != null) {
-                    InputSource source = resolver.resolve(systemId, baseURI);
+                    // Run inside doPrivileged so that sm.checkPermission() calls
+                    // inside the resolver chain (SecurityActions.fileExists) stop
+                    // at this boundary and check only CXF's own permissions rather
+                    // than walking up through the JAXP schema-validator frames that
+                    // lack CXF-internal permissions.
+                    final String sid = systemId;
+                    final String buri = baseURI;
+                    InputSource source = AccessController.doPrivileged(
+                        (PrivilegedAction<InputSource>) () -> resolver.resolve(sid, buri));
                     if (source != null) {
                         impl = new LSInputImpl();
                         impl.setByteStream(source.getByteStream());

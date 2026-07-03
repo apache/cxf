@@ -32,6 +32,8 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -270,7 +272,16 @@ public class URIResolver implements AutoCloseable {
 
     private HttpURLConnection createInputStream() throws IOException {
         checkAllowedScheme(url);
-        HttpURLConnection huc = (HttpURLConnection)url.openConnection();
+        // Wrap the network connection in doPrivileged so that callers (including
+        // user deployments) do not need SocketPermission for the target host.
+        final HttpURLConnection huc;
+        try {
+            huc = AccessController.doPrivileged(
+                (PrivilegedExceptionAction<HttpURLConnection>) () ->
+                    (HttpURLConnection)url.openConnection());
+        } catch (PrivilegedActionException e) {
+            throw (IOException) e.getException();
+        }
 
         String host = SystemPropertyAction.getPropertyOrNull("http.proxyHost");
         if (host != null) {
