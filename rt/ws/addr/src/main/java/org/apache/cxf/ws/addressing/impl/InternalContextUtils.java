@@ -95,11 +95,27 @@ final class InternalContextUtils {
                 return null;
             }
             final String destinationUri = reference.getAddress().getValue();
-            if (!ContextUtils.isDecoupledDestinationAllowed(destinationUri)) {
+            boolean approved = Boolean.TRUE.equals(
+                inMessage.getExchange().get(ContextUtils.DECOUPLED_DESTINATION_APPROVED_PROPERTY));
+            if (approved) {
+                if (!ContextUtils.isDecoupledDestinationSchemeAllowed(destinationUri)) {
+                    LOG.log(Level.WARNING,
+                        "Rejected pre-approved decoupled destination with disallowed scheme: {0}. "
+                        + "Configure permitted URI schemes with system property {1}",
+                        new Object[] {destinationUri, ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                    return null;
+                }
+            } else if (!ContextUtils.isDecoupledDestinationAllowed(destinationUri)) {
                 LOG.log(Level.WARNING,
-                    "Rejected wsa:ReplyTo/FaultTo address with disallowed scheme: {0}. "
-                    + "Override the permitted schemes with system property {1}",
-                    new Object[] {destinationUri, ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                    "Rejected wsa:ReplyTo/FaultTo decoupled destination: {0}. "
+                    + "Decoupled WS-Addressing is disabled by default; "
+                    + "enable with system property {1}=true, "
+                    + "and/or configure permitted URI schemes with {2}",
+                    new Object[] {
+                        destinationUri,
+                        ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
+                        ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                    });
                 return null;
             }
             Bus bus = inMessage.getExchange().getBus();

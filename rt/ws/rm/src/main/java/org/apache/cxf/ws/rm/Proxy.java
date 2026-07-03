@@ -49,6 +49,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
@@ -90,6 +91,10 @@ public class Proxy {
         String address = ds.getAcksTo().getAddress().getValue();
         if (RMUtils.getAddressingConstants().getAnonymousURI().equals(address)) {
             LOG.log(Level.WARNING, "STANDALONE_ANON_ACKS_NOT_SUPPORTED");
+            return;
+        }
+        if (!ContextUtils.isDecoupledDestinationSchemeAllowed(address)) {
+            LOG.log(Level.WARNING, "WSRM_ACKS_TO_SCHEME_NOT_PERMITTED", address);
             return;
         }
         RMConstants constants = protocol.getConstants();

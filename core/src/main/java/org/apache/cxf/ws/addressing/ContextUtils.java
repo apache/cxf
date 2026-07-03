@@ -67,6 +67,30 @@ public final class ContextUtils {
         "org.apache.cxf.ws.addressing.decoupled.allowedSchemes";
 
     /**
+     * System property that enables WS-Addressing decoupled destinations (non-anonymous
+     * wsa:ReplyTo / wsa:FaultTo). Defaults to {@code false} — decoupled destinations
+     * are <em>disabled</em> by default to prevent SSRF. Set to {@code true} only when
+     * your deployment legitimately requires decoupled WS-Addressing callbacks.
+     */
+    public static final String WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY =
+        "org.apache.cxf.ws.addressing.decoupled.enabled";
+
+    /**
+     * Exchange property key that higher-level protocols (e.g. WS-RM) may set to
+     * {@code Boolean.TRUE} to pre-approve decoupled wsa:ReplyTo / wsa:FaultTo
+     * destinations for a specific exchange, bypassing the global
+     * {@value #WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY} opt-in flag.
+     *
+     * <p>The URI-scheme allowlist ({@value #ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY} /
+     * {@link #DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES}) is still enforced even when
+     * this flag is set, to prevent reaching dangerous URI types (e.g. {@code file://}).
+     *
+     * <p>Only trusted CXF modules should set this property.
+     */
+    public static final String DECOUPLED_DESTINATION_APPROVED_PROPERTY =
+        "org.apache.cxf.ws.addressing.decoupled.approved";
+
+    /**
      * Default set of URI scheme prefixes permitted in wsa:ReplyTo / wsa:FaultTo
      * decoupled-destination addresses. Schemes that can open arbitrary filesystem or
      * OS resources (file://, corba:, IOR:, etc.) are intentionally excluded.
@@ -590,13 +614,33 @@ public final class ContextUtils {
     }
 
     /**
-     * Returns {@code true} if the scheme of {@code uri} is permitted as a
-     * wsa:ReplyTo / wsa:FaultTo decoupled-destination address. The permitted set is
-     * read from the system property {@value #ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY}
-     * (comma-separated prefix list) and falls back to
-     * {@link #DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES} when the property is absent.
+     * Returns {@code true} if {@code uri} is permitted as a wsa:ReplyTo / wsa:FaultTo
+     * decoupled-destination address for the <em>WS-Addressing</em> path.
+     *
+     * <p>WS-Addressing decoupled destinations are <em>disabled by default</em> to
+     * prevent SSRF: any attacker who can craft a SOAP request can otherwise force
+     * the server to open an outbound connection to any URL. Enable with
+     * {@value #WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY}{@code =true}.
+     *
+     * <p>When enabled, the URI must start with a prefix from
+     * {@value #ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY} or
+     * {@link #DEFAULT_ALLOWED_DECOUPLED_DEST_SCHEMES}.
      */
     public static boolean isDecoupledDestinationAllowed(String uri) {
+        if (uri == null) {
+            return false;
+        }
+        if (!Boolean.parseBoolean(
+                System.getProperty(WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "false"))) {
+            return false;
+        }
+        return isDecoupledDestinationSchemeAllowed(uri);
+    }
+
+    /**
+     * Validates the URI scheme for {@link #isDecoupledDestinationAllowed}.
+     */
+    public static boolean isDecoupledDestinationSchemeAllowed(String uri) {
         if (uri == null) {
             return false;
         }
@@ -647,11 +691,29 @@ public final class ContextUtils {
                 return null;
             }
             final String destinationUri = reference.getAddress().getValue();
-            if (!isDecoupledDestinationAllowed(destinationUri)) {
+            boolean approved = Boolean.TRUE.equals(
+                inMessage.getExchange().get(DECOUPLED_DESTINATION_APPROVED_PROPERTY));
+            if (approved) {
+                // Higher-level protocol (e.g. WS-RM) pre-approved decoupled addressing
+                // for this exchange; still enforce the scheme allowlist.
+                if (!isDecoupledDestinationSchemeAllowed(destinationUri)) {
+                    LOG.log(Level.WARNING,
+                        "Rejected pre-approved decoupled destination with disallowed scheme: {0}. "
+                        + "Configure permitted URI schemes with system property {1}",
+                        new Object[] {destinationUri, ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                    return null;
+                }
+            } else if (!isDecoupledDestinationAllowed(destinationUri)) {
                 LOG.log(Level.WARNING,
-                    "Rejected wsa:ReplyTo/FaultTo address with disallowed scheme: {0}. "
-                    + "Override permitted schemes with system property {1}",
-                    new Object[] {destinationUri, ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                    "Rejected wsa:ReplyTo/FaultTo decoupled destination: {0}. "
+                    + "Decoupled WS-Addressing is disabled by default; "
+                    + "enable with system property {1}=true, "
+                    + "or configure permitted URI schemes with {2}",
+                    new Object[] {
+                        destinationUri,
+                        WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
+                        ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                    });
                 return null;
             }
             Bus bus = inMessage.getExchange().getBus();

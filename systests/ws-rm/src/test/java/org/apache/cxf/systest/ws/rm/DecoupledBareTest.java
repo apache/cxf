@@ -33,11 +33,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.hello_world_soap_http.DocLitBare;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.SOAPServiceAddressingDocLitBare;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -81,7 +83,13 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        System.setProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY, "true");
         assertTrue("server did not launch correctly", launchServer(DecoupledBareServer.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty(ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY);
     }
 
     @Test

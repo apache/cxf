@@ -21,10 +21,11 @@ package org.apache.cxf.systest.ws.addressing;
 
 import jakarta.jws.WebService;
 
-
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertTrue;
+
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties.
@@ -54,10 +55,17 @@ public class MAPTest extends MAPTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        System.setProperty("org.apache.cxf.ws.addressing.decoupled.enabled", "true");
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, null,
                                 new String[] {ADDRESS, GreeterImpl.class.getName()},  true));
     }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty("org.apache.cxf.ws.addressing.decoupled.enabled");
+    }
+
     @WebService(serviceName = "SOAPServiceAddressing",
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",

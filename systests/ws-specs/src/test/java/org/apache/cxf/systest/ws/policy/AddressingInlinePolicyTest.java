@@ -40,6 +40,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.policy.PolicyInInterceptor;
 import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -92,7 +93,13 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
+        System.setProperty("org.apache.cxf.ws.addressing.decoupled.enabled", "true");
         assertTrue("server did not launch correctly", launchServer(AddressingInlinePolicyServer.class, true));
+    }
+
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty("org.apache.cxf.ws.addressing.decoupled.enabled");
     }
 
     @Test

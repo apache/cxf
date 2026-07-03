@@ -38,6 +38,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,9 +56,14 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        System.setProperty("org.apache.cxf.ws.addressing.decoupled.enabled", "true");
         assertTrue("FaultTo server did not launch correctly", launchServer(FaultToEndpointServer.class, true));
     }
 
+    @AfterClass
+    public static void cleanup() throws Exception {
+        System.clearProperty("org.apache.cxf.ws.addressing.decoupled.enabled");
+    }
 
     @Test
     public void testOneWayFaultTo() throws Exception {

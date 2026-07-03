@@ -65,6 +65,11 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
 
+        // Pre-approve decoupled wsa:ReplyTo/wsa:FaultTo destinations for this exchange.
+        // WS-RM requires decoupled addressing for async acknowledgements and responses;
+        // the ContextUtils guard is bypassed at exchange level rather than globally.
+        msg.getExchange().put(ContextUtils.DECOUPLED_DESTINATION_APPROVED_PROPERTY, Boolean.TRUE);
+
         RMConfiguration config = getManager().getEffectiveConfiguration(msg);
         String wsaNamespace = config.getAddressingNamespace();
         String rmNamespace = config.getRMNamespace();
