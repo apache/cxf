@@ -72,14 +72,13 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
-import org.apache.hc.client5.http.auth.AuthCache;
-import org.apache.hc.client5.http.auth.AuthScheme;
 import org.apache.hc.client5.http.auth.AuthSchemeFactory;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -557,24 +556,9 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
             ctx.setCredentialsProvider(credsProvider);
             if (proxyAuthorizationPolicy != null && proxyAuthorizationPolicy.getUserName() != null) {
-                // We only support BasicAuth
-                ctx.setAuthCache(new AuthCache() {
-                    @Override
-                    public void remove(HttpHost host) {
-                    }
-
-                    @Override
-                    public void put(HttpHost host, AuthScheme authScheme) {
-                    }
-                    @Override
-                    public AuthScheme get(HttpHost host) {
-                        return new BasicScheme();
-                    }
-
-                    @Override
-                    public void clear() {
-                    }
-                });
+                final BasicAuthCache cache = new BasicAuthCache();
+                cache.put(entity.getConfig().getProxy(), new BasicScheme());
+                ctx.setAuthCache(cache);
             }
 
             TlsStrategy tlsStrategy = null;
