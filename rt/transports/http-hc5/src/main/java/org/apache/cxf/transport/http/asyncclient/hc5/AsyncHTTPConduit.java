@@ -78,7 +78,9 @@ import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.BasicFuture;
@@ -553,6 +555,11 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             };
 
             ctx.setCredentialsProvider(credsProvider);
+            if (proxyAuthorizationPolicy != null && proxyAuthorizationPolicy.getUserName() != null) {
+                final BasicAuthCache cache = new BasicAuthCache();
+                cache.put(entity.getConfig().getProxy(), new BasicScheme());
+                ctx.setAuthCache(cache);
+            }
 
             TlsStrategy tlsStrategy = null;
             if ("https".equals(url.getScheme())) {
