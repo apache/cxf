@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.aegis.type.mtom;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,6 +32,7 @@ import org.apache.cxf.aegis.util.UID;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.resource.URIResolver;
 
 public final class AttachmentUtil {
     // The xop:include "href" attribute (https://www.w3.org/TR/xop10/#xop_href) may include 
@@ -79,9 +79,11 @@ public final class AttachmentUtil {
         if (followUrls) {
             // Try loading the URL remotely
             try {
-                URLDataSource source = new URLDataSource(new URL(id));
+                final URL remoteUrl = new URL(id);
+                URIResolver.checkAllowedScheme(remoteUrl);
+                URLDataSource source = new URLDataSource(remoteUrl);
                 return new AttachmentImpl(id, new DataHandler(source));
-            } catch (MalformedURLException e) {
+            } catch (java.io.IOException e) {
                 return null;
             }
         }

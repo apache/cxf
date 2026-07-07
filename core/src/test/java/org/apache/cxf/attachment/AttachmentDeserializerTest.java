@@ -43,6 +43,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.helpers.DefaultHandler;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -938,6 +939,17 @@ public class AttachmentDeserializerTest {
             final DataSource ds = AttachmentUtil
                 .getAttachmentDataSource("cid:http://image.com/1.gif", Collections.emptyList());
             assertThat(ds, instanceOf(URLDataSource.class));
+        } finally {
+            System.clearProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY);
+        }
+    }
+
+    @Test
+    public void testCXF8706followUrlRejectsDisallowedScheme() {
+        System.setProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "true");
+        try {
+            assertThrows(Fault.class, () -> AttachmentUtil
+                .getAttachmentDataSource("cid:gopher://image.com/1.gif", Collections.emptyList()));
         } finally {
             System.clearProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY);
         }
