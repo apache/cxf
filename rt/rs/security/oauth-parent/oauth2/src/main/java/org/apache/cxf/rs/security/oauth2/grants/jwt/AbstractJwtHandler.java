@@ -82,6 +82,13 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
         if (subject == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
+        // Strict-by-default: require the assertion subject to match the authenticated client id.
+        // Subclasses can override this method to support a different authorization model
+        // (for example, trusted delegation with an explicit client-to-subject policy).
+        if (client != null && client.getClientId() != null
+            && !client.getClientId().equals(subject)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
     }
     public void setSupportedIssuers(Set<String> supportedIssuers) {
         this.supportedIssuers = supportedIssuers;
