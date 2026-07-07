@@ -63,6 +63,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.resource.URIResolver;
 
 public final class AttachmentUtil {
     // The default values for {@link AttachmentDataSource} content type in case when
@@ -593,11 +594,15 @@ public final class AttachmentUtil {
                     final boolean followUrls = Boolean.valueOf(SystemPropertyAction
                         .getProperty(ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY, "false"));
                     if (followUrls) {
-                        return new URLDataSource(new URL(contentId));
+                        final URL remoteUrl = new URL(contentId);
+                        URIResolver.checkAllowedScheme(remoteUrl);
+                        return new URLDataSource(remoteUrl);
                     } else {
                         return loadDataSource(contentId, atts);
                     }
                 } catch (MalformedURLException e) {
+                    throw new Fault(e);
+                } catch (IOException e) {
                     throw new Fault(e);
                 }
             }
