@@ -450,7 +450,10 @@ public class URIResolver implements AutoCloseable {
         }
     }
 
-    private static void checkAllowedScheme(URL targetUrl) throws IOException {
+    /**
+     * Verifies that the URL scheme is permitted by URIResolver allowlist policy.
+     */
+    public static void checkAllowedScheme(URL targetUrl) throws IOException {
         String scheme = targetUrl.getProtocol();
         if (scheme == null) {
             return;

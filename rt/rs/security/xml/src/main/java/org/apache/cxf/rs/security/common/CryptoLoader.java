@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -85,10 +86,11 @@ public class CryptoLoader {
     }
 
     public static Crypto loadCryptoFromURL(URL url) throws IOException, WSSecurityException {
+        URIResolver.checkAllowedScheme(url);
         Properties props = new Properties();
-        InputStream in = url.openStream();
-        props.load(in);
-        in.close();
+        try (InputStream in = url.openStream()) {
+            props.load(in);
+        }
         return CryptoFactory.getInstance(props);
     }
 
