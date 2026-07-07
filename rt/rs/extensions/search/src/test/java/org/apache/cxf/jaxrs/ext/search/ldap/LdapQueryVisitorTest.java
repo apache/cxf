@@ -20,8 +20,11 @@ package org.apache.cxf.jaxrs.ext.search.ldap;
 
 import java.util.Date;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+import org.apache.cxf.jaxrs.ext.search.SimpleSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 import org.junit.Ignore;
@@ -86,6 +89,18 @@ public class LdapQueryVisitorTest {
         assertEquals("(&(|(name=test)(level=18))(|(name=test1)(!level=19)))", ldap);
     }
 
+    @Test
+    public void testLdapFilterInjectionViaUnencodedPropertyName() throws SearchParseException {
+        SearchBean bean = new SearchBean();
+        bean.set("cn)(|(sn", "admin");
+
+        SearchCondition<SearchBean> filter =
+            new SimpleSearchCondition<>(ConditionType.EQUALS, bean);
+        LdapQueryVisitor<SearchBean> visitor = new LdapQueryVisitor<>();
+        filter.accept(visitor.visitor());
+
+        assertEquals("(cn\\29\\28|\\28sn=admin)", visitor.getQuery());
+    }
 
     @Ignore
     public static class Condition {
