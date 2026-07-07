@@ -198,6 +198,8 @@ public final class TestUtil {
         while (p == null) {
             int pn = portNum++;
             try (ServerSocket sock = new ServerSocket(pn)) {
+                // Enable SO_REUSEADDR to allow faster port reuse after socket closure
+                sock.setReuseAddress(true);
                 //make sure the port can be opened.   Something MIGHT be running on it.
                 p = Integer.toString(pn);
                 LOG.fine("Setting port for " + fullName + " to " + p);
