@@ -60,8 +60,9 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
                 }
 
                 String ldapOperator = conditionTypeToLdapOperator(sc.getConditionType());
+                String encodedName = encodeQueryValues ? Util.doRFC2254Encoding(name) : name;
                 String encodedRValStr = encodeQueryValues ? Util.doRFC2254Encoding(rvalStr) : rvalStr;
-                sb.append(name).append(ldapOperator).append(encodedRValStr);
+                sb.append(encodedName).append(ldapOperator).append(encodedRValStr);
 
                 sb.append(')');
             }
