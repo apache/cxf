@@ -93,6 +93,7 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.resource.URIResolver;
 
 public final class StaxUtils {
     // System properties for defaults, but also contextual properties usable
@@ -1693,6 +1694,7 @@ public final class StaxUtils {
         } else {
             try {
                 final URL url = new URL(sysId);
+                URIResolver.checkAllowedScheme(url);
                 final InputStream is = url.openStream();
                 final StreamSource ss = new StreamSource(is, sysId);
                 ss.setPublicId(pubId);
