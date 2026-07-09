@@ -71,6 +71,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
 
     private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
+    private int maxSize = IOUtils.DEFAULT_BINARY_MAX_SIZE;
     private boolean reportByteArraySize;
     private boolean closeResponseInputStream = true;
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -105,7 +106,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                 return clazz.cast(new InputStreamReader(is, getEncoding(type)));
             }
             if (byte[].class.isAssignableFrom(clazz)) {
-                return clazz.cast(IOUtils.readBytesFromStream(is));
+                return clazz.cast(IOUtils.readBytesFromStream(is, maxSize));
             }
             if (File.class.isAssignableFrom(clazz)) {
                 LOG.warning("Reading data into File objects with the help of pre-packaged"
@@ -259,6 +260,10 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         this.bufferSize = bufferSize;
     }
 
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
+    }
+    
     protected NioWriteHandler getNioHandler(final InputStream in) {
 
         return new NioWriteHandler() {
