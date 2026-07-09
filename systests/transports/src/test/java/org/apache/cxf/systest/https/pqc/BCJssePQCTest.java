@@ -50,7 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Verifies BouncyCastle JSSE ({@code bctls-jdk18on} 1.81+) TLS support on JDK 17-26
+ * Verifies BouncyCastle JSSE ({@code bctls-jdk18on} 1.84+) TLS support on JDK 17-26
  * using standard CXF XML configuration.
  *
  * <p>The server is configured via {@code bcjsse-server.xml} using

@@ -265,13 +265,13 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.81</version>
+            <version>${cxf.bcprov.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bctls-jdk18on</artifactId>
-            <version>1.81</version>
+            <version>${cxf.bcprov.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
