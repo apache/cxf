@@ -27,12 +27,15 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -117,6 +120,22 @@ public class JwtAccessTokenValidatorTest {
         assertTrue(ex.getCause().getMessage().contains("cannot be accepted"));
     }
 
+    @Test
+    public void testRejectsJwtThatDeclaresJwtInsteadOfAccessTokenType() {
+        JwtAccessTokenValidator validator = new JwtAccessTokenValidator();
+        validator.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+        validator.setValidateAudience(false);
+
+        String jwt = createSignedToken(SIGNING_KEY, "signed-client", 3600, 0, null, JoseConstants.TYPE_JWT, null);
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+
+        OAuthServiceException ex = assertThrows(OAuthServiceException.class, () ->
+            validator.validateAccessToken(mock(MessageContext.class), "Bearer", jwt, params));
+
+        assertNotNull(ex.getCause());
+        assertTrue(ex.getCause().getMessage().contains("Invalid token type"));
+    }
+
     @After
     public void clearCurrentMessage() throws Exception {
         setThreadLocalMessage(null);
@@ -162,17 +181,26 @@ public class JwtAccessTokenValidatorTest {
     }
 
     private static String createSignedToken(String key, String clientId, long expiresInSeconds) {
-        return createSignedToken(key, clientId, expiresInSeconds, 0, null);
+        return createSignedToken(key, clientId, expiresInSeconds, 0, null, null, null);
     }
 
     private static String createSignedToken(String key, String clientId, long expiresInSeconds,
                                            long notBeforeOffsetSeconds, String audience) {
+        return createSignedToken(key, clientId, expiresInSeconds, notBeforeOffsetSeconds, audience, null, null);
+    }
+
+    private static String createSignedToken(String key, String clientId, long expiresInSeconds,
+                                           long notBeforeOffsetSeconds, String audience,
+                                           String tokenType, String tokenUse) {
         long now = System.currentTimeMillis() / 1000;
         JwtClaims claims = new JwtClaims();
         claims.setIssuedAt(now);
         claims.setExpiryTime(now + expiresInSeconds);
         if (clientId != null) {
             claims.setClaim("client_id", clientId);
+        }
+        if (tokenUse != null) {
+            claims.setClaim("token_use", tokenUse);
         }
         claims.setIssuer("SomeIssuer");
         claims.setSubject("SomeSubject");
@@ -183,7 +211,12 @@ public class JwtAccessTokenValidatorTest {
             claims.setAudience(audience);
         }
 
-        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(claims);
+        JwsHeaders headers = new JwsHeaders();
+        if (tokenType != null) {
+            headers.setHeader(JoseConstants.HEADER_TYPE, tokenType);
+        }
+
+        JwsJwtCompactProducer producer = new JwsJwtCompactProducer(new JwtToken(headers, claims));
         return producer.signWith(new HmacJwsSignatureProvider(key, SignatureAlgorithm.HS256));
     }
 
