@@ -95,6 +95,9 @@ public class TLSServerParametersConfig
         if (params.isSetSniHostCheck()) {
             this.setSniHostCheck(params.isSniHostCheck());
         }
+        if (params.isSetNamedGroups()) {
+            this.setNamedGroups(params.getNamedGroups().getNamedGroup());
+        }
         if (iparams != null && iparams.isSetKeyManagersRef()) {
             this.setKeyManagers(iparams.getKeyManagersRef());
         }

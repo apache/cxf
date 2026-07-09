@@ -131,6 +131,9 @@ public final class TLSClientParametersConfig {
         if (params.isSetCertAlias()) {
             ret.setCertAlias(params.getCertAlias());
         }
+        if (params.isSetNamedGroups()) {
+            ret.setNamedGroups(params.getNamedGroups().getNamedGroup());
+        }
         if (iparams != null && iparams.isSetKeyManagersRef() && !usingDefaults) {
             ret.setKeyManagers(iparams.getKeyManagersRef());
         }

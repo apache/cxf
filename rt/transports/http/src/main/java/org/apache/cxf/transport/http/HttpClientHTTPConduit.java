@@ -433,10 +433,14 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                         if (clientParameters.getSecureSocketProtocol() != null) {
                             String protocol = clientParameters.getSecureSocketProtocol();
                             SSLParameters params = new SSLParameters(cipherSuites, new String[] {protocol});
+                            org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(
+                                params, clientParameters.getNamedGroups());
                             cb.sslParameters(params);
                         } else {
                             final SSLParameters params = new SSLParameters(cipherSuites,
                                 TLSClientParameters.getPreferredClientProtocols());
+                            org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(
+                                params, clientParameters.getNamedGroups());
                             cb.sslParameters(params);
                         }
                     }
