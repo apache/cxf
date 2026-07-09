@@ -72,6 +72,19 @@ public class StaxUtilsTest {
         assertNotNull(reader);
     }
 
+    @Test
+    public void testCreateXMLStreamReaderInputSourceHonorsAllowedSchemes() throws Exception {
+        InputSource source = new InputSource();
+        source.setSystemId("ftp://127.0.0.1/test.xml");
+
+        try {
+            StaxUtils.createXMLStreamReader(source);
+            fail("Failure expected on disallowed scheme");
+        } catch (IllegalArgumentException ex) {
+            assertEquals("InputSource must have a ByteStream or CharacterStream", ex.getMessage());
+        }
+    }
+
     private InputStream getTestStream(String resource) {
         return getClass().getResourceAsStream(resource);
     }
