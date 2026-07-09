@@ -19,7 +19,14 @@
 
 package org.apache.cxf.ws.addressing;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -213,4 +220,78 @@ public class ContextUtilsTest {
         assertThat(hasEmptyAction(maps), is(false));
         assertThat(maps.getAction(), notNullValue());
     }
+
+    @Test
+    public void formatMessages() {
+        assertThat(
+                ContextUtils.formatDecoupledReplyToNotPermittedMessage("http://localhost:1234/decoupled"),
+                is("Decoupled WS-Addressing ReplyTo (http://localhost:1234/decoupled) is not permitted by this server."
+                        + " Enable with system property org.apache.cxf.ws.addressing.decoupled.enabled=true,"
+                        + " or configure permitted URI schemes with"
+                        + " org.apache.cxf.ws.addressing.decoupled.allowedSchemes"));
+        assertThat(
+                ContextUtils.formatDecoupledReplyToSchemeNotPermittedMessage("http://localhost:1234/decoupled"),
+                is("Decoupled WS-Addressing ReplyTo (http://localhost:1234/decoupled) is not permitted by this server:"
+                        + " URI scheme is not allowed."
+                        + " Configure permitted schemes with system property"
+                        + " org.apache.cxf.ws.addressing.decoupled.allowedSchemes"));
+    }
+
+    @Test
+    public void logMessages() {
+        assertLogMessage(log -> ContextUtils.logDisallowedDecoupledDestinationScheme(
+                log,
+                Level.WARNING,
+                "http://localhost:1234/decoupled"),
+                "Rejected pre-approved decoupled destination with disallowed scheme: http://localhost:1234/decoupled."
+                        + " Configure permitted URI schemes with system property "
+                        + ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY);
+        assertLogMessage(
+                log -> ContextUtils.logRejectedDecoupledDestination(
+                        log,
+                        Level.WARNING,
+                        "http://localhost:1234/decoupled"),
+                "Rejected wsa:ReplyTo/FaultTo decoupled destination: http://localhost:1234/decoupled."
+                        + " Decoupled WS-Addressing is disabled by default;"
+                        + " enable with system property org.apache.cxf.ws.addressing.decoupled.enabled=true,"
+                        + " or configure permitted URI schemes with"
+                        + " org.apache.cxf.ws.addressing.decoupled.allowedSchemes");
+        assertLogMessage(
+                log -> ContextUtils.logDecoupledFaultToSchemeNotAllowed(
+                        log,
+                        Level.WARNING,
+                        "http://localhost:1234/decoupled"),
+                "Decoupled pre-approved FaultTo (http://localhost:1234/decoupled) is not permitted:"
+                        + " URI scheme is not allowed. Fault will be delivered to ReplyTo instead."
+                        + " Configure permitted schemes with org.apache.cxf.ws.addressing.decoupled.allowedSchemes");
+        assertLogMessage(
+                log -> ContextUtils.logDecoupledFaultToNotAllowed(
+                        log,
+                        Level.WARNING,
+                        "http://localhost:1234/decoupled"),
+                "Fault will be delivered to ReplyTo instead. Configure permitted schemes with"
+                        + " org.apache.cxf.ws.addressing.decoupled.enabled Decoupled WS-Addressing FaultTo"
+                        + " (http://localhost:1234/decoupled) is not permitted; fault will be delivered to ReplyTo"
+                        + " instead. Enable with system property org.apache.cxf.ws.addressing.decoupled.enabled=true,"
+                        + " or configure permitted URI schemes with"
+                        + " org.apache.cxf.ws.addressing.decoupled.allowedSchemes");
+    }
+
+    static void assertLogMessage(Consumer<Logger> logMethod, String expected) {
+        Logger log = Logger.getLogger("test" + logMethod.toString());
+        log.setLevel(Level.FINEST);
+        log.setUseParentHandlers(false);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        StreamHandler handler = new StreamHandler(out, new SimpleFormatter());
+        handler.setLevel(Level.FINEST);
+        log.addHandler(handler);
+        logMethod.accept(log);
+        handler.flush();
+        String logOutput = out.toString(StandardCharsets.UTF_8);
+        assertThat(
+                logOutput,
+                org.hamcrest.Matchers.containsString("WARNING: " + expected));
+        log.removeHandler(handler);
+    }
+
 }
