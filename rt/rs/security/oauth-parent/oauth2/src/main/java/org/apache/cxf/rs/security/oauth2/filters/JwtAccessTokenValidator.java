@@ -45,6 +45,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
     private static final String USERNAME_PROP = "username";
+    private static final String TOKEN_USE_CLAIM = "token_use";
+    private static final String ACCESS_TOKEN_USE = "access";
+    private static final String INVALID_TOKEN_TYPE = "Invalid token type";
 
     private Map<String, String> jwtAccessTokenClaimMap;
     private boolean validateAudience = true;
@@ -68,12 +71,26 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
 
     @Override
     protected void validateToken(JwtToken jwt) {
+        validateTokenType(jwt);
+
         // We must have an issuer
         if (jwt.getClaim(JwtConstants.CLAIM_ISSUER) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
 
         JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
+    }
+
+    private void validateTokenType(JwtToken jwt) {
+        Object tokenType = jwt.getJwsHeader(JoseConstants.HEADER_TYPE);
+        if (tokenType != null && !JoseConstants.TYPE_AT_JWT.equals(tokenType.toString())) {
+            throw new OAuthServiceException(INVALID_TOKEN_TYPE);
+        }
+
+        String tokenUse = jwt.getClaims().getStringProperty(TOKEN_USE_CLAIM);
+        if (tokenUse != null && !ACCESS_TOKEN_USE.equals(tokenUse)) {
+            throw new OAuthServiceException(INVALID_TOKEN_TYPE);
+        }
     }
 
     private AccessTokenValidation convertClaimsToValidation(JwtClaims claims) {
