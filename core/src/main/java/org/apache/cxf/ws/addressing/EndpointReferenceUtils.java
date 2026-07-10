@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.addressing;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
@@ -72,6 +71,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -550,20 +550,17 @@ public final class EndpointReferenceUtils {
                         && !schemaSourcesMap.containsKey(sch.getSourceURI() + ':'
                                                          + sch.getTargetNamespace())) {
 
-                        InputStream ins = null;
-                        try {
-                            URL url = new URL(sch.getSourceURI());
-                            ins = url.openStream();
+                        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
+                        try (URIResolver resolver = new URIResolver(sch.getSourceURI())) {
+                            if (resolver.getInputStream() == null) {
+                                sch.write(out);
+                            } else {
+                                IOUtils.copyAndCloseInput(resolver.getInputStream(), out);
+                            }
                         } catch (Exception e) {
                             //ignore, we'll just use what we have.  (though
                             //bugs in XmlSchema could make this less useful)
-                        }
-
-                        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
-                        if (ins == null) {
                             sch.write(out);
-                        } else {
-                            IOUtils.copyAndCloseInput(ins, out);
                         }
 
                         schemaSourcesMap.put(sch.getSourceURI() + ':'
