@@ -22,6 +22,7 @@ package org.apache.cxf.ws.addressing;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -330,7 +331,7 @@ public final class ContextUtils {
         relatesTo.setValue(uri);
         return relatesTo;
     }
-    
+
     private static boolean startsWith(String value, String ref) {
         if (StringUtils.isEmpty(value)) {
             return false;
@@ -638,6 +639,106 @@ public final class ContextUtils {
     }
 
     /**
+     * Log a message after {@link #isDecoupledDestinationAllowed(String)} returned {@code false}.
+     *
+     * @param logger the {@link Logger} to pass the message to
+     * @param level log {@link Level} on which the message should be logged
+     * @param destinationUri the URI banned due to the configuration
+     */
+    public static void logDisallowedDecoupledDestinationScheme(Logger logger, Level level, String destinationUri) {
+        logger.logrb(level,
+                AddressingConstants.BUNDLE,
+                "DISALLOWED_DECOUPLED_DESTINATION_SCHEME",
+                new Object[] {
+                    destinationUri,
+                    ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                });
+    }
+
+    /**
+     * Log a message after {@link #isDecoupledDestinationAllowed(String)} returned {@code false}
+     * for messages having {@value #DECOUPLED_DESTINATION_APPROVED_PROPERTY} set to {@code true}.
+     *
+     * @param logger the {@link Logger} to pass the message to
+     * @param level log {@link Level} on which the message should be logged
+     * @param destinationUri the URI banned due to the configuration
+     */
+    public static void logRejectedDecoupledDestination(Logger logger, Level level, String destinationUri) {
+        logger.logrb(level,
+                AddressingConstants.BUNDLE,
+                "REJECTED_DECOUPLED_DESTINATION",
+                new Object[] {
+                    destinationUri,
+                    WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
+                    ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                });
+    }
+
+    /**
+     * Log a message after {@link #isDecoupledDestinationSchemeAllowed(String)} returned {@code false}
+     * for messages having {@value #DECOUPLED_DESTINATION_APPROVED_PROPERTY} set to {@code true}.
+     *
+     * @param logger the {@link Logger} to pass the message to
+     * @param level log {@link Level} on which the message should be logged
+     * @param destinationUri the URI banned due to the configuration
+     */
+    public static void logDecoupledFaultToSchemeNotAllowed(Logger logger, Level level, String destinationUri) {
+        logger.logrb(level,
+                AddressingConstants.BUNDLE,
+                "DECOUPLED_FAULT_TO_SCHEME_NOT_ALLOWED",
+                new Object[] {
+                    destinationUri,
+                    ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                });
+    }
+
+    /**
+     * Log a message after {@link #isDecoupledDestinationAllowed(String)} returned {@code false}
+     * for {@code FaultTo} URI.
+     *
+     * @param logger the {@link Logger} to pass the message to
+     * @param level log {@link Level} on which the message should be logged
+     * @param destinationUri the URI banned due to the configuration
+     */
+    public static void logDecoupledFaultToNotAllowed(Logger logger, Level level, String destinationUri) {
+        logger.logrb(level,
+                AddressingConstants.BUNDLE,
+                "DECOUPLED_FAULT_TO_NOT_ALLOWED",
+                new Object[] {
+                    destinationUri,
+                    WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
+                    ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
+                });
+    }
+
+    /**
+     * Create a SOAP Fault reason after {@link #isDecoupledDestinationAllowed(String)} returned {@code false}.
+     *
+     * @param destinationUri the URI banned due to the configuration
+     * @return a formatted message
+     */
+    public static String formatDecoupledReplyToNotPermittedMessage(String destinationUri) {
+        return MessageFormat.format(
+                AddressingConstants.BUNDLE.getString("DECOUPLED_REPLY_TO_NOT_PERMITTED"),
+                destinationUri,
+                WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
+                ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY);
+    }
+
+    /**
+     * Create a SOAP Fault reason after {@link #isDecoupledDestinationSchemeAllowed(String)} returned {@code false}.
+     *
+     * @param destinationUri the URI banned due to the configuration
+     * @return a formatted message
+     */
+    public static String formatDecoupledReplyToSchemeNotPermittedMessage(String destinationUri) {
+        return MessageFormat.format(
+                AddressingConstants.BUNDLE.getString("DECOUPLED_REPLY_TO_SCHEME_NOT_PERMITTED"),
+                destinationUri,
+                ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY);
+    }
+
+    /**
      * Validates the URI scheme for {@link #isDecoupledDestinationAllowed}.
      */
     public static boolean isDecoupledDestinationSchemeAllowed(String uri) {
@@ -697,23 +798,11 @@ public final class ContextUtils {
                 // Higher-level protocol (e.g. WS-RM) pre-approved decoupled addressing
                 // for this exchange; still enforce the scheme allowlist.
                 if (!isDecoupledDestinationSchemeAllowed(destinationUri)) {
-                    LOG.log(Level.WARNING,
-                        "Rejected pre-approved decoupled destination with disallowed scheme: {0}. "
-                        + "Configure permitted URI schemes with system property {1}",
-                        new Object[] {destinationUri, ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+                    logDisallowedDecoupledDestinationScheme(LOG, Level.WARNING, destinationUri);
                     return null;
                 }
             } else if (!isDecoupledDestinationAllowed(destinationUri)) {
-                LOG.log(Level.WARNING,
-                    "Rejected wsa:ReplyTo/FaultTo decoupled destination: {0}. "
-                    + "Decoupled WS-Addressing is disabled by default; "
-                    + "enable with system property {1}=true, "
-                    + "or configure permitted URI schemes with {2}",
-                    new Object[] {
-                        destinationUri,
-                        WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY,
-                        ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY
-                    });
+                logRejectedDecoupledDestination(LOG, Level.WARNING, destinationUri);
                 return null;
             }
             Bus bus = inMessage.getExchange().getBus();

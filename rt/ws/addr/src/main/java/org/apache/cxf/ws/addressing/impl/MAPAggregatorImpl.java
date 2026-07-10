@@ -1235,10 +1235,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (ContextUtils.isDecoupledDestinationSchemeAllowed(uri)) {
                 return;
             }
-            final String reason = "Decoupled WS-Addressing ReplyTo (" + uri
-                + ") is not permitted by this server: URI scheme is not allowed. "
-                + "Configure permitted schemes with system property "
-                + ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY;
+            final String reason = ContextUtils.formatDecoupledReplyToSchemeNotPermittedMessage(uri);
             if (isSOAP12(message)) {
                 SoapFault f = new SoapFault(reason, Soap12.getInstance().getSender());
                 f.setSubCode(Names.DESTINATION_UNREACHABLE_QNAME);
@@ -1250,9 +1247,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (ContextUtils.isDecoupledDestinationAllowed(uri)) {
             return;
         }
-        final String reason = "Decoupled WS-Addressing ReplyTo (" + uri
-            + ") is not permitted by this server. Enable with system property "
-            + ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY + "=true";
+        final String reason = ContextUtils.formatDecoupledReplyToNotPermittedMessage(uri);
         if (isSOAP12(message)) {
             SoapFault f = new SoapFault(reason, Soap12.getInstance().getSender());
             f.setSubCode(Names.DESTINATION_UNREACHABLE_QNAME);
@@ -1284,22 +1279,14 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 m.getExchange().setDestination(destination);
                 return;
             }
-            LOG.log(Level.WARNING,
-                "Decoupled pre-approved FaultTo ({0}) is not permitted: URI scheme is not allowed. "
-                + "Fault will be delivered to ReplyTo instead. Configure permitted schemes with {1}",
-                new Object[]{faultToUri, ContextUtils.ALLOWED_DECOUPLED_DEST_SCHEMES_PROPERTY});
+            ContextUtils.logDecoupledFaultToSchemeNotAllowed(LOG, Level.WARNING, faultToUri);
             if (inMAPs.getReplyTo() != null) {
                 maps.setTo(inMAPs.getReplyTo());
             }
             return;
         }
         if (!ContextUtils.isDecoupledDestinationAllowed(faultToUri)) {
-            LOG.log(Level.WARNING,
-                "Decoupled WS-Addressing FaultTo ({0}) is not permitted; "
-                + "fault will be delivered to ReplyTo instead. "
-                + "Enable with system property {1}=true",
-                new Object[]{faultToUri,
-                    ContextUtils.WS_ADDRESSING_DECOUPLED_ENABLED_PROPERTY});
+            ContextUtils.logDecoupledFaultToNotAllowed(LOG, Level.WARNING, faultToUri);
             if (inMAPs.getReplyTo() != null) {
                 maps.setTo(inMAPs.getReplyTo());
             }
