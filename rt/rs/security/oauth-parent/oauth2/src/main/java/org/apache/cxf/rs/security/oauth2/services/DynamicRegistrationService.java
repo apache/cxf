@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import jakarta.ws.rs.Consumes;
@@ -44,6 +45,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.provider.AbstractOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -52,6 +54,7 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @Path("register")
 public class DynamicRegistrationService {
+    private static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
     private static final String DEFAULT_APPLICATION_TYPE = "web";
     private static final Integer DEFAULT_CLIENT_ID_SIZE = 10;
     private ClientRegistrationProvider clientProvider;
@@ -60,6 +63,7 @@ public class DynamicRegistrationService {
     private MessageContext mc;
     private boolean supportRegistrationAccessTokens = true;
     private String userRole;
+    private List<String> allowedClientScopes;
 
     @POST
     @Consumes("application/json")
@@ -328,7 +332,9 @@ public class DynamicRegistrationService {
         // Client Scopes
         String scope = request.getScope();
         if (!StringUtils.isEmpty(scope)) {
-            client.setRegisteredScopes(OAuthUtils.parseScope(scope));
+            List<String> requestedScopes = OAuthUtils.parseScope(scope);
+            validateClientScopes(requestedScopes);
+            client.setRegisteredScopes(requestedScopes);
         }
         // Client Application URI
         String clientUri = request.getClientUri();
@@ -415,6 +421,28 @@ public class DynamicRegistrationService {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public void setAllowedClientScopes(List<String> allowedClientScopes) {
+        this.allowedClientScopes = allowedClientScopes;
+    }
+
+    protected void validateClientScopes(List<String> requestedScopes) {
+        if (requestedScopes == null || requestedScopes.isEmpty()) {
+            return;
+        }
+
+        List<String> allowedScopes = allowedClientScopes;
+        if (allowedScopes == null && clientProvider instanceof AbstractOAuthDataProvider) {
+            allowedScopes = new java.util.ArrayList<>(
+                ((AbstractOAuthDataProvider)clientProvider).getPermissionMap().keySet());
+        }
+
+        if (allowedScopes != null && !new HashSet<>(allowedScopes).containsAll(requestedScopes)) {
+            OAuthError error =
+                new OAuthError(INVALID_CLIENT_METADATA, "Invalid scope metadata");
+            reportInvalidRequestError(error);
+        }
     }
 
     private void reportInvalidRequestError(OAuthError entity) {
