@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 import java.util.Arrays;
 import java.util.Collections;
 
-import jakarta.ws.rs.BadRequestException;
+import javax.ws.rs.BadRequestException;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
