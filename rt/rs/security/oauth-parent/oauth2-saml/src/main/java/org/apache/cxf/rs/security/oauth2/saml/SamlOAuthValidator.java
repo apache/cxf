@@ -58,7 +58,7 @@ public class SamlOAuthValidator {
     }
 
     public void setClientAddress(String value) {
-        issuer = value;
+        clientAddress = value;
     }
 
     public void validate(Message message, SamlAssertionWrapper wrapper) {
