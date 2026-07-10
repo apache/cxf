@@ -109,6 +109,11 @@ under the License.
     <bean id="dynRegServiceWithAt" class="org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService">
       <property name="clientProvider" ref="dataProviderJwt"/>
       <property name="initialAccessToken" value="123456789"/>
+            <property name="allowedClientScopes">
+                <list>
+                    <value>openid</value>
+                </list>
+            </property>
     </bean>
     
     <jaxrs:server id="tokenServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
