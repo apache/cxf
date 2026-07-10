@@ -30,7 +30,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
  * Encapsulation of version-specific WS-Addressing constants.
  */
 public class AddressingConstants {
-    private static final ResourceBundle BUNDLE =
+    static final ResourceBundle BUNDLE =
         BundleUtils.getBundle(AddressingConstants.class);
 
 
