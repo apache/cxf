@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.https;
 
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -530,5 +531,44 @@ public final class SSLUtils {
             return session.getPeerCertificateChain();
         }
     };
+
+    /**
+     * Applies the given named groups to {@code SSLParameters} via reflection.
+     * {@code SSLParameters.setNamedGroups()} requires JDK 20+; this method
+     * silently skips the call on older JDKs.
+     */
+    public static void applyNamedGroups(SSLParameters params, List<String> namedGroups) {
+        if (namedGroups == null || namedGroups.isEmpty()) {
+            return;
+        }
+        try {
+            Method m = SSLParameters.class.getMethod("setNamedGroups", String[].class);
+            m.invoke(params, (Object) namedGroups.toArray(new String[0]));
+        } catch (NoSuchMethodException e) {
+            LOG.fine("SSLParameters.setNamedGroups() not available on this JDK; namedGroups ignored");
+        } catch (ReflectiveOperationException e) {
+            LOG.warning("Failed to apply TLS namedGroups: " + e.getMessage());
+        }
+    }
+
+    // Reflection-based BC JSSE path: avoids a compile-time dependency on bctls-jdk18on.
+    public static void applyNamedGroupsBC(SSLEngine sslEngine, List<String> namedGroups) {
+        if (namedGroups == null || namedGroups.isEmpty()) {
+            return;
+        }
+        try {
+            Class<?> bcEngineClass = Class.forName("org.bouncycastle.jsse.BCSSLEngine");
+            if (!bcEngineClass.isInstance(sslEngine)) {
+                return;
+            }
+            Class<?> bcParamsClass = Class.forName("org.bouncycastle.jsse.BCSSLParameters");
+            Object bcParams = bcEngineClass.getMethod("getParameters").invoke(sslEngine);
+            bcParamsClass.getMethod("setNamedGroups", String[].class)
+                .invoke(bcParams, (Object) namedGroups.toArray(new String[0]));
+            bcEngineClass.getMethod("setParameters", bcParamsClass).invoke(sslEngine, bcParams);
+        } catch (ReflectiveOperationException e) {
+            LOG.fine("Could not apply named groups via BC JSSE engine: " + e.getMessage());
+        }
+    }
 
 }

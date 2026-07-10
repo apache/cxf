@@ -40,6 +40,8 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.RequestDispatcher;
@@ -731,6 +733,19 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                 public void checkKeyStore() {
                     //we'll handle this later
                 }
+                @Override
+                public SSLParameters customize(SSLParameters sslParams) {
+                    sslParams = super.customize(sslParams);
+                    org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(
+                        sslParams, tlsServerParameters.getNamedGroups());
+                    return sslParams;
+                }
+                @Override
+                public void customize(SSLEngine sslEngine) {
+                    super.customize(sslEngine);
+                    org.apache.cxf.transport.https.SSLUtils.applyNamedGroupsBC(
+                        sslEngine, tlsServerParameters.getNamedGroups());
+                }
             };
             decorateCXFJettySslSocketConnector(sslcf);
         }
@@ -857,7 +872,21 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
     protected SSLContext createSSLContext(SslContextFactory scf) throws Exception  {
         // The full SSL context is provided by SSLContextServerParameters
         if (tlsServerParameters instanceof SSLContextServerParameters sslContextServerParameters) {
-            return sslContextServerParameters.getSslContext();
+            SSLContext context = sslContextServerParameters.getSslContext();
+            // Without setting included cipher suites here, Jetty's default
+            // SslContextFactory filter drops suite names it does not
+            // recognise (e.g. BouncyCastle JSSE names), causing
+            // handshake_failure even if the SSLContext supports them.
+            String[] supported =
+                SSLUtils.getServerSupportedCipherSuites(context);
+            String[] included = SSLUtils.getCiphersuitesToInclude(
+                tlsServerParameters.getCipherSuites(),
+                tlsServerParameters.getCipherSuitesFilter(),
+                context.getServerSocketFactory().getDefaultCipherSuites(),
+                supported,
+                LOG);
+            scf.setIncludeCipherSuites(included);
+            return context;
         }
 
         String proto = tlsServerParameters.getSecureSocketProtocol() == null

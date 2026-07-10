@@ -383,6 +383,20 @@
            <xs:element name="includeProtocol" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:complexType name="NamedGroups">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds an ordered list of TLS named groups (key-exchange groups) to offer
+        during the handshake.  Examples: "X25519MLKEM768" (PQC hybrid, JDK 27+ / BC JSSE 1.81+),
+        "x25519", "secp256r1".  When set, the list is applied via SSLParameters.setNamedGroups()
+        (requires JDK 20+; silently ignored on older JDKs).
+        </xs:documentation>
+      </xs:annotation>
+        <xs:sequence>
+           <xs:element name="namedGroup" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
     <xs:complexType name="SecureRandomParameters">
       <xs:annotation>
@@ -509,6 +523,15 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains the SNI server names.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="namedGroups" type="tns:NamedGroups" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the ordered list of TLS named groups to offer during
+                the handshake (e.g. "X25519MLKEM768", "x25519", "secp256r1").
+                Requires JDK 20+; silently ignored on older JDKs.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
@@ -648,6 +671,15 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains the Certificate Alias.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="namedGroups" type="tns:NamedGroups" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the ordered list of TLS named groups to offer during
+                the handshake (e.g. "X25519MLKEM768", "x25519", "secp256r1").
+                Requires JDK 20+; silently ignored on older JDKs.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>

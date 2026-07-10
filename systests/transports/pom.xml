@@ -111,6 +111,23 @@
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
+                    <execution>
+                        <!-- Runs PQCTLSTest with jdk.tls.namedGroups including X25519MLKEM768,
+                             overriding the parent pom's BouncyCastle workaround that restricts
+                             named groups to classical-only. Requires JDK 27+ (JEP 527). -->
+                        <id>pqc-tls-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/pqc/PQCTLSTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <jdk.tls.namedGroups>X25519MLKEM768,x25519,secp256r1,secp384r1,secp521r1</jdk.tls.namedGroups>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -244,6 +261,18 @@
             <version>${project.version}</version>
             <scope>test</scope>
             <classifier>keys</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${cxf.bcprov.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk18on</artifactId>
+            <version>${cxf.bcprov.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
