@@ -44,6 +44,7 @@ import javax.crypto.CipherOutputStream;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -334,9 +335,14 @@ public class CachedOutputStream extends OutputStream {
             }
             throw new IOException("Unknown format of currentStream");
         }
+
+        if (totalLength > Integer.MAX_VALUE) {
+            throw new IOException("The total limit of " + Integer.MAX_VALUE + " bytes exceeded, data is too large");
+        }
+
         // read the file
         try (InputStream fin = createInputStream(tempFile)) {
-            return IOUtils.readBytesFromStream(fin);
+            return IOUtils.readBytesFromStream(fin, CastUtils.cast(maxSize));
         }
     }
 

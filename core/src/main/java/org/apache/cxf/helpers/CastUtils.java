@@ -92,5 +92,13 @@ public final class CastUtils {
         return (Map.Entry<T, U>)p;
     }
 
-
+    public static int cast(long value) {
+        if (value > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        } else if (value < Integer.MIN_VALUE) {
+            return Integer.MIN_VALUE;
+        } else {
+            return (int) value;
+        }
+    }
 }
