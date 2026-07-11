@@ -34,10 +34,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.io.Transferable;
 
 public final class IOUtils {
+    public static final int DEFAULT_BINARY_MAX_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.binary-max-size", 1073741824 /* 1Gb */);
+
     public static final Charset UTF8_CHARSET = java.nio.charset.StandardCharsets.UTF_8;
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
@@ -176,7 +180,7 @@ public final class IOUtils {
         if (output instanceof CopyingOutputStream) {
             return ((CopyingOutputStream)output).copyFrom(input);
         }
-        return copy(input, output, DEFAULT_BUFFER_SIZE);
+        return copy(input, output, DEFAULT_BUFFER_SIZE, -1);
     }
 
     public static int copyAndCloseInput(final InputStream input,
@@ -189,7 +193,7 @@ public final class IOUtils {
     public static int copyAndCloseInput(final InputStream input,
             final OutputStream output, int bufferSize) throws IOException {
         try (InputStream in = input) {
-            return copy(in, output, bufferSize);
+            return copy(in, output, bufferSize, -1);
         }
     }
 
@@ -206,9 +210,13 @@ public final class IOUtils {
             copy(r, output, bufferSize);
         }
     }
+    
+    public static int copy(final InputStream input, final OutputStream output, int bufferSize) throws IOException {
+        return copy(input, output, bufferSize, -1);
+    }
 
     public static int copy(final InputStream input, final OutputStream output,
-            int bufferSize) throws IOException {
+            int bufferSize, int maxSize) throws IOException {
         Objects.requireNonNull(input, "The inputStream is required but null value was provided");
         Objects.requireNonNull(output, "The outputStream is required but null value was provided");
         int avail = input.available();
@@ -228,6 +236,10 @@ public final class IOUtils {
             output.write(buffer, 0, n);
             total += n;
             n = input.read(buffer);
+
+            if (maxSize > 0 /* -1 sets to unlimited */ && total > maxSize) {
+                throw new IOException("The total limit of " + maxSize + " bytes exceeded, data is too large");
+            }
         }
         return total;
     }
@@ -426,15 +438,23 @@ public final class IOUtils {
             n = input.read(buffer, 0, n);
         }
     }
-
+    
+    /**
+     * @deprecated use {@link #readBytesFromStream(InputStream, int)}
+     */
+    @Deprecated(forRemoval = true)
     public static byte[] readBytesFromStream(InputStream in) throws IOException {
+        return readBytesFromStream(in, -1);
+    }
+
+    public static byte[] readBytesFromStream(InputStream in, int maxSize) throws IOException {
         Objects.requireNonNull(in, "The inputStream is required but null value was provided");
         int i = in.available();
         if (i < DEFAULT_BUFFER_SIZE) {
             i = DEFAULT_BUFFER_SIZE;
         }
         try (InputStream input = in; ByteArrayOutputStream bos = new ByteArrayOutputStream(i)) {
-            copy(input, bos);
+            copy(input, bos, DEFAULT_BUFFER_SIZE, maxSize);
             return bos.toByteArray();
         }
     }

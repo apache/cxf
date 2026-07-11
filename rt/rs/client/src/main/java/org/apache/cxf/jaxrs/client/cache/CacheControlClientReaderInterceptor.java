@@ -49,6 +49,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     @Context
     private UriInfo uriInfo;
     private boolean cacheResponseInputStream;
+    private int maxSize = IOUtils.DEFAULT_BINARY_MAX_SIZE;
 
     public CacheControlClientReaderInterceptor(final Cache<Key, Entry> cache) {
         this.cache = cache;
@@ -61,6 +62,10 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     public CacheControlClientReaderInterceptor setCache(final Cache<Key, Entry> c) {
         this.cache = c;
         return this;
+    }
+
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
     }
 
     @Override
@@ -97,7 +102,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         final boolean validCacheControl = isCacheControlValid(context, cacheControl);
         if (validCacheControl && cacheResponseInputStream) {
             // if Cache-Control is set and the stream needs to be cached then do it
-            cachedBytes = IOUtils.readBytesFromStream(context.getInputStream());
+            cachedBytes = IOUtils.readBytesFromStream(context.getInputStream(), maxSize);
             context.setInputStream(new ByteArrayInputStream(cachedBytes));
         }
         // Read the stream and get the actual entity
@@ -117,7 +122,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         } else if (responseEntity instanceof InputStream) {
             // read the stream, cache it, the cached bytes will be returned immediately
             // when a client cache will return them
-            byte[] bytes = IOUtils.readBytesFromStream((InputStream)responseEntity);
+            byte[] bytes = IOUtils.readBytesFromStream((InputStream)responseEntity, maxSize);
             ser = new BytesEntity(bytes, true);
             responseEntity = new ByteArrayInputStream(bytes);
         }
