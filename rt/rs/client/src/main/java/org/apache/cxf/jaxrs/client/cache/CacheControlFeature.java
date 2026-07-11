@@ -39,7 +39,7 @@ import jakarta.annotation.PreDestroy;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
-
+import org.apache.cxf.helpers.IOUtils;
 
 @Provider
 public class CacheControlFeature implements Feature, Closeable {
@@ -47,6 +47,7 @@ public class CacheControlFeature implements Feature, Closeable {
     private CacheManager manager;
     private Cache<Key, Entry> cache;
     private boolean cacheResponseInputStream;
+    private int maxSize = IOUtils.DEFAULT_BINARY_MAX_SIZE;
 
     @Override
     public boolean configure(final FeatureContext context) {
@@ -55,8 +56,13 @@ public class CacheControlFeature implements Feature, Closeable {
         context.register(new CacheControlClientRequestFilter(entryCache));
         CacheControlClientReaderInterceptor reader = new CacheControlClientReaderInterceptor(entryCache);
         reader.setCacheResponseInputStream(cacheResponseInputStream);
+        reader.setMaxSize(maxSize);
         context.register(reader);
         return true;
+    }
+
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
     }
 
     @PreDestroy // TODO: check it is called
