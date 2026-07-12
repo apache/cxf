@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import javax.ws.rs.BadRequestException;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;

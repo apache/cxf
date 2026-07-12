@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.oauth2.grants.jwt;
 import java.lang.reflect.Field;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
