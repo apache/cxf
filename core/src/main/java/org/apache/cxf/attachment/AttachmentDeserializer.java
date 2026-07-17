@@ -69,6 +69,7 @@ public class AttachmentDeserializer {
      * The maximum number of attachments permitted in a message. The default is 50.
      */
     public static final String ATTACHMENT_MAX_COUNT = "attachment-max-count";
+    public static final int DEFAULT_ATTACHMENT_MAX_COUNT = 50;
 
     /**
      * The maximum number of attachment headers permitted in a message. The default is 500.
@@ -134,7 +135,7 @@ public class AttachmentDeserializer {
         initializeRootMessage();
 
         Object maxCountProperty = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_COUNT);
-        int maxCount = 50;
+        int maxCount = DEFAULT_ATTACHMENT_MAX_COUNT;
         if (maxCountProperty != null) {
             if (maxCountProperty instanceof Integer) {
                 maxCount = (Integer)maxCountProperty;
