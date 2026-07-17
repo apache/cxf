@@ -73,6 +73,14 @@ public class EntityPartProvider extends AbstractConfigurableProvider
     private String attachmentDir;
     private String attachmentThreshold;
     private String attachmentMaxSize;
+    
+    void setProviders(Providers providers) {
+        this.providers = providers;
+    }
+
+    void setMessageContext(MessageContext context) {
+        this.mc = context;
+    }
 
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
