@@ -53,6 +53,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
     @Produces({"application/json", "application/jwt" })
     public Response getUserInfo() {
         OAuthContext oauth = OAuthContextUtils.getContext(mc);
+        List<String> scopes = OAuthUtils.convertPermissionsToScopeList(oauth.getPermissions());
 
         // Check the access token has the "openid" scope
         if (!oauth.getPermissions().stream()
@@ -64,12 +65,12 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         UserInfo userInfo = null;
         if (userInfoProvider != null) {
             userInfo = userInfoProvider.getUserInfo(oauth.getClientId(), oauth.getSubject(),
-                OAuthUtils.convertPermissionsToScopeList(oauth.getPermissions()));
+                scopes);
         } else if (oauth.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject oidcUserSubject = (OidcUserSubject)oauth.getSubject();
             userInfo = oidcUserSubject.getUserInfo();
             if (userInfo == null) {
-                userInfo = createFromIdToken(oidcUserSubject.getIdToken());
+                userInfo = createFromIdToken(oidcUserSubject.getIdToken(), scopes);
             }
         }
         if (userInfo == null) {
@@ -98,6 +99,10 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
     }
 
     protected UserInfo createFromIdToken(IdToken idToken) {
+        return createFromIdToken(idToken, Collections.emptyList());
+    }
+
+    protected UserInfo createFromIdToken(IdToken idToken, List<String> scopes) {
         UserInfo userInfo = new UserInfo();
         userInfo.setSubject(idToken.getSubject());
 
@@ -105,28 +110,31 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             userInfo.setIssuer(idToken.getIssuer());
             userInfo.setAudience(idToken.getAudience());
         }
-        if (idToken.getPreferredUserName() != null) {
-            userInfo.setPreferredUserName(idToken.getPreferredUserName());
+        if (scopes.contains(OidcUtils.PROFILE_SCOPE)) {
+            if (idToken.getPreferredUserName() != null) {
+                userInfo.setPreferredUserName(idToken.getPreferredUserName());
+            }
+            if (idToken.getName() != null) {
+                userInfo.setName(idToken.getName());
+            }
+            if (idToken.getGivenName() != null) {
+                userInfo.setGivenName(idToken.getGivenName());
+            }
+            if (idToken.getFamilyName() != null) {
+                userInfo.setFamilyName(idToken.getFamilyName());
+            }
+            if (idToken.getNickName() != null) {
+                userInfo.setNickName(idToken.getNickName());
+            }
         }
-        if (idToken.getName() != null) {
-            userInfo.setName(idToken.getName());
-        }
-        if (idToken.getGivenName() != null) {
-            userInfo.setGivenName(idToken.getGivenName());
-        }
-        if (idToken.getFamilyName() != null) {
-            userInfo.setFamilyName(idToken.getFamilyName());
-        }
-        if (idToken.getEmail() != null) {
+        if (scopes.contains(OidcUtils.EMAIL_SCOPE) && idToken.getEmail() != null) {
             userInfo.setEmail(idToken.getEmail());
-        }
-        if (idToken.getNickName() != null) {
-            userInfo.setNickName(idToken.getNickName());
         }
 
         if (additionalClaims != null && !additionalClaims.isEmpty()) {
             for (String additionalClaim : additionalClaims) {
-                if (idToken.containsProperty(additionalClaim)) {
+                if (idToken.containsProperty(additionalClaim)
+                    && isClaimExposedByScope(additionalClaim, scopes)) {
                     userInfo.setClaim(additionalClaim, idToken.getClaim(additionalClaim));
                 }
             }
@@ -134,6 +142,22 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
 
         //etc
         return userInfo;
+    }
+
+    private boolean isClaimExposedByScope(String claimName, List<String> scopes) {
+        if (OidcUtils.PROFILE_CLAIMS.contains(claimName)) {
+            return scopes.contains(OidcUtils.PROFILE_SCOPE);
+        }
+        if (OidcUtils.EMAIL_CLAIMS.contains(claimName)) {
+            return scopes.contains(OidcUtils.EMAIL_SCOPE);
+        }
+        if (OidcUtils.ADDRESS_CLAIMS.contains(claimName)) {
+            return scopes.contains(OidcUtils.ADDRESS_SCOPE);
+        }
+        if (OidcUtils.PHONE_CLAIMS.contains(claimName)) {
+            return scopes.contains(OidcUtils.PHONE_SCOPE);
+        }
+        return true;
     }
 
     public void setUserInfoProvider(UserInfoProvider userInfoProvider) {
