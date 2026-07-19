@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import jakarta.ws.rs.BadRequestException;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -78,6 +79,82 @@ public class DynamicRegistrationServiceTest {
         service.applyClientRegistration(request, client);
 
         assertEquals(Collections.singletonList("openid"), client.getRegisteredScopes());
+    }
+
+    @Test
+    public void testAcceptsAllowedRedirectUrlsWebApp() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        ClientRegistration request = new ClientRegistration();
+        request.setScope("read write");
+        request.setRedirectUris(List.of("https://localhost", "http://localhost"));
+
+        Client client = createClient();
+        service.applyClientRegistration(request, client);
+
+        assertEquals(Arrays.asList("https://localhost", "http://localhost"), client.getRedirectUris());
+    }
+
+    @Test
+    public void testRejectsNotAllowedRedirectUrlsWebApp() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        final List<String> schemes = List.of("http", "https");
+        for (String scheme: schemes) {
+            ClientRegistration request = new ClientRegistration();
+            request.setScope("read write");
+            request.setRedirectUris(List.of(scheme + "://localhost"));
+    
+            Client client = createClient();
+            client.setAllowedGrantTypes(Collections.singletonList(OAuthConstants.IMPLICIT_GRANT));
+            assertThrows(BadRequestException.class, () -> service.applyClientRegistration(request, client));
+        }
+    }
+
+    @Test
+    public void testAcceptsAllowedRedirectUrlsNativeApp() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        final List<String> hosts = List.of("localhost", "127.0.0.1", "[::1]");
+        for (String host: hosts) {
+            ClientRegistration request = new ClientRegistration();
+            request.setScope("read write");
+            request.setRedirectUris(List.of("http://" + host));
+            request.setApplicationType("native");
+
+            Client client = createClient();
+            service.applyClientRegistration(request, client);
+
+            assertEquals(Arrays.asList("http://" + host), client.getRedirectUris());
+        }
+    }
+
+    @Test
+    public void testRejectsNotAllowedRedirectUrlsNativeApp() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        ClientRegistration request = new ClientRegistration();
+        request.setScope("read write");
+        request.setRedirectUris(List.of("http://test"));
+        request.setApplicationType("native");
+
+        Client client = createClient();
+        assertThrows(BadRequestException.class, () -> service.applyClientRegistration(request, client));
+    }
+
+    @Test
+    public void testRejectsNotAllowedRedirectUrls() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        final List<String> uris = List.of("custom://test", "//test", "");
+        for (String uri: uris) {
+            ClientRegistration request = new ClientRegistration();
+            request.setScope("read write");
+            request.setRedirectUris(List.of(uri));
+    
+            Client client = createClient();
+            assertThrows(BadRequestException.class, () -> service.applyClientRegistration(request, client));
+        }
     }
 
     private static Client createClient() {
