@@ -43,7 +43,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -390,16 +389,16 @@ public class DynamicRegistrationService {
         }
         final String host = parsedUri.getHost().toLowerCase();
         final String scheme = parsedUri.getScheme().toLowerCase();
-        if (!URIResolver.getAllowedSchemes().contains(scheme)) {
+        if (!scheme.equals("http") && !scheme.equals("https")) {
             reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
                 "Redirect URI scheme is not allowed: " + scheme
-                    + ". Allowed schemes: " + URIResolver.getAllowedSchemes()));
+                    + ". Allowed schemes: http, https"));
         }
 
         // Kind of the application. The default, if omitted, is web. The defined values are native or web.
         if (appType == null || appType.isBlank() || appType.equalsIgnoreCase(WEB_APPLICATION_TYPE)) {
             if (grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)) {
-                if (!"https".equalsIgnoreCase(scheme)) {
+                if (!"https".equals(scheme)) {
                     reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
                         "Unsupported redirect URI scheme"));
                 } else if ("localhost".equals(host)) {
@@ -408,7 +407,7 @@ public class DynamicRegistrationService {
                 }
             }
         } else if (appType.equalsIgnoreCase(NATIVE_APPLICATION_TYPE)) {
-            if ("http".equalsIgnoreCase(scheme) && !LOOPBACK_HOSTS.contains(host)) {
+            if ("http".equals(scheme) && !LOOPBACK_HOSTS.contains(host)) {
                 reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
                     "Unsupported redirect URI hostname for scheme"));
             }

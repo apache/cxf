@@ -146,7 +146,7 @@ public class DynamicRegistrationServiceTest {
     public void testRejectsNotAllowedRedirectUrls() {
         TestDynamicRegistrationService service = new TestDynamicRegistrationService();
 
-        final List<String> uris = List.of("custom://test", "//test", "");
+        final List<String> uris = List.of("custom://test", "//test", "http:/");
         for (String uri: uris) {
             ClientRegistration request = new ClientRegistration();
             request.setScope("read write");
