@@ -118,6 +118,9 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     public X509Certificate getX509Certificate() {
         return cert;
     }
+    public PublicKey getPublicKey() {
+        return key;
+    }
     @Override
     public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
         Signature sig = CryptoUtils.getVerificationSignature(key,
