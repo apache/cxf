@@ -174,7 +174,7 @@
         <cxf.json.bind-api.version>3.0.2</cxf.json.bind-api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.13.2</cxf.junit.version>
-        <cxf.junit6.version>6.1.1</cxf.junit6.version>
+        <cxf.junit6.version>6.1.2</cxf.junit6.version>
         <cxf.kerby.version>2.1.2</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.5</cxf.ldapsdk.version>
         <cxf.littleproxy.version>2.8.0</cxf.littleproxy.version>
