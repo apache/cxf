@@ -56,7 +56,7 @@ under the License.
                 <sec:trustManagers>
                     <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
-                <sec:clientAuthentication want="false" required="false"/>
+                <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
             <httpj:sessionSupport>true</httpj:sessionSupport>
         </httpj:engine>

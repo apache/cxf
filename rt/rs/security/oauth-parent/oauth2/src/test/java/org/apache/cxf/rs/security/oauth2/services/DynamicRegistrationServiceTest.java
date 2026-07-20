@@ -18,20 +18,29 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.ws.rs.BadRequestException;
+import javax.security.auth.x500.X500Principal;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.SecurityContext;
+
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DynamicRegistrationServiceTest {
 
@@ -81,6 +90,95 @@ public class DynamicRegistrationServiceTest {
         assertEquals(Collections.singletonList("openid"), client.getRegisteredScopes());
     }
 
+    @Test
+    public void testRejectsTlsClientAuthWithoutTlsCertificate() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+        service.setEnforceTlsClientAuthCertificateBinding(true);
+        service.setMessageContext(createMessageContext("", null));
+
+        ClientRegistration request = new ClientRegistration();
+        request.setGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
+        request.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
+        request.setProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
+            "CN=client,OU=Test,O=Apache,C=US");
+
+        BadRequestException ex = assertThrows(BadRequestException.class,
+            () -> service.createClient(request));
+
+        assertInvalidClientMetadata(ex);
+    }
+
+    @Test
+    public void testRejectsTlsClientAuthWhenSubjectDnDoesNotMatchCertificate() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+        service.setEnforceTlsClientAuthCertificateBinding(true);
+        X509Certificate cert = createCertificate(
+            "CN=actual,OU=Test,O=Apache,C=US",
+            "CN=issuer,OU=Test,O=Apache,C=US");
+        service.setMessageContext(createMessageContext("", cert));
+
+        ClientRegistration request = new ClientRegistration();
+        request.setGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
+        request.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
+        request.setProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN,
+            "CN=expected,OU=Test,O=Apache,C=US");
+
+        BadRequestException ex = assertThrows(BadRequestException.class,
+            () -> service.createClient(request));
+
+        assertInvalidClientMetadata(ex);
+    }
+
+    @Test
+    public void testAcceptsTlsClientAuthWhenSubjectDnMatchesCertificate() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+        service.setEnforceTlsClientAuthCertificateBinding(true);
+        String subjectDn = "CN=client,OU=Test,O=Apache,C=US";
+        X509Certificate cert = createCertificate(subjectDn, "CN=issuer,OU=Test,O=Apache,C=US");
+        service.setMessageContext(createMessageContext("", cert));
+
+        ClientRegistration request = new ClientRegistration();
+        request.setGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
+        request.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
+        request.setProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, subjectDn);
+
+        Client client = service.createClient(request);
+        assertEquals(subjectDn, client.getProperties().get(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN));
+        assertEquals(1, client.getApplicationCertificates().size());
+    }
+
+    private static void assertInvalidClientMetadata(BadRequestException ex) {
+        assertNotNull(ex.getResponse());
+        OAuthError error = (OAuthError)ex.getResponse().getEntity();
+        assertNotNull(error);
+        assertEquals("invalid_client_metadata", error.getError());
+    }
+
+    private static MessageContext createMessageContext(String authScheme, X509Certificate cert) {
+        SecurityContext sc = mock(SecurityContext.class);
+        when(sc.getAuthenticationScheme()).thenReturn(authScheme);
+
+        MessageContext mc = mock(MessageContext.class);
+        when(mc.getSecurityContext()).thenReturn(sc);
+        if (cert != null) {
+            TLSSessionInfo tlsInfo = new TLSSessionInfo("TLS_FAKE", null, new Certificate[] {cert});
+            when(mc.get(TLSSessionInfo.class.getName())).thenReturn(tlsInfo);
+        }
+        return mc;
+    }
+
+    private static X509Certificate createCertificate(String subjectDn, String issuerDn) {
+        X509Certificate cert = mock(X509Certificate.class);
+        when(cert.getSubjectX500Principal()).thenReturn(new X500Principal(subjectDn));
+        when(cert.getIssuerX500Principal()).thenReturn(new X500Principal(issuerDn));
+        try {
+            when(cert.getEncoded()).thenReturn(new byte[] {1, 2, 3});
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return cert;
+    }
+
     private static Client createClient() {
         Client client = new Client("client", "secret", true);
         client.setAllowedGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
@@ -90,6 +188,10 @@ public class DynamicRegistrationServiceTest {
     private static final class TestDynamicRegistrationService extends DynamicRegistrationService {
         void applyClientRegistration(ClientRegistration request, Client client) {
             fromClientRegistrationToClient(request, client);
+        }
+
+        Client createClient(ClientRegistration request) {
+            return createNewClient(request);
         }
     }
 }
