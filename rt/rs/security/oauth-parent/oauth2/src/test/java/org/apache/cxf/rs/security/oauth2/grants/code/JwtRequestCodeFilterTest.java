@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import jakarta.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
