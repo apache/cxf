@@ -89,4 +89,4 @@ jobs:
     #   make release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e # v4.35.3
+      uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e97 # v4.35.3
