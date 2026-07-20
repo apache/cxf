@@ -21,6 +21,8 @@ package org.apache.cxf.ws.policy.mtom;
 
 import java.util.Collection;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -39,7 +41,14 @@ public class MTOMPolicyInterceptor extends AbstractPhaseInterceptor<Message> {
 
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(MetadataConstants.MTOM_ASSERTION_QNAME);
+            assertAssertion(message, aim, MetadataConstants.MTOM_ASSERTION_QNAME);
+            assertAssertion(message, aim, MetadataConstants.MTOM11_ASSERTION_QNAME);
+        }
+    }
+
+    private static void assertAssertion(Message message, AssertionInfoMap aim, QName type) {
+        Collection<AssertionInfo> ais = aim.get(type);
+        if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (MessageUtils.isRequestor(message)) {
                     //just turn on MTOM
