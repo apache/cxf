@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.QName;
 
@@ -62,7 +63,11 @@ public class EndpointAPITest {
 
     @After
     public void tearDown() {
-        server.shutdownNow();
+        try {
+            server.shutdown().get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            server.shutdownNow();
+        }
         server = null;
     }
 
