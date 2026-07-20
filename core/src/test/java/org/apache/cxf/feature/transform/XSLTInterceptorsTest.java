@@ -144,6 +144,40 @@ public class XSLTInterceptorsTest {
         Assert.assertTrue("Message was not transformed", checkTransformedXML(doc));
     }
 
+    @Test
+    public void inStreamWithEncodingTest() throws Exception {
+        InputStream iso88591IS = ClassLoaderUtils
+            .getResourceAsStream("message-iso-8859-1.xml",
+                                 this.getClass());
+        message.setContent(InputStream.class, iso88591IS);
+        message.put(Message.ENCODING, "ISO-8859-1");
+        inInterceptor.handleMessage(message);
+        InputStream transformedIS =
+            message.getContent(InputStream.class);
+        Document doc = StaxUtils.read(transformedIS);
+        Assert.assertTrue("Message was not transformed",
+            checkTransformedXML(doc));
+    }
+
+    @Test
+    public void outStreamWithEncodingTest() throws Exception {
+        CachedOutputStream cos = new CachedOutputStream();
+        cos.holdTempFile();
+        message.setContent(OutputStream.class, cos);
+        message.put(Message.ENCODING, "ISO-8859-1");
+        outInterceptor.handleMessage(message);
+        InputStream iso88591IS = ClassLoaderUtils
+            .getResourceAsStream("message-iso-8859-1.xml",
+                                 this.getClass());
+        OutputStream os = message.getContent(OutputStream.class);
+        IOUtils.copy(iso88591IS, os);
+        os.close();
+        cos.releaseTempFileHold();
+        Document doc = StaxUtils.read(cos.getInputStream());
+        Assert.assertTrue("Message was not transformed",
+            checkTransformedXML(doc));
+    }
+
     private boolean checkTransformedXML(Document doc) {
         NodeList list = doc.getDocumentElement()
             .getElementsByTagNameNS("http://customerservice.example.com/", "getCustomersByName1");
