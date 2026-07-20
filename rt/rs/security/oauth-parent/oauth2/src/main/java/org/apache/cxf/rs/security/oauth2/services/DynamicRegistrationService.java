@@ -19,9 +19,12 @@
 package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.security.auth.x500.X500Principal;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -39,6 +42,7 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -52,6 +56,7 @@ import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 
 @Path("register")
 public class DynamicRegistrationService {
@@ -66,6 +71,7 @@ public class DynamicRegistrationService {
     private int clientIdSizeInBytes = DEFAULT_CLIENT_ID_SIZE;
     private MessageContext mc;
     private boolean supportRegistrationAccessTokens = true;
+    private boolean enforceTlsClientAuthCertificateBinding = true;
     private String userRole;
     private List<String> allowedClientScopes;
 
@@ -278,6 +284,8 @@ public class DynamicRegistrationService {
 
         newClient.setTokenEndpointAuthMethod(tokenEndpointAuthMethod);
         if (OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS.equals(tokenEndpointAuthMethod)) {
+            X509Certificate cert = enforceTlsClientAuthCertificateBinding
+                ? validateTlsClientAuthCertificateBinding(request) : getTlsClientCertificate();
             String subjectDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN);
             if (subjectDn != null) {
                 newClient.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, subjectDn);
@@ -285,6 +293,15 @@ public class DynamicRegistrationService {
             String issuerDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN);
             if (issuerDn != null) {
                 newClient.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN, issuerDn);
+            }
+            if (cert != null) {
+                try {
+                    newClient.getApplicationCertificates().add(Base64Utility.encode(cert.getEncoded()));
+                } catch (Exception ex) {
+                    OAuthError error =
+                        new OAuthError(INVALID_CLIENT_METADATA, "Unable to register TLS client certificate");
+                    reportInvalidRequestError(error);
+                }
             }
         }
         // Client Registration Time
@@ -300,6 +317,44 @@ public class DynamicRegistrationService {
 
         newClient.setRegisteredDynamically(true);
         return newClient;
+    }
+
+    protected X509Certificate getTlsClientCertificate() {
+        TLSSessionInfo tlsSessionInfo = (TLSSessionInfo)mc.get(TLSSessionInfo.class.getName());
+        return tlsSessionInfo == null ? null : OAuthUtils.getRootTLSCertificate(tlsSessionInfo);
+    }
+
+    protected X509Certificate validateTlsClientAuthCertificateBinding(ClientRegistration request) {
+        X509Certificate cert = getTlsClientCertificate();
+        if (cert == null) {
+            OAuthError error =
+                new OAuthError(INVALID_CLIENT_METADATA, "TLS client certificate is required");
+            reportInvalidRequestError(error);
+        }
+
+        String subjectDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN);
+        if (subjectDn != null
+            && !isSameDistinguishedName(subjectDn, OAuthUtils.getSubjectDnFromTLSCertificates(cert))) {
+            OAuthError error =
+                new OAuthError(INVALID_CLIENT_METADATA, "Invalid tls_client_auth_subject_dn metadata");
+            reportInvalidRequestError(error);
+        }
+        String issuerDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN);
+        if (issuerDn != null
+            && !isSameDistinguishedName(issuerDn, OAuthUtils.getIssuerDnFromTLSCertificates(cert))) {
+            OAuthError error =
+                new OAuthError(INVALID_CLIENT_METADATA, "Invalid tls_client_auth_root_dn metadata");
+            reportInvalidRequestError(error);
+        }
+        return cert;
+    }
+
+    private boolean isSameDistinguishedName(String expectedDn, String actualDn) {
+        try {
+            return new X500Principal(expectedDn).equals(new X500Principal(actualDn));
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 
     protected void fromClientRegistrationToClient(ClientRegistration request, Client client) {
@@ -457,6 +512,10 @@ public class DynamicRegistrationService {
 
     public void setSupportRegistrationAccessTokens(boolean supportRegistrationAccessTokens) {
         this.supportRegistrationAccessTokens = supportRegistrationAccessTokens;
+    }
+
+    public void setEnforceTlsClientAuthCertificateBinding(boolean enforceTlsClientAuthCertificateBinding) {
+        this.enforceTlsClientAuthCertificateBinding = enforceTlsClientAuthCertificateBinding;
     }
 
     public void setUserRole(String userRole) {

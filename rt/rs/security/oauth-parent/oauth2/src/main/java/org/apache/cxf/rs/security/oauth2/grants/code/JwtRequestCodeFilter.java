@@ -19,8 +19,11 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -47,6 +50,17 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
     private static final String REQUEST_URI_CONTENT_TYPE = "application/oauth-authz-req+jwt";
     private static final String REQUEST_PARAM = "request";
     private static final String REQUEST_URI_PARAM = "request_uri";
+    /**
+     * Security-sensitive parameters that must be sourced from the outer HTTP
+     * request per RFC 9101 §2.2.  Any JWT claim whose key appears in this set
+     * is silently ignored; the outer request value is always authoritative.
+     */
+    private static final Set<String> OUTER_REQUEST_ONLY_PARAMS = new HashSet<>(Arrays.asList(
+            OAuthConstants.AUTHORIZATION_CODE_CHALLENGE,
+            OAuthConstants.AUTHORIZATION_CODE_CHALLENGE_METHOD,
+            OAuthConstants.NONCE,
+            OAuthConstants.STATE
+    ));
 
     private boolean verifyWithClientCertificates;
     private String issuer;
@@ -104,6 +118,11 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
                 } else if (value instanceof List) {
                     List<Object> list = CastUtils.cast((List<?>)value);
                     value = jsonHandler.toJson(list);
+                }
+                // RFC 9101 §2.2: security-sensitive parameters must be sourced
+                // from the outer request; JWT claims for these keys are ignored.
+                if (OUTER_REQUEST_ONLY_PARAMS.contains(key)) {
+                    continue;
                 }
                 newParams.putSingle(key, value.toString());
             }

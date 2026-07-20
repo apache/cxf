@@ -36,6 +36,9 @@
     <http:conduit name="https://localhost.*">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="JKS" password="password" resource="keys/Morpit.jks"/>
+            </sec:keyManagers>
             <sec:trustManagers>
                 <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
