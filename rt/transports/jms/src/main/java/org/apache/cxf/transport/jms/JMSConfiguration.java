@@ -87,6 +87,7 @@ public class JMSConfiguration {
     private volatile Destination replyToDestinationDest;
 
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
+    private boolean useObjectMessageFallback;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
 
@@ -282,6 +283,14 @@ public class JMSConfiguration {
 
     public void setMessageType(String messageType) {
         this.messageType = messageType;
+    }
+
+    public boolean isUseObjectMessageFallback() {
+        return useObjectMessageFallback;
+    }
+
+    public void setUseObjectMessageFallback(boolean useObjectMessageFallback) {
+        this.useObjectMessageFallback = useObjectMessageFallback;
     }
 
     public boolean isPubSubDomain() {
