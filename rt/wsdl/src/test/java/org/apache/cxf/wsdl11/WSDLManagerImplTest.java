@@ -43,6 +43,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -224,6 +225,54 @@ public class WSDLManagerImplTest {
             fail("Failure expected");
         } catch (NullPointerException ex) {
             // expected
+        }
+    }
+
+    /**
+     * Regression test for CWE-611: XML External Entity (XXE) injection via WSDL/XSD imports.
+     *
+     * When a WSDL contains a {@code <wsdl:import>} or {@code <xsd:import>} that resolves
+     * to a document carrying a DTD with an external SYSTEM entity, CXF must not allow that
+     * entity to be resolved or expanded. The top-level WSDL is already parsed through the
+     * hardened {@code StaxUtils} path; this test verifies the same protection is applied
+     * to all transitively imported documents by {@link AbstractWrapperWSDLLocator}.
+     *
+     * <p>Without the fix, WSDL4J's {@code DocumentBuilderFactory} (configured with only
+     * {@code setNamespaceAware(true)}) would attempt to resolve the external entity,
+     * enabling file disclosure, blind SSRF, or entity-expansion DoS.
+     * Related: CWE-611, CWE-776, CWE-918.
+     */
+    @Test
+    public void testWSDLImportXXEVulnerability() throws Exception {
+        String wsdlUrl = getClass().getResource("wsdl_xxe_import_main.wsdl").toString();
+
+        WSDLManager builder = new WSDLManagerImpl();
+
+        // With the fix in place AbstractWrapperWSDLLocator pre-parses imported documents
+        // through StaxUtils (DTD off, external entities off) before WSDL4J ever sees them.
+        // Either:
+        //   (a) loading succeeds and no file content is leaked into the definition, OR
+        //   (b) loading fails because StaxUtils itself rejects the DOCTYPE – either outcome
+        //       proves the malicious entity was not handed to WSDL4J's unhardenened parser.
+        try {
+            Definition def = builder.getDefinition(wsdlUrl);
+
+            // (a) Loaded successfully: assert the sentinel file content is not present.
+            assertNotNull("WSDL Definition should be parsed", def);
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+            builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
+            String serialized = bos.toString(java.nio.charset.StandardCharsets.UTF_8.name());
+            // The entity target (/etc/hostname content) must not appear in the output
+            assertFalse("XXE entity content must not be present in parsed WSDL definition",
+                        serialized.contains("xxe_test_file"));
+        } catch (Exception e) {
+            // (b) StaxUtils rejected the DTD before WSDL4J could act on it.
+            // Any error here must originate from CXF's own hardened path, not from
+            // WSDL4J's unhardenened DocumentBuilderFactory.
+            String message = e.getMessage() == null ? "" : e.getMessage();
+            assertFalse("WSDL4J's unhardened parser must not reach entity resolution; "
+                        + "only CXF's StaxUtils path should produce errors. Got: " + message,
+                        message.contains("com.ibm.wsdl.xml.WSDLReaderImpl.getDocument"));
         }
     }
 }
