@@ -25,10 +25,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,6 +78,7 @@ import org.opensaml.xmlsec.signature.Signature;
  */
 public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     private static final String ENCODED_SAML2_BEARER_GRANT;
+    private static final Pattern CN_RDN_PATTERN = Pattern.compile("\\s*CN\\s*=\\s*([^,]+?)\\s*(?:,|$)");
     static {
         WSSConfig.init();
         //  AccessTokenService may be configured with the form provider
@@ -210,6 +214,9 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
                 );
             } else if (getTLSCertificates(message) == null) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+            } else {
+                // Unsigned assertion + mTLS present: require Holder-of-Key binding
+                validateUnsignedAssertionBinding(message, assertion);
             }
 
             if (samlValidator != null) {
@@ -226,6 +233,112 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
     private Certificate[] getTLSCertificates(Message message) {
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         return tlsInfo != null ? tlsInfo.getPeerCertificates() : null;
+    }
+
+    /**
+     * Validates that an unsigned SAML assertion is bound to the mTLS client certificate
+     * (Holder-of-Key binding). This prevents subject impersonation attacks where an attacker
+     * with a valid mTLS certificate could submit an unsigned assertion claiming a different
+     * subject.
+     *
+     * @param message The CXF message containing TLS session info
+     * @param assertion The unsigned SAML assertion
+     * @throws OAuthServiceException If validation fails
+     */
+    protected void validateUnsignedAssertionBinding(Message message, SamlAssertionWrapper assertion) {
+        Certificate[] tlsCerts = getTLSCertificates(message);
+        if (tlsCerts == null || tlsCerts.length == 0) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
+
+        // Extract subject identifier from mTLS certificate
+        String certSubjectId = extractCertificateSubjectIdentifier(tlsCerts[0]);
+        if (certSubjectId == null || certSubjectId.isEmpty()) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
+
+        // Extract subject from SAML assertion
+        String assertionSubject = extractAssertionSubject(assertion);
+        if (assertionSubject == null || assertionSubject.isEmpty()) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
+
+        // Verify Holder-of-Key binding: subject must match
+        if (!certSubjectId.equals(assertionSubject)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
+    }
+
+    /**
+     * Extracts the subject identifier from an X.509 certificate.
+     * Attempts to extract the Common Name (CN) from the subject DN first;
+     * falls back to the full DN if CN is not found.
+     *
+     * @param cert The certificate to extract from
+     * @return The subject identifier, or null if extraction fails
+     */
+    protected String extractCertificateSubjectIdentifier(Certificate cert) {
+        if (!(cert instanceof X509Certificate)) {
+            return null;
+        }
+
+        X509Certificate x509 = (X509Certificate) cert;
+        String dn = x509.getSubjectX500Principal().getName();
+        if (dn == null || dn.isEmpty()) {
+            return null;
+        }
+
+        // Try to extract CN (Common Name) first
+        String cn = extractCNValue(dn);
+        if (cn != null && !cn.isEmpty()) {
+            return cn;
+        }
+
+        // Fall back to full DN if CN not found
+        return dn;
+    }
+
+    /**
+     * Extracts the SAML assertion subject from the SAML2 NameID.
+     *
+     * @param assertion The SAML assertion
+     * @return The subject identifier from the NameID, or null if not found
+     */
+    protected String extractAssertionSubject(SamlAssertionWrapper assertion) {
+        if (assertion == null) {
+            return null;
+        }
+
+        if (assertion.getSaml2() != null && assertion.getSaml2().getSubject() != null) {
+            org.opensaml.saml.saml2.core.NameID nameID = assertion.getSaml2().getSubject().getNameID();
+            if (nameID != null) {
+                return nameID.getValue();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Extracts the CN value from an X.500 DN.
+     * For example, extractCNValue("CN=user@example.com,O=Company,C=US") returns "user@example.com"
+     * Also handles DNs with spaces like "CN = user@example.com , O = Company"
+     *
+     * @param dn The distinguished name string
+     * @return The CN value, or null if not found
+     */
+    protected String extractCNValue(String dn) {
+        if (dn == null || dn.isEmpty()) {
+            return null;
+        }
+
+        Matcher m = CN_RDN_PATTERN.matcher(dn);
+
+        if (m.find()) {
+            return m.group(1).trim();
+        }
+
+        return null;
     }
 
     protected void setSecurityContext(Message message, SamlAssertionWrapper wrapper) {
