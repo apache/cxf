@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,8 +60,11 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 
 @Path("register")
 public class DynamicRegistrationService {
+    private static final List<String> LOOPBACK_HOSTS = List.of("localhost", "127.0.0.1", "[::1]");
+    private static final String WEB_APPLICATION_TYPE = "web";
+    private static final String NATIVE_APPLICATION_TYPE = "native";
     private static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
-    private static final String DEFAULT_APPLICATION_TYPE = "web";
+    private static final String DEFAULT_APPLICATION_TYPE = WEB_APPLICATION_TYPE;
     private static final Integer DEFAULT_CLIENT_ID_SIZE = 10;
     private ClientRegistrationProvider clientProvider;
     private String initialAccessToken;
@@ -187,7 +191,7 @@ public class DynamicRegistrationService {
         ClientRegistration reg = new ClientRegistration();
         reg.setClientName(c.getApplicationName());
         reg.setGrantTypes(c.getAllowedGrantTypes());
-        reg.setApplicationType(c.isConfidential() ? "web" : "native");
+        reg.setApplicationType(c.isConfidential() ? WEB_APPLICATION_TYPE : NATIVE_APPLICATION_TYPE);
         if (!c.getRedirectUris().isEmpty()) {
             reg.setRedirectUris(c.getRedirectUris());
         }
@@ -421,12 +425,48 @@ public class DynamicRegistrationService {
                 || OAuthConstants.TOKEN_ENDPOINT_AUTH_POST.equals(tokenEndpointAuthMethod));
     }
 
+    @SuppressWarnings("PMD.CollapsibleIfStatements")
     protected void validateRequestUri(String uri, String appType, List<String> grantTypes) {
+        if (uri == null || uri.isBlank()) {
+            reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA, "Empty redirect URI is not supported"));
+        }
+
         // Web Clients using the OAuth Implicit Grant Type MUST only register URLs using the https scheme
         // as redirect_uris; they MUST NOT use localhost as the hostname. Native Clients MUST only register
-        // redirect_uris using custom URI schemes or URLs using the http: scheme with localhost as the hostname.
+        // redirect_uris using custom URI schemes or loopback URLs using the http scheme; loopback URLs use 
+        // localhost or the IP loopback literals 127.0.0.1 or [::1] as the hostname.
         // Authorization Servers MAY place additional constraints on Native Clients. Authorization Servers MAY
         // reject Redirection URI values using the http scheme, other than the localhost case for Native Clients
+
+        final URI parsedUri = URI.create(uri);
+        if (parsedUri.getHost() == null || parsedUri.getScheme() == null) {
+            reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA, "Unsupported redirect URI scheme/host"));
+        }
+        final String host = parsedUri.getHost().toLowerCase();
+        final String scheme = parsedUri.getScheme().toLowerCase();
+        if (!scheme.equals("http") && !scheme.equals("https")) {
+            reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
+                "Redirect URI scheme is not allowed: " + scheme
+                    + ". Allowed schemes: http, https"));
+        }
+
+        // Kind of the application. The default, if omitted, is web. The defined values are native or web.
+        if (appType == null || appType.isBlank() || appType.equalsIgnoreCase(WEB_APPLICATION_TYPE)) {
+            if (grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)) {
+                if (!"https".equals(scheme)) {
+                    reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
+                        "Unsupported redirect URI scheme"));
+                } else if ("localhost".equals(host)) {
+                    reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
+                        "Unsupported redirect URI hostname"));
+                }
+            }
+        } else if (appType.equalsIgnoreCase(NATIVE_APPLICATION_TYPE)) {
+            if ("http".equals(scheme) && !LOOPBACK_HOSTS.contains(host)) {
+                reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
+                    "Unsupported redirect URI hostname for scheme"));
+            }
+        }
     }
 
     public void setClientProvider(ClientRegistrationProvider clientProvider) {
