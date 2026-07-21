@@ -18,15 +18,22 @@
  */
 package org.apache.cxf.wsdl11;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.wsdl.xml.WSDLLocator;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.w3c.dom.Document;
 
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.resource.URIResolver;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
 
@@ -106,6 +113,38 @@ public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
                 lastImport = src.getSystemId();
             }
         }
+
+        // Pre-parse imported documents through CXF's hardened StaxUtils path to neutralize
+        // any XXE payloads (CWE-611) before handing the InputSource back to WSDL4J,
+        // whose DocumentBuilderFactory is not configured with XXE protections.
+        // The serialised output will contain no DOCTYPE declarations or unresolved entities.
+        if (src != null && (src.getByteStream() != null || src.getCharacterStream() != null)) {
+            String savedSystemId = src.getSystemId();
+            String savedPublicId = src.getPublicId();
+            XMLStreamReader xmlReader = null;
+            try {
+                xmlReader = StaxUtils.createXMLStreamReader(src);
+                Document doc = StaxUtils.read(xmlReader, true);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                StaxUtils.writeTo(doc, bos);
+                InputSource hardenedSrc = new InputSource(new ByteArrayInputStream(bos.toByteArray()));
+                hardenedSrc.setSystemId(savedSystemId);
+                hardenedSrc.setPublicId(savedPublicId);
+                src = hardenedSrc;
+            } catch (XMLStreamException e) {
+                throw new RuntimeException("Failed to securely parse WSDL/XSD import '"
+                                           + importLocation + "': " + e.getMessage(), e);
+            } finally {
+                if (xmlReader != null) {
+                    try {
+                        StaxUtils.close(xmlReader);
+                    } catch (XMLStreamException ex) {
+                        // ignore close failure
+                    }
+                }
+            }
+        }
+
         return src;
     }
 
