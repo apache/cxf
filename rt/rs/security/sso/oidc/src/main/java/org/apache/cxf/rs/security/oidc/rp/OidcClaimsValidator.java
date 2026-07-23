@@ -57,60 +57,93 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         if (issuer == null && validateClaimsAlways) {
             throw new OAuthServiceException("Invalid issuer");
         }
-        if (supportSelfIssuedProvider && issuerId == null
-            && issuer != null && SELF_ISSUED_ISSUER.equals(issuer)) {
-            validateSelfIssuedProvider(claims, clientId, validateClaimsAlways);
+
+        boolean isSelfIssued = supportSelfIssuedProvider && issuerId == null
+            && issuer != null && SELF_ISSUED_ISSUER.equals(issuer);
+
+        if (isSelfIssued) {
+            // Self-issued specific: validate sub_jwk binding (OIDC Core §7)
+            validateSelfIssuedSubJwkBinding(claims);
         } else {
+            // Normal issuer validation
             if (issuer != null && !issuer.equals(issuerId)) {
                 throw new OAuthServiceException("Invalid issuer");
             }
-            // validate subject
-            if (claims.getSubject() == null) {
-                throw new OAuthServiceException("Invalid subject");
-            }
 
-            // validate authorized party
+            // validate authorized party (not applicable for self-issued)
             String authorizedParty = (String)claims.getClaim(IdToken.AZP_CLAIM);
             if (authorizedParty != null && !authorizedParty.equals(clientId)) {
                 throw new OAuthServiceException("Invalid authorized party");
             }
-            // validate audience
-            List<String> audiences = claims.getAudiences();
-            if (StringUtils.isEmpty(audiences) && validateClaimsAlways
-                || !StringUtils.isEmpty(audiences) && !audiences.contains(clientId)) {
-                throw new OAuthServiceException("Invalid audience");
-            }
+        }
 
-            // If strict time validation: if no issuedTime claim is set then an expiresAt claim must be set
-            // Otherwise: validate only if expiresAt claim is set
-            boolean expiredRequired =
-                validateClaimsAlways || strictTimeValidation && claims.getIssuedAt() == null;
-            try {
-                JwtUtils.validateJwtExpiry(claims, getClockOffset(), expiredRequired);
-            } catch (JwtException ex) {
-                throw new OAuthServiceException("ID Token has expired", ex);
-            }
+        // Common validations for both self-issued and normal issuers
+        validateSubject(claims);
+        validateAudience(claims, clientId, validateClaimsAlways);
+        validateTokenTime(claims, validateClaimsAlways);
+    }
 
-            // If strict time validation: If no expiresAt claim is set then an issuedAt claim must be set
-            // Otherwise: validate only if issuedAt claim is set
-            boolean issuedAtRequired =
-                validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
-            try {
-                JwtUtils.validateJwtIssuedAt(claims, getTtl(), getClockOffset(), issuedAtRequired);
-            } catch (JwtException ex) {
-                throw new OAuthServiceException("Invalid issuedAt claim", ex);
-            }
+    private void validateSelfIssuedSubJwkBinding(JwtClaims claims) {
+        String subJwk = (String)claims.getClaim("sub_jwk");
+        if (subJwk == null) {
+            throw new OAuthServiceException("Missing sub_jwk claim for self-issued token");
+        }
 
-            // Validate nbf - but don't require it to be present
-            try {
-                JwtUtils.validateJwtNotBefore(claims, getClockOffset(), false);
-            } catch (JwtException ex) {
-                throw new OAuthServiceException("ID Token can not be used yet", ex);
+        try {
+            JsonWebKey publicKey = JwkUtils.readJwkKey(subJwk);
+            String thumbprint = JwkUtils.getThumbprint(publicKey);
+            String sub = claims.getSubject();
+            if (!thumbprint.equals(sub)) {
+                throw new OAuthServiceException("sub_jwk thumbprint does not match sub claim");
             }
+        } catch (OAuthServiceException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            throw new OAuthServiceException("Invalid sub_jwk claim: " + ex.getMessage(), ex);
         }
     }
 
-    private void validateSelfIssuedProvider(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
+    private void validateSubject(JwtClaims claims) {
+        if (claims.getSubject() == null) {
+            throw new OAuthServiceException("Invalid subject");
+        }
+    }
+
+    private void validateAudience(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
+        List<String> audiences = claims.getAudiences();
+        if (StringUtils.isEmpty(audiences) && validateClaimsAlways
+            || !StringUtils.isEmpty(audiences) && !audiences.contains(clientId)) {
+            throw new OAuthServiceException("Invalid audience");
+        }
+    }
+
+    private void validateTokenTime(JwtClaims claims, boolean validateClaimsAlways) {
+        // If strict time validation: if no issuedTime claim is set then an expiresAt claim must be set
+        // Otherwise: validate only if expiresAt claim is set
+        boolean expiredRequired =
+            validateClaimsAlways || strictTimeValidation && claims.getIssuedAt() == null;
+        try {
+            JwtUtils.validateJwtExpiry(claims, getClockOffset(), expiredRequired);
+        } catch (JwtException ex) {
+            throw new OAuthServiceException("ID Token has expired", ex);
+        }
+
+        // If strict time validation: If no expiresAt claim is set then an issuedAt claim must be set
+        // Otherwise: validate only if issuedAt claim is set
+        boolean issuedAtRequired =
+            validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
+        try {
+            JwtUtils.validateJwtIssuedAt(claims, getTtl(), getClockOffset(), issuedAtRequired);
+        } catch (JwtException ex) {
+            throw new OAuthServiceException("Invalid issuedAt claim", ex);
+        }
+
+        // Validate nbf - but don't require it to be present
+        try {
+            JwtUtils.validateJwtNotBefore(claims, getClockOffset(), false);
+        } catch (JwtException ex) {
+            throw new OAuthServiceException("ID Token can not be used yet", ex);
+        }
     }
 
     public void setIssuerId(String issuerId) {
@@ -124,7 +157,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
     @Override
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
         JsonWebKey key = null;
-        if (supportSelfIssuedProvider && SELF_ISSUED_ISSUER.equals(jwt.getClaim("issuer"))) {
+        if (supportSelfIssuedProvider && SELF_ISSUED_ISSUER.equals(jwt.getClaims().getIssuer())) {
             String publicKeyJson = (String)jwt.getClaim("sub_jwk");
             if (publicKeyJson != null) {
                 JsonWebKey publicKey = JwkUtils.readJwkKey(publicKeyJson);
