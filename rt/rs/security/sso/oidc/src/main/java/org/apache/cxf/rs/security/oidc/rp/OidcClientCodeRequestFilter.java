@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientCodeRequestFilter;
@@ -35,6 +36,8 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.common.ClaimsRequest;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
 
@@ -51,6 +54,14 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private String claims;
     private String claimsLocales;
     private String roleClaim;
+    /**
+     * The OAuth 2.0 / OIDC response_type to request from the Authorization Endpoint.
+     * Defaults to {@code code} (Authorization Code Flow).
+     * Set to an Implicit or Hybrid value (e.g. {@code id_token}, {@code code id_token})
+     * to enable those flows; a nonce will be auto-generated and enforced for any
+     * response type that contains {@code id_token}, per OIDC Core §3.2.2.1 and §3.3.2.1.
+     */
+    private String responseType;
 
     public OidcClientCodeRequestFilter() {
         super();
@@ -59,6 +70,27 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
 
     public void setAuthenticationContextRef(String acr) {
         this.authenticationContextRef = Arrays.asList(acr.split(" "));
+    }
+
+    /**
+     * Set the {@code response_type} sent to the Authorization Endpoint.
+     * When set to a value that contains {@code id_token} (Implicit or Hybrid flows),
+     * the filter will automatically generate a nonce for each authorization request
+     * and enforce its presence in the returned ID Token.
+     * @param responseType e.g. {@code id_token}, {@code code id_token}, {@code id_token token}
+     */
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
+    }
+
+    /**
+     * Returns {@code true} when the configured response type causes an ID Token to be
+     * delivered directly from the Authorization Endpoint (Implicit or Hybrid flows),
+     * meaning a nonce is REQUIRED per OIDC Core §3.2.2.1 and §3.3.2.1.
+     */
+    private boolean isNonceRequired() {
+        return responseType != null
+            && responseType.contains(OidcUtils.ID_TOKEN_RESPONSE_TYPE);
     }
 
     @Override
@@ -77,8 +109,13 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             IdToken idToken = idTokenReader.getIdToken(at,
                                   requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE),
                                   getConsumer());
+            // Hybrid flow can be detected from context: when the Authorization Endpoint
+            // returns an id_token directly in the callback parameters (response_type
+            // contains "id_token" together with "code"), a nonce is REQUIRED even if
+            // the caller has not explicitly configured a responseType on this filter.
+            boolean hybridFlowDetected = requestParams.containsKey(OidcUtils.ID_TOKEN);
             // Validate the properties set up at the redirection time.
-            validateIdToken(idToken, state);
+            validateIdToken(idToken, state, hybridFlowDetected);
 
             ctx.setIdToken(idToken);
             if (userInfoClient != null) {
@@ -100,12 +137,29 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         if (maxAgeOffset != null) {
             state.putSingle(MAX_AGE_PARAMETER, Long.toString(System.currentTimeMillis() + maxAgeOffset));
         }
+        // Per OIDC Core §3.2.2.1 and §3.3.2.1, a nonce is REQUIRED for Implicit and Hybrid flows
+        // (any response_type containing "id_token"). Auto-generate one if the caller has not
+        // already supplied it, so replay protection is always active for these flows.
+        if (isNonceRequired() && state.getFirst(IdToken.NONCE_CLAIM) == null) {
+            state.putSingle(IdToken.NONCE_CLAIM,
+                Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16)));
+        }
         return state;
     }
 
-    private void validateIdToken(IdToken idToken, MultivaluedMap<String, String> state) {
+    private void validateIdToken(IdToken idToken, MultivaluedMap<String, String> state,
+                                    boolean hybridFlowDetected) {
 
-        String nonce = state.getFirst(IdToken.NONCE_CLAIM);
+        String nonce = state != null ? state.getFirst(IdToken.NONCE_CLAIM) : null;
+        // A nonce is REQUIRED (OIDC Core §3.2.2.1 / §3.3.2.1) when:
+        //  (a) the configured responseType contains "id_token" (Implicit or Hybrid), OR
+        //  (b) an id_token was observed in the authorization callback parameters, which
+        //      indicates a Hybrid flow even without explicit responseType configuration.
+        // In either case, reject the response if no nonce was round-tripped — this means
+        // the authorization request was sent without one, removing replay protection.
+        if ((isNonceRequired() || hybridFlowDetected) && nonce == null) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
+        }
         String tokenNonce = idToken.getNonce();
         if (nonce != null && (tokenNonce == null || !nonce.equals(tokenNonce))) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
@@ -145,13 +199,18 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     protected void setAdditionalCodeRequestParams(UriBuilder ub,
                                                   MultivaluedMap<String, String> redirectState,
                                                   MultivaluedMap<String, String> codeRequestState) {
-        if (redirectState != null) {
-            if (redirectState.getFirst(IdToken.NONCE_CLAIM) != null) {
-                ub.queryParam(IdToken.NONCE_CLAIM, redirectState.getFirst(IdToken.NONCE_CLAIM));
-            }
-            if (redirectState.getFirst(MAX_AGE_PARAMETER) != null) {
-                ub.queryParam(MAX_AGE_PARAMETER, redirectState.getFirst(MAX_AGE_PARAMETER));
-            }
+        // Prefer the nonce from redirectState (managed by the ClientCodeStateManager).
+        // Fall back to codeRequestState to cover the auto-generated nonce path used when the
+        // state manager does not copy the nonce into its redirect map.
+        String nonce = redirectState != null ? redirectState.getFirst(IdToken.NONCE_CLAIM) : null;
+        if (nonce == null && codeRequestState != null) {
+            nonce = codeRequestState.getFirst(IdToken.NONCE_CLAIM);
+        }
+        if (nonce != null) {
+            ub.queryParam(IdToken.NONCE_CLAIM, nonce);
+        }
+        if (redirectState != null && redirectState.getFirst(MAX_AGE_PARAMETER) != null) {
+            ub.queryParam(MAX_AGE_PARAMETER, redirectState.getFirst(MAX_AGE_PARAMETER));
         }
         if (codeRequestState != null && codeRequestState.getFirst(LOGIN_HINT_PARAMETER) != null) {
             ub.queryParam(LOGIN_HINT_PARAMETER, codeRequestState.getFirst(LOGIN_HINT_PARAMETER));
@@ -167,6 +226,11 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         }
         if (promptLogin != null) {
             ub.queryParam(PROMPT_PARAMETER, promptLogin);
+        }
+        // Override the response_type set by the base filter (which defaults to "code").
+        // This is required to support Implicit (id_token) and Hybrid (code id_token, etc.) flows.
+        if (responseType != null && !OAuthConstants.CODE_RESPONSE_TYPE.equals(responseType)) {
+            ub.replaceQueryParam(OAuthConstants.RESPONSE_TYPE, responseType);
         }
 
     }
