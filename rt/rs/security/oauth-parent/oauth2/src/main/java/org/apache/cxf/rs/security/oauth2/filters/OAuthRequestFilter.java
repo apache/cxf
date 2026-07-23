@@ -74,7 +74,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private String audience;
     private String issuer;
     private boolean completeAudienceMatch;
-    private boolean audienceIsEndpointAddress = true;
+    private boolean audienceIsEndpointAddress;
     private boolean checkFormData;
     private List<String> requiredScopes = Collections.emptyList();
     private boolean allPermissionsMatch;
