@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 
 import javax.ws.rs.NotAuthorizedException;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
