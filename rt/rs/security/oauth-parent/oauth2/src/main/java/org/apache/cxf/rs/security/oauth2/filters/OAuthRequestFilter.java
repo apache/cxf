@@ -286,13 +286,37 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         String requestPath = (String)PhaseInterceptorChain.getCurrentMessage().get(Message.REQUEST_URL);
         for (String s : audiences) {
-            boolean matched = completeAudienceMatch ? requestPath.equals(s) : requestPath.startsWith(s);
+            // In non-exact mode, only allow prefix matches at path/query/fragment boundaries.
+            boolean matched = completeAudienceMatch ? requestPath.equals(s)
+                : matchesAudiencePrefix(requestPath, s);
             if (matched) {
                 return s;
             }
         }
         AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         return null;
+    }
+
+    /**
+     * Checks whether a configured audience matches a request URL using safe prefix semantics.
+     * <p>
+     * This keeps subtree-style matching (for example, "/api/read" matching "/api/read/item")
+     * but prevents same-prefix sibling matches (for example, "/api/readadmin").
+     * A match is accepted only when the configured audience is an exact match, ends with '/',
+     * or is followed by a URL boundary character ('/', '?', '#').
+     */
+    protected boolean matchesAudiencePrefix(String requestPath, String configuredAudience) {
+        if (requestPath == null || configuredAudience == null) {
+            return false;
+        }
+        if (!requestPath.startsWith(configuredAudience)) {
+            return false;
+        }
+        if (requestPath.length() == configuredAudience.length() || configuredAudience.endsWith("/")) {
+            return true;
+        }
+        char boundary = requestPath.charAt(configuredAudience.length());
+        return boundary == '/' || boundary == '?' || boundary == '#';
     }
 
     public void setCheckFormData(boolean checkFormData) {
