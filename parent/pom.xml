@@ -166,7 +166,7 @@
         <cxf.jettison.version>1.5.6</cxf.jettison.version>
         <cxf.jetty12.version>12.1.11</cxf.jetty12.version>
         <cxf.jetty.version>${cxf.jetty12.version}</cxf.jetty.version>
-        <cxf.jexl.version>3.6.4</cxf.jexl.version>
+        <cxf.jexl.version>3.7.0</cxf.jexl.version>
         <cxf.joda.time.version>2.10.10</cxf.joda.time.version>
         <cxf.johnzon.version>2.1.0</cxf.johnzon.version>
         <cxf.jspecify.version>1.0.0</cxf.jspecify.version>
