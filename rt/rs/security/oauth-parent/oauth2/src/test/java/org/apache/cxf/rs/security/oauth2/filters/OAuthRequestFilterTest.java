@@ -83,9 +83,8 @@ public class OAuthRequestFilterTest {
     }
 
     @Test
-    public void testValidateAudiencesSkipsEndpointCheckWhenDisabled() {
+    public void testValidateAudiencesSkipsEndpointCheckByDefault() {
         OAuthRequestFilter filter = new OAuthRequestFilter();
-        filter.setAudienceIsEndpointAddress(false);
 
         String result = filter.validateAudiences(Collections.singletonList("/api/read"));
         assertNull(result);
@@ -103,6 +102,22 @@ public class OAuthRequestFilterTest {
 
         String result = filter.validateAudiences(Collections.singletonList("/api/read"));
         assertEquals("/api/read", result);
+    }
+
+    @Test
+    public void testValidateAudiencesRequiresEndpointCheckEnabledForAudienceMatch() throws Exception {
+        OAuthRequestFilter filter = new OAuthRequestFilter();
+        filter.setCompleteAudienceMatch(false);
+
+        Message message = new MessageImpl();
+        message.put(Message.REQUEST_URL, "/api/read/item");
+        setThreadLocalMessage(message);
+
+        // Default is disabled, so endpoint-address audience matching is skipped.
+        assertNull(filter.validateAudiences(Collections.singletonList("/api/read")));
+
+        filter.setAudienceIsEndpointAddress(true);
+        assertEquals("/api/read", filter.validateAudiences(Collections.singletonList("/api/read")));
     }
 
     private static void setThreadLocalMessage(Message message) throws Exception {
