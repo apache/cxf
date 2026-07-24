@@ -37,6 +37,16 @@ import jakarta.jms.TextMessage;
  */
 public class JMSMessageConverter {
 
+    private final boolean allowObjectMessage;
+
+    public JMSMessageConverter() {
+        this(false);
+    }
+
+    public JMSMessageConverter(boolean allowObjectMessage) {
+        this.allowObjectMessage = allowObjectMessage;
+    }
+
     public Message toMessage(Object object, Session session) throws JMSException {
         if (object instanceof Message) {
             return (Message)object;
@@ -67,6 +77,9 @@ public class JMSMessageConverter {
             message1.readBytes(bytes);
             return bytes;
         } else if (message instanceof ObjectMessage) {
+            if (!allowObjectMessage) {
+                throw new JMSException("ObjectMessage is disabled by configuration");
+            }
             return ((ObjectMessage)message).getObject();
         } else if (message instanceof StreamMessage) {
             StreamMessage streamMessage = (StreamMessage)message;

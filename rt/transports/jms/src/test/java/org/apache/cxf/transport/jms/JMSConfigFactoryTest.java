@@ -136,4 +136,18 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());
     }
+
+    @Test
+    public void testUseObjectMessageFallbackIsSet() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?useObjectMessageFallback=true");
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
+        Assert.assertTrue(jmsConfig.isUseObjectMessageFallback());
+    }
+
+    @Test
+    public void testAllowObjectMessagesIsSet() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?allowObjectMessages=true");
+        JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
+        Assert.assertTrue(jmsConfig.isAllowObjectMessages());
+    }
 }
