@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.JMSException;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -82,6 +83,18 @@ public class JMSUtilTest {
             javax.jms.Message jmsMessage =
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE);
+            assertTrue("Binary message fallback should have been of type ObjectMessage ",
+                       jmsMessage instanceof ObjectMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE, false);
+            assertTrue("Fallback-disabled binary message should have been of type BytesMessage ",
+                       jmsMessage instanceof BytesMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, "application/octet-stream", true);
+            assertTrue("Non-text message fallback should have been of type ObjectMessage ",
+                       jmsMessage instanceof ObjectMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, "application/octet-stream", false);
+            assertTrue("Fallback-disabled message should have been of type BytesMessage ",
+                       jmsMessage instanceof BytesMessage);
         }
 
     }
