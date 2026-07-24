@@ -106,12 +106,30 @@ public final class JMSUtil {
      * @param messageType the JMS message type
      * @return a JMS of the appropriate type populated with the given payload
      */
+    @Deprecated(since = "4.2.3", forRemoval = true)
     public static Message createAndSetPayload(Object payload, Session session, String messageType)
+        throws JMSException {
+        return createAndSetPayload(payload, session, messageType, true);
+    }
+
+    /**
+     * Create a JMS of the appropriate type populated with the given payload.
+     *
+     * @param payload the message payload, expected to be either of type String or byte[] depending on payload
+     *            type
+     * @param session the JMS session
+     * @param messageType the JMS message type
+     * @param useObjectMessageFallback whether non-text payloads should fall back to ObjectMessage
+     * @return a JMS of the appropriate type populated with the given payload
+     */
+    public static Message createAndSetPayload(Object payload, Session session, String messageType,
+                                              boolean useObjectMessageFallback)
         throws JMSException {
         final Message message;
         if (JMSConstants.TEXT_MESSAGE_TYPE.equals(messageType)) {
             message = session.createTextMessage((String)payload);
-        } else if (JMSConstants.BYTE_MESSAGE_TYPE.equals(messageType)) {
+        } else if (JMSConstants.BYTE_MESSAGE_TYPE.equals(messageType)
+            || !useObjectMessageFallback) {
             message = session.createBytesMessage();
             ((BytesMessage)message).writeBytes((byte[])payload);
         } else {
