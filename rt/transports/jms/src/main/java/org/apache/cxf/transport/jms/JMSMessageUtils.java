@@ -186,7 +186,8 @@ final class JMSMessageUtils {
                                        String headerType)
         throws JMSException {
 
-        Message jmsMessage = JMSUtil.createAndSetPayload(payload, session, messageType);
+        Message jmsMessage = JMSUtil.createAndSetPayload(payload, session, messageType,
+                                                         jmsConfig.isUseObjectMessageFallback());
         JMSMessageHeadersType messageHeaders = getOrCreateHeader(outMessage, headerType);
         if (!messageHeaders.isSetJMSDeliveryMode()) {
             messageHeaders.setJMSDeliveryMode(jmsConfig.getDeliveryMode());
