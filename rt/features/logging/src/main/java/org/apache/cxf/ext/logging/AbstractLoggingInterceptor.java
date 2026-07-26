@@ -25,20 +25,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.PropertyUtils;
-import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
-import org.apache.cxf.ext.logging.event.LogEvent;
-import org.apache.cxf.ext.logging.event.LogEventSender;
-import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
+import org.apache.cxf.ext.logging.event.*;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
+import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.normalizeFlow;
+
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
-    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
+    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable."; // the EventType (flow) will be concatenated
     private static final Pattern BOUNDARY_PATTERN =
         Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
     private static final Pattern CONTENT_TYPE_PATTERN =
@@ -62,9 +61,17 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         this.eventMapper = new DefaultLogEventMapper(maskSensitiveHelper);
     }
 
-    protected static boolean isLoggingDisabledNow(Message message) throws Fault {
-        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+    // The concatenated flow is added in order to enhance resilience against misuse and underlying framework
+    // (Reuse of the same Message object with properties still there)
+    // The message will be logged once per flow
+    // If previous properties (ex. LIVE_LOGGING_PROP + REQ_IN) are still there... this will search
+    // only for the right properties (ex. LIVE_LOGGING_PROP + RESP_OUT)
+    protected boolean isLoggingDisabledForThisFlow(Message message) throws Fault {
+        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message))); //idempotency per Flow
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
+    }
+    protected void disableFutureLoggingForThisFlow(Message message) throws Fault {
+        message.put(LIVE_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message)), Boolean.FALSE);
     }
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
