@@ -83,7 +83,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public void handleMessage(Message message) throws Fault {
 
         createExchangeId(message);
-        if (isLoggingDisabledForThisFlow(message)) {
+        if (isLoggingDisabledNow(message) || isLoggingDisabledForThisFlow(message)) {
             return;
         }
         //ensure only logging once for a certain message

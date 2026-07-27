@@ -60,7 +60,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
     public void handleMessage(Message message) throws Fault {
         createExchangeId(message);
-        if (isLoggingDisabledForThisFlow(message)) {
+        if (isLoggingDisabledNow(message) || isLoggingDisabledForThisFlow(message)) {
             return;
         }
 
