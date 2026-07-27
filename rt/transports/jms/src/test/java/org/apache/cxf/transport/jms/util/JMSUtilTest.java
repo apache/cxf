@@ -81,14 +81,17 @@ public class JMSUtilTest {
             Connection connection = JMSFactory.createConnection(jmsConfig);
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             javax.jms.Message jmsMessage =
-                JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
+                JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE, false);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
-            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE);
-            assertTrue("Binary message fallback should have been of type ObjectMessage ",
-                       jmsMessage instanceof ObjectMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE, false);
+            assertTrue("Default binary message should have been of type BytesMessage ",
+                       jmsMessage instanceof BytesMessage);
             jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE, false);
             assertTrue("Fallback-disabled binary message should have been of type BytesMessage ",
                        jmsMessage instanceof BytesMessage);
+            jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BINARY_MESSAGE_TYPE, true);
+            assertTrue("Fallback-enabled binary message should have been of type ObjectMessage ",
+                       jmsMessage instanceof ObjectMessage);
             jmsMessage = JMSUtil.createAndSetPayload(testBytes, session, "application/octet-stream", true);
             assertTrue("Non-text message fallback should have been of type ObjectMessage ",
                        jmsMessage instanceof ObjectMessage);

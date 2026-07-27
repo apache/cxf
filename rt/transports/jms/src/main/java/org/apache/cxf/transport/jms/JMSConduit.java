@@ -473,7 +473,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         LOG.log(Level.FINE, "client received reply: ", jmsMessage);
         try {
             Message inMessage = JMSMessageUtils.asCXFMessage(jmsMessage,
-                                                             JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+                                                             JMSConstants.JMS_CLIENT_RESPONSE_HEADERS,
+                                                             jmsConfig.isAllowObjectMessages());
             if (jmsConfig.isCreateSecurityContext()) {
                 SecurityContext securityContext = SecurityContextFactory.buildSecurityContext(jmsMessage, jmsConfig);
                 inMessage.put(SecurityContext.class, securityContext);

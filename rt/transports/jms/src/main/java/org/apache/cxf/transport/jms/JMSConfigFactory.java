@@ -83,6 +83,8 @@ public final class JMSConfigFactory {
         jmsConfig.setConcurrentConsumers(endpoint.getConcurrentConsumers());
         jmsConfig.setOneSessionPerConnection(endpoint.isOneSessionPerConnection());
         jmsConfig.setMessageSelector(endpoint.getMessageSelector());
+        jmsConfig.setUseObjectMessageFallback(endpoint.isUseObjectMessageFallback());
+        jmsConfig.setAllowObjectMessages(endpoint.isAllowObjectMessages());
 
         TransactionManager tm = getTransactionManager(bus, endpoint);
         jmsConfig.setTransactionManager(tm);

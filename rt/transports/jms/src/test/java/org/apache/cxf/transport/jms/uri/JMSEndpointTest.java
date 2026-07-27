@@ -191,6 +191,30 @@ public class JMSEndpointTest {
     }
 
     @Test
+    public void testAllowObjectMessagesDefaultsToFalse() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        assertFalse(endpoint.isAllowObjectMessages());
+    }
+
+    @Test
+    public void testAllowObjectMessagesCanBeEnabledFromUri() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?allowObjectMessages=true");
+        assertTrue(endpoint.isAllowObjectMessages());
+    }
+
+    @Test
+    public void testUseObjectMessageFallbackDefaultsToFalse() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
+        assertFalse(endpoint.isUseObjectMessageFallback());
+    }
+
+    @Test
+    public void testUseObjectMessageFallbackCanBeEnabledFromUri() {
+        JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?useObjectMessageFallback=true");
+        assertTrue(endpoint.isUseObjectMessageFallback());
+    }
+
+    @Test
     public void nonSoapJMS() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms://");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());

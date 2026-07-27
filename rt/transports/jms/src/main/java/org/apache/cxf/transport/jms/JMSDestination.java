@@ -229,7 +229,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             getLogger().log(Level.FINE,
                             "JMS destination received message " + message + " on "
                                 + jmsConfig.getTargetDestination());
-            Message inMessage = JMSMessageUtils.asCXFMessage(message, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+            Message inMessage = JMSMessageUtils.asCXFMessage(message,
+                                                             JMSConstants.JMS_SERVER_REQUEST_HEADERS,
+                                                             jmsConfig.isAllowObjectMessages());
             if (jmsConfig.isCreateSecurityContext()) {
                 SecurityContext securityContext = SecurityContextFactory.buildSecurityContext(message, jmsConfig);
                 inMessage.put(SecurityContext.class, securityContext);
