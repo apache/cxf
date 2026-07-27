@@ -252,18 +252,20 @@ public class LoggingInInterceptorTest {
         DefaultLogEventMapper mapper = new DefaultLogEventMapper();
         assertEquals(FAULT_OUT, mapper.getEventType(message));
 
+        assertNull(message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
         assertFalse(interceptor.isLoggingDisabledForThisFlow(message));
+        assertNotNull(message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
         interceptor.disableFutureLoggingForThisFlow(message);
         assertTrue(interceptor.isLoggingDisabledForThisFlow(message));
 
-        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + REQ_IN));
-        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + REQ_OUT));
-        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_IN));
-        assertNotNull(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_OUT)); //The only present // FAULT_OUT normalized
-        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + FAULT_IN));
-        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + FAULT_OUT));
+        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + REQ_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + REQ_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNotNull(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID))); //The only present // FAULT_OUT normalized
+        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + FAULT_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(LIVE_LOGGING_PROP + FAULT_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
 
-        assertTrue(isFalse(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_OUT)));
+        assertTrue(isFalse(message.getContextualProperty(LIVE_LOGGING_PROP + RESP_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID))));
 
     }
 }

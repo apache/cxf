@@ -37,7 +37,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
-    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable."; // the EventType (flow) will be concatenated
+    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable."; // the EventType (flow) and ExchangeId will be concatenated
     private static final Pattern BOUNDARY_PATTERN =
         Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
     private static final Pattern CONTENT_TYPE_PATTERN =
@@ -63,15 +63,21 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
     // The concatenated flow is added in order to enhance resilience against misuse and underlying framework
     // (Reuse of the same Message object with properties still there)
-    // The message will be logged once per flow
-    // If previous properties (ex. LIVE_LOGGING_PROP + REQ_IN) are still there... this will search
-    // only for the right properties (ex. LIVE_LOGGING_PROP + RESP_OUT)
+    // The message will be logged once per flow per ExchangeId
+    // If previous properties (ex. LIVE_LOGGING_PROP + REQ_IN + ExchangeId) are still there... this will search
+    // only for the right properties (ex. LIVE_LOGGING_PROP + RESP_OUT + ExchangeId)
     protected boolean isLoggingDisabledForThisFlow(Message message) throws Fault {
-        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message))); //idempotency per Flow
+        Object liveLoggingProp = message.getContextualProperty(getDisableLogKey(message)); //idempotency per Flow per ExchangeId
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
     protected void disableFutureLoggingForThisFlow(Message message) throws Fault {
-        message.put(LIVE_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message)), Boolean.FALSE);
+        message.put(getDisableLogKey(message), Boolean.FALSE);
+    }
+
+    // LIVE_LOGGING_PROP + FLOW + ExchangeId
+    protected String getDisableLogKey(Message message){
+        createExchangeId(message); //Redundant
+        return LIVE_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message)) + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID);
     }
 
     public void addBinaryContentMediaTypes(String mediaTypes) {
