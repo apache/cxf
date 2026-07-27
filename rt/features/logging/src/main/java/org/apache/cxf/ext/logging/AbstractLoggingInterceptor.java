@@ -72,8 +72,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     // The concatenated flow is added in order to enhance resilience against misuse and underlying framework
     // (Reuse of the same Message object with properties still there)
     // The message will be logged once per flow per ExchangeId
-    // If previous properties (ex. LIVE_LOGGING_PROP + REQ_IN + ExchangeId) are still there... this will search
-    // only for the right properties (ex. LIVE_LOGGING_PROP + RESP_OUT + ExchangeId)
+    // If previous properties (ex. IDEMPOTENT_LOGGING_PROP + REQ_IN + ExchangeId) are still there... this will search
+    // only for the right properties (ex. IDEMPOTENT_LOGGING_PROP + RESP_OUT + ExchangeId)
     protected boolean isLoggingDisabledForThisFlow(Message message) throws Fault {
         Object idempotentLoggingProp = message.getContextualProperty(getIdempotentDisableLogKey(message)); //idempotency per Flow per ExchangeId
         return idempotentLoggingProp != null && PropertyUtils.isFalse(idempotentLoggingProp);
@@ -82,7 +82,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         message.put(getIdempotentDisableLogKey(message), Boolean.FALSE);
     }
 
-    // LIVE_LOGGING_PROP + FLOW + ExchangeId
+    // IDEMPOTENT_LOGGING_PROP + FLOW + ExchangeId
     protected String getIdempotentDisableLogKey(Message message){
         createExchangeId(message); //Redundant
         return IDEMPOTENT_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message)) + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID);
