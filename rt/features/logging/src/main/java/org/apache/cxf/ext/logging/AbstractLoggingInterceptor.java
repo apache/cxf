@@ -75,15 +75,15 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     // If previous properties (ex. LIVE_LOGGING_PROP + REQ_IN + ExchangeId) are still there... this will search
     // only for the right properties (ex. LIVE_LOGGING_PROP + RESP_OUT + ExchangeId)
     protected boolean isLoggingDisabledForThisFlow(Message message) throws Fault {
-        Object idempotentLoggingProp = message.getContextualProperty(getidempotentDisableLogKey(message)); //idempotency per Flow per ExchangeId
+        Object idempotentLoggingProp = message.getContextualProperty(getIdempotentDisableLogKey(message)); //idempotency per Flow per ExchangeId
         return idempotentLoggingProp != null && PropertyUtils.isFalse(idempotentLoggingProp);
     }
     protected void disableFutureLoggingForThisFlow(Message message) throws Fault {
-        message.put(getidempotentDisableLogKey(message), Boolean.FALSE);
+        message.put(getIdempotentDisableLogKey(message), Boolean.FALSE);
     }
 
     // LIVE_LOGGING_PROP + FLOW + ExchangeId
-    protected String getidempotentDisableLogKey(Message message){
+    protected String getIdempotentDisableLogKey(Message message){
         createExchangeId(message); //Redundant
         return IDEMPOTENT_LOGGING_PROP + normalizeFlow(eventMapper.getEventType(message)) + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID);
     }
