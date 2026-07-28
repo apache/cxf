@@ -29,12 +29,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
+import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.URLDataSource;
 import javax.xml.parsers.SAXParser;
@@ -711,39 +713,89 @@ public class AttachmentDeserializerTest {
         assertThrows("Failure expected on too many attachment headers", IOException.class, 
             () -> ad.initializeAttachments());
     }
-
     
     @Test
-    public void testManyAttachments() throws Exception {
-        StringBuilder sb = new StringBuilder(1000);
-        sb.append("SomeHeader: foo\n")
-            .append("------=_Part_34950_1098328613.1263781527359\n")
-            .append("Content-Type: text/xml; charset=UTF-8\n")
-            .append("Content-Transfer-Encoding: binary\n")
-            .append("Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n")
-            .append('\n')
-            .append("<envelope/>\n");
+    public void testManyAttachmentsDataHandlerIterator() throws Exception {
+        prepareAttachments();
 
-        // Add many attachments
-        IntStream.range(0, 100000).forEach(i -> {
-            sb.append("------=_Part_34950_1098328613.1263781527359\n")
-                .append("Content-Type: text/xml\n")
-                .append("Content-Transfer-Encoding: binary\n")
-                .append("Content-Id: <b86a5f2d-e7af-4e5e-b71a-9f6f2307cab0>\n")
-                .append('\n')
-                .append("<message>\n")
-                .append("------=_Part_34950_1098328613.1263781527359--\n");
-        });
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
 
-        msg = new MessageImpl();
-        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
-        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        // Force it to load the attachments
+        final LazyAttachmentCollection attachments = (LazyAttachmentCollection) msg.getAttachments();
+        assertThrows("Failure expected on too many attachments", RuntimeException.class, 
+            () -> {
+                // Exercise iterator() path
+                for (Map.Entry<String, DataHandler> entry : attachments.createDataHandlerMap().entrySet()) {
+                    // Do nothing, just force loading
+                }
+            });
+    }
+
+    @Test
+    public void testManyAttachmentsLoadAll() throws Exception {
+        prepareAttachments();
+
         AttachmentDeserializer ad = new AttachmentDeserializer(msg);
         ad.initializeAttachments();
 
         // Force it to load the attachments
         assertThrows("Failure expected on too many attachments", RuntimeException.class, 
             () -> msg.getAttachments().size());
+    }
+
+    @Test
+    public void testManyAttachmentsIterator() throws Exception {
+        prepareAttachments();
+
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+
+        // Iterate over attachments
+        assertThrows("Failure expected on too many attachments", RuntimeException.class, 
+            () -> {
+                // Exercise iterator() path
+                for (Attachment attachment : msg.getAttachments()) {
+                    // Do nothing, just force loading
+                }
+            }
+        );
+        
+        // Iterate over attachments
+        final LazyAttachmentCollection attachments = (LazyAttachmentCollection) msg.getAttachments();
+        assertThrows("Failure expected on too many attachments", IOException.class, 
+            () -> {
+                // Exercise iterator() path
+                while (attachments.hasNext()) {
+                    // Do nothing, just force loading
+                }
+            }
+        );
+
+        assertThrows("Failure expected on too many attachments", RuntimeException.class, 
+            () -> attachments.add(new AttachmentImpl("contentId")));
+
+        assertThrows("Failure expected on too many attachments", RuntimeException.class, 
+            () -> attachments.addAll(List.of(new AttachmentImpl("contentId"))));
+    }
+
+    @Test
+    public void testManyAttachmentsHasNext() throws Exception {
+        prepareAttachments();
+
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+
+        // Iterate over attachments
+        final LazyAttachmentCollection attachments = (LazyAttachmentCollection) msg.getAttachments();
+        assertThrows("Failure expected on too many attachments", IOException.class, 
+            () -> {
+                // Exercise iterator() path
+                while (attachments.hasNext()) {
+                    // Do nothing, just force loading
+                }
+            }
+        );
     }
 
     @Test
@@ -953,5 +1005,31 @@ public class AttachmentDeserializerTest {
         } finally {
             System.clearProperty(AttachmentUtil.ATTACHMENT_XOP_FOLLOW_URLS_PROPERTY);
         }
+    }
+
+    private void prepareAttachments() {
+        StringBuilder sb = new StringBuilder(1000);
+        sb.append("SomeHeader: foo\n")
+            .append("------=_Part_34950_1098328613.1263781527359\n")
+            .append("Content-Type: text/xml; charset=UTF-8\n")
+            .append("Content-Transfer-Encoding: binary\n")
+            .append("Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n")
+            .append('\n')
+            .append("<envelope/>\n");
+
+        // Add many attachments
+        IntStream.range(0, 100000).forEach(i -> {
+            sb.append("------=_Part_34950_1098328613.1263781527359\n")
+                .append("Content-Type: text/xml\n")
+                .append("Content-Transfer-Encoding: binary\n")
+                .append("Content-Id: <b86a5f2d-e7af-4e5e-b71a-9f6f2307cab0>\n")
+                .append('\n')
+                .append("<message>\n")
+                .append("------=_Part_34950_1098328613.1263781527359--\n");
+        });
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
     }
 }

@@ -30,6 +30,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -111,6 +112,7 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
         protected void run() {
             EndpointImpl endpointImpl = (EndpointImpl)Endpoint.publish(ADDRESS, new MTOMServer());
             endpointImpl.getProperties().put(Message.CONTENT_TRANSFER_ENCODING, "base64");
+            endpointImpl.getBus().getProperties().put(AttachmentDeserializer.ATTACHMENT_MAX_COUNT, "100");
         }
         public static void main(String[] args) {
             try {
