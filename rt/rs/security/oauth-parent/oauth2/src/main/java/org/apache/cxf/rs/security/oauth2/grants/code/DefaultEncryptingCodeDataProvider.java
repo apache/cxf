@@ -49,15 +49,25 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
     }
     @Override
     public Client removeClient(String clientId) {
-        Client c = super.removeClient(clientId);
-        removeClientCodeGrants(c);
-        return c;
+        // Purge code grants while the client record is still in the store so
+        // that decryption can look up the client by ID.
+        Client c = getClient(clientId);
+        if (c != null) {
+            removeClientCodeGrants(c);
+        }
+        return super.removeClient(clientId);
     }
 
     protected void removeClientCodeGrants(Client c) {
-        for (ServerAuthorizationCodeGrant grant : getCodeGrants(c, null)) {
-            removeCodeGrant(grant.getCode());
-        }
+        // The grants set holds encrypted code strings; iterate them directly
+        // rather than going through removeCodeGrant (which expects the same
+        // encrypted form) to avoid the mismatch between the encrypted key and
+        // the plain code embedded in the decrypted payload.
+        grants.removeIf(encryptedCode -> {
+            ServerAuthorizationCodeGrant grant = getCodeGrant(encryptedCode);
+            return grant != null && grant.getClient() != null
+                   && c.getClientId().equals(grant.getClient().getClientId());
+        });
     }
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
@@ -84,16 +94,16 @@ public class DefaultEncryptingCodeDataProvider extends DefaultEncryptingOAuthDat
 
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
-        grants.remove(code);
+        if (!grants.remove(code)) {
+            return null;
+        }
         return ModelEncryptionSupport.decryptCodeGrant(this, code, key);
     }
     public ServerAuthorizationCodeGrant getCodeGrant(String code) throws OAuthServiceException {
-
-        ServerAuthorizationCodeGrant grant = ModelEncryptionSupport.decryptCodeGrant(this, code, key);
-        if (grant != null) {
-            grants.remove(code);
+        if (!grants.contains(code)) {
+            return null;
         }
-        return grant;
+        return ModelEncryptionSupport.decryptCodeGrant(this, code, key);
     }
 
     protected ServerAuthorizationCodeGrant doCreateCodeGrant(AuthorizationCodeRegistration reg)
