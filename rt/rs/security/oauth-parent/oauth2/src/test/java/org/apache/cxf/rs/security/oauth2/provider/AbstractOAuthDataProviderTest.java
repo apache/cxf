@@ -346,6 +346,38 @@ abstract class AbstractOAuthDataProviderTest {
         assertNull(getProvider().getRefreshToken(rt.getTokenKey()));
     }
 
+    /**
+     * Regression test for cross-client refresh token acceptance when recycleRefreshTokens=false.
+     * Client B must not be able to exchange Client A's refresh token for an access token.
+     */
+    @Test
+    public void testCrossClientRefreshTokenRejectedWhenRecycleDisabled() {
+        getProvider().setRecycleRefreshTokens(false);
+
+        // Client A obtains a refresh token for its resource owner.
+        Client clientA = addClient("101", "alice");
+        AccessTokenRegistration atrA = new AccessTokenRegistration();
+        atrA.setClient(clientA);
+        atrA.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atrA.setSubject(clientA.getResourceOwnerSubject());
+        ServerAccessToken atA = getProvider().createAccessToken(atrA);
+        assertNotNull(atA.getRefreshToken());
+
+        // Client B is a separate registered client controlled by an attacker.
+        Client clientB = addClient("102", "bob");
+
+        // Attacker uses Client B credentials to present Client A's refresh token.
+        try {
+            getProvider().refreshAccessToken(clientB, atA.getRefreshToken(), Collections.emptyList());
+            fail("Cross-client refresh token use must be rejected with OAuthServiceException");
+        } catch (OAuthServiceException ex) {
+            assertEquals(OAuthConstants.INVALID_GRANT, ex.getMessage());
+        }
+
+        // Client A's original access token must remain usable.
+        assertNotNull(getProvider().getAccessToken(atA.getTokenKey()));
+    }
+
     protected Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
