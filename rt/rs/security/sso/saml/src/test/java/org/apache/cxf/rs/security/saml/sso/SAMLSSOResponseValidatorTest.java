@@ -325,6 +325,88 @@ public class SAMLSSOResponseValidatorTest {
     }
 
     @org.junit.Test
+    public void testResponseIssuerShortPrefixOfConfiguredIssuer() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+        // An arbitrary short prefix on a different host must not be accepted
+        response.setIssuer(SAML2PResponseComponentBuilder.createIssuer("http://cxf"));
+
+        // Validate the Response
+        SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
+        validator.setIssuerIDP("http://cxf.apache.org/issuer");
+        validator.setAssertionConsumerURL("http://recipient.apache.org");
+        validator.setClientAddress("http://apache.org");
+        validator.setRequestId("12345");
+        validator.setSpIdentifier("http://service.apache.org");
+        try {
+            validator.validateSamlResponse(response, false);
+            fail("Expected failure on issuer that only matches a short prefix of the configured issuer");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
+    public void testResponseIssuerSameOriginPrefixAccepted() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+        // A prefix on the same scheme/host/port is the legitimate entityID-of-endpoint case
+        response.setIssuer(SAML2PResponseComponentBuilder.createIssuer("http://cxf.apache.org"));
+
+        // Validate the Response
+        SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
+        validator.setIssuerIDP("http://cxf.apache.org/issuer");
+        validator.setAssertionConsumerURL("http://recipient.apache.org");
+        validator.setClientAddress("http://apache.org");
+        validator.setRequestId("12345");
+        validator.setSpIdentifier("http://service.apache.org");
+
+        SSOValidatorResponse validateSamlResponse = validator.validateSamlResponse(response, false);
+        assertEquals(response.getID(), validateSamlResponse.getResponseId());
+    }
+
+    @org.junit.Test
+    public void testResponseIssuerStrictMatchRejectsPrefix() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+        // Same-origin prefix, but strict matching must require an exact match
+        response.setIssuer(SAML2PResponseComponentBuilder.createIssuer("http://cxf.apache.org"));
+
+        // Validate the Response
+        SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
+        validator.setEnforceStrictIssuerMatch(true);
+        validator.setIssuerIDP("http://cxf.apache.org/issuer");
+        validator.setAssertionConsumerURL("http://recipient.apache.org");
+        validator.setClientAddress("http://apache.org");
+        validator.setRequestId("12345");
+        validator.setSpIdentifier("http://service.apache.org");
+        try {
+            validator.validateSamlResponse(response, false);
+            fail("Expected failure on prefix issuer when strict matching is enforced");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
     public void testMissingAuthnStatement() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
