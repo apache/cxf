@@ -20,6 +20,10 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -35,9 +39,43 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class DefaultEncryptingOAuthDataProviderTest {
+    private static class BlockingRefreshProvider extends DefaultEncryptingOAuthDataProvider {
+        private final CountDownLatch enteredUpdate = new CountDownLatch(1);
+        private final CountDownLatch allowUpdate = new CountDownLatch(1);
+
+        BlockingRefreshProvider() {
+            super(new KeyProperties("AES", 128));
+        }
+
+        @Override
+        protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
+            enteredUpdate.countDown();
+            try {
+                if (!allowUpdate.await(5, TimeUnit.SECONDS)) {
+                    throw new OAuthServiceException("Timed out waiting to continue refresh update");
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new OAuthServiceException("Interrupted while waiting to continue refresh update", ex);
+            }
+            // For this lock-ordering regression we only need to hold and release the lock,
+            // not to exercise refresh-token list mutation semantics.
+            return rt;
+        }
+
+        boolean awaitEnteredUpdate(long timeout, TimeUnit unit) throws InterruptedException {
+            return enteredUpdate.await(timeout, unit);
+        }
+
+        void continueUpdate() {
+            allowUpdate.countDown();
+        }
+    }
+
     private DefaultEncryptingOAuthDataProvider provider;
 
     @Before
@@ -263,5 +301,77 @@ public class DefaultEncryptingOAuthDataProviderTest {
         // This prevents using the revoked refresh token to mint new access tokens
         assertNull("Revoked refresh token must return null, preventing token minting", 
                    provider.getRefreshToken(refreshTokenKey));
+    }
+
+    @Test
+    public void testRevokeWaitsForRefreshWhenRecycleDisabled() throws Exception {
+        BlockingRefreshProvider blockingProvider = new BlockingRefreshProvider();
+        try {
+            blockingProvider.setSupportedScopes(Collections.singletonMap("read", "Read Scope"));
+            blockingProvider.setSupportedScopes(Collections.singletonMap("refreshToken", "RefreshToken"));
+            blockingProvider.setRecycleRefreshTokens(false);
+
+            Client c = new Client();
+            c.setRedirectUris(Collections.singletonList("http://client/redirect"));
+            c.setClientId("race-client");
+            c.setClientSecret("secret");
+            c.setResourceOwnerSubject(new UserSubject("race-user"));
+            blockingProvider.setClient(c);
+
+            AccessTokenRegistration atr = new AccessTokenRegistration();
+            atr.setClient(c);
+            atr.setApprovedScope(Arrays.asList("read", "refreshToken"));
+            atr.setSubject(c.getResourceOwnerSubject());
+
+            ServerAccessToken initial = blockingProvider.createAccessToken(atr);
+            String refreshTokenKey = initial.getRefreshToken();
+
+            AtomicReference<Throwable> refreshFailure = new AtomicReference<>();
+            AtomicReference<Throwable> revokeFailure = new AtomicReference<>();
+
+            Thread refreshThread = new Thread(() -> {
+                try {
+                    blockingProvider.refreshAccessToken(c, refreshTokenKey, Collections.emptyList());
+                } catch (Throwable ex) {
+                    refreshFailure.set(ex);
+                }
+            });
+
+            refreshThread.start();
+            assertTrue("Refresh thread should reach the refresh-token update phase",
+                       blockingProvider.awaitEnteredUpdate(5, TimeUnit.SECONDS));
+
+            Thread revokeThread = new Thread(() -> {
+                try {
+                    blockingProvider.revokeToken(c, refreshTokenKey, OAuthConstants.REFRESH_TOKEN);
+                } catch (Throwable ex) {
+                    revokeFailure.set(ex);
+                }
+            });
+
+            revokeThread.start();
+            revokeThread.join(200);
+            assertTrue("Revoke must block while refresh holds refreshTokenLock", revokeThread.isAlive());
+
+            blockingProvider.continueUpdate();
+
+            refreshThread.join(5000);
+            revokeThread.join(5000);
+
+            assertTrue("Refresh thread must finish", !refreshThread.isAlive());
+            assertTrue("Revoke thread must finish after refresh releases lock", !revokeThread.isAlive());
+            assertNull("Refresh thread must not fail", refreshFailure.get());
+            assertNull("Revoke thread must not fail", revokeFailure.get());
+            assertNull("Refresh token should be revoked after revoke thread completes",
+                       blockingProvider.getRefreshToken(refreshTokenKey));
+
+            List<ServerAccessToken> remaining = blockingProvider.getAccessTokens(c, c.getResourceOwnerSubject());
+            for (ServerAccessToken token : remaining) {
+                assertNull("No remaining access token should reference a revoked refresh token",
+                           token.getRefreshToken());
+            }
+        } finally {
+            blockingProvider.close();
+        }
     }
 }
