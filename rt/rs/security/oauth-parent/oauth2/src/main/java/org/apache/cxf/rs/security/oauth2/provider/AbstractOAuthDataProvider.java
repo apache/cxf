@@ -241,6 +241,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (currentRefreshToken == null) {
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
         }
+        if (!currentRefreshToken.getClient().getClientId().equals(client.getClientId())) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
         if (OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
             if (!recycleRefreshTokens) {
                 revokeRefreshToken(client, refreshTokenKey);
