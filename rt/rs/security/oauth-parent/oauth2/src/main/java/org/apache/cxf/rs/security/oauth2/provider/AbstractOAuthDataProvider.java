@@ -271,6 +271,17 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     @Override
     public void revokeToken(Client client, UserSubject callerSubject, String tokenKey, String tokenTypeHint)
         throws OAuthServiceException {
+        if (!recycleRefreshTokens) {
+            synchronized (refreshTokenLock) {
+                doRevokeToken(client, callerSubject, tokenKey, tokenTypeHint);
+            }
+            return;
+        }
+        doRevokeToken(client, callerSubject, tokenKey, tokenTypeHint);
+    }
+
+    private void doRevokeToken(Client client, UserSubject callerSubject,
+                               String tokenKey, String tokenTypeHint) {
         ServerAccessToken accessToken = null;
         if (!OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) {
             accessToken = revokeAccessToken(client, callerSubject, tokenKey);
