@@ -278,12 +278,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         } else {
             doRevokeToken(client, callerSubject, tokenKey, tokenTypeHint);
         }
-            synchronized (refreshTokenLock) {
-                doRevokeToken(client, callerSubject, tokenKey, tokenTypeHint);
-            }
-            return;
-        }
-        doRevokeToken(client, callerSubject, tokenKey, tokenTypeHint);
     }
 
     private void doRevokeToken(Client client, UserSubject callerSubject,
