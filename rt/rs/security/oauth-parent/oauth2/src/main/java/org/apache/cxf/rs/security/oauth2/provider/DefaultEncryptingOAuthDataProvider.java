@@ -100,6 +100,10 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
+        // Check if token has been revoked (RFC 7009 §2.1 compliance)
+        if (!tokens.contains(accessToken)) {
+            return null;
+        }
         try {
             return ModelEncryptionSupport.decryptAccessToken(this, accessToken, key);
         } catch (SecurityException ex) {
@@ -136,6 +140,10 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
     @Override
     protected RefreshToken getRefreshToken(String refreshTokenKey) {
+        // Check if token has been revoked (RFC 7009 §2.1 compliance)
+        if (!refreshTokens.contains(refreshTokenKey)) {
+            return null;
+        }
         try {
             return ModelEncryptionSupport.decryptRefreshToken(this, refreshTokenKey, key);
         } catch (SecurityException ex) {
