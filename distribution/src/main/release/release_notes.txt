@@ -1,4 +1,4 @@
-Apache CXF 4.1.7 Release Notes
+Apache CXF 4.1.8 Release Notes
 
 1. Overview
 
@@ -27,7 +27,7 @@ for further information and requirements for upgrading from earlier
 versions of CXF.
 
 
-4.1.7 fixes over 4 JIRA issues reported by users and the community.
+4.1.8 fixes over 6 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,14 +70,11 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-9129] - Chunked attachment streaming not working when using ws-security
-
-
-
-
-** Improvement
-    * [CXF-9213] - RetryStrategy is a stateful class whose objects shouldn't be reused
-    * [CXF-9214] - WSDLs and XSDs cannot be loaded from class path on GraalVM
-    * [CXF-9218] - Respect configured ProxySelector instead of hard-wiring system proxy properties
+    * [CXF-9219] - cxf-bom manages dependencies for 4.x that no longer exist or are not published
+    * [CXF-9221] - JCache providers use inverted isExpired() logic causing expired tokens/codes to never be evicted
+    * [CXF-9223] - completeAudienceMatch=false defaults to prefix matching for audience validation, widening resource access
+    * [CXF-9225] - OIDC RP does not enforce nonce validation for Implicit/Hybrid flows
+    * [CXF-9226] - Proxy authentication fails with IllegalStateException instead of HTTPException (407)
+    * [CXF-9227] - CXF 4.1.7 regression: more SecurityManager permission requirements
 
 
