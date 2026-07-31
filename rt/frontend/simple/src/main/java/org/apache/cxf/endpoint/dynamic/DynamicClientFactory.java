@@ -972,7 +972,7 @@ public class DynamicClientFactory {
         return addedToNotDone ? null : element;
     }
 
-    public Node cloneNode(Document document, Node node, boolean deep) throws DOMException {
+    private Node cloneNode(Document document, Node node, boolean deep) throws DOMException {
         if (document == null || node == null) {
             return null;
         }
