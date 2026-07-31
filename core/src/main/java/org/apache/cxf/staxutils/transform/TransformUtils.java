@@ -42,6 +42,17 @@ public final class TransformUtils {
         return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
     }
 
+    public static XMLStreamReader createNewReaderIfNeeded(
+            XMLStreamReader reader, InputStream is, String encoding) {
+        if (reader != null) {
+            return reader;
+        }
+        if (encoding != null) {
+            return StaxUtils.createXMLStreamReader(is, encoding);
+        }
+        return StaxUtils.createXMLStreamReader(is);
+    }
+
     public static XMLStreamWriter createNewWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
         return createNewWriterIfNeeded(writer, os, null);
     }
@@ -106,15 +117,30 @@ public final class TransformUtils {
                                                                 Map<String, String> inAppendMap,
                                                                 Map<String, String> inAttributesMap,
                                                                 boolean blockOriginalReader) {
+        return createTransformReaderIfNeeded(reader, is,
+                          inDropElements, inElementsMap, inAppendMap,
+                          inAttributesMap, blockOriginalReader, null);
+    }
+
+    //CHECKSTYLE:OFF ParameterNumber
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
+                                                                InputStream is,
+                                                                List<String> inDropElements,
+                                                                Map<String, String> inElementsMap,
+                                                                Map<String, String> inAppendMap,
+                                                                Map<String, String> inAttributesMap,
+                                                                boolean blockOriginalReader,
+                                                                String encoding) {
         if (inElementsMap != null || inAppendMap != null || inDropElements != null
             || inAttributesMap != null) {
-            reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
+            reader = new InTransformReader(createNewReaderIfNeeded(reader, is, encoding),
                                            inElementsMap, inAppendMap, inDropElements,
                                            inAttributesMap, blockOriginalReader);
         }
 
         return reader;
     }
+    //CHECKSTYLE:ON ParameterNumber
 
     protected static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
