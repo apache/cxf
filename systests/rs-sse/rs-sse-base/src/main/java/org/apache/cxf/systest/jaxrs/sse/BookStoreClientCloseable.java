@@ -97,16 +97,18 @@ abstract class BookStoreClientCloseable {
                 Thread.sleep(500);
                 localBroadcaster.broadcast(createEvent(builder.name("book"), id + 4))
                     .whenComplete((r, ex) -> {
-                        // we expect the sink to be closed at this point
-                        if (ex != null || !sink.isClosed()) {
+                        // Count only an unexpected successful delivery after client close.
+                        if (ex == null && !sink.isClosed()) {
                             stats.inc();
                         }   
                     });
 
-                stats.setWasClosed(sink.isClosed());
-                phaser.arriveAndDeregister();
-                
-                sink.close();
+                try {
+                    sink.close();
+                } finally {
+                    stats.setWasClosed(sink.isClosed());
+                    phaser.arriveAndDeregister();
+                }
             } catch (final InterruptedException ex) {
                 LOG.error("Communication error", ex);
             }
