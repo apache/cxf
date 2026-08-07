@@ -47,6 +47,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
+import static org.apache.cxf.ext.logging.event.EventType.*;
+
 public class DefaultLogEventMapper {
     public static final String MASKED_HEADER_VALUE = "XXX";
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
@@ -352,9 +354,23 @@ public class DefaultLogEventMapper {
             return isRequestor ? EventType.REQ_OUT : EventType.RESP_OUT;
         }
         if (isFault) {
-            return EventType.FAULT_IN;
+            return FAULT_IN;
         }
         return isRequestor ? EventType.RESP_IN : EventType.REQ_IN;
+    }
+
+    /**
+     * Get the normalize 'flow' from the eventType
+     *
+     * @param eventType
+     * @return normalized eventType
+     */
+    public static EventType normalizeFlow(EventType eventType){
+        return switch (eventType) {
+            case FAULT_IN -> RESP_IN;
+            case FAULT_OUT -> RESP_OUT;
+            default -> eventType;
+        };
     }
 
     /**

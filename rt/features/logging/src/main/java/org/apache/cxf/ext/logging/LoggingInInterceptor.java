@@ -81,15 +81,16 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
 
     public void handleMessage(Message message) throws Fault {
-        if (isLoggingDisabledNow(message)) {
-            return;
-        } else {
-            //ensure only logging once for a certain message
-            //this can prevent message logging again when fault
-            //happen after PRE_INVOKE phase(rewind calls into LoggingInFaultInterceptor)
-            message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
-        }
+
         createExchangeId(message);
+        if (isLoggingDisabledNow(message) || isLoggingDisabledForThisFlow(message)) {
+            return;
+        }
+        //ensure only logging once for a certain message
+        //this can prevent message logging again when fault
+        //happen after PRE_INVOKE phase(rewind calls into LoggingInFaultInterceptor)
+        disableFutureLoggingForThisFlow(message);
+
         final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
         if (shouldLogContent(event)) {
             addContent(message, event);

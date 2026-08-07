@@ -22,15 +22,12 @@ package org.apache.cxf.ext.logging;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -38,11 +35,14 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.cxf.common.util.PropertyUtils.isFalse;
+import static org.apache.cxf.ext.logging.AbstractLoggingInterceptor.IDEMPOTENT_LOGGING_PROP;
 import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.MASKED_HEADER_VALUE;
+import static org.apache.cxf.ext.logging.event.EventType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class LoggingInInterceptorTest {
     private static final String TEST_HEADER_VALUE = "TestValue";
@@ -233,5 +233,33 @@ public class LoggingInInterceptorTest {
         final LogEvent event = sender.getEvents().get(0);
 
         assertThat(event.getPayload(), equalToIgnoringCase(buf.toString()));
+    }
+
+    @Test
+    public void testLoggingEnable(){
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        exchange.setOutMessage(message);
+        message.setExchange(exchange);
+        message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        assertEquals(FAULT_OUT, mapper.getEventType(message));
+
+        assertNull(message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
+        assertFalse(interceptor.isLoggingDisabledForThisFlow(message));
+        assertNotNull(message.getExchange().get(LogEvent.KEY_EXCHANGE_ID));
+        interceptor.disableFutureLoggingForThisFlow(message);
+        assertTrue(interceptor.isLoggingDisabledForThisFlow(message));
+
+        assertNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + REQ_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + REQ_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + RESP_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNotNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + RESP_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID))); //The only present // FAULT_OUT normalized
+        assertNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + FAULT_IN + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+        assertNull(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + FAULT_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID)));
+
+        assertTrue(isFalse(message.getContextualProperty(IDEMPOTENT_LOGGING_PROP + RESP_OUT + '.' + message.getExchange().get(LogEvent.KEY_EXCHANGE_ID))));
+
     }
 }

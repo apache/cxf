@@ -43,6 +43,8 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Test;
 
 import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.MASKED_HEADER_VALUE;
+import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.normalizeFlow;
+import static org.apache.cxf.ext.logging.event.EventType.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -81,7 +83,7 @@ public class DefaultLogEventMapperTest {
         message.setExchange(exchange);
         exchange.setOutMessage(message);
         LogEvent event = mapper.map(message, Collections.emptySet());
-        assertEquals(EventType.RESP_OUT, event.getType());
+        assertEquals(RESP_OUT, event.getType());
     }
 
     /**
@@ -205,5 +207,11 @@ public class DefaultLogEventMapperTest {
 
         LogEvent event = Subject.doAs(subject, (PrivilegedAction<LogEvent>) () -> mapper.map(message));
         assertThat(event.getPrincipal(), is(nullValue()));
+    }
+
+    @Test
+    public void testNormalizeFlow(){
+        assertEquals(RESP_IN, normalizeFlow(FAULT_IN));
+        assertEquals(RESP_OUT, normalizeFlow(FAULT_OUT));
     }
 }
