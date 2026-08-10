@@ -136,7 +136,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = super.toCodeRequestState(rc, ui);
         if (maxAgeOffset != null) {
-            state.putSingle(MAX_AGE_PARAMETER, Long.toString(System.currentTimeMillis() + maxAgeOffset));
+            // Store the earliest acceptable auth_time (seconds) so validateIdToken can compare
+            // directly against the id_token auth_time claim, which is also in seconds.
+            state.putSingle(MAX_AGE_PARAMETER, Long.toString(System.currentTimeMillis() / 1000 - maxAgeOffset));
         }
         // Per OIDC Core §3.2.2.1 and §3.3.2.1, a nonce is REQUIRED for Implicit and Hybrid flows
         // (any response_type containing "id_token"). Auto-generate one if the caller has not
@@ -166,9 +168,10 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         if (maxAgeOffset != null) {
-            long authTime = Long.parseLong(state.getFirst(MAX_AGE_PARAMETER));
+            long minAuthTime = Long.parseLong(state.getFirst(MAX_AGE_PARAMETER));
             Long tokenAuthTime = idToken.getAuthenticationTime();
-            if (tokenAuthTime > authTime) {
+            // auth_time is required when max_age was requested (OIDC Core §3.1.3.7).
+            if (tokenAuthTime == null || tokenAuthTime < minAuthTime) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         }
@@ -210,8 +213,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         if (nonce != null) {
             ub.queryParam(IdToken.NONCE_CLAIM, nonce);
         }
-        if (redirectState != null && redirectState.getFirst(MAX_AGE_PARAMETER) != null) {
-            ub.queryParam(MAX_AGE_PARAMETER, redirectState.getFirst(MAX_AGE_PARAMETER));
+        if (maxAgeOffset != null) {
+            // max_age is a duration in seconds per OIDC Core §3.1.2.1, not a timestamp.
+            ub.queryParam(MAX_AGE_PARAMETER, Long.toString(maxAgeOffset));
         }
         if (codeRequestState != null && codeRequestState.getFirst(LOGIN_HINT_PARAMETER) != null) {
             ub.queryParam(LOGIN_HINT_PARAMETER, codeRequestState.getFirst(LOGIN_HINT_PARAMETER));
