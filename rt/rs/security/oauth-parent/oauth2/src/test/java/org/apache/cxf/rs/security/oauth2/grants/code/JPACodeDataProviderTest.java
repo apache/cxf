@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class JPACodeDataProviderTest {
@@ -100,6 +101,30 @@ public class JPACodeDataProviderTest {
         grants = getProvider().getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(0, grants.size());
+    }
+
+    @Test
+    public void testRemoveCodeGrantTwiceReturnsNullOnSecondCall() {
+        Client c = addClient("222", "alice");
+
+        AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        try {
+            ServerAuthorizationCodeGrant grant = getProvider().createCodeGrant(atr);
+
+            ServerAuthorizationCodeGrant first = getProvider().removeCodeGrant(grant.getCode());
+            assertNotNull(first);
+            assertEquals(grant.getCode(), first.getCode());
+
+            // second remove must not return the grant (single-use enforcement)
+            ServerAuthorizationCodeGrant second = getProvider().removeCodeGrant(grant.getCode());
+            assertNull(second);
+        } finally {
+            getProvider().removeClient(c.getClientId());
+        }
     }
 
     @Test
