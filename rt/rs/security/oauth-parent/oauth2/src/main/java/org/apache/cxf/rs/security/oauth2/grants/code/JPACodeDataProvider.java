@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -97,9 +98,16 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
     }
 
     private ServerAuthorizationCodeGrant removeCodeGrant(String code, EntityManager em) throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = em.getReference(ServerAuthorizationCodeGrant.class, code);
+        return removeCodeGrant(code, em, LockModeType.PESSIMISTIC_WRITE);
+    }
+
+    protected ServerAuthorizationCodeGrant removeCodeGrant(String code, EntityManager em,
+                                                           LockModeType lockModeType) throws OAuthServiceException {
+        ServerAuthorizationCodeGrant grant = em.find(ServerAuthorizationCodeGrant.class, code, lockModeType);
         try {
-            em.remove(grant);
+            if (grant != null) {
+                em.remove(grant);
+            }
         } catch (EntityNotFoundException e) {
         }
         return grant;
