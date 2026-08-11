@@ -25,9 +25,12 @@ import java.util.Map;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.LockModeType;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * Same as {@link JPACodeDataProvider} (stores Clients and tokens in a rdbms using
@@ -120,6 +123,28 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
      */
     @Override
     protected void closeIfNeeded(EntityManager em) {
+    }
+
+    @Override
+    protected RefreshToken revokeRefreshToken(Client client, UserSubject callerSubject, String refreshTokenKey) {
+        // Atomic find + validate + delete with lock timeout hint, parallel to removeCodeGrant.
+        final Map<String, Object> options = new HashMap<>();
+        options.put(JPA_LOCK_TIMEOUT_HINT, pessimisticLockTimeout);
+        return executeInTransaction(em -> {
+            RefreshToken refreshToken = em.find(RefreshToken.class, refreshTokenKey,
+                                                LockModeType.PESSIMISTIC_WRITE, options);
+            if (refreshToken != null) {
+                if (!refreshToken.getClient().getClientId().equals(client.getClientId())) {
+                    throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+                }
+                if (callerSubject != null && refreshToken.getSubject() != null
+                    && !callerSubject.getLogin().equals(refreshToken.getSubject().getLogin())) {
+                    throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+                }
+                em.remove(refreshToken);
+            }
+            return refreshToken;
+        });
     }
 
     @Override
