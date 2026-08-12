@@ -23,13 +23,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.TokenIntrospection;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
@@ -250,6 +254,72 @@ public class OAuthJSONProviderTest {
                      macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY));
         assertEquals("hmac-sha-256",
                      macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM));
+    }
+
+    @Test
+    public void testWriteClientAccessTokenEscapesJsonStringValues() throws Exception {
+        ClientAccessToken token = new ClientAccessToken(OAuthConstants.BEARER_TOKEN_TYPE, "1234");
+        token.setExpiresIn(10);
+        token.setApprovedScope("read\"write\\scope\nnext\tstep");
+        token.setParameters(Collections.singletonMap("custom", "value\"\\\r\n"));
+
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(token,
+                         ClientAccessToken.class,
+                         ClientAccessToken.class,
+                         new Annotation[] {},
+                         MediaType.APPLICATION_JSON_TYPE,
+                         new MetadataMap<String, Object>(),
+                         bos);
+
+        Map<String, Object> parsed = new JsonMapObjectReaderWriter().fromJson(bos.toString());
+        assertEquals("read\"write\\scope\nnext\tstep", parsed.get(OAuthConstants.SCOPE));
+        assertEquals("value\"\\\r\n", parsed.get("custom"));
+        assertFalse(parsed.containsKey("scope\""));
+    }
+
+    @Test
+    public void testWriteOAuthErrorEscapesErrorDescription() throws Exception {
+        OAuthError error = new OAuthError("invalid_request", "bad \"request\"\\line\nnext\rline\tend");
+
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(error,
+                         OAuthError.class,
+                         OAuthError.class,
+                         new Annotation[] {},
+                         MediaType.APPLICATION_JSON_TYPE,
+                         new MetadataMap<String, Object>(),
+                         bos);
+
+        Map<String, Object> parsed = new JsonMapObjectReaderWriter().fromJson(bos.toString());
+        assertEquals("invalid_request", parsed.get(OAuthConstants.ERROR_KEY));
+        assertEquals("bad \"request\"\\line\nnext\rline\tend", parsed.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
+    }
+
+    @Test
+    public void testWriteTokenIntrospectionEscapesAudienceValues() throws Exception {
+        TokenIntrospection introspection = new TokenIntrospection(true);
+        introspection.setIat(10L);
+        introspection.setAud(Arrays.asList("https://a.example/\"quoted\"", "https://b.example/path\\slash\nnext"));
+
+        OAuthJSONProvider provider = new OAuthJSONProvider();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(introspection,
+                         TokenIntrospection.class,
+                         TokenIntrospection.class,
+                         new Annotation[] {},
+                         MediaType.APPLICATION_JSON_TYPE,
+                         new MetadataMap<String, Object>(),
+                         bos);
+
+        Map<String, Object> parsed = new JsonMapObjectReaderWriter().fromJson(bos.toString());
+        @SuppressWarnings("unchecked")
+        List<String> aud = (List<String>)parsed.get("aud");
+        assertEquals(2, aud.size());
+        assertEquals("https://a.example/\"quoted\"", aud.get(0));
+        assertEquals("https://b.example/path\\slash\nnext", aud.get(1));
     }
 
 }
