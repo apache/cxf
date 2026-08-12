@@ -351,6 +351,31 @@ abstract class AbstractOAuthDataProviderTest {
      * Client B must not be able to exchange Client A's refresh token for an access token.
      */
     @Test
+    public void testRefreshTokenSingleUseEnforcedWhenRecycled() {
+        Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        String rtKey = at.getRefreshToken();
+        assertNotNull("Expected a refresh token to be issued", rtKey);
+
+        // First use must succeed and invalidate the original token.
+        getProvider().refreshAccessToken(c, rtKey, Collections.emptyList());
+
+        // Second use of the same (now consumed) refresh token must be denied.
+        try {
+            getProvider().refreshAccessToken(c, rtKey, Collections.emptyList());
+            fail("Replayed refresh token must be rejected");
+        } catch (OAuthServiceException ex) {
+            assertEquals(OAuthConstants.ACCESS_DENIED, ex.getMessage());
+        }
+    }
+
+    @Test
     public void testCrossClientRefreshTokenRejectedWhenRecycleDisabled() {
         getProvider().setRecycleRefreshTokens(false);
 
