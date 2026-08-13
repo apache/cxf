@@ -24,11 +24,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.CreatedExpiryPolicy;
+import javax.cache.expiry.Duration;
 import javax.cache.spi.CachingProvider;
 
 import org.apache.cxf.Bus;
@@ -43,6 +46,13 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 import static org.apache.cxf.jaxrs.utils.ResourceUtils.getClasspathResourceURL;
 
+/**
+ * By default the client/access-token/refresh-token JCache caches are eternal at the cache
+ * infrastructure level: expired tokens are only ever removed when looked up (e.g. via
+ * {@link #getAccessToken}/{@link #getAccessTokens}), so entries that are never queried again
+ * accumulate for the life of the process. Pass a {@link CacheTTLs} to one of the constructors
+ * to have the JCache provider itself evict expired access/refresh token entries.
+ */
 public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public static final String CLIENT_CACHE_KEY = "cxf.oauth2.client.cache";
     public static final String ACCESS_TOKEN_CACHE_KEY = "cxf.oauth2.accesstoken.cache";
@@ -86,18 +96,65 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
                                    String accessTokenCacheKey,
                                    String refreshTokenCacheKey,
                                    boolean storeJwtTokenKeyOnly) {
+        this(configFileURL, bus, clientCacheKey, accessTokenCacheKey, refreshTokenCacheKey,
+             storeJwtTokenKeyOnly, CacheTTLs.ETERNAL);
+    }
+
+    // cacheTTLs lets the access/refresh token caches be evicted by the JCache infrastructure
+    // itself once entries age out, independently of any application-level expiry check;
+    // a TTL <= 0 (CacheTTLs.ETERNAL by default) leaves the corresponding cache eternal
+    public JCacheOAuthDataProvider(String configFileURL,
+                                   Bus bus,
+                                   String clientCacheKey,
+                                   String accessTokenCacheKey,
+                                   String refreshTokenCacheKey,
+                                   boolean storeJwtTokenKeyOnly,
+                                   CacheTTLs cacheTTLs) {
 
         cacheManager = createCacheManager(configFileURL, bus);
-        clientCache = createCache(cacheManager, clientCacheKey, String.class, Client.class);
+        // clients are persistent configuration, not time-bound tokens, so the cache stays eternal
+        clientCache = createCache(cacheManager, clientCacheKey, String.class, Client.class, -1);
 
         this.storeJwtTokenKeyOnly = storeJwtTokenKeyOnly;
         if (storeJwtTokenKeyOnly) {
-            jwtAccessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, String.class);
+            jwtAccessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, String.class,
+                                              cacheTTLs.getAccessTokenSeconds());
         } else {
-            accessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, ServerAccessToken.class);
+            accessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, ServerAccessToken.class,
+                                           cacheTTLs.getAccessTokenSeconds());
         }
 
-        refreshTokenCache = createCache(cacheManager, refreshTokenCacheKey, String.class, RefreshToken.class);
+        refreshTokenCache = createCache(cacheManager, refreshTokenCacheKey, String.class, RefreshToken.class,
+                                        cacheTTLs.getRefreshTokenSeconds());
+    }
+
+    // immutable holder so the access/refresh token cache TTLs can be passed as a single
+    // constructor argument without exceeding the parameter-count limit
+    /**
+     * Cache-infrastructure-level time-to-live for the access/refresh token caches, in seconds.
+     * Not enabled by default: {@link #ETERNAL} (both values {@code -1}) means neither cache
+     * expires entries on its own, matching the pre-existing default behavior. A value {@code <= 0}
+     * for either field leaves that specific cache eternal, e.g. to match an eternal-by-default
+     * ({@code refreshTokenLifetime == 0}) refresh token configuration.
+     */
+    public static final class CacheTTLs {
+        public static final CacheTTLs ETERNAL = new CacheTTLs(-1, -1);
+
+        private final long accessTokenSeconds;
+        private final long refreshTokenSeconds;
+
+        public CacheTTLs(long accessTokenSeconds, long refreshTokenSeconds) {
+            this.accessTokenSeconds = accessTokenSeconds;
+            this.refreshTokenSeconds = refreshTokenSeconds;
+        }
+
+        public long getAccessTokenSeconds() {
+            return accessTokenSeconds;
+        }
+
+        public long getRefreshTokenSeconds() {
+            return refreshTokenSeconds;
+        }
     }
 
     @Override
@@ -299,16 +356,24 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected static <K, V> Cache<K, V> createCache(CacheManager cacheManager,
                                                     String cacheKey, Class<K> keyType, Class<V> valueType) {
+        return createCache(cacheManager, cacheKey, keyType, valueType, -1);
+    }
+
+    protected static <K, V> Cache<K, V> createCache(CacheManager cacheManager,
+                                                    String cacheKey, Class<K> keyType, Class<V> valueType,
+                                                    long ttlSeconds) {
 
         Cache<K, V> cache = cacheManager.getCache(cacheKey, keyType, valueType);
         if (cache == null) {
-            cache = cacheManager.createCache(
-                cacheKey,
-                new MutableConfiguration<K, V>()
-                    .setTypes(keyType, valueType)
-                    .setStoreByValue(true)
-                    .setStatisticsEnabled(false)
-            );
+            MutableConfiguration<K, V> configuration = new MutableConfiguration<K, V>()
+                .setTypes(keyType, valueType)
+                .setStoreByValue(true)
+                .setStatisticsEnabled(false);
+            if (ttlSeconds > 0) {
+                configuration.setExpiryPolicyFactory(
+                    CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, ttlSeconds)));
+            }
+            cache = cacheManager.createCache(cacheKey, configuration);
         }
 
         return cache;
