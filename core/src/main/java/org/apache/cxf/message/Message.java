@@ -211,6 +211,12 @@ public interface Message extends StringMap {
      */
     String THREAD_SAFE_STAX_FACTORIES = Message.class.getName() + ".THREAD_SAFE_STAX_FACTORIES";
 
+
+    /**
+     * Property to disable the interceptor log of the Message
+     */
+    String LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
+
     String getId();
     void setId(String id);
 
