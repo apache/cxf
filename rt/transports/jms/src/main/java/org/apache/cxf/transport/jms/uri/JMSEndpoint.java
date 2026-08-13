@@ -89,6 +89,8 @@ public class JMSEndpoint {
     private int retryInterval = 5000;
     private boolean oneSessionPerConnection;
     private boolean ignoreTimeoutException;
+    private boolean useObjectMessageFallback;
+    private boolean allowObjectMessages;
 
     /**
      * @param endpointUri
@@ -515,6 +517,30 @@ public class JMSEndpoint {
 
     public void setIgnoreTimeoutException(boolean ignoreTimeoutException) {
         this.ignoreTimeoutException = ignoreTimeoutException;
+    }
+
+    public boolean isAllowObjectMessages() {
+        return allowObjectMessages;
+    }
+
+    public void setAllowObjectMessages(boolean allowObjectMessages) {
+        this.allowObjectMessages = allowObjectMessages;
+    }
+
+    public void setAllowObjectMessages(String allowObjectMessages) {
+        this.allowObjectMessages = Boolean.parseBoolean(allowObjectMessages);
+    }
+
+    public boolean isUseObjectMessageFallback() {
+        return useObjectMessageFallback;
+    }
+
+    public void setUseObjectMessageFallback(boolean useObjectMessageFallback) {
+        this.useObjectMessageFallback = useObjectMessageFallback;
+    }
+
+    public void setUseObjectMessageFallback(String useObjectMessageFallback) {
+        this.useObjectMessageFallback = Boolean.parseBoolean(useObjectMessageFallback);
     }
 
 }

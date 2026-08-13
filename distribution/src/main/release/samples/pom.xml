@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.3-SNAPSHOT</version>
+    <version>4.2.4-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
@@ -33,11 +33,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <cxf.spring.boot.version>4.1.0</cxf.spring.boot.version>
         <cxf.spring.cloud.eureka.version>5.0.2</cxf.spring.cloud.eureka.version>
-        <cxf.jetty12.version>12.1.11</cxf.jetty12.version>
-        <cxf.netty.version>4.2.16.Final</cxf.netty.version>
+        <cxf.jetty12.version>12.1.12</cxf.jetty12.version>
+        <cxf.netty.version>4.2.17.Final</cxf.netty.version>
         <cxf.httpcomponents.client.version>4.5.14</cxf.httpcomponents.client.version>
-        <cxf.swagger.ui.version>5.32.8</cxf.swagger.ui.version>
-        <cxf.tika.version>3.3.1</cxf.tika.version>
+        <cxf.swagger.ui.version>5.32.11</cxf.swagger.ui.version>
+        <cxf.tika.version>3.3.2</cxf.tika.version>
         <cxf.tomcat.version>11.0.24</cxf.tomcat.version>
         <cxf.jboss.weld.version>6.0.4.Final</cxf.jboss.weld.version>
         <cxf.gson.version>2.14.0</cxf.gson.version>
@@ -169,14 +169,14 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>4.2.3-SNAPSHOT</version>
+                <version>4.2.4-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>4.2.3-SNAPSHOT</version>
+                <version>4.2.4-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -213,7 +213,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>6.0.2</version>
+                    <version>6.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>

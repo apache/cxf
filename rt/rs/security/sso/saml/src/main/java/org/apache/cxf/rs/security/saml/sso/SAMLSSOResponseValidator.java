@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.logging.Logger;
@@ -47,6 +48,7 @@ public class SAMLSSOResponseValidator {
     private boolean enforceResponseSigned;
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
+    private boolean enforceStrictIssuerMatch;
     private TokenReplayCache<String> replayCache;
 
     /**
@@ -62,6 +64,15 @@ public class SAMLSSOResponseValidator {
      */
     public void setEnforceKnownIssuer(boolean enforceKnownIssuer) {
         this.enforceKnownIssuer = enforceKnownIssuer;
+    }
+
+    /**
+     * Require the Issuer of the received Response/Assertion to match the configured Issuer IDP
+     * exactly, rather than allowing a same-origin prefix. The default is false, which keeps
+     * backwards compatibility for deployments whose entityID is a prefix of the configured value.
+     */
+    public void setEnforceStrictIssuerMatch(boolean enforceStrictIssuerMatch) {
+        this.enforceStrictIssuerMatch = enforceStrictIssuerMatch;
     }
 
     /**
@@ -169,8 +180,8 @@ public class SAMLSSOResponseValidator {
             return;
         }
 
-        // Issuer value must match (be contained in) Issuer IDP
-        if (enforceKnownIssuer && (issuer.getValue() == null || !issuerIDP.startsWith(issuer.getValue()))) {
+        // Issuer value must match the configured Issuer IDP
+        if (enforceKnownIssuer && !matchesKnownIssuer(issuer.getValue())) {
             LOG.warning("Issuer value: " + issuer.getValue() + " does not match issuer IDP: "
                 + issuerIDP);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -183,6 +194,59 @@ public class SAMLSSOResponseValidator {
                 + SAML2Constants.NAMEID_FORMAT_ENTITY);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
+    }
+
+    private boolean matchesKnownIssuer(String issuerValue) {
+        if (issuerValue == null || issuerIDP == null) {
+            return false;
+        }
+
+        if (issuerIDP.equals(issuerValue)) {
+            return true;
+        }
+
+        // Strict matching only accepts an exact match with the configured Issuer IDP
+        if (enforceStrictIssuerMatch || !issuerIDP.startsWith(issuerValue)) {
+            return false;
+        }
+
+        // Keep prefix compatibility, but for URL-based IdP values require a URL-based issuer on
+        // the same scheme/host/port to avoid accepting arbitrary short prefixes.
+        URI issuerIdpUri = toUri(issuerIDP);
+        if (isHierarchicalAbsoluteUri(issuerIdpUri)) {
+            URI issuerUri = toUri(issuerValue);
+            return isHierarchicalAbsoluteUri(issuerUri)
+                && issuerIdpUri.getScheme().equalsIgnoreCase(issuerUri.getScheme())
+                && issuerIdpUri.getHost().equalsIgnoreCase(issuerUri.getHost())
+                && getEffectivePort(issuerIdpUri) == getEffectivePort(issuerUri);
+        }
+
+        return true;
+    }
+
+    private URI toUri(String value) {
+        try {
+            return URI.create(value);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    private boolean isHierarchicalAbsoluteUri(URI uri) {
+        return uri != null && uri.isAbsolute() && uri.getHost() != null;
+    }
+
+    private int getEffectivePort(URI uri) {
+        if (uri.getPort() != -1) {
+            return uri.getPort();
+        }
+        if ("http".equalsIgnoreCase(uri.getScheme())) {
+            return 80;
+        }
+        if ("https".equalsIgnoreCase(uri.getScheme())) {
+            return 443;
+        }
+        return -1;
     }
 
     /**

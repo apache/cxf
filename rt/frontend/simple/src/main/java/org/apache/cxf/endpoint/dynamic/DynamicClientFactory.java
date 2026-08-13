@@ -972,14 +972,22 @@ public class DynamicClientFactory {
         return addedToNotDone ? null : element;
     }
 
-    public Node cloneNode(Document document, Node node, boolean deep) throws DOMException {
+    private Node cloneNode(Document document, Node node, boolean deep) throws DOMException {
         if (document == null || node == null) {
             return null;
         }
         int type = node.getNodeType();
 
         if (node.getOwnerDocument() == document) {
-            return node.cloneNode(deep);
+            // The schema/WSDL Document backing this node may be cached and shared across
+            // concurrent createClient() calls (see WSDLManagerImpl). The native cloneNode(true)
+            // walk triggers UserDataHandler callbacks (e.g. StaxUtils$LocationUserDataHandler)
+            // that mutate the source document's internal userData table, which is not
+            // thread-safe (WeakHashMap in Xerces-J, HashMap in the JDK DOM impl). Concurrent
+            // clones of the same shared document must therefore be serialized (CXF-9234).
+            synchronized (document) {
+                return node.cloneNode(deep);
+            }
         }
         Node clone;
         switch (type) {

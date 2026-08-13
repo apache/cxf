@@ -28,6 +28,7 @@ import java.util.function.Function;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
@@ -37,6 +38,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * Provides a Jpa BMT implementation for OAuthDataProvider.
@@ -187,6 +189,26 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected RefreshToken getRefreshToken(final String refreshTokenKey) {
         return executeInTransaction(em -> {
             return em.find(RefreshToken.class, refreshTokenKey);
+        });
+    }
+
+    @Override
+    protected RefreshToken revokeRefreshToken(Client client, UserSubject callerSubject, String refreshTokenKey) {
+        // Atomic find + validate + delete in one transaction prevents concurrent replay of the same refresh token.
+        return executeInTransaction(em -> {
+            RefreshToken refreshToken = em.find(RefreshToken.class, refreshTokenKey,
+                                                LockModeType.PESSIMISTIC_WRITE);
+            if (refreshToken != null) {
+                if (!refreshToken.getClient().getClientId().equals(client.getClientId())) {
+                    throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+                }
+                if (callerSubject != null && refreshToken.getSubject() != null
+                    && !callerSubject.getLogin().equals(refreshToken.getSubject().getLogin())) {
+                    throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+                }
+                em.remove(refreshToken);
+            }
+            return refreshToken;
         });
     }
 

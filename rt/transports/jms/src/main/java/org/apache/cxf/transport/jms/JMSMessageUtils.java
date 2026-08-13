@@ -58,11 +58,18 @@ final class JMSMessageUtils {
     }
     public static org.apache.cxf.message.Message asCXFMessage(Message message, String jmsHeadersKey)
         throws UnsupportedEncodingException, JMSException {
+        return asCXFMessage(message, jmsHeadersKey, false);
+    }
+
+    public static org.apache.cxf.message.Message asCXFMessage(Message message,
+                                                              String jmsHeadersKey,
+                                                              boolean allowObjectMessage)
+        throws UnsupportedEncodingException, JMSException {
         org.apache.cxf.message.Message inMessage = new MessageImpl();
         JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
         inMessage.put(jmsHeadersKey, messageHeaders);
         populateIncomingContext(messageHeaders, inMessage);
-        retrieveAndSetPayload(inMessage, message);
+        retrieveAndSetPayload(inMessage, message, allowObjectMessage);
         return inMessage;
     }
 
@@ -74,10 +81,12 @@ final class JMSMessageUtils {
      * @throws UnsupportedEncodingException
      * @throws JMSException
      */
-    private static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
+    private static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage,
+                                              Message message,
+                                              boolean allowObjectMessage)
         throws UnsupportedEncodingException, JMSException {
         final String messageType;
-        Object converted = new JMSMessageConverter().fromMessage(message);
+        Object converted = new JMSMessageConverter(allowObjectMessage).fromMessage(message);
         if (converted instanceof String) {
             inMessage.setContent(Reader.class, new StringReader((String)converted));
             messageType = JMSConstants.TEXT_MESSAGE_TYPE;

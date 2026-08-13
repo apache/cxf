@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf</artifactId>
-    <version>4.2.3-SNAPSHOT</version>
+    <version>4.2.4-SNAPSHOT</version>
     <name>Apache CXF</name>
     <description>Apache CXF is an open-source services framework that aids in 
     the development of services using front-end programming APIs, like JAX-WS 
@@ -457,7 +457,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>6.0.2</version>
+                    <version>6.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
