@@ -32,6 +32,7 @@ import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -63,7 +64,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
-        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+        final Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + "."
+            + MessageUtils.isRequestor(message));
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 

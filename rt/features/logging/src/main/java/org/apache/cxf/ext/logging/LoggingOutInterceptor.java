@@ -37,6 +37,7 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 /**
@@ -65,7 +66,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             //ensure only logging once for a certain message
             //this can prevent message logging again when fault
             //happen after PRE_STREAM phase(LoggingOutInterceptor is called both in out chain and fault out chain)
-            message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
+            message.put(LIVE_LOGGING_PROP + "." + MessageUtils.isRequestor(message), Boolean.FALSE);
         }
         createExchangeId(message);
         final OutputStream os = message.getContent(OutputStream.class);
