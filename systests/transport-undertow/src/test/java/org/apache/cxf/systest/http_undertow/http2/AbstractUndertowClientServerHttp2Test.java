@@ -117,7 +117,7 @@ abstract class AbstractUndertowClientServerHttp2Test extends AbstractBusClientSe
             }
 
             // Create TrustManager instance which trusts all clients and servers
-            params.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers()); 
+            params.setTrustManagers(InsecureTrustManager.getNoOpX509ExtendedTrustManagers()); 
             params.setDisableCNCheck(true);
         }
         
