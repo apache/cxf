@@ -83,6 +83,7 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.core5.concurrent.BasicFuture;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.Header;
@@ -591,7 +592,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
                         sslContext.getSupportedSSLParameters().getProtocols());
 
                     tlsStrategy = new DefaultClientTlsStrategy(sslcontext, protocols,
-                        cipherSuites, SSLBufferMode.STATIC, verifier);
+                        cipherSuites, SSLBufferMode.STATIC, HostnameVerificationPolicy.CLIENT, verifier);
                 } catch (final GeneralSecurityException e) {
                     LOG.warning(e.getMessage());
                 }
