@@ -22,6 +22,7 @@ package org.apache.cxf.jaxws;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,9 @@ import jakarta.xml.ws.handler.soap.SOAPHandler;
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -58,10 +62,12 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.apache.hello_world_soap_http.types.SayHi;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -249,6 +255,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         EndpointInfo ei = service.getServiceInfos().get(0).getEndpoint(new QName(namespace, "SoapPort"));
         JaxWsEndpointImpl endpoint = new JaxWsEndpointImpl(getBus(), service, ei);
 
+        getBus().setFeatures(List.of(new LoggingFeature()));
         ClientImpl client = new ClientImpl(getBus(), endpoint);
 
         BindingOperationInfo bop = ei.getBinding().getOperation(new QName(namespace, "sayHi"));
@@ -305,6 +312,42 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
     }
 
+    @Test
+    public void testEndpointWithLogging() throws Exception {
+        GreeterImpl service = new GreeterImpl();
+        String namespace = "http://apache.org/hello_world_soap_http";
+        try (EndpointImpl ep = new EndpointImpl(getBus(), service, (String) null)) {
+            ep.publish("local://localhost:9092/hello");
+
+            EndpointInfo ei = ep.getService().getServiceInfos().get(0).getEndpoint(new QName(namespace, "SoapPort"));
+            JaxWsEndpointImpl endpoint = new JaxWsEndpointImpl(getBus(), ep.getService(), ei);
+
+            final List<LogEvent> events = new ArrayList<>();
+            final LoggingFeature loggingFeature = new LoggingFeature();
+            loggingFeature.setSender(new LogEventSender() {
+                @Override
+                public void send(LogEvent event) {
+                    events.add(event);
+                }
+            });
+            getBus().setFeatures(List.of(loggingFeature));
+
+            ClientImpl client = new ClientImpl(getBus(), endpoint);
+            client.getRequestContext().put(LocalTransportFactory.MESSAGE_INCLUDE_PROPERTIES,
+                    Collections.singleton("org.apache.cxf.logging.enable"));
+
+            BindingOperationInfo bop = ei.getBinding().getOperation(new QName(namespace, "sayHi"));
+            assertNotNull(bop);
+
+            Object[] ret = client.invoke(bop, new Object[] {new SayHi()}, null);
+            assertNotNull(ret);
+            assertEquals("Wrong number of return objects", 1, ret.length);
+
+            assertEquals(4, events.size());
+            client.close();
+        }
+    }
+    
     @Test
     public void testClientProxyFactory() {
         JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean();
