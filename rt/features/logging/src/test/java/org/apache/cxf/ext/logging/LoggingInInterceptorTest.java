@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
@@ -38,11 +40,13 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.apache.cxf.ext.logging.AbstractLoggingInterceptor.LIVE_LOGGING_PROP;
 import static org.apache.cxf.ext.logging.event.DefaultLogEventMapper.MASKED_HEADER_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LoggingInInterceptorTest {
     private static final String TEST_HEADER_VALUE = "TestValue";
@@ -233,5 +237,18 @@ public class LoggingInInterceptorTest {
         final LogEvent event = sender.getEvents().get(0);
 
         assertThat(event.getPayload(), equalToIgnoringCase(buf.toString()));
+    }
+
+    @Test
+    public void shouldAddResponseContextInExcludedProperty() throws NoSuchFieldException, IllegalAccessException {
+        Field field = ClientImpl.class
+                .getDeclaredField("RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES");
+
+        field.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        Set<String> actual = (Set<String>) field.get(null);
+
+        assertTrue(actual.contains(LIVE_LOGGING_PROP));
     }
 }
