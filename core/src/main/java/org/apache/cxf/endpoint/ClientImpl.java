@@ -24,14 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
@@ -106,6 +99,35 @@ public class ClientImpl
 
     protected Map<Thread, ResponseContext> responseContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, ResponseContext>());
+
+    /**
+     * Set of properties that should not be propagated into the ResponseContext from IN Message
+     */
+    private static final Set<String> RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES = new HashSet<>(
+        List.of(
+            // remove the recursive reference if present
+            Message.INVOCATION_CONTEXT
+        )
+    );
+
+    /**
+     * Method that a cxf submodule can call to add a property not to propagate from IN Message into the ResponseContext
+     * @param property to exclude
+     */
+    public static void addResponseContextExcludedInProperty(String property) {
+        RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES.add(property);
+    }
+    public static void addAllResponseContextExcludedInProperties(Set<String> properties) {
+        RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES.addAll(properties);
+    }
+
+    /**
+     * Method to remove RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES from ResponseContext Map
+     * @param context ResponseContext Map
+     */
+    protected void filterResponseContextProperties(Map<String, Object> context) {
+        RESPONSE_CONTEXT_EXCLUDED_IN_PROPERTIES.forEach(context::remove);
+    }
 
     protected Executor executor;
 
@@ -648,10 +670,7 @@ public class ClientImpl
         if (inMsg != null) {
             if (null != resContext) {
                 resContext.putAll(inMsg);
-                // remove the recursive reference if present
-                resContext.remove(Message.INVOCATION_CONTEXT);
-                // remove the logging disable property
-                resContext.remove(Message.LIVE_LOGGING_PROP);
+                filterResponseContextProperties(resContext);
                 setResponseContext(resContext);
             }
             resList = CastUtils.cast(inMsg.getContent(List.class));
