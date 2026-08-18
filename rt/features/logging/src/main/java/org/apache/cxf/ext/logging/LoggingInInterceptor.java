@@ -38,6 +38,8 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 
+import static org.apache.cxf.endpoint.ClientImpl.addResponseContextExcludedInProperty;
+
 /**
  * 
  */
@@ -71,6 +73,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
 
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);
+
+        //Make sure that the LIVE_LOGGING_PROP won't be propagated into the ResponseContext from IN Messages
+        addResponseContextExcludedInProperty(LIVE_LOGGING_PROP);
     }
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
