@@ -38,6 +38,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final int DEFAULT_THRESHOLD = -1;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
+    protected static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
     private static final Pattern BOUNDARY_PATTERN =
         Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
     private static final Pattern CONTENT_TYPE_PATTERN =
@@ -62,7 +63,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
-        Object liveLoggingProp = message.getContextualProperty(Message.LIVE_LOGGING_PROP);
+        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 
