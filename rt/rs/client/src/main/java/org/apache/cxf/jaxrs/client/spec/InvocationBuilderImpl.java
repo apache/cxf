@@ -288,8 +288,12 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         }
         if (value == null) {
             filterProps.remove(name);
+            contextProps.remove(name);
         } else {
             filterProps.put(name, value);
+            // CXF-9235: also write to the top-level context so that the transport layer
+            // can find the property via Message.getContextualProperty()
+            contextProps.put(name, value);
         }
         return this;
     }
