@@ -408,7 +408,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         // Set up (shared) KeyManagers/TrustManagers
-        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509TrustManagers();
+        TrustManager[] trustManagers = InsecureTrustManager.getNoOpX509ExtendedTrustManagers();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 

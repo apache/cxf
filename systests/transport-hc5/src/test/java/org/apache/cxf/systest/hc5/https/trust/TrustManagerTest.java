@@ -125,7 +125,7 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         }
 
         TLSClientParameters tlsParams = new TLSClientParameters();
-        tlsParams.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers());
+        tlsParams.setTrustManagers(InsecureTrustManager.getNoOpX509ExtendedTrustManagers());
         tlsParams.setDisableCNCheck(true);
 
         Client client = ClientProxy.getClient(port);

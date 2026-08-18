@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
@@ -56,6 +57,15 @@ public class JexlClaimsMapper implements ClaimsMapper {
         jexlEngine = new JexlBuilder()
                 .silent(false)
                 .namespaces(functions)
+                .features(JexlFeatures.createNone()
+                        .newInstance(true)
+                        .localVar(true)
+                        .sideEffect(true)
+                        .sideEffectGlobal(true)
+                        .structuredLiteral(true)
+                        .methodCall(true)
+                        .loops(true)
+                        .script(true))
                 .permissions(new ClassPermissions(java.net.URI.class)
                     .compose("org.apache.cxf.*"))
                 .create();
