@@ -160,7 +160,7 @@
         <cxf.jaxb.xjc.version>${cxf.jaxb.runtime.version}</cxf.jaxb.xjc.version>
         <cxf.jaxen.version>2.0.6</cxf.jaxen.version>
         <cxf.jboss.logging.version>3.6.3.Final</cxf.jboss.logging.version>
-        <cxf.jboss.weld.version>6.0.4.Final</cxf.jboss.weld.version>
+        <cxf.jboss.weld.version>7.0.0.Final</cxf.jboss.weld.version>
         <cxf.jboss.narayana.version>5.13.1.Final</cxf.jboss.narayana.version>
         <cxf.jcache.version>1.1.1</cxf.jcache.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
@@ -182,8 +182,8 @@
         <cxf.logback.classic.version>1.6.4</cxf.logback.classic.version>
         <cxf.lucene.version>10.5.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.16</cxf.maven.core.version>
-        <cxf.micrometer.version>1.17.1</cxf.micrometer.version>
-        <cxf.micrometer-tracing.version>1.7.1</cxf.micrometer-tracing.version>
+        <cxf.micrometer.version>1.18.0-M2</cxf.micrometer.version>
+        <cxf.micrometer-tracing.version>1.8.0-M2</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.1.2</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>4.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>4.1.1</cxf.microprofile.openapi.version>
@@ -217,11 +217,11 @@
         <cxf.slf4j.version>2.0.20</cxf.slf4j.version>
         <cxf.snakeyaml.version>2.7</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>4.1.1</cxf.spring.boot.version>
-        <cxf.spring.ldap.version>4.1.1</cxf.spring.ldap.version>
+        <cxf.spring.boot.version>4.2.0-M2</cxf.spring.boot.version>
+        <cxf.spring.ldap.version>4.2.0-M1</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>7.1.1</cxf.spring.security.version>
-        <cxf.spring.version>7.0.9</cxf.spring.version>
+        <cxf.spring.security.version>7.2.0-M2</cxf.spring.security.version>
+        <cxf.spring.version>7.1.0-M2</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.32.15</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.55</cxf.swagger.v3.version>
