@@ -24,6 +24,7 @@ import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 import org.junit.Test;
@@ -55,6 +56,61 @@ public class IdTokenReaderTest {
         idTokenReader.getIdJwtToken(accessToken, "auth-code", new Consumer("client-id"));
     }
 
+    // The String overload has no access_token/code to check at_hash/c_hash against: if the
+    // id_token asserts such a claim while hash validation is required, it must be rejected.
+    @Test(expected = OAuthServiceException.class)
+    public void testStringOverloadRejectsUnverifiableAtHashByDefault() {
+        JwtClaims claims = validClaims();
+        claims.setClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM, "some-hash");
+        IdTokenReader idTokenReader = new StubJwtParsingIdTokenReader(new JwtToken(claims));
+        idTokenReader.setIssuerId("https://idp.example.com");
+
+        idTokenReader.getIdJwtToken("id-token", new Consumer("client-id"));
+    }
+
+    @Test(expected = OAuthServiceException.class)
+    public void testStringOverloadRejectsUnverifiableCodeHashWhenRequired() {
+        JwtClaims claims = validClaims();
+        claims.setClaim(IdToken.AUTH_CODE_HASH_CLAIM, "some-hash");
+        IdTokenReader idTokenReader = new StubJwtParsingIdTokenReader(new JwtToken(claims));
+        idTokenReader.setIssuerId("https://idp.example.com");
+        idTokenReader.setRequireAccessTokenHash(false);
+        idTokenReader.setRequireCodeHash(true);
+
+        idTokenReader.getIdJwtToken("id-token", new Consumer("client-id"));
+    }
+
+    @Test
+    public void testStringOverloadAcceptsTokenWithoutHashClaimsByDefault() {
+        JwtClaims claims = validClaims();
+        IdTokenReader idTokenReader = new StubJwtParsingIdTokenReader(new JwtToken(claims));
+        idTokenReader.setIssuerId("https://idp.example.com");
+
+        assertNotNull(idTokenReader.getIdJwtToken("id-token", new Consumer("client-id")));
+    }
+
+    @Test
+    public void testStringOverloadAcceptsAtHashWhenNotRequired() {
+        JwtClaims claims = validClaims();
+        claims.setClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM, "some-hash");
+        IdTokenReader idTokenReader = new StubJwtParsingIdTokenReader(new JwtToken(claims));
+        idTokenReader.setIssuerId("https://idp.example.com");
+        idTokenReader.setRequireAccessTokenHash(false);
+
+        assertNotNull(idTokenReader.getIdJwtToken("id-token", new Consumer("client-id")));
+    }
+
+    private static JwtClaims validClaims() {
+        JwtClaims claims = new JwtClaims();
+        claims.setIssuer("https://idp.example.com");
+        claims.setSubject("subject");
+        claims.setAudience("client-id");
+        long now = System.currentTimeMillis() / 1000L;
+        claims.setIssuedAt(now);
+        claims.setExpiryTime(now + 300L);
+        return claims;
+    }
+
     private static final class StubIdTokenReader extends IdTokenReader {
         private final JwtToken jwt;
 
@@ -63,7 +119,27 @@ public class IdTokenReaderTest {
         }
 
         @Override
-        public JwtToken getIdJwtToken(String idJwtToken, Consumer client) {
+        public JwtToken getJwtToken(String wrappedJwtToken, String clientSecret) {
+            return jwt;
+        }
+
+        @Override
+        public void validateJwtClaims(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
+            // Claims validation is exercised separately in OidcClaimsValidatorTest.
+        }
+    }
+
+    // Bypasses actual JWS parsing/signature verification so the real getIdJwtToken(String, Consumer)
+    // logic (claims validation + hash-claim guard) under test still executes.
+    private static final class StubJwtParsingIdTokenReader extends IdTokenReader {
+        private final JwtToken jwt;
+
+        private StubJwtParsingIdTokenReader(JwtToken jwt) {
+            this.jwt = jwt;
+        }
+
+        @Override
+        public JwtToken getJwtToken(String wrappedJwtToken, String clientSecret) {
             return jwt;
         }
     }
