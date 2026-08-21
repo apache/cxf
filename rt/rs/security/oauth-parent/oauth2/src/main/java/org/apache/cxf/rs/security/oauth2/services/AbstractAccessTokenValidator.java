@@ -56,10 +56,21 @@ public abstract class AbstractAccessTokenValidator {
     private OAuthDataProvider dataProvider;
 
     private int maxValidationDataCacheSize;
-    private ConcurrentHashMap<String, AccessTokenValidation> accessTokenValidations =
+    private long validationDataCacheLifetime = 60L;
+    private ConcurrentHashMap<String, AccessTokenValidationCacheEntry> accessTokenValidations =
         new ConcurrentHashMap<>();
     private JoseJwtConsumer jwtTokenConsumer;
     private boolean persistJwtEncoding = true;
+
+    private static final class AccessTokenValidationCacheEntry {
+        private final AccessTokenValidation validation;
+        private final long cachedAt;
+
+        private AccessTokenValidationCacheEntry(AccessTokenValidation validation) {
+            this.validation = validation;
+            this.cachedAt = OAuthUtils.getIssuedAt();
+        }
+    }
 
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
@@ -106,8 +117,16 @@ public abstract class AbstractAccessTokenValidator {
         }
 
         AccessTokenValidation accessTokenV = null;
+        AccessTokenValidationCacheEntry cacheEntry = null;
         if (maxValidationDataCacheSize > 0) {
-            accessTokenV = accessTokenValidations.get(authSchemeData);
+            cacheEntry = accessTokenValidations.get(authSchemeData);
+            if (cacheEntry != null) {
+                if (isValidationDataCacheEntryExpired(cacheEntry)) {
+                    accessTokenValidations.remove(authSchemeData, cacheEntry);
+                } else {
+                    accessTokenV = cacheEntry.validation;
+                }
+            }
         }
         ServerAccessToken localAccessToken = null;
         if (accessTokenV == null) {
@@ -151,6 +170,8 @@ public abstract class AbstractAccessTokenValidator {
         if (OAuthUtils.isExpired(accessTokenV.getTokenIssuedAt(), accessTokenV.getTokenLifetime())) {
             if (localAccessToken != null) {
                 removeAccessToken(localAccessToken);
+            } else if (cacheEntry != null) {
+                accessTokenValidations.remove(authSchemeData, cacheEntry);
             } else if (maxValidationDataCacheSize > 0) {
                 accessTokenValidations.remove(authSchemeData);
             }
@@ -162,14 +183,19 @@ public abstract class AbstractAccessTokenValidator {
             && accessTokenV.getTokenNotBefore() > System.currentTimeMillis() / 1000L) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
-        if (maxValidationDataCacheSize > 0) {
+        if (maxValidationDataCacheSize > 0 && accessTokenV.isInitialValidationSuccessful()) {
             if (accessTokenValidations.size() >= maxValidationDataCacheSize) {
                 // or delete the ones expiring sooner than others, etc
                 accessTokenValidations.clear();
             }
-            accessTokenValidations.put(authSchemeData, accessTokenV);
+            accessTokenValidations.putIfAbsent(authSchemeData, new AccessTokenValidationCacheEntry(accessTokenV));
         }
         return accessTokenV;
+    }
+
+    private boolean isValidationDataCacheEntryExpired(AccessTokenValidationCacheEntry cacheEntry) {
+        return validationDataCacheLifetime <= 0
+            || OAuthUtils.isExpired(cacheEntry.cachedAt, validationDataCacheLifetime);
     }
 
     protected void removeAccessToken(ServerAccessToken at) {
@@ -184,6 +210,10 @@ public abstract class AbstractAccessTokenValidator {
 
     public void setMaxValidationDataCacheSize(int maxValidationDataCacheSize) {
         this.maxValidationDataCacheSize = maxValidationDataCacheSize;
+    }
+
+    public void setValidationDataCacheLifetime(long validationDataCacheLifetime) {
+        this.validationDataCacheLifetime = validationDataCacheLifetime;
     }
 
     public JoseJwtConsumer getJwtTokenConsumer() {
