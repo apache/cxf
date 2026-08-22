@@ -41,6 +41,15 @@ class ObservationIntegrationTest extends SampleTestRunner {
     private ObservationFeature logging;
     private ObservationClientFeature clientLogging;
 
+    @Override
+    public TracingSetup[] getTracingSetup() {
+        return new TracingSetup[] {
+            TracingSetup.IN_MEMORY_BRAVE,
+            TracingSetup.IN_MEMORY_OTEL,
+            TracingSetup.ZIPKIN_BRAVE
+        };
+    }
+
     @AfterEach
     public void stopServer() {
         if (server != null) {
