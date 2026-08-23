@@ -334,7 +334,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
             ClientImpl client = new ClientImpl(getBus(), endpoint);
             client.getRequestContext().put(LocalTransportFactory.MESSAGE_INCLUDE_PROPERTIES,
-                    Collections.singleton("org.apache.cxf.logging.enable"));
+                    Set.of("org.apache.cxf.logging.enable.out", "org.apache.cxf.logging.enable.in"));
 
             BindingOperationInfo bop = ei.getBinding().getOperation(new QName(namespace, "sayHi"));
             assertNotNull(bop);

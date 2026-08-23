@@ -34,7 +34,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -88,7 +87,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             //ensure only logging once for a certain message
             //this can prevent message logging again when fault
             //happen after PRE_INVOKE phase(rewind calls into LoggingInFaultInterceptor)
-            message.put(LIVE_LOGGING_PROP + "." + MessageUtils.isRequestor(message), Boolean.FALSE);
+            message.put(LIVE_LOGGING_PROP + "." + getRequestorSuffix(message), Boolean.FALSE);
         }
         createExchangeId(message);
         final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);

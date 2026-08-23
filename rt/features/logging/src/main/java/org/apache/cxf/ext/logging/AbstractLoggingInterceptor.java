@@ -64,8 +64,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
+        // Some frameworks (like Camel) do copy the context (properties) from in- to out-
+        // messages as-is, so it is very possible that LIVE_LOGGING_PROP will end up in the
+        // in / out message by mistake. To track that, adding the requestor message property
+        // to distinguish between such messages.
         final Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + "."
-            + MessageUtils.isRequestor(message));
+            + getRequestorSuffix(message));
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 
@@ -235,5 +239,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         // Use regex to get the boundary and return null if it's not found
         Matcher m = BOUNDARY_PATTERN.matcher(payload);
         return m.find() ? "--" + m.group(1) : null;
+    }
+
+    static String getRequestorSuffix(Message message) {
+        return MessageUtils.isRequestor(message) ? "in" : "out";
     }
 }
