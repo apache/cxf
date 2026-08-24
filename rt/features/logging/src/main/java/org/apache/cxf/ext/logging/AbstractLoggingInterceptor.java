@@ -64,12 +64,16 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
+        // For backward compatibility, check the old LIVE_LOGGING_PROP property first
+        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+        if (liveLoggingProp != null) {
+            return PropertyUtils.isFalse(liveLoggingProp);
+        }
         // Some frameworks (like Camel) do copy the context (properties) from in- to out-
         // messages as-is, so it is very possible that LIVE_LOGGING_PROP will end up in the
         // in / out message by mistake. To track that, adding the requestor message property
         // to distinguish between such messages.
-        final Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + "."
-            + getRequestorSuffix(message));
+        liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + "." + getRequestorSuffix(message));
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 
