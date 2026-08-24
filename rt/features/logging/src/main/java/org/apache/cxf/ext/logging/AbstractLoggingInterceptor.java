@@ -32,6 +32,7 @@ import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -63,7 +64,16 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
+        // For backward compatibility, check the old LIVE_LOGGING_PROP property first
         Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+        if (liveLoggingProp != null) {
+            return PropertyUtils.isFalse(liveLoggingProp);
+        }
+        // Some frameworks (like Camel) do copy the context (properties) from in- to out-
+        // messages as-is, so it is very possible that LIVE_LOGGING_PROP will end up in the
+        // in / out message by mistake. To track that, adding the requestor message property
+        // to distinguish between such messages.
+        liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP + "." + getRequestorSuffix(message));
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 
@@ -233,5 +243,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         // Use regex to get the boundary and return null if it's not found
         Matcher m = BOUNDARY_PATTERN.matcher(payload);
         return m.find() ? "--" + m.group(1) : null;
+    }
+
+    static String getRequestorSuffix(Message message) {
+        return MessageUtils.isRequestor(message) ? "in" : "out";
     }
 }

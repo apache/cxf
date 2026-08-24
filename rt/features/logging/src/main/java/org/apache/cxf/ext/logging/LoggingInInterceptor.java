@@ -87,7 +87,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             //ensure only logging once for a certain message
             //this can prevent message logging again when fault
             //happen after PRE_INVOKE phase(rewind calls into LoggingInFaultInterceptor)
-            message.put(LIVE_LOGGING_PROP, Boolean.FALSE);
+            message.put(LIVE_LOGGING_PROP + "." + getRequestorSuffix(message), Boolean.FALSE);
         }
         createExchangeId(message);
         final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
