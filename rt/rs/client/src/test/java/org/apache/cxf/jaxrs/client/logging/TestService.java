@@ -18,15 +18,18 @@
  */
 package org.apache.cxf.jaxrs.client.logging;
 
-public class TestServiceRest implements TestService {
-    @Override
-    public String echo(String msg) {
-        return msg;
-    }
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
-    @Override
-    public String post(String msg) {
-        return msg;
-    }
+public interface TestService {
+    @GET
+    @Path("{msg}")
+    @Produces("application/octet-stream")
+    String echo(@PathParam("msg") String msg);
+
+    @POST
+    String post(String msg);
 }
-

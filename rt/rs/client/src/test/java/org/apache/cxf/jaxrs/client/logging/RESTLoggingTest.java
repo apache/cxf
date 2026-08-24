@@ -192,12 +192,45 @@ public class RESTLoggingTest {
         checkResponseIn(events.get(3));
     }
     
+    @Test
+    public void testEventsWithProxy() throws MalformedURLException {
+        LoggingFeature loggingFeature = new LoggingFeature();
+        loggingFeature.setLogBinary(true);
+        TestEventSender sender = new TestEventSender();
+        loggingFeature.setSender(sender);
+        Server server = createService(SERVICE_URI, new TestServiceRest(), loggingFeature);
+        server.start();
+        TestService client = createClient(SERVICE_URI, TestService.class, loggingFeature);
+        String result = client.echo("test1");
+        Assert.assertEquals("test1", result);
+
+        List<LogEvent> events = sender.getEvents();
+        await().until(() -> events.size(), is(4));
+        server.stop();
+        server.destroy();
+
+        Assert.assertEquals(4, events.size());
+        checkRequestOut(events.get(0));
+        checkRequestIn(events.get(1));
+        checkResponseOut(events.get(2));
+        checkResponseIn(events.get(3));
+    }
+    
+    
     private void assertContentLogged(LogEvent event) {
         Assert.assertNotEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
     }
 
     private void assertContentNotLogged(LogEvent event) {
         Assert.assertEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
+    }
+
+    private <T> T createClient(String serviceURI, Class<T> contract, LoggingFeature loggingFeature) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(serviceURI);
+        bean.setFeatures(Collections.singletonList(loggingFeature));
+        bean.setResourceClass(contract);
+        return bean.create(contract);
     }
 
     private WebClient createClient(String serviceURI, LoggingFeature loggingFeature) {
