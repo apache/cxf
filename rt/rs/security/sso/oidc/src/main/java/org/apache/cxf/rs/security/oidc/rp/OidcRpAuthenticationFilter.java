@@ -137,10 +137,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             return true;
         }
         URI base = rc.getUriInfo().getAbsolutePath();
-        return uri.getScheme() != null
-            && uri.getScheme().equalsIgnoreCase(base.getScheme())
-            && uri.getAuthority() != null
-            && uri.getAuthority().equalsIgnoreCase(base.getAuthority());
+        return OidcRpAuthenticationUtils.isSameOrigin(base, uri);
     }
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
