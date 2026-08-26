@@ -61,12 +61,26 @@ public class OidcRpAuthenticationService {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
         } else if (location != null) {
-            redirectUri = URI.create(UrlUtils.urlDecode(location));
+            redirectUri = getSameOriginUri(location);
         }
         if (redirectUri != null) {
             return Response.seeOther(redirectUri).build();
         }
         return Response.ok(oidcContext).build();
+    }
+
+    private URI getSameOriginUri(String location) {
+        final URI uri;
+        try {
+            uri = URI.create(UrlUtils.urlDecode(location));
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+        URI base = mc.getUriInfo().getAbsolutePath();
+        if (OidcRpAuthenticationUtils.isSameOrigin(base, uri)) {
+            return uri;
+        }
+        return null;
     }
 
     public void setDefaultLocation(String defaultLocation) {
