@@ -46,8 +46,11 @@ under the License.
     </httpj:engine-factory>
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     
-    <bean id="jwsInMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter"/>
+    <bean id="jwsInMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter">
+        <property name="bufferPayload" value="false"/>
+    </bean>
     <bean id="jwsInMultipartFilterJwsJson" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter">
+        <property name="bufferPayload" value="false"/>
         <property name="useJwsJsonSignatureFormat" value="true"/>
     </bean>
     <bean id="jwsOutMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerResponseFilter"/>
