@@ -47,6 +47,20 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
     private boolean bufferPayload;
     private Message message;
     private boolean useJwsJsonSignatureFormat;
+
+    /**
+     * Creates a multipart JWS verification filter.
+     *
+     * <p>When {@code bufferPayload} is {@code false}, payload data is streamed
+     * to the application before signature verification completes. Applications
+     * must not perform irreversible processing on streamed data until the
+     * complete multipart payload has been consumed and verified.</p>
+     *
+     * @param message the current message
+     * @param verifier the signature verifier, or {@code null} to resolve one from message properties
+     * @param bufferPayload whether to buffer and verify the complete payload before exposing it
+     * @param useJwsJsonSignatureFormat whether the detached signature uses JWS JSON serialization
+     */
     public JwsMultipartSignatureInFilter(Message message, 
                                          JwsSignatureVerifier verifier, 
                                          boolean bufferPayload,
