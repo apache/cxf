@@ -50,6 +50,21 @@ public abstract class AbstractJwsMultipartVerificationFilter {
         this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
     }
 
+    /**
+     * Controls whether multipart payloads are buffered and verified before
+     * they are made available to the application. The default is
+     * {@code false}, which streams payload data before signature verification
+     * completes.
+     *
+     * <p>Applications must not perform irreversible processing on streamed
+     * data until the complete multipart payload has been consumed and its
+     * signature verified. Set this to {@code true} to buffer and verify the
+     * complete payload before exposing it to the application. Buffering may
+     * use memory or temporary disk storage depending on the configured
+     * {@code CachedOutputStream} thresholds.</p>
+     *
+     * @param bufferPayload whether to buffer and verify the complete payload
+     */
     public void setBufferPayload(boolean bufferPayload) {
         this.bufferPayload = bufferPayload;
     }
