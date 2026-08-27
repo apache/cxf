@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.jose.jws;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 public class JwsInputStream extends FilterInputStream {
     private final JwsVerificationSignature signature;
@@ -42,7 +41,7 @@ public class JwsInputStream extends FilterInputStream {
     public int read() throws IOException {
         int value = super.read();
         if (value != -1) {
-            byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
+            byte[] bytes = new byte[] {(byte)value};
             signature.update(bytes, 0, bytes.length);
         } else {
             verify();
