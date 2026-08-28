@@ -261,10 +261,15 @@ public final class ModelEncryptionSupport {
         byte[] iv = CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
         byte[] cipherText = CryptoUtils.encryptBytes(sequence.getBytes(StandardCharsets.UTF_8),
                                                      secretKey, gcmProperties(iv));
-        byte[] out = new byte[iv.length + cipherText.length];
-        System.arraycopy(iv, 0, out, 0, iv.length);
-        System.arraycopy(cipherText, 0, out, iv.length, cipherText.length);
-        return CryptoUtils.encodeBytes(out);
+        try {
+            int outLength = Math.addExact(iv.length, cipherText.length);
+            byte[] out = new byte[outLength];
+            System.arraycopy(iv, 0, out, 0, iv.length);
+            System.arraycopy(cipherText, 0, out, iv.length, cipherText.length);
+            return CryptoUtils.encodeBytes(out);
+        } catch (ArithmeticException e) {
+            throw new SecurityException("Encrypted data size overflow", e);
+        }
     }
 
     private static String decryptSequence(String encodedData, Key secretKey,
