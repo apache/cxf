@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
@@ -169,6 +170,7 @@ public class TikaContentExtractor {
             return null;
         }
         final Metadata metadata = new Metadata();
+        final TikaInputStream tin = TikaInputStream.get(in);
 
         try {
             // Try to validate that input stream media type is supported by the parser
@@ -176,7 +178,7 @@ public class TikaContentExtractor {
             if (mtHint != null) {
                 mediaType = MediaType.parse(mtHint.toString());
             } else if (detector != null && in.markSupported()) {
-                mediaType = detector.detect(in, metadata);
+                mediaType = detector.detect(tin, metadata);
             }
             if (mediaType != null) {
                 metadata.set(HttpHeaders.CONTENT_TYPE, mediaType.toString());
@@ -209,7 +211,7 @@ public class TikaContentExtractor {
 
 
             try {
-                parser.parse(in, handler, metadata, context);
+                parser.parse(tin, handler, metadata, context);
             } catch (Exception ex) {
                 // Starting from Tika 1.6 PDFParser (with other parsers to be updated in the future) will skip
                 // the content processing if the content handler is null. This can be used to optimize the
@@ -217,7 +219,7 @@ public class TikaContentExtractor {
                 // not ready to accept null handlers so lets retry with IgnoreContentHandler.
                 if (handler == null) {
                     handler = new IgnoreContentHandler();
-                    parser.parse(in, handler, metadata, context);
+                    parser.parse(tin, handler, metadata, context);
                 } else {
                     throw ex;
                 }
