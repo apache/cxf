@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -109,6 +110,56 @@ public class CryptoUtilsTest {
         ServerAccessToken token2 = ModelEncryptionSupport.decryptAccessToken(p, encryptedToken, decryptedSecretKey);
         // compare tokens
         compareAccessTokens(token, token2);
+    }
+
+    @Test
+    public void testModelEncryptionDefaultIsNonDeterministic() throws Exception {
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        SecretKey secretKey = CryptoUtils.getSecretKey("AES");
+
+        String encrypted1 = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
+        String encrypted2 = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
+        // AES/GCM with a random IV: encrypting the same token twice must not
+        // produce the same ciphertext (the old AES/ECB default was deterministic)
+        assertNotEquals(encrypted1, encrypted2);
+
+        token.setTokenKey(encrypted1);
+        ServerAccessToken token2 = ModelEncryptionSupport.decryptAccessToken(p, encrypted1, secretKey);
+        compareAccessTokens(token, token2);
+    }
+
+    @Test(expected = SecurityException.class)
+    public void testModelEncryptionDefaultRejectsTamperedToken() throws Exception {
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        SecretKey secretKey = CryptoUtils.getSecretKey("AES");
+
+        String encrypted = ModelEncryptionSupport.encryptAccessToken(token, secretKey);
+        // flip one character of the ciphertext: authenticated encryption must reject it
+        char[] chars = encrypted.toCharArray();
+        int pos = chars.length - 2;
+        chars[pos] = chars[pos] == 'A' ? 'B' : 'A';
+        ModelEncryptionSupport.decryptAccessToken(p, new String(chars), secretKey);
+    }
+
+    @Test
+    public void testModelEncryptionExplicitLegacyPropertiesRoundTrip() throws Exception {
+        AccessTokenRegistration atr = prepareTokenRegistration();
+        BearerAccessToken token = p.createAccessTokenInternal(atr);
+        SecretKey secretKey = CryptoUtils.getSecretKey("AES");
+        KeyProperties legacyProps = new KeyProperties("AES");
+
+        String encrypted = ModelEncryptionSupport.encryptAccessToken(token, secretKey, legacyProps);
+        token.setTokenKey(encrypted);
+        ServerAccessToken decrypted = ModelEncryptionSupport.decryptAccessToken(
+            p, encrypted, secretKey, legacyProps);
+        compareAccessTokens(token, decrypted);
+
+        String encodedSecretKey = CryptoUtils.encodeSecretKey(secretKey);
+        ServerAccessToken decryptedWithEncodedKey = ModelEncryptionSupport.decryptAccessToken(
+            p, encrypted, encodedSecretKey, legacyProps);
+        compareAccessTokens(token, decryptedWithEncodedKey);
     }
 
     @Test
