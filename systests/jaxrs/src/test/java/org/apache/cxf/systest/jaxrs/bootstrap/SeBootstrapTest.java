@@ -97,7 +97,8 @@ public class SeBootstrapTest {
     @Test
     public final void shouldBootInstanceUsingDefaults() {
         final Application application = new StaticApplication();
-        final SeBootstrap.Configuration.Builder bootstrapConfigurationBuilder = SeBootstrap.Configuration.builder();
+        final SeBootstrap.Configuration.Builder bootstrapConfigurationBuilder = SeBootstrap.Configuration.builder()
+            .port(SeBootstrap.Configuration.FREE_PORT);
         final SeBootstrap.Configuration requestedConfiguration = bootstrapConfigurationBuilder.build();
 
         final CompletionStage<SeBootstrap.Instance> completionStage = SeBootstrap.start(application,
@@ -148,7 +149,7 @@ public class SeBootstrapTest {
         final Application application = new StaticApplication();
         final SeBootstrap.Configuration.Builder bootstrapConfigurationBuilder = SeBootstrap.Configuration.builder();
         final SeBootstrap.Configuration requestedConfiguration = bootstrapConfigurationBuilder.protocol("HTTP")
-                .host("localhost").port(SeBootstrap.Configuration.DEFAULT_PORT).rootPath("/root/path").build();
+                .host("localhost").port(SeBootstrap.Configuration.FREE_PORT).rootPath("/root/path").build();
 
         final CompletionStage<SeBootstrap.Instance> completionStage = SeBootstrap.start(application,
                 requestedConfiguration);
