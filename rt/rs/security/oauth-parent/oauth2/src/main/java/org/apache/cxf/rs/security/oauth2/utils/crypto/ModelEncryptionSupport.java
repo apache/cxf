@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,7 +52,6 @@ public final class ModelEncryptionSupport {
     private static final String DEFAULT_TRANSFORMATION = "AES/GCM/NoPadding";
     private static final int DEFAULT_IV_SIZE = 12;
     private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     private ModelEncryptionSupport() {
     }
@@ -261,7 +259,6 @@ public final class ModelEncryptionSupport {
             return CryptoUtils.encryptSequence(sequence, secretKey, props);
         }
         byte[] iv = CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
-        RANDOM.nextBytes(iv);
         byte[] cipherText = CryptoUtils.encryptBytes(sequence.getBytes(StandardCharsets.UTF_8),
                                                      secretKey, gcmProperties(iv));
         byte[] out = new byte[iv.length + cipherText.length];
