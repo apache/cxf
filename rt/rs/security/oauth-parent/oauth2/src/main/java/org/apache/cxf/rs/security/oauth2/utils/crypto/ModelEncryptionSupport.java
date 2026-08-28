@@ -260,7 +260,7 @@ public final class ModelEncryptionSupport {
         if (props != null) {
             return CryptoUtils.encryptSequence(sequence, secretKey, props);
         }
-        byte[] iv = new byte[DEFAULT_IV_SIZE];
+        byte[] iv = CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
         RANDOM.nextBytes(iv);
         byte[] cipherText = CryptoUtils.encryptBytes(sequence.getBytes(StandardCharsets.UTF_8),
                                                      secretKey, gcmProperties(iv));
