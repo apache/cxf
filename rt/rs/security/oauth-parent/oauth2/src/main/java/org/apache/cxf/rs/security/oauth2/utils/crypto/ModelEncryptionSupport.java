@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.security.auth.DestroyFailedException;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -46,6 +48,11 @@ import org.apache.cxf.rt.security.crypto.KeyProperties;
  */
 public final class ModelEncryptionSupport {
     public static final String SEP = "|";
+
+    private static final String DEFAULT_TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final int DEFAULT_IV_SIZE = 12;
+    private static final int DEFAULT_AUTH_TAG_LENGTH = 128;
+
     private ModelEncryptionSupport() {
     }
 
@@ -56,7 +63,7 @@ public final class ModelEncryptionSupport {
     public static String encryptClient(Client client, Key secretKey,
                                        KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeClient(client);
-        return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static String encryptAccessToken(ServerAccessToken token, Key secretKey) throws SecurityException {
@@ -66,7 +73,7 @@ public final class ModelEncryptionSupport {
     public static String encryptAccessToken(ServerAccessToken token, Key secretKey,
                                             KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeServerToken(token);
-        return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static String encryptRefreshToken(RefreshToken token, Key secretKey) throws SecurityException {
@@ -77,7 +84,7 @@ public final class ModelEncryptionSupport {
                                              KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeRefreshToken(token);
 
-        return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static String encryptCodeGrant(ServerAuthorizationCodeGrant grant, Key secretKey)
@@ -89,17 +96,18 @@ public final class ModelEncryptionSupport {
                                           KeyProperties props) throws SecurityException {
         String tokenSequence = tokenizeCodeGrant(grant);
 
-        return CryptoUtils.encryptSequence(tokenSequence, secretKey, props);
+        return encryptSequence(tokenSequence, secretKey, props);
     }
 
     public static Client decryptClient(String encodedSequence, String encodedSecretKey)
         throws SecurityException {
-        return decryptClient(encodedSequence, encodedSecretKey, new KeyProperties("AES"));
+        return decryptClient(encodedSequence, encodedSecretKey, null);
     }
 
     public static Client decryptClient(String encodedSequence, String encodedSecretKey,
                                        KeyProperties props) throws SecurityException {
-        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
+        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey,
+                                                    props == null ? "AES" : props.getKeyAlgo());
         Client client = decryptClient(encodedSequence, key, props);
 
         // Clean the secret key from memory when we're done
@@ -118,21 +126,22 @@ public final class ModelEncryptionSupport {
 
     public static Client decryptClient(String encodedData, Key secretKey,
                                        KeyProperties props) throws SecurityException {
-        String decryptedSequence = CryptoUtils.decryptSequence(encodedData, secretKey, props);
+        String decryptedSequence = decryptSequence(encodedData, secretKey, props);
         return recreateClient(decryptedSequence);
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
                                                  String encodedToken,
                                                  String encodedSecretKey) throws SecurityException {
-        return decryptAccessToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
+        return decryptAccessToken(provider, encodedToken, encodedSecretKey, null);
     }
 
     public static ServerAccessToken decryptAccessToken(OAuthDataProvider provider,
                                                  String encodedToken,
                                                  String encodedSecretKey,
                                                  KeyProperties props) throws SecurityException {
-        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
+        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey,
+                                                    props == null ? "AES" : props.getKeyAlgo());
         ServerAccessToken serverAccessToken = decryptAccessToken(provider, encodedToken, key, props);
 
         // Clean the secret key from memory when we're done
@@ -155,21 +164,22 @@ public final class ModelEncryptionSupport {
                                                  String encodedData,
                                                  Key secretKey,
                                                  KeyProperties props) throws SecurityException {
-        String decryptedSequence = CryptoUtils.decryptSequence(encodedData, secretKey, props);
+        String decryptedSequence = decryptSequence(encodedData, secretKey, props);
         return recreateAccessToken(provider, encodedData, decryptedSequence);
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                    String encodedToken,
                                                    String encodedSecretKey) throws SecurityException {
-        return decryptRefreshToken(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
+        return decryptRefreshToken(provider, encodedToken, encodedSecretKey, null);
     }
 
     public static RefreshToken decryptRefreshToken(OAuthDataProvider provider,
                                                   String encodedToken,
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
-        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
+        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey,
+                                                    props == null ? "AES" : props.getKeyAlgo());
         RefreshToken refreshToken = decryptRefreshToken(provider, encodedToken, key, props);
 
         // Clean the secret key from memory when we're done
@@ -192,21 +202,22 @@ public final class ModelEncryptionSupport {
                                                    String encodedData,
                                                    Key key,
                                                    KeyProperties props) throws SecurityException {
-        String decryptedSequence = CryptoUtils.decryptSequence(encodedData, key, props);
+        String decryptedSequence = decryptSequence(encodedData, key, props);
         return recreateRefreshToken(provider, encodedData, decryptedSequence);
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
                                                    String encodedToken,
                                                    String encodedSecretKey) throws SecurityException {
-        return decryptCodeGrant(provider, encodedToken, encodedSecretKey, new KeyProperties("AES"));
+        return decryptCodeGrant(provider, encodedToken, encodedSecretKey, null);
     }
 
     public static ServerAuthorizationCodeGrant decryptCodeGrant(OAuthDataProvider provider,
                                                   String encodedToken,
                                                   String encodedSecretKey,
                                                   KeyProperties props) throws SecurityException {
-        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey, props.getKeyAlgo());
+        SecretKey key = CryptoUtils.decodeSecretKey(encodedSecretKey,
+                                                    props == null ? "AES" : props.getKeyAlgo());
         ServerAuthorizationCodeGrant authzCodeGrant = decryptCodeGrant(provider, encodedToken, key, props);
 
         // Clean the secret key from memory when we're done
@@ -229,8 +240,57 @@ public final class ModelEncryptionSupport {
                                                    String encodedData,
                                                    Key key,
                                                    KeyProperties props) throws SecurityException {
-        String decryptedSequence = CryptoUtils.decryptSequence(encodedData, key, props);
+        String decryptedSequence = decryptSequence(encodedData, key, props);
         return recreateCodeGrant(provider, decryptedSequence);
+    }
+
+    /**
+     * Encrypts the sequence. When no explicit KeyProperties are supplied the
+     * authenticated AES/GCM transformation is used, with a random IV prepended
+     * to the ciphertext. The previous default (the JCE "AES" shorthand, i.e.
+     * AES/ECB/PKCS5Padding) produced deterministic, malleable ciphertexts which
+     * a client holding several tokens could cut and splice block-by-block to
+     * forge token state; pass explicit KeyProperties only if a legacy
+     * transformation must be retained.
+     */
+    private static String encryptSequence(String sequence, Key secretKey,
+                                          KeyProperties props) throws SecurityException {
+        if (props != null) {
+            return CryptoUtils.encryptSequence(sequence, secretKey, props);
+        }
+        byte[] iv = CryptoUtils.generateSecureRandomBytes(DEFAULT_IV_SIZE);
+        byte[] cipherText = CryptoUtils.encryptBytes(sequence.getBytes(StandardCharsets.UTF_8),
+                                                     secretKey, gcmProperties(iv));
+        try {
+            int outLength = Math.addExact(iv.length, cipherText.length);
+            byte[] out = new byte[outLength];
+            System.arraycopy(iv, 0, out, 0, iv.length);
+            System.arraycopy(cipherText, 0, out, iv.length, cipherText.length);
+            return CryptoUtils.encodeBytes(out);
+        } catch (ArithmeticException e) {
+            throw new SecurityException("Encrypted data size overflow", e);
+        }
+    }
+
+    private static String decryptSequence(String encodedData, Key secretKey,
+                                          KeyProperties props) throws SecurityException {
+        if (props != null) {
+            return CryptoUtils.decryptSequence(encodedData, secretKey, props);
+        }
+        byte[] bytes = CryptoUtils.decodeSequence(encodedData);
+        if (bytes.length <= DEFAULT_IV_SIZE) {
+            throw new SecurityException();
+        }
+        KeyProperties gcmProps = gcmProperties(Arrays.copyOf(bytes, DEFAULT_IV_SIZE));
+        byte[] decrypted = CryptoUtils.decryptBytes(
+            Arrays.copyOfRange(bytes, DEFAULT_IV_SIZE, bytes.length), secretKey, gcmProps);
+        return new String(decrypted, StandardCharsets.UTF_8);
+    }
+
+    private static KeyProperties gcmProperties(byte[] iv) {
+        KeyProperties props = new KeyProperties(DEFAULT_TRANSFORMATION);
+        props.setAlgoSpec(new GCMParameterSpec(DEFAULT_AUTH_TAG_LENGTH, iv));
+        return props;
     }
 
     public static ServerAccessToken recreateAccessToken(OAuthDataProvider provider,
