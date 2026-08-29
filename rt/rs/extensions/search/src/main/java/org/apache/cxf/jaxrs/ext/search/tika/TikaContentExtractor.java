@@ -21,6 +21,10 @@ package org.apache.cxf.jaxrs.ext.search.tika;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,9 +49,35 @@ import org.apache.tika.sax.ToTextContentHandler;
 
 public class TikaContentExtractor {
     private static final Logger LOG = LogUtils.getL7dLogger(TikaContentExtractor.class);
+    private static final MethodHandle MH_DETECTOR;
+    private static final MethodHandle MH_DETECTOR_FALLBACK;
 
     private final List<Parser> parsers;
     private final Detector detector;
+    
+    static {
+        MethodHandle detector = null;
+        MethodHandle detectorFallback = null;
+
+        try {
+            detector = MethodHandles
+                .publicLookup()
+                .findVirtual(Detector.class, "detect",  MethodType.methodType(MediaType.class,
+                        TikaInputStream.class, Metadata.class, ParseContext.class));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            try {
+                detectorFallback = MethodHandles
+                    .publicLookup()
+                    .findVirtual(Detector.class, "detect", MethodType.methodType(MediaType.class,
+                        InputStream.class, Metadata.class));
+            } catch (NoSuchMethodException | IllegalAccessException e1) {
+                throw new UndeclaredThrowableException(e1, "Unable to detect Tika version");
+            }
+        }
+
+        MH_DETECTOR = detector;
+        MH_DETECTOR_FALLBACK = detectorFallback;
+    }
 
     /**
      * Create new Tika-based content extractor using AutoDetectParser.
@@ -173,12 +203,20 @@ public class TikaContentExtractor {
         final TikaInputStream tin = TikaInputStream.get(in);
 
         try {
+            if (context == null) {
+                context = new ParseContext();
+            }
+
             // Try to validate that input stream media type is supported by the parser
             MediaType mediaType = null;
             if (mtHint != null) {
                 mediaType = MediaType.parse(mtHint.toString());
             } else if (detector != null && in.markSupported()) {
-                mediaType = detector.detect(tin, metadata);
+                if (MH_DETECTOR != null) {
+                    mediaType = (MediaType) MH_DETECTOR.bindTo(detector).invoke(tin, metadata, context);
+                } else {
+                    mediaType = (MediaType) MH_DETECTOR_FALLBACK.bindTo(detector).invoke(tin, metadata);
+                }
             }
             if (mediaType != null) {
                 metadata.set(HttpHeaders.CONTENT_TYPE, mediaType.toString());
@@ -200,9 +238,6 @@ public class TikaContentExtractor {
                 return null;
             }
 
-            if (context == null) {
-                context = new ParseContext();
-            }
             if (context.get(Parser.class) == null) {
                 // to process the embedded attachments
                 context.set(Parser.class,
@@ -230,6 +265,8 @@ public class TikaContentExtractor {
         } catch (final SAXException ex) {
             LOG.log(Level.WARNING, "Unable to parse input stream", ex);
         } catch (final TikaException ex) {
+            LOG.log(Level.WARNING, "Unable to parse input stream", ex);
+        } catch (final Throwable ex) {
             LOG.log(Level.WARNING, "Unable to parse input stream", ex);
         }
 
