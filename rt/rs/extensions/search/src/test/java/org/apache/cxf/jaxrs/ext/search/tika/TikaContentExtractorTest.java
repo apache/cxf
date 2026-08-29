@@ -18,12 +18,16 @@
  */
 package org.apache.cxf.jaxrs.ext.search.tika;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import org.junit.Before;
@@ -83,5 +87,20 @@ public class TikaContentExtractorTest {
     @Test
     public void testExtractionFromNullInputStreamFails() {
         assertNull("Document should be null, it is encrypted", extractor.extract((InputStream)null));
+    }
+
+    @Test
+    public void testDetectorReceivesParseContext() {
+        ParseContext[] detectorContext = new ParseContext[1];
+        TikaContentExtractor another = new TikaContentExtractor(
+            Collections.singletonList(new PDFParser()),
+            (stream, metadata, context) -> {
+                detectorContext[0] = context;
+                return MediaType.OCTET_STREAM;
+            });
+
+        another.extract(new ByteArrayInputStream(new byte[0]));
+
+        assertNotNull(detectorContext[0]);
     }
 }
