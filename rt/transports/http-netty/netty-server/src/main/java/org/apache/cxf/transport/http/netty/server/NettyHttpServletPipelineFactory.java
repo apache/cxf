@@ -233,6 +233,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     private SslContext configureServerHttp2SSLOnDemand() throws Exception {
         if (tlsServerParameters != null) {
             final SSLContextInitParameters initParams = SSLUtils.getSSLContextInitParameters(tlsServerParameters);
+            final SSLContext sslContext = SSLUtils.getSSLContext(tlsServerParameters);
             // Use only JDK provider for now, leaving OpenSsl as an option
             final SslProvider provider = SslProvider.JDK;
     
@@ -264,6 +265,15 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
                         ApplicationProtocolNames.HTTP_2,
                         ApplicationProtocolNames.HTTP_1_1
                     ));
+
+            if (!tlsServerParameters.getIncludeProtocols().isEmpty()
+                || !tlsServerParameters.getExcludeProtocols().isEmpty()) {
+                builder.protocols(SSLUtils.getProtocolsToInclude(
+                    tlsServerParameters.getIncludeProtocols(),
+                    tlsServerParameters.getExcludeProtocols(),
+                    sslContext.getDefaultSSLParameters().getProtocols(),
+                    sslContext.getSupportedSSLParameters().getProtocols()));
+            }
             
             final TrustManager[] trustManagers = initParams.getTrustManagers();
             if (trustManagers != null && trustManagers.length > 0) {
