@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -66,6 +67,38 @@ public final class SSLUtils {
 
     private SSLUtils() {
         //Helper class
+    }
+
+    public static String[] getProtocolsToInclude(List<String> includeProtocols,
+                                                 List<String> excludeProtocols,
+                                                 String[] defaultProtocols,
+                                                 String[] supportedProtocols)
+        throws GeneralSecurityException {
+        boolean hasInclude = includeProtocols != null && !includeProtocols.isEmpty();
+        boolean hasExclude = excludeProtocols != null && !excludeProtocols.isEmpty();
+        if (!hasInclude && !hasExclude) {
+            return defaultProtocols;
+        }
+
+        List<String> protocols = new ArrayList<>();
+        if (hasInclude) {
+            for (String supported : supportedProtocols) {
+                if (includeProtocols.contains(supported)) {
+                    protocols.add(supported);
+                }
+            }
+        } else {
+            protocols.addAll(Arrays.asList(defaultProtocols));
+        }
+        if (hasExclude) {
+            protocols.removeAll(excludeProtocols);
+        }
+        if (protocols.isEmpty()) {
+            throw new GeneralSecurityException(
+                "No TLS protocol remains enabled after applying the configured"
+                + " includeProtocols/excludeProtocols constraints");
+        }
+        return protocols.toArray(new String[0]);
     }
 
     public static HostnameVerifier getHostnameVerifier(TLSClientParameters tlsClientParameters) {
@@ -173,7 +206,37 @@ public final class SSLUtils {
 
         SSLEngine serverEngine = sslContext.createSSLEngine();
         serverEngine.setUseClientMode(false);
-        serverEngine.setNeedClientAuth(parameters.getClientAuthentication().isRequired());
+
+        List<String> includeProtocols = parameters.getIncludeProtocols();
+        List<String> excludeProtocols = parameters.getExcludeProtocols();
+        if (!includeProtocols.isEmpty() || !excludeProtocols.isEmpty()) {
+            serverEngine.setEnabledProtocols(
+                getProtocolsToInclude(
+                    includeProtocols,
+                    excludeProtocols,
+                    serverEngine.getEnabledProtocols(),
+                    serverEngine.getSupportedProtocols()));
+        }
+
+        String[] cipherSuites =
+            org.apache.cxf.configuration.jsse.SSLUtils.getCiphersuitesToInclude(
+                parameters.getCipherSuites(),
+                parameters.getCipherSuitesFilter(),
+                serverEngine.getEnabledCipherSuites(),
+                serverEngine.getSupportedCipherSuites(),
+                LOG);
+        serverEngine.setEnabledCipherSuites(cipherSuites);
+
+        org.apache.cxf.configuration.security.ClientAuthentication clientAuth =
+            parameters.getClientAuthentication();
+        if (clientAuth != null) {
+            if (clientAuth.isSetWant()) {
+                serverEngine.setWantClientAuth(clientAuth.isWant());
+            }
+            if (clientAuth.isSetRequired()) {
+                serverEngine.setNeedClientAuth(clientAuth.isRequired());
+            }
+        }
         return serverEngine;
     }
 
