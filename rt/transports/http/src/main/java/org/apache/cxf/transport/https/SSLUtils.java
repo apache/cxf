@@ -45,6 +45,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.StandardConstants;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
@@ -245,6 +246,11 @@ public final class SSLUtils {
             } else {
                 delegate.checkServerTrusted(chain, s);
             }
+            // certificates are valid, now check the hostname regardless of the
+            // delegate's type - see the SSLEngine overload below
+            if (socket instanceof SSLSocket) {
+                verifyPeerHostname(chain, ((SSLSocket)socket).getHandshakeSession());
+            }
         }
 
         private String getHostName(List<SNIServerName> names) {
@@ -268,26 +274,38 @@ public final class SSLUtils {
                 throws CertificateException {
             if (extendedDelegate != null) {
                 extendedDelegate.checkServerTrusted(chain, s, new SSLEngineWrapper(engine));
-                //certificates are valid, now check hostnames
-                SSLSession session = engine.getHandshakeSession();
-                List<SNIServerName> names = null;
-                if (session instanceof ExtendedSSLSession) {
-                    ExtendedSSLSession extSession = (ExtendedSSLSession)session;
-                    names = extSession.getRequestedServerNames();
-                }
-                
-                boolean identifiable = false;
-                String peerHost = session.getPeerHost();
-                String hostname = getHostName(names);
-                session = new SSLSessionWrapper(session, chain);
-                if (hostname != null && verifier.verify(hostname, session)) {
-                    identifiable = true;
-                }
-                if (!identifiable && !verifier.verify(peerHost, session)) {
-                    throw new CertificateException("No name matching " + peerHost + " found");
-                }                
             } else {
                 delegate.checkServerTrusted(chain, s);
+            }
+            // certificates are valid, now check the hostname. This must run regardless
+            // of the delegate's type: JSSE endpoint identification is deliberately
+            // suppressed (SSLEngineWrapper.getSSLParameters), so if the verifier were
+            // skipped for a plain X509TrustManager delegate no hostname check would
+            // happen anywhere and any certificate the delegate trusts would enable MITM.
+            verifyPeerHostname(chain, engine.getHandshakeSession());
+        }
+
+        private void verifyPeerHostname(X509Certificate[] chain, SSLSession session)
+                throws CertificateException {
+            if (session == null) {
+                throw new CertificateException(
+                    "No handshake session available to verify the peer hostname");
+            }
+            List<SNIServerName> names = null;
+            if (session instanceof ExtendedSSLSession) {
+                ExtendedSSLSession extSession = (ExtendedSSLSession)session;
+                names = extSession.getRequestedServerNames();
+            }
+
+            boolean identifiable = false;
+            String peerHost = session.getPeerHost();
+            String hostname = getHostName(names);
+            SSLSession wrappedSession = new SSLSessionWrapper(session, chain);
+            if (hostname != null && verifier.verify(hostname, wrappedSession)) {
+                identifiable = true;
+            }
+            if (!identifiable && !verifier.verify(peerHost, wrappedSession)) {
+                throw new CertificateException("No name matching " + peerHost + " found");
             }
         }
 
