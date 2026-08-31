@@ -21,6 +21,7 @@ package org.apache.cxf.wsn.util;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,8 +42,6 @@ public class IdGenerator {
     private static String hostName;
 
     private String seed;
-
-    private long sequence;
 
     public IdGenerator() {
         this("ID:");
@@ -101,13 +100,17 @@ public class IdGenerator {
     }
 
     /**
-     * Generate a unqiue id
+     * Generate a unique id. The variable part of the id is generated from a
+     * cryptographically strong random source rather than a sequential counter:
+     * the ids are used as unguessable endpoint addresses for resources such as
+     * subscriptions, and a client knowing one id must not be able to derive
+     * the ids handed out to other clients.
      *
      * @return a unique id
      */
 
-    public synchronized String generateId() {
-        return this.seed + (this.sequence++);
+    public String generateId() {
+        return this.seed + UUID.randomUUID();
     }
 
     /**
