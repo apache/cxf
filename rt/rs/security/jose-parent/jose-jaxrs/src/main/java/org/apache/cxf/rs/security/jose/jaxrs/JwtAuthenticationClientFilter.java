@@ -43,7 +43,12 @@ public class JwtAuthenticationClientFilter extends JoseJwtProducer
     implements ClientRequestFilter {
 
     private static final String DEFAULT_AUTH_SCHEME = "Bearer";
+    // Bounds the lifetime of the credential-wrapping token built below; it is consumed
+    // within the same request round trip so a short-lived default is sufficient.
+    private static final int DEFAULT_TTL_SECS = 60;
     private String authScheme = DEFAULT_AUTH_SCHEME;
+    private int ttl = DEFAULT_TTL_SECS;
+
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         JwtToken jwt = getJwtToken(requestContext);
@@ -54,7 +59,11 @@ public class JwtAuthenticationClientFilter extends JoseJwtProducer
                 JwtClaims claims = new JwtClaims();
                 claims.setSubject(ap.getUserName());
                 claims.setClaim("password", ap.getPassword());
-                claims.setIssuedAt(System.currentTimeMillis() / 1000L);
+                long issuedAt = System.currentTimeMillis() / 1000L;
+                claims.setIssuedAt(issuedAt);
+                if (ttl > 0) {
+                    claims.setExpiryTime(issuedAt + ttl);
+                }
                 jwt = new JwtToken(new JweHeaders(), claims);
             }
         }
@@ -100,6 +109,12 @@ public class JwtAuthenticationClientFilter extends JoseJwtProducer
         this.authScheme = authScheme;
     }
 
+    public int getTtl() {
+        return ttl;
+    }
 
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
 
 }
