@@ -19,10 +19,13 @@
 
 package org.apache.cxf.transport.https;
 
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import javax.net.ssl.ExtendedSSLSession;
 import javax.net.ssl.HostnameVerifier;
@@ -30,6 +33,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.transport.https.SSLUtils.SSLEngineWrapper;
 import org.apache.cxf.transport.https.SSLUtils.X509TrustManagerWrapper;
 
@@ -51,7 +56,42 @@ import static org.mockito.Mockito.when;
 
 
 public class SSLUtilsTest {
+
     private SSLEngine engine;
+
+    @Test
+    public void testProtocolConstraints() throws Exception {
+        String[] protocols = SSLUtils.getProtocolsToInclude(
+            Arrays.asList("TLSv1.3", "TLSv1"),
+            Collections.singletonList("TLSv1.3"),
+            new String[] {"TLSv1.3", "TLSv1.2"},
+            new String[] {"TLSv1", "TLSv1.2", "TLSv1.3"});
+
+        assertThat(protocols, is(new String[] {"TLSv1"}));
+    }
+
+    @Test(expected = GeneralSecurityException.class)
+    public void testProtocolConstraintsRejectEmptyResult() throws Exception {
+        SSLUtils.getProtocolsToInclude(
+            Collections.singletonList("TLSv1.3"),
+            Collections.emptyList(),
+            new String[] {"TLSv1.2"},
+            new String[] {"TLSv1.2"});
+    }
+
+    @Test
+    public void testProtocolConstraintsUseConfiguredContext() throws Exception {
+        SSLContext context = SSLContext.getInstance("TLSv1.2");
+        context.init(null, null, null);
+
+        String[] protocols = SSLUtils.getProtocolsToInclude(
+            Collections.emptyList(),
+            Collections.emptyList(),
+            context.getDefaultSSLParameters().getProtocols(),
+            context.getSupportedSSLParameters().getProtocols());
+
+        assertThat(protocols, is(new String[] {"TLSv1.2"}));
+    }
     
     @Before
     public void setUp() throws NoSuchAlgorithmException {
@@ -124,5 +164,23 @@ public class SSLUtilsTest {
             new X509TrustManagerWrapper(plainTrustManager, passingVerifier);
         wrapper.checkServerTrusted(new X509Certificate[0], "RSA", mockEngine);
         verify(passingVerifier).verify(eq("service.example.com"), any());
+    }
+
+    @Test
+    public void testServerEngineHonorsConfiguredConstraints() throws Exception {
+        TLSServerParameters parameters = new TLSServerParameters();
+        parameters.setExcludeProtocols(Arrays.asList("SSLv3", "TLSv1", "TLSv1.1"));
+        ClientAuthentication clientAuth = new ClientAuthentication();
+        clientAuth.setWant(Boolean.TRUE);
+        parameters.setClientAuthentication(clientAuth);
+
+        SSLEngine serverEngine = SSLUtils.createServerSSLEngine(parameters);
+
+        assertThat(serverEngine.getUseClientMode(), is(false));
+        assertThat(serverEngine.getWantClientAuth(), is(true));
+        List<String> enabled = Arrays.asList(serverEngine.getEnabledProtocols());
+        assertThat(enabled.contains("SSLv3"), is(false));
+        assertThat(enabled.contains("TLSv1"), is(false));
+        assertThat(enabled.contains("TLSv1.1"), is(false));
     }
 }
