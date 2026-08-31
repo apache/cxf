@@ -41,9 +41,14 @@ import org.apache.cxf.security.SecurityContext;
 @Priority(Priorities.AUTHENTICATION)
 public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwtAuthenticationFilter.class);
+    private static final int DEFAULT_TTL_SECS = 300;
 
     private String roleClaim;
     private boolean validateAudience = true;
+
+    protected AbstractJwtAuthenticationFilter() {
+        setTtl(DEFAULT_TTL_SECS);
+    }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
