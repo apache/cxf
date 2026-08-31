@@ -213,5 +213,41 @@ public class JwtUtilsTest {
         }
     }
 
+    @org.junit.Test
+    public void testIssuedAtOnlyTokenRejectedWithoutTTL() {
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond());
+
+        try {
+            JwtUtils.validateTokenClaims(claims, 0, 0, false);
+            fail("Failure expected on an iat-only token with no configured TTL");
+        } catch (JwtException ex) {
+            // expected
+        }
+    }
+
+    @org.junit.Test
+    public void testIssuedAtOnlyTokenAcceptedWithTTL() {
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        claims.setIssuedAt(ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond());
+
+        JwtUtils.validateTokenClaims(claims, 60, 0, false);
+    }
+
+    @org.junit.Test
+    public void testExpiryTokenAcceptedWithoutTTL() {
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setExpiryTime(now.plusMinutes(5L).toEpochSecond());
+
+        JwtUtils.validateTokenClaims(claims, 0, 0, false);
+    }
 
 }
