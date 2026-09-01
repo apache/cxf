@@ -95,11 +95,17 @@ final class AttachmentDeserializerUtil {
                     // preserve the line break and append the continuation
                     buffer.append("\r\n");
                     buffer.append(b);
+
+                    if (buffer.length() > maxHeaderLength) {
+                        LOG.fine("The attachment header size has exceeded the configured parameter: "
+                            + maxHeaderLength);
+                        throw new HeaderSizeExceededException();
+                    }
                 }
             } else {
                 // if we have a line pending in the buffer, flush it
                 if (buffer.length() > 0) {
-                    addHeaderLine(heads, buffer, maxHeadersCount);
+                    addHeaderLine(heads, buffer, maxHeadersCount, maxHeaderLength);
                     buffer.setLength(0);
                 }
                 // add this to the accumulator
@@ -109,7 +115,7 @@ final class AttachmentDeserializerUtil {
 
         // if we have a line pending in the buffer, flush it
         if (buffer.length() > 0) {
-            addHeaderLine(heads, buffer, maxHeadersCount);
+            addHeaderLine(heads, buffer, maxHeadersCount, maxHeaderLength);
         }
         return heads;
     }
@@ -144,7 +150,7 @@ final class AttachmentDeserializerUtil {
     }
 
     private static void addHeaderLine(Map<String, List<String>> heads, StringBuilder line, 
-            int maxHeadersCount) throws IOException {
+            int maxHeadersCount, int maxHeaderLength) throws IOException {
         // null lines are a nop
         final int size = line.length();
         if (size == 0) {
@@ -174,6 +180,11 @@ final class AttachmentDeserializerUtil {
             throw new IOException("The attachment contains more headers than are permitted");
         }
         List<String> v = heads.computeIfAbsent(name, k -> new ArrayList<>(1));
+        final int headerSize = v.stream().mapToInt(String::length).sum();
+        if ((headerSize + value.length()) > maxHeaderLength) {
+            LOG.fine("The attachment header size has exceeded the configured parameter: " + maxHeaderLength);
+            throw new HeaderSizeExceededException();
+        }
         v.add(value);
     }
 
