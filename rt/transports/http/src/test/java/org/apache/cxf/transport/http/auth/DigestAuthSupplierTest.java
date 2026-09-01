@@ -29,6 +29,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DigestAuthSupplierTest {
@@ -90,6 +91,19 @@ public class DigestAuthSupplierTest {
         expectedParams.put("uri", "");
         expectedParams.put("algorithm", "MD5");
         assertEquals(expectedParams, params);
+    }
+
+    @Test
+    public void testCnonceIsUnpredictable() throws Exception {
+        DigestAuthSupplier authSupplier = new DigestAuthSupplier();
+        String cnonce1 = authSupplier.createCnonce();
+        String cnonce2 = authSupplier.createCnonce();
+        // 16 random bytes, hex encoded
+        assertEquals(32, cnonce1.length());
+        assertTrue(cnonce1.matches("[0-9a-fA-F]+"));
+        assertNotEquals(cnonce1, cnonce2);
+        // must not be an epoch-millis timestamp
+        assertNotEquals(Long.toString(System.currentTimeMillis()).length(), cnonce1.length());
     }
 
     @Test
