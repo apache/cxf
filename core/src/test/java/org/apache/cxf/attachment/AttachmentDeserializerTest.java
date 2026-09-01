@@ -743,6 +743,32 @@ public class AttachmentDeserializerTest {
     }
     
     @Test
+    public void testManyAttachmentRepeatedHeaders() throws Exception {
+        StringBuilder sb = new StringBuilder(10000);
+        // Add many attachment headers
+        sb.append("------=_Part_34950_1098328613.1263781527359\n");
+        IntStream.range(0, 100).forEach(i -> sb.append("Header1").append(": ").append(i).append('\n'));
+        IntStream.range(0, 100).forEach(i -> sb.append("Header2").append(": ").append(i).append('\n'));
+        IntStream.range(0, 100).forEach(i -> sb.append("Header3").append(": ").append(i).append('\n'));
+        IntStream.range(0, 100).forEach(i -> sb.append("Header4").append(": ").append(i).append('\n'));
+        IntStream.range(0, 100).forEach(i -> sb.append("Header5").append(": ").append(i).append('\n'));
+        IntStream.range(0, 100).forEach(i -> sb.append("Header6").append(": ").append(i).append('\n'));
+        sb.append("Content-Type: text/xml; charset=UTF-8\n")
+            .append("Content-Transfer-Encoding: binary\n")
+            .append("Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n")
+            .append('\n')
+            .append("<envelope/>\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+
+        assertThrows("Failure expected on too many attachment headers", IOException.class, 
+                () -> ad.initializeAttachments());
+    }
+    
+    @Test
     public void testAttachmentRepeatedHeaderSize() throws Exception {
         final Random random = new Random();
         
