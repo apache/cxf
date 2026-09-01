@@ -55,6 +55,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     private String redirectUri;
     private String roleClaim;
     private boolean addRequestUriAsRedirectQuery;
+    private boolean requireIdTokenExpiry = true;
 
     public void filter(ContainerRequestContext rc) {
         if (checkSecurityContext(rc)) {
@@ -87,9 +88,13 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             return false;
         }
         IdToken idToken = tokenContext.getIdToken();
+        if (idToken == null) {
+            return false;
+        }
         try {
-            // If ID token has expired then the context is no longer valid
-            JwtUtils.validateJwtExpiry(idToken, 0, idToken.getExpiryTime() != null);
+            // If ID token has expired then the context is no longer valid.
+            // OIDC Core mandates "exp" in ID Tokens, so it is required by default.
+            JwtUtils.validateJwtExpiry(idToken, 0, requireIdTokenExpiry);
         } catch (JwtException ex) {
             stateManager.removeClientTokenContext(new MessageContextImpl(JAXRSUtils.getCurrentMessage()));
             return false;
@@ -153,5 +158,15 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
 
     public void setAddRequestUriAsRedirectQuery(boolean addRequestUriAsRedirectQuery) {
         this.addRequestUriAsRedirectQuery = addRequestUriAsRedirectQuery;
+    }
+
+    /**
+     * Whether the stored ID token must carry an expiry ("exp") claim for the
+     * session context to keep being revalidated. Default is true. Disabling
+     * this re-opens never-expiring sessions for exp-less ID tokens - only do
+     * so if another mechanism bounds the session lifetime.
+     */
+    public void setRequireIdTokenExpiry(boolean requireIdTokenExpiry) {
+        this.requireIdTokenExpiry = requireIdTokenExpiry;
     }
 }
