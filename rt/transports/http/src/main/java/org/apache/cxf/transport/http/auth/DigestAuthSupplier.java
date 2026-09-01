@@ -22,6 +22,7 @@ package org.apache.cxf.transport.http.auth;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +37,7 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  *
  */
 public class DigestAuthSupplier implements HttpAuthSupplier {
+    private static final SecureRandom CNONCE_GENERATOR = new SecureRandom();
 
     Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<>();
 
@@ -107,8 +109,16 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
         return authURI;
     }
 
+    /**
+     * Creates the client nonce. RFC 7616 relies on the cnonce being unpredictable so
+     * that a hostile or spoofed server controlling the challenge nonce cannot steer
+     * the client into computing a digest over fully attacker-chosen input; a
+     * timestamp is guessable and must not be used here.
+     */
     public String createCnonce() {
-        return Long.toString(System.currentTimeMillis());
+        byte[] bytes = new byte[16];
+        CNONCE_GENERATOR.nextBytes(bytes);
+        return StringUtils.toHexString(bytes);
     }
 
     class DigestInfo {
