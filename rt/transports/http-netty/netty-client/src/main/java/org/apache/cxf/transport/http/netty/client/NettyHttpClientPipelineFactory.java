@@ -82,26 +82,39 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
     private final int readTimeout;
     private final int maxContentLength;
     private final boolean enableHttp2;
+    private final String peerHost;
+    private final int peerPort;
 
+    @Deprecated
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters) {
         this(clientParameters, 0);
     }
 
+    @Deprecated
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout) {
         this(clientParameters, readTimeout, NettyHttpConduit.DEFAULT_MAX_RESPONSE_CONTENT_LENGTH);
     }
 
+    @Deprecated
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout,
                                           int maxResponseContentLength) {
         this(clientParameters, readTimeout, maxResponseContentLength, false);
     }
     
+    @Deprecated
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout,
             int maxResponseContentLength, boolean enableHttp2) {
+        this(clientParameters, readTimeout, maxResponseContentLength, enableHttp2, null, -1);
+    }
+
+    public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters, int readTimeout,
+            int maxResponseContentLength, boolean enableHttp2, String peerHost, int peerPort) {
         this.tlsClientParameters = clientParameters;
         this.readTimeout = readTimeout;
         this.maxContentLength = maxResponseContentLength;
         this.enableHttp2 = enableHttp2;
+        this.peerHost = peerHost;
+        this.peerPort = peerPort;
     }
 
     @Override
@@ -200,9 +213,10 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
             final SSLEngine sslEngine;
 
             if (enableHttp2) {
-                final SSLContextInitParameters initParams = SSLUtils.getSSLContextInitParameters(tlsClientParameters);
+                final SSLContextInitParameters initParams =
+                    SSLUtils.getSSLContextInitParameters(tlsClientParameters, peerHost != null);
 
-                sslEngine = SslContextBuilder
+                final SslContext sslContext = SslContextBuilder
                     .forClient()
                     .sslProvider(SslContext.defaultClientProvider())
                     .keyManager(new SimpleKeyManagerFactory() {
@@ -255,10 +269,24 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
                             ApplicationProtocolNames.HTTP_1_1
                         )
                     )
-                    .build()
-                    .newEngine(channel.alloc());
+                    .build();
+
+                sslEngine = peerHost != null
+                    ? sslContext.newEngine(channel.alloc(), peerHost, peerPort)
+                    : sslContext.newEngine(channel.alloc());
             } else {
-                sslEngine = SSLUtils.createClientSSLEngine(tlsClientParameters);
+                if (peerHost != null) {
+                    sslEngine = SSLUtils.createClientSSLEngine(tlsClientParameters, peerHost, peerPort);
+                } else {
+                    sslEngine = SSLUtils.getSSLContext(tlsClientParameters).createSSLEngine();
+                    sslEngine.setUseClientMode(true);
+                }
+            }
+
+            if (peerHost == null && !tlsClientParameters.isDisableCNCheck()) {
+                LOG.warning("No peer host information was supplied to the pipeline factory: TLS "
+                    + "hostname verification cannot be performed. Use the constructor taking a "
+                    + "peer host and port, or set disableCNCheck to accept the legacy behavior.");
             }
 
             return new SslHandler(sslEngine);

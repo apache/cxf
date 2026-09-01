@@ -388,21 +388,22 @@ public class NettyHttpConduit extends HttpClientHTTPConduit implements BusLifeCy
 
         protected void connect(boolean output) {
             final NettyHttpClientPipelineFactory handler; 
+            final int port = url.getPort() != -1 ? url.getPort()
+                : "http".equals(url.getScheme()) ? 80 : 443;
             if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
                 handler = new NettyHttpClientPipelineFactory(clientParameters, entity.getReceiveTimeout(),
-                    entity.getMaxResponseContentLength(), enableHttp2);
+                    entity.getMaxResponseContentLength(), enableHttp2, url.getHost(), port);
             } else {
                 handler = new NettyHttpClientPipelineFactory(null, entity.getReceiveTimeout(),
-                    entity.getMaxResponseContentLength(), enableHttp2);
+                    entity.getMaxResponseContentLength(), enableHttp2, null, -1);
             }
 
             // Set handler
             bootstrap.handler(handler);
 
             ChannelFuture connFuture =
-                bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort() != -1 ? url.getPort()
-                                                            : "http".equals(url.getScheme()) ? 80 : 443));
+                bootstrap.connect(new InetSocketAddress(url.getHost(), port));
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
