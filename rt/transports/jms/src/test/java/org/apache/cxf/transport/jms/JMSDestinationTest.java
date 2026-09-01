@@ -230,7 +230,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSDestination destination = setupJMSDestination(ei);
         destination.setMessageObserver(createMessageObserver());
         // The JMSBroker (ActiveMQ 5.x) need to take some time to setup the DurableSubscriber
-        Thread.sleep(500L);
+        Thread.sleep(2000L);
         sendOneWayMessage(conduit, outMessage);
         Message destMessage = waitForReceiveDestMessage();
 
@@ -515,7 +515,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         conduit.getJmsConfig().resetCachedReplyDestination();
         // The queue deletion events (as well as others) are propagated asynchronously
         await()
-            .atMost(1, TimeUnit.SECONDS)
+            .atMost(5, TimeUnit.SECONDS)
             .untilAsserted(() -> assertThat(ReflectionUtil.accessDeclaredField("tempQueues", ActiveMQConnection.class, 
                 connection, Set.class).size(), equalTo(0)));
         
@@ -648,7 +648,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         });
 
         final Message outMessage = createMessage();
-        Thread.sleep(500L);
+        Thread.sleep(2000L);
 
         sendOneWayMessage(conduit, outMessage);
         latch.await(5, TimeUnit.SECONDS);
@@ -660,11 +660,12 @@ public class JMSDestinationTest extends AbstractJMSTester {
     @Test
     public void testConnectionFactoryExceptionHandling() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldPubSubService", "HelloWorldPubSubPort");
+        final FaultyConnectionFactory faultyCf = new FaultyConnectionFactory(cf, 3);
         final Function<ConnectionFactory, ConnectionFactory> wrapper =
             new Function<ConnectionFactory, ConnectionFactory>() {
                 @Override
                 public ConnectionFactory apply(ConnectionFactory cf) {
-                    return new FaultyConnectionFactory(cf, 3);
+                    return faultyCf;
                 }
             };
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
@@ -673,7 +674,10 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
 
         final Message outMessage = createMessage();
-        Thread.sleep(4000L);
+        // Wait until the faulty connection factory has successfully created a connection
+        // (3 faults x 1000ms retry = at least 3s)
+        await().atMost(30, TimeUnit.SECONDS)
+            .until(() -> faultyCf.connectionsCreated.get() > 0);
 
         sendOneWayMessage(conduit, outMessage);
 
@@ -694,11 +698,20 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.getJmsConfig().setRetryInterval(1000);
         destination.setMessageObserver(createMessageObserver());
 
-        Thread.sleep(500L);
+        Thread.sleep(2000L);
         broker.stop();
 
         broker.start();
-        Thread.sleep(2000L);
+        // Wait until broker is accepting connections again
+        await().atMost(30, TimeUnit.SECONDS).pollInterval(500, TimeUnit.MILLISECONDS).until(() -> {
+            try (Connection testConn = cf1.createConnection()) {
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+        // Allow additional time for the destination's async reconnect to complete
+        Thread.sleep(5000L);
 
         final Message outMessage = createMessage();
         sendOneWayMessage(conduit, outMessage);
@@ -748,7 +761,10 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.setMessageObserver(createMessageObserver());
 
         final Message outMessage = createMessage();
-        Thread.sleep(4000L);
+        // Wait until the faulty connection factory has created the expected connections
+        // (5 session faults x 1000ms retry = at least 5s)
+        await().atMost(30, TimeUnit.SECONDS)
+            .until(() -> faultyConnectionFactory.connectionsCreated.get() >= 2);
 
         sendOneWayMessage(conduit, outMessage);
 
@@ -759,7 +775,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         conduit.close();
         destination.shutdown();
-        
+
         assertEquals("Only two createConnection() calls allowed because restartConnection() should be "
             + "called only once.", 2, faultyConnectionFactory.connectionsCreated.get());
     }
