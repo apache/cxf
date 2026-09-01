@@ -50,8 +50,18 @@ public final class XSLTUtils {
     }
 
     public static InputStream transform(Templates xsltTemplate, InputStream in) {
-        try (InputStream inputStream = in; CachedOutputStream out = new CachedOutputStream()) {
-            Source beforeSource = new StaxSource(StaxUtils.createXMLStreamReader(inputStream));
+        return transform(xsltTemplate, in, null);
+    }
+
+    public static InputStream transform(Templates xsltTemplate,
+                                        InputStream in,
+                                        String encoding) {
+        try (InputStream inputStream = in;
+             CachedOutputStream out = new CachedOutputStream()) {
+            Source beforeSource = new StaxSource(
+                encoding != null
+                    ? StaxUtils.createXMLStreamReader(inputStream, encoding)
+                    : StaxUtils.createXMLStreamReader(inputStream));
 
             Transformer trans = xsltTemplate.newTransformer();
             trans.transform(beforeSource, new StreamResult(out));

@@ -21,12 +21,14 @@ package org.apache.cxf.interceptor.transform;
 
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -71,26 +73,51 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) {
         if (contextPropertyName != null
-            && !MessageUtils.getContextualBoolean(message, contextPropertyName, false)) {
+            && !MessageUtils.getContextualBoolean(message,
+                contextPropertyName, false)) {
             return;
         }
-        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
+        XMLStreamReader reader =
+            message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
 
-        XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is);
+        String encoding = getEncoding(message);
+        XMLStreamReader transformReader =
+            createTransformReaderIfNeeded(reader, is, encoding);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
         }
 
     }
 
-    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
-        return TransformUtils.createTransformReaderIfNeeded(reader, is,
-                                                            inDropElements,
-                                                            inElementsMap,
-                                                            inAppendMap,
-                                                            inAttributesMap,
-                                                            blockOriginalReader);
+    protected XMLStreamReader createTransformReaderIfNeeded(
+            XMLStreamReader reader,
+            InputStream is,
+            String encoding) {
+        return TransformUtils.createTransformReaderIfNeeded(
+            reader, is,
+            inDropElements,
+            inElementsMap,
+            inAppendMap,
+            inAttributesMap,
+            blockOriginalReader,
+            encoding);
+    }
+
+    private String getEncoding(Message message) {
+        String encoding =
+            (String) message.get(Message.ENCODING);
+        if (encoding == null) {
+            Exchange ex = message.getExchange();
+            if (ex != null && ex.getInMessage() != null) {
+                encoding = (String) ex.getInMessage()
+                    .get(Message.ENCODING);
+            }
+        }
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+        return encoding;
     }
 
     public void setInAppendElements(Map<String, String> inElements) {
