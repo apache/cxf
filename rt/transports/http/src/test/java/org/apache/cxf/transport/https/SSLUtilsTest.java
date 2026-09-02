@@ -33,6 +33,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.transport.https.SSLUtils.SSLEngineWrapper;
@@ -114,6 +115,30 @@ public class SSLUtilsTest {
         }
     
         assertThat(wrapper.getSSLParameters(), is(not(nullValue())));
+    }
+
+    @Test
+    public void testCreateClientSSLEngineBoundToPeer() throws Exception {
+        TLSClientParameters parameters = new TLSClientParameters();
+        SSLEngine clientEngine = SSLUtils.createClientSSLEngine(parameters, "api.example.com", 443);
+
+        assertThat(clientEngine.getPeerHost(), is("api.example.com"));
+        assertThat(clientEngine.getPeerPort(), is(443));
+        assertThat(clientEngine.getUseClientMode(), is(true));
+    }
+
+    @Test
+    public void testHostnameVerifierWrapsConfiguredTrustManager() throws Exception {
+        X509TrustManager trustManager = mock(X509TrustManager.class);
+        HostnameVerifier verifier = mock(HostnameVerifier.class);
+        TLSClientParameters parameters = new TLSClientParameters();
+        parameters.setTrustManagers(new X509TrustManager[] {trustManager});
+        parameters.setHostnameVerifier(verifier);
+
+        var initParameters = SSLUtils.getSSLContextInitParameters(parameters, true);
+
+        assertThat(initParameters.getTrustManagers()[0] instanceof X509TrustManagerWrapper, is(true));
+        assertThat(parameters.getTrustManagers()[0], is(trustManager));
     }
 
     /**
