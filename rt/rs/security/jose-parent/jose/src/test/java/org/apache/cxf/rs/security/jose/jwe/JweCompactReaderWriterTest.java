@@ -23,6 +23,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -263,6 +264,108 @@ public class JweCompactReaderWriterTest {
         String decryptedText = decryption.decrypt(jweContent).getContentText();
         assertEquals(specPlainText, decryptedText);
     }
+
+    @Test
+    public void testRSA15A128GCMDecryptionErrorsAreIndistinguishable() throws Exception {
+        assertRSA15DecryptionErrorsAreIndistinguishable(ContentAlgorithm.A128GCM);
+    }
+
+    @Test
+    public void testRSA15A128CBCHS256DecryptionErrorsAreIndistinguishable() throws Exception {
+        assertRSA15DecryptionErrorsAreIndistinguishable(ContentAlgorithm.A128CBC_HS256);
+    }
+
+    private void assertRSA15DecryptionErrorsAreIndistinguishable(ContentAlgorithm contentAlgorithm)
+        throws Exception {
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1,
+                                                             RSA_PUBLIC_EXPONENT_ENCODED_A1);
+        KeyEncryptionProvider keyEncryption = new RSAKeyEncryptionAlgorithm(publicKey, KeyAlgorithm.RSA1_5);
+        JweEncryptionProvider encryption;
+        if (AlgorithmUtils.isAesCbcHmac(contentAlgorithm.getJwaName())) {
+            encryption = new AesCbcHmacJweEncryption(contentAlgorithm, CONTENT_ENCRYPTION_KEY_A3,
+                                                      INIT_VECTOR_A3, keyEncryption);
+        } else {
+            encryption = new JweEncryption(keyEncryption,
+                new AesGcmContentEncryptionAlgorithm(Arrays.copyOf(CONTENT_ENCRYPTION_KEY_A3, 16), INIT_VECTOR_A1,
+                                                     contentAlgorithm));
+        }
+        String jweContent = encryption.encrypt("test".getBytes(StandardCharsets.UTF_8), null);
+
+        RSAPrivateKey privateKey = CryptoUtils.getRSAPrivateKey(RSA_MODULUS_ENCODED_A1,
+                                                                RSA_PRIVATE_EXPONENT_ENCODED_A1);
+        for (boolean unwrap : new boolean[] {true, false}) {
+            KeyDecryptionProvider keyDecryption = new RSAKeyDecryptionAlgorithm(privateKey, KeyAlgorithm.RSA1_5,
+                                                                                unwrap);
+            JweDecryptionProvider decryption = AlgorithmUtils.isAesCbcHmac(contentAlgorithm.getJwaName())
+                ? new AesCbcHmacJweDecryption(keyDecryption, contentAlgorithm)
+                : new JweDecryption(keyDecryption, new AesGcmContentDecryptionAlgorithm(contentAlgorithm));
+
+            assertEquals("test", decryption.decrypt(jweContent).getContentText());
+            RuntimeException encryptedKeyFailure = getDecryptionFailure(decryption,
+                                                                         tamperJwePart(jweContent, 1, true));
+            RuntimeException keyLengthFailure = getDecryptionFailure(decryption,
+                replaceJwePart(jweContent, 1, encryptInvalidCek(publicKey, contentAlgorithm)));
+            RuntimeException authenticationTagFailure = getDecryptionFailure(decryption,
+                                                                              tamperJwePart(jweContent, 4, false));
+            assertEquals(getExceptionTypes(authenticationTagFailure), getExceptionTypes(encryptedKeyFailure));
+            assertEquals(getExceptionTypes(authenticationTagFailure), getExceptionTypes(keyLengthFailure));
+        }
+    }
+
+    private static byte[] encryptInvalidCek(RSAPublicKey publicKey, ContentAlgorithm contentAlgorithm)
+        throws Exception {
+        int cekSize = contentAlgorithm.getKeySizeBits() / 8;
+        if (AlgorithmUtils.isAesCbcHmac(contentAlgorithm.getJwaName())) {
+            cekSize *= 2;
+        }
+        Cipher cipher = Cipher.getInstance(AlgorithmUtils.toJavaName(KeyAlgorithm.RSA1_5.getJwaName()));
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        return cipher.doFinal(new byte[cekSize - 1]);
+    }
+
+    private static String tamperJwePart(String jweContent, int partIndex, boolean truncate) throws Exception {
+        String[] parts = jweContent.split("\\.", -1);
+        byte[] value = Base64UrlUtility.decode(parts[partIndex]);
+        if (truncate) {
+            value = Arrays.copyOf(value, value.length - 1);
+        } else {
+            value[0] ^= 1;
+        }
+        return replaceJwePart(parts, partIndex, value);
+    }
+
+    private static String replaceJwePart(String jweContent, int partIndex, byte[] value) {
+        return replaceJwePart(jweContent.split("\\.", -1), partIndex, value);
+    }
+
+    private static String replaceJwePart(String[] parts, int partIndex, byte[] value) {
+        parts[partIndex] = Base64UrlUtility.encode(value);
+        return String.join(".", parts);
+    }
+
+    private static RuntimeException getDecryptionFailure(JweDecryptionProvider decryption, String jweContent) {
+        try {
+            decryption.decrypt(jweContent);
+        } catch (RuntimeException ex) {
+            return ex;
+        }
+        fail("Decryption should have failed");
+        return null;
+    }
+
+    private static String getExceptionTypes(Throwable exception) {
+        StringBuilder types = new StringBuilder();
+        while (exception != null) {
+            if (types.length() != 0) {
+                types.append(':');
+            }
+            types.append(exception.getClass().getName());
+            exception = exception.getCause();
+        }
+        return types.toString();
+    }
+
     @Test
     public void testEncryptDecryptAesGcmWrapA128CBCHS256() throws Exception {
         //fips: CBC mode not supported
