@@ -117,6 +117,12 @@ public final class SSLUtils {
     
     public static SSLContextInitParameters getSSLContextInitParameters(TLSParameterBase parameters) 
             throws GeneralSecurityException {
+        return getSSLContextInitParameters(parameters, false);
+    }
+
+    public static SSLContextInitParameters getSSLContextInitParameters(TLSParameterBase parameters,
+                                                                       boolean addHostnameVerifier)
+            throws GeneralSecurityException {
         
         final SSLContextInitParameters contextParameters = new SSLContextInitParameters();
 
@@ -129,6 +135,15 @@ public final class SSLUtils {
         TrustManager[] trustManagers = parameters.getTrustManagers();
         if (trustManagers == null && parameters instanceof TLSClientParameters) {
             trustManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultTrustStoreManagers(LOG);
+        }
+        if (trustManagers != null && addHostnameVerifier && parameters instanceof TLSClientParameters) {
+            trustManagers = Arrays.copyOf(trustManagers, trustManagers.length);
+            HostnameVerifier verifier = getHostnameVerifier((TLSClientParameters)parameters);
+            for (int i = 0; i < trustManagers.length; i++) {
+                if (trustManagers[i] instanceof X509TrustManager) {
+                    trustManagers[i] = new X509TrustManagerWrapper((X509TrustManager)trustManagers[i], verifier);
+                }
+            }
         }
         
         contextParameters.setKeyManagers(configuredKeyManagers);
@@ -152,17 +167,8 @@ public final class SSLUtils {
         SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
             .getInstance(protocol, provider);
 
-        final SSLContextInitParameters initParams = getSSLContextInitParameters(parameters);
-        TrustManager[] tms = initParams.getTrustManagers();
-        if (tms != null && addHNV && parameters instanceof TLSClientParameters) {
-            HostnameVerifier hnv = getHostnameVerifier((TLSClientParameters)parameters);
-            for (int i = 0; i < tms.length; i++) {
-                if (tms[i] instanceof  X509TrustManager) {
-                    tms[i] = new X509TrustManagerWrapper((X509TrustManager)tms[i], hnv);
-                }
-            }
-        }
-        ctx.init(initParams.getKeyManagers(), tms, parameters.getSecureRandom());
+        final SSLContextInitParameters initParams = getSSLContextInitParameters(parameters, addHNV);
+        ctx.init(initParams.getKeyManagers(), initParams.getTrustManagers(), parameters.getSecureRandom());
 
         if (parameters instanceof TLSClientParameters && ctx.getClientSessionContext() != null) {
             ctx.getClientSessionContext().setSessionTimeout(((TLSClientParameters)parameters).getSslCacheTimeout());
@@ -239,9 +245,21 @@ public final class SSLUtils {
         return serverEngine;
     }
 
+    /**
+     * @deprecated use {@link #createClientSSLEngine(TLSClientParameters, String, int)}
+     */
+    @Deprecated
     public static SSLEngine createClientSSLEngine(TLSClientParameters parameters) throws Exception {
         SSLContext sslContext = getSSLContext(parameters);
         SSLEngine clientEngine = sslContext.createSSLEngine();
+        clientEngine.setUseClientMode(true);
+        return clientEngine;
+    }
+
+    public static SSLEngine createClientSSLEngine(TLSClientParameters parameters,
+                                                   String peerHost, int peerPort) throws Exception {
+        SSLContext sslContext = getSSLContext(parameters, true);
+        SSLEngine clientEngine = sslContext.createSSLEngine(peerHost, peerPort);
         clientEngine.setUseClientMode(true);
         return clientEngine;
     }

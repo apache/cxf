@@ -52,6 +52,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
 
@@ -98,7 +99,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testInvocation() throws Exception {
-        setupTLS(g);
+        setupTLS(g, true);
         setAddress(g, address);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
@@ -121,7 +122,20 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
 
     }
 
-    private static void setupTLS(Greeter port)
+    @Test
+    public void testRejectsCertificateForWrongHostByDefault() throws Exception {
+        setupTLS(g, false);
+        setAddress(g, address);
+
+        try {
+            g.greetMe("test");
+            fail("The certificate for www.service.com must not be accepted for localhost");
+        } catch (Exception expected) {
+            // expected
+        }
+    }
+
+    private static void setupTLS(Greeter port, boolean disableCNCheck)
         throws FileNotFoundException, IOException, GeneralSecurityException {
         String keyStoreLoc =
             "/keys/clientstore.jks";
@@ -140,8 +154,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
 
-
-        tlsCP.setDisableCNCheck(true);
+        tlsCP.setDisableCNCheck(disableCNCheck);
         httpConduit.setTlsClientParameters(tlsCP);
     }
 
