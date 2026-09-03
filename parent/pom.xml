@@ -181,8 +181,8 @@
         <cxf.logback.classic.version>1.6.3</cxf.logback.classic.version>
         <cxf.lucene.version>10.5.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.16</cxf.maven.core.version>
-        <cxf.micrometer.version>1.17.1</cxf.micrometer.version>
-        <cxf.micrometer-tracing.version>1.7.1</cxf.micrometer-tracing.version>
+        <cxf.micrometer.version>1.18.0-M1</cxf.micrometer.version>
+        <cxf.micrometer-tracing.version>1.8.0-M1</cxf.micrometer-tracing.version>
         <cxf.microprofile.config.version>3.1.1</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>4.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>4.1.1</cxf.microprofile.openapi.version>
@@ -216,11 +216,11 @@
         <cxf.slf4j.version>2.0.18</cxf.slf4j.version>
         <cxf.snakeyaml.version>2.6</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>2.3_2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>4.1.1</cxf.spring.boot.version>
+        <cxf.spring.boot.version>4.2.0-M1</cxf.spring.boot.version>
         <cxf.spring.ldap.version>4.1.1</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
-        <cxf.spring.security.version>7.1.1</cxf.spring.security.version>
-        <cxf.spring.version>7.0.9</cxf.spring.version>
+        <cxf.spring.security.version>7.2.0-M1</cxf.spring.security.version>
+        <cxf.spring.version>7.1.0-M1</cxf.spring.version>
         <cxf.stax-ex.version>1.8.3</cxf.stax-ex.version>
         <cxf.swagger.ui.version>5.32.14</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.2.54</cxf.swagger.v3.version>
