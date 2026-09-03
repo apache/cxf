@@ -27,6 +27,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,15 +49,24 @@ import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.saml.saml2.core.impl.EncryptedAssertionBuilder;
 import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.encryption.EncryptedData;
+import org.opensaml.xmlsec.encryption.EncryptedKey;
+import org.opensaml.xmlsec.encryption.EncryptionMethod;
+import org.opensaml.xmlsec.encryption.impl.EncryptedDataBuilder;
+import org.opensaml.xmlsec.encryption.impl.EncryptedKeyBuilder;
+import org.opensaml.xmlsec.encryption.impl.EncryptionMethodBuilder;
 import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.impl.KeyInfoBuilder;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
 import static org.junit.Assert.assertNotNull;
@@ -187,6 +199,36 @@ public class SAMLResponseValidatorTest {
         } catch (WSSecurityException ex) {
             // expected
         }
+    }
+
+    @org.junit.Test
+    public void testEncryptedAssertionRejectsRSA15KeyTransport() throws Exception {
+        Response response = createEncryptedResponse(XMLCipher.RSA_v1dot5, XMLCipher.AES_128_GCM);
+
+        assertEncryptedAssertionRejected(response);
+    }
+
+    @org.junit.Test
+    public void testEncryptedAssertionRejectsCBCContentEncryption() throws Exception {
+        Response response = createEncryptedResponse(XMLCipher.RSA_OAEP, XMLCipher.AES_128);
+
+        assertEncryptedAssertionRejected(response);
+    }
+
+    @org.junit.Test
+    public void testEncryptedAssertionAllowsDefaultAlgorithms() throws Exception {
+        Logger logger = Logger.getLogger(SAMLProtocolResponseValidator.class.getName());
+        CipherValueWarningHandler handler = new CipherValueWarningHandler();
+        logger.addHandler(handler);
+        try {
+            assertEncryptedAssertionRejected(
+                createEncryptedResponse(XMLCipher.RSA_OAEP, XMLCipher.AES_128_GCM)
+            );
+        } finally {
+            logger.removeHandler(handler);
+        }
+
+        assertTrue(handler.cipherValueWarningLogged);
     }
 
     @org.junit.Test
@@ -850,5 +892,81 @@ public class SAMLResponseValidatorTest {
         assertNotNull(policyElement);
 
         return (Response)OpenSAMLUtil.fromDom(policyElement);
+    }
+
+    private Response createEncryptedResponse(String keyTransportAlgorithm, String contentEncryptionAlgorithm)
+        throws Exception {
+        Document doc = DOMUtils.createDocument();
+        Status status =
+            SAML2PResponseComponentBuilder.createStatus(
+                SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
+            );
+        Response response =
+            SAML2PResponseComponentBuilder.createSAMLResponse(
+                "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
+            );
+
+        EncryptionMethod keyTransportMethod = new EncryptionMethodBuilder().buildObject();
+        keyTransportMethod.setAlgorithm(keyTransportAlgorithm);
+        EncryptedKey encryptedKey = new EncryptedKeyBuilder().buildObject();
+        encryptedKey.setEncryptionMethod(keyTransportMethod);
+
+        KeyInfo keyInfo = new KeyInfoBuilder().buildObject();
+        keyInfo.getEncryptedKeys().add(encryptedKey);
+
+        EncryptionMethod contentEncryptionMethod = new EncryptionMethodBuilder().buildObject();
+        contentEncryptionMethod.setAlgorithm(contentEncryptionAlgorithm);
+        EncryptedData encryptedData = new EncryptedDataBuilder().buildObject();
+        encryptedData.setEncryptionMethod(contentEncryptionMethod);
+        encryptedData.setKeyInfo(keyInfo);
+
+        org.opensaml.saml.saml2.core.EncryptedAssertion encryptedAssertion =
+            new EncryptedAssertionBuilder().buildObject();
+        encryptedAssertion.setEncryptedData(encryptedData);
+        response.getEncryptedAssertions().add(encryptedAssertion);
+
+        Element responseElement = OpenSAMLUtil.toDom(response, doc);
+        doc.appendChild(responseElement);
+        return (Response)OpenSAMLUtil.fromDom(responseElement);
+    }
+
+    private void assertEncryptedAssertionRejected(Response response) throws Exception {
+        Crypto issuerCrypto = createAliceCrypto();
+
+        try {
+            new SAMLProtocolResponseValidator().validateSamlResponse(
+                response, issuerCrypto, new KeystorePasswordCallback()
+            );
+            fail("Expected failure on a disallowed encrypted assertion algorithm");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+
+    private Crypto createAliceCrypto() throws Exception {
+        Crypto issuerCrypto = new Merlin();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(SAMLResponseValidatorTest.class);
+        InputStream input = Merlin.loadInputStream(loader, "alice.jks");
+        keyStore.load(input, "password".toCharArray());
+        ((Merlin)issuerCrypto).setKeyStore(keyStore);
+        issuerCrypto.setDefaultX509Identifier("alice");
+        return issuerCrypto;
+    }
+
+    private static final class CipherValueWarningHandler extends Handler {
+        private boolean cipherValueWarningLogged;
+
+        public void publish(LogRecord record) {
+            cipherValueWarningLogged |= "CipherValue element is not available".equals(record.getMessage());
+        }
+
+        public void flush() {
+            // nothing to flush
+        }
+
+        public void close() {
+            // nothing to close
+        }
     }
 }
