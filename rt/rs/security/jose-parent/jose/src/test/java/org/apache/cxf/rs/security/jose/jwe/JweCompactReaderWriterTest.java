@@ -220,7 +220,6 @@ public class JweCompactReaderWriterTest {
 
     private void assertRSA15DecryptionErrorsAreIndistinguishable(ContentAlgorithm contentAlgorithm)
         throws Exception {
-        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(RSA_MODULUS_ENCODED_A1,
                                                              RSA_PUBLIC_EXPONENT_ENCODED_A1);
         KeyEncryptionProvider keyEncryption = new RSAKeyEncryptionAlgorithm(publicKey, KeyAlgorithm.RSA1_5);
