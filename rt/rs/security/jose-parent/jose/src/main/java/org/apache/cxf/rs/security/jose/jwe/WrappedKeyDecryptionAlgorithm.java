@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.KeyProperties;
@@ -41,6 +42,10 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
         this.cekDecryptionKey = cekDecryptionKey;
         this.supportedAlgo = supportedAlgo;
         this.unwrap = unwrap;
+        if (KeyAlgorithm.RSA1_5 == supportedAlgo) {
+            LOG.warning("The RSA1_5 JWE key encryption algorithm is deprecated: RSAES-PKCS1-v1_5 is"
+                + " vulnerable to padding oracle attacks, consider migrating to RSA-OAEP");
+        }
     }
     public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(jweDecryptionInput));
@@ -48,15 +53,43 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
         if (spec != null) {
             keyProps.setAlgoSpec(spec);
         }
-        if (!unwrap) {
-            keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput),
-                                            getCekDecryptionKey(), keyProps);
+        byte[] fallbackCek = supportedAlgo == KeyAlgorithm.RSA1_5
+            ? generateRandomContentEncryptionKey(jweDecryptionInput) : null;
+        try {
+            byte[] decryptedCek;
+            if (!unwrap) {
+                keyProps.setBlockSize(getKeyCipherBlockSize());
+                decryptedCek = CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput),
+                                                        getCekDecryptionKey(), keyProps);
+            } else {
+                decryptedCek = CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
+                                                           getKeyEncryptionAlgorithm(jweDecryptionInput),
+                                                           getCekDecryptionKey(),
+                                                           keyProps).getEncoded();
+            }
+            return fallbackCek != null && decryptedCek.length != fallbackCek.length ? fallbackCek : decryptedCek;
+        } catch (SecurityException ex) {
+            if (fallbackCek != null) {
+                return fallbackCek;
+            }
+            throw ex;
         }
-        return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
-                                           getContentEncryptionAlgorithm(jweDecryptionInput),
-                                           getCekDecryptionKey(),
-                                           keyProps).getEncoded();
+    }
+
+    private static byte[] generateRandomContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
+        int keySizeBytes = 32;
+        try {
+            ContentAlgorithm ctAlgo = jweDecryptionInput.getJweHeaders().getContentEncryptionAlgorithm();
+            if (ctAlgo != null) {
+                keySizeBytes = ctAlgo.getKeySizeBits() / 8;
+                if (AlgorithmUtils.isAesCbcHmac(ctAlgo.getJwaName())) {
+                    keySizeBytes *= 2;
+                }
+            }
+        } catch (RuntimeException ex) {
+            // Keep a valid default size so malformed headers follow the normal rejection path.
+        }
+        return CryptoUtils.generateSecureRandomBytes(keySizeBytes);
     }
 
     protected Key getCekDecryptionKey() {
