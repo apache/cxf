@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +93,25 @@ public class SAMLProtocolResponseValidator {
      * Assertion is valid. The default is 60 seconds.
      */
     private int futureTTL = 60;
+
+    /**
+     * The key transport algorithms accepted when decrypting an EncryptedKey.
+     * RSA-1.5 is deliberately not accepted by default: allowing an
+     * attacker-chosen PKCS#1 v1.5 transport would turn this
+     * pre-authentication endpoint into a Bleichenbacher decryption oracle
+     * against the SP private key.
+     */
+    private Collection<String> allowedKeyTransportAlgorithms =
+        Arrays.asList(XMLCipher.RSA_OAEP, XMLCipher.RSA_OAEP_11);
+
+    /**
+     * The content encryption algorithms accepted when decrypting an
+     * EncryptedData. Only AEAD (AES-GCM) algorithms are accepted by default;
+     * unauthenticated CBC modes expose a padding oracle against captured
+     * assertions and have to be enabled explicitly for legacy IdPs.
+     */
+    private Collection<String> allowedContentEncryptionAlgorithms =
+        Arrays.asList(XMLCipher.AES_128_GCM, XMLCipher.AES_192_GCM, XMLCipher.AES_256_GCM);
 
     /**
      * Validate a SAML 2 Protocol Response
@@ -454,9 +474,21 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        // now start decrypting
+        // now start decrypting. Only allow-listed algorithms may reach the
+        // private key or the content decryption - both algorithm identifiers
+        // are attacker-supplied
         String keyEncAlgo = getEncodingMethodAlgorithm(encKeyElement);
+        if (!allowedKeyTransportAlgorithms.contains(keyEncAlgo)) {
+            LOG.warning("The Key Transport Algorithm " + keyEncAlgo + " is not allowed");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
         String digestAlgo = getDigestMethodAlgorithm(encKeyElement);
+
+        String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
+        if (!allowedContentEncryptionAlgorithms.contains(symKeyAlgo)) {
+            LOG.warning("The Content Encryption Algorithm " + symKeyAlgo + " is not allowed");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
 
         Element cipherValue = getNode(encKeyElement, WSS4JConstants.ENC_NS, "CipherValue", 0);
         if (cipherValue == null) {
@@ -478,7 +510,7 @@ public class SAMLProtocolResponseValidator {
         }
         Cipher cipher =
                 EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
-        final byte[] decryptedBytes;
+        byte[] decryptedBytes;
         try {
             byte[] encryptedBytes = Base64Utility.decode(cipherValue.getTextContent().trim());
             decryptedBytes = cipher.doFinal(encryptedBytes);
@@ -486,11 +518,13 @@ public class SAMLProtocolResponseValidator {
             LOG.log(Level.FINE, "Base64 decoding has failed", ex);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         } catch (Exception ex) {
+            // Substitute a randomly generated symmetric key and carry on, so that
+            // an EncryptedKey decryption failure cannot be distinguished - in
+            // behavior or in timing - from a content decryption failure. This is
+            // the same mitigation WSS4J applies against Bleichenbacher attacks.
             LOG.log(Level.FINE, "Encrypted key can not be decrypted", ex);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            decryptedBytes = generateRandomSymmetricKey(symKeyAlgo);
         }
-
-        String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
 
         final byte[] decryptedPayload;
         try {
@@ -591,6 +625,18 @@ public class SAMLProtocolResponseValidator {
         } catch (XMLEncryptionException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
+    }
+
+    private static byte[] generateRandomSymmetricKey(String symEncAlgo) throws WSSecurityException {
+        return KeyUtils.getKeyGenerator(symEncAlgo).generateKey().getEncoded();
+    }
+
+    public void setAllowedKeyTransportAlgorithms(Collection<String> allowedKeyTransportAlgorithms) {
+        this.allowedKeyTransportAlgorithms = allowedKeyTransportAlgorithms;
+    }
+
+    public void setAllowedContentEncryptionAlgorithms(Collection<String> allowedContentEncryptionAlgorithms) {
+        this.allowedContentEncryptionAlgorithms = allowedContentEncryptionAlgorithms;
     }
 
     public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
