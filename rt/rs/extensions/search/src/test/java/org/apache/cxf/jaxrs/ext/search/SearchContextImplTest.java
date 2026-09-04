@@ -60,6 +60,22 @@ public class SearchContextImplTest {
         new SearchContextImpl(m).getCondition(Book.class);
     }
 
+    @Test(expected = SearchParseException.class)
+    public void testMaxParenthesisDepthPropertyIsHonoured() {
+        Message m = new MessageImpl();
+        m.put(FiqlParser.MAX_PARENTHESIS_DEPTH, "1");
+        m.put(Message.QUERY_STRING, "_s=(((name==CXF)))");
+        new SearchContextImpl(m).getCondition(Book.class);
+    }
+
+    @Test
+    public void testMaxParenthesisDepthPropertyAllowsWithinBound() {
+        Message m = new MessageImpl();
+        m.put(FiqlParser.MAX_PARENTHESIS_DEPTH, "3");
+        m.put(Message.QUERY_STRING, "_s=(((name==CXF)))");
+        assertNotNull(new SearchContextImpl(m).getCondition(Book.class));
+    }
+
     @Test
     public void testPlainQuery2() {
         Message m = new MessageImpl();
