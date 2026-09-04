@@ -70,13 +70,20 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      * the request thread. Must be a positive integer; the default is 64.
      */
     public static final String MAX_PARENTHESIS_DEPTH = "fiql.max.parenthesis.depth";
+    /**
+    * Context property limiting the length of a FIQL expression. The default is 8 KiB.
+     */
+    public static final String MAX_EXPRESSION_LENGTH = "fiql.max.expression.length";
     public static final String EXTENSION_COUNT = "count";
     protected static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
 
     private static final int DEFAULT_MAX_PARENTHESIS_DEPTH = 64;
+    private static final int DEFAULT_MAX_EXPRESSION_LENGTH = 8 * 1024;
     private static final Map<String, ConditionType> OPERATORS_MAP;
     private static final Pattern COMPARATORS_PATTERN;
     private static final Pattern COMPARATORS_PATTERN_SINGLE_EQUALS;
+    private static final String[] COMPARATORS = {GT, GE, LT, LE, EQ, NEQ};
+    private static final String[] COMPARATORS_SINGLE_EQUALS = {GT, GE, LT, LE, EQ, NEQ, "="};
 
     static {
         // operatorsMap
@@ -110,6 +117,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     protected Pattern comparatorsPattern = COMPARATORS_PATTERN;
 
     private final int maxParenthesisDepth;
+    private final int maxExpressionLength;
 
     /**
      * Creates FIQL parser.
@@ -146,6 +154,8 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         super(tclass, contextProperties, beanProperties);
 
         this.maxParenthesisDepth = parseMaxParenthesisDepth(this.contextProperties.get(MAX_PARENTHESIS_DEPTH));
+        this.maxExpressionLength = parseMaxExpressionLength(
+            this.contextProperties.get(MAX_EXPRESSION_LENGTH));
 
         if (PropertyUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
             operatorsMap = new HashMap<>(operatorsMap);
@@ -172,6 +182,24 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         return depth;
     }
 
+    private static int parseMaxExpressionLength(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return DEFAULT_MAX_EXPRESSION_LENGTH;
+        }
+        final int length;
+        try {
+            length = Integer.parseInt(value.trim());
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException(MAX_EXPRESSION_LENGTH
+                + " must be a positive integer, got: " + value, ex);
+        }
+        if (length < 1) {
+            throw new IllegalArgumentException(MAX_EXPRESSION_LENGTH
+                + " must be a positive integer, got: " + value);
+        }
+        return length;
+    }
+
     /**
      * Parses expression and builds search filter. Names used in FIQL expression are names of getters/setters
      * in type T.
@@ -196,6 +224,11 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      */
     @Override
     public SearchCondition<T> parse(String fiqlExpression) throws SearchParseException {
+        if (fiqlExpression.length() > maxExpressionLength) {
+            throw new SearchParseException("Exceeded the maximum FIQL expression length of "
+                + maxExpressionLength + "; the limit can be adjusted with the "
+                + MAX_EXPRESSION_LENGTH + " property");
+        }
         ASTNode<T> ast = parseAndsOrsBrackets(fiqlExpression, 0);
         return ast.build();
     }
@@ -284,11 +317,11 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     }
 
     protected ASTNode<T> parseComparison(String expr) throws SearchParseException {
-        Matcher m = comparatorsPattern.matcher(expr);
-        if (m.find()) {
-            String propertyName = expr.substring(0, m.start(1));
-            String operator = m.group(1);
-            String value = expr.substring(m.end(1));
+        int[] comparator = findComparator(expr);
+        if (comparator != null) {
+            String propertyName = expr.substring(0, comparator[0]);
+            String operator = expr.substring(comparator[0], comparator[1]);
+            String value = expr.substring(comparator[1]);
             if ("".equals(value)) {
                 throw new SearchParseException("Not a comparison expression: " + expr);
             }
@@ -303,6 +336,40 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             return null;
         }
         throw new SearchParseException("Not a comparison expression: " + expr);
+    }
+
+    private int[] findComparator(String expr) {
+        // Preserve custom comparator patterns for subclasses.
+        if (comparatorsPattern != COMPARATORS_PATTERN
+            && comparatorsPattern != COMPARATORS_PATTERN_SINGLE_EQUALS) {
+            Matcher m = comparatorsPattern.matcher(expr);
+            return m.find() ? new int[] {m.start(1), m.end(1)} : null;
+        }
+
+        String[] comparators = comparatorsPattern == COMPARATORS_PATTERN
+            ? COMPARATORS : COMPARATORS_SINGLE_EQUALS;
+        int runStart = 0;
+        while (runStart < expr.length()) {
+            // The original pattern only allows the prefix and comparator to be ASCII.
+            while (runStart < expr.length() && expr.charAt(runStart) > 0x7F) {
+                runStart++;
+            }
+            int runEnd = runStart;
+            while (runEnd < expr.length() && expr.charAt(runEnd) <= 0x7F) {
+                runEnd++;
+            }
+            // Match the rightmost comparator, as the original greedy prefix did.
+            for (int index = runEnd - 1; index > runStart; index--) {
+                for (String comparator : comparators) {
+                    int comparatorEnd = index + comparator.length();
+                    if (comparatorEnd <= runEnd && expr.startsWith(comparator, index)) {
+                        return new int[] {index, comparatorEnd};
+                    }
+                }
+            }
+            runStart = runEnd;
+        }
+        return null;
     }
 
 
