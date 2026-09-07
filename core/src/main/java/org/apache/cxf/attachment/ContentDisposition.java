@@ -32,8 +32,9 @@ public class ContentDisposition {
     private static final Pattern CD_HEADER_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_PARAMS_EXPRESSION);
 
+    // Keep the alternatives disjoint and prevent backtracking over the encoded value.
     private static final String CD_HEADER_EXT_PARAMS_EXPRESSION =
-            "(?i)(UTF-8|ISO-8859-1)''((?:%[0-9a-f]{2}|\\S)+)";
+            "(?i)(UTF-8|ISO-8859-1)''((?:%[0-9a-f]{2}|[^%\\s])++)";
     private static final Pattern CD_HEADER_EXT_PARAMS_PATTERN =
             Pattern.compile(CD_HEADER_EXT_PARAMS_EXPRESSION);
     private static final Pattern CODEPOINT_ENCODED_VALUE_PATTERN = Pattern.compile("&#[0-9]{4};|\\S");
