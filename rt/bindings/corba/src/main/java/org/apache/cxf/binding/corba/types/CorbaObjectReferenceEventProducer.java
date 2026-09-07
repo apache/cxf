@@ -135,7 +135,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         return refAttrs;
     }
 
-    protected EprMetaData getObjectReferenceBinding(Definition wsdlDef, QName bindingName) {
+    private EprMetaData getObjectReferenceBinding(Definition wsdlDef, QName bindingName) {
         EprMetaData info = new EprMetaData();
         Binding wsdlBinding = wsdlDef.getBinding(bindingName);
 

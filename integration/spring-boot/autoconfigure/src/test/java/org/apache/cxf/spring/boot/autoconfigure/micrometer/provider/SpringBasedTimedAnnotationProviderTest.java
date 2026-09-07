@@ -54,7 +54,7 @@ public class SpringBasedTimedAnnotationProviderTest {
     private MethodDispatcher methodDispatcher;
 
     @Before
-    @SuppressWarnings("PMD.UselessPureMethodCall")
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void setUp() {
         openMocks(this);
         underTest = new SpringBasedTimedAnnotationProvider();

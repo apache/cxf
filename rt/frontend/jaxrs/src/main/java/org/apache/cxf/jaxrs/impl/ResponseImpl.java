@@ -553,11 +553,11 @@ public final class ResponseImpl extends Response {
         throw new ResponseProcessingException(this, errorMessage, cause);
     }
 
-    protected void autoClose(Class<?> cls, boolean exception) {
+    void autoClose(Class<?> cls, boolean exception) {
         autoCloseWithHint(cls, false, exception);
     }
 
-    protected void autoCloseWithHint(Class<?> cls, boolean autoCloseHint, boolean exception) {
+    void autoCloseWithHint(Class<?> cls, boolean autoCloseHint, boolean exception) {
         if (!entityBufferred && !JAXRSUtils.isStreamingOutType(cls)
             && (exception || MessageUtils.getContextualBoolean(outMessage,
                 RESPONSE_STREAM_AUTO_CLOSE, autoCloseHint))) {

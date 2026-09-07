@@ -704,6 +704,7 @@ public class RMManagerTest {
     }
 
     // just read the begining of the input and compare it against the specified string
+    @SuppressWarnings("PMD.UnusedReturnValue")
     private static boolean assertStartsWith(InputStream in, String starting) {
         assertNotNull(in);
         byte[] buf = new byte[starting.length()];

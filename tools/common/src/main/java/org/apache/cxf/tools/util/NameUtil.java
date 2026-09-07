@@ -51,13 +51,13 @@ public final class NameUtil {
         }
     }
 
-    protected static boolean isPunct(char c) {
+    private static boolean isPunct(char c) {
         boolean isPunct = c == '-' || c == '.' || c == ':' || c == '_';
         boolean isUnicodePunct = c == '\u00b7' || c == '\u0387' || c == '\u06dd' || c == '\u06de';
         return isPunct || isUnicodePunct;
     }
 
-    protected static boolean isLower(char c) {
+    private static boolean isLower(char c) {
         return c >= 'a' && c <= 'z' || Character.isLowerCase(c);
     }
 
@@ -120,7 +120,7 @@ public final class NameUtil {
         return (x && y) || (!x && !y);
     }
 
-    protected static int classify(char c0) {
+    private static int classify(char c0) {
         switch (Character.getType(c0)) {
         case Character.UPPERCASE_LETTER:
             return UPPER_LETTER;
@@ -166,7 +166,7 @@ public final class NameUtil {
         return ss;
     }
 
-    protected static String toMixedCaseName(List<String> ss, boolean startUpper) {
+    private static String toMixedCaseName(List<String> ss, boolean startUpper) {
         StringBuilder sb = new StringBuilder();
         if (!ss.isEmpty()) {
             sb.append(startUpper ? ss.get(0) : ss.get(0).toLowerCase());
@@ -177,7 +177,7 @@ public final class NameUtil {
         return sb.toString();
     }
 
-    protected static String toMixedCaseVariableName(String[] ss,
+    static String toMixedCaseVariableName(String[] ss,
                                              boolean startUpper,
                                              boolean cdrUpper) {
         if (cdrUpper) {

@@ -140,7 +140,7 @@ public class WrapperClassLoaderTest extends AbstractCXFTest {
                 loadedClassNames);
     }
 
-    @SuppressWarnings("PMD.UselessPureMethodCall")
+    @SuppressWarnings("PMD.UnusedReturnValue")
     private List<String> testWrapperClassLoaderWithNamingConvention(WrapperClassNamingConvention convention)
             throws Exception {
         bus.setExtension(convention, WrapperClassNamingConvention.class);

@@ -64,7 +64,8 @@ public class LocalConduit extends AbstractConduit {
         protected void onFirstWrite() throws IOException {
             dispatchToService(false);
         }
-        protected void dispatchToService(boolean empty) throws IOException {
+
+        void dispatchToService(boolean empty) throws IOException {
             final MessageImpl inMsg = new MessageImpl();
             transportFactory.copy(message, inMsg);
 

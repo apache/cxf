@@ -193,6 +193,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
 
     }
 
+    @SuppressWarnings("PMD.InstantiableUtilityClass")
     public static class ServerManagersFactory {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
@@ -226,6 +227,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @SuppressWarnings("PMD.InstantiableUtilityClass")
     public static class ClientManagersFactory {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();

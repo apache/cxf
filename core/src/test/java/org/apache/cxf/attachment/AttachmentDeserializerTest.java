@@ -367,6 +367,7 @@ public class AttachmentDeserializerTest {
 
 
     @Test
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void testSmallStream() throws Exception {
         byte[] messageBytes = ("------=_Part_1\n\nJJJJ\n------=_Part_1\n\n"
             + "Content-Transfer-Encoding: binary\n\n=3D=3D=3D\n------=_Part_1\n").getBytes();

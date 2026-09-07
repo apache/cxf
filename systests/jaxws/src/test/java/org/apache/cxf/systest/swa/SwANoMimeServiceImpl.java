@@ -98,6 +98,7 @@ public class SwANoMimeServiceImpl implements SwAServiceInterface {
         data.value = ("test" + new String(data.value, 0, 6)).getBytes(StandardCharsets.UTF_8);
     }
 
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void echoDataRef(Holder<DataStruct> data) {
         try {
             InputStream bis = null;
