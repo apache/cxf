@@ -44,6 +44,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -57,6 +58,11 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 public final class TokenProviderUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenProviderUtils.class);
+
+    private static final Map<Integer, String> AES_ALGORITHMS = Map.of(
+        16, WSS4JConstants.AES_128,
+        24, WSS4JConstants.AES_192,
+        32, WSS4JConstants.AES_256);
 
     private TokenProviderUtils() {
         // complete
@@ -102,6 +108,36 @@ public final class TokenProviderUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Create a SecretKey for the given issued secret. The secret was sized according to the KeySize and
+     * EncryptWith values of the request, so the algorithm associated with it must match that length
+     * rather than simply being the algorithm that the STS is configured with.
+     */
+    public static SecretKey createSecretKey(
+        byte[] secret,
+        KeyRequirements keyRequirements,
+        EncryptionProperties encryptionProperties
+    ) throws WSSecurityException {
+        String encryptWith = keyRequirements.getEncryptWith();
+        if (encryptWith == null
+            || !encryptionProperties.getAcceptedEncryptionAlgorithms().contains(encryptWith)
+            || KeyUtils.getKeyLength(encryptWith) != secret.length) {
+            encryptWith = encryptionProperties.getEncryptionAlgorithm();
+        }
+        if (KeyUtils.getKeyLength(encryptWith) != secret.length) {
+            // Fall back on an algorithm that matches the length of the issued secret
+            encryptWith = AES_ALGORITHMS.get(secret.length);
+            if (encryptWith == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
+            }
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Issued secret does not match the configured encryption algorithm, using: "
+                    + encryptWith);
+            }
+        }
+        return KeyUtils.prepareSecretKey(encryptWith, secret);
     }
 
     /**
