@@ -61,6 +61,7 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
     private String attachmentDir;
     private String attachmentThreshold;
     private String attachmentMaxSize;
+    private int formParamsMaxSize = FormUtils.DEFAULT_FORM_PARAMS_MAX_SIZE;
 
     private boolean expectEncoded;
 
@@ -86,6 +87,10 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
 
     public void setAttachmentMaxSize(String maxSize) {
         attachmentMaxSize = maxSize;
+    }
+    
+    public void setFormParamsMaxSize(int maxSize) {
+        this.formParamsMaxSize = maxSize;
     }
 
     public void setValidator(FormValidator formValidator) {
@@ -172,13 +177,13 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
             if (servletRequest == null) {
                 FormUtils.populateMapFromString(params,
                                                 PhaseInterceptorChain.getCurrentMessage(),
-                                                FormUtils.readBody(is, enc),
+                                                FormUtils.readBody(is, enc, formParamsMaxSize),
                                                 enc,
                                                 decode);
             } else {
                 FormUtils.populateMapFromString(params,
                                                 PhaseInterceptorChain.getCurrentMessage(),
-                                                FormUtils.readBody(is, enc),
+                                                FormUtils.readBody(is, enc, formParamsMaxSize),
                                                 enc,
                                                 decode,
                                                 (javax.servlet.http.HttpServletRequest)servletRequest);

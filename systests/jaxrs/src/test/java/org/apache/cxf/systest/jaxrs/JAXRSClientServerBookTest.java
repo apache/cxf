@@ -36,6 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 
 import javax.ws.rs.InternalServerErrorException;
@@ -337,6 +339,30 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.type(MediaType.APPLICATION_FORM_URLENCODED);
         Response r = wc.post(new ByteArrayInputStream("".getBytes()));
         assertEquals("empty form", r.readEntity(String.class));
+    }
+
+    @Test
+    public void testTooManyFormParams() throws Exception {
+        // Exceeding 500 limit
+        String params = IntStream.range(0, 501).mapToObj(i -> "param" + i + "=" + i).collect(Collectors.joining("&"));
+        String address = "http://localhost:" + PORT + "/bookstore/form";
+        WebClient wc = WebClient.create(address);
+        wc.type(MediaType.APPLICATION_FORM_URLENCODED);
+        Response r = wc.post(new ByteArrayInputStream(params.getBytes(StandardCharsets.UTF_8)));
+        assertThat("max form params limit reached",  r.getStatus(), equalTo(413));
+    }
+
+    @Test
+    public void testTooLargeFormParams() throws Exception {
+        // Exceeding 100Mb limit
+        String params = IntStream.range(0, 110)
+            .mapToObj(i -> "param" + i + "="
+                + new String(Integer.toString(i)).repeat(524800)).collect(Collectors.joining("&"));
+        String address = "http://localhost:" + PORT + "/bookstore/form";
+        WebClient wc = WebClient.create(address);
+        wc.type(MediaType.APPLICATION_FORM_URLENCODED);
+        Response r = wc.post(new ByteArrayInputStream(params.getBytes(StandardCharsets.UTF_8)));
+        assertThat("max form params limit reached",  r.getStatus(), equalTo(500));
     }
 
     @Test
