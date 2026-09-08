@@ -61,6 +61,7 @@ import org.apache.cxf.sts.token.delegation.TokenDelegationParameters;
 import org.apache.cxf.sts.token.delegation.TokenDelegationResponse;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
+import org.apache.cxf.sts.token.provider.TokenProviderUtils;
 import org.apache.cxf.sts.token.provider.TokenReference;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.sts.token.realm.RelationshipResolver;
@@ -382,7 +383,7 @@ public abstract class AbstractOperation {
 
         final SecretKey symmetricKey;
         if (secret != null) {
-            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+            symmetricKey = TokenProviderUtils.createSecretKey(secret, keyRequirements, encryptionProperties);
         } else {
             KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
             symmetricKey = keyGen.generateKey();

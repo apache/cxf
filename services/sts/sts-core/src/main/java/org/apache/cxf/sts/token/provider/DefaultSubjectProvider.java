@@ -266,7 +266,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
                 Document doc = subjectProviderParameters.getDoc();
                 byte[] secret = subjectProviderParameters.getSecret();
-                return createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
+                return createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto,
+                                                 keyRequirements);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException(ex.getMessage(), ex);
@@ -327,7 +328,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
         byte[] secret,
         Document doc,
         EncryptionProperties encryptionProperties,
-        Crypto encryptionCrypto
+        Crypto encryptionCrypto,
+        KeyRequirements keyRequirements
     ) throws WSSecurityException {
         KeyInfoBean keyInfo = new KeyInfoBean();
 
@@ -339,7 +341,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
 
         final SecretKey symmetricKey;
         if (secret != null) {
-            symmetricKey = KeyUtils.prepareSecretKey(encryptionProperties.getEncryptionAlgorithm(), secret);
+            symmetricKey = TokenProviderUtils.createSecretKey(secret, keyRequirements, encryptionProperties);
         } else {
             KeyGenerator keyGen = KeyUtils.getKeyGenerator(encryptionProperties.getEncryptionAlgorithm());
             symmetricKey = keyGen.generateKey();
