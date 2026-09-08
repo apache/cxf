@@ -37,7 +37,8 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
  *
  */
 public class DigestAuthSupplier implements HttpAuthSupplier {
-    private static final SecureRandom CNONCE_GENERATOR = new SecureRandom();
+    private static volatile SecureRandom cnonceGenerator;
+    private static final Object CNONCE_GENERATOR_LOCK = new Object();
 
     Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<>();
 
@@ -117,7 +118,20 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
      */
     public String createCnonce() {
         byte[] bytes = new byte[16];
-        CNONCE_GENERATOR.nextBytes(bytes);
+
+        SecureRandom cg;
+        // CHECKSTYLE:OFF
+        // May the Gods of Code Style forgive us these three inner assignments
+        if ((cg = cnonceGenerator) == null) {
+            synchronized (CNONCE_GENERATOR_LOCK) {
+                if ((cg = cnonceGenerator) == null) {
+                    cg = cnonceGenerator = new SecureRandom();
+                }
+            }
+        }
+        // CHECKSTYLE:ON
+
+        cg.nextBytes(bytes);
         return StringUtils.toHexString(bytes);
     }
 
