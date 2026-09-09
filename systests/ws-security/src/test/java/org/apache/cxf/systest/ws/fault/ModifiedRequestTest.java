@@ -74,11 +74,15 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(ModifiedRequestServer.class, true)
         );
+        if (!JavaUtils.isFIPSEnabled()) {
+            System.setProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm", "true");
+        }
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
+        System.clearProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm");
     }
 
     @org.junit.Test

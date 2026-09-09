@@ -845,33 +845,41 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = X509TokenTest.class.getResource(
-                      JavaUtils.isFIPSEnabled() 
-                      ? "client-fips.xml"
-                          : "client.xml");
+        try {
+            if (!JavaUtils.isFIPSEnabled()) {
+                System.setProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm", "true");
+            }
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = X509TokenTest.class.getResource(
+                        JavaUtils.isFIPSEnabled() 
+                        ? "client-fips.xml"
+                            : "client.xml");
 
-        URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
-                                                   ? "DoubleItX509-fips.wsdl"
-                                                       : "DoubleItX509.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptedPasswordPort");
-        DoubleItPortType x509Port =
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(x509Port, test.getPort());
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
 
-        if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(x509Port);
+            URL wsdl = X509TokenTest.class.getResource(JavaUtils.isFIPSEnabled()
+                                                    ? "DoubleItX509-fips.wsdl"
+                                                        : "DoubleItX509.wsdl");
+            Service service = Service.create(wsdl, SERVICE_QNAME);
+            QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptedPasswordPort");
+            DoubleItPortType x509Port =
+                    service.getPort(portQName, DoubleItPortType.class);
+            updateAddressPort(x509Port, test.getPort());
+
+            if (test.isStreaming()) {
+                SecurityTestUtil.enableStreaming(x509Port);
+            }
+
+            assertEquals(50, x509Port.doubleIt(25));
+
+            ((java.io.Closeable)x509Port).close();
+            bus.shutdown(true);
+        } finally {
+            System.clearProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm");
         }
-
-        assertEquals(50, x509Port.doubleIt(25));
-
-        ((java.io.Closeable)x509Port).close();
-        bus.shutdown(true);
     }
 
     @org.junit.Test
