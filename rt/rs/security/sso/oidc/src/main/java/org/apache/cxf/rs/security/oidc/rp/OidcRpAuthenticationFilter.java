@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContext;
@@ -114,8 +115,10 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> requestState = new MetadataMap<>();
         requestState.putAll(rc.getUriInfo().getQueryParameters(true));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
-            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
-            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body,
+            final Message currentMessage = JAXRSUtils.getCurrentMessage();
+            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name(),
+                    FormUtils.getMaxFormParamsSize(currentMessage));
+            FormUtils.populateMapFromString(requestState, currentMessage, body,
                                             StandardCharsets.UTF_8.name(), true);
             rc.setEntityStream(new ByteArrayInputStream(StringUtils.toBytesUTF8(body)));
 
