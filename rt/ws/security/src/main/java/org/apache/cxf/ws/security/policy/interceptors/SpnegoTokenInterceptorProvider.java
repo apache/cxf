@@ -36,6 +36,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.xml.security.algorithms.JCEMapper;
 
 /**
  *
@@ -79,8 +80,10 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         AlgorithmSuite suite = NegotiationUtils.getAlgorithmSuite(aim);
         if (suite != null) {
             client.setAlgorithmSuite(suite);
-            int x = suite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength();
-            if (x < 256) {
+            // The secret must have exactly the length required by the encryption algorithm of the suite
+            int x = JCEMapper.getKeyLengthFromURI(suite.getAlgorithmSuiteType().getEncryption());
+            if (x >= suite.getAlgorithmSuiteType().getMinimumSymmetricKeyLength()
+                && x <= suite.getAlgorithmSuiteType().getMaximumSymmetricKeyLength()) {
                 client.setKeySize(x);
             }
         }
