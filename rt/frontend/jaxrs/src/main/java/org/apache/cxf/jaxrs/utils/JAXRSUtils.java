@@ -1198,7 +1198,7 @@ public final class JAXRSUtils {
 
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 InputStream entityStream = copyAndGetEntityStream(m);
-                String body = FormUtils.readBody(entityStream, enc);
+                String body = FormUtils.readBody(entityStream, enc, FormUtils.getMaxFormParamsSize(m));
                 // Do not decode unless the key is empty value, fe @FormParam("")
                 FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, StringUtils.isEmpty(key) && decode);
             } else {
