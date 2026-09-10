@@ -246,25 +246,32 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             return;
         }
 
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = ActionTest.class.getResource(
-                      JavaUtils.isFIPSEnabled() 
-                      ? "client-fips.xml" : "client.xml");
+        try {
+            if (!JavaUtils.isFIPSEnabled()) {
+                System.setProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm", "true");
+            }
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = ActionTest.class.getResource(
+                        JavaUtils.isFIPSEnabled() 
+                        ? "client-fips.xml" : "client.xml");
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
 
-        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPasswordPort");
-        DoubleItPortType port =
-                service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(port, PORT);
-        assertEquals(50, port.doubleIt(25));
+            URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+            Service service = Service.create(wsdl, SERVICE_QNAME);
+            QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPasswordPort");
+            DoubleItPortType port =
+                    service.getPort(portQName, DoubleItPortType.class);
+            updateAddressPort(port, PORT);
+            assertEquals(50, port.doubleIt(25));
 
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
+            ((java.io.Closeable)port).close();
+            bus.shutdown(true);
+        } finally {
+            System.clearProperty("org.apache.wss4j.crypto.jasypt.useLegacyDefaultAlgorithm");
+        }
     }
 
     @org.junit.Test
