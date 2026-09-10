@@ -67,6 +67,7 @@ public final class FormUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";
     private static final String MAX_FORM_PARAM_COUNT = "maxFormParameterCount";
+    private static final String MAX_FORM_PARAM_SIZE = "maxFormParameterSize";
     private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";
     private FormUtils() {
 
@@ -333,5 +334,9 @@ public final class FormUtils {
     public static boolean isFormPostRequest(Message m) {
         return MediaType.APPLICATION_FORM_URLENCODED.equals(m.get(Message.CONTENT_TYPE))
             && HttpMethod.POST.equals(m.get(Message.HTTP_REQUEST_METHOD));
+    }
+
+    public static int getMaxFormParamsSize(Message m) {
+        return MessageUtils.getContextualInteger(m, MAX_FORM_PARAM_SIZE, DEFAULT_FORM_PARAMS_MAX_SIZE);
     }
 }

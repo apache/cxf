@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth2.grants.code.CodeVerifierTransformer;
@@ -311,8 +312,10 @@ public class ClientCodeRequestFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> requestState = new MetadataMap<>();
         requestState.putAll(ui.getQueryParameters(decodeRequestParameters));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
-            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
-            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body,
+            final Message currentMessage = JAXRSUtils.getCurrentMessage();
+            String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name(),
+                    FormUtils.getMaxFormParamsSize(currentMessage));
+            FormUtils.populateMapFromString(requestState, currentMessage, body,
                                             StandardCharsets.UTF_8.name(), decodeRequestParameters);
         }
         return requestState;

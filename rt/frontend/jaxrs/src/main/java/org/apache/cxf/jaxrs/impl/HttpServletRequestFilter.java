@@ -119,7 +119,8 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
                 formParams = new MetadataMap<>();
                 MediaType mt = JAXRSUtils.toMediaType((String)m.get(Message.CONTENT_TYPE));
                 String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
-                String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
+                String body = FormUtils.readBody(m.getContent(InputStream.class), enc,
+                        FormUtils.getMaxFormParamsSize(m));
                 FormUtils.populateMapFromString(formParams, m, body, enc, true);
             }
         }
