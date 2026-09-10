@@ -21,10 +21,10 @@ package org.apache.cxf.transport.websocket.jetty10;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -237,14 +237,8 @@ public class Jetty10WebSocketDestination extends JettyHTTPDestination implements
                 }
                 @Override
                 public void onWebSocketText(String message) {
-                    //TODO may want use string directly instead of converting it to byte[]
-                    try {
-                        byte[] bdata = message.getBytes("utf-8");
-                        onWebSocketBinary(bdata, 0, bdata.length);
-                    } catch (UnsupportedEncodingException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    byte[] bdata = message.getBytes(StandardCharsets.UTF_8);
+                    onWebSocketBinary(bdata, 0, bdata.length);
                 }
             };
         }
