@@ -56,6 +56,7 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * WS-ReliableMessaging 1.1/1.2 encoding and decoding. This just works with the standard internal form of the
  * WS-RM data structures.
  */
+@SuppressWarnings("PMD.ProtectedMemberInFinalClass")
 public final class EncoderDecoder11Impl extends EncoderDecoder {
 
     public static final EncoderDecoder11Impl INSTANCE = new EncoderDecoder11Impl();
