@@ -35,6 +35,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.FaultBean;
 
+@SuppressWarnings("PMD.ProtectedMemberInFinalClass")
 public final class FaultBeanGenerator extends BeanGenerator {
 
     private String getSEIPackage(final Method method) {
@@ -66,7 +67,7 @@ public final class FaultBeanGenerator extends BeanGenerator {
         return faultBeanClasses;
     }
 
-    protected Set<Class<?>> getExceptionClasses(final Method method) {
+    Set<Class<?>> getExceptionClasses(final Method method) {
         Set<Class<?>> exps = new HashSet<>();
         final Class<?>[] exceptionClasses = method.getExceptionTypes();
         for (int i = 0; i < exceptionClasses.length; i++) {

@@ -249,7 +249,7 @@ public final class JAXBUtils {
      * @return true if the word is a keyword.
      * @see org.apache.cxf.helpers.JavaUtils
      */
-    protected static boolean isJavaKeyword(String word) {
+    private static boolean isJavaKeyword(String word) {
         return JavaUtils.isJavaKeyword(word);
     }
 

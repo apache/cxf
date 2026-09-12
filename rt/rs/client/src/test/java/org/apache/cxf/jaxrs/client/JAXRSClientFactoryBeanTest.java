@@ -321,7 +321,7 @@ public class JAXRSClientFactoryBeanTest {
             provider.getOutInterceptors().add(testInterceptor);
         }
 
-        protected boolean isInitialized() {
+        private boolean isInitialized() {
             return testInterceptor.isInitialized();
         }
     }

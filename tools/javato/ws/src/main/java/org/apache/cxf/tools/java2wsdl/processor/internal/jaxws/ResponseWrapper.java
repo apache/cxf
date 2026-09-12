@@ -66,7 +66,7 @@ public final class ResponseWrapper extends Wrapper {
         return buildFields(getMethod(), getOperationInfo().getUnwrappedOperation().getOutput());
     }
 
-    protected List<JavaField> buildFields(final Method method, final MessageInfo message) {
+    List<JavaField> buildFields(final Method method, final MessageInfo message) {
         List<JavaField> fields = new ArrayList<>();
 
         final Class<?> returnType = method.getReturnType();

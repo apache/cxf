@@ -48,6 +48,7 @@ public class URIResolverTest {
     private Throwable checkingThreadThrowable;      // assumes single-thread test execution
 
     @Test
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void testJARProtocol() throws Exception {
         uriResolver = new URIResolver();
 

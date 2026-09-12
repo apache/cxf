@@ -97,7 +97,7 @@ public class LocalDestination extends AbstractDestination {
                 dispatchToClient(false);
             }
 
-            protected void dispatchToClient(boolean empty) throws IOException {
+            void dispatchToClient(boolean empty) throws IOException {
                 final MessageImpl m = new MessageImpl();
                 localDestinationFactory.copy(message, m);
                 if (!empty) {

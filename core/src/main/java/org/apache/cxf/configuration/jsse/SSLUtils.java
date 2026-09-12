@@ -192,7 +192,7 @@ public final class SSLUtils {
         return keystoreManagers;
     }
 
-    protected static byte[] loadFile(String fileName) throws IOException {
+    private static byte[] loadFile(String fileName) throws IOException {
         if (fileName == null) {
             return null;
         }

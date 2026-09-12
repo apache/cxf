@@ -33,7 +33,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 
 public final class DefaultApplicationFactory {
-    protected static class DefaultApplication extends Application {
+    static class DefaultApplication extends Application {
         private final Set<Class<?>> serviceClasses;
         
         DefaultApplication(final Set<Class<?>> serviceClasses) {

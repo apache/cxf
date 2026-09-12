@@ -41,6 +41,7 @@ public class RxJava3SingleService {
     @GET
     @Produces("text/plain")
     @Path("textAsync")
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void getTextAsync(@Suspended final AsyncResponse ar) {
         final StringAsyncSubscriber subscriber = new StringAsyncSubscriber(ar);
         

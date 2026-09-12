@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass({ Resource.class, WebServiceContext.class })
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class CxfJaxwsAutoConfiguration {
     @Bean
     static BeanFactoryPostProcessor jaxwsBeanFactoryPostProcessor() {

@@ -23,6 +23,7 @@ package org.apache.cxf.rt.security.rs;
  * Some common security constants that can be used RS-Security (for now they are used in the
  * JOSE + HTTP Signature modules).
  */
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class RSSecurityConstants {
 
     /**

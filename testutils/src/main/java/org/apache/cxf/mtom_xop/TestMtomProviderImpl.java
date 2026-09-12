@@ -46,6 +46,7 @@ wsdlLocation = "testutils/mtom_xop.wsdl")
 
 public class TestMtomProviderImpl implements Provider<SOAPMessage> {
 
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public SOAPMessage invoke(final SOAPMessage request) {
         try {
             System.out.println("=== Received client request ===");
