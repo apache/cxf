@@ -1201,7 +1201,6 @@ public class WebClient extends AbstractClient {
         }
     }
 
-    @SuppressWarnings("PMD.ProtectedMemberInFinalClass")
     private final class BodyWriter extends AbstractBodyWriter {
 
         protected void doWriteBody(Message outMessage,

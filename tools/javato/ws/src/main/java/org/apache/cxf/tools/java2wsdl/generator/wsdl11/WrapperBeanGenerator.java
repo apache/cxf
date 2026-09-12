@@ -29,7 +29,6 @@ import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.RequestWrapper;
 import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.ResponseWrapper;
 
-@SuppressWarnings("PMD.ProtectedMemberInFinalClass")
 public final class WrapperBeanGenerator extends BeanGenerator {
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {
         Collection<JavaClass> wrapperClasses = new HashSet<>();
