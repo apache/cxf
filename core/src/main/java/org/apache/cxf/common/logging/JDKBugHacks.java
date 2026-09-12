@@ -86,7 +86,7 @@ final class JDKBugHacks {
     }
 
     
-    @SuppressWarnings("PMD.UselessPureMethodCall")
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public static void doHacks() {
         if (skipHack("org.apache.cxf.JDKBugHacks.all")) {
             return;

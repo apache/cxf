@@ -138,7 +138,7 @@ public final class OptionLoader {
     }
 
 
-    protected static WadlOption generateWadlOptionFromFile(final File wadl,
+    private static WadlOption generateWadlOptionFromFile(final File wadl,
                                                            final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {

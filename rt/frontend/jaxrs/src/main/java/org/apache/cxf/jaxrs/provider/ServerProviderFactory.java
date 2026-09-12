@@ -281,7 +281,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             containerResponseFilters.values());
     }
 
-    protected void injectApplicationIntoFeature(Feature feature) {
+    private void injectApplicationIntoFeature(Feature feature) {
         if (application != null) {
             AbstractResourceInfo info = new AbstractResourceInfo(feature.getClass(),
                                                                  ClassHelper.getRealClass(feature),
@@ -451,7 +451,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         return featureContext;
     }
 
-    protected static boolean isPrematching(Class<?> filterCls) {
+    private static boolean isPrematching(Class<?> filterCls) {
         return AnnotationUtils.getClassAnnotation(filterCls, PreMatching.class) != null;
     }
 

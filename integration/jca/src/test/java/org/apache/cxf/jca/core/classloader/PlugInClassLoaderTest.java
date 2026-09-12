@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-
+@SuppressWarnings("PMD.UnusedReturnValue")
 public class PlugInClassLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(PlugInClassLoaderTest.class);
     private static boolean debug;

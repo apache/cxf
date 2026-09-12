@@ -252,6 +252,7 @@ public abstract class AbstractJMSTester {
         return outMessage;
     }
 
+    @SuppressWarnings("PMD.UnusedReturnValue")
     protected static void verifyReceivedMessage(Message message) {
         String response = "<not found>";
         InputStream bis = message.getContent(InputStream.class);

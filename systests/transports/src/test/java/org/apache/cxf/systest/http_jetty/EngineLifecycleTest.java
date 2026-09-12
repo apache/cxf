@@ -126,6 +126,7 @@ public class EngineLifecycleTest {
         assertEquals("We should get out put from this client", "hello world", client.echo("hello world"));
     }
 
+    @SuppressWarnings("PMD.UnusedReturnValue")
     private static void verifyStaticHtml() throws Exception {
         String response = null;
         for (int i = 0; i < 50 && null == response; i++) {

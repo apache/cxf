@@ -60,6 +60,7 @@ import org.apache.cxf.ws.addressing.v200408.ServiceNameType;
  * version of WS-Adressing (for example WS-RM depends on the
  * 2004/08 version).
  */
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class VersionTransformer {
 
     protected static final String NATIVE_VERSION = Names.WSA_NAMESPACE_NAME;

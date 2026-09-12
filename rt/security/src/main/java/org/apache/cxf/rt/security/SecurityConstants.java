@@ -36,6 +36,7 @@ import java.util.Set;
  * More specific configuration tags for WS-SecurityPolicy are configured in the SecurityConstants
  * class in the cxf-rt-ws-security module, which extends this class.
  */
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class SecurityConstants {
 
     //
