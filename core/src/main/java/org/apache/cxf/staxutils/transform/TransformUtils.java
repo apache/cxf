@@ -116,7 +116,7 @@ public final class TransformUtils {
         return reader;
     }
 
-    protected static void convertToQNamesMap(Map<String, String> map,
+    static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
                                              Map<String, String> nsMap) {
         if (map != null) {
@@ -163,7 +163,7 @@ public final class TransformUtils {
         }
     }
 
-    protected static void convertToSetOfQNames(List<String> set,
+    static void convertToSetOfQNames(List<String> set,
                                                Set<QName> elementsSet) {
         if (set != null) {
             for (String entry : set) {

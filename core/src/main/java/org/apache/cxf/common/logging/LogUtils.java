@@ -219,8 +219,8 @@ public final class LogUtils {
     /**
      * Create a logger
      */
-    @SuppressWarnings("PMD.UselessPureMethodCall")
-    protected static Logger createLogger(Class<?> cls,
+    @SuppressWarnings("PMD.UnusedReturnValue")
+    private static Logger createLogger(Class<?> cls,
                                          String name,
                                          String loggerName) {
         ClassLoader orig = getContextClassLoader();

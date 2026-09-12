@@ -64,6 +64,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(value = Parameterized.class)
+@SuppressWarnings("PMD.UnusedReturnValue")
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     static String serverPort = TestUtil.getPortNumber(SwaServer.class);
     static String serverPortInvalid = TestUtil.getPortNumber(SwaServer.class, 1);

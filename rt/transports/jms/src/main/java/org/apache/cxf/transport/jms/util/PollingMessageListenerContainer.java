@@ -108,7 +108,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             }
         }
 
-        protected void safeRollBack(Session session) {
+        void safeRollBack(Session session) {
             try {
                 if (session != null && session.getTransacted()) {
                     session.rollback();

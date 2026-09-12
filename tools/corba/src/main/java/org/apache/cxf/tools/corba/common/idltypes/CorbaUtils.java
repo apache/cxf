@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class CorbaUtils {
 
     protected static final Set<String> IDL_RESERVED_WORDS = new TreeSet<>();
@@ -174,5 +175,4 @@ public class CorbaUtils {
     public static boolean ignoreModule(String name) {
         return IGNORED_MODULES.contains(name);
     }
-
 }

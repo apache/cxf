@@ -78,6 +78,7 @@ public class LoggingInInterceptorTest {
     }
 
     @After
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void tearDown() throws Exception {
         verify(inputStream, atLeastOnce()).read(any(byte[].class), anyInt(), anyInt());
     }

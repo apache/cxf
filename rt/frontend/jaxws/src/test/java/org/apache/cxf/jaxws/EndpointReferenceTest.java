@@ -326,7 +326,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
     }
 
     final class MyEndpointReference extends EndpointReference {
-        protected MyEndpointReference() {
+        MyEndpointReference() {
         }
 
         public void writeTo(Result result) {

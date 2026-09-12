@@ -70,6 +70,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@SuppressWarnings("PMD.UnusedReturnValue")
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ClientMtomXopTest.class);
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");

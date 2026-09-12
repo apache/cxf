@@ -40,6 +40,7 @@ import org.apache.cxf.swa.types.VoidRequest;
             serviceName = "SwAService",
             targetNamespace = "http://cxf.apache.org/swa",
             portName = "SwAServiceHttpPort")
+@SuppressWarnings("PMD.UnusedReturnValue")
 public class SwAServiceImpl implements SwAServiceInterface {
 
     public void echoDataRef(Holder<DataStruct> data) {

@@ -34,7 +34,7 @@ public final class WSDLGeneratorFactory {
         this.wsdlVersion = v;
     }
 
-    protected String getGeneratorClassName() {
+    String getGeneratorClassName() {
         String pkgName = PackageUtils.getPackageName(getClass());
         return pkgName + '.' + wsdlVersion.toString().toLowerCase() + '.' + wsdlVersion + "Generator";
     }

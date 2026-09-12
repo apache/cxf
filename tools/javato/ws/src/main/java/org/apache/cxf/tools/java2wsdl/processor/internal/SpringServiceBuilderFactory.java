@@ -103,7 +103,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
      * @param s Style of service
      * @return name of bean.
      */
-    protected String getBuilderBeanName(FrontendFactory.Style s) {
+    String getBuilderBeanName(FrontendFactory.Style s) {
         return s + "ServiceBuilderBean";
     }
 

@@ -121,7 +121,7 @@ public final class WsdlOptionLoader {
         }
     }
 
-    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl,
+    private static WsdlOption generateWsdlOptionFromFile(final File wsdl,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 

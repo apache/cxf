@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@SuppressWarnings({"unused", "PMD.UselessPureMethodCall"})
+@SuppressWarnings({"unused", "PMD.UnusedReturnValue"})
 public class DefaultTimedAnnotationProviderTest {
 
     private DefaultTimedAnnotationProvider underTest;

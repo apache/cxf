@@ -54,7 +54,8 @@ class ClientHttpConnectionOutInterceptor extends AbstractPhaseInterceptor<Messag
                 .anyMatch(this::isClosedInputStream);
         }
     }
-    
+
+    @SuppressWarnings("PMD.UnusedReturnValue")
     private boolean isClosedInputStream(Message message) {
         try {
             final InputStream inputStream = message.getExchange().getInMessage().getContent(InputStream.class);

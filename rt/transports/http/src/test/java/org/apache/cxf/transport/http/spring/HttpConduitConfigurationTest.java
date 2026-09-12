@@ -116,6 +116,8 @@ public class HttpConduitConfigurationTest {
 
 
     public static final class ManagersFactory {
+        private ManagersFactory() {
+        }
 
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();

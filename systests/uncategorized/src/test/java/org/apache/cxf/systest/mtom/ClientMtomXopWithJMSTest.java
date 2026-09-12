@@ -76,6 +76,7 @@ public class ClientMtomXopWithJMSTest {
     }
 
     @Test
+    @SuppressWarnings("PMD.UnusedReturnValue")
     public void testMtomXop() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true);
         InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");

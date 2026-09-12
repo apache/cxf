@@ -26,7 +26,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 /**
  * Holder for utility methods relating to contexts.
  */
-
+@SuppressWarnings({ "PMD.InstantiableUtilityClass", "PMD.ProtectedMemberInFinalClass" })
 public final class RMContextUtils {
 
     /**

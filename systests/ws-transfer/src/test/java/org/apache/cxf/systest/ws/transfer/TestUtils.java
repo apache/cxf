@@ -60,14 +60,14 @@ public final class TestUtils {
 
     }
 
-    protected static ResourceFactory createResourceFactoryClient(String port) {
+    static ResourceFactory createResourceFactoryClient(String port) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setAddress("http://localhost:" + port + "/ResourceFactory");
         return (ResourceFactory) factory.create();
     }
 
-    protected static Resource createResourceClient(EndpointReferenceType ref) {
+    static Resource createResourceClient(EndpointReferenceType ref) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Resource.class);
         factory.setAddress(ref.getAddress().getValue());
@@ -81,14 +81,14 @@ public final class TestUtils {
         return proxy;
     }
 
-    protected static void createStudentsServers(String port, String port2) {
+    static void createStudentsServers(String port, String port2) {
         UIDManager.reset();
         ResourceManager studentsResourceManager = new MemoryResourceManager();
         resourceFactoryServer = createResourceFactory(studentsResourceManager, port, port2);
         studentsResourceServer = createStudentsResource(studentsResourceManager, port);
     }
 
-    protected static void createTeachersServers(String port) {
+    static void createTeachersServers(String port) {
         ResourceManager teachersResourceManager = new MemoryResourceManager();
         ResourceRemote resource = new ResourceRemote();
         resource.setManager(teachersResourceManager);
@@ -101,12 +101,12 @@ public final class TestUtils {
         teachersResourceServer = createTeacherResourceEndpoint(resource, port);
     }
 
-    protected static void destroyStudentsServers() {
+    static void destroyStudentsServers() {
         resourceFactoryServer.destroy();
         studentsResourceServer.destroy();
     }
 
-    protected static void destroyTeachersServers() {
+    static void destroyTeachersServers() {
         teachersResourceFactoryServer.destroy();
         teachersResourceServer.destroy();
     }

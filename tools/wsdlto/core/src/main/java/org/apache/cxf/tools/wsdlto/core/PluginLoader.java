@@ -143,7 +143,7 @@ public final class PluginLoader {
 
     }
 
-    protected void loadPlugin(Plugin plugin) {
+    void loadPlugin(Plugin plugin) {
         if (plugin.getFrontend().size() > 0) {
             LOG.log(Level.FINE, "FOUND_FRONTENDS", new Object[]{plugin.getName(),
                                                                 plugin.getFrontend().size()});
@@ -186,7 +186,7 @@ public final class PluginLoader {
         }
     }
 
-    protected Plugin getPlugin(URL url) throws IOException, JAXBException, FileNotFoundException {
+    Plugin getPlugin(URL url) throws IOException, JAXBException, FileNotFoundException {
         Plugin plugin = plugins.get(url.toString());
         if (plugin == null) {
             try (InputStream is = url.openStream()) {
@@ -202,7 +202,7 @@ public final class PluginLoader {
         return plugin;
     }
 
-    protected Plugin getPlugin(String resource) throws JAXBException, IOException, FileNotFoundException {
+    Plugin getPlugin(String resource) throws JAXBException, IOException, FileNotFoundException {
         Plugin plugin = plugins.get(resource);
         if (plugin == null) {
             File resourceFile = new File(resource);

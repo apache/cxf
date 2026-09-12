@@ -54,6 +54,7 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * WS-ReliableMessaging 1.0 encoding and decoding. This converts between the standard WS-RM objects and the
  * 1.0 representation using the WS-Addressing recommendation 200508 namespace.
  */
+@SuppressWarnings("PMD.ProtectedMemberInFinalClass")
 public final class EncoderDecoder10AImpl extends EncoderDecoder {
 
     public static final EncoderDecoder10AImpl INSTANCE = new EncoderDecoder10AImpl();

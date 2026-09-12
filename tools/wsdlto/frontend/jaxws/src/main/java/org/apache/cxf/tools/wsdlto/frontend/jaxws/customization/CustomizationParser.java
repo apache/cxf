@@ -248,7 +248,7 @@ public final class CustomizationParser {
         }
     }
 
-    protected void copyAllJaxbDeclarations(final Node schemaNode, final Element jaxwsBindingNode) {
+    void copyAllJaxbDeclarations(final Node schemaNode, final Element jaxwsBindingNode) {
         if (isSchemaElement(schemaNode)) {
             appendJaxbVersion((Element)schemaNode);
         }
@@ -341,7 +341,7 @@ public final class CustomizationParser {
 
     }
 
-    protected void internalizeBinding(Element bindings, Element targetNode, String expression) {
+    void internalizeBinding(Element bindings, Element targetNode, String expression) {
         if (bindings.getAttributeNode("wsdlLocation") != null) {
             expression = "/";
         }
@@ -597,7 +597,7 @@ public final class CustomizationParser {
         return ToolConstants.JAXWS_BINDINGS.equals(reader.getName());
     }
 
-    protected void setWSDLNode(final Element node) {
+    void setWSDLNode(final Element node) {
         this.wsdlNode = node;
     }
 
@@ -623,7 +623,7 @@ public final class CustomizationParser {
         return "bindings".equals(bindings.getLocalName());
     }
 
-    protected boolean hasJaxbBindingDeclaration(Node bindings) {
+    boolean hasJaxbBindingDeclaration(Node bindings) {
         for (Node childNode = bindings.getFirstChild();
             childNode != null;
             childNode = childNode.getNextSibling()) {
