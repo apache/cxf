@@ -163,7 +163,7 @@ public final class StaxUtils {
             getInteger(MAX_CHILD_ELEMENTS, getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, 50000));
     // The MAX_ELEMENT_COUNT should be aligned with MAX_CHILD_ELEMENTS
     private static final long MAX_ELEMENT_COUNT_VAL =
-            getLong(MAX_ELEMENT_COUNT, Math.max(100 * MAX_CHILD_ELEMENTS_VAL, 50000L));
+            getLong(MAX_ELEMENT_COUNT, Math.max(100L * MAX_CHILD_ELEMENTS_VAL, 50000L));
 
     // Variables from Woodstox
     private static final String P_MAX_ATTRIBUTES_PER_ELEMENT = "com.ctc.wstx.maxAttributesPerElement";
