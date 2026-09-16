@@ -63,7 +63,10 @@ public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusEx
     }
 
     public void stopServer(Server server) {
-        ListIterator<ServerLifeCycleListener> li = listeners.listIterator(listeners.size());
+        @SuppressWarnings("unchecked")
+        final CopyOnWriteArrayList<ServerLifeCycleListener> cloned = 
+            (CopyOnWriteArrayList<ServerLifeCycleListener>) listeners.clone();
+        ListIterator<ServerLifeCycleListener> li = cloned.listIterator(cloned.size());
         while (li.hasPrevious()) {
             li.previous().stopServer(server);
         }
