@@ -20,7 +20,6 @@
 package org.apache.cxf.bus.managers;
 
 import java.util.ListIterator;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import jakarta.annotation.Resource;
 import org.apache.cxf.Bus;
@@ -30,19 +29,19 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 @NoJSR250Annotations(unlessNull = "bus")
-public class CXFBusLifeCycleManager implements BusLifeCycleManager {
+public class CXFBusLifeCycleManager extends AbstractLifeCycleManager<BusLifeCycleListener>
+        implements BusLifeCycleManager {
 
-    private final CopyOnWriteArrayList<BusLifeCycleListener> listeners;
     private Bus bus;
     private boolean initCalled;
     private boolean preShutdownCalled;
     private boolean postShutdownCalled;
 
     public CXFBusLifeCycleManager() {
-        listeners = new CopyOnWriteArrayList<>();
+        super();
     }
     public CXFBusLifeCycleManager(Bus b) {
-        listeners = new CopyOnWriteArrayList<>();
+        super();
         setBus(b);
     }
 
@@ -112,11 +111,4 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
     }
 
-    private ListIterator<BusLifeCycleListener> reversedListIterator() {
-        @SuppressWarnings("unchecked")
-        final CopyOnWriteArrayList<BusLifeCycleListener> cloned = 
-            (CopyOnWriteArrayList<BusLifeCycleListener>) listeners.clone();
-        ListIterator<BusLifeCycleListener> li = cloned.listIterator(cloned.size());
-        return li;
-    }
 }

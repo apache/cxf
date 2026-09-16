@@ -21,7 +21,6 @@ package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
 import java.util.ListIterator;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -32,15 +31,15 @@ import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.extension.BusExtension;
 
 @NoJSR250Annotations
-public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusExtension {
-
-    private CopyOnWriteArrayList<ServerLifeCycleListener> listeners =
-            new CopyOnWriteArrayList<>();
+public class ServerLifeCycleManagerImpl extends AbstractLifeCycleManager<ServerLifeCycleListener> 
+        implements ServerLifeCycleManager, BusExtension {
 
     public ServerLifeCycleManagerImpl() {
-
+        super();
     }
+
     public ServerLifeCycleManagerImpl(Bus b) {
+        super();
         Collection<? extends ServerLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
                 .getBeansOfType(ServerLifeCycleListener.class);
         if (l != null) {
@@ -63,10 +62,7 @@ public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusEx
     }
 
     public void stopServer(Server server) {
-        @SuppressWarnings("unchecked")
-        final CopyOnWriteArrayList<ServerLifeCycleListener> cloned = 
-            (CopyOnWriteArrayList<ServerLifeCycleListener>) listeners.clone();
-        ListIterator<ServerLifeCycleListener> li = cloned.listIterator(cloned.size());
+        ListIterator<ServerLifeCycleListener> li = reversedListIterator();
         while (li.hasPrevious()) {
             li.previous().stopServer(server);
         }

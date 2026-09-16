@@ -21,7 +21,6 @@ package org.apache.cxf.bus.managers;
 
 import java.util.Collection;
 import java.util.ListIterator;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -32,16 +31,15 @@ import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.extension.BusExtension;
 
 @NoJSR250Annotations
-public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusExtension {
-
-    private CopyOnWriteArrayList<ClientLifeCycleListener> listeners
-        = new CopyOnWriteArrayList<>();
+public class ClientLifeCycleManagerImpl extends AbstractLifeCycleManager<ClientLifeCycleListener>
+        implements ClientLifeCycleManager, BusExtension {
 
     public ClientLifeCycleManagerImpl() {
-
+        super();
     }
 
     public ClientLifeCycleManagerImpl(Bus b) {
+        super();
         Collection<? extends ClientLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
                 .getBeansOfType(ClientLifeCycleListener.class);
         if (l != null) {
@@ -64,10 +62,7 @@ public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusEx
     }
 
     public void clientDestroyed(Client client) {
-        @SuppressWarnings("unchecked")
-        final CopyOnWriteArrayList<ClientLifeCycleListener> cloned = 
-            (CopyOnWriteArrayList<ClientLifeCycleListener>) listeners.clone();
-        ListIterator<ClientLifeCycleListener> li = cloned.listIterator(cloned.size());
+        ListIterator<ClientLifeCycleListener> li = reversedListIterator();
         while (li.hasPrevious()) {
             li.previous().clientDestroyed(client);
         }
