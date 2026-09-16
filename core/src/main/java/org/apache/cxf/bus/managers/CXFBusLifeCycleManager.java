@@ -91,7 +91,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     public void preShutdown() {
         if (!preShutdownCalled) {
             preShutdownCalled = true;
-            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            ListIterator<BusLifeCycleListener> li = reversedListIterator();
             while (li.hasPrevious()) {
                 li.previous().preShutdown();
             }
@@ -104,7 +104,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
         if (!postShutdownCalled) {
             postShutdownCalled = true;
-            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            ListIterator<BusLifeCycleListener> li = reversedListIterator();
             while (li.hasPrevious()) {
                 li.previous().postShutdown();
             }
@@ -112,4 +112,11 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
     }
 
+    private ListIterator<BusLifeCycleListener> reversedListIterator() {
+        @SuppressWarnings("unchecked")
+        final CopyOnWriteArrayList<BusLifeCycleListener> cloned = 
+            (CopyOnWriteArrayList<BusLifeCycleListener>) listeners.clone();
+        ListIterator<BusLifeCycleListener> li = cloned.listIterator(cloned.size());
+        return li;
+    }
 }

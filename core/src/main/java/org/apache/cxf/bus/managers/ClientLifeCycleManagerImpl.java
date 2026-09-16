@@ -64,7 +64,10 @@ public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusEx
     }
 
     public void clientDestroyed(Client client) {
-        ListIterator<ClientLifeCycleListener> li = listeners.listIterator(listeners.size());
+        @SuppressWarnings("unchecked")
+        final CopyOnWriteArrayList<ClientLifeCycleListener> cloned = 
+            (CopyOnWriteArrayList<ClientLifeCycleListener>) listeners.clone();
+        ListIterator<ClientLifeCycleListener> li = cloned.listIterator(cloned.size());
         while (li.hasPrevious()) {
             li.previous().clientDestroyed(client);
         }
