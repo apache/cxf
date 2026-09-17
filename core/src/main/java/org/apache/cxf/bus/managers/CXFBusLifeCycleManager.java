@@ -20,7 +20,6 @@
 package org.apache.cxf.bus.managers;
 
 import java.util.ListIterator;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.Resource;
 
@@ -31,19 +30,19 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 @NoJSR250Annotations(unlessNull = "bus")
-public class CXFBusLifeCycleManager implements BusLifeCycleManager {
+public class CXFBusLifeCycleManager extends AbstractLifeCycleManager<BusLifeCycleListener>
+        implements BusLifeCycleManager {
 
-    private final CopyOnWriteArrayList<BusLifeCycleListener> listeners;
     private Bus bus;
     private boolean initCalled;
     private boolean preShutdownCalled;
     private boolean postShutdownCalled;
 
     public CXFBusLifeCycleManager() {
-        listeners = new CopyOnWriteArrayList<>();
+        super();
     }
     public CXFBusLifeCycleManager(Bus b) {
-        listeners = new CopyOnWriteArrayList<>();
+        super();
         setBus(b);
     }
 
@@ -92,7 +91,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     public void preShutdown() {
         if (!preShutdownCalled) {
             preShutdownCalled = true;
-            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            ListIterator<BusLifeCycleListener> li = reversedListIterator();
             while (li.hasPrevious()) {
                 li.previous().preShutdown();
             }
@@ -105,7 +104,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         }
         if (!postShutdownCalled) {
             postShutdownCalled = true;
-            ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
+            ListIterator<BusLifeCycleListener> li = reversedListIterator();
             while (li.hasPrevious()) {
                 li.previous().postShutdown();
             }
