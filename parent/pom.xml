@@ -99,7 +99,7 @@
         <cxf.atmosphere.version>3.1.0</cxf.atmosphere.version>
         <cxf.bcprov.version>1.85</cxf.bcprov.version>
         <cxf.brave.version>6.3.1</cxf.brave.version>
-        <cxf.cdi.api.version>4.1.0</cxf.cdi.api.version>
+        <cxf.cdi.api.version>5.0.0</cxf.cdi.api.version>
         <cxf.classgraph.version>4.8.25</cxf.classgraph.version>
         <cxf.classmate.version>1.5.1</cxf.classmate.version>
         <cxf.commons-codec.version>1.22.1</cxf.commons-codec.version>
