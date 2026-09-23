@@ -271,7 +271,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bctls-jdk18on</artifactId>
-            <version>${cxf.bcprov.version}</version>
+            <version>${cxf.bclts.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
