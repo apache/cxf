@@ -100,6 +100,45 @@ public class X509TokenValidatorTest {
     }
 
     /**
+     * When proof-of-possession checking is enabled, a trusted certificate must NOT be validated
+     * (and therefore must not be usable to obtain a token via transformation) unless the requestor
+     * has proven possession of the corresponding private key. The test message context carries no
+     * signature or TLS client certificate, so validation must fail.
+     */
+    @org.junit.Test
+    public void testValidCertificateProofOfPossessionRequired() throws Exception {
+        X509TokenValidator x509TokenValidator = new X509TokenValidator();
+        x509TokenValidator.setValidateProofOfPossession(true);
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+
+        // Create a ValidateTarget consisting of a trusted X509Certificate
+        BinarySecurityTokenType binarySecurityToken = new BinarySecurityTokenType();
+        JAXBElement<BinarySecurityTokenType> tokenType =
+            new JAXBElement<BinarySecurityTokenType>(
+                QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
+            );
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("myclientkey");
+        Crypto crypto = validatorParameters.getStsProperties().getSignatureCrypto();
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertTrue(certs != null && certs.length > 0);
+        binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
+        binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
+        binarySecurityToken.setEncodingType(WSS4JConstants.SOAPMESSAGE_NS + "#Base64Binary");
+
+        ReceivedToken validateTarget = new ReceivedToken(tokenType);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+
+        // Even though the certificate is trusted, without proof of possession it must be INVALID
+        TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+
+    /**
      * Test an invalid certificate
      */
     @org.junit.Test
