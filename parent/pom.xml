@@ -184,7 +184,7 @@
         <cxf.maven.core.version>3.9.16</cxf.maven.core.version>
         <cxf.micrometer.version>1.17.1</cxf.micrometer.version>
         <cxf.micrometer-tracing.version>1.7.1</cxf.micrometer-tracing.version>
-        <cxf.microprofile.config.version>3.1.1</cxf.microprofile.config.version>
+        <cxf.microprofile.config.version>3.1.2</cxf.microprofile.config.version>
         <cxf.microprofile.rest.client.version>4.0</cxf.microprofile.rest.client.version>
         <cxf.microprofile.openapi.version>4.1.1</cxf.microprofile.openapi.version>
         <cxf.mina.version>2.2.9</cxf.mina.version>
