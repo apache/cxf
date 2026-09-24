@@ -23,7 +23,6 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +32,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -51,10 +51,12 @@ import org.apache.cxf.sts.token.realm.RealmProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
@@ -73,6 +75,7 @@ import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml1.core.Audience;
 import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.xmlsec.signature.Signature;
 
 /**
  * A TokenRenewer implementation that renews a (valid or expired) SAML Token.
@@ -176,11 +179,15 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         }
 
         try {
-            SamlAssertionWrapper assertion = new SamlAssertionWrapper((Element)tokenToRenew.getToken());
+            Element tokenElement = getAttachedElement((Element)tokenToRenew.getToken());
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper(tokenElement);
 
-            byte[] oldSignature = assertion.getSignatureValue();
-            int hash = Arrays.hashCode(oldSignature);
-            SecurityToken cachedToken = tokenStore.getToken(Integer.toString(hash));
+            // Verify the signature, so that the signed content matches the (cached) token that was
+            // previously issued or validated. The Assertion is re-signed below with the STS key.
+            verifySignature(assertion, tokenElement, tokenParameters);
+
+            String cacheKey = TokenStoreUtils.getCacheKey(assertion);
+            SecurityToken cachedToken = cacheKey != null ? tokenStore.getToken(cacheKey) : null;
             if (cachedToken == null) {
                 LOG.log(Level.FINE, "The token to be renewed must be stored in the cache");
                 throw new STSException("Can't renew SAML assertion", STSException.REQUEST_FAILED);
@@ -193,7 +200,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
             String oldId = createNewId(renewedAssertion);
             // Remove the previous token (now expired) from the cache
             tokenStore.remove(oldId);
-            tokenStore.remove(Integer.toString(hash));
+            tokenStore.remove(cacheKey);
 
             // Create new Conditions & sign the Assertion
             createNewConditions(renewedAssertion, tokenParameters);
@@ -279,6 +286,47 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
      */
     public Map<String, RealmProperties> getRealmMap() {
         return Collections.unmodifiableMap(realmMap);
+    }
+
+    /**
+     * The signature (profile) validation requires the Element to be attached to a Document. This is the case
+     * for a received token, but not e.g. for a token that was just created by the SAMLTokenProvider.
+     */
+    private static Element getAttachedElement(Element element) {
+        Node root = element;
+        while (root.getParentNode() != null) {
+            root = root.getParentNode();
+        }
+        if (root.getNodeType() == Node.DOCUMENT_NODE) {
+            return element;
+        }
+
+        Document doc = DOMUtils.createDocument();
+        return (Element)doc.appendChild(doc.importNode(element, true));
+    }
+
+    private void verifySignature(
+        SamlAssertionWrapper assertion,
+        Element tokenElement,
+        TokenRenewerParameters tokenParameters
+    ) throws WSSecurityException {
+        Signature sig = assertion.getSignature();
+        if (sig == null || sig.getKeyInfo() == null) {
+            LOG.log(Level.WARNING, "The token to be renewed must be signed");
+            throw new STSException("Can't renew SAML assertion", STSException.REQUEST_FAILED);
+        }
+
+        Crypto sigCrypto = tokenParameters.getStsProperties().getSignatureCrypto();
+        RequestData requestData = new RequestData();
+        requestData.setSigVerCrypto(sigCrypto);
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setWsDocInfo(new WSDocInfo(tokenElement.getOwnerDocument()));
+
+        SAMLKeyInfo samlKeyInfo =
+            SAMLUtil.getCredentialFromKeyInfo(
+                sig.getKeyInfo().getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
+            );
+        assertion.verifySignature(samlKeyInfo);
     }
 
     private void validateAssertion(
@@ -522,7 +570,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                     assertion.getNotOnOrAfter(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
                     tokenParameters.getTokenRequirements().getRenewing());
             CacheUtils.storeTokenInCache(
-                securityToken, tokenParameters.getTokenStore(), signatureValue);
+                securityToken, tokenParameters.getTokenStore(), assertion);
         }
     }
 

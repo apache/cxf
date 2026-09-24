@@ -27,6 +27,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
@@ -67,9 +68,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
             if (tokenParameters.getTokenStore() != null) {
                 SecurityToken securityToken = new SecurityToken(usernameToken.getID());
                 securityToken.setToken(usernameToken.getElement());
-                int hashCode = usernameToken.hashCode();
-                String identifier = Integer.toString(hashCode);
-                securityToken.setTokenHash(hashCode);
+                String identifier = TokenStoreUtils.getCacheKey(usernameToken);
                 tokenParameters.getTokenStore().add(identifier, securityToken);
             }
 
