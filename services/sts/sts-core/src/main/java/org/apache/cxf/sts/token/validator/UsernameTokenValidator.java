@@ -48,6 +48,7 @@ import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -176,11 +177,11 @@ public class UsernameTokenValidator implements TokenValidator {
             }
 
             // See if the UsernameToken is stored in the cache
-            int hash = ut.hashCode();
+            String cacheKey = TokenStoreUtils.getCacheKey(ut);
             SecurityToken secToken = null;
             if (tokenParameters.getTokenStore() != null) {
-                secToken = tokenParameters.getTokenStore().getToken(Integer.toString(hash));
-                if (secToken != null && (secToken.getTokenHash() != hash || secToken.isExpired())) {
+                secToken = tokenParameters.getTokenStore().getToken(cacheKey);
+                if (secToken != null && secToken.isExpired()) {
                     secToken = null;
                 }
             }
@@ -226,10 +227,7 @@ public class UsernameTokenValidator implements TokenValidator {
             if (tokenParameters.getTokenStore() != null && secToken == null) {
                 secToken = new SecurityToken(ut.getID());
                 secToken.setToken(ut.getElement());
-                int hashCode = ut.hashCode();
-                String identifier = Integer.toString(hashCode);
-                secToken.setTokenHash(hashCode);
-                tokenParameters.getTokenStore().add(identifier, secToken);
+                tokenParameters.getTokenStore().add(cacheKey, secToken);
             }
 
             response.setPrincipal(principal);

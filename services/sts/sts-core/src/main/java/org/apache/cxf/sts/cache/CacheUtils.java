@@ -21,7 +21,6 @@ package org.apache.cxf.sts.cache;
 
 import java.security.Principal;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +30,9 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public final class CacheUtils {
 
@@ -74,14 +76,20 @@ public final class CacheUtils {
         return securityToken;
     }
 
+    /**
+     * Store the given SecurityToken in the cache, using a (SHA-256 based) key derived from the signature
+     * of the given (signed) SAML Assertion - see TokenStoreUtils.getCacheKey(SamlAssertionWrapper).
+     * Nothing is stored if the Assertion is not signed. The signature profile is not checked here, as the
+     * Assertion might have just been signed by the STS - it is checked when a received token is looked up.
+     */
     public static void storeTokenInCache(
         SecurityToken securityToken,
         TokenStore cache,
-        byte[] signatureValue
-    ) {
-        int hash = Arrays.hashCode(signatureValue);
-        securityToken.setTokenHash(hash);
-        String identifier = Integer.toString(hash);
-        cache.add(identifier, securityToken);
+        SamlAssertionWrapper assertion
+    ) throws WSSecurityException {
+        String identifier = TokenStoreUtils.getCacheKey(assertion, false);
+        if (identifier != null) {
+            cache.add(identifier, securityToken);
+        }
     }
 }

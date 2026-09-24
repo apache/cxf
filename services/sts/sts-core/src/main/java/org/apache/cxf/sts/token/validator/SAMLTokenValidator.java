@@ -20,7 +20,6 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,7 @@ import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -179,13 +179,10 @@ public class SAMLTokenValidator implements TokenValidator {
             assertion.verifySignature(samlKeyInfo);
 
             SecurityToken secToken = null;
-            byte[] signatureValue = assertion.getSignatureValue();
-            if (tokenParameters.getTokenStore() != null && signatureValue != null
-                && signatureValue.length > 0) {
-                int hash = Arrays.hashCode(signatureValue);
-                secToken = tokenParameters.getTokenStore().getToken(Integer.toString(hash));
-                if (secToken != null && secToken.getTokenHash() != hash) {
-                    secToken = null;
+            if (tokenParameters.getTokenStore() != null) {
+                String cacheKey = TokenStoreUtils.getCacheKey(assertion);
+                if (cacheKey != null) {
+                    secToken = tokenParameters.getTokenStore().getToken(cacheKey);
                 }
             }
             if (secToken != null && secToken.isExpired()) {
@@ -332,7 +329,7 @@ public class SAMLTokenValidator implements TokenValidator {
             SecurityToken securityToken =
                 CacheUtils.createSecurityTokenForStorage(assertion.getElement(), assertion.getId(),
                                                          assertion.getNotOnOrAfter(), principal, tokenRealm, null);
-            CacheUtils.storeTokenInCache(securityToken, tokenStore, signatureValue);
+            CacheUtils.storeTokenInCache(securityToken, tokenStore, assertion);
         }
     }
 

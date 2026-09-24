@@ -131,7 +131,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                         assertion.getNotOnOrAfter(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
                         tokenParameters.getTokenRequirements().getRenewing());
                 CacheUtils.storeTokenInCache(
-                    securityToken, tokenParameters.getTokenStore(), signatureValue);
+                    securityToken, tokenParameters.getTokenStore(), assertion);
             }
 
             TokenProviderResponse response = new TokenProviderResponse();
