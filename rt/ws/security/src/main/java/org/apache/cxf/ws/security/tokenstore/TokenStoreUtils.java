@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -206,7 +206,7 @@ public final class TokenStoreUtils {
             out.flush();
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return HexFormat.of().formatHex(digest.digest(bytes.toByteArray()));
+            return StringUtils.toHexString(digest.digest(bytes.toByteArray()));
         } catch (IOException | NoSuchAlgorithmException ex) {
             throw new IllegalStateException(ex);
         }
