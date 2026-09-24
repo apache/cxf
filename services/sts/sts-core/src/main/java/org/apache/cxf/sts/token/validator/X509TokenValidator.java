@@ -19,8 +19,11 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +34,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -44,7 +49,10 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 import org.apache.wss4j.dom.validate.Validator;
@@ -67,12 +75,41 @@ public class X509TokenValidator implements TokenValidator {
 
     private CertConstraintsParser certConstraints = new CertConstraintsParser();
 
+    private boolean validateProofOfPossession;
+
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
      * of a certificate
      */
     public void setSubjectConstraints(List<String> subjectConstraints) {
         certConstraints.setSubjectConstraints(subjectConstraints);
+    }
+
+    /**
+     * Whether to require the requestor to prove possession of the private key that corresponds to
+     * the X.509 certificate being validated. This is disabled by default.
+     *
+     * <p>An X.509 certificate is public data, so trust-chain verification alone does not establish
+     * that the requestor is the certificate's subject. When the Validate operation is reachable by
+     * untrusted callers, this lets anyone holding a copy of any certificate that chains to the STS
+     * truststore have that certificate marked VALID - and, via WS-Trust token transformation
+     * (Validate with a requested TokenType), obtain an STS-issued token for the certificate's
+     * subject. Enabling this check requires the requestor to prove possession of the private key (a
+     * message signature made with, or a TLS client certificate matching, the validated certificate)
+     * before the token is considered VALID.
+     *
+     * <p><b>Note:</b> this is off by default because it is incompatible with brokered validation, a
+     * common deployment where a trusted intermediary (for example a service that already
+     * authenticated the client) forwards the client's bare certificate to the STS for
+     * validation/transformation over a separately secured channel. In that pattern the intermediary
+     * does not hold the client's private key, so it cannot prove possession at the STS. Enable this
+     * only when the Validate operation may be reached by untrusted callers and brokered validation
+     * is not in use; otherwise restrict access to the Validate endpoint instead.
+     *
+     * @param validateProofOfPossession whether to require proof of possession (default false)
+     */
+    public void setValidateProofOfPossession(boolean validateProofOfPossession) {
+        this.validateProofOfPossession = validateProofOfPossession;
     }
 
     /**
@@ -186,9 +223,26 @@ public class X509TokenValidator implements TokenValidator {
             }
 
             Credential returnedCredential = validator.validate(credential, requestData);
+            X509Certificate[] validatedCerts = returnedCredential.getCertificates();
+
+            // The certificate is trusted, but a certificate is public data. Unless the requestor
+            // has proven possession of the corresponding private key, we must not confer the
+            // certificate subject's identity - otherwise anyone holding a copy of a trusted
+            // certificate could have a token issued in that subject's name via token
+            // transformation. See setValidateProofOfPossession().
+            if (validateProofOfPossession
+                && !verifyProofOfPossession(validatedCerts, tokenParameters.getMessageContext())) {
+                LOG.log(
+                    Level.WARNING,
+                    "Failed to verify the proof of possession of the private key corresponding to "
+                    + "the X.509 certificate being validated"
+                );
+                return response;
+            }
+
             Principal principal = returnedCredential.getPrincipal();
             if (principal == null) {
-                principal = returnedCredential.getCertificates()[0].getSubjectX500Principal();
+                principal = validatedCerts[0].getSubjectX500Principal();
             }
             response.setPrincipal(principal);
             validateTarget.setState(STATE.VALID);
@@ -197,6 +251,67 @@ public class X509TokenValidator implements TokenValidator {
             LOG.log(Level.WARNING, "", ex);
         }
         return response;
+    }
+
+    /**
+     * Verify that the requestor proved possession of the private key corresponding to (one of) the
+     * validated certificate(s), either by signing the request message with it or by presenting it
+     * as a TLS client certificate.
+     */
+    protected boolean verifyProofOfPossession(
+        X509Certificate[] validatedCerts,
+        Map<String, Object> messageContext
+    ) {
+        if (validatedCerts == null || validatedCerts.length == 0 || messageContext == null) {
+            return false;
+        }
+
+        // Certificate(s) used to sign the request message
+        final List<WSHandlerResult> handlerResults =
+            CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
+        if (handlerResults != null && !handlerResults.isEmpty()) {
+            final List<WSSecurityEngineResult> signedResults = new ArrayList<>();
+            for (WSHandlerResult handlerResult : handlerResults) {
+                if (handlerResult.getActionResults().containsKey(WSConstants.SIGN)) {
+                    signedResults.addAll(handlerResult.getActionResults().get(WSConstants.SIGN));
+                }
+                if (handlerResult.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+                    signedResults.addAll(handlerResult.getActionResults().get(WSConstants.UT_SIGN));
+                }
+            }
+            for (WSSecurityEngineResult signedResult : signedResults) {
+                X509Certificate signingCert =
+                    (X509Certificate)signedResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                if (matchesValidatedCert(signingCert, validatedCerts)) {
+                    return true;
+                }
+            }
+        }
+
+        // Certificate presented at the TLS layer
+        TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());
+        if (tlsInfo != null && tlsInfo.getPeerCertificates() != null) {
+            for (Certificate tlsCert : tlsInfo.getPeerCertificates()) {
+                if (tlsCert instanceof X509Certificate
+                    && matchesValidatedCert((X509Certificate)tlsCert, validatedCerts)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean matchesValidatedCert(X509Certificate presentedCert, X509Certificate[] validatedCerts) {
+        if (presentedCert == null) {
+            return false;
+        }
+        for (X509Certificate validatedCert : validatedCerts) {
+            if (presentedCert.equals(validatedCert)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

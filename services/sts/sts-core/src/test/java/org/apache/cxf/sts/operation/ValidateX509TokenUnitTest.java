@@ -20,8 +20,10 @@ package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -35,6 +37,8 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
+import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.validator.X509TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -120,6 +124,81 @@ public class ValidateX509TokenUnitTest {
         RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
+    }
+
+    /**
+     * When proof-of-possession checking is enabled, a trusted certificate presented as a
+     * ValidateTarget must NOT be transformed into a freshly issued STS token unless the requestor
+     * has proven possession of the corresponding private key. A certificate is public data, so
+     * trust-chain verification alone must not confer the certificate subject's identity.
+     */
+    @org.junit.Test
+    public void testValidateX509TokenProofOfPossessionRequiredNoTransformation() throws Exception {
+        TokenValidateOperation validateOperation = new TokenValidateOperation();
+
+        // Add Token Validator with proof-of-possession checking enabled
+        X509TokenValidator x509TokenValidator = new X509TokenValidator();
+        x509TokenValidator.setValidateProofOfPossession(true);
+        validateOperation.setTokenValidators(Collections.singletonList(x509TokenValidator));
+
+        // Add a SAMLTokenProvider so that a transformation to a SAML token would be possible
+        // if the certificate were (incorrectly) considered validated
+        List<TokenProvider> providerList = new ArrayList<>();
+        providerList.add(new SAMLTokenProvider());
+        validateOperation.setTokenProviders(providerList);
+
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        validateOperation.setStsProperties(stsProperties);
+
+        // Request a SAML2 token via transformation (TokenType != Status)
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType =
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+
+        // Present a trusted certificate (public data) that the requestor does not possess
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("myclientkey");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertTrue(certs != null && certs.length > 0);
+
+        JAXBElement<BinarySecurityTokenType> binarySecurityTokenType =
+            createBinarySecurityToken(certs[0]);
+        ValidateTargetType validateTarget = new ValidateTargetType();
+        validateTarget.setAny(binarySecurityTokenType);
+
+        JAXBElement<ValidateTargetType> validateTargetType =
+            new JAXBElement<ValidateTargetType>(
+                QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
+            );
+        request.getAny().add(validateTargetType);
+
+        // Mock up message context - crucially there is no message signature or TLS client
+        // certificate proving possession of the private key
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("eve");
+        msgCtx.put(
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
+        );
+
+        RequestSecurityTokenResponseType response =
+            validateOperation.validate(request, principal, msgCtx);
+
+        // The status must be invalid and no token must have been issued
+        assertFalse(validateResponse(response));
+        assertFalse(hasIssuedToken(response));
     }
 
     /**
@@ -214,6 +293,24 @@ public class ValidateX509TokenUnitTest {
                     if (STSConstants.VALID_CODE.equals(status.getCode())) {
                         return true;
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return true if the response contains a freshly issued token
+     */
+    private boolean hasIssuedToken(RequestSecurityTokenResponseType response) {
+        if (response == null || response.getAny() == null) {
+            return false;
+        }
+        for (Object requestObject : response.getAny()) {
+            if (requestObject instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
+                if (REQUESTED_SECURITY_TOKEN.equals(jaxbElement.getName())) {
+                    return true;
                 }
             }
         }
