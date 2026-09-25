@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import jakarta.ws.rs.HttpMethod;
@@ -57,6 +58,7 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         }
 
         Document doc = null;
+        Element signedBody = null;
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             try {
@@ -68,6 +70,12 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
             XMLStreamReader reader = message.getContent(XMLStreamReader.class);
             if (reader instanceof W3CDOMStreamReader) {
                 doc = ((W3CDOMStreamReader)reader).getDocument();
+                // A detached XML Signature has already been validated, and the reader
+                // is restricted to the signed element, which is then the body
+                Node node = ((W3CDOMStreamReader)reader).getCurrentNode();
+                if (node instanceof Element && node != doc.getDocumentElement()) {
+                    signedBody = (Element)node;
+                }
             }
         }
         if (doc == null) {
@@ -85,7 +93,11 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         validateToken(message, samlElement);
 
         doc.getDocumentElement().removeChild(samlElement);
-        if (bodyIsRoot) {
+        if (signedBody != null) {
+            message.setContent(XMLStreamReader.class,
+                               new W3CDOMStreamReader(signedBody));
+            message.setContent(InputStream.class, null);
+        } else if (bodyIsRoot) {
             message.setContent(XMLStreamReader.class,
                                new W3CDOMStreamReader(doc));
             message.setContent(InputStream.class, null);
