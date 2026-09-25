@@ -27,7 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import jakarta.ws.rs.WebApplicationException;
+import javax.ws.rs.WebApplicationException;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
