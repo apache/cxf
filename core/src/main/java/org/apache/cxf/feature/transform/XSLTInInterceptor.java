@@ -79,9 +79,12 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
     protected void transformXReader(Message message, XMLStreamReader xReader) {
         CachedOutputStream cachedOS = new CachedOutputStream();
         try {
+            String encoding = getEncoding(message);
             StaxUtils.copy(xReader, cachedOS);
-            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), cachedOS.getInputStream());
-            XMLStreamReader transformedReader = StaxUtils.createXMLStreamReader(transformedIS);
+            InputStream transformedIS = XSLTUtils.transform(
+                getXSLTTemplate(), cachedOS.getInputStream(), encoding);
+            XMLStreamReader transformedReader =
+                StaxUtils.createXMLStreamReader(transformedIS, encoding);
             message.setContent(XMLStreamReader.class, transformedReader);
         } catch (XMLStreamException e) {
             throw new Fault("STAX_COPY", LOG, e, e.getMessage());
@@ -103,9 +106,12 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
 
     protected void transformIS(Message message, InputStream is) {
         try (InputStream inputStream = is) {
-            message.setContent(InputStream.class, XSLTUtils.transform(getXSLTTemplate(), inputStream));
+            String encoding = getEncoding(message);
+            message.setContent(InputStream.class,
+                XSLTUtils.transform(getXSLTTemplate(), inputStream, encoding));
         } catch (IOException e) {
-            LOG.warning("Cannot close stream after transformation: " + e.getMessage());
+            LOG.warning("Cannot close stream after transformation: "
+                + e.getMessage());
         }
     }
 
