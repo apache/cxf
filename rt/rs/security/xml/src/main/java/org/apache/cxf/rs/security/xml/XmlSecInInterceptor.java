@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -73,6 +74,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
@@ -82,6 +84,15 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> implements ReaderInterceptor  {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
+
+    private static final Set<String> ALLOWED_TRANSFORMS = Set.of(
+        XMLSecurityConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE,
+        XMLSecurityConstants.NS_C14N_OMIT_COMMENTS,
+        XMLSecurityConstants.NS_C14N_WITH_COMMENTS,
+        XMLSecurityConstants.NS_C14N11_OMIT_COMMENTS,
+        XMLSecurityConstants.NS_C14N11_WITH_COMMENTS,
+        XMLSecurityConstants.NS_C14N_EXCL_OMIT_COMMENTS,
+        XMLSecurityConstants.NS_C14N_EXCL_WITH_COMMENTS);
 
     private EncryptionProperties encryptionProperties;
     private SignatureProperties sigProps;
@@ -243,6 +254,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == SecurityEventConstants.AlgorithmSuite) {
+                    checkSignatureTransform((AlgorithmSuiteSecurityEvent)securityEvent);
                     if (encryptionProperties != null) {
                         checkEncryptionAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
                     }
@@ -260,6 +272,17 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
 
         return securityEventListener;
+    }
+
+    // Only allow transforms which cover the whole of the signed element, so that
+    // no unsigned content is passed on to the application
+    private void checkSignatureTransform(AlgorithmSuiteSecurityEvent event)
+        throws XMLSecurityException {
+        if (XMLSecurityConstants.SigTransform.equals(event.getAlgorithmUsage())
+            && !ALLOWED_TRANSFORMS.contains(event.getAlgorithmURI())) {
+            throw new XMLSecurityException("empty", new Object[] {"The signature transformation algorithm "
+                + event.getAlgorithmURI() + " is not allowed"});
+        }
     }
 
     private void checkEncryptionAlgorithms(AlgorithmSuiteSecurityEvent event)
@@ -503,6 +526,14 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                         new XMLSecurityException("empty", new Object[] {"The request was not signed"});
                     throwFault(ex.getMessage(), ex);
                 }
+                // The signature must cover the document root, otherwise unsigned content
+                // around the signed element would be passed on to the application
+                if (!isRootSigned(incomingSecurityEventList)) {
+                    LOG.warning("The request root element was not signed");
+                    XMLSecurityException ex = new XMLSecurityException("empty",
+                        new Object[] {"The request root element was not signed"});
+                    throwFault(ex.getMessage(), ex);
+                }
             }
 
             if (encryptionRequired) {
@@ -516,6 +547,18 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                 }
             }
 
+        }
+
+        private boolean isRootSigned(List<SecurityEvent> incomingSecurityEventList) {
+            for (SecurityEvent incomingEvent : incomingSecurityEventList) {
+                if (incomingEvent.getSecurityEventType() == SecurityEventConstants.SignedElement) {
+                    SignedElementSecurityEvent signedEvent = (SignedElementSecurityEvent)incomingEvent;
+                    if (signedEvent.isSigned() && signedEvent.getElementPath().size() == 1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
