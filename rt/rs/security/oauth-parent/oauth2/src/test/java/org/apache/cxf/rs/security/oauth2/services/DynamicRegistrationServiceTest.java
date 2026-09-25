@@ -91,6 +91,39 @@ public class DynamicRegistrationServiceTest {
     }
 
     @Test
+    public void testDefaultsToAllowedScopesWhenNoScopeRegistered() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+        service.setAllowedClientScopes(Collections.singletonList("read"));
+
+        Client client = createClient();
+        service.applyClientRegistration(new ClientRegistration(), client);
+
+        assertEquals(Collections.singletonList("read"), client.getRegisteredScopes());
+    }
+
+    @Test
+    public void testRejectsUnknownApplicationTypeRedirectUrl() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        ClientRegistration request = new ClientRegistration();
+        request.setApplicationType("x");
+        request.setRedirectUris(List.of("http://evil.example/cb"));
+
+        Client client = createClient();
+        client.setAllowedGrantTypes(Collections.singletonList(OAuthConstants.IMPLICIT_GRANT));
+        assertThrows(BadRequestException.class, () -> service.applyClientRegistration(request, client));
+    }
+
+    @Test
+    public void testRejectsUnknownApplicationType() {
+        TestDynamicRegistrationService service = new TestDynamicRegistrationService();
+
+        ClientRegistration request = new ClientRegistration();
+        request.setApplicationType("x");
+        assertThrows(BadRequestException.class, () -> service.createClient(request));
+    }
+
+    @Test
     public void testAcceptsAllowedRedirectUrlsWebApp() {
         TestDynamicRegistrationService service = new TestDynamicRegistrationService();
 

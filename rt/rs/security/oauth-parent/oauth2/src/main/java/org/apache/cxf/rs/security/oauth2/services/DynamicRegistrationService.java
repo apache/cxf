@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -270,6 +271,9 @@ public class DynamicRegistrationService {
         String appType = request.getApplicationType();
         if (appType == null) {
             appType = DEFAULT_APPLICATION_TYPE;
+        } else if (!WEB_APPLICATION_TYPE.equalsIgnoreCase(appType)
+            && !NATIVE_APPLICATION_TYPE.equalsIgnoreCase(appType)) {
+            reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA, "Unsupported application type"));
         }
         boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType)
             && (passwordRequired
@@ -394,6 +398,10 @@ public class DynamicRegistrationService {
             List<String> requestedScopes = OAuthUtils.parseScope(scope);
             validateClientScopes(requestedScopes);
             client.setRegisteredScopes(requestedScopes);
+        } else if (allowedClientScopes != null && client.getRegisteredScopes().isEmpty()) {
+            // An empty list of registered scopes allows any scope to be requested later on,
+            // so restrict the client to the configured scopes instead
+            client.setRegisteredScopes(new ArrayList<>(allowedClientScopes));
         }
         // Client Application URI
         String clientUri = request.getClientUri();
@@ -466,6 +474,9 @@ public class DynamicRegistrationService {
                 reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
                     "Unsupported redirect URI hostname for scheme"));
             }
+        } else {
+            reportInvalidRequestError(new OAuthError(INVALID_CLIENT_METADATA,
+                "Unsupported application type"));
         }
     }
 
@@ -533,7 +544,7 @@ public class DynamicRegistrationService {
 
         List<String> allowedScopes = allowedClientScopes;
         if (allowedScopes == null && clientProvider instanceof AbstractOAuthDataProvider) {
-            allowedScopes = new java.util.ArrayList<>(
+            allowedScopes = new ArrayList<>(
                 ((AbstractOAuthDataProvider)clientProvider).getPermissionMap().keySet());
         }
 
