@@ -52,7 +52,6 @@ import org.apache.wss4j.dom.validate.Validator;
  * "useIssueBinding" to "true" only works for validating UsernameTokens.
  */
 public class STSTokenValidator implements Validator {
-    private STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
     private boolean alwaysValidateToSts;
     private boolean useIssueBinding;
     private boolean useOnBehalfOf = true;
@@ -179,6 +178,9 @@ public class STSTokenValidator implements Validator {
 
         if (!alwaysValidateToSts && credential.getSamlAssertion() != null) {
             try {
+                // STSSamlAssertionValidator records the trust verification result in an instance field, so
+                // a new instance must be used for each request to avoid sharing state between requests
+                STSSamlAssertionValidator samlValidator = new STSSamlAssertionValidator();
                 samlValidator.validate(credential, data);
                 return samlValidator.isTrustVerificationSucceeded();
             } catch (RuntimeException e) {
