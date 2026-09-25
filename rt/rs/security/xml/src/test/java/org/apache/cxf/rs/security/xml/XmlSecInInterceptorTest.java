@@ -26,13 +26,13 @@ import java.security.cert.X509Certificate;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import javax.ws.rs.WebApplicationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.ws.rs.WebApplicationException;
 import org.apache.cxf.bus.managers.PhaseManagerImpl;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Interceptor;
