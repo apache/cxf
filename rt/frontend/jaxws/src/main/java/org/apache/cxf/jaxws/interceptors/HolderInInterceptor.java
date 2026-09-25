@@ -63,9 +63,13 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
             for (MessagePartInfo part : parts) {
                 if (part.getIndex() != 0 && part.getTypeClass() != null) {
                     @SuppressWarnings("unchecked")
-                    Holder<Object> holder = (Holder<Object>)outHolders.get(part.getIndex() - 1);
+                    Holder<Object> holder = (Holder<Object>)outHolders
+                        .get(part.getIndex() - 1);
                     if (holder != null) {
-                        holder.value = inObjects.get(part);
+                        if (inObjects != null
+                            && part.getIndex() < inObjects.size()) {
+                            holder.value = inObjects.get(part);
+                        }
                         inObjects.put(part, holder);
                     }
                 }
