@@ -71,11 +71,10 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
             if (reader instanceof W3CDOMStreamReader) {
                 W3CDOMStreamReader w3cReader = (W3CDOMStreamReader)reader;
                 doc = w3cReader.getDocument();
-                ...
-                Node node = w3cReader.getCurrentNode();
+
                 // A detached XML Signature has already been validated, and the reader
                 // is restricted to the signed element, which is then the body
-                Node node = ((W3CDOMStreamReader)reader).getCurrentNode();
+                Node node = w3cReader.getCurrentNode();
                 if (node instanceof Element && node != doc.getDocumentElement()) {
                     signedBody = (Element)node;
                 }
