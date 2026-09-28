@@ -1,0 +1,21 @@
+<application xmlns="http://wadl.dev.java.net/2009/02"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <grammars />
+    <resources>
+        <resource id="Test" path="/test">
+            <doc>Resource */ int CLASS_DOC = 1; /*</doc>
+            <param name="id" style="template" type="xs:string">
+                <doc>Param *\u002f int PARAM_DOC = 1; /*</doc>
+            </param>
+            <method name="GET" id="get">
+                <doc>Method */ int METHOD_DOC = 1; /*</doc>
+                <response>
+                    <doc>Response */ int RESPONSE_DOC = 1; /*</doc>
+                    <representation mediaType="text/plain">
+                        <param name="result" style="plain" type="xs:string" />
+                    </representation>
+                </response>
+            </method>
+        </resource>
+    </resources>
+</application>
