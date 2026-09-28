@@ -103,6 +103,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -873,7 +874,7 @@ public class SourceGenerator {
     private String getDocText(Element el) {
         Element doc = DOMUtils.getFirstChildWithName(el, getWadlNamespace(), "doc");
         if (doc != null) {
-            return DOMUtils.getContent(doc);
+            return JavaInterface.escapeJavaDocContent(DOMUtils.getContent(doc));
         }
         return null;
     }
