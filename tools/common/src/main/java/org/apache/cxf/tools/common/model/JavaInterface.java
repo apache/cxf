@@ -97,12 +97,12 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     /**
-     * Make sure documentation text taken from a WSDL cannot terminate the
-     * enclosing comment block. Unicode escapes are neutralized as well since
+     * Make sure documentation text taken from a WSDL or WADL cannot terminate
+     * the enclosing comment block. Unicode escapes are neutralized as well since
      * the compiler translates them before lexing.
      */
-    static String escapeJavaDocContent(String s) {
-        if (s.indexOf("\\u") == -1 && s.indexOf("*/") == -1) {
+    public static String escapeJavaDocContent(String s) {
+        if (s == null || s.indexOf("\\u") == -1 && s.indexOf("*/") == -1) {
             return s;
         }
         return s.replace("\\u", "&#92;u").replace("*/", "*&#47;");
