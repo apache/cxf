@@ -400,8 +400,20 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     public void setResolver(URIResolver resolver) {
         uriResolver = resolver;
         if (factory != null) {
-            factory.setURIResolver(uriResolver);
+            factory.setURIResolver(getEffectiveResolver());
         }
+    }
+
+    /**
+     * The external access restrictions enabled by secure processing do not apply to sources returned
+     * by a custom URIResolver, so when secure processing is enabled the resolver is only consulted for
+     * local resources. Other references are left to the TransformerFactory, which rejects them.
+     */
+    private URIResolver getEffectiveResolver() {
+        if (uriResolver == null || !secureProcessing) {
+            return uriResolver;
+        }
+        return new LocalURIResolver(uriResolver);
     }
 
     public void setSystemId(String system) {
@@ -451,7 +463,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
-        TemplatesImpl templ = new TemplatesImpl(templates, uriResolver);
+        TemplatesImpl templ = new TemplatesImpl(templates, getEffectiveResolver());
         MessageContext mc = getContext();
         if (mc != null) {
             UriInfo ui = mc.getUriInfo();
@@ -525,7 +537,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 factory = (SAXTransformerFactory)TransformerFactory.newInstance();
                 factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, secureProcessing);
                 if (uriResolver != null) {
-                    factory.setURIResolver(uriResolver);
+                    factory.setURIResolver(getEffectiveResolver());
                 }
             }
             return factory.newTemplates(source);
@@ -542,6 +554,23 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
 
     public void setSecureProcessing(boolean secureProcessing) {
         this.secureProcessing = secureProcessing;
+    }
+
+    private static final class LocalURIResolver implements URIResolver {
+        private final URIResolver delegate;
+
+        LocalURIResolver(URIResolver delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            if (org.apache.cxf.resource.URIResolver.isLocalReference(href, base)) {
+                return delegate.resolve(href, base);
+            }
+            LOG.warning("Resolving " + href + " is not allowed with secure processing enabled");
+            return null;
+        }
     }
 
     private static class TemplatesImpl implements Templates {

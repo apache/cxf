@@ -25,6 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import org.apache.cxf.helpers.IOUtils;
 
@@ -312,5 +313,48 @@ public class URIResolverTest {
             }
             return super.findResource(name);
         }
+    }
+
+    @Test
+    public void testGetLocalSchemes() {
+        String property = "org.apache.cxf.resource.uriresolver.allowedSchemes";
+        String oldValue = System.getProperty(property);
+        System.setProperty(property, "jndi,ftp");
+        try {
+            Set<String> local = URIResolver.getLocalSchemes();
+            assertTrue(local.contains("file"));
+            assertTrue(local.contains("jar"));
+            assertTrue(local.contains("bundle"));
+            assertTrue("Configured local scheme should be included", local.contains("jndi"));
+            assertFalse(local.contains("http"));
+            assertFalse(local.contains("https"));
+            assertFalse("Configured network scheme should be excluded", local.contains("ftp"));
+        } finally {
+            if (oldValue == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, oldValue);
+            }
+        }
+    }
+
+    @Test
+    public void testIsLocalReference() {
+        assertTrue(URIResolver.isLocalReference("file:/tmp/a.xsl", null));
+        assertTrue(URIResolver.isLocalReference("jar:file:/tmp/a.jar!/a.xsl", null));
+        assertTrue("Relative reference against a local base",
+            URIResolver.isLocalReference("b.xsl", "file:/tmp/a.xsl"));
+        assertTrue("Relative reference without a base", URIResolver.isLocalReference("b.xsl", null));
+
+        assertFalse(URIResolver.isLocalReference("http://localhost/a.xsl", null));
+        assertFalse(URIResolver.isLocalReference("HTTPS://localhost/a.xsl", null));
+        assertFalse("Relative reference against a remote base",
+            URIResolver.isLocalReference("b.xsl", "http://localhost/a.xsl"));
+        assertFalse("Archive at a remote location",
+            URIResolver.isLocalReference("jar:http://localhost/a.jar!/a.xsl", null));
+        assertFalse("Nested archive at a remote location",
+            URIResolver.isLocalReference("jar:jar:http://localhost/a.jar!/b.jar!/a.xsl", null));
+        assertFalse("Invalid URI", URIResolver.isLocalReference("file:/tmp/a b.xsl", null));
+        assertFalse(URIResolver.isLocalReference(null, null));
     }
 }

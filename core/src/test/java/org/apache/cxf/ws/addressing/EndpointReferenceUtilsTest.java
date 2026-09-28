@@ -20,10 +20,12 @@
 package org.apache.cxf.ws.addressing;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.validation.Schema;
@@ -36,13 +38,20 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class EndpointReferenceUtilsTest {
+    private static final String NAMESPACE = "urn:test:endpoint:reference:utils";
+    private static final String MEMORY_SYSTEM_ID = "memory:/schema.xsd";
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
     public void testGetSchemaCanOpenSourceUriAllowedByDefaultSchemes() throws Exception {
@@ -75,8 +84,62 @@ public class EndpointReferenceUtilsTest {
         }
     }
 
+    @Test
+    public void testGetSchemaDoesNotResolveDtdFromSourceUri() throws Exception {
+        try (LocalHttpProbeServer probeServer = new LocalHttpProbeServer()) {
+            File xsd = writeSchemaWithExternalDtd("source.xsd", NAMESPACE, probeServer.getPort());
+            ServiceInfo serviceInfo = createServiceInfo(xsd.toURI().toString());
+
+            Schema schema = EndpointReferenceUtils.getSchema(serviceInfo, null);
+
+            probeServer.awaitCompletion();
+            assertFalse("External DTD of the sourceURI document should not be loaded", probeServer.wasConnected());
+            assertNotNull(schema);
+        }
+    }
+
+    @Test
+    public void testGetSchemaDoesNotResolveDtdFromImportedSchema() throws Exception {
+        try (LocalHttpProbeServer probeServer = new LocalHttpProbeServer()) {
+            String importedNamespace = "urn:test:endpoint:reference:utils:imported";
+            File importedXsd = writeSchemaWithExternalDtd("imported.xsd", importedNamespace, probeServer.getPort());
+
+            String schemaText =
+                "<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
+                + "targetNamespace='" + NAMESPACE + "' elementFormDefault='qualified'>"
+                + "<xsd:import namespace='" + importedNamespace + "' "
+                + "schemaLocation='" + importedXsd.toURI().toString() + "'/>"
+                + "<xsd:element name='value' type='xsd:string'/>"
+                + "</xsd:schema>";
+            Document doc = StaxUtils.read(new ByteArrayInputStream(schemaText.getBytes(StandardCharsets.UTF_8)));
+
+            // Only the SchemaInfo element carries the import, so it is resolved by getSchema itself
+            ServiceInfo serviceInfo = createServiceInfo(MEMORY_SYSTEM_ID);
+            serviceInfo.getSchemas().iterator().next().setElement(doc.getDocumentElement());
+
+            Schema schema = EndpointReferenceUtils.getSchema(serviceInfo, null);
+
+            probeServer.awaitCompletion();
+            assertFalse("External DTD of an imported schema should not be loaded", probeServer.wasConnected());
+            assertNotNull(schema);
+        }
+    }
+
+    private File writeSchemaWithExternalDtd(String name, String namespace, int port) throws Exception {
+        String schemaText =
+            "<?xml version='1.0'?>"
+            + "<!DOCTYPE xsd:schema SYSTEM 'http://127.0.0.1:" + port + "/evil.dtd'>"
+            + "<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
+            + "targetNamespace='" + namespace + "' elementFormDefault='qualified'>"
+            + "<xsd:element name='other' type='xsd:string'/>"
+            + "</xsd:schema>";
+        File file = tempFolder.newFile(name);
+        Files.write(file.toPath(), schemaText.getBytes(StandardCharsets.UTF_8));
+        return file;
+    }
+
     private ServiceInfo createServiceInfo(String sourceUri) throws Exception {
-        String namespace = "urn:test:endpoint:reference:utils";
+        String namespace = NAMESPACE;
         String schemaText =
             "<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
             + "targetNamespace='" + namespace + "' elementFormDefault='qualified'>"
@@ -90,7 +153,7 @@ public class EndpointReferenceUtilsTest {
 
         SchemaInfo schemaInfo = new SchemaInfo(namespace);
         schemaInfo.setSchema(xmlSchema);
-        schemaInfo.setSystemId("memory:/schema.xsd");
+        schemaInfo.setSystemId(MEMORY_SYSTEM_ID);
         serviceInfo.addSchema(schemaInfo);
 
         return serviceInfo;

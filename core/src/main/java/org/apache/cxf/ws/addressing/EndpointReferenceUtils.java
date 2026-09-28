@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.addressing;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
@@ -43,6 +44,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
@@ -50,6 +52,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.LSInput;
@@ -67,7 +70,6 @@ import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.endpoint.EndpointResolverRegistry;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.resource.ResourceManager;
@@ -110,6 +112,11 @@ public final class EndpointReferenceUtils {
 
         public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                        String systemId, String baseURI) {
+            if (!XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(type)) {
+                // Leave DTDs and external entities to the SchemaFactory, so that the
+                // ACCESS_EXTERNAL_DTD restriction configured on it is enforced
+                return null;
+            }
 
             String newId = systemId;
             if (baseURI != null && systemId != null) {  //add additional systemId null check
@@ -211,11 +218,23 @@ public final class EndpointReferenceUtils {
                     InputSource source = AccessController.doPrivileged(
                         (PrivilegedAction<InputSource>) () -> resolver.resolve(sid, buri));
                     if (source != null) {
-                        impl = new LSInputImpl();
-                        impl.setByteStream(source.getByteStream());
-                        impl.setSystemId(source.getSystemId());
-                        impl.setPublicId(source.getPublicId());
-                        return impl;
+                        // The external access restrictions set on the SchemaFactory do not apply to
+                        // inputs returned from this resolver, so re-parse the resolved document with
+                        // the secure StAX parser to strip any DTD before it reaches the SchemaFactory.
+                        byte[] bytes = null;
+                        try (InputStream ins = source.getByteStream()) {
+                            if (ins != null) {
+                                bytes = toSecureBytes(ins, source.getSystemId());
+                            }
+                        } catch (Exception e) {
+                            LOG.log(Level.WARNING, "Could not parse Schema for " + systemId, e);
+                            return null;
+                        }
+                        if (bytes != null) {
+                            impl = createInput(source.getSystemId(), bytes);
+                            impl.setPublicId(source.getPublicId());
+                            return impl;
+                        }
                     }
                 }
                 LOG.warning("Could not resolve Schema for " + systemId);
@@ -555,7 +574,9 @@ public final class EndpointReferenceUtils {
                             if (resolver.getInputStream() == null) {
                                 sch.write(out);
                             } else {
-                                IOUtils.copyAndCloseInput(resolver.getInputStream(), out);
+                                // Re-parse securely rather than copying the raw bytes, so that any
+                                // DTD in the fetched document never reaches the SchemaFactory
+                                out.write(toSecureBytes(resolver.getInputStream(), sch.getSourceURI()));
                             }
                         } catch (Exception e) {
                             //ignore, we'll just use what we have.  (though
@@ -591,6 +612,25 @@ public final class EndpointReferenceUtils {
             serviceInfo.setProperty(Schema.class.getName(), schema);
         }
         return schema;
+    }
+
+    /**
+     * Parse the document with the secure StAX parser (DTDs and external entities disabled) and
+     * re-serialize the document element, dropping any DOCTYPE declaration.
+     */
+    private static byte[] toSecureBytes(InputStream ins, String systemId) throws XMLStreamException {
+        InputSource inputSource = new InputSource(ins);
+        inputSource.setSystemId(systemId);
+        Document doc = StaxUtils.read(inputSource);
+        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        try {
+            StaxUtils.copy(doc.getDocumentElement(), writer);
+            writer.flush();
+        } finally {
+            StaxUtils.close(writer);
+        }
+        return out.toByteArray();
     }
 
     public static Schema getSchema(ServiceInfo serviceInfo) {
