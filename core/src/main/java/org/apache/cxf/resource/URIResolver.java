@@ -69,6 +69,12 @@ public class URIResolver implements AutoCloseable {
         Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
                     "resource")));
+    private static final Set<String> NETWORK_URL_SCHEMES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("http", "https", "ftp")));
+    private static final Set<String> ARCHIVE_URL_SCHEMES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jar", "wsjar", "zip")));
+    private static final Set<String> ADDITIONAL_LOCAL_URL_SCHEMES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("bundle", "bundleresource")));
 
     private Map<String, LoadingByteArrayOutputStream> cache = new HashMap<>();
     private File file;
@@ -463,6 +469,55 @@ public class URIResolver implements AutoCloseable {
             throw new IOException("URL scheme '" + scheme + "' is not permitted for URIResolver. "
                                   + "Allowed schemes: " + getAllowedSchemes());
         }
+    }
+
+    /**
+     * Returns the URL schemes that refer to local resources: the allowed schemes (including any configured
+     * with the "org.apache.cxf.resource.uriresolver.allowedSchemes" system property) plus the OSGi bundle
+     * schemes, minus the network schemes (http, https, ftp).
+     */
+    public static Set<String> getLocalSchemes() {
+        Set<String> local = getAllowedSchemes();
+        local.addAll(ADDITIONAL_LOCAL_URL_SCHEMES);
+        local.removeAll(NETWORK_URL_SCHEMES);
+        return local;
+    }
+
+    /**
+     * Returns whether a reference refers to a local resource, i.e. whether its scheme is one of
+     * {@link #getLocalSchemes()}. A relative reference is checked against the scheme of the base URI, or is
+     * treated as local if there is no base URI. An archive URL such as jar:http://host/a.jar!/a.xsl is checked
+     * against the scheme of the archive location. A reference that is not a valid URI is not local.
+     */
+    public static boolean isLocalReference(String href, String base) {
+        if (href == null) {
+            return false;
+        }
+        try {
+            URI uri = new URI(href);
+            if (uri.getScheme() == null) {
+                if (base == null) {
+                    return true;
+                }
+                uri = new URI(base);
+            }
+            String scheme = getInnermostScheme(uri);
+            return scheme == null || getLocalSchemes().contains(scheme);
+        } catch (URISyntaxException ex) {
+            return false;
+        }
+    }
+
+    private static String getInnermostScheme(URI uri) throws URISyntaxException {
+        String scheme = uri.getScheme();
+        if (scheme == null) {
+            return null;
+        }
+        scheme = scheme.toLowerCase(Locale.ROOT);
+        if (ARCHIVE_URL_SCHEMES.contains(scheme)) {
+            return getInnermostScheme(new URI(uri.getRawSchemeSpecificPart()));
+        }
+        return scheme;
     }
 
     public static Set<String> getAllowedSchemes() {
