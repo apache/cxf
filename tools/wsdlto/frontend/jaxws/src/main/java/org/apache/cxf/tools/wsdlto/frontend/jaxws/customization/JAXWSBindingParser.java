@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.lang.model.SourceVersion;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.xml.XMLConstants;
@@ -119,7 +120,7 @@ public class JAXWSBindingParser {
                         }
                     }
 
-                    String name = childElement.getAttribute("name");
+                    String name = checkIdentifier(childElement.getAttribute("name"));
                     String elementNameString = childElement.getAttribute("childElementName");
                     QName elementName = null;
                     if (!StringUtils.isEmpty(elementNameString)) {
@@ -136,7 +137,7 @@ public class JAXWSBindingParser {
                     jaxwsBinding.addJaxwsPara(jpara);
                 } else if (isJAXWSClass(child)) {
                     Element childElement = (Element)child;
-                    String clzName = childElement.getAttribute("name");
+                    String clzName = checkQualifiedName(childElement.getAttribute("name"));
                     String javadoc = "";
                     Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
@@ -160,7 +161,26 @@ public class JAXWSBindingParser {
 
     private String getMethodName(Node node) {
         Element ele = (Element)node;
-        return ele.getAttribute("name");
+        return checkIdentifier(ele.getAttribute("name"));
+    }
+
+    /**
+     * Customized names end up verbatim in the generated source, so they
+     * must be valid Java identifiers.
+     */
+    private static String checkIdentifier(String name) {
+        if (!StringUtils.isEmpty(name)
+            && (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name))) {
+            throw new ToolException(new Message("INVALID_JAVA_NAME", LOG, name));
+        }
+        return name;
+    }
+
+    private static String checkQualifiedName(String name) {
+        if (!StringUtils.isEmpty(name) && !SourceVersion.isName(name)) {
+            throw new ToolException(new Message("INVALID_JAVA_NAME", LOG, name));
+        }
+        return name;
     }
 
 
@@ -188,7 +208,7 @@ public class JAXWSBindingParser {
 
     private String getPackageName(Node node) {
         Element ele = (Element)node;
-        return ele.getAttribute("name");
+        return checkQualifiedName(ele.getAttribute("name"));
     }
 
     private Boolean isAsyncElement(Node node) {
