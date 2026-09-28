@@ -25,6 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import org.apache.cxf.helpers.IOUtils;
 
@@ -311,6 +312,29 @@ public class URIResolverTest {
                 throw new AssertionError("Suspicious resource name: " + name);
             }
             return super.findResource(name);
+        }
+    }
+
+    @Test
+    public void testGetLocalSchemes() {
+        String property = "org.apache.cxf.resource.uriresolver.allowedSchemes";
+        String oldValue = System.getProperty(property);
+        System.setProperty(property, "jndi,ftp");
+        try {
+            Set<String> local = URIResolver.getLocalSchemes();
+            assertTrue(local.contains("file"));
+            assertTrue(local.contains("jar"));
+            assertTrue(local.contains("bundle"));
+            assertTrue("Configured local scheme should be included", local.contains("jndi"));
+            assertFalse(local.contains("http"));
+            assertFalse(local.contains("https"));
+            assertFalse("Configured network scheme should be excluded", local.contains("ftp"));
+        } finally {
+            if (oldValue == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, oldValue);
+            }
         }
     }
 }

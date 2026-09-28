@@ -69,6 +69,10 @@ public class URIResolver implements AutoCloseable {
         Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
                     "resource")));
+    private static final Set<String> NETWORK_URL_SCHEMES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("http", "https", "ftp")));
+    private static final Set<String> ADDITIONAL_LOCAL_URL_SCHEMES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("bundle", "bundleresource")));
 
     private Map<String, LoadingByteArrayOutputStream> cache = new HashMap<>();
     private File file;
@@ -463,6 +467,18 @@ public class URIResolver implements AutoCloseable {
             throw new IOException("URL scheme '" + scheme + "' is not permitted for URIResolver. "
                                   + "Allowed schemes: " + getAllowedSchemes());
         }
+    }
+
+    /**
+     * Returns the URL schemes that refer to local resources: the allowed schemes (including any configured
+     * with the "org.apache.cxf.resource.uriresolver.allowedSchemes" system property) plus the OSGi bundle
+     * schemes, minus the network schemes (http, https, ftp).
+     */
+    public static Set<String> getLocalSchemes() {
+        Set<String> local = getAllowedSchemes();
+        local.addAll(ADDITIONAL_LOCAL_URL_SCHEMES);
+        local.removeAll(NETWORK_URL_SCHEMES);
+        return local;
     }
 
     public static Set<String> getAllowedSchemes() {
