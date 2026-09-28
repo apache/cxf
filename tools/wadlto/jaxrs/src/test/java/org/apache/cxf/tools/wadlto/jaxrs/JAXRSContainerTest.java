@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
@@ -195,6 +196,32 @@ public class JAXRSContainerTest extends ProcessorTestBase {
                     assertArrayEquals(entry.getValue(), m.getExceptionTypes());
                 }
             }
+        }
+    }
+
+    @Test
+    public void testJavaDocsAreEscaped() throws Exception {
+        JAXRSContainer container = new JAXRSContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/javaDocEscape.xml"));
+        context.put(WadlToolConstants.CFG_COMPILE, Boolean.TRUE);
+        context.put(WadlToolConstants.CFG_CREATE_JAVA_DOCS, Boolean.TRUE);
+        container.setContext(context);
+        container.execute();
+
+        List<File> javaFiles = FileUtils.getFilesRecurseUsingSuffix(output, ".java");
+        assertEquals(1, javaFiles.size());
+        String source = new String(Files.readAllBytes(javaFiles.get(0).toPath()), StandardCharsets.UTF_8);
+        assertTrue(source.contains("Resource *&#47; int CLASS_DOC"));
+        assertFalse(source.contains("\\u002f"));
+
+        ClassCollector cc = context.get(ClassCollector.class);
+        assertEquals(1, cc.getServiceClassNames().size());
+        try (URLClassLoader loader = new URLClassLoader(new URL[]{output.toURI().toURL()})) {
+            final Class<?> generatedClass = loader.loadClass(cc.getServiceClassNames().values().iterator().next());
+            assertEquals(0, generatedClass.getDeclaredFields().length);
         }
     }
 
