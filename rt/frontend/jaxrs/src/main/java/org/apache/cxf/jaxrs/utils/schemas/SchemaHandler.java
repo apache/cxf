@@ -29,7 +29,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -38,17 +41,24 @@ import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class SchemaHandler {
 
     static final String DEFAULT_CATALOG_LOCATION = "classpath:META-INF/jax-rs-catalog.xml";
+
+    private static final Logger LOG = LogUtils.getLogger(SchemaHandler.class);
 
     private Schema schema;
     private Bus bus;
@@ -83,6 +93,7 @@ public class SchemaHandler {
     public static Schema createSchema(List<String> locations, String catalogLocation, final Bus bus) {
 
         SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
+        setSecureProperties(factory);
         try {
             List<Source> sources = new ArrayList<>();
             for (String loc : locations) {
@@ -151,6 +162,29 @@ public class SchemaHandler {
             return factory.newSchema(sources.toArray(new Source[0]));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Failed to load XML schema : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Disallow external DTDs and restrict schema imports/includes to local resources. Remote
+     * schemas can still be used by mapping them to local copies with an OASIS catalog.
+     */
+    private static void setSecureProperties(SchemaFactory factory) {
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOG.log(Level.WARNING, "The feature '" + XMLConstants.FEATURE_SECURE_PROCESSING
+                + "' is not supported.");
+        }
+        try {
+            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_DTD + "' is not supported.");
+        }
+        try {
+            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, String.join(",", URIResolver.getLocalSchemes()));
+        } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA + "' is not supported.");
         }
     }
 
