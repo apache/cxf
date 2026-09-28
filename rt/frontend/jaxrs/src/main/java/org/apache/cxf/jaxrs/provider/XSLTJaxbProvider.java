@@ -25,18 +25,12 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -563,8 +557,6 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
 
     private static final class LocalURIResolver implements URIResolver {
-        private static final Set<String> ARCHIVE_SCHEMES = new HashSet<>(Arrays.asList("jar", "wsjar", "zip"));
-
         private final URIResolver delegate;
 
         LocalURIResolver(URIResolver delegate) {
@@ -573,42 +565,11 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String scheme = getScheme(href, base);
-            if (scheme == null || org.apache.cxf.resource.URIResolver.getLocalSchemes().contains(scheme)) {
+            if (org.apache.cxf.resource.URIResolver.isLocalReference(href, base)) {
                 return delegate.resolve(href, base);
             }
             LOG.warning("Resolving " + href + " is not allowed with secure processing enabled");
             return null;
-        }
-
-        private static String getScheme(String href, String base) {
-            try {
-                URI uri = new URI(href);
-                if (uri.getScheme() == null) {
-                    // A relative reference is resolved against the base URI
-                    if (base == null) {
-                        return null;
-                    }
-                    uri = new URI(base);
-                }
-                return getInnermostScheme(uri);
-            } catch (URISyntaxException ex) {
-                // Not a URI, leave it to the TransformerFactory
-                return "";
-            }
-        }
-
-        private static String getInnermostScheme(URI uri) throws URISyntaxException {
-            String scheme = uri.getScheme();
-            if (scheme == null) {
-                return null;
-            }
-            scheme = scheme.toLowerCase(Locale.ROOT);
-            if (ARCHIVE_SCHEMES.contains(scheme)) {
-                // An archive URL such as jar:http://host/a.jar!/a.xsl is only as local as the archive
-                return getInnermostScheme(new URI(uri.getRawSchemeSpecificPart()));
-            }
-            return scheme;
         }
     }
 
