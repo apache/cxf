@@ -22,6 +22,7 @@ package org.apache.cxf.tools.common.model;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class JavaInterfaceTest {
     @Test
@@ -31,5 +32,22 @@ public class JavaInterfaceTest {
         intf.setFullClassName(fullName);
         assertEquals("org.apache.cxf.tools.common.model", intf.getPackageName());
         assertEquals("JavaInterface", intf.getName());
+    }
+
+    @Test
+    public void testFormatJavaDocCannotCloseComment() throws Exception {
+        String doc = "Some docs */ int PWNED = 1; /*\n  more \\u002a/ text";
+        String formatted = JavaInterface.formatJavaDoc(doc, " ");
+        assertFalse(formatted.contains("*/"));
+        assertFalse(formatted.contains("\\u"));
+        assertEquals(" * Some docs *&#47; int PWNED = 1; /*\n *   more &#92;u002a/ text", formatted);
+    }
+
+    @Test
+    public void testFormatJavaDocUnchanged() throws Exception {
+        assertEquals("   * Some docs\n   * a/b * c",
+                     JavaInterface.formatJavaDoc("Some docs\na/b * c", "   "));
+        assertEquals(" * C:\\temp matches \\d+",
+                     JavaInterface.formatJavaDoc("C:\\temp matches \\d+", " "));
     }
 }
