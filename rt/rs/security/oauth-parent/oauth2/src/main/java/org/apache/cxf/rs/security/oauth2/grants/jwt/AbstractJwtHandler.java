@@ -69,6 +69,11 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
         if (claims.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
+
+        // We must have an Audience (RFC 7523, section 3)
+        if (claims.getAudiences().isEmpty()) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
     }
 
     protected void validateIssuer(String issuer) {
