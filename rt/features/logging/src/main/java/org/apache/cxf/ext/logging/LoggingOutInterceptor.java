@@ -223,7 +223,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             // If something goes wrong while closing the LoggingOutputStream, this can be recall and log twice (or more) when trying to delete the orphan tmp file.
             // Furthermore, the LoggingOutputStream that registered this callback holds a reference to this Object, so it remains in memory avoiding GC until the DelayedCachedOutputStreamCleaner does his job (default 30 minutes)
             // -------------
-            // Doing, instead, this we should be ok :)
+            // Doing this, instead, we should be ok :)
             cos.deregisterCallback(this);
         }
 
