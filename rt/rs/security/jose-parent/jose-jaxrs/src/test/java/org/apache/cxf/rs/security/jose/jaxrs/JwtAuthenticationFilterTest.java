@@ -18,19 +18,39 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
+import java.lang.reflect.Field;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
 public class JwtAuthenticationFilterTest {
+
+    private static final String AUDIENCE = "https://service.example.com";
+
+    @Before
+    public void setUp() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.REQUEST_URL, AUDIENCE);
+        setThreadLocalMessage(message);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        setThreadLocalMessage(null);
+    }
 
     @Test
     public void testNoIssuerAcceptedWithoutSupportedIssuers() {
@@ -71,22 +91,22 @@ public class JwtAuthenticationFilterTest {
 
     @Test
     public void testNoAudienceAcceptedByDefault() {
-        JwtAuthenticationFilter filter = createFilter();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.validateToken(new JwtToken(createClaims(null)));
     }
 
     @Test
     public void testAudienceAcceptedWithRequireAudience() {
-        JwtAuthenticationFilter filter = createFilter();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.setRequireAudience(true);
         JwtClaims claims = createClaims(null);
-        claims.setAudience("https://service.example.com");
+        claims.setAudience(AUDIENCE);
         filter.validateToken(new JwtToken(claims));
     }
 
     @Test
     public void testNoAudienceRejectedWithRequireAudience() {
-        JwtAuthenticationFilter filter = createFilter();
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.setRequireAudience(true);
         try {
             filter.validateToken(new JwtToken(createClaims(null)));
@@ -112,5 +132,17 @@ public class JwtAuthenticationFilterTest {
         claims.setIssuedAt(now.toEpochSecond());
         claims.setExpiryTime(now.plusMinutes(5L).toEpochSecond());
         return claims;
+    }
+
+    private static void setThreadLocalMessage(Message message) throws Exception {
+        Field f = PhaseInterceptorChain.class.getDeclaredField("CURRENT_MESSAGE");
+        f.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        ThreadLocal<Message> tl = (ThreadLocal<Message>) f.get(null);
+        if (message == null) {
+            tl.remove();
+        } else {
+            tl.set(message);
+        }
     }
 }

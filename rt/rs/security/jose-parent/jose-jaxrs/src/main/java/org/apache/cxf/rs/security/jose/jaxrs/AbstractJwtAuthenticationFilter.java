@@ -19,7 +19,6 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -95,16 +94,9 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
 
     @Override
     protected void validateToken(JwtToken jwt) {
-        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
-        validateAudiencePresent(jwt.getClaims().getAudiences());
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience(),
+                                     isRequireAudience());
         validateIssuer(jwt.getClaims().getIssuer());
-    }
-
-    protected void validateAudiencePresent(List<String> audiences) {
-        // If the audience is required, an "aud" claim must be present
-        if (requireAudience && audiences.isEmpty()) {
-            throw new JwtException("Invalid audience restriction");
-        }
     }
 
     protected void validateIssuer(String issuer) {
@@ -137,6 +129,7 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
     /**
      * Reject tokens which do not contain an "aud" claim. By default, a token without an "aud" claim
      * passes the audience restriction check unless JwtConstants.EXPECTED_CLAIM_AUDIENCE is configured.
+     * This only applies if "validateAudience" is enabled.
      */
     public void setRequireAudience(boolean requireAudience) {
         this.requireAudience = requireAudience;
