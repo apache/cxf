@@ -179,6 +179,39 @@ public class JwtAccessTokenValidatorTest {
         assertTrue(ex.getCause().getMessage().contains("Invalid audience restriction"));
     }
 
+    @Test
+    public void testMissingAudienceAcceptedByDefault() throws Exception {
+        JwtAccessTokenValidator validator = new JwtAccessTokenValidator();
+        validator.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+
+        String jwt = createSignedToken(SIGNING_KEY, "signed-client", 3600);
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+        setThreadLocalMessage(new MessageImpl());
+
+        AccessTokenValidation result = validator.validateAccessToken(
+            mock(MessageContext.class), "Bearer", jwt, params);
+
+        assertNotNull(result);
+        assertTrue(result.isInitialValidationSuccessful());
+    }
+
+    @Test
+    public void testMissingAudienceRejectedWhenRequired() throws Exception {
+        JwtAccessTokenValidator validator = new JwtAccessTokenValidator();
+        validator.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+        validator.setRequireAudience(true);
+
+        String jwt = createSignedToken(SIGNING_KEY, "signed-client", 3600);
+        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
+        setThreadLocalMessage(new MessageImpl());
+
+        OAuthServiceException ex = assertThrows(OAuthServiceException.class, () ->
+            validator.validateAccessToken(mock(MessageContext.class), "Bearer", jwt, params));
+
+        assertNotNull(ex.getCause());
+        assertTrue(ex.getCause().getMessage().contains("Invalid audience restriction"));
+    }
+
     private static String createSignedToken(String key, String clientId, long expiresInSeconds) {
         return createSignedToken(key, clientId, expiresInSeconds, 0, null, null, null);
     }

@@ -51,6 +51,7 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
 
     private Map<String, String> jwtAccessTokenClaimMap;
     private boolean validateAudience = true;
+    private boolean requireAudience;
 
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
@@ -78,7 +79,8 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
 
-        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience(),
+                                     isRequireAudience());
     }
 
     private void validateTokenType(JwtToken jwt) {
@@ -168,5 +170,18 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
 
     public void setValidateAudience(boolean validateAudience) {
         this.validateAudience = validateAudience;
+    }
+
+    public boolean isRequireAudience() {
+        return requireAudience;
+    }
+
+    /**
+     * Reject tokens which do not contain an "aud" claim. By default, a token without an "aud" claim
+     * passes the audience restriction check unless JwtConstants.EXPECTED_CLAIM_AUDIENCE is configured.
+     * This only applies if "validateAudience" is enabled.
+     */
+    public void setRequireAudience(boolean requireAudience) {
+        this.requireAudience = requireAudience;
     }
 }
