@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
@@ -48,6 +49,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.AuthenticationMethod;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
@@ -81,6 +83,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     private boolean allPermissionsMatch;
     private boolean blockPublicClients;
     private AuthenticationMethod am;
+    private final AtomicBoolean audienceWarningLogged = new AtomicBoolean();
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -101,6 +104,12 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         String authScheme = authParts[0];
         String authSchemeData = authParts[1];
+
+        // Make the configured audience available to JWT access token validators, unless an
+        // expected audience has already been configured
+        if (audience != null && m.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE) == null) {
+            m.put(JwtConstants.EXPECTED_CLAIM_AUDIENCE, audience);
+        }
 
         // Get the access token
         AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null);
@@ -265,11 +274,17 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     }
 
     protected String validateAudiences(List<String> audiences) {
+        if (audience == null && !audienceIsEndpointAddress
+            && audienceWarningLogged.compareAndSet(false, true)) {
+            LOG.warning("No audience is configured and audienceIsEndpointAddress is disabled, so access "
+                + "token audiences will not be validated. Configure the \"audience\" property to restrict "
+                + "this resource server to tokens issued for it.");
+        }
         if (StringUtils.isEmpty(audiences) && audience == null) {
             return null;
         }
         if (audience != null) {
-            if (audiences.contains(audience)) {
+            if (audiences != null && audiences.contains(audience)) {
                 return audience;
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
