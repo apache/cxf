@@ -126,7 +126,8 @@ public class OAuthRequestFilterTest {
         message.put(Message.REQUEST_URL, "/api/read/item");
         setThreadLocalMessage(message);
 
-        // Default is disabled, so endpoint-address audience matching is skipped.
+        // Enabled by default on 4.1.x, unlike main
+        filter.setAudienceIsEndpointAddress(false);
         assertNull(filter.validateAudiences(Collections.singletonList("/api/read")));
 
         filter.setAudienceIsEndpointAddress(true);
