@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
@@ -34,6 +35,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
+import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -46,6 +48,8 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
 
     private String roleClaim;
     private boolean validateAudience = true;
+    private boolean requireAudience;
+    private Set<String> supportedIssuers;
 
     protected AbstractJwtAuthenticationFilter() {
         setTtl(DEFAULT_TTL_SECS);
@@ -91,7 +95,16 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
 
     @Override
     protected void validateToken(JwtToken jwt) {
-        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience(),
+                                     isRequireAudience());
+        validateIssuer(jwt.getClaims().getIssuer());
+    }
+
+    protected void validateIssuer(String issuer) {
+        // If supported issuers are configured, a matching "iss" must be present
+        if (supportedIssuers != null && (issuer == null || !supportedIssuers.contains(issuer))) {
+            throw new JwtException("Invalid issuer");
+        }
     }
 
     public String getRoleClaim() {
@@ -108,6 +121,27 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
 
     public void setValidateAudience(boolean validateAudience) {
         this.validateAudience = validateAudience;
+    }
+
+    public boolean isRequireAudience() {
+        return requireAudience;
+    }
+
+    /**
+     * Reject tokens which do not contain an "aud" claim. By default, a token without an "aud" claim
+     * passes the audience restriction check unless JwtConstants.EXPECTED_CLAIM_AUDIENCE is configured.
+     * This only applies if "validateAudience" is enabled.
+     */
+    public void setRequireAudience(boolean requireAudience) {
+        this.requireAudience = requireAudience;
+    }
+
+    public Set<String> getSupportedIssuers() {
+        return supportedIssuers;
+    }
+
+    public void setSupportedIssuers(Set<String> supportedIssuers) {
+        this.supportedIssuers = supportedIssuers;
     }
 
 }

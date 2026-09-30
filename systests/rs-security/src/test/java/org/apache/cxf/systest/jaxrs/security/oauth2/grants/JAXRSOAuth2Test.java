@@ -553,6 +553,27 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testJWTNoAudience() throws Exception {
+        String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
+        WebClient wc = createWebClient(address);
+
+        // Create the JWT Token
+        String token = OAuth2TestUtils.createToken("resourceOwner", "alice", null, true, true);
+
+        Map<String, String> extraParams = new HashMap<>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
+
+        try {
+            OAuthClientUtils.getAccessToken(wc, new CustomGrant(), extraParams);
+            fail("Failure expected on no audience");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+
+    @Test
     public void testJWTBadAudienceRestriction() throws Exception {
         String address = "https://localhost:" + port + "/oauth2-auth-jwt/token";
         WebClient wc = createWebClient(address);

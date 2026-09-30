@@ -49,6 +49,7 @@ import static org.junit.Assert.fail;
 public class JwtBearerGrantHandlerTest {
 
     private static final String SIGNING_KEY = "jwt-grant-test-signing-key";
+    private static final String AUDIENCE = "https://localhost:8080/oauth2/token";
 
     @Before
     public void setUp() throws Exception {
@@ -65,9 +66,10 @@ public class JwtBearerGrantHandlerTest {
         JwtBearerGrantHandler handler = new JwtBearerGrantHandler();
         handler.setDataProvider(new SubjectAwareDataProvider());
         handler.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+        handler.setAudience(AUDIENCE);
 
         Client client = new Client("fuzz-client", "secret", true);
-        String assertion = createSignedAssertion("trusted-issuer", "victim-user");
+        String assertion = createSignedAssertion("trusted-issuer", "victim-user", AUDIENCE);
 
         MultivaluedMap<String, String> params = new MetadataMap<>();
         params.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, assertion);
@@ -85,9 +87,10 @@ public class JwtBearerGrantHandlerTest {
         JwtBearerGrantHandler handler = new JwtBearerGrantHandler();
         handler.setDataProvider(new SubjectAwareDataProvider());
         handler.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+        handler.setAudience(AUDIENCE);
 
         Client client = new Client("fuzz-client", "secret", true);
-        String assertion = createSignedAssertion("trusted-issuer", client.getClientId());
+        String assertion = createSignedAssertion("trusted-issuer", client.getClientId(), AUDIENCE);
 
         MultivaluedMap<String, String> params = new MetadataMap<>();
         params.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, assertion);
@@ -99,13 +102,36 @@ public class JwtBearerGrantHandlerTest {
         assertEquals(client.getClientId(), token.getSubject().getLogin());
     }
 
-    private static String createSignedAssertion(String issuer, String subject) {
+    @Test
+    public void testMissingAudienceRejected() {
+        JwtBearerGrantHandler handler = new JwtBearerGrantHandler();
+        handler.setDataProvider(new SubjectAwareDataProvider());
+        handler.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
+
+        Client client = new Client("fuzz-client", "secret", true);
+        String assertion = createSignedAssertion("trusted-issuer", client.getClientId(), null);
+
+        MultivaluedMap<String, String> params = new MetadataMap<>();
+        params.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, assertion);
+
+        try {
+            handler.createAccessToken(client, params);
+            fail("OAuthServiceException expected");
+        } catch (OAuthServiceException expected) {
+            assertEquals("invalid_grant", expected.getMessage());
+        }
+    }
+
+    private static String createSignedAssertion(String issuer, String subject, String audience) {
         long now = System.currentTimeMillis() / 1000;
         JwtClaims claims = new JwtClaims();
         claims.setIssuer(issuer);
         claims.setSubject(subject);
         claims.setIssuedAt(now);
         claims.setExpiryTime(now + 300);
+        if (audience != null) {
+            claims.setAudience(audience);
+        }
 
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(claims);
         return producer.signWith(new HmacJwsSignatureProvider(SIGNING_KEY, SignatureAlgorithm.HS256));
