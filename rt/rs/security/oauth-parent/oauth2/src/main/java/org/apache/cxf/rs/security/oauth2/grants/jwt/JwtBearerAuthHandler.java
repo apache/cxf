@@ -130,7 +130,8 @@ public class JwtBearerAuthHandler extends OAuthServerJoseJwtConsumer implements 
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
 
-        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
+        // We must have an Audience (RFC 7523, section 3)
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience(), true);
     }
 
     public void setClientProvider(ClientRegistrationProvider clientProvider) {

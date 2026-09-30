@@ -132,6 +132,11 @@ public final class JwtUtils {
     }
 
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
+        validateJwtAudienceRestriction(claims, message, false);
+    }
+
+    public static void validateJwtAudienceRestriction(JwtClaims claims, Message message,
+                                                      boolean audienceRequired) {
         // If the expected audience is configured, a matching "aud" must be present
         String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
         if (expectedAudience != null) {
@@ -141,8 +146,11 @@ public final class JwtUtils {
             throw new JwtException("Invalid audience restriction");
         }
 
-        // Otherwise if we have no aud claims then the token is valid
+        // Otherwise if we have no aud claims then the token is valid, unless an audience is required
         if (claims.getAudiences().isEmpty()) {
+            if (audienceRequired) {
+                throw new JwtException("Invalid audience restriction");
+            }
             return;
         }
 
@@ -157,6 +165,11 @@ public final class JwtUtils {
 
     public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset,
                                            boolean validateAudienceRestriction) {
+        validateTokenClaims(claims, timeToLive, clockOffset, validateAudienceRestriction, false);
+    }
+
+    public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset,
+                                           boolean validateAudienceRestriction, boolean audienceRequired) {
         // A positive TTL bounds the token age from its issued time.
         boolean expiredRequired = claims.getIssuedAt() == null || timeToLive <= 0;
         validateJwtExpiry(claims, clockOffset, expiredRequired);
@@ -168,7 +181,8 @@ public final class JwtUtils {
         validateJwtIssuedAt(claims, timeToLive, clockOffset, issuedAtRequired);
 
         if (validateAudienceRestriction) {
-            validateJwtAudienceRestriction(claims, PhaseInterceptorChain.getCurrentMessage());
+            validateJwtAudienceRestriction(claims, PhaseInterceptorChain.getCurrentMessage(),
+                                           audienceRequired);
         }
     }
 
