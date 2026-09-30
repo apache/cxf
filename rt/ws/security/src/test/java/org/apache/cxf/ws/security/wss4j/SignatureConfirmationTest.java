@@ -83,7 +83,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         // Save the signature for future confirmation
         //
-        Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
+        Set<String> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
         assertFalse(sigv.isEmpty());
 
@@ -116,7 +116,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
 
     private void testSignatureConfirmationResponse(
-        Set<Integer> sigSaved,
+        Set<String> sigSaved,
         List<WSHandlerResult> sigReceived
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
