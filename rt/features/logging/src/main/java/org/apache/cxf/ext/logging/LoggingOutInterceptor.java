@@ -71,7 +71,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         final OutputStream os = message.getContent(OutputStream.class);
         if (os != null) {
             // Wrap the callback to ensure logging only once and to avoid memory leaks (CXF-9251)
-            OneTimeLoggingCallback callback = new OneTimeLoggingCallback(new LoggingCallback(sender, message, os, limit));
+            OneTimeLoggingCallback callback = new OneTimeLoggingCallback(
+                    new LoggingCallback(sender, message, os, limit)
+            );
             message.setContent(OutputStream.class, createCachingOut(message, os, callback));
         } else {
             final Writer iowriter = message.getContent(Writer.class);
