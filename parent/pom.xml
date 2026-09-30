@@ -2123,7 +2123,7 @@
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>org.eclipse.persistence.moxy</artifactId>
-                    <version>5.0.1</version>
+                    <version>5.0.2</version>
                     <scope>provided</scope>
                     <optional>true</optional>
                 </dependency>
