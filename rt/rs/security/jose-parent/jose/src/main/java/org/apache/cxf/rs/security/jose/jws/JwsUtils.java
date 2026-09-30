@@ -402,6 +402,8 @@ public final class JwsUtils {
                                                               JwsHeaders inHeaders) {
         JwsSignatureVerifier theVerifier = null;
         String inHeaderKid = null;
+        boolean jwkStore =
+            JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE));
         if (inHeaders != null) {
             inHeaderKid = inHeaders.getKeyId();
             //TODO: optionally validate inHeaders.getAlgorithm against a property in props
@@ -413,6 +415,11 @@ public final class JwsUtils {
                 }
                 return getSignatureVerifier(publicJwk,
                                             inHeaders.getSignatureAlgorithm());
+            } else if (jwkStore) {
+                // The x5c, x5t and x5t#S256 headers are resolved against a Java KeyStore,
+                // which can not be loaded when the configured store type is "jwk".
+                // Fall through to loading the verification key from the JWK set below.
+                LOG.fine("Ignoring X.509 headers as the configured key store type is jwk");
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
                 KeyManagementUtils.validateCertificateChain(props, chain);
@@ -439,7 +446,7 @@ public final class JwsUtils {
             }
         }
 
-        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
+        if (jwkStore) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.VERIFY, inHeaderKid);
             if (jwk != null) {
                 SignatureAlgorithm signatureAlgo = getSignatureAlgorithm(m, props,

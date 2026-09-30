@@ -296,12 +296,21 @@ public final class JwkUtils {
     public static JsonWebKey loadJsonWebKey(Message m, Properties props, KeyOperation keyOper, String inHeaderKid) {
         PrivateKeyPasswordProvider cb = KeyManagementUtils.loadPasswordProvider(m, props, keyOper);
         JsonWebKeys jwkSet = loadJwkSet(m, props, cb);
-        final String kid;
-        if (inHeaderKid != null
-            && MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false)) {
-            kid = inHeaderKid;
-        } else {
-            kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
+        String kid = KeyManagementUtils.getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
+        // A configured alias pins the key, unless accepting public keys has been explicitly enabled,
+        // in which case the key id from the incoming headers selects the key as before.
+        // Otherwise the key id selects a key from the configured key set, which lets verification follow
+        // key rotation (e.g. of a JWKS published by an identity provider), but only a key explicitly
+        // marked for the requested operation, so that a key set containing other keys can't widen trust.
+        if (inHeaderKid != null) {
+            boolean acceptPublicKey =
+                MessageUtils.getContextualBoolean(m, JoseConstants.RSSEC_ACCEPT_PUBLIC_KEY, false);
+            if (acceptPublicKey || kid == null) {
+                JsonWebKey jwk = jwkSet.getKey(inHeaderKid);
+                if (jwk != null && (acceptPublicKey || isKeyMarkedFor(jwk, keyOper))) {
+                    return jwk;
+                }
+            }
         }
         if (kid != null) {
             return jwkSet.getKey(kid);
@@ -312,6 +321,22 @@ public final class JwkUtils {
             }
         }
         return null;
+    }
+
+    private static boolean isKeyMarkedFor(JsonWebKey jwk, KeyOperation keyOper) {
+        if (keyOper == null) {
+            return false;
+        }
+        List<KeyOperation> ops = jwk.getKeyOperation();
+        if (ops != null) {
+            return ops.contains(keyOper);
+        }
+        PublicKeyUse use = jwk.getPublicKeyUse();
+        if (use == null) {
+            return false;
+        }
+        boolean sigOper = keyOper == KeyOperation.SIGN || keyOper == KeyOperation.VERIFY;
+        return sigOper == (use == PublicKeyUse.SIGN);
     }
 
     public static List<JsonWebKey> loadJsonWebKeys(Message m,
