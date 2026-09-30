@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -177,7 +178,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
     protected Set<WSEncryptionPart> encryptedTokensList = new HashSet<>();
 
-    protected Set<Integer> signatures = new HashSet<>();
+    protected Set<String> signatures = new HashSet<>();
 
     protected Element bottomUpElement;
     protected Element topDownElement;
@@ -2396,7 +2397,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
     protected void addSig(byte[] val) {
         if (val != null && val.length > 0) {
-            signatures.add(Arrays.hashCode(val));
+            // Store the whole value (as WSS4J's WSHandler does) rather than a collidable 32-bit hash
+            signatures.add(Base64.getEncoder().encodeToString(val));
         }
     }
 
