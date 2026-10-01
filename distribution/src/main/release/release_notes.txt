@@ -1,4 +1,4 @@
-Apache CXF 3.6.12 Release Notes
+Apache CXF 3.6.13 Release Notes
 
 1. Overview
 
@@ -24,7 +24,7 @@ http://cxf.apache.org/docs/36-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.6.12 fixes over 4 issues/tasks reported by users.
+3.6.13 fixes over 4 issues/tasks reported by users.
 
 
 2. Installation Prerequisites 
@@ -68,8 +68,13 @@ for caveats when upgrading.
 
 
 ** Bug
-    * [CXF-9221] - JCache providers use inverted isExpired() logic causing expired tokens/codes to never be evicted
-    * [CXF-9223] - completeAudienceMatch=false defaults to prefix matching for audience validation, widening resource access
-    * [CXF-9225] - OIDC RP does not enforce nonce validation for Implicit/Hybrid flows
-    * [CXF-9227] - CXF 4.1.7 regression: more SecurityManager permission requirements
+    * [CXF-9240] - OAuthJSONProvider.appendJsonPair() does not escape JSON string values — output injection / malformed JSON in introspect & token responses
+    * [CXF-9245] - Race Condition in ServerLifeCycleManagerImpl#stopServer()
+    * [CXF-9250] - HttpClientHTTPConduit: failed exchange without request body is re-sent endlessly from the exceptionally callback (e.g. remote WSDL fetch)
+
+
+
+
+** Improvement
+    * [CXF-9233] - AbstractLoggingInterceptor.LIVE_LOGGING_PROP already set in the message properties, so RESP_OUT log is disable :(  
 
