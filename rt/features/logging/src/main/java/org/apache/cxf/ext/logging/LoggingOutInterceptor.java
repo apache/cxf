@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -200,6 +201,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
      */
     public class OneTimeLoggingCallback implements CachedOutputStreamCallback {
         private LoggingCallback wrappedCallback;
+        private final AtomicBoolean alreadyClosed = new AtomicBoolean(false);
 
         public OneTimeLoggingCallback(LoggingCallback wrappedCallback) {
             this.wrappedCallback = wrappedCallback;
@@ -208,7 +210,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         @Override
         public void onClose(CachedOutputStream cos) {
             // Ensure to log only once
-            if (wrappedCallback != null) {
+            if (alreadyClosed.compareAndSet(false, true) && wrappedCallback != null) {
                 try {
                     wrappedCallback.onClose(cos);
                 } finally {
@@ -222,7 +224,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
         @Override
         public void onFlush(CachedOutputStream cos) {
-            if (wrappedCallback != null) {
+            if (!alreadyClosed.get() && wrappedCallback != null) {
                 wrappedCallback.onFlush(cos);
             }
         }
