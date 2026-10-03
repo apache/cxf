@@ -68,6 +68,9 @@ public class TruncatedTest {
         assertNotNull(event);
         assertEquals("T", event.getPayload()); // only the first byte is read!
         assertTrue(event.isTruncated());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) out).getCallbacks().size());
     }
 
     @Test

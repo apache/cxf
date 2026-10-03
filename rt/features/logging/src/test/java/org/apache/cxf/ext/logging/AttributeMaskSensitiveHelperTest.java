@@ -181,6 +181,9 @@ public class AttributeMaskSensitiveHelperTest {
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals(maskedContent, event.getPayload());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) out).getCallbacks().size());
     }
 
     @Test
@@ -203,6 +206,9 @@ public class AttributeMaskSensitiveHelperTest {
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals(maskedContent, event.getPayload());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) out).getCallbacks().size());
     }
 
     @Test
@@ -222,6 +228,9 @@ public class AttributeMaskSensitiveHelperTest {
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals(loggingContent, event.getPayload());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) out).getCallbacks().size());
     }
 
     private Message prepareInMessage() {

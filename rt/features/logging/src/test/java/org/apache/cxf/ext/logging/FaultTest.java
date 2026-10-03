@@ -65,5 +65,8 @@ public class FaultTest {
         
         assertEquals(1, logEventSender.getLogEvents().size());
         assertEquals("TestMessage", logEventSender.getLogEvents().get(0).getPayload());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) postFaultOut).getCallbacks().size());
     }
 }
