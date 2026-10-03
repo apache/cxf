@@ -19,8 +19,9 @@
 
 package org.apache.cxf.version;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public final class Version {
 

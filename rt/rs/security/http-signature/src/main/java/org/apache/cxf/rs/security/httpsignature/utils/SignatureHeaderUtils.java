@@ -18,14 +18,19 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
-import java.net.*;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
