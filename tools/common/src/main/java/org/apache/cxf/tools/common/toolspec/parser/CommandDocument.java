@@ -19,11 +19,14 @@
 
 package org.apache.cxf.tools.common.toolspec.parser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;

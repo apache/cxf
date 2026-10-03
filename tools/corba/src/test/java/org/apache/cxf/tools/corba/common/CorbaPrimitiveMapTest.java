@@ -19,7 +19,8 @@
 
 package org.apache.cxf.tools.corba.common;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 

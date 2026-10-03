@@ -19,7 +19,8 @@
 
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
