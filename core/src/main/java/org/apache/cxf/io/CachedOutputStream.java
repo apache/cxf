@@ -164,6 +164,13 @@ public class CachedOutputStream extends OutputStream {
         return callbacks == null ? null : Collections.unmodifiableList(callbacks);
     }
 
+    private List<CachedOutputStreamCallback> getCallbacksSnapshot() {
+        if (callbacks == null || callbacks.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(callbacks);
+    }
+
     /**
      * Perform any actions required on stream flush (freeze headers, reset
      * output stream ... etc.)
@@ -208,7 +215,8 @@ public class CachedOutputStream extends OutputStream {
         currentStream.flush();
         outputLocked = true;
         if (null != callbacks) {
-            for (CachedOutputStreamCallback cb : callbacks) {
+            // Using a snapshot so the cb may unregister itself from the cos
+            for (CachedOutputStreamCallback cb : getCallbacksSnapshot()) {
                 cb.onClose(this);
             }
         }
@@ -221,7 +229,8 @@ public class CachedOutputStream extends OutputStream {
         currentStream.flush();
         outputLocked = true;
         if (null != callbacks) {
-            for (CachedOutputStreamCallback cb : callbacks) {
+            // Using a snapshot so the cb may unregister itself from the cos
+            for (CachedOutputStreamCallback cb : getCallbacksSnapshot()) {
                 try {
                     cb.onClose(this);
                 } catch (final RuntimeException ex) {
