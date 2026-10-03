@@ -193,11 +193,28 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             this.lim = limit == -1 ? Integer.MAX_VALUE : limit;
         }
 
+        private void deregisterFrom(CachedOutputStream cos){
+            // -------------
+            // CXF-9251
+            // If cos has a tmp file (so 'threshold' was triggered), after the introduction of DelayedCachedOutputStreamCleaner, a reference of LoggingOutputStream
+            // is held in a queue list ( DelayQueue<DelayedCloseable> queue )
+            // If something goes wrong while closing the LoggingOutputStream, this can be recall and log twice (or more) when trying to delete the orphan tmp file.
+            // Furthermore, the LoggingOutputStream that registered this callback holds a reference to this Object, so it remains in memory avoiding GC until the DelayedCachedOutputStreamCleaner does his job (default 30 minutes)
+            // -------------
+            // Doing, instead, this we should be ok :)
+            cos.deregisterCallback(this);
+        }
+
         public void onFlush(CachedOutputStream cos) {
 
         }
 
         public void onClose(CachedOutputStream cos) {
+
+            // The callback has been called, so we release it.
+            // Avoid logging twice in certain scenarios.
+            deregisterFrom(cos);
+
             final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
             if (shouldLogContent(event)) {
                 copyPayload(cos, event);
