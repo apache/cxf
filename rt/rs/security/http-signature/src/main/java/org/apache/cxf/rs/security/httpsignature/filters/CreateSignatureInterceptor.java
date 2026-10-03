@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.annotation.Priority;

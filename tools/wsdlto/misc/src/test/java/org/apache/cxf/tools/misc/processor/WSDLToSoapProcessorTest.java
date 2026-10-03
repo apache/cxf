@@ -20,7 +20,9 @@
 package org.apache.cxf.tools.misc.processor;
 
 import java.io.File;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;

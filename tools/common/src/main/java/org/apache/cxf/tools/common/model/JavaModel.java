@@ -19,7 +19,8 @@
 
 package org.apache.cxf.tools.common.model;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class JavaModel {
 
