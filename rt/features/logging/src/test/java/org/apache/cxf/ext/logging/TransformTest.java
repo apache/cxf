@@ -92,6 +92,9 @@ public class TransformTest {
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals(TRANSFORMED_LOGGING_CONTENT, event.getPayload());
+
+        // Assert that the LoggingCallback has been deregistered from callbacks
+        assertEquals(0, ((LoggingOutputStream) out).getCallbacks().size());
     }
 
     @Test
