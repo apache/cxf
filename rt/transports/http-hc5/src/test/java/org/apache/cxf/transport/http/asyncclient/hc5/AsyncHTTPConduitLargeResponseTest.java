@@ -91,7 +91,7 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
                     return "Hello, finally! " + cnt;
                 }
                 public String greetMe(String me) {
-                    return "Hello " + me.repeat(500);
+                    return "Hello " + me.repeat(2 * 500);
                 }
             });
 
@@ -121,12 +121,12 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
     @Test
     public void testCall() throws Exception {
         updateAddressPort(g, PORT);
-        assertEquals("Hello " + request.repeat(500), g.greetMe(request));
+        assertEquals("Hello " + request.repeat(2 * 500), g.greetMe(request));
         HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
         HTTPClientPolicy cp = new HTTPClientPolicy();
         cp.setAllowChunking(false);
         c.setClient(cp);
-        assertEquals("Hello " + request.repeat(500), g.greetMe(request));
+        assertEquals("Hello " + request.repeat(2 * 500), g.greetMe(request));
     }
     @Test
     public void testCallAsync() throws Exception {
@@ -140,7 +140,7 @@ public class AsyncHTTPConduitLargeResponseTest extends AbstractBusClientServerTe
                 }
             }
         }).get();
-        assertEquals("Hello " + request.repeat(500), resp.getResponseType());
+        assertEquals("Hello " + request.repeat(2 * 500), resp.getResponseType());
 
         g.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
             public void handleResponse(Response<GreetMeLaterResponse> res) {
