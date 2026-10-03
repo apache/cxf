@@ -20,7 +20,7 @@
 package org.apache.cxf.tools.common.toolspec.parser;
 
 
-import java.util.*;
+import java.util.Collection;
 
 
 public class BadUsageException extends Exception {

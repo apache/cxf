@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.BadRequestException;

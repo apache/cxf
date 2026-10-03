@@ -18,8 +18,9 @@
  */
 package org.apache.cxf.jca.core.resourceadapter;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

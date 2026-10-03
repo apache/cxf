@@ -19,7 +19,10 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
