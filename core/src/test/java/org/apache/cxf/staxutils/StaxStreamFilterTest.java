@@ -19,7 +19,7 @@
 
 package org.apache.cxf.staxutils;
 
-import java.io.*;
+import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;

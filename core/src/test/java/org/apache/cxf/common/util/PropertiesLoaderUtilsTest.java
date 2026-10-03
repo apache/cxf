@@ -19,7 +19,7 @@
 
 package org.apache.cxf.common.util;
 
-import java.util.*;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;

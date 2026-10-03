@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>4.2.4-SNAPSHOT</version>
+        <version>4.2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -90,7 +90,7 @@
 
         <!-- please maintain alphabetical order here -->
         <cxf.activemq.artemis.version>2.57.0</cxf.activemq.artemis.version>
-        <cxf.ahc.version>3.0.13</cxf.ahc.version>
+        <cxf.ahc.version>3.0.14</cxf.ahc.version>
         <cxf.arquillian.version>1.10.2.Final</cxf.arquillian.version>
         <cxf.arquillian.weld.container.version>4.0.0.Final</cxf.arquillian.weld.container.version>
         <cxf.aspectj.version>1.9.25.1</cxf.aspectj.version>
@@ -126,7 +126,7 @@
         <cxf.hamcrest.version>3.0</cxf.hamcrest.version>
         <cxf.hazelcast.version>5.7.0</cxf.hazelcast.version>
         <cxf.hibernate.em.version>7.4.10.Final</cxf.hibernate.em.version>
-        <cxf.hibernate.validator.version>9.1.3.Final</cxf.hibernate.validator.version>
+        <cxf.hibernate.validator.version>9.1.4.Final</cxf.hibernate.validator.version>
         <cxf.hsqldb.version>2.7.4</cxf.hsqldb.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
         <cxf.httpcomponents.asyncclient.version>4.1.5</cxf.httpcomponents.asyncclient.version>
@@ -179,7 +179,7 @@
         <cxf.kerby.version>2.1.2</cxf.kerby.version>
         <cxf.ldapsdk.version>7.0.5</cxf.ldapsdk.version>
         <cxf.littleproxy.version>2.9.1</cxf.littleproxy.version>
-        <cxf.logback.classic.version>1.6.3</cxf.logback.classic.version>
+        <cxf.logback.classic.version>1.6.4</cxf.logback.classic.version>
         <cxf.lucene.version>10.5.1</cxf.lucene.version>
         <cxf.maven.core.version>3.9.16</cxf.maven.core.version>
         <cxf.micrometer.version>1.17.1</cxf.micrometer.version>
@@ -242,7 +242,7 @@
         <cxf.woodstox.core.version>7.2.2</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>4.2.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
-        <cxf.jakarta.wss4j.version>4.0.1</cxf.jakarta.wss4j.version>
+        <cxf.jakarta.wss4j.version>4.0.2</cxf.jakarta.wss4j.version>
         <cxf.xmlschema.version>2.3.3</cxf.xmlschema.version>
         <cxf.xnio.version>3.8.17.Final</cxf.xnio.version>
         <cxf.zest.version>2.1</cxf.zest.version>
@@ -438,12 +438,12 @@
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-core</artifactId>
-                            <version>7.27.0</version>
+                            <version>7.28.0</version>
                         </dependency>
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
                             <artifactId>pmd-java</artifactId>
-                            <version>7.27.0</version>
+                            <version>7.28.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -2123,7 +2123,7 @@
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>org.eclipse.persistence.moxy</artifactId>
-                    <version>5.0.1</version>
+                    <version>5.0.2</version>
                     <scope>provided</scope>
                     <optional>true</optional>
                 </dependency>
