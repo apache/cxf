@@ -167,7 +167,7 @@ public class JAXRSAsyncClientChunkingTest extends AbstractBusClientServerTestBas
         config.getHttpConduit().getClient().setAutoRedirect(autoRedirect);
         configureLogging(config);
 
-        final byte[] bytes = new byte [32 * 1024];
+        final byte[] bytes = new byte [2 * 32 * 1024 + 16 * 1024];
         final Random random = new Random();
         random.nextBytes(bytes);
 
