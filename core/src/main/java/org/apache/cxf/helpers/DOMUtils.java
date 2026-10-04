@@ -38,8 +38,6 @@ import java.util.WeakHashMap;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -54,6 +52,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -125,28 +124,20 @@ public final class DOMUtils {
     private DOMUtils() {
     }
 
-    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+    private static DocumentBuilder getDocumentBuilder() {
         ClassLoader loader = getContextClassLoader();
         if (loader == null) {
             loader = getClassLoader(DOMUtils.class);
         }
         if (loader == null) {
-            return createDocumentBuilder();
+            return SecureDocumentBuilderFactory.newNSDocumentBuilder();
         }
         DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
         if (factory == null) {
-            factory = createDocumentBuilder();
+            factory = SecureDocumentBuilderFactory.newNSDocumentBuilder();
             DOCUMENT_BUILDERS.put(loader, factory);
         }
         return factory;
-    }
-
-    private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-        f.setNamespaceAware(true);
-        f.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        return f.newDocumentBuilder();
     }
 
     private static ClassLoader getContextClassLoader() {
@@ -175,17 +166,12 @@ public final class DOMUtils {
 
     /**
      * Creates a new Document object
-     * @throws ParserConfigurationException
      */
     public static Document newDocument() {
         return createDocument();
     }
     public static Document createDocument() {
-        try {
-            return getDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+        return getDocumentBuilder().newDocument();
     }
 
     private static synchronized Document createEmptyDocument() {

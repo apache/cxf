@@ -53,6 +53,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.XMLBeanTypeInfo;
@@ -113,14 +114,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     // cache of classes to documents
     private Map<String, Document> documents = new HashMap<>();
     static {
-        AEGIS_DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-        AEGIS_DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
-        try {
-            AEGIS_DOCUMENT_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            AEGIS_DOCUMENT_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        } catch (javax.xml.parsers.ParserConfigurationException ex) {
-            // ignore
-        }
+        AEGIS_DOCUMENT_BUILDER_FACTORY = SecureDocumentBuilderFactory.newNSInstance();
 
         String path = "/META-INF/cxf/aegis.xsd";
         try (InputStream is = XMLTypeCreator.class.getResourceAsStream(path)) {

@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -92,14 +93,7 @@ public class ExtendedDocumentBuilder {
                 LOG.log(Level.SEVERE, "SCHEMA_FACTORY_EXCEPTION_MSG");
             }
             try {
-                parserFactory = DocumentBuilderFactory.newInstance();
-                try {
-                    parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-                    parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-                } catch (ParserConfigurationException e) {
-                    //old version, not supported.
-                }
-                parserFactory.setNamespaceAware(true);
+                parserFactory = SecureDocumentBuilderFactory.newNSInstance();
                 parserFactory.setSchema(this.schema);
             } catch (UnsupportedOperationException e) {
                 LOG.log(Level.WARNING, "DOC_PARSER_NOT_SUPPORTED", e);
