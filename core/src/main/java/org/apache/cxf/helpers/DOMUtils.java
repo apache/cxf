@@ -38,6 +38,9 @@ import java.util.WeakHashMap;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -138,6 +141,31 @@ public final class DOMUtils {
             DOCUMENT_BUILDERS.put(loader, factory);
         }
         return factory;
+    }
+
+    /**
+     * Creates a namespace-aware {@link DocumentBuilder} validating against a schema.
+     *
+     * <p>A DOCTYPE declaration is refused by policy: an implementation that can refuse one fails the
+     * parse outright, and on one that cannot, the declaration is read, but the external resources it
+     * names resolve to nothing.</p>
+     *
+     * @param schema the schema to validate against while parsing, or {@code null}.
+     * @return a new document builder.
+     * @throws UnsupportedOperationException when the implementation does not support validation.
+     * @since 4.3.0
+     */
+    public static DocumentBuilder createNSDocumentBuilder(Schema schema) {
+        DocumentBuilderFactory f = SecureDocumentBuilderFactory.newNSInstance();
+        if (schema != null) {
+            f.setSchema(schema);
+        }
+        try {
+            return f.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            // Unreachable in practice: JAXP implementations fail eagerly, as the factory is configured.
+            throw new IllegalStateException(e);
+        }
     }
 
     private static ClassLoader getContextClassLoader() {

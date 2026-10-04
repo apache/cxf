@@ -21,28 +21,21 @@ package org.apache.cxf.tools.common.dom;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-
-
 
 import org.w3c.dom.Document;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 
-import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
+import org.apache.commons.xml.secure.SecureSchemaFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -53,65 +46,37 @@ public class ExtendedDocumentBuilder {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ExtendedDocumentBuilder.class);
 
-    private DocumentBuilderFactory parserFactory;
-    private SchemaFactory schemaFactory;
+    private static final Schema TOOLSPEC_SCHEMA;
+    static {
+        // Shipped in this artifact: if it cannot be loaded, the artifact is broken.
+        String path = "/org/apache/cxf/tools/common/toolspec/tool-specification.xsd";
+        URL url = ExtendedDocumentBuilder.class.getResource(path);
+        if (url == null) {
+            throw new IllegalStateException("Missing tool specification schema " + path);
+        }
+        try {
+            TOOLSPEC_SCHEMA = SecureSchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
+        } catch (SAXException e) {
+            throw new IllegalStateException("Invalid tool specification schema " + path, e);
+        }
+    }
+
     private Schema schema;
 
     public ExtendedDocumentBuilder() {
     }
 
-    private InputStream getSchemaLocation() {
-        String toolspec = "/org/apache/cxf/tools/common/toolspec/tool-specification.xsd";
-        return getClass().getResourceAsStream(toolspec);
-    }
-
     public void setValidating(boolean validate) {
-        if (validate) {
-            this.schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            try {
-                schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                LOG.log(Level.WARNING, "The property '" + XMLConstants.FEATURE_SECURE_PROCESSING
-                    + "' is not supported.");
-            }
-
-            try {
-                schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_DTD + "' is not supported.");
-            }
-
-            try {
-                schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
-                LOG.log(Level.WARNING, "The property '" + XMLConstants.ACCESS_EXTERNAL_SCHEMA + "' is not supported.");
-            }
-
-            try {
-                this.schema = schemaFactory.newSchema(new StreamSource(getSchemaLocation()));
-            } catch (SAXException e) {
-                LOG.log(Level.SEVERE, "SCHEMA_FACTORY_EXCEPTION_MSG");
-            }
-            try {
-                parserFactory = SecureDocumentBuilderFactory.newNSInstance();
-                parserFactory.setSchema(this.schema);
-            } catch (UnsupportedOperationException e) {
-                LOG.log(Level.WARNING, "DOC_PARSER_NOT_SUPPORTED", e);
-            }
-        }
+        this.schema = validate ? TOOLSPEC_SCHEMA : null;
     }
 
     public Document parse(InputStream in) throws SAXException, IOException, XMLStreamException {
         if (in == null && LOG.isLoggable(Level.FINE)) {
             LOG.fine("ExtendedDocumentBuilder trying to parse a null inputstream");
         }
-        if (parserFactory != null) {
-            //validating, so need to use the validating parser factory
-            try {
-                return parserFactory.newDocumentBuilder().parse(in);
-            } catch (ParserConfigurationException e) {
-                LOG.log(Level.SEVERE, "NEW_DOCUMENT_BUILDER_EXCEPTION_MSG");
-            }
+        if (this.schema != null) {
+            // validating, which only the DOM path does
+            return DOMUtils.createNSDocumentBuilder(this.schema).parse(in);
         }
         return StaxUtils.read(in);
     }
