@@ -21,11 +21,14 @@ package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 
 public class LoggingOutputStream extends CacheAndWriteOutputStream {
     private boolean skipFlushingFlowThroughStream;
+    private final AtomicBoolean closed = new AtomicBoolean();
+    private volatile boolean hasFailedWrites;
 
     LoggingOutputStream(OutputStream stream) {
         super(stream);
@@ -50,7 +53,9 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
      */
     @Override
     protected void postClose() throws IOException {
-        getFlowThroughStream().close();
+        if (closed.compareAndSet(false, true)) {
+            getFlowThroughStream().close();
+        }
     }
 
     /**
@@ -70,5 +75,39 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         skipFlushingFlowThroughStream = true;
         super.writeCacheTo(out, charsetName, limit);
         skipFlushingFlowThroughStream = false;
+    }
+    
+    @Override
+    public void write(byte[] b) throws IOException {
+        try {
+            super.write(b);
+        } catch (RuntimeException | IOException ex) {
+            hasFailedWrites = true;
+            throw ex;
+        }
+    }
+    
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        try {
+            super.write(b, off, len);
+        } catch (RuntimeException | IOException ex) {
+            hasFailedWrites = true;
+            throw ex;
+        }
+    }
+    
+    @Override
+    public void write(int b) throws IOException {
+        try {
+            super.write(b);
+        } catch (RuntimeException | IOException ex) {
+            hasFailedWrites = true;
+            throw ex;
+        }
+    }
+
+    boolean isLoggable() {
+        return !closed.get() && !hasFailedWrites;
     }
 }

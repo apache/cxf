@@ -198,6 +198,13 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void onClose(CachedOutputStream cos) {
+            if (cos instanceof LoggingOutputStream) {
+                final LoggingOutputStream los = (LoggingOutputStream) cos;
+                if (!los.isLoggable()) {
+                    message.setContent(OutputStream.class, origStream);
+                    return;
+                }
+            }
             final LogEvent event = eventMapper.map(message, sensitiveProtocolHeaderNames);
             if (shouldLogContent(event)) {
                 copyPayload(cos, event);
