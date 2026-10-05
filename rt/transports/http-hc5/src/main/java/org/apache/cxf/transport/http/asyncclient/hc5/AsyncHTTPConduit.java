@@ -893,7 +893,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             sslURL = null;
 
             //reset the buffers
-            int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
+            int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 32 * 1024;
             inbuf = new SharedInputBuffer(bufSize);
             outbuf = new SharedOutputBuffer(bufSize);
             try {

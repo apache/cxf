@@ -52,6 +52,7 @@ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.config.Lookup;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
@@ -85,6 +86,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     //AsycClient specific props
     public static final String THREAD_COUNT = "org.apache.cxf.transport.http.async.ioThreadCount";
     public static final String SELECT_INTERVAL = "org.apache.cxf.transport.http.async.selectInterval";
+
+    //Buffers
+    public static final String BUFFER_SIZE = "org.apache.cxf.transport.http.async.bufferSize";
 
     //CXF specific
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
@@ -155,7 +159,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     private int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout().toMillisecondsIntBound();
     private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepAlive();
     private boolean tcpNoDelay = true;
-
+    private int bufferSize = 16 * 1024;
 
     AsyncHTTPConduitFactory() {
         super();
@@ -203,6 +207,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
         connectionMaxIdle = getInt(s.get(CONNECTION_MAX_IDLE), connectionMaxIdle);
         maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
+        bufferSize = getInt(s.get(BUFFER_SIZE), bufferSize);
 
         if (!clients.isEmpty()) {
             for (Map.Entry<HTTPClientPolicy, AsyncClient> entry: clients.entrySet()) {
@@ -384,6 +389,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             .custom()
             .setConnectionManager(connectionManager)
             .setRedirectStrategy(redirectStrategy)
+            .setHttp1Config(http1Config())
             .setDefaultCookieStore(new BasicCookieStore() {
                 private static final long serialVersionUID = 1L;
                 public void addCookie(Cookie cookie) {
@@ -402,6 +408,10 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         new CloseIdleConnectionThread(connectionManager, client).start();
 
         return new AsyncClient(connectionManager, client);
+    }
+
+    protected Http1Config http1Config() {
+        return Http1Config.custom().setBufferSize(bufferSize).build();
     }
 
     //provide a hook to customize the builder
