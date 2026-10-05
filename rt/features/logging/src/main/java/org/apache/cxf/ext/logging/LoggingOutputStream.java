@@ -76,9 +76,10 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
 
 
     /**
+     * CXF-9251
      * We override the write() methods in order to catch some error that would not
-     * close the CachedOutputStream (ex. IOException "Connection reset by peer".
-     * Causing ghost or delayed OUT log and possible memory-leak due to DelayedCachedOutputStreamCleaner
+     * close the CachedOutputStream (ex. IOException "Connection reset by peer").
+     * This caused ghost/delayed OUT log and possible memory-leak due to DelayedCachedOutputStreamCleaner
      */
     @Override
     public void write(byte[] b) throws IOException {
@@ -118,7 +119,6 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         }
     }
 
-    // See CXF-9251 ... introduced due to IOException "Connection reset by peer"
     private void handleIoException(Exception ex) {
         try {
             // Close this CachedOutputStream
