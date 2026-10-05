@@ -1,11 +1,15 @@
 package org.apache.cxf.ext.logging;
 
 import junit.framework.TestCase;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.io.CachedOutputStreamCleaner;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -20,6 +24,14 @@ public class LoggingOutputStreamTest {
 
     private static final String APPLICATION_XML = "application/xml";
     private LogEventSenderMock logEventSender = new LogEventSenderMock();
+    private CachedOutputStreamCleaner cleaner;
+
+    @Before
+    public void setup(){
+        Bus bus = BusFactory.getDefaultBus(true);
+        assert bus != null;
+        cleaner = bus.getExtension(CachedOutputStreamCleaner.class);
+    }
 
     @Test
     public void shouldNotLogTwice() throws IOException {
@@ -41,18 +53,26 @@ public class LoggingOutputStreamTest {
                 </soapenv:Envelope>
                 """;
 
-
         // Act
+        outInterceptor.setInMemThreshold(1);
         outInterceptor.handleMessage(message);
+
         byte[] payload = loggingContent.getBytes(StandardCharsets.UTF_8);
         OutputStream out = message.getContent(OutputStream.class);
         out.write(payload);
+
+        // Now there should be a tmp file
+        assertEquals(1, cleaner.size());
+
         out.close();
 
         // Verify
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
         assertEquals(event.getPayload(), loggingContent);
+
+        // Should not leak memory
+        assertEquals(0, cleaner.size());
 
         // Should not log twice
         logEventSender.getLogEvents().clear();
@@ -94,6 +114,7 @@ public class LoggingOutputStreamTest {
                 """;
 
         // Act
+        outInterceptor.setInMemThreshold(1);
         outInterceptor.handleMessage(message);
 
         byte[] payload = loggingContent.getBytes(StandardCharsets.UTF_8);
@@ -108,6 +129,9 @@ public class LoggingOutputStreamTest {
             // First chunk of bytes OK (mock limit is above ...244)
             out.write(firstChunk);
             assertTrue(true);
+            // Now there should be a tmp file
+            assertEquals(1, cleaner.size());
+
             // Second chunk of byte the peer reset :(
             out.write(secondChunk);
             fail();
@@ -122,6 +146,9 @@ public class LoggingOutputStreamTest {
         assertNotNull(event);
         // Assert the partial log (only what was wrote onto the http socket)
         assertEquals(event.getPayload(), loggingContent.substring(0, loggingContent.length()/2));
+
+        // Should not leak memory
+        assertEquals(0, cleaner.size());
 
         // Should not log twice
         logEventSender.getLogEvents().clear();
