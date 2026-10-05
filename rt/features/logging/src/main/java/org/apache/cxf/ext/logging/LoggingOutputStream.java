@@ -126,7 +126,9 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
             // So additional call to this.close would produce nothing
             this.close();
         } catch (Exception suppressed) {
-            ex.addSuppressed(suppressed);
+            if(ex!=null){
+                ex.addSuppressed(suppressed);
+            }
         }
     }
 }
