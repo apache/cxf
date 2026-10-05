@@ -85,7 +85,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         try {
             super.write(b);
         } catch (RuntimeException | IOException ex) {
-            handleIoException();
+            handleIoException(ex);
             throw ex;
         }
     }
@@ -95,7 +95,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         try {
             super.write(b, off, len);
         } catch (RuntimeException | IOException ex) {
-            handleIoException();
+            handleIoException(ex);
             throw ex;
         }
     }
@@ -105,7 +105,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         try {
             super.write(b);
         } catch (RuntimeException | IOException ex) {
-            handleIoException();
+            handleIoException(ex);
             throw ex;
         }
     }
@@ -119,14 +119,14 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     }
 
     // See CXF-9251 ... introduced due to IOException "Connection reset by peer"
-    private void handleIoException() {
+    private void handleIoException(Exception ex) {
         try {
             // Close this CachedOutputStream
             // Write method maybe called more than one time... but we already consume the stream the first time
             // So additional call to this.close would produce nothing
             this.close();
-        } catch (Exception ignored) {
-            // ignore
+        } catch (Exception suppressed) {
+            ex.addSuppressed(suppressed);
         }
     }
 }
