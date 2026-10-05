@@ -66,11 +66,14 @@ public class LoggingOutputStreamTest {
         final LoggingOutInterceptor outInterceptor = new LoggingOutInterceptor(logEventSender);
 
         final Message message = prepareOutMessage();
+
+        // Counter to let some bytes to be written onto the http socket before thrown IOException
         final AtomicInteger written = new AtomicInteger(0);
+        final int limitIO = 244;
         OutputStream mockUnderlyingStream = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
-                if (written.incrementAndGet() > 244) {
+                if (written.incrementAndGet() > limitIO) {
                     throw new IOException("Connection reset by peer");
                 }
             }
@@ -90,7 +93,6 @@ public class LoggingOutputStreamTest {
                 </soapenv:Envelope>
                 """;
 
-
         // Act
         outInterceptor.handleMessage(message);
 
@@ -103,18 +105,22 @@ public class LoggingOutputStreamTest {
 
         OutputStream out = message.getContent(OutputStream.class);
         try{
+            // First chunk of bytes OK (mock limit is above ...244)
             out.write(firstChunk);
             assertTrue(true);
+            // Second chunk of byte the peer reset :(
             out.write(secondChunk);
             fail();
             out.close();
         } catch (IOException ex){
+            //Ensure the exception is propagated
             assertTrue(true);
         }
 
         // Verify
         LogEvent event = logEventSender.getLogEvent();
         assertNotNull(event);
+        // Assert the partial log (only what was wrote onto the http socket)
         assertEquals(event.getPayload(), loggingContent.substring(0, loggingContent.length()/2));
 
         // Should not log twice
