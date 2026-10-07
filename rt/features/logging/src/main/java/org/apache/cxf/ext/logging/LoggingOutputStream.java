@@ -80,9 +80,19 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
      * We override the write() methods in order to catch some error that would not
      * close the CachedOutputStream (ex. IOException "Connection reset by peer").
      * This caused ghost/delayed OUT log and possible memory-leak due to DelayedCachedOutputStreamCleaner
+     *
+     * Once closed (and logged), any late write (for example the fault chain writing the closing tags
+     * through a writer still wrapping this stream) is only passed through to the flow-through stream and
+     * is not cached anymore: some containers (e.g. Tomcat 10.1) silently accept writes after close, and
+     * caching them would spill into a new temp file that close() (now a no-op) could never delete.
      */
     @Override
     public void write(byte[] b) throws IOException {
+        if (closed.get()) {
+            // already closed and logged: pass through only, do not cache again
+            getFlowThroughStream().write(b);
+            return;
+        }
         try {
             super.write(b);
         } catch (RuntimeException | IOException ex) {
@@ -93,6 +103,11 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
+        if (closed.get()) {
+            // already closed and logged: pass through only, do not cache again
+            getFlowThroughStream().write(b, off, len);
+            return;
+        }
         try {
             super.write(b, off, len);
         } catch (RuntimeException | IOException ex) {
@@ -103,6 +118,11 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
 
     @Override
     public void write(int b) throws IOException {
+        if (closed.get()) {
+            // already closed and logged: pass through only, do not cache again
+            getFlowThroughStream().write(b);
+            return;
+        }
         try {
             super.write(b);
         } catch (RuntimeException | IOException ex) {
