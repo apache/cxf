@@ -311,9 +311,14 @@ public class LoggingOutInterceptorTest {
         // We did not close the cached stream, should be subject of cleanup
         assertThat(sender.getEvents(), hasSize(1));
         final LogEvent event = sender.getEvents().get(0);
-
         buf.setLength(buf.length() - 1);
         assertThat(event.getPayload(), equalToIgnoringCase(buf.toString()));
+
+        // Try to close the cached, but close() only close the FlowThroughStream without logging
+        sender.getEvents().clear();
+        cached.close();
+        assertTrue("The FlowThroughStream now should be closed!", isOsClosed[0]);
+        assertThat(sender.getEvents(), hasSize(0));
     }
 
     @Test

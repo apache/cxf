@@ -145,6 +145,10 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         // Ensure closing only one time
         if (closed.compareAndSet(false, true)) {
             super.close();
+        } else {
+            // Still behave as a pass-through for the flowThroughStream,
+            // closing it if .close() is explicitly called
+            getFlowThroughStream().close();
         }
     }
 
