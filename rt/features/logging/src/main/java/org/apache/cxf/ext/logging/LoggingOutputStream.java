@@ -27,6 +27,7 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 
 public class LoggingOutputStream extends CacheAndWriteOutputStream {
     private boolean skipFlushingFlowThroughStream;
+    private boolean skipClosingFlowThroughStream;
     private final AtomicBoolean closed = new AtomicBoolean();
 
     LoggingOutputStream(OutputStream stream) {
@@ -41,6 +42,10 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
      */
     @Override
     public void closeFlowthroughStream() throws IOException {
+        if (skipClosingFlowThroughStream) {
+            return;
+        }
+
         getFlowThroughStream().close();
     }
 
@@ -52,6 +57,10 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
      */
     @Override
     protected void postClose() throws IOException {
+        if (skipClosingFlowThroughStream) {
+            return;
+        }
+
         getFlowThroughStream().close();
     }
 
@@ -144,11 +153,15 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
             // Close this CachedOutputStream
             // Write method maybe called more than one time... but we already consume the stream the first time
             // So additional call to this.close would produce nothing
+            // Skip the close of flowThroughStream as it will become a pass-through
+            skipClosingFlowThroughStream = true;
             this.close();
         } catch (Exception suppressed) {
             if (ex != null) {
                 ex.addSuppressed(suppressed);
             }
+        } finally {
+            skipClosingFlowThroughStream = false;
         }
     }
 }
