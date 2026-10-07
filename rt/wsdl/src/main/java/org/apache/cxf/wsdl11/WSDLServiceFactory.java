@@ -19,9 +19,11 @@
 
 package org.apache.cxf.wsdl11;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
@@ -94,6 +96,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         allowRefs = b;
     }
 
+    public void setServiceName(QName qn) {
+        serviceName = qn;
+    }
+
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
@@ -142,6 +148,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                                 break;
                             }
                         }
+                        warnIfBindingIgnored(portType);
                         WSDLFactory factory = WSDLFactory.newInstance();
                         ExtensionRegistry extReg = factory.newPopulatedExtensionRegistry();
                         Binding binding = PartialWSDLProcessor.doAppendBinding(definition,
@@ -172,6 +179,28 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         ServiceImpl service = new ServiceImpl(services);
         setService(service);
         return service;
+    }
+
+    /**
+     * The service could not be found, so a SOAP binding and service are about to be synthesized
+     * from the portType. If the WSDL already contains a binding for that portType, anything it
+     * declares beyond the soap:body (e.g. soap:header bindings) will be ignored, so warn about it.
+     */
+    private void warnIfBindingIgnored(PortType portType) {
+        if (portType == null || !LOG.isLoggable(Level.WARNING)) {
+            return;
+        }
+        List<QName> bindings = new ArrayList<>();
+        for (Binding b : CastUtils.cast(definition.getAllBindings().values(), Binding.class)) {
+            if (!b.isUndefined() && b.getPortType() != null
+                && portType.getQName().equals(b.getPortType().getQName())) {
+                bindings.add(b.getQName());
+            }
+        }
+        if (!bindings.isEmpty()) {
+            LOG.log(Level.WARNING, "PARTIAL_WSDL_BINDING_IGNORED",
+                    new Object[] {serviceName, wsdlUrl, portType.getQName(), bindings});
+        }
     }
 
 }

@@ -46,7 +46,10 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.wsdl.Binding;
+import javax.wsdl.Definition;
 import javax.wsdl.Operation;
+import javax.wsdl.Port;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.DOMError;
@@ -105,6 +108,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
 import org.apache.cxf.wsdl.WSDLConstants;
+import org.apache.cxf.wsdl11.PartialWSDLProcessor;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -386,11 +390,15 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     protected void buildServiceFromWSDL(String url) {
         sendEvent(Event.CREATE_FROM_WSDL, url);
 
+        populateFromClass = false;
+        WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url);
+        if (getServiceQName(false) == null) {
+            selectServiceFromWSDL(factory.getDefinition(), url);
+        }
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("Creating Service " + getServiceQName() + " from WSDL: " + url);
         }
-        populateFromClass = false;
-        WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url, getServiceQName());
+        factory.setServiceName(getServiceQName());
         boolean setEPName = true;
         if (features != null) {
             for (Feature f : features) {
@@ -423,6 +431,87 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             }
         }
         initializeDataBindings();
+    }
+
+    /**
+     * No service name was configured, so the default one derived from the service class is used.
+     * If the WSDL doesn't contain a service with that name (so WSDLServiceFactory would treat it as a
+     * partial WSDL), but does contain exactly one service with port(s) bound to the portType of the
+     * service class, use that service (and port) rather than generating a default binding from the
+     * portType, which would silently lose everything the real binding defines (soap:header bindings,
+     * etc.).
+     */
+    private void selectServiceFromWSDL(Definition def, String url) {
+        QName defaultServiceName;
+        QName portTypeName;
+        try {
+            defaultServiceName = getServiceQName();
+            portTypeName = getInterfaceName();
+        } catch (RuntimeException ex) {
+            return;
+        }
+        if (def == null || portTypeName == null
+            || PartialWSDLProcessor.isServiceExisted(def, defaultServiceName)
+            || PartialWSDLProcessor.isBindingExisted(def, defaultServiceName)
+            || !PartialWSDLProcessor.isPortTypeExisted(def, defaultServiceName)) {
+            // only replace the "partial WSDL" handling in WSDLServiceFactory, where a default
+            // binding and service would otherwise be generated from the portType
+            return;
+        }
+
+        javax.wsdl.Service wsdlService = null;
+        List<Port> ports = null;
+        for (javax.wsdl.Service s : CastUtils.cast(def.getAllServices().values(), javax.wsdl.Service.class)) {
+            List<Port> matching = new ArrayList<>();
+            for (Port port : CastUtils.cast(s.getPorts().values(), Port.class)) {
+                Binding binding = port.getBinding();
+                if (binding != null && binding.getPortType() != null
+                    && portTypeName.equals(binding.getPortType().getQName())) {
+                    matching.add(port);
+                }
+            }
+            if (!matching.isEmpty()) {
+                if (wsdlService != null) {
+                    // more than one candidate service, we can't choose
+                    return;
+                }
+                wsdlService = s;
+                ports = matching;
+            }
+        }
+        if (wsdlService == null) {
+            return;
+        }
+
+        QName epName = getEndpointName(false);
+        boolean explicitEndpoint = epName != null;
+        if (!explicitEndpoint) {
+            try {
+                epName = getEndpointName();
+            } catch (RuntimeException ex) {
+                epName = null;
+            }
+        }
+        String epLocalName = epName == null ? null : epName.getLocalPart();
+        Port port = null;
+        for (Port p : ports) {
+            if (p.getName().equals(epLocalName)) {
+                port = p;
+            }
+        }
+        if (port == null) {
+            if (explicitEndpoint || ports.size() != 1) {
+                // the configured port isn't in this service, or the port to use is ambiguous
+                return;
+            }
+            port = ports.get(0);
+        }
+
+        QName serviceQName = wsdlService.getQName();
+        LOG.log(Level.INFO, "USING_WSDL_SERVICE",
+                new Object[] {defaultServiceName, url, serviceQName, port.getName(), portTypeName});
+        setServiceName(serviceQName);
+        setEndpointName(new QName(serviceQName.getNamespaceURI(), port.getName()));
     }
 
     protected void buildServiceFromClass() {
