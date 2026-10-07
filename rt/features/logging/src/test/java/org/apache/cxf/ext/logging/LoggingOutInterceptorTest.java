@@ -20,10 +20,12 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -304,6 +306,93 @@ public class LoggingOutInterceptorTest {
 
         buf.setLength(buf.length() - 1);
         assertThat(event.getPayload(), equalToIgnoringCase(buf.toString()));
+    }
+
+    @Test
+    public void shouldDeleteTempFileWhenWrittenAfterClose() throws IOException {
+        message.put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/");
+        message.put(Message.REQUEST_URI, "/api");
+
+        final StringBuilder buf = content();
+        String ct = "multipart/related; type=\"application/xop+xml\"; "
+                + "boundary=\"----=_Part_0_2180223.1203118300920\"";
+
+        final byte[] bytes = buf.toString().getBytes(StandardCharsets.UTF_8);
+        final OutputStream os = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, os);
+        message.put(Message.CONTENT_TYPE, ct);
+
+        interceptor.setInMemThreshold(1);
+        interceptor.addBinaryContentMediaTypes("application/xop+xml");
+        interceptor.setLogMultipart(true);
+        interceptor.setLogBinary(true);
+        interceptor.handleMessage(message);
+
+        final OutputStream cached = message.getContent(OutputStream.class);
+        cached.write(bytes, 0, bytes.length);
+        cached.close();
+        assertThat(sender.getEvents(), hasSize(1));
+        assertThat(cleaner.size(), equalTo(0));
+
+        // A late writer still holding the old stream reference, with a flow-through stream that
+        // accepts writes after close: it must not be cached (and spilled to a new temp file) again
+        cached.write(bytes, 0, bytes.length);
+        assertThat(((ByteArrayOutputStream) os).size(), equalTo(2 * bytes.length));
+        final File tempFile = ((CachedOutputStream) cached).getTempFile();
+
+        cleaner.forceClean();
+        assertThat(cleaner.size(), equalTo(0));
+        assertThat(sender.getEvents(), hasSize(1));
+        assertThat("temp file leaked: " + tempFile, tempFile != null && tempFile.exists(), equalTo(false));
+    }
+
+    @Test
+    public void shouldDeleteTempFileWhenWrittenAfterFailedWrite() throws IOException {
+        message.put(Message.ENDPOINT_ADDRESS, "http://localhost:9001/");
+        message.put(Message.REQUEST_URI, "/api");
+
+        final StringBuilder buf = content();
+        String ct = "multipart/related; type=\"application/xop+xml\"; "
+                + "boundary=\"----=_Part_0_2180223.1203118300920\"";
+
+        final byte[] bytes = buf.toString().getBytes(StandardCharsets.UTF_8);
+        final AtomicBoolean failNextWrite = new AtomicBoolean();
+        final OutputStream os = new ByteArrayOutputStream() {
+            @Override
+            public synchronized void write(byte[] b, int off, int len) {
+                if (failNextWrite.compareAndSet(true, false)) {
+                    throw new UncheckedIOException(new IOException("Simulated"));
+                }
+                super.write(b, off, len);
+            }
+        };
+        message.setContent(OutputStream.class, os);
+        message.put(Message.CONTENT_TYPE, ct);
+
+        interceptor.setInMemThreshold(1);
+        interceptor.addBinaryContentMediaTypes("application/xop+xml");
+        interceptor.setLogMultipart(true);
+        interceptor.setLogBinary(true);
+        interceptor.handleMessage(message);
+
+        final OutputStream cached = message.getContent(OutputStream.class);
+        cached.write(bytes, 0, bytes.length);
+        failNextWrite.set(true);
+        assertThrows(UncheckedIOException.class, () -> cached.write(bytes, 0, bytes.length));
+        assertThat(sender.getEvents(), hasSize(1));
+        assertThat(cleaner.size(), equalTo(0));
+
+        // e.g. the fault chain (SoapOutEndingInterceptor) writing the closing tags through the
+        // XMLStreamWriter that still wraps this stream, with a flow-through stream that accepts writes
+        // after close (as Tomcat 10.1 does): it must not be cached (and spilled to a new temp file) again
+        cached.write(bytes, 0, bytes.length);
+        assertThat(((ByteArrayOutputStream) os).size(), equalTo(2 * bytes.length));
+        final File tempFile = ((CachedOutputStream) cached).getTempFile();
+
+        cleaner.forceClean();
+        assertThat(cleaner.size(), equalTo(0));
+        assertThat(sender.getEvents(), hasSize(1));
+        assertThat("temp file leaked: " + tempFile, tempFile != null && tempFile.exists(), equalTo(false));
     }
 
     private static StringBuilder content() {
