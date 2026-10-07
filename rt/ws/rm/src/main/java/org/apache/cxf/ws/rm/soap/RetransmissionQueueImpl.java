@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -402,6 +403,39 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     /**
+     * Initiate the resend of the given candidate, after initiating the resend of any earlier message of the
+     * same sequence which is due no later than it and not pending yet. java.util.Timer does not run tasks
+     * scheduled for the same time in scheduling order, so for messages cached within the same millisecond
+     * the resend of a later message could otherwise run (and, with in-order delivery, block the resend
+     * thread until the receive timeout) before the resend of an earlier one.
+     *
+     * @param candidate the candidate whose resend is due
+     */
+    protected void initiateInOrder(ResendCandidate candidate) {
+        final Date due = candidate.getNext();
+        final List<ResendCandidate> earlier = new ArrayList<>();
+        if (null != due) {
+            String key = RMContextUtils.retrieveRMProperties(candidate.getMessage(), true)
+                .getSequence().getIdentifier().getValue();
+            synchronized (this) {
+                List<ResendCandidate> sequenceCandidates = getSequenceCandidates(key);
+                if (null != sequenceCandidates) {
+                    for (ResendCandidate c : sequenceCandidates) {
+                        if (c.getNumber() < candidate.getNumber() && c.takeOverDueResend(due)) {
+                            earlier.add(c);
+                        }
+                    }
+                }
+            }
+            earlier.sort(Comparator.comparingLong(ResendCandidate::getNumber));
+        }
+        for (ResendCandidate c : earlier) {
+            c.initiate(c.includeAckRequested);
+        }
+        candidate.initiate(candidate.includeAckRequested);
+    }
+
+    /**
      * Represents a candidate for resend, i.e. an unacked outgoing message.
      */
     protected class ResendCandidate implements Runnable, RetryStatus {
@@ -561,6 +595,23 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
 
         /**
+         * Take over the resend of this candidate if it is due no later than the given time and is neither
+         * pending nor suspended: its own scheduled resend is then cancelled, as the caller initiates it.
+         *
+         * @param due the time by which the resend must be due
+         * @return true if the caller must initiate the resend of this candidate
+         */
+        protected synchronized boolean takeOverDueResend(Date due) {
+            if (pending || suspended || null == next || next.after(due)) {
+                return false;
+            }
+            if (null != nextTask) {
+                nextTask.cancel();
+            }
+            return true;
+        }
+
+        /**
          * Cancel further resend (although no ACK has been received).
          */
         protected synchronized void cancel() {
@@ -641,7 +692,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 @Override
                 public void run() {
                     if (!candidate.isPending()) {
-                        candidate.initiate(includeAckRequested);
+                        initiateInOrder(candidate);
                     }
                 }
             }
