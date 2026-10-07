@@ -21,12 +21,15 @@
 package org.apache.cxf.ws.rm.soap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMEndpoint;
 import org.apache.cxf.ws.rm.RMException;
@@ -221,6 +224,43 @@ public class RetransmissionQueueImplTest {
     }
 
     @Test
+    public void testInitiateInOrderResendsEarlierDueMessageFirst() {
+        SoapMessage message1 = setUpMessage("sequence1", ONE);
+        SoapMessage message2 = setUpMessage("sequence1", TWO);
+        setupMessagePolicies(message1);
+        setupMessagePolicies(message2);
+        setUpExecutor(message1);
+        setUpExecutor(message2);
+        ready(false);
+
+        queue.cacheUnacknowledged(message1);
+        RetransmissionQueueImpl.ResendCandidate candidate2 = queue.cacheUnacknowledged(message2);
+
+        // the resend task of message 2 runs first, as java.util.Timer may do for tasks due at the same time
+        queue.initiateInOrder(candidate2);
+        assertEquals(Arrays.asList(message1, message2), resender.resent);
+    }
+
+    @Test
+    public void testInitiateInOrderSkipsEarlierMessageNotDue() {
+        SoapMessage message1 = setUpMessage("sequence1", ONE);
+        SoapMessage message2 = setUpMessage("sequence1", TWO);
+        setupMessagePolicies(message1);
+        setupMessagePolicies(message2);
+        setUpExecutor(message1);
+        setUpExecutor(message2);
+        ready(false);
+
+        RetransmissionQueueImpl.ResendCandidate candidate1 = queue.cacheUnacknowledged(message1);
+        RetransmissionQueueImpl.ResendCandidate candidate2 = queue.cacheUnacknowledged(message2);
+
+        // message 1 was already resent, so its next resend is due after the one of message 2
+        candidate1.attempted();
+        queue.initiateInOrder(candidate2);
+        assertEquals(Arrays.asList(message2), resender.resent);
+    }
+
+    @Test
     public void testPurgeAcknowledgedSome() {
         Long[] messageNumbers = {TEN, ONE};
         SourceSequence sequence = setUpSequence("sequence1",
@@ -368,6 +408,15 @@ public class RetransmissionQueueImplTest {
         return message;
     }
 
+    private void setUpExecutor(Message message) {
+        Exchange exchange = createMock(Exchange.class);
+        org.apache.cxf.endpoint.Endpoint ep = createMock(org.apache.cxf.endpoint.Endpoint.class);
+        Service service = createMock(Service.class);
+        when(message.getExchange()).thenReturn(exchange);
+        when(exchange.getEndpoint()).thenReturn(ep);
+        when(ep.getService()).thenReturn(service);
+    }
+
     private void setupMessagePolicies(Message message) {
         RMConfiguration cfg = new RMConfiguration();
         when(manager.getEffectiveConfiguration(message)).thenReturn(cfg);
@@ -451,15 +500,18 @@ public class RetransmissionQueueImplTest {
     static class TestResender implements RetransmissionQueueImpl.Resender {
         Message message;
         boolean includeAckRequested;
+        List<Message> resent = new ArrayList<>();
 
         public void resend(Message ctx, boolean requestAcknowledge) {
             message = ctx;
             includeAckRequested = requestAcknowledge;
+            resent.add(ctx);
         }
 
         void clear() {
             message = null;
             includeAckRequested = false;
+            resent.clear();
         }
     };
 }
