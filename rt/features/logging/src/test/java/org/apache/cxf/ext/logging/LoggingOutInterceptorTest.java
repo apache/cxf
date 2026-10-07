@@ -44,7 +44,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
 public class LoggingOutInterceptorTest {
     private Bus bus;
@@ -277,6 +277,8 @@ public class LoggingOutInterceptorTest {
                 + "boundary=\"----=_Part_0_2180223.1203118300920\"";
 
         final byte[] bytes = buf.toString().getBytes(StandardCharsets.UTF_8);
+
+        final boolean[] isOsClosed = {false};
         final OutputStream os = new ByteArrayOutputStream() {
             @Override
             public synchronized void write(byte[] b, int off, int len) {
@@ -285,6 +287,11 @@ public class LoggingOutInterceptorTest {
                 } else {
                     super.write(bytes, off, len);
                 }
+            }
+
+            @Override
+            public void close() throws IOException {
+                isOsClosed[0] =true;
             }
         };
         message.setContent(OutputStream.class, os);
@@ -299,6 +306,7 @@ public class LoggingOutInterceptorTest {
         final OutputStream cached = message.getContent(OutputStream.class);
         cached.write(bytes, 0, bytes.length - 1);
         assertThrows(UncheckedIOException.class, () -> cached.write(bytes, bytes.length - 1, 1));
+        assertFalse("The FlowThroughStream should not be closed!", isOsClosed[0]);
 
         // We did not close the cached stream, should be subject of cleanup
         assertThat(sender.getEvents(), hasSize(1));
