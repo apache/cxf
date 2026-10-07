@@ -19,11 +19,14 @@
 
 package org.apache.cxf.resource;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
@@ -204,6 +207,19 @@ public class URIResolverTest {
             assertTrue(ex.getMessage().contains("ftp"));
             assertTrue(ex.getMessage().contains("not permitted"));
         }
+    }
+
+    @Test
+    public void testBundleResourceProtocolAllowedByDefault() throws Exception {
+        assertTrue(URIResolver.getAllowedSchemes().contains("bundleresource"));
+        // no bundleresource handler is registered outside OSGi, so supply one to build the URL
+        URL url = new URL(null, "bundleresource://1.fwk123/wsdl/foo.wsdl", new URLStreamHandler() {
+            @Override
+            protected URLConnection openConnection(URL u) throws IOException {
+                throw new IOException("not supported");
+            }
+        });
+        URIResolver.checkAllowedScheme(url);
     }
 
     @Test

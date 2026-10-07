@@ -68,7 +68,7 @@ public class URIResolver implements AutoCloseable {
     private static final Set<String> DEFAULT_ALLOWED_URL_SCHEMES =
         Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
-                    "resource")));
+                    "resource", "bundleresource")));
     private static final Set<String> NETWORK_URL_SCHEMES =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList("http", "https", "ftp")));
     private static final Set<String> ARCHIVE_URL_SCHEMES =
