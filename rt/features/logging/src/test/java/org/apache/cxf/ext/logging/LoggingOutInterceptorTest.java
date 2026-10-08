@@ -336,8 +336,7 @@ public class LoggingOutInterceptorTest {
 
         // A late writer still holding the old stream reference, with a flow-through stream that
         // accepts writes after close: it must not be cached (and spilled to a new temp file) again
-        cached.write(bytes, 0, bytes.length);
-        assertThat(((ByteArrayOutputStream) os).size(), equalTo(2 * bytes.length));
+        assertThrows(IOException.class, () -> cached.write(bytes, 0, bytes.length));
         final File tempFile = ((CachedOutputStream) cached).getTempFile();
 
         cleaner.forceClean();
@@ -385,8 +384,7 @@ public class LoggingOutInterceptorTest {
         // e.g. the fault chain (SoapOutEndingInterceptor) writing the closing tags through the
         // XMLStreamWriter that still wraps this stream, with a flow-through stream that accepts writes
         // after close (as Tomcat 10.1 does): it must not be cached (and spilled to a new temp file) again
-        cached.write(bytes, 0, bytes.length);
-        assertThat(((ByteArrayOutputStream) os).size(), equalTo(2 * bytes.length));
+        assertThrows(IOException.class, () -> cached.write(bytes, 0, bytes.length));
         final File tempFile = ((CachedOutputStream) cached).getTempFile();
 
         cleaner.forceClean();

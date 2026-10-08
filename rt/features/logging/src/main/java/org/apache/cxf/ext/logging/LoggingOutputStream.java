@@ -89,9 +89,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(byte[] b) throws IOException {
         if (closed.get()) {
-            // already closed and logged: pass through only, do not cache again
-            getFlowThroughStream().write(b);
-            return;
+            throw new IOException("The channel has been closed already");
         }
         try {
             super.write(b);
@@ -104,9 +102,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (closed.get()) {
-            // already closed and logged: pass through only, do not cache again
-            getFlowThroughStream().write(b, off, len);
-            return;
+            throw new IOException("The channel has been closed already");
         }
         try {
             super.write(b, off, len);
@@ -119,9 +115,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(int b) throws IOException {
         if (closed.get()) {
-            // already closed and logged: pass through only, do not cache again
-            getFlowThroughStream().write(b);
-            return;
+            throw new IOException("The channel has been closed already");
         }
         try {
             super.write(b);
