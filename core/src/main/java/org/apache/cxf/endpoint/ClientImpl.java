@@ -138,11 +138,14 @@ public class ClientImpl
         EndpointInfo epfo = findEndpoint(svc, port);
 
         try {
+            final Endpoint ep;
             if (endpointImplFactory != null) {
-                getConduitSelector().setEndpoint(endpointImplFactory.newEndpointImpl(bus, svc, epfo));
+                ep = endpointImplFactory.newEndpointImpl(bus, svc, epfo);
             } else {
-                getConduitSelector().setEndpoint(new EndpointImpl(bus, svc, epfo));
+                ep = new EndpointImpl(bus, svc, epfo);
             }
+            svc.getEndpoints().put(epfo.getName(), ep);
+            getConduitSelector().setEndpoint(ep);
         } catch (EndpointException epex) {
             throw new IllegalStateException("Unable to create endpoint: " + epex.getMessage(), epex);
         }
