@@ -82,9 +82,10 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
      * This caused ghost/delayed OUT log and possible memory-leak due to DelayedCachedOutputStreamCleaner
      *
      * Once closed (and logged), any late write (for example the fault chain writing the closing tags
-     * through a writer still wrapping this stream) is only passed through to the flow-through stream and
-     * is not cached anymore: some containers (e.g. Tomcat 10.1) silently accept writes after close, and
-     * caching them would spill into a new temp file that close() (now a no-op) could never delete.
+     * through a writer still wrapping this stream) is leading to {@code IOException} since all underlying
+     * stream are closed: some containers (e.g. Tomcat 10.1) silently accept writes after close, and
+     * caching them (by letting writes to go through) would spill into a new temp file that close()
+     * (now a no-op) could never delete.
      */
     @Override
     public void write(byte[] b) throws IOException {
