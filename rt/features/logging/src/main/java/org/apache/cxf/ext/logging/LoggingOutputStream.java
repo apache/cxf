@@ -148,6 +148,9 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
         } else {
             // Still behave as a pass-through for the flowThroughStream,
             // closing it if .close() is explicitly called
+            if(skipClosingFlowThroughStream){
+                return;
+            }
             getFlowThroughStream().close();
         }
     }
