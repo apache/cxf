@@ -412,13 +412,14 @@ public final class AttachmentUtil {
 
         AttachmentImpl att = new AttachmentImpl(id);
 
-        String ct = getHeader(headers, "Content-Type");
-        if (StringUtils.isEmpty(ct)) {
-            ct = MessageUtils.getContextualString(message, ATTACHMENT_CONTENT_TYPE, "application/octet-stream");
-        }
-
         String cd = getHeader(headers, "Content-Disposition");
         String fileName = getContentDispositionFileName(cd);
+
+        String ct = getHeader(headers, "Content-Type");
+        if (StringUtils.isEmpty(ct)) {
+            ct = MessageUtils.getContextualString(message, ATTACHMENT_CONTENT_TYPE,
+                                                  getDefaultContentType(cd));
+        }
 
         String encoding = null;
 
@@ -445,6 +446,21 @@ public final class AttachmentUtil {
         }
         att.setDataHandler(new DataHandler(source));
         return att;
+    }
+
+    /**
+     * RFC 7578, section 4.4: a multipart/form-data part without a Content-Type header
+     * defaults to "text/plain". File parts (those carrying a "filename" parameter) and
+     * all other attachments keep defaulting to "application/octet-stream".
+     */
+    private static String getDefaultContentType(String cd) {
+        if (!StringUtils.isEmpty(cd)) {
+            ContentDisposition c = new ContentDisposition(cd);
+            if ("form-data".equalsIgnoreCase(c.getType()) && c.getParameter("filename") == null) {
+                return "text/plain";
+            }
+        }
+        return "application/octet-stream";
     }
 
     static String getContentDispositionFileName(String cd) {
