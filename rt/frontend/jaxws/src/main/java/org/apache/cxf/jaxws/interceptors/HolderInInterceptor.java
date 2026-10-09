@@ -65,7 +65,13 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
                     @SuppressWarnings("unchecked")
                     Holder<Object> holder = (Holder<Object>)outHolders.get(part.getIndex() - 1);
                     if (holder != null) {
-                        holder.value = inObjects.get(part);
+                        if (inObjects == null) {
+                            //the response may be missing some (or all) of the
+                            //parts defined in the WSDL (non-compliant servers)
+                            inObjects = new MessageContentsList();
+                            message.setContent(List.class, inObjects);
+                        }
+                        holder.value = inObjects.hasValue(part) ? inObjects.get(part) : null;
                         inObjects.put(part, holder);
                     }
                 }
