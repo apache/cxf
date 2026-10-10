@@ -1033,12 +1033,21 @@ public class WebClient extends AbstractClient {
                 }
             }
             if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
-                cb.handleResponse(message, new Object[] {r});
+                try {
+                    cb.handleResponse(message, new Object[] {r});
+                } catch (Throwable t) {
+                    cb.handleException(message, t);
+                }
             } else if (r.getStatus() >= 300) {
                 cb.handleException(message, convertToWebApplicationException(r));
             } else {
-                cb.handleResponse(message, new Object[] {r.getEntity()});
-                closeAsyncResponseIfPossible(r, message, cb);
+                try {
+                    cb.handleResponse(message, new Object[] {r.getEntity()});
+                } catch (Throwable t) {
+                    cb.handleException(message, t);
+                } finally {
+                    closeAsyncResponseIfPossible(r, message, cb);
+                }
             }
         }
     }

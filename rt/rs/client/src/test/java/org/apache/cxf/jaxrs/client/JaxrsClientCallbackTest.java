@@ -190,11 +190,19 @@ public class JaxrsClientCallbackTest {
 
         final CyclicBarrier barrier = new CyclicBarrier(2);
         Object[] result = new String[] {"results"};
-        schedule(barrier, () -> callback.handleResponse(ctx, result));
+        // Callers invoke handleException() if handleResponse() throws
+        schedule(barrier, () -> {
+            try {
+                callback.handleResponse(ctx, result);
+            } catch (Throwable t) {
+                callback.handleException(ctx, t);
+            }
+        });
         barrier.await(5, TimeUnit.SECONDS);
 
         ExecutionException ex = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
         assertThat(ex.getCause(), sameInstance(handlerException));
+        assertThat(handlerException.getSuppressed().length, equalTo(0));
         assertThrows(ExecutionException.class, () -> future.get());
         assertThat(future.isCancelled(), equalTo(false));
         assertThat(future.isDone(), equalTo(true));

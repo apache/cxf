@@ -159,11 +159,19 @@ public class JaxwsClientCallbackTest {
 
         final CyclicBarrier barrier = new CyclicBarrier(2);
         Object[] result = new Object[0];
-        schedule(barrier, () -> callback.handleResponse(ctx, result));
+        // Callers invoke handleException() if handleResponse() throws
+        schedule(barrier, () -> {
+            try {
+                callback.handleResponse(ctx, result);
+            } catch (Throwable t) {
+                callback.handleException(ctx, t);
+            }
+        });
         barrier.await(5, TimeUnit.SECONDS);
 
         ExecutionException ex = assertThrows(ExecutionException.class, () -> callback.get(5, TimeUnit.SECONDS));
         assertThat(ex.getCause(), sameInstance(handlerException));
+        assertThat(handlerException.getSuppressed().length, equalTo(0));
         assertThrows(ExecutionException.class, () -> callback.get());
         assertThat(callback.isCancelled(), equalTo(false));
         assertThat(callback.isDone(), equalTo(true));

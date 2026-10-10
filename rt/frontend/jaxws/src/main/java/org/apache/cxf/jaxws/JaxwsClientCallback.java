@@ -41,47 +41,38 @@ class JaxwsClientCallback<T> extends ClientCallback {
         
         // The handler has to be called *before* future completes
         if (handler != null) {
-            try {
-                handler.handleResponse(new Response<T>() {
-                    protected boolean cancelled;
-                    
-                    public Map<String, Object> getContext() {
-                        return context;
-                    }
-
-                    public boolean cancel(boolean mayInterruptIfRunning) {
-                        cancelled = true;
-                        return true;
-                    }
-
-                    @SuppressWarnings("unchecked")
-                    public T get() throws InterruptedException, ExecutionException {
-                        return (T)res[0];
-                    }
-
-                    @SuppressWarnings("unchecked")
-                    public T get(long timeout, TimeUnit unit) throws InterruptedException,
-                        ExecutionException, TimeoutException {
-                        return (T)res[0];
-                    }
-
-                    public boolean isCancelled() {
-                        return cancelled;
-                    }
-
-                    public boolean isDone() {
-                        return true;
-                    }
-
-                });
-            } catch (Throwable t) {
-                // The future has to complete even if the handler fails, otherwise waiting threads hang forever
-                delegate.completeExceptionally(t);
-                synchronized (this) {
-                    notifyAll();
+            handler.handleResponse(new Response<T>() {
+                protected boolean cancelled;
+                
+                public Map<String, Object> getContext() {
+                    return context;
                 }
-                return;
-            }
+
+                public boolean cancel(boolean mayInterruptIfRunning) {
+                    cancelled = true;
+                    return true;
+                }
+
+                @SuppressWarnings("unchecked")
+                public T get() throws InterruptedException, ExecutionException {
+                    return (T)res[0];
+                }
+
+                @SuppressWarnings("unchecked")
+                public T get(long timeout, TimeUnit unit) throws InterruptedException,
+                    ExecutionException, TimeoutException {
+                    return (T)res[0];
+                }
+
+                public boolean isCancelled() {
+                    return cancelled;
+                }
+
+                public boolean isDone() {
+                    return true;
+                }
+
+            });
         }
         
         delegate.complete(res);
@@ -131,7 +122,9 @@ class JaxwsClientCallback<T> extends ClientCallback {
                 });
             } catch (Throwable t) {
                 // The future has to complete even if the handler fails, otherwise waiting threads hang forever
-                ex.addSuppressed(t);
+                if (t != ex) {
+                    ex.addSuppressed(t);
+                }
             }
         }
 

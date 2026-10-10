@@ -87,16 +87,7 @@ public class JaxrsClientCallback<T> extends ClientCallback {
         
         // The handler has to be called *before* future completes
         if (handler != null) {
-            try {
-                handler.completed((T)res[0]);
-            } catch (Throwable t) {
-                // The future has to complete even if the handler fails, otherwise waiting threads hang forever
-                delegate.completeExceptionally(t);
-                synchronized (this) {
-                    notifyAll();
-                }
-                return;
-            }
+            handler.completed((T)res[0]);
         }
         
         delegate.complete(res);
@@ -115,7 +106,9 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                 handler.failed(ex);
             } catch (Throwable t) {
                 // The future has to complete even if the handler fails, otherwise waiting threads hang forever
-                ex.addSuppressed(t);
+                if (t != ex) {
+                    ex.addSuppressed(t);
+                }
             }
         }
 
@@ -152,7 +145,9 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                     try {
                         callback.handler.failed(ex);
                     } catch (Throwable t) {
-                        ex.addSuppressed(t);
+                        if (t != ex) {
+                            ex.addSuppressed(t);
+                        }
                     }
                 }
                 throw ex;
@@ -167,7 +162,9 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                     try {
                         callback.handler.failed(ex);
                     } catch (Throwable t) {
-                        ex.addSuppressed(t);
+                        if (t != ex) {
+                            ex.addSuppressed(t);
+                        }
                     }
                 }
                 throw ex;
