@@ -41,6 +41,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 
@@ -180,6 +181,74 @@ public class JaxrsClientCallbackTest {
     @Test(expected = TimeoutException.class)
     public void testTimeout() throws Exception {
         future.get(10, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void testHandleResponseCallbackThrows() throws Exception {
+        final RuntimeException handlerException = new RuntimeException("completed failed");
+        useThrowingHandler(handlerException);
+
+        final CyclicBarrier barrier = new CyclicBarrier(2);
+        Object[] result = new String[] {"results"};
+        // Callers invoke handleException() if handleResponse() throws
+        schedule(barrier, () -> {
+            try {
+                callback.handleResponse(ctx, result);
+            } catch (Throwable t) {
+                callback.handleException(ctx, t);
+            }
+        });
+        barrier.await(5, TimeUnit.SECONDS);
+
+        ExecutionException ex = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
+        assertThat(ex.getCause(), sameInstance(handlerException));
+        assertThat(handlerException.getSuppressed().length, equalTo(0));
+        assertThrows(ExecutionException.class, () -> future.get());
+        assertThat(future.isCancelled(), equalTo(false));
+        assertThat(future.isDone(), equalTo(true));
+    }
+
+    @Test
+    public void testHandleExceptionCallbackThrows() throws Exception {
+        final RuntimeException handlerException = new RuntimeException("failed failed");
+        useThrowingHandler(handlerException);
+
+        final RuntimeException cause = new RuntimeException("invocation failed");
+        final CyclicBarrier barrier = new CyclicBarrier(2);
+        schedule(barrier, () -> callback.handleException(ctx, cause));
+        barrier.await(5, TimeUnit.SECONDS);
+
+        ExecutionException ex = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
+        assertThat(ex.getCause(), sameInstance(cause));
+        assertThat(cause.getSuppressed(), equalTo(new Throwable[] {handlerException}));
+        assertThat(future.isCancelled(), equalTo(false));
+        assertThat(future.isDone(), equalTo(true));
+    }
+
+    @Test
+    public void testHandleCancellationCallbackThrows() throws Exception {
+        useThrowingHandler(new RuntimeException("failed failed"));
+
+        assertThat(future.cancel(true), equalTo(true));
+        assertThrows(InterruptedException.class, () -> future.get(10, TimeUnit.MILLISECONDS));
+        assertThat(future.isCancelled(), equalTo(true));
+        assertThat(future.isDone(), equalTo(true));
+    }
+
+    private void useThrowingHandler(final RuntimeException handlerException) {
+        handler = new InvocationCallback<String>() {
+            @Override
+            public void failed(Throwable throwable) {
+                throw handlerException;
+            }
+
+            @Override
+            public void completed(String response) {
+                throw handlerException;
+            }
+        };
+        callback = new JaxrsClientCallback<String>(handler, String.class, null);
+        future = (JaxrsResponseFuture<String>)callback.createFuture();
     }
 
     private void schedule(CyclicBarrier barrier, Runnable runnable) {

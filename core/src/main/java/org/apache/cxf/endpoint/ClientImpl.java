@@ -517,7 +517,11 @@ public class ClientImpl
                                 Map<String, Object> ctx = responseContext.get(Thread.currentThread());
                                 List<Object> resList = CastUtils.cast(inMsg.getContent(List.class));
                                 Object[] result = resList == null ? null : resList.toArray();
-                                callback.handleResponse(ctx, result);
+                                try {
+                                    callback.handleResponse(ctx, result);
+                                } catch (Throwable t) {
+                                    callback.handleException(ctx, t);
+                                }
                                 return;
                             }
                         }
