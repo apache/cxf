@@ -94,7 +94,10 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
 
     protected void transformOS(Message message, OutputStream out) {
         CachedOutputStream wrapper = new CachedOutputStream();
-        CachedOutputStreamCallback callback = new XSLTCachedOutputStreamCallback(getXSLTTemplate(), out);
+        String encoding = getEncoding(message);
+        CachedOutputStreamCallback callback =
+            new XSLTCachedOutputStreamCallback(getXSLTTemplate(),
+                                               out, encoding);
         wrapper.registerCallback(callback);
         message.setContent(OutputStream.class, wrapper);
     }
@@ -144,10 +147,14 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
     public static class XSLTCachedOutputStreamCallback implements CachedOutputStreamCallback {
         private final Templates xsltTemplate;
         private final OutputStream origStream;
+        private final String encoding;
 
-        public XSLTCachedOutputStreamCallback(Templates xsltTemplate, OutputStream origStream) {
+        public XSLTCachedOutputStreamCallback(Templates xsltTemplate,
+                                              OutputStream origStream,
+                                              String encoding) {
             this.xsltTemplate = xsltTemplate;
             this.origStream = origStream;
+            this.encoding = encoding;
         }
 
         @Override
@@ -159,7 +166,8 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
             InputStream transformedStream;
             Exception exceptionOnClose = null;
             try {
-                transformedStream = XSLTUtils.transform(xsltTemplate, wrapper.getInputStream());
+                transformedStream = XSLTUtils.transform(
+                    xsltTemplate, wrapper.getInputStream(), encoding);
                 IOUtils.copyAndCloseInput(transformedStream, origStream);
             } catch (IOException e) {
                 throw new Fault("STREAM_COPY", LOG, e, e.getMessage());
