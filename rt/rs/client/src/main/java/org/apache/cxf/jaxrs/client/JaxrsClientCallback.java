@@ -59,7 +59,11 @@ public class JaxrsClientCallback<T> extends ClientCallback {
         if (!started) {
             // The handler has to be called *before* future completes
             if (handler != null) {
-                handler.failed(new CancellationException());
+                try {
+                    handler.failed(new CancellationException());
+                } catch (Throwable t) {
+                    // The future has to be cancelled even if the handler fails
+                }
             }
             
             delegate.cancel(mayInterruptIfRunning);
@@ -83,7 +87,16 @@ public class JaxrsClientCallback<T> extends ClientCallback {
         
         // The handler has to be called *before* future completes
         if (handler != null) {
-            handler.completed((T)res[0]);
+            try {
+                handler.completed((T)res[0]);
+            } catch (Throwable t) {
+                // The future has to complete even if the handler fails, otherwise waiting threads hang forever
+                delegate.completeExceptionally(t);
+                synchronized (this) {
+                    notifyAll();
+                }
+                return;
+            }
         }
         
         delegate.complete(res);
@@ -98,7 +111,12 @@ public class JaxrsClientCallback<T> extends ClientCallback {
 
         // The handler has to be called *before* future completes
         if (handler != null) {
-            handler.failed(ex);
+            try {
+                handler.failed(ex);
+            } catch (Throwable t) {
+                // The future has to complete even if the handler fails, otherwise waiting threads hang forever
+                ex.addSuppressed(t);
+            }
         }
 
         delegate.completeExceptionally(ex);
@@ -131,7 +149,11 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                 return getObject(callback.get()[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed(ex);
+                    try {
+                        callback.handler.failed(ex);
+                    } catch (Throwable t) {
+                        ex.addSuppressed(t);
+                    }
                 }
                 throw ex;
             }
@@ -142,7 +164,11 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                 return getObject(callback.get(timeout, unit)[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed(ex);
+                    try {
+                        callback.handler.failed(ex);
+                    } catch (Throwable t) {
+                        ex.addSuppressed(t);
+                    }
                 }
                 throw ex;
             }
