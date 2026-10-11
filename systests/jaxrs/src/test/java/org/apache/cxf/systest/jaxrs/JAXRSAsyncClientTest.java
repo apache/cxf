@@ -411,6 +411,28 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testGetBookAsyncCallbackThrows() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/123";
+        WebClient wc = createWebClient(address);
+        final RuntimeException handlerException = new RuntimeException("completed failed");
+        InvocationCallback<Book> callback = new InvocationCallback<Book>() {
+            public void completed(Book response) {
+                throw handlerException;
+            }
+
+            public void failed(Throwable error) {
+            }
+        };
+        try {
+            wc.async().get(callback).get(10, TimeUnit.SECONDS);
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() == handlerException);
+        }
+        wc.close();
+    }
+
+    @Test
     public void testClientResponseFilter() throws Exception {
         final String address = "http://localhost:" + PORT + "/bookstore/books/wildcard";
         try (Response response = ClientBuilder.newClient()
