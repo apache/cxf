@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Set;
 
@@ -25,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class BeanspectorTest {
@@ -161,5 +164,65 @@ public class BeanspectorTest {
         }
         
         public void setSimpleBean(String simpleBean) { }
+    }
+
+    @Test
+    public void testFindSetterExactMatch() throws Exception {
+        Method m = Beanspector.findSetter(OverloadedSetterEntity.class, "setName", String.class);
+        assertEquals(String.class, m.getParameterTypes()[0]);
+    }
+
+    @Test
+    public void testFindSetterGenericSuperclass() throws Exception {
+        // 'setId(PK)' erases to 'setId(Serializable)', there is no 'setId(Long)'
+        Method m = Beanspector.findSetter(OverloadedSetterEntity.class, "setId", Long.class);
+        assertEquals(Serializable.class, m.getParameterTypes()[0]);
+    }
+
+    @Test
+    public void testFindSetterPrefersMostSpecializedType() throws Exception {
+        // Both 'setName(Object)' and 'setName(CharSequence)' accept a StringBuilder
+        Method m = Beanspector.findSetter(OverloadedSetterEntity.class, "setName", StringBuilder.class);
+        assertEquals(CharSequence.class, m.getParameterTypes()[0]);
+    }
+
+    @Test
+    public void testFindSetterNotFound() {
+        assertThrows(NoSuchMethodException.class,
+            () -> Beanspector.findSetter(OverloadedSetterEntity.class, "setId", Object.class));
+    }
+
+    @Ignore
+    public abstract static class AbstractIdEntity<PK extends Serializable> {
+        private PK id;
+
+        public PK getId() {
+            return id;
+        }
+
+        public void setId(PK id) {
+            this.id = id;
+        }
+    }
+
+    @Ignore
+    public static class OverloadedSetterEntity extends AbstractIdEntity<Long> {
+        private Object name;
+
+        public Object getName() {
+            return name;
+        }
+
+        public void setName(Object name) {
+            this.name = name;
+        }
+
+        public void setName(CharSequence name) {
+            this.name = name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

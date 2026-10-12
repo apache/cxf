@@ -233,7 +233,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             } else {
                 nextObject = actualReturnType.getDeclaredConstructor().newInstance();
             }
-            Method setterM = getSetterMethod(actualType, "set" + nextPart, returnType);
+            Method setterM = Beanspector.findSetter(actualType, "set" + nextPart, returnType);
             final Object valueObjectValue;
             if (lastTry || !returnCollection) {
                 valueObjectValue = nextObject;
@@ -263,23 +263,6 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         } catch (Throwable e) {
             throw new SearchParseException("Cannot convert String value \"" + value
                                            + "\" to a value of class " + valueType.getName(), e);
-        }
-    }
-
-    private static Method getSetterMethod(Class<?> cls, String name, Class<?> paramType)
-        throws NoSuchMethodException {
-        try {
-            return cls.getMethod(name, new Class[]{paramType});
-        } catch (NoSuchMethodException ex) {
-            // The setter may be declared by a generic superclass, e.g. 'setId(PK id)',
-            // in which case its erased parameter type is a supertype of the resolved one
-            for (Method m : cls.getMethods()) {
-                if (m.getName().equals(name) && m.getParameterCount() == 1
-                    && m.getParameterTypes()[0].isAssignableFrom(paramType)) {
-                    return m;
-                }
-            }
-            throw ex;
         }
     }
 

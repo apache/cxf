@@ -167,6 +167,33 @@ public class Beanspector<T> {
         return cls != null ? cls : defaultType;
     }
 
+    /**
+     * Finds a public single-argument setter which accepts the given parameter type. The setter
+     * may be declared by a generic superclass (for example, {@code setId(PK id)}), in which case
+     * its erased parameter type is a supertype of the resolved one. As in {@link #init()}, the
+     * setter with the most specialized parameter type is preferred.
+     */
+    static Method findSetter(Class<?> cls, String name, Class<?> paramType) throws NoSuchMethodException {
+        try {
+            return cls.getMethod(name, paramType);
+        } catch (NoSuchMethodException ex) {
+            Method setter = null;
+            for (Method m : cls.getMethods()) {
+                if (m.getName().equals(name) && m.getParameterCount() == 1) {
+                    Class<?> type = m.getParameterTypes()[0];
+                    if (type.isAssignableFrom(paramType)
+                        && (setter == null || setter.getParameterTypes()[0].isAssignableFrom(type))) {
+                        setter = m;
+                    }
+                }
+            }
+            if (setter == null) {
+                throw ex;
+            }
+            return setter;
+        }
+    }
+
     public Beanspector<T> swap(T newobject) throws Exception {
         if (newobject == null) {
             throw new IllegalArgumentException("newobject is null");
