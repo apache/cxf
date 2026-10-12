@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.odata;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -26,6 +27,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -117,6 +119,47 @@ public class ODataParserTest {
         }
     }
 
+    public abstract static class AbstractEntity<PK extends Serializable> {
+        private PK id;
+
+        public PK getId() {
+            return id;
+        }
+
+        public void setId(PK id) {
+            this.id = id;
+        }
+    }
+
+    public static class Call extends AbstractEntity<Long> {
+        Call withId(Long newId) {
+            setId(newId);
+            return this;
+        }
+    }
+
+    public static class CallHeader extends AbstractEntity<Long> {
+        private Call call;
+
+        public Call getCall() {
+            return call;
+        }
+
+        public void setCall(Call call) {
+            this.call = call;
+        }
+
+        CallHeader withId(Long newId) {
+            setId(newId);
+            return this;
+        }
+
+        CallHeader withCall(Call newCall) {
+            setCall(newCall);
+            return this;
+        }
+    }
+
     @Before
     public void setUp() {
         parser = new ODataParser<>(Person.class, Collections.<String, String>emptyMap(),
@@ -195,5 +238,21 @@ public class ODataParserTest {
         SearchCondition< Person > filter = parser.parse("Ssn ne 748232221");
         assertTrue(filter.isMet(new Person("Tom", "Bombadil").withSsn(553232222L)));
         assertFalse(filter.isMet(new Person("Tom", "Bombadil").withHourlyRate(748232221L)));
+    }
+
+    @Test
+    public void testFilterByGenericSuperclassProperty() throws SearchParseException {
+        SearchCondition< CallHeader > filter = new ODataParser<>(CallHeader.class).parse("id eq 1");
+        assertEquals(Long.valueOf(1L), filter.getStatement().getValue());
+        assertTrue(filter.isMet(new CallHeader().withId(1L)));
+        assertFalse(filter.isMet(new CallHeader().withId(2L)));
+    }
+
+    @Test
+    public void testFilterByNestedGenericSuperclassProperty() throws SearchParseException {
+        SearchCondition< CallHeader > filter = new ODataParser<>(CallHeader.class).parse("call.id eq 1");
+        assertEquals(Long.valueOf(1L), ((Call)filter.getStatement().getValue()).getId());
+        assertTrue(filter.isMet(new CallHeader().withCall(new Call().withId(1L))));
+        assertFalse(filter.isMet(new CallHeader().withCall(new Call().withId(2L))));
     }
 }
