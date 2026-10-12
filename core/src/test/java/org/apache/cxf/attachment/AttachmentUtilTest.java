@@ -18,14 +18,20 @@
  */
 package org.apache.cxf.attachment;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
@@ -363,5 +369,43 @@ public class AttachmentUtilTest {
                 new Object())) {
             // Will throw exception
         }
+    }
+
+    @Test
+    public void testCreateAttachmentFormDataFieldDefaultsToTextPlain() throws IOException {
+        // RFC 7578, section 4.4
+        assertEquals("text/plain",
+            createAttachmentContentType("form-data; name=\"dzchunkindex\"", null));
+    }
+
+    @Test
+    public void testCreateAttachmentFormDataFileDefaultsToOctetStream() throws IOException {
+        assertEquals("application/octet-stream",
+            createAttachmentContentType("form-data; name=\"file\"; filename=\"a.bin\"", null));
+    }
+
+    @Test
+    public void testCreateAttachmentNoContentDispositionDefaultsToOctetStream() throws IOException {
+        assertEquals("application/octet-stream", createAttachmentContentType(null, null));
+    }
+
+    @Test
+    public void testCreateAttachmentFormDataFieldHonoursDefaultContentTypeProperty() throws IOException {
+        assertEquals("application/json",
+            createAttachmentContentType("form-data; name=\"field\"", "application/json"));
+    }
+
+    private static String createAttachmentContentType(String cd, String defaultCt) throws IOException {
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        if (cd != null) {
+            headers.put("Content-Disposition", Collections.singletonList(cd));
+        }
+        Message message = new MessageImpl();
+        if (defaultCt != null) {
+            message.put(AttachmentUtil.ATTACHMENT_CONTENT_TYPE, defaultCt);
+        }
+        Attachment att = AttachmentUtil.createAttachment(
+            new ByteArrayInputStream("3".getBytes(StandardCharsets.UTF_8)), headers, message);
+        return att.getDataHandler().getContentType();
     }
 }

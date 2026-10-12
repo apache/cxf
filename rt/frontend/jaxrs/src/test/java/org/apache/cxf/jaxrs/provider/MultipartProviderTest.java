@@ -28,7 +28,9 @@ import java.util.stream.IntStream;
 
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -39,6 +41,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MultipartProviderTest {
     @Test
@@ -129,5 +133,52 @@ public class MultipartProviderTest {
                     MediaType.APPLICATION_OCTET_STREAM_TYPE,
                     new MetadataMap<String, String>(),
                     msg.getContent(InputStream.class)));
+    }
+
+    @Test
+    public void testFormDataFieldWithoutContentTypeAsInteger() throws Exception {
+        assertEquals(Integer.valueOf(3), readFormDataInteger(null));
+    }
+
+    @Test
+    public void testFormDataFieldWithTextPlainContentTypeAsInteger() throws Exception {
+        assertEquals(Integer.valueOf(3), readFormDataInteger("text/plain"));
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private Object readFormDataInteger(String partContentType) throws Exception {
+        StringBuilder sb = new StringBuilder()
+            .append("--bound\r\n")
+            .append("Content-Disposition: form-data; name=\"dzchunkindex\"\r\n");
+        if (partContentType != null) {
+            sb.append("Content-Type: ").append(partContentType).append("\r\n");
+        }
+        sb.append("\r\n")
+            .append("3\r\n")
+            .append("--bound--\r\n");
+
+        final Exchange exchange = new ExchangeImpl();
+        final Endpoint endpoint = mock(Endpoint.class);
+        when(endpoint.get(ServerProviderFactory.class.getName())).thenReturn(ServerProviderFactory.getInstance());
+        exchange.put(Endpoint.class, endpoint);
+        final Message msg = new MessageImpl();
+        msg.setExchange(exchange);
+        exchange.setInMessage(msg);
+        msg.put(Message.CONTENT_TYPE, "multipart/form-data; boundary=bound");
+        InputStream is = new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
+        msg.setContent(InputStream.class, is);
+
+        final MultipartProvider p = new MultipartProvider();
+        p.setMessageContext(new MessageContextImpl(msg));
+        Annotation[] anns = FormDataResource.class.getMethod("upload", Integer.class)
+            .getParameterAnnotations()[0];
+        return p.readFrom((Class)Integer.class, Integer.class, anns,
+            MediaType.valueOf("multipart/form-data; boundary=bound"), new MetadataMap<String, String>(), is);
+    }
+
+    public static class FormDataResource {
+        public void upload(@Multipart(value = "dzchunkindex", required = false) Integer index) {
+            // complete
+        }
     }
 }
