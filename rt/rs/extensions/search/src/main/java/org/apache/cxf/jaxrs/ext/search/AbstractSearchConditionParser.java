@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -183,10 +184,13 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
         try {
             String nextPart = getMethodNameSuffix(names[1]);
             Method getterM = actualType.getMethod("get" + nextPart, new Class[]{});
-            Class<?> returnType = getterM.getReturnType();
+            // The getter may be declared by a generic superclass, e.g. 'PK getId()',
+            // in which case its type has to be resolved against the actual class
+            Type genericReturnType = Beanspector.resolveType(actualType, getterM.getGenericReturnType());
+            Class<?> returnType = Beanspector.getRawType(genericReturnType, getterM.getReturnType());
             boolean returnCollection = InjectionUtils.isSupportedCollectionOrArray(returnType);
             Class<?> actualReturnType = !returnCollection ? returnType
-                : InjectionUtils.getActualType(getterM.getGenericReturnType());
+                : InjectionUtils.getActualType(genericReturnType);
 
             boolean isPrimitive = !returnCollection
                 && InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
@@ -229,7 +233,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             } else {
                 nextObject = actualReturnType.getDeclaredConstructor().newInstance();
             }
-            Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
+            Method setterM = Beanspector.findSetter(actualType, "set" + nextPart, returnType);
             final Object valueObjectValue;
             if (lastTry || !returnCollection) {
                 valueObjectValue = nextObject;
@@ -245,7 +249,7 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
             }
             lastCastedValue = valueObject;
 
-            TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), getterM.getGenericReturnType());
+            TypeInfo nextTypeInfo = new TypeInfo(valueObjectValue.getClass(), genericReturnType);
             Object response = parseType(originalPropName,
                              nextObject,
                              lastCastedValue,
