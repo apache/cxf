@@ -41,6 +41,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
@@ -407,5 +408,43 @@ public class AttachmentUtilTest {
         Attachment att = AttachmentUtil.createAttachment(
             new ByteArrayInputStream("3".getBytes(StandardCharsets.UTF_8)), headers, message);
         return att.getDataHandler().getContentType();
+    }
+
+    @Test
+    public void testCreateAttachmentStripsPathFromFilename() throws IOException {
+        assertEquals("passwd",
+            createAttachmentName("form-data; name=\"file\"; filename=\"../../../etc/passwd\""));
+        assertEquals("secret.txt",
+            createAttachmentName("form-data; name=\"file\"; filename=\"..\\..\\secret.txt\""));
+    }
+
+    @Test
+    public void testCreateAttachmentStripsExtendedFilenameTraversal() throws IOException {
+        // CXF percent-decodes the filename* value, turning %2e%2e%2f back into ../
+        assertEquals("passwd",
+            createAttachmentName("form-data; name=\"file\"; filename*=UTF-8''%2e%2e%2f%2e%2e%2fpasswd"));
+    }
+
+    @Test
+    public void testCreateAttachmentStripsCodepointEncodedTraversal() throws IOException {
+        // &#NNNN; references are decoded too: &#0046;&#0046;&#0047; becomes ../
+        assertEquals("x",
+            createAttachmentName("form-data; name=\"file\"; filename=\"&#0046;&#0046;&#0047;x\""));
+    }
+
+    @Test
+    public void testCreateAttachmentDropsUnsafeFilename() throws IOException {
+        // ".." and a trailing separator leave nothing usable, so no name is set
+        assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"..\""));
+        assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"reports/\""));
+        assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"shell.jsp\u0000.png\""));
+    }
+
+    private static String createAttachmentName(String cd) throws IOException {
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("Content-Disposition", Collections.singletonList(cd));
+        Attachment att = AttachmentUtil.createAttachment(
+            new ByteArrayInputStream("3".getBytes(StandardCharsets.UTF_8)), headers, new MessageImpl());
+        return att.getDataHandler().getName();
     }
 }

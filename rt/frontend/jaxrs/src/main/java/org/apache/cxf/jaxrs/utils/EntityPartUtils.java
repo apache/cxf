@@ -29,6 +29,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -56,7 +57,7 @@ final class EntityPartUtils {
             final Attachment attachment = body.getAttachment(key);
             if (attachment != null) {
                 final ContentDisposition cd = attachment.getContentDisposition();
-                final String fileName = (cd != null) ? cd.getFilename() : null;
+                final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
 
                 if (!StringUtils.isEmpty(fileName)) {
                     return new EntityPartImpl(providers, key, fileName, value, String.class, null,
@@ -95,7 +96,7 @@ final class EntityPartUtils {
             return null;
         }
 
-        final String fileName = (cd != null) ? cd.getFilename() : null;
+        final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
         final String cdName = cd == null ? null : cd.getParameter("name");
         final String contentId = a.getContentId();
         final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");

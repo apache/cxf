@@ -47,6 +47,7 @@ import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -165,7 +166,7 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final InputStream is = attachment.getDataHandler().getInputStream();
             final ContentDisposition cd = attachment.getContentDisposition();
             
-            final String fileName = (cd != null) ? cd.getFilename() : null;
+            final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
 
