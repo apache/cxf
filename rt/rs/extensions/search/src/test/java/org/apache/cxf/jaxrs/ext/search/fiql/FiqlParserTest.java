@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.fiql;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -448,6 +449,22 @@ public class FiqlParserTest {
         }
     }
 
+    @Test
+    public void testGenericSuperclassProperty() throws SearchParseException {
+        SearchCondition<CallHeader> filter = new FiqlParser<>(CallHeader.class).parse("id==1");
+        assertEquals(Long.valueOf(1L), filter.getStatement().getValue());
+        assertTrue(filter.isMet(new CallHeader().withId(1L)));
+        assertFalse(filter.isMet(new CallHeader().withId(2L)));
+    }
+
+    @Test
+    public void testNestedGenericSuperclassProperty() throws SearchParseException {
+        SearchCondition<CallHeader> filter = new FiqlParser<>(CallHeader.class).parse("call.id==1");
+        assertEquals(Long.valueOf(1L), ((Call)filter.getStatement().getValue()).getId());
+        assertTrue(filter.isMet(new CallHeader().withCall(new Call().withId(1L))));
+        assertFalse(filter.isMet(new CallHeader().withCall(new Call().withId(2L))));
+    }
+
     @Ignore
     public static class Condition {
         private String name;
@@ -615,6 +632,47 @@ public class FiqlParserTest {
         }
     }
 
+
+    public abstract static class AbstractEntity<PK extends Serializable> {
+        private PK id;
+
+        public PK getId() {
+            return id;
+        }
+
+        public void setId(PK id) {
+            this.id = id;
+        }
+    }
+
+    public static class Call extends AbstractEntity<Long> {
+        Call withId(Long newId) {
+            setId(newId);
+            return this;
+        }
+    }
+
+    public static class CallHeader extends AbstractEntity<Long> {
+        private Call call;
+
+        public Call getCall() {
+            return call;
+        }
+
+        public void setCall(Call call) {
+            this.call = call;
+        }
+
+        CallHeader withId(Long newId) {
+            setId(newId);
+            return this;
+        }
+
+        CallHeader withCall(Call newCall) {
+            setCall(newCall);
+            return this;
+        }
+    }
 
     public static class Job {
         private List<Task> tasks;

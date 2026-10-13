@@ -22,6 +22,7 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 /**
  * Bean introspection utility.
@@ -140,8 +142,56 @@ public class Beanspector<T> {
                                        setters.keySet(), getters.keySet());
             throw new IntrospectionException(msg);
         }
-        return new TypeInfo(m.getReturnType(), m.getGenericReturnType(),
-            primitiveToWrapper(m.getReturnType()));
+        Type genericType = resolveType(tclass, m.getGenericReturnType());
+        Class<?> cls = getRawType(genericType, m.getReturnType());
+        return new TypeInfo(cls, genericType, primitiveToWrapper(cls));
+    }
+
+    /**
+     * Resolves a type variable (for example, the type of a property declared in a generic
+     * superclass such as {@code AbstractEntity<PK extends Serializable>}) against the given
+     * concrete class. Any other type is returned unchanged.
+     */
+    static Type resolveType(Class<?> concreteClass, Type type) {
+        if (type instanceof TypeVariable) {
+            Type resolved = InjectionUtils.getSuperType(concreteClass, (TypeVariable<?>)type);
+            if (resolved != null) {
+                return resolved;
+            }
+        }
+        return type;
+    }
+
+    static Class<?> getRawType(Type type, Class<?> defaultType) {
+        Class<?> cls = InjectionUtils.getRawType(type);
+        return cls != null ? cls : defaultType;
+    }
+
+    /**
+     * Finds a public single-argument setter which accepts the given parameter type. The setter
+     * may be declared by a generic superclass (for example, {@code setId(PK id)}), in which case
+     * its erased parameter type is a supertype of the resolved one. As in {@link #init()}, the
+     * setter with the most specialized parameter type is preferred.
+     */
+    static Method findSetter(Class<?> cls, String name, Class<?> paramType) throws NoSuchMethodException {
+        try {
+            return cls.getMethod(name, paramType);
+        } catch (NoSuchMethodException ex) {
+            Method setter = null;
+            for (Method m : cls.getMethods()) {
+                if (m.getName().equals(name) && m.getParameterCount() == 1) {
+                    Class<?> type = m.getParameterTypes()[0];
+                    if (type.isAssignableFrom(paramType)
+                        && (setter == null || setter.getParameterTypes()[0].isAssignableFrom(type))) {
+                        setter = m;
+                    }
+                }
+            }
+            if (setter == null) {
+                throw ex;
+            }
+            return setter;
+        }
     }
 
     public Beanspector<T> swap(T newobject) throws Exception {
