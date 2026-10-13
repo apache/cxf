@@ -121,6 +121,20 @@ public class ContentDisposition {
         if (extendedFilename != null) {
             params.put(FILE_NAME, extendedFilename);
         }
+        // The filename arrives on an inbound part header and is fully attacker
+        // controlled, and the filename* form even percent-decodes %2e%2e%2f back
+        // into ../ here. RFC 6266 section 4.3 says a recipient must not treat the
+        // value as a path, so reduce it to its final segment before anyone builds
+        // a File from getFilename().
+        String filename = params.get(FILE_NAME);
+        if (filename != null) {
+            params.put(FILE_NAME, stripPath(filename));
+        }
+    }
+
+    private static String stripPath(String filename) {
+        int lastSeparator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+        return lastSeparator >= 0 ? filename.substring(lastSeparator + 1) : filename;
     }
 
     public String getType() {

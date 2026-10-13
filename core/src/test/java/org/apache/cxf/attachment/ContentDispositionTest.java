@@ -33,6 +33,24 @@ public class ContentDispositionTest {
         assertEquals("a file.txt", cd.getFilename());
     }
 
+    @Test
+    public void testFilenameWithPathIsReducedToFinalSegment() {
+        ContentDisposition cd = new ContentDisposition("attachment;filename=\"../../../etc/passwd\"");
+        assertEquals("passwd", cd.getFilename());
+    }
+
+    @Test
+    public void testFilenameWithBackslashPathIsReducedToFinalSegment() {
+        ContentDisposition cd = new ContentDisposition("attachment;filename=\"..\\..\\secret.txt\"");
+        assertEquals("secret.txt", cd.getFilename());
+    }
+
+    @Test
+    public void testExtendedFilenamePercentEncodedTraversalIsStripped() {
+        ContentDisposition cd = new ContentDisposition("attachment;filename*=UTF-8''%2e%2e%2f%2e%2e%2fpasswd");
+        assertEquals("passwd", cd.getFilename());
+    }
+
     @Test(timeout = 10000)
     public void testMalformedExtendedFilenameDoesNotOverflow() {
         StringBuilder value = new StringBuilder("attachment;filename*=UTF-8''");
