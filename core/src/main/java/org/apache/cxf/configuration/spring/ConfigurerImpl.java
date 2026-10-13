@@ -21,15 +21,14 @@ package org.apache.cxf.configuration.spring;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -58,24 +57,15 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
 
     private Set<ApplicationContext> appContexts;
-    private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions = new TreeMap<>();
+    private final Map<String, List<PatternHolder>> wildCardBeanDefinitions = new HashMap<>();
     private BeanFactory beanFactory;
 
-    @SuppressWarnings("PMD.OverrideBothEqualsAndHashCodeOnComparable")
-    static class MatcherHolder implements Comparable<MatcherHolder> {
-        Matcher matcher;
-        String wildCardId;
-        MatcherHolder(String orig, Matcher matcher) {
-            wildCardId = orig;
-            this.matcher = matcher;
-        }
-        
-        @Override
-        public int compareTo(MatcherHolder mh) {
-            int literalCharsLen1 = this.wildCardId.replace("*", "").length();
-            int literalCharsLen2 = mh.wildCardId.replace("*", "").length();
-            // The expression with more literal characters should end up on the top of the list
-            return Integer.compare(literalCharsLen1, literalCharsLen2) * -1;
+    static class PatternHolder {
+        final Pattern pattern;
+        final String wildCardId;
+        PatternHolder(String orig, Pattern pattern) {
+            this.wildCardId = orig;
+            this.pattern = pattern;
         }
     }
 
@@ -106,16 +96,12 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                             final String name = n.charAt(0) != '*' ? n
                                     : "." + n.replaceAll("\\.", "\\."); //old wildcard
                             try {
-                                Matcher matcher = Pattern.compile(name).matcher("");
-                                List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
-                                if (m == null) {
-                                    m = new ArrayList<>();
-                                    wildCardBeanDefinitions.put(className, m);
-                                }
-                                MatcherHolder holder = new MatcherHolder(n, matcher);
-                                m.add(holder);
+                                Pattern pattern = Pattern.compile(name);
+                                wildCardBeanDefinitions
+                                    .computeIfAbsent(className, k -> new ArrayList<>())
+                                    .add(new PatternHolder(n, pattern));
                             } catch (PatternSyntaxException npe) {
-                                //not a valid patter, we'll ignore
+                                //not a valid pattern, we'll ignore
                             }
                         } else {
                             LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n);
@@ -192,15 +178,12 @@ public class ConfigurerImpl extends BeanConfigurerSupport
             Class<?> clazz = beanInstance.getClass();
             while (!Object.class.equals(clazz)) {
                 String className = clazz.getName();
-                List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
-                if (matchers != null) {
-                    for (MatcherHolder m : matchers) {
-                        synchronized (m.matcher) {
-                            m.matcher.reset(bn);
-                            if (m.matcher.matches()) {
-                                configureBean(m.wildCardId, beanInstance, false);
-                                return;
-                            }
+                List<PatternHolder> patterns = wildCardBeanDefinitions.get(className);
+                if (patterns != null) {
+                    for (PatternHolder p : patterns) {
+                        if (p.pattern.matcher(bn).matches()) {
+                            configureBean(p.wildCardId, beanInstance, false);
+                            return;
                         }
                     }
                 }
@@ -209,7 +192,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         }
     }
 
-    private boolean isWildcardBeanName(String bn) {
+    private static boolean isWildcardBeanName(String bn) {
         return bn.indexOf('*') != -1 || bn.indexOf('?') != -1
             || (bn.indexOf('(') != -1 && bn.indexOf(')') != -1);
     }
