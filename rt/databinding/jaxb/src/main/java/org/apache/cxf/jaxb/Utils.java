@@ -313,6 +313,40 @@ final class Utils {
     }
 
     static Type getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
+        return getXmlAdapterTypeArgument(xjta, 0);
+    }
+
+    /**
+     * Returns true if the field holds multiple values (a collection or an array) that are written as
+     * repeated elements. As in JAXB, an XmlJavaTypeAdapter on such a field is applied to each item,
+     * unless the field type is assignable to the adapter's bound type, in which case the adapter
+     * converts the whole value and the field is treated as single-valued.
+     */
+    static boolean isFieldArray(Field f) {
+        return JAXBSchemaInitializer.isArray(f.getGenericType())
+            && !isAdaptedAsWhole(getFieldXJTA(f), f.getType());
+    }
+
+    /**
+     * Same as {@link #isFieldArray(Field)} for a getter.
+     */
+    static boolean isMethodArray(Method m) {
+        return JAXBSchemaInitializer.isArray(m.getGenericReturnType())
+            && !isAdaptedAsWhole(getMethodXJTA(m), m.getReturnType());
+    }
+
+    private static boolean isAdaptedAsWhole(XmlJavaTypeAdapter xjta, Class<?> memberType) {
+        if (xjta == null) {
+            return false;
+        }
+        Type boundType = getXmlAdapterTypeArgument(xjta, 1);
+        if (boundType instanceof ParameterizedType) {
+            boundType = ((ParameterizedType)boundType).getRawType();
+        }
+        return boundType instanceof Class && ((Class<?>)boundType).isAssignableFrom(memberType);
+    }
+
+    private static Type getXmlAdapterTypeArgument(XmlJavaTypeAdapter xjta, int index) {
         if (xjta != null) {
             Class<?> c2 = xjta.value();
             Type sp = c2.getGenericSuperclass();
@@ -321,7 +355,7 @@ final class Utils {
                 c2 = c2.getSuperclass();
             }
             if (sp instanceof ParameterizedType) {
-                return ((ParameterizedType)sp).getActualTypeArguments()[0];
+                return ((ParameterizedType)sp).getActualTypeArguments()[index];
             }
         }
         return null;
