@@ -22,10 +22,14 @@ package org.apache.cxf.ext.logging;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 
 public class LoggingOutputStream extends CacheAndWriteOutputStream {
+    private static final Logger LOG = LogUtils.getL7dLogger(LoggingOutputStream.class);
+
     private boolean skipFlushingFlowThroughStream;
     private final AtomicBoolean closed = new AtomicBoolean();
 
@@ -90,7 +94,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(byte[] b) throws IOException {
         if (closed.get()) {
-            throw new IOException("The channel has been closed already");
+            throw new IOException("The output stream has been closed already");
         }
         try {
             super.write(b);
@@ -103,7 +107,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (closed.get()) {
-            throw new IOException("The channel has been closed already");
+            throw new IOException("The output stream has been closed already");
         }
         try {
             super.write(b, off, len);
@@ -116,7 +120,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
     @Override
     public void write(int b) throws IOException {
         if (closed.get()) {
-            throw new IOException("The channel has been closed already");
+            throw new IOException("The output stream has been closed already");
         }
         try {
             super.write(b);
@@ -139,6 +143,7 @@ public class LoggingOutputStream extends CacheAndWriteOutputStream {
             // Close this CachedOutputStream
             // Write method maybe called more than one time... but we already consume the stream the first time
             // So additional call to this.close would produce nothing
+            LOG.warning("Closing the output stream due to unrecoverable exception (while performing write operation)");
             this.close();
         } catch (Exception suppressed) {
             if (ex != null) {
