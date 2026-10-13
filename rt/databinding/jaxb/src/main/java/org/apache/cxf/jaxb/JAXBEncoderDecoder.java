@@ -43,6 +43,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -76,6 +77,8 @@ import jakarta.xml.bind.annotation.XmlAccessorOrder;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import jakarta.xml.bind.attachment.AttachmentMarshaller;
 import jakarta.xml.bind.attachment.AttachmentUnmarshaller;
 import org.apache.cxf.common.i18n.Message;
@@ -239,7 +242,8 @@ public final class JAXBEncoderDecoder {
                         writeArrayObject(marshaller,
                                          source,
                                          elName,
-                                         mObj);
+                                         mObj,
+                                         null);
                     } else {
                         writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
                     }
@@ -447,8 +451,8 @@ public final class JAXBEncoderDecoder {
                     Field f = (Field)member;
                     QName fname = new QName(namespace, f.getName());
                     ReflectionUtil.setAccessible(f);
-                    if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
-                        writeArrayObject(marshaller, writer, fname, f.get(elValue));
+                    if (Utils.isFieldArray(f)) {
+                        writeArrayObject(marshaller, writer, fname, f.get(elValue), Utils.getFieldXJTA(f));
                     } else {
                         Object o = Utils.getFieldValue(f, elValue);
                         writeObject(marshaller, writer, newJAXBElement(fname, String.class, o));
@@ -459,8 +463,8 @@ public final class JAXBEncoderDecoder {
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
                     QName mname = new QName(namespace, name);
-                    if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
-                        writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
+                    if (Utils.isMethodArray(m)) {
+                        writeArrayObject(marshaller, writer, mname, m.invoke(elValue), Utils.getMethodXJTA(m));
                     } else {
                         Object o = Utils.getMethodValue(m, elValue);
                         writeObject(marshaller, writer, newJAXBElement(mname, String.class, o));
@@ -488,17 +492,19 @@ public final class JAXBEncoderDecoder {
         }
         return m1Name;
     }
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static void writeArrayObject(Marshaller marshaller,
                                          Object source,
                                          QName mname,
-                                         Object mObj) throws Fault, JAXBException {
+                                         Object mObj,
+                                         XmlJavaTypeAdapter xjta) throws Exception {
         // Have to handle this ourselves.... which really
         // sucks.... but what can we do?
         if (mObj == null) {
             return;
         }
         Object objArray;
-        final Class<?> cls;
+        Class<?> cls;
         if (mObj instanceof List) {
             List<?> l = (List<?>)mObj;
             objArray = l.toArray();
@@ -507,12 +513,54 @@ public final class JAXBEncoderDecoder {
             objArray = mObj;
             cls = objArray.getClass().getComponentType();
         }
+        // an adapter on a multi-valued member applies to each item
+        XmlAdapter adapter = Utils.getXmlAdapter(xjta);
+        if (adapter != null) {
+            cls = getAdaptedItemClass(xjta);
+        }
         int len = Array.getLength(objArray);
         for (int x = 0; x < len; x++) {
             Object o = Array.get(objArray, x);
+            if (adapter != null) {
+                o = adapter.marshal(o);
+            }
             writeObject(marshaller, source,
                         newJAXBElement(mname, cls == null ? o.getClass() : cls, o));
         }
+    }
+
+    private static Class<?> getAdaptedItemClass(XmlJavaTypeAdapter xjta) {
+        Type t = Utils.getTypeFromXmlAdapter(xjta);
+        if (t instanceof ParameterizedType) {
+            t = ((ParameterizedType)t).getRawType();
+        }
+        return t instanceof Class ? (Class<?>)t : null;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Object unmarshallArrayMember(Unmarshaller u, XMLStreamReader reader, QName q,
+                                                Type type, XmlJavaTypeAdapter xjta) throws Exception {
+        Class<?> compType = JAXBSchemaInitializer.getArrayComponentType(type);
+        // an adapter on a multi-valued member applies to each item
+        XmlAdapter adapter = Utils.getXmlAdapter(xjta);
+        Class<?> itemType = adapter != null ? getAdaptedItemClass(xjta) : compType;
+        List<Object> ret = unmarshallArray(u, reader, q, itemType, createList(type));
+        if (adapter != null) {
+            for (ListIterator<Object> it = ret.listIterator(); it.hasNext();) {
+                it.set(adapter.unmarshal(it.next()));
+            }
+        }
+        if (isList(type)) {
+            return ret;
+        }
+        if (compType.isPrimitive()) {
+            Object o = Array.newInstance(compType, ret.size());
+            for (int x = 0; x < ret.size(); x++) {
+                Array.set(o, x, ret.get(x));
+            }
+            return o;
+        }
+        return ret.toArray((Object[])Array.newInstance(compType, ret.size()));
     }
 
     public static Exception unmarshallException(Unmarshaller u,
@@ -557,22 +605,8 @@ public final class JAXBEncoderDecoder {
                 if (f != null) {
                     Type type = f.getGenericType();
                     ReflectionUtil.setAccessible(f);
-                    if (JAXBSchemaInitializer.isArray(type)) {
-                        Class<?> compType = JAXBSchemaInitializer.getArrayComponentType(type);
-                        List<Object> ret = unmarshallArray(u, reader, q, compType, createList(type));
-                        Object o = ret;
-                        if (!isList(type)) {
-                            if (compType.isPrimitive()) {
-                                o = java.lang.reflect.Array.newInstance(compType, ret.size());
-                                for (int x = 0; x < ret.size(); x++) {
-                                    Array.set(o, x, ret.get(x));
-                                }
-                            } else {
-                                o = ret.toArray((Object[]) Array.newInstance(compType, ret.size()));
-                            }
-                        }
-
-                        f.set(obj, o);
+                    if (Utils.isFieldArray(f)) {
+                        f.set(obj, unmarshallArrayMember(u, reader, q, type, Utils.getFieldXJTA(f)));
                     } else {
                         Object o = getElementValue(u.unmarshal(reader, Utils.getFieldType(f)));
                         Utils.setFieldValue(f, obj, o);
@@ -585,30 +619,15 @@ public final class JAXBEncoderDecoder {
                     }
                     Type type = m.getGenericReturnType();
                     Object o;
-                    if (JAXBSchemaInitializer.isArray(type)) {
-                        Class<?> compType = JAXBSchemaInitializer
-                            .getArrayComponentType(type);
-                        List<Object> ret = unmarshallArray(u, reader,
-                                                           q,
-                                                           compType,
-                                                           createList(type));
-                        o = ret;
-                        if (!isList(type)) {
-                            if (compType.isPrimitive()) {
-                                o = java.lang.reflect.Array.newInstance(compType, ret.size());
-                                for (int x = 0; x < ret.size(); x++) {
-                                    Array.set(o, x, ret.get(x));
-                                }
-                            } else {
-                                o = ret.toArray((Object[])Array.newInstance(compType, ret.size()));
-                            }
-                        }
+                    boolean isArray = Utils.isMethodArray(m);
+                    if (isArray) {
+                        o = unmarshallArrayMember(u, reader, q, type, Utils.getMethodXJTA(m));
                     } else {
                         o = getElementValue(u.unmarshal(reader, Utils.getMethodReturnType(m)));
                     }
                     Method m2 = Utils.getMethod(cls, accessType, "set" + s, m.getReturnType());
                     if (m2 != null) {
-                        if (JAXBSchemaInitializer.isArray(type)) {
+                        if (isArray) {
                             m2.invoke(obj, o);
                         } else {
                             Utils.setMethodValue(m, m2, obj, o);

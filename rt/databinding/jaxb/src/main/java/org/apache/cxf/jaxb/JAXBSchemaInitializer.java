@@ -550,7 +550,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
                     XmlElement xmlElementAnno = f.getAnnotation(XmlElement.class);
-                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type), xmlElementAnno);
+                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()),
+                               isArray(type) || Utils.isFieldArray(f), xmlElementAnno);
                 }
             }
         }
@@ -573,7 +574,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
                     XmlElement xmlElementAnno = m.getAnnotation(XmlElement.class);
-                    addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type), xmlElementAnno);
+                    addElement(schema, seq, beanInfo, new QName(namespace, name),
+                               isArray(type) || Utils.isMethodArray(m), xmlElementAnno);
                 }
             }
         }
