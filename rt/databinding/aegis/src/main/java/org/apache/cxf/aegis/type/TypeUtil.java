@@ -22,6 +22,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -251,12 +253,30 @@ public final class TypeUtil {
         if (type instanceof GenericArrayType) {
             GenericArrayType gat = (GenericArrayType) type;
             Type compType = gat.getGenericComponentType();
-            Class<?> arrayBaseType = getTypeRelatedClass(compType);
+            Class<?> arrayBaseType = getTypeRelatedClass(getErasedType(compType));
+            if (arrayBaseType == null) {
+                arrayBaseType = Object.class;
+            }
             // believe it or not, this seems to be the only way to get the
             // Class object for an array of primitive type.
             Object instance = Array.newInstance(arrayBaseType, 0);
             return instance.getClass();
         }
         return null;
+    }
+
+    /**
+     * Replace a type variable or wildcard by its (first) upper bound, e.g. so that
+     * the component type of a generic array such as T[] can be resolved to a class.
+     */
+    private static Type getErasedType(Type type) {
+        Type erased = type;
+        while (erased instanceof TypeVariable || erased instanceof WildcardType) {
+            Type[] bounds = erased instanceof TypeVariable
+                ? ((TypeVariable<?>) erased).getBounds()
+                : ((WildcardType) erased).getUpperBounds();
+            erased = bounds.length > 0 ? bounds[0] : Object.class;
+        }
+        return erased;
     }
 }
