@@ -44,7 +44,11 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     public void handleMessage(Message message) {
         try {
-            getConduit(message).prepare(message);
+            Conduit conduit = getConduit(message);
+            if (conduit == null) {
+                throw new Fault(new org.apache.cxf.common.i18n.Message("NO_CONDUIT", BUNDLE));
+            }
+            conduit.prepare(message);
         } catch (IOException ex) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), ex);
         }
