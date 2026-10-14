@@ -832,6 +832,16 @@ public class ProviderFactoryTest {
     }
 
     @Test
+    public void testExceptionMapperWithMultipleBounds() {
+        ServerProviderFactory pf = ServerProviderFactory.getInstance();
+        FaultInfoExceptionMapper<?> faultInfoMapper = new FaultInfoExceptionMapper<>();
+        pf.registerUserProvider(faultInfoMapper);
+        assertSame(faultInfoMapper,
+            pf.createExceptionMapper(FaultInfoException.class, new MessageImpl()));
+        assertNull(pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
+    }
+
+    @Test
     public void testRegisterCustomResolver() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new JAXBContextProvider());
@@ -1616,4 +1626,23 @@ public class ProviderFactoryTest {
         }
     }
 
+    public interface FaultInfo {
+        String getFaultInfo();
+    }
+
+    public static class FaultInfoException extends RuntimeException implements FaultInfo {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public String getFaultInfo() {
+            return "fault";
+        }
+    }
+
+    public static class FaultInfoExceptionMapper<T extends Throwable & FaultInfo> implements ExceptionMapper<T> {
+        @Override
+        public Response toResponse(T exception) {
+            return Response.serverError().entity(exception.getFaultInfo()).build();
+        }
+    }
 }
