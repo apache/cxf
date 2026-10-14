@@ -393,11 +393,12 @@ public abstract class ProviderFactory {
                     if (arg instanceof TypeVariable) {
                         TypeVariable<?> var = (TypeVariable<?>) arg;
                         Type[] bounds = var.getBounds();
-                        boolean isResolved = false;
+                        // all the bounds must match, e.g. T extends Throwable & SomeInterface
+                        boolean isResolved = true;
                         for (Type bound : bounds) {
                             Class<?> cls = InjectionUtils.getRawType(bound);
-                            if (cls != null && (cls == Object.class || cls.isAssignableFrom(expectedType))) {
-                                isResolved = true;
+                            if (cls == null || (cls != Object.class && !cls.isAssignableFrom(expectedType))) {
+                                isResolved = false;
                                 break;
                             }
                         }
