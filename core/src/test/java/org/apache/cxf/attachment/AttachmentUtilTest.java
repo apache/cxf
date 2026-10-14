@@ -437,7 +437,13 @@ public class AttachmentUtilTest {
         // ".." and a trailing separator leave nothing usable, so no name is set
         assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"..\""));
         assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"reports/\""));
-        assertNull(createAttachmentName("form-data; name=\"file\"; filename=\"shell.jsp\u0000.png\""));
+    }
+
+    @Test
+    public void testCreateAttachmentNeutralisesNulInFilename() throws IOException {
+        // a NUL is replaced rather than dropped, so the part keeps a usable name
+        assertEquals("shell.jsp_.png",
+            createAttachmentName("form-data; name=\"file\"; filename=\"shell.jsp\u0000.png\""));
     }
 
     private static String createAttachmentName(String cd) throws IOException {

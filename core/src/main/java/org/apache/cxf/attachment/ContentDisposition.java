@@ -127,6 +127,13 @@ public class ContentDisposition {
         return type;
     }
 
+    /**
+     * Returns the raw filename as it appeared in the header. The value is parsed
+     * straight from attacker-controlled input and is not sanitised here, so it may
+     * still contain path separators or traversal sequences; callers building a file
+     * from it should pass it through
+     * {@link org.apache.cxf.helpers.FileUtils#safeFileName(String)} first.
+     */
     public String getFilename() {
         return params.get(FILE_NAME);
     }

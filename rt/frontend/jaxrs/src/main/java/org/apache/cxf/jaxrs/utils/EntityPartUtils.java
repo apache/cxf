@@ -57,11 +57,11 @@ final class EntityPartUtils {
             final Attachment attachment = body.getAttachment(key);
             if (attachment != null) {
                 final ContentDisposition cd = attachment.getContentDisposition();
-                final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
+                final String rawFileName = (cd != null) ? cd.getFilename() : null;
 
-                if (!StringUtils.isEmpty(fileName)) {
-                    return new EntityPartImpl(providers, key, fileName, value, String.class, null,
-                        attachment.getHeaders(), attachment.getContentType());
+                if (rawFileName != null) {
+                    return new EntityPartImpl(providers, key, FileUtils.safeFileName(rawFileName), value, String.class,
+                        null, attachment.getHeaders(), attachment.getContentType());
                 } else {
                     return new EntityPartImpl(providers, key, null, value, String.class, null, attachment.getHeaders(),
                         attachment.getContentType());
@@ -96,11 +96,11 @@ final class EntityPartUtils {
             return null;
         }
 
-        final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
+        final String rawFileName = (cd != null) ? cd.getFilename() : null;
         final String cdName = cd == null ? null : cd.getParameter("name");
         final String contentId = a.getContentId();
         final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
-        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(fileName)) {
+        if (StringUtils.isEmpty(name) && rawFileName == null) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
 
@@ -110,9 +110,9 @@ final class EntityPartUtils {
 
         try {
             final InputStream is = a.getDataHandler().getInputStream();
-            if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(providers, name, fileName, is, InputStream.class, null,
-                    a.getHeaders(), a.getContentType());
+            if (rawFileName != null) {
+                return new EntityPartImpl(providers, name, FileUtils.safeFileName(rawFileName), is, InputStream.class,
+                    null, a.getHeaders(), a.getContentType());
             } else {
                 return new EntityPartImpl(providers, name, null, is, InputStream.class, null,
                     a.getHeaders(), a.getContentType());

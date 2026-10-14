@@ -166,13 +166,13 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final InputStream is = attachment.getDataHandler().getInputStream();
             final ContentDisposition cd = attachment.getContentDisposition();
             
-            final String fileName = (cd != null) ? FileUtils.safeFileName(cd.getFilename()) : null;
+            final String rawFileName = (cd != null) ? cd.getFilename() : null;
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
 
-            if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(mc.getProviders(), contentId, fileName, is, c, genericType,
-                    attachment.getHeaders(), attachment.getContentType());
+            if (rawFileName != null) {
+                return new EntityPartImpl(mc.getProviders(), contentId, FileUtils.safeFileName(rawFileName), is, c,
+                    genericType, attachment.getHeaders(), attachment.getContentType());
             } else {
                 final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
                 return new EntityPartImpl(mc.getProviders(), name, null, is, c, genericType, attachment.getHeaders(),

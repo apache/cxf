@@ -101,8 +101,11 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testSafeFileNameRejectsNulAndColon() {
-        assertNull(FileUtils.safeFileName("shell.jsp\u0000.png"));
-        assertNull(FileUtils.safeFileName("C:evil.exe"));
+    public void testSafeFileNameNeutralisesNulAndColon() {
+        // NUL and ':' are replaced rather than rejected, so an otherwise valid
+        // name keeps a usable form instead of being dropped altogether
+        assertEquals("shell.jsp_.png", FileUtils.safeFileName("shell.jsp\u0000.png"));
+        assertEquals("C_evil.exe", FileUtils.safeFileName("C:evil.exe"));
+        assertEquals("Meeting 10_30.pdf", FileUtils.safeFileName("Meeting 10:30.pdf"));
     }
 }
