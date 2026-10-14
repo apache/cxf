@@ -59,7 +59,7 @@ final class EntityPartUtils {
                 final ContentDisposition cd = attachment.getContentDisposition();
                 final String rawFileName = (cd != null) ? cd.getFilename() : null;
 
-                if (rawFileName != null) {
+                if (!StringUtils.isEmpty(rawFileName)) {
                     return new EntityPartImpl(providers, key, FileUtils.safeFileName(rawFileName), value, String.class,
                         null, attachment.getHeaders(), attachment.getContentType());
                 } else {
@@ -100,7 +100,7 @@ final class EntityPartUtils {
         final String cdName = cd == null ? null : cd.getParameter("name");
         final String contentId = a.getContentId();
         final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
-        if (StringUtils.isEmpty(name) && rawFileName == null) {
+        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(rawFileName)) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
 
@@ -110,7 +110,7 @@ final class EntityPartUtils {
 
         try {
             final InputStream is = a.getDataHandler().getInputStream();
-            if (rawFileName != null) {
+            if (!StringUtils.isEmpty(rawFileName)) {
                 return new EntityPartImpl(providers, name, FileUtils.safeFileName(rawFileName), is, InputStream.class,
                     null, a.getHeaders(), a.getContentType());
             } else {

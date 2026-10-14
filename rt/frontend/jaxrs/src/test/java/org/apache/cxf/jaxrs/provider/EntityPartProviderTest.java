@@ -194,6 +194,16 @@ public class EntityPartProviderTest {
         assertEquals("file-part", parts.get(0).getName());
     }
 
+    @Test
+    public void testEmptyFilenameIsAFormField() throws Exception {
+        // browsers send filename="" for an empty HTML file input, so an empty value
+        // stays a plain form field named after its part name rather than a file part
+        final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"\"");
+        assertEquals(1, parts.size());
+        assertEquals(Optional.empty(), parts.get(0).getFileName());
+        assertEquals("file", parts.get(0).getName());
+    }
+
     @SuppressWarnings("unchecked")
     private List<EntityPart> readParts(final String contentDisposition) throws Exception {
         final Exchange exchange = new ExchangeImpl();

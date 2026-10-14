@@ -170,7 +170,7 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
 
-            if (rawFileName != null) {
+            if (!StringUtils.isEmpty(rawFileName)) {
                 return new EntityPartImpl(mc.getProviders(), contentId, FileUtils.safeFileName(rawFileName), is, c,
                     genericType, attachment.getHeaders(), attachment.getContentType());
             } else {
