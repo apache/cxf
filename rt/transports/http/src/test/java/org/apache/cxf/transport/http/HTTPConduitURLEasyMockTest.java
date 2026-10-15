@@ -64,6 +64,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -73,7 +74,9 @@ public class HTTPConduitURLEasyMockTest {
 
     private static final String HTTP_RESPONSE_MESSAGE = "Some Response Message I can test";
     
-    private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED, ONEWAY_NONE };
+    private enum ResponseStyle {
+        NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED, ONEWAY_NONE, ONEWAY_STREAM_CLOSED
+    };
     private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
@@ -260,6 +263,21 @@ public class HTTPConduitURLEasyMockTest {
     }
 
     @Test
+    public void testSendOnewayResponseStreamAlreadyClosed()
+        throws Exception {
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
+        Message message = createMessage();
+        conduit.prepare(message);
+        verifySentMessage(conduit,
+                          message,
+                          ResponseStyle.ONEWAY_STREAM_CLOSED,
+                          ResponseDelimiter.CHUNKED,
+                          true,  // empty response
+                          "POST");
+        verify(is).close();
+    }
+
+    @Test
     public void testSendTwowayDecoupledEmptyPartialResponse()
         throws Exception {
         HTTPConduit conduit = setUpConduit(true, false, "POST");
@@ -443,7 +461,8 @@ public class HTTPConduitURLEasyMockTest {
             doNothing().when(os).close();
         }
 
-        setUpExchange(message, style == ResponseStyle.NONE || style == ResponseStyle.ONEWAY_NONE);
+        setUpExchange(message, style == ResponseStyle.NONE || style == ResponseStyle.ONEWAY_NONE
+            || style == ResponseStyle.ONEWAY_STREAM_CLOSED);
 
         when(connection.getRequestMethod()).thenReturn(method);
         verifyHandleResponse(style, delimiter, emptyResponse, conduit);
@@ -566,6 +585,15 @@ public class HTTPConduitURLEasyMockTest {
 
         case ONEWAY_NONE:
             when(connection.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+            break;
+
+        case ONEWAY_STREAM_CLOSED:
+            is = mock(InputStream.class);
+            when(connection.getInputStream()).thenReturn(is);
+            when(connection.getContentLength()).thenReturn(-1);
+            when(connection.getHeaderField("Transfer-Encoding")).thenReturn("chunked");
+            when(is.read()).thenReturn(-1);
+            when(is.available()).thenThrow(new IOException("stream is closed"));
             break;
 
         default:
