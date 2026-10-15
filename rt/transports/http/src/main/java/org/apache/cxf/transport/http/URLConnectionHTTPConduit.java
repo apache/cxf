@@ -357,7 +357,13 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 ins = connection.getInputStream();
             }
             if (ins != null) {
-                IOUtils.consume(ins);
+                try {
+                    IOUtils.consume(ins);
+                } catch (IOException ex) {
+                    // Draining is only done so the connection might be reused, so a failure here
+                    // (for example the stream was already closed) should not fail the invocation
+                    LOG.log(Level.FINE, "Could not consume the response stream: " + ex.getMessage(), ex);
+                }
                 ins.close();
             }
         }
