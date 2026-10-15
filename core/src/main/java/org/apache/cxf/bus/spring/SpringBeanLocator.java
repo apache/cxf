@@ -230,7 +230,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String searchValue) {
         if (context.containsBean(beanName) && !passThroughs.contains(beanName)) {
             ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
-            BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanName);
+            BeanDefinition def = ctxt.getBeanFactory().getMergedBeanDefinition(beanName);
             if (!ctxt.getBeanFactory().isSingleton(beanName) || def.isAbstract()) {
                 return false;
             }
