@@ -47,7 +47,6 @@ import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -170,8 +169,11 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
 
+            // a filename in the header makes this a file part, even if nothing usable is
+            // left once it is sanitised (e.g. ".." or "reports/"), in which case the part
+            // is kept with no file name rather than being turned into a form field
             if (!StringUtils.isEmpty(rawFileName)) {
-                return new EntityPartImpl(mc.getProviders(), contentId, FileUtils.safeFileName(rawFileName), is, c,
+                return new EntityPartImpl(mc.getProviders(), contentId, cd.getFilenameSanitized(), is, c,
                     genericType, attachment.getHeaders(), attachment.getContentType());
             } else {
                 final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");

@@ -29,7 +29,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.ext.Providers;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -60,7 +59,7 @@ final class EntityPartUtils {
                 final String rawFileName = (cd != null) ? cd.getFilename() : null;
 
                 if (!StringUtils.isEmpty(rawFileName)) {
-                    return new EntityPartImpl(providers, key, FileUtils.safeFileName(rawFileName), value, String.class,
+                    return new EntityPartImpl(providers, key, cd.getFilenameSanitized(), value, String.class,
                         null, attachment.getHeaders(), attachment.getContentType());
                 } else {
                     return new EntityPartImpl(providers, key, null, value, String.class, null, attachment.getHeaders(),
@@ -111,7 +110,7 @@ final class EntityPartUtils {
         try {
             final InputStream is = a.getDataHandler().getInputStream();
             if (!StringUtils.isEmpty(rawFileName)) {
-                return new EntityPartImpl(providers, name, FileUtils.safeFileName(rawFileName), is, InputStream.class,
+                return new EntityPartImpl(providers, name, cd.getFilenameSanitized(), is, InputStream.class,
                     null, a.getHeaders(), a.getContentType());
             } else {
                 return new EntityPartImpl(providers, name, null, is, InputStream.class, null,
