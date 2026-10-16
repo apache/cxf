@@ -39,6 +39,7 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
+import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -152,6 +153,26 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                                 use == UseGzip.FORCE,
                                                 message);
             message.setContent(OutputStream.class, cs);
+        } else if (!MessageUtils.isRequestor(message) && isSupportedPayloadContentType(message)) {
+            // the response is not compressed, but it would have been if the client accepted
+            // gzip, so it still needs the Vary header
+            OutputStream os = message.getContent(OutputStream.class);
+            if (os != null) {
+                message.setContent(OutputStream.class, new AbstractWrappedOutputStream(os) {
+                    @Override
+                    protected void onFirstWrite() {
+                        addHeader(message, "Vary", "Accept-Encoding");
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (!written) {
+                            onFirstWrite();
+                        }
+                        super.close();
+                    }
+                });
+            }
         }
     }
 
@@ -171,8 +192,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      */
     public UseGzip gzipPermitted(Message message) {
         UseGzip permitted = UseGzip.NO;
-        if (supportedPayloadContentTypes != null && message.containsKey(Message.CONTENT_TYPE)
-            && !supportedPayloadContentTypes.contains(message.get(Message.CONTENT_TYPE))) {
+        if (!isSupportedPayloadContentType(message)) {
             return permitted;
         }
         if (MessageUtils.isRequestor(message)) {
@@ -272,6 +292,11 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return permitted;
     }
 
+    private boolean isSupportedPayloadContentType(Message message) {
+        return supportedPayloadContentTypes == null || !message.containsKey(Message.CONTENT_TYPE)
+            || supportedPayloadContentTypes.contains(message.get(Message.CONTENT_TYPE));
+    }
+
     static class GZipThresholdOutputStream extends AbstractThresholdOutputStream {
         Message message;
 
@@ -291,8 +316,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
         @Override
         public void thresholdNotReached() {
-            //nothing
             LOG.fine("Message is smaller than compression threshold, not compressing.");
+            addVaryHeader();
         }
 
         @Override
@@ -301,14 +326,18 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             // Set the Content-Encoding HTTP header
             String enc = (String)message.get(GZIP_ENCODING_KEY);
             addHeader(message, "Content-Encoding", enc);
-            // if this is a response message, add the Vary header
-            if (!Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
-                addHeader(message, "Vary", "Accept-Encoding");
-            }
+            addVaryHeader();
 
             // gzip the result
             GZIPOutputStream zipOutput = new GZIPOutputStream(wrappedStream);
             wrappedStream = zipOutput;
+        }
+
+        private void addVaryHeader() {
+            // if this is a response message, add the Vary header, whether it is compressed or not
+            if (!MessageUtils.isRequestor(message)) {
+                addHeader(message, "Vary", "Accept-Encoding");
+            }
         }
     }
 

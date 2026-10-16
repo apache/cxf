@@ -22,11 +22,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -41,6 +43,8 @@ import org.junit.Test;
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.FORCE;
 import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.YES;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
@@ -115,6 +119,106 @@ public class GZIPAcceptEncodingTest {
         interceptor.handleMessage(outMessage);
     }
 
+    @Test
+    public void testVaryWhenNotCompressed() throws Exception {
+        // the response is not compressed, but would have been for a client accepting gzip
+        setAcceptEncoding("identity");
+        writeResponse(2048);
+        assertNull(getOutHeaders().get("Content-Encoding"));
+        assertVary("Accept-Encoding");
+    }
+
+    @Test
+    public void testVaryWithoutAcceptEncoding() throws Exception {
+        setRequestHeaders(new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
+        writeResponse(2048);
+        assertVary("Accept-Encoding");
+    }
+
+    @Test
+    public void testVaryWithoutBody() throws Exception {
+        setAcceptEncoding("identity");
+        interceptor.handleMessage(outMessage);
+        outMessage.getContent(OutputStream.class).close();
+        assertVary("Accept-Encoding");
+        assertNull(getOutHeaders().get("Content-Encoding"));
+    }
+
+    @Test
+    public void testVaryWithoutBodyOrAcceptEncoding() throws Exception {
+        setRequestHeaders(new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
+        interceptor.handleMessage(outMessage);
+        // JAX-RS can replace the response headers after this interceptor runs.
+        Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("Vary", Collections.singletonList("Accept"));
+        outMessage.put(Message.PROTOCOL_HEADERS, headers);
+        outMessage.getContent(OutputStream.class).close();
+        assertVary("Accept", "Accept-Encoding");
+        assertNull(getOutHeaders().get("Content-Encoding"));
+    }
+
+    @Test
+    public void testVaryWhenCompressed() throws Exception {
+        setAcceptEncoding("gzip");
+        writeResponse(2048);
+        assertEquals(Collections.singletonList("gzip"), getOutHeaders().get("Content-Encoding"));
+        assertVary("Accept-Encoding");
+    }
+
+    @Test
+    public void testVaryBelowThreshold() throws Exception {
+        setAcceptEncoding("gzip");
+        writeResponse(16);
+        assertNull(getOutHeaders().get("Content-Encoding"));
+        assertVary("Accept-Encoding");
+    }
+
+    @Test
+    public void testVaryAppended() throws Exception {
+        Map<String, List<String>> outHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        outHeaders.put("Vary", Collections.singletonList("Accept"));
+        outMessage.put(Message.PROTOCOL_HEADERS, outHeaders);
+        setAcceptEncoding("identity");
+        writeResponse(2048);
+        assertVary("Accept", "Accept-Encoding");
+    }
+
+    @Test
+    public void testNoVaryForUnsupportedContentType() throws Exception {
+        // a response that is never compressed does not depend on Accept-Encoding
+        interceptor.setSupportedPayloadContentTypes(Collections.singleton("text/xml"));
+        outMessage.put(Message.CONTENT_TYPE, "image/png");
+        setAcceptEncoding("gzip");
+        writeResponse(2048);
+        assertNull(getOutHeaders());
+    }
+
+    @Test
+    public void testNoVaryForRequest() throws Exception {
+        outMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+        outMessage.put(GZIPOutInterceptor.USE_GZIP_KEY, YES);
+        writeResponse(2048);
+        assertEquals(Collections.singletonList("gzip"), getOutHeaders().get("Content-Encoding"));
+        assertNull(getOutHeaders().get("Vary"));
+    }
+
+    private void writeResponse(int size) throws Exception {
+        interceptor.handleMessage(outMessage);
+        try (OutputStream os = outMessage.getContent(OutputStream.class)) {
+            os.write(new byte[size]);
+        }
+    }
+
+    private void assertVary(String... expected) {
+        Map<String, List<String>> headers = getOutHeaders();
+        assertNotNull("Response headers should include Vary", headers);
+        assertEquals(Arrays.asList(expected), headers.get("Vary"));
+    }
+
+    private Map<String, List<String>> getOutHeaders() {
+        return CastUtils.cast((Map<?, ?>)outMessage.get(Message.PROTOCOL_HEADERS));
+    }
+
     private void singleTest(String encoding,
                             GZIPOutInterceptor.UseGzip expectedUseGzip, String expectedGzipEncoding)
         throws Exception {
@@ -132,6 +236,10 @@ public class GZIPAcceptEncodingTest {
             = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         protocolHeaders.put(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.ACCEPT_ENCODING), Collections
             .singletonList(enc));
+        setRequestHeaders(protocolHeaders);
+    }
+
+    private void setRequestHeaders(Map<String, List<String>> protocolHeaders) {
         inMessage.put(Message.PROTOCOL_HEADERS, protocolHeaders);
     }
 }
