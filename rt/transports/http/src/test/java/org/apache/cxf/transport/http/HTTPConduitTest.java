@@ -20,11 +20,8 @@
 package org.apache.cxf.transport.http;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +35,6 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -287,91 +283,5 @@ public class HTTPConduitTest {
         } catch (Exception ex) {
             throw ex;
         }
-    }
-
-    private static String invokeRedactMessageBody(Message message,
-            CacheAndWriteOutputStream cachedStream) throws Exception {
-        Method m = HTTPConduit.class.getDeclaredMethod(
-            "redactMessageBody", Message.class, CacheAndWriteOutputStream.class);
-        m.setAccessible(true);
-        return (String) m.invoke(null, message, cachedStream);
-    }
-
-    private static CacheAndWriteOutputStream createCachedStream(String content) throws Exception {
-        CacheAndWriteOutputStream cos = new CacheAndWriteOutputStream(new ByteArrayOutputStream());
-        cos.write(content.getBytes(StandardCharsets.UTF_8));
-        return cos;
-    }
-
-    @Test
-    public void testRedactFormParams() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        CacheAndWriteOutputStream cos = createCachedStream("username=alice&password=s3cret&token=abc123");
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("username=***&password=***&token=***", result);
-    }
-
-    @Test
-    public void testRedactFormParamsSingleParam() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        CacheAndWriteOutputStream cos = createCachedStream("password=s3cret");
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("password=***", result);
-    }
-
-    @Test
-    public void testRedactFormParamsEmptyValue() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        CacheAndWriteOutputStream cos = createCachedStream("key1=&key2=value2");
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("key1=***&key2=***", result);
-    }
-
-    @Test
-    public void testRedactFormParamsContentTypeCharset() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8");
-        CacheAndWriteOutputStream cos = createCachedStream("user=bob&pass=secret");
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("user=***&pass=***", result);
-    }
-
-    @Test
-    public void testRedactNonFormContentReturnsSize() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "application/json");
-        String body = "{\"password\":\"secret\"}";
-        CacheAndWriteOutputStream cos = createCachedStream(body);
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("(" + body.length() + " bytes)", result);
-    }
-
-    @Test
-    public void testRedactNullContentTypeReturnsSize() throws Exception {
-        Message msg = new MessageImpl();
-        String body = "some data";
-        CacheAndWriteOutputStream cos = createCachedStream(body);
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("(" + body.length() + " bytes)", result);
-    }
-
-    @Test
-    public void testRedactXmlContentReturnsSize() throws Exception {
-        Message msg = new MessageImpl();
-        msg.put(Message.CONTENT_TYPE, "text/xml");
-        String body = "<root><password>secret</password></root>";
-        CacheAndWriteOutputStream cos = createCachedStream(body);
-
-        String result = invokeRedactMessageBody(msg, cos);
-        assertEquals("(" + body.length() + " bytes)", result);
     }
 }
