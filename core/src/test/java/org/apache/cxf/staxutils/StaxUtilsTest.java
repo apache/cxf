@@ -61,6 +61,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -441,6 +442,28 @@ public class StaxUtilsTest {
         int idx = s.indexOf("xmlns:a");
         idx = s.indexOf("xmlns:a", idx + 1);
         assertEquals(-1, idx);
+    }
+
+    @Test
+    public void testCachingXmlEventWriterNamespaceScope() throws Exception {
+        CachingXmlEventWriter writer = new CachingXmlEventWriter();
+        writer.writeStartElement("root");
+        writer.writeStartElement("a", "first", "urn:a");
+        writer.writeNamespace("a", "urn:a");
+        writer.writeStartElement("child");
+        assertEquals("urn:a", writer.getNamespaceContext().getNamespaceURI("a"));
+        assertEquals("a", writer.getPrefix("urn:a"));
+        writer.writeEndElement();
+        writer.writeEndElement();
+        assertNull(writer.getNamespaceContext().getNamespaceURI("a"));
+        writer.writeStartElement("second");
+        assertNull(writer.getNamespaceContext().getNamespaceURI("a"));
+        assertNull(writer.getPrefix("urn:a"));
+        writer.setPrefix("b", "urn:b");
+        assertEquals("urn:b", writer.getNamespaceContext().getNamespaceURI("b"));
+        writer.writeEndElement();
+        assertNull(writer.getNamespaceContext().getNamespaceURI("b"));
+        writer.writeEndElement();
     }
 
     @Test

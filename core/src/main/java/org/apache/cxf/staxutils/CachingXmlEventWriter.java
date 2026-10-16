@@ -157,12 +157,12 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void setDefaultNamespace(String ns) throws XMLStreamException {
-        curContext.addNs("", ns);
+        addNs("", ns);
     }
 
 
     public void writeNamespace(String pfx, String ns) throws XMLStreamException {
-        curContext.addNs(pfx, ns);
+        addNs(pfx, ns);
         if (StringUtils.isEmpty(pfx)) {
             addEvent(factory.createNamespace(ns));
         } else {
@@ -179,7 +179,18 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         }
     }
     public void setPrefix(String pfx, String uri) throws XMLStreamException {
-        curContext.addNs(pfx, uri);
+        addNs(pfx, uri);
+    }
+
+    /**
+     * Elements share their parent's namespace context until they declare a namespace,
+     * to avoid allocating a context per element when buffering large documents.
+     */
+    private void addNs(String pfx, String ns) {
+        if (!contexts.isEmpty() && curContext == contexts.peek()) {
+            curContext = new NSContext(curContext);
+        }
+        curContext.addNs(pfx, ns);
     }
 
 
@@ -211,7 +222,6 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     public void writeStartElement(String name) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
-        curContext = new NSContext(curContext);
         lastStart = new QName(name);
         Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
         Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
@@ -220,7 +230,6 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     public void writeStartElement(String name, String ns) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
-        curContext = new NSContext(curContext);
         lastStart = new QName(ns, name);
         Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
         Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
@@ -229,7 +238,6 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     public void writeStartElement(String pfx, String name, String ns) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
-        curContext = new NSContext(curContext);
         lastStart = new QName(ns, name, pfx);
         Set<javax.xml.stream.events.Attribute> atSet = Collections.emptySet();
         Set<javax.xml.stream.events.Namespace> nsSet = Collections.emptySet();
@@ -238,12 +246,15 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
     public static class NSContext implements NamespaceContext {
         NamespaceContext parent;
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = Collections.emptyMap();
 
         public NSContext(NamespaceContext p) {
             parent = p;
         }
         public void addNs(String pfx, String ns) {
+            if (map.isEmpty()) {
+                map = new HashMap<>();
+            }
             map.put(pfx, ns);
         }
 
