@@ -1336,9 +1336,8 @@ public abstract class HTTPConduit
                 LOG.fine("Conduit \""
                          + getConduitName()
                          + "\" Retransmit message to: "
-                         + newURL
-                         + ": "
-                         + new String(cachedStream.getBytes()));
+                         + newURL + ": ("
+                         + cachedStream.size() + " bytes)");
             }
         }
 
@@ -1475,13 +1474,10 @@ public abstract class HTTPConduit
                 || authSupplier != null && authSupplier.requiresRequestCaching()) {
 
                 if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
-                    StringBuilder b = new StringBuilder(4096);
-                    b.append("Conduit \"").append(getConduitName())
-                        .append("\" Transmit cached message to: ")
-                        .append(url)
-                        .append(": ");
-                    cachedStream.writeCacheTo(b, 16L * 1024L);
-                    LOG.fine(b.toString());
+                    LOG.fine("Conduit \"" + getConduitName()
+                        + "\" Transmit cached message to: "
+                        + url + ": ("
+                        + cachedStream.size() + " bytes)");
                 }
 
 
