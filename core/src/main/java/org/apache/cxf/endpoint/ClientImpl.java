@@ -933,7 +933,8 @@ public class ClientImpl
             }
 
             callback = message.getExchange().get(ClientCallback.class);
-            if (callback == null || isPartialResponse(message)) {
+            if (callback == null
+                || (isPartialResponse(message) && message.getContent(Exception.class) == null)) {
                 return;
             }
 
