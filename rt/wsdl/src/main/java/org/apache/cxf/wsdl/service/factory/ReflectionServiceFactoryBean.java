@@ -864,8 +864,8 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         }
         setIndexes(o.getInput());
         sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, origOp, method, origOp.getInput());
-        // Initialize return type
-        if (o.hasOutput()
+        // Initialize return type (a void method has no return part to map)
+        if (o.hasOutput() && !void.class.equals(method.getReturnType())
             && !initializeParameter(o, method, -1, method.getReturnType(), method.getGenericReturnType())) {
             return false;
         }
