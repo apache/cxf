@@ -29,7 +29,9 @@ import java.util.Optional;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FileUtilsTest {
@@ -77,5 +79,33 @@ public class FileUtilsTest {
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 
         assertTrue(foundFiles.containsAll(foundFiles2) && foundFiles2.containsAll(foundFiles));
+    }
+
+    @Test
+    public void testSafeFileNameKeepsFinalSegment() {
+        assertEquals("passwd", FileUtils.safeFileName("../../../etc/passwd"));
+        assertEquals("secret.txt", FileUtils.safeFileName("..\\..\\secret.txt"));
+        assertEquals("report.pdf", FileUtils.safeFileName("report.pdf"));
+    }
+
+    @Test
+    public void testSafeFileNameRejectsTraversalAndEmpty() {
+        assertNull(FileUtils.safeFileName(".."));
+        assertNull(FileUtils.safeFileName("."));
+        assertNull(FileUtils.safeFileName("a/.."));
+        // a trailing separator strips down to an empty name, which would resolve
+        // back to the upload directory itself
+        assertNull(FileUtils.safeFileName("x/"));
+        assertNull(FileUtils.safeFileName(""));
+        assertNull(FileUtils.safeFileName(null));
+    }
+
+    @Test
+    public void testSafeFileNameNeutralisesNulAndColon() {
+        // NUL and ':' are replaced rather than rejected, so an otherwise valid
+        // name keeps a usable form instead of being dropped altogether
+        assertEquals("shell.jsp_.png", FileUtils.safeFileName("shell.jsp\u0000.png"));
+        assertEquals("C_evil.exe", FileUtils.safeFileName("C:evil.exe"));
+        assertEquals("Meeting 10_30.pdf", FileUtils.safeFileName("Meeting 10:30.pdf"));
     }
 }

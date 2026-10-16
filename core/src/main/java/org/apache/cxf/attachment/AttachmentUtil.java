@@ -442,8 +442,9 @@ public final class AttachmentUtil {
             headers.remove("Content-Transfer-Encoding");
         }
         DataSource source = new AttachmentDataSource(ct, ins);
-        if (!StringUtils.isEmpty(fileName)) {
-            ((AttachmentDataSource)source).setName(FileUtils.stripPath(fileName));
+        String safeFileName = FileUtils.safeFileName(fileName);
+        if (!StringUtils.isEmpty(safeFileName)) {
+            ((AttachmentDataSource)source).setName(safeFileName);
         }
         att.setDataHandler(new DataHandler(source));
         return att;

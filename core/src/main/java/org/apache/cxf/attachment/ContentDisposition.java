@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.cxf.helpers.FileUtils;
+
 public class ContentDisposition {
     private static final String CD_HEADER_PARAMS_EXPRESSION =
        "[\\w-]++( )?\\*?=( )?((\"[^\"]++\")|([^;]+))";
@@ -127,8 +129,24 @@ public class ContentDisposition {
         return type;
     }
 
+    /**
+     * Returns the raw filename as it appeared in the header. The value is parsed
+     * straight from attacker-controlled input and is not sanitised here, so it may
+     * still contain path separators or traversal sequences; callers building a file
+     * from it should use {@link #getFilenameSanitized()} instead.
+     */
     public String getFilename() {
         return params.get(FILE_NAME);
+    }
+
+    /**
+     * Returns the filename reduced by {@link FileUtils#safeFileName(String)} to a
+     * value that is safe to build a file from, or null if the header carried no
+     * filename or nothing usable is left once it is sanitised (for example ".."
+     * or a name ending in a path separator).
+     */
+    public String getFilenameSanitized() {
+        return FileUtils.safeFileName(getFilename());
     }
 
     public String getParameter(String name) {

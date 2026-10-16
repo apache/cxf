@@ -349,4 +349,24 @@ public final class FileUtils {
         return name;
     }
 
+    /**
+     * Reduces an untrusted file name, for example one parsed from an inbound
+     * Content-Disposition header, to a value that is safe to build a file from.
+     * Any directory component is stripped (see {@link #stripPath(String)}) and a
+     * name that would still walk a caller doing {@code new File(dir, name)} out of
+     * its directory - "." or "..", or one that strips down to nothing - is rejected
+     * by returning null. A NUL or a ':' (which Windows can treat as a drive-relative
+     * path) is neutralised to '_' rather than rejected, so an otherwise valid name
+     * such as "Meeting 10:30.pdf" keeps a usable form. Callers should treat a null
+     * result as the part having no usable file name.
+     */
+    public static String safeFileName(String name) {
+        String stripped = stripPath(name);
+        if (stripped == null || stripped.isEmpty()
+            || ".".equals(stripped) || "..".equals(stripped)) {
+            return null;
+        }
+        return stripped.replace('\0', '_').replace(':', '_');
+    }
+
 }
