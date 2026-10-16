@@ -24,12 +24,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.xml.ws.BindingProvider;
-import jakarta.xml.ws.Endpoint;
-import jakarta.xml.ws.WebServiceException;
-import jakarta.xml.ws.soap.SOAPBinding;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPBinding;
+
 import org.apache.cxf.Download;
 import org.apache.cxf.DownloadNextResponseType;
 import org.apache.cxf.common.logging.LogUtils;
