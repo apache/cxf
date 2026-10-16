@@ -186,12 +186,13 @@ public abstract class AbstractToolContainer implements ToolContainer {
     }
 
     public Bus getBus() {
-        Bus bus = BusFactory.getDefaultBus();
-
-        OASISCatalogManager catalogManager = bus.getExtension(OASISCatalogManager.class);
+        // Use the thread default bus rather than the global default bus, so that concurrent
+        // invocations (e.g. a parallel Maven build) don't use a bus that another thread may shut down
+        Bus bus = BusFactory.getThreadDefaultBus();
 
         String catalogLocation = getCatalogURL();
         if (!StringUtils.isEmpty(catalogLocation)) {
+            OASISCatalogManager catalogManager = OASISCatalogManager.getCatalogManager(bus);
             try {
                 catalogManager.loadCatalog(new URI(catalogLocation).toURL());
             } catch (Exception e) {
