@@ -43,6 +43,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -222,6 +223,9 @@ public abstract class HTTPConduit
      * is used in authorization loop protection.
      */
     private static final String KEY_AUTH_URLS = "AuthURLs";
+
+    private static final Pattern FORM_PARAM_VALUE_PATTERN =
+        Pattern.compile("([^&=]+)=([^&]*)");
 
     /**
      *  This field holds a reference to the CXF bus associated this conduit.
@@ -1336,9 +1340,8 @@ public abstract class HTTPConduit
                 LOG.fine("Conduit \""
                          + getConduitName()
                          + "\" Retransmit message to: "
-                         + newURL
-                         + ": "
-                         + new String(cachedStream.getBytes()));
+                         + newURL + ": "
+                         + redactMessageBody(outMessage, cachedStream));
             }
         }
 
@@ -1475,13 +1478,10 @@ public abstract class HTTPConduit
                 || authSupplier != null && authSupplier.requiresRequestCaching()) {
 
                 if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
-                    StringBuilder b = new StringBuilder(4096);
-                    b.append("Conduit \"").append(getConduitName())
-                        .append("\" Transmit cached message to: ")
-                        .append(url)
-                        .append(": ");
-                    cachedStream.writeCacheTo(b, 16L * 1024L);
-                    LOG.fine(b.toString());
+                    LOG.fine("Conduit \"" + getConduitName()
+                        + "\" Transmit cached message to: "
+                        + url + ": "
+                        + redactMessageBody(outMessage, cachedStream));
                 }
 
 
@@ -1886,6 +1886,21 @@ public abstract class HTTPConduit
                 }
             }
         }
+    }
+
+    private static String redactMessageBody(Message message, CacheAndWriteOutputStream cachedStream) {
+        try {
+            String contentType = (String) message.get(Message.CONTENT_TYPE);
+            if (contentType != null
+                && contentType.toLowerCase().contains("application/x-www-form-urlencoded")) {
+                StringBuilder b = new StringBuilder(1024);
+                cachedStream.writeCacheTo(b, 16L * 1024L);
+                return FORM_PARAM_VALUE_PATTERN.matcher(b).replaceAll("$1=***");
+            }
+        } catch (Exception e) {
+            // ignore, fall through to size-only logging
+        }
+        return "(" + cachedStream.size() + " bytes)";
     }
 
     private static void checkAllowedRedirectUri(String conduitName,
