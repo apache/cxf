@@ -18,13 +18,20 @@
  */
 package org.apache.cxf.service.factory;
 
+import java.io.File;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
 
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.GreeterImplDoc;
 
@@ -56,6 +63,40 @@ public class RountripTest extends AbstractSimpleFrontendTest {
 
         assertEquals("hello", client.sayHello());
         assertEquals("hello", client.echo("hello"));
+    }
+
+    @Test
+    public void testVoidMethodWithWsdl() throws Exception {
+        ServerFactoryBean svrBean = new ServerFactoryBean();
+        svrBean.setAddress("http://localhost/HelloWsdl");
+        svrBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
+        svrBean.setServiceBean(new HelloServiceImpl());
+        svrBean.setServiceClass(HelloService.class);
+        svrBean.setBus(getBus());
+
+        Server server = svrBean.create();
+
+        Definition def = new ServiceWSDLBuilder(getBus(),
+            server.getEndpoint().getService().getServiceInfos()).build();
+        File wsdlFile = File.createTempFile("hello", ".wsdl");
+        wsdlFile.deleteOnExit();
+        try (Writer w = Files.newBufferedWriter(wsdlFile.toPath())) {
+            getBus().getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().writeWSDL(def, w);
+        }
+
+        ClientProxyFactoryBean proxyFactory = new ClientProxyFactoryBean();
+        ClientFactoryBean clientBean = proxyFactory.getClientFactoryBean();
+        clientBean.setAddress("http://localhost/HelloWsdl");
+        clientBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
+        clientBean.setServiceClass(HelloService.class);
+        clientBean.setWsdlURL(wsdlFile.toURI().toString());
+        clientBean.setBus(getBus());
+
+        HelloService client = (HelloService) proxyFactory.create();
+
+        assertEquals("hello", client.sayHello());
+        assertEquals("hello", client.echo("hello"));
+        client.ping();
     }
 
     @Test
