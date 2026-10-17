@@ -31,6 +31,7 @@ import java.util.List;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookRecord;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 
 import org.junit.Before;
@@ -93,7 +94,19 @@ public class JsrJsonbProviderTest {
         assertThat(book.getId(), equalTo(1L));
         assertThat(book.getName(), equalTo("CXF 1"));
     }
-    
+
+    @Test
+    public void testReadBookRecord() throws Exception {
+        String input = "{"
+            +     "\"id\":1,"
+            +     "\"name\":\"CXF 1\""
+            + "}";
+        
+        final BookRecord book = read(BookRecord.class, input.getBytes());
+        assertThat(book.id(), equalTo(1L));
+        assertThat(book.name(), equalTo("CXF 1"));
+    }
+
     @Test
     public void testWriteListOfBooks() throws Exception {
         final List<Book> books = new ArrayList<>();
