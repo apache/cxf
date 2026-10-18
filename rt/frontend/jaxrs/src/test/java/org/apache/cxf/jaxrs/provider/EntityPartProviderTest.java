@@ -170,10 +170,12 @@ public class EntityPartProviderTest {
     }
 
     @Test
-    public void testFilenameTraversalIsStripped() throws Exception {
+    public void testFilenameIsCarriedThroughRaw() throws Exception {
+        // the EntityPart keeps the filename verbatim so a read-and-forwarded part is not
+        // corrupted; sanitising is left to callers via ContentDisposition.getFilenameSanitized()
         final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"../../../etc/passwd\"");
         assertEquals(1, parts.size());
-        assertEquals(Optional.of("passwd"), parts.get(0).getFileName());
+        assertEquals(Optional.of("../../../etc/passwd"), parts.get(0).getFileName());
     }
 
     @Test
@@ -185,12 +187,11 @@ public class EntityPartProviderTest {
 
     @Test
     public void testTrailingSeparatorStaysAFilePart() throws Exception {
-        // the name strips down to nothing, but a filename was present in the header
-        // so the part stays a file part (named by its content id) rather than being
-        // turned into a plain form field
+        // a non-empty filename in the header makes this a file part (named by its
+        // content id) rather than a plain form field, and the value is kept raw
         final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"reports/\"");
         assertEquals(1, parts.size());
-        assertEquals(Optional.empty(), parts.get(0).getFileName());
+        assertEquals(Optional.of("reports/"), parts.get(0).getFileName());
         assertEquals("file-part", parts.get(0).getName());
     }
 
