@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import jakarta.ws.rs.core.EntityPart;
@@ -161,10 +162,73 @@ public class EntityPartProviderTest {
         msg.put(Message.CONTENT_TYPE, "multipart/related");
 
         assertThrows("Failure expected on too many attachment headers", RuntimeException.class,
-                () -> p.readFrom((Class<List<EntityPart>>) (Class<?>) List.class, 
+                () -> p.readFrom((Class<List<EntityPart>>) (Class<?>) List.class,
                     EntityPart.class, new Annotation[]{},
                     MediaType.APPLICATION_OCTET_STREAM_TYPE,
                     new MetadataMap<String, String>(),
                     msg.getContent(InputStream.class)));
+    }
+
+    @Test
+    public void testFilenameIsCarriedThroughRaw() throws Exception {
+        // the EntityPart keeps the filename verbatim so a read-and-forwarded part is not
+        // corrupted; sanitising is left to callers via ContentDisposition.getFilenameSanitized()
+        final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"../../../etc/passwd\"");
+        assertEquals(1, parts.size());
+        assertEquals(Optional.of("../../../etc/passwd"), parts.get(0).getFileName());
+    }
+
+    @Test
+    public void testPlainFilenamePassesThrough() throws Exception {
+        final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"report.pdf\"");
+        assertEquals(1, parts.size());
+        assertEquals(Optional.of("report.pdf"), parts.get(0).getFileName());
+    }
+
+    @Test
+    public void testTrailingSeparatorStaysAFilePart() throws Exception {
+        // a non-empty filename in the header makes this a file part (named by its
+        // content id) rather than a plain form field, and the value is kept raw
+        final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"reports/\"");
+        assertEquals(1, parts.size());
+        assertEquals(Optional.of("reports/"), parts.get(0).getFileName());
+        assertEquals("file-part", parts.get(0).getName());
+    }
+
+    @Test
+    public void testEmptyFilenameIsAFormField() throws Exception {
+        // browsers send filename="" for an empty HTML file input, so an empty value
+        // stays a plain form field named after its part name rather than a file part
+        final List<EntityPart> parts = readParts("form-data; name=\"file\"; filename=\"\"");
+        assertEquals(1, parts.size());
+        assertEquals(Optional.empty(), parts.get(0).getFileName());
+        assertEquals("file", parts.get(0).getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<EntityPart> readParts(final String contentDisposition) throws Exception {
+        final Exchange exchange = new ExchangeImpl();
+        final EntityPartProvider p = new EntityPartProvider();
+
+        final String boundary = "----=_Part_34950_1098328613.1263781527359";
+        final String body = "--" + boundary + "\n"
+            + "Content-Type: application/octet-stream\n"
+            + "Content-Disposition: " + contentDisposition + "\n"
+            + "Content-Id: <file-part>\n"
+            + '\n'
+            + "some bytes\n"
+            + "--" + boundary + "--\n";
+
+        final Message msg = new MessageImpl();
+        msg.setExchange(exchange);
+        exchange.setInMessage(msg);
+        p.setMessageContext(new MessageContextImpl(msg));
+        p.setProviders(providers);
+
+        msg.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/form-data; boundary=\"" + boundary + "\"");
+
+        return p.readFrom((Class<List<EntityPart>>) (Class<?>) List.class, EntityPart.class, new Annotation[]{},
+            MediaType.MULTIPART_FORM_DATA_TYPE, new MetadataMap<String, String>(), msg.getContent(InputStream.class));
     }
 }

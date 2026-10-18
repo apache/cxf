@@ -45,4 +45,17 @@ public class ContentDispositionTest {
 
         assertNull(cd.getFilename());
     }
+
+    @Test
+    public void testGetFilenameSanitized() {
+        ContentDisposition cd = new ContentDisposition("attachment;filename=\"../../../etc/passwd\"");
+        assertEquals("../../../etc/passwd", cd.getFilename());
+        assertEquals("passwd", cd.getFilenameSanitized());
+
+        cd = new ContentDisposition("attachment;filename*=UTF-8''%2e%2e%2f%2e%2e%2fpasswd");
+        assertEquals("passwd", cd.getFilenameSanitized());
+
+        assertNull(new ContentDisposition("attachment;filename=\"..\"").getFilenameSanitized());
+        assertNull(new ContentDisposition("attachment;name=\"field\"").getFilenameSanitized());
+    }
 }

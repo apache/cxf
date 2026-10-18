@@ -59,8 +59,8 @@ final class EntityPartUtils {
                 final String fileName = (cd != null) ? cd.getFilename() : null;
 
                 if (!StringUtils.isEmpty(fileName)) {
-                    return new EntityPartImpl(providers, key, fileName, value, String.class, null,
-                        attachment.getHeaders(), attachment.getContentType());
+                    return new EntityPartImpl(providers, key, fileName, value, String.class,
+                        null, attachment.getHeaders(), attachment.getContentType());
                 } else {
                     return new EntityPartImpl(providers, key, null, value, String.class, null, attachment.getHeaders(),
                         attachment.getContentType());
@@ -110,8 +110,8 @@ final class EntityPartUtils {
         try {
             final InputStream is = a.getDataHandler().getInputStream();
             if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(providers, name, fileName, is, InputStream.class, null,
-                    a.getHeaders(), a.getContentType());
+                return new EntityPartImpl(providers, name, fileName, is, InputStream.class,
+                    null, a.getHeaders(), a.getContentType());
             } else {
                 return new EntityPartImpl(providers, name, null, is, InputStream.class, null,
                     a.getHeaders(), a.getContentType());

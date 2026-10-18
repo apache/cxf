@@ -169,9 +169,13 @@ public class EntityPartProvider extends AbstractConfigurableProvider
             final String cdName = cd == null ? null : cd.getParameter("name");
             final String contentId = attachment.getContentId();
 
+            // the filename is carried through verbatim: EntityPartImpl passes it straight
+            // back out when the part is re-serialised, so sanitising it here would corrupt
+            // a part that is simply read and forwarded. Callers that build a file from the
+            // name should reduce it through ContentDisposition.getFilenameSanitized().
             if (!StringUtils.isEmpty(fileName)) {
-                return new EntityPartImpl(mc.getProviders(), contentId, fileName, is, c, genericType,
-                    attachment.getHeaders(), attachment.getContentType());
+                return new EntityPartImpl(mc.getProviders(), contentId, fileName, is, c,
+                    genericType, attachment.getHeaders(), attachment.getContentType());
             } else {
                 final String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
                 return new EntityPartImpl(mc.getProviders(), name, null, is, c, genericType, attachment.getHeaders(),
