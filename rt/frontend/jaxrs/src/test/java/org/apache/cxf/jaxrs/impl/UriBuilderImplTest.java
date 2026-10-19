@@ -40,6 +40,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
@@ -134,7 +136,41 @@ public class UriBuilderImplTest {
         assertEquals("/?a=%25&a2=%7B%7D", uri.toString());
     }
 
+    @Test
+    public void testReplaceFullPath() {
+        UriBuilder ub = UriBuilder.fromPath("");
+        URI uri = ub.build();
+        assertEquals("", uri.toString());
+        uri = ub.replacePath("http://foo.com").build();
+        assertEquals("http://foo.com", uri.toString());
+    }
 
+    @Test
+    public void testReplaceFullPathWhenUriIsSet() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replacePath("http://bar.com/").build();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+    }
+
+    @Test
+    public void testBuildAndSetFullPath() {
+        UriBuilder ub = UriBuilder.fromPath("");
+        URI uri = ub.build();
+        assertEquals("", uri.toString());
+        uri = ub.path("http://foo.com").build();
+        assertEquals("http://foo.com", uri.toString());
+    }
+
+    @Test
+    public void testBuildAndSetFullPathWhenUriIsSet() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path("http://bar.com/").build();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+    }
 
     @Test
     public void testResolveTemplate() {

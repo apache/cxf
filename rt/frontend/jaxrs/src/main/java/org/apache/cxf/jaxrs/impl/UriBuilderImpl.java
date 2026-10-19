@@ -780,7 +780,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     public UriBuilder replacePath(String path) {
         if (path == null) {
             clearPathAndMatrix();
-        } else if (isAbsoluteUriPath(path)) {
+        } else if (isAbsoluteUriPath(path) && scheme == null && host == null) {
+            // Only set uri when path is absolute and the current URI's is not set
+            // (scheme and host are all null). 
             clearPathAndMatrix();
             uri(URI.create(path));
         } else {
