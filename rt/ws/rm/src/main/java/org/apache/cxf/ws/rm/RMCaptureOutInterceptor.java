@@ -223,6 +223,9 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
     }
     private void captureMessage(Message message) {
         message.put(RMMessageConstants.MESSAGE_CAPTURE, Boolean.TRUE);
+        if (message.get(Message.CONTENT_TYPE) != null) {
+            message.put(RMMessageConstants.SAVED_CONTENT_TYPE, message.get(Message.CONTENT_TYPE));
+        }
 
         message.getInterceptorChain().add(new CaptureStart());
         message.getInterceptorChain().add(new CaptureEnd());
