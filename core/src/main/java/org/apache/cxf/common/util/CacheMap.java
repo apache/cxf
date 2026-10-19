@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.common.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -120,10 +122,13 @@ public class CacheMap<K, V> implements Map<K, V> {
 
     public V remove(Object key) {
         V v = mainDataMap.remove(key);
-        Set<K> keys = new HashSet<>(extraKeyMap.keySet());
+        // Must not use a HashSet here: extraKeyMap may hold several distinct key
+        // instances that are equal to each other (e.g. different String instances
+        // of the same URL), and all of them need to be removed.
+        List<K> keys = new ArrayList<>(extraKeyMap.keySet());
         V v2 = extraKeyMap.remove(key);
         for (K nk : keys) {
-            if ((key != null && key.equals(nk)) || (key == null && nk == null)) {
+            if (Objects.equals(key, nk)) {
                 V v3 = extraKeyMap.remove(nk);
                 if (v2 == null) {
                     v2 = v3;

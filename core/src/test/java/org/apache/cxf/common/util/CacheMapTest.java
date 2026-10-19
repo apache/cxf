@@ -50,4 +50,26 @@ public class CacheMapTest {
         Assert.assertNull(definitions.remove(null));
     }
 
+    @Test
+    public void testRemoveWithMultipleEqualKeys() {
+        Map<Object, Object> definitions = new CacheMap<>();
+        Object value = new Object();
+
+        String putKey = new String("http://localhost/service?wsdl");
+        definitions.put(putKey, value);
+        // lookups with distinct but equal key instances are recorded in the extra key map
+        String lookupKey1 = new String("http://localhost/service?wsdl");
+        String lookupKey2 = new String("http://localhost/service?wsdl");
+        Assert.assertSame(value, definitions.get(lookupKey1));
+        Assert.assertSame(value, definitions.get(lookupKey2));
+
+        Assert.assertSame(value, definitions.remove(new String("http://localhost/service?wsdl")));
+
+        Assert.assertTrue(definitions.isEmpty());
+        Assert.assertFalse(definitions.containsKey(putKey));
+        Assert.assertNull(definitions.get(lookupKey1));
+        Assert.assertNull(definitions.get(lookupKey2));
+        Assert.assertEquals(0, definitions.size());
+    }
+
 }
