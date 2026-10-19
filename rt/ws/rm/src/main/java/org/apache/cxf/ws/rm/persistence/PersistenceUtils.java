@@ -172,7 +172,7 @@ public final class PersistenceUtils {
                 }
             }
         } catch (MimeTypeParseException e) {
-            LOG.log(Level.FINE, "Invalid multipart Content-Type " + multipartType, e);
+            LOG.log(Level.FINE, "Invalid multipart Content-Type", e);
         }
         if (rootType == null) {
             LOG.log(Level.WARNING, "The Content-Type of the SOAP root message is unknown, using "
