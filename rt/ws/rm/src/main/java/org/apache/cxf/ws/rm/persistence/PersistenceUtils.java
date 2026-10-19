@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLStreamReader;
 
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
@@ -46,6 +46,7 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
@@ -60,14 +61,6 @@ public final class PersistenceUtils {
     private static final String DEFAULT_ROOT_CONTENT_TYPE = "text/xml";
 
     private static final String XOP_CONTENT_TYPE = "application/xop+xml";
-
-    private static final Pattern CHARSET_PARAM =
-        Pattern.compile(";\\s*charset\\s*=\\s*(\"[^\"]*\"|[^;\\s]*)", Pattern.CASE_INSENSITIVE);
-
-    /** The type parameter of an XOP content type, whose quoted value may contain escaped quotes */
-    private static final Pattern TYPE_PARAM =
-        Pattern.compile(";\\s*type\\s*=\\s*(?:\"((?:[^\"\\\\]|\\\\.)*)\"|([^;\\s]+))",
-                        Pattern.CASE_INSENSITIVE);
 
     private static PersistenceUtils instance;
     private JAXBContext context;
@@ -139,24 +132,54 @@ public final class PersistenceUtils {
             Map<String, List<String>> ih =
                 CastUtils.cast((Map<?, ?>)msg.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));
             List<String> types = ih != null ? ih.get("Content-Type") : null;
-            ct = types != null && !types.isEmpty() ? String.join("; ", types) : null;
-            if (ct != null) {
+            if (types != null && !types.isEmpty()) {
                 // the charset is added again by the AttachmentSerializer when the message is written
-                ct = CHARSET_PARAM.matcher(ct).replaceAll("").trim();
-                if (ct.endsWith(";")) {
-                    ct = ct.substring(0, ct.length() - 1).trim();
-                }
+                ct = removeCharset(types.get(0));
             }
         }
         if (ct == null) {
             ct = (String) msg.get(Message.CONTENT_TYPE);
         }
-        if (ct != null && ct.regionMatches(true, 0, "multipart/", 0, "multipart/".length())) {
+        if (isMultipart(ct)) {
+            return getMultipartRootType(ct);
+        }
+        return ct;
+    }
+
+    /**
+     * Content type of the root part of a multipart message of the given type, used when the multipart
+     * type is the only known type, like when it was stored as the type of the root part. The start-info
+     * parameter written by the AttachmentSerializer holds the SOAP content type with its parameters,
+     * like the SOAP 1.2 action, and the type parameter is the one of the root part, application/xop+xml
+     * for an XOP package.
+     */
+    private static String getMultipartRootType(String multipartType) {
+        String rootType = null;
+        try {
+            MimeType mt = new MimeType(multipartType);
+            String type = mt.getParameter("type");
+            String startInfo = mt.getParameter("start-info");
+            if (XOP_CONTENT_TYPE.equalsIgnoreCase(type)) {
+                MimeType xop = new MimeType(XOP_CONTENT_TYPE);
+                if (startInfo != null) {
+                    xop.setParameter("type", removeCharset(startInfo));
+                }
+                rootType = xop.toString();
+            } else {
+                String soapType = startInfo != null ? startInfo : type;
+                if (soapType != null && !isMultipart(soapType)) {
+                    rootType = removeCharset(soapType);
+                }
+            }
+        } catch (MimeTypeParseException e) {
+            LOG.log(Level.FINE, "Invalid multipart Content-Type " + multipartType, e);
+        }
+        if (rootType == null) {
             LOG.log(Level.WARNING, "The Content-Type of the SOAP root message is unknown, using "
                 + DEFAULT_ROOT_CONTENT_TYPE);
             return DEFAULT_ROOT_CONTENT_TYPE;
         }
-        return ct;
+        return rootType;
     }
 
     /**
@@ -164,15 +187,50 @@ public final class PersistenceUtils {
      * the content type is not the one of an XOP root part.
      */
     private static String getXopWrappedType(String rootType) {
-        if (rootType == null
-            || !rootType.regionMatches(true, 0, XOP_CONTENT_TYPE, 0, XOP_CONTENT_TYPE.length())) {
+        if (rootType == null) {
             return null;
         }
-        Matcher m = TYPE_PARAM.matcher(rootType);
-        if (!m.find()) {
-            return DEFAULT_ROOT_CONTENT_TYPE;
+        MimeType mt;
+        try {
+            mt = new MimeType(rootType);
+        } catch (MimeTypeParseException e) {
+            return null;
         }
-        return m.group(1) != null ? m.group(1).replaceAll("\\\\(.)", "$1") : m.group(2);
+        if (!XOP_CONTENT_TYPE.equalsIgnoreCase(mt.getBaseType())) {
+            return null;
+        }
+        String type = mt.getParameter("type");
+        return type != null ? removeCharset(type) : DEFAULT_ROOT_CONTENT_TYPE;
+    }
+
+    private static boolean isMultipart(String ct) {
+        return ct != null && ct.regionMatches(true, 0, "multipart/", 0, "multipart/".length());
+    }
+
+    /** Removes the charset parameter, but not the one in the value of another parameter */
+    private static String removeCharset(String ct) {
+        try {
+            MimeType mt = new MimeType(ct);
+            mt.removeParameter("charset");
+            return mt.toString();
+        } catch (MimeTypeParseException e) {
+            // only keep the type/subtype of an invalid content type
+            int index = ct.indexOf(';');
+            return (index == -1 ? ct : ct.substring(0, index)).trim();
+        }
+    }
+
+    /**
+     * Encodes the content of a message, which is stored as it is if the message has no attachments.
+     */
+    public static void encodeRMContent(RMMessage rmmsg, Message msg, CachedOutputStream msgContent)
+        throws IOException {
+        if (msg.getAttachments() == null || msg.getAttachments().isEmpty()) {
+            rmmsg.setContentType(getRootContentType(msg));
+            rmmsg.setContent(msgContent);
+        } else {
+            encodeRMContent(rmmsg, msg, msgContent.getInputStream());
+        }
     }
 
     public static void encodeRMContent(RMMessage rmmsg, Message msg, InputStream msgContent)
@@ -187,7 +245,12 @@ public final class PersistenceUtils {
             MessageImpl msgImpl1 = new MessageImpl();
             msgImpl1.setContent(OutputStream.class, cos);
             msgImpl1.setAttachments(msg.getAttachments());
-            msgImpl1.put(Message.CONTENT_TYPE, getRootContentType(msg));
+            // an outbound MTOM message is stored as an XOP package, so that it is resent as one
+            boolean xop = MessageUtils.isOutbound(msg) && AttachmentUtil.isMtomEnabled(msg);
+            String rootType = getRootContentType(msg);
+            String xopWrappedType = xop ? getXopWrappedType(rootType) : null;
+            // the AttachmentSerializer wraps the SOAP type into the XOP root part type
+            msgImpl1.put(Message.CONTENT_TYPE, xopWrappedType != null ? xopWrappedType : rootType);
             // the encoding of the root part, otherwise the AttachmentSerializer declares UTF-8
             Object encoding = msg.get(Message.ENCODING);
             if (encoding != null) {
@@ -195,9 +258,7 @@ public final class PersistenceUtils {
             }
             msgImpl1.setContent(InputStream.class, msgContent);
             AttachmentSerializer serializer = new AttachmentSerializer(msgImpl1);
-            // a captured outbound MTOM message is stored as an XOP package, so that it is resent as one
-            serializer.setXop(msg.get(RMMessageConstants.SAVED_CONTENT_TYPE) != null
-                && AttachmentUtil.isMtomEnabled(msg));
+            serializer.setXop(xop);
             serializer.writeProlog();
             // write soap root message into cached output stream
             IOUtils.copyAndCloseInput(msgContent, cos);

@@ -50,7 +50,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.attachment.AttachmentSerializer;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
@@ -815,7 +814,6 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             // clear flags for SOAP and attachment out interceptors so envelope and attachments will be written
             message.remove(SoapOutInterceptor.WROTE_ENVELOPE_START);
             message.remove(AttachmentOutInterceptor.ATTACHMENT_OUT_CHECKED);
-            message.removeContent(AttachmentSerializer.class);
             String savedContentType = (String)message.get(RMMessageConstants.SAVED_CONTENT_TYPE);
             if (savedContentType != null) {
                 message.put(org.apache.cxf.message.Message.CONTENT_TYPE, savedContentType);
