@@ -103,7 +103,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        return doBuild(false, true, values);
+        return build(values, true);
     }
 
     private static Map<String, Object> getResolvedTemplates(Map<String, Object> rtemplates) {
@@ -185,13 +185,16 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment)
         throws URISyntaxException {
+
+        // Always include the leading slash in order to prevent host overrides 
+        if ((scheme != null || host != null || userInfo != null)
+                && thePath.length() != 0 && !(thePath.startsWith("/") || thePath.startsWith(";"))) {
+            thePath = "/" + thePath;
+        }
+
         if (fromEncoded) {
             return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
-            if ((scheme != null || host != null || userInfo != null)
-                && thePath.length() != 0 && !(thePath.startsWith("/") || thePath.startsWith(";"))) {
-                thePath = "/" + thePath;
-            }
             try {
                 return buildURIFromEncoded(thePath, theQuery, theFragment);
             } catch (Exception ex) {
@@ -262,7 +265,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     @Override
     public URI buildFromMap(Map<String, ?> map) throws IllegalArgumentException,
         UriBuilderException {
-        return doBuildFromMap(map, false, true);
+        return buildFromMap(map, true);
     }
 
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded,

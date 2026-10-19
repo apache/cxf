@@ -41,6 +41,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -143,6 +144,9 @@ public class UriBuilderImplTest {
         assertEquals("", uri.toString());
         uri = ub.replacePath("http://foo.com").build();
         assertEquals("http://foo.com", uri.toString());
+
+        uri = ub.buildFromEncoded();
+        assertEquals("http://foo.com", uri.toString());
     }
 
     @Test
@@ -152,6 +156,11 @@ public class UriBuilderImplTest {
         assertEquals("http://foo.com", uri.toString());
         uri = ub.replacePath("http://bar.com/").build();
         assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
     }
 
     @Test
@@ -161,6 +170,10 @@ public class UriBuilderImplTest {
         assertEquals("", uri.toString());
         uri = ub.path("http://foo.com").build();
         assertEquals("http://foo.com", uri.toString());
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
     }
 
     @Test
@@ -170,6 +183,40 @@ public class UriBuilderImplTest {
         assertEquals("http://foo.com", uri.toString());
         uri = ub.path("http://bar.com/").build();
         assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+
+        uri = ub.path(".org").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testReplacePathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replacePath(".org").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
     }
 
     @Test
