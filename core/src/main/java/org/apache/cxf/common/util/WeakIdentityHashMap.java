@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,7 +96,8 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     }
     public Set<K> keySet() {
         reap();
-        Set<K> ret = new HashSet<>();
+        // keys are compared by identity, so equal but distinct keys must not be merged
+        Set<K> ret = Collections.newSetFromMap(new IdentityHashMap<>());
         for (IdentityWeakReference ref : backingStore.keySet()) {
             K key = ref.get();
             if (key != null) {
