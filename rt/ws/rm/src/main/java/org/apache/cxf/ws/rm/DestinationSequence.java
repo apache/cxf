@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -191,14 +190,7 @@ public class DestinationSequence extends AbstractSequence {
                         .get(RMMessageConstants.SAVED_CONTENT);
                     msg.setMessageNumber(st.getMessageNumber());
                     msg.setCreatedTime(rmps.getCreatedTime());
-                    // in case no attachments are available, cos can be saved directly
-                    if (message.getAttachments() == null) {
-                        msg.setContent(cos);
-                        msg.setContentType((String)message.get(Message.CONTENT_TYPE));
-                    } else {
-                        InputStream is = cos.getInputStream();
-                        PersistenceUtils.encodeRMContent(msg, message, is);
-                    }
+                    PersistenceUtils.encodeRMContent(msg, message, cos);
                     store.persistIncoming(this, msg);
                 } catch (IOException e) {
                     throw new Fault(e);

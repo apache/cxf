@@ -39,6 +39,9 @@ public final class RMMessageConstants {
     /** Message content must be an instance of {@link CachedOutputStream}. */
     public static final String SAVED_CONTENT = "org.apache.cxf.ws.rm.content";
 
+    /** Saved Content-Type before AttachmentOutInterceptor replaces it with multipart. */
+    public static final String SAVED_CONTENT_TYPE = "org.apache.cxf.ws.rm.content.type";
+
     /** Variable holds reference to source streams of the attachments.
      * It must be an instance of {@link Closeable}. */
     public static final String ATTACHMENTS_CLOSEABLE = "org.apache.cxf.ws.rm.attachment.closeable";

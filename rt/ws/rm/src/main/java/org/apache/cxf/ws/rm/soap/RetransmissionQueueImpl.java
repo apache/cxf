@@ -59,6 +59,7 @@ import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -810,8 +811,13 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             message.setInterceptorChain(retransmitChain);
 
-            // clear flag for SOAP out interceptor so envelope will be written
+            // clear flags for SOAP and attachment out interceptors so envelope and attachments will be written
             message.remove(SoapOutInterceptor.WROTE_ENVELOPE_START);
+            message.remove(AttachmentOutInterceptor.ATTACHMENT_OUT_CHECKED);
+            String savedContentType = (String)message.get(RMMessageConstants.SAVED_CONTENT_TYPE);
+            if (savedContentType != null) {
+                message.put(org.apache.cxf.message.Message.CONTENT_TYPE, savedContentType);
+            }
 
             // discard all saved content
             Set<Class<?>> formats = message.getContentFormats();
