@@ -512,10 +512,9 @@ public class UriBuilderImplTest {
     @Test
     public void replaceMatrixParamWithEmptyPathTest() throws Exception {
         String name = "name";
-        String expected = "http://localhost:8080/;name=x;name=y;name=y%20x;name=x%25y;name=%20";
+        String expected = "http://localhost:8080;name=x;name=y;name=y%20x;name=x%25y;name=%20";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
-            .path(";name=x=;name=y?;name=x y;name=&")
+        URI uri = UriBuilder.fromPath("http://localhost:8080;name=x=;name=y?;name=x y;name=&")
             .replaceMatrixParam(name, "x", "y", "y x", "x%y", "%20")
             .build();
         assertEquals(expected, uri.toString());
@@ -523,21 +522,20 @@ public class UriBuilderImplTest {
 
     @Test
     public void replaceMatrixWithEmptyPathTest() throws Exception {
-        String expected = "http://localhost:8080/;name=x;name=y;name=y%20x;name=x%25y;name=%20";
+        String expected = "http://localhost:8080;name=x;name=y;name=y%20x;name=x%25y;name=%20";
         String value = "name=x;name=y;name=y x;name=x%y;name= ";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
-                .path(";name=x=;name=y?;name=x y;name=&")
-                .replaceMatrix(value).build();
+        URI uri = UriBuilder.fromPath("http://localhost:8080;name=x=;name=y?;name=x y;name=&")
+                                .replaceMatrix(value).build();
         assertEquals(expected, uri.toString());
     }
 
     @Test
     public void testAddMatrixToEmptyPath() throws Exception {
         String name = "name";
-        String expected = "http://localhost:8080/;name=x;name=y";
+        String expected = "http://localhost:8080;name=x;name=y";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080").matrixParam(name, "x", "y")
+        URI uri = UriBuilder.fromPath("http://localhost:8080").matrixParam(name, "x", "y")
             .build();
         assertEquals(expected, uri.toString());
     }
@@ -887,7 +885,7 @@ public class UriBuilderImplTest {
     public void testReplaceQueryWithNull2() {
         String expected = "http://localhost:8080";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
             .queryParam("name", "x=", "y?", "x y", "&").replaceQuery(null).build();
         assertEquals(expected, uri.toString());
     }
@@ -917,7 +915,7 @@ public class UriBuilderImplTest {
     public void testReplaceQuery3() {
         String expected = "http://localhost:8080?name1=xyz";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
             .queryParam("name", "x=", "y?", "x y", "&").replaceQuery("name1=xyz").build();
         assertEquals(expected, uri.toString());
     }
@@ -926,7 +924,7 @@ public class UriBuilderImplTest {
     public void testFromPathUriOnly() {
         String expected = "http://localhost:8080";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080").build();
+        URI uri = UriBuilder.fromPath("http://localhost:8080").build();
         assertEquals(expected, uri.toString());
     }
 
@@ -1348,7 +1346,7 @@ public class UriBuilderImplTest {
     @Test
     public void testFromEncodedDuplicateVar2() {
         String expected = "http://localhost:8080/xy/%20/%25/xy";
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
             .path("/{x}/{y}/{z}/{x}")
             .buildFromEncoded("xy", " ", "%");
         assertEquals(expected, uri.toString());
@@ -1357,7 +1355,7 @@ public class UriBuilderImplTest {
     @Test
     public void testFromEncodedDuplicateVar3() {
         String expected = "http://localhost:8080/1/2/3/1";
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
                             .path("/{a}/{b}/{c}/{a}")
                             .buildFromEncoded("1", "2", "3");
 
@@ -1428,7 +1426,7 @@ public class UriBuilderImplTest {
     public void testFromEncodedDuplicateVar() {
         String expected = "http://localhost:8080/a/%25/=/%25G0/%25/=";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
             .path("/{v}/{w}/{x}/{y}/{z}/{x}")
             .buildFromEncoded("a", "%25", "=", "%G0", "%", "23");
         assertEquals(expected, uri.toString());
@@ -1522,7 +1520,7 @@ public class UriBuilderImplTest {
     public void testEncodingQueryParamFromBuild() throws Exception {
         String expectedValue =
                 "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
-        URI uri = UriBuilder.fromUri("http://localhost:8080").queryParam("name",
+        URI uri = UriBuilder.fromPath("http://localhost:8080").queryParam("name",
                     "x=", "y?", "x y", "&").build();
         assertEquals(expectedValue, uri.toString());
     }
@@ -1531,7 +1529,7 @@ public class UriBuilderImplTest {
     public void testReplaceParamAndEncodeQueryParamFromBuild() throws Exception {
         String expectedValue =
                 "http://localhost:8080?name=x&name=y&name=y+x&name=x%25y&name=%20";
-        URI uri = UriBuilder.fromUri("http://localhost:8080").queryParam("name",
+        URI uri = UriBuilder.fromPath("http://localhost:8080").queryParam("name",
                     "x=", "y?", "x y", "&").replaceQueryParam("name", "x", "y",
                     "y x", "x%y", "%20").build();
         assertEquals(expectedValue, uri.toString());
@@ -1541,7 +1539,7 @@ public class UriBuilderImplTest {
     public void testReplaceStringAndEncodeQueryParamFromBuild() {
         String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
 
-        URI uri = UriBuilder.fromUri("http://localhost:8080")
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
             .queryParam("name", "x=", "y?", "x y", "&")
             .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
         assertEquals(expected, uri.toString());

@@ -514,7 +514,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             String httpBasePath = (String)mc.get("http.base.path");
             final UriBuilder builder;
             if (httpBasePath != null) {
-                builder = UriBuilder.fromUri(httpBasePath);
+                builder = UriBuilder.fromPath(httpBasePath);
             } else {
                 builder = mc.getUriInfo().getBaseUriBuilder();
             }

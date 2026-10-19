@@ -548,7 +548,38 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
-       
+        // Only set uri when path is absolute and the current URI's is not set
+        // (scheme and host are all null). 
+        if (isAbsoluteUriPath(path) && scheme == null && host == null) {
+            try {
+                URI uri = URI.create(path);
+                this.originalPathEmpty = StringUtils.isEmpty(uri.getPath());
+                uri(uri);
+            } catch (IllegalArgumentException ex) {
+                if (!URITemplate.createExactTemplate(path).getVariables().isEmpty()) {
+                    return uriAsTemplate(path);
+                }
+                String pathEncoded = HttpUtils.pathEncode(path);
+                // Bad hack to bypass the TCK usage of bogus URI with empty paths containing matrix parameters,
+                // which even URI class chokes upon; cheaper to do the following than try to challenge,
+                // given that URI RFC mentions the possibility of empty paths, though no word on the possibility of
+                // such empty paths having matrix parameters...
+                int schemeIndex = pathEncoded.indexOf("//");
+                if (schemeIndex != -1) {
+                    int pathComponentStart = pathEncoded.indexOf('/', schemeIndex + 2);
+                    if (pathComponentStart == -1) {
+                        this.originalPathEmpty = true;
+                        pathComponentStart = pathEncoded.indexOf(';');
+                        if (pathComponentStart != -1) {
+                            pathEncoded = pathEncoded.substring(0, pathComponentStart)
+                                + "/" + pathEncoded.substring(pathComponentStart);
+                        }
+                    }
+                }
+                setUriParts(URI.create(pathEncoded));
+            }
+            return this;
+        }
 
         if (paths.isEmpty()) {
             leadingSlash = path.startsWith("/");
