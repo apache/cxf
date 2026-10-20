@@ -41,6 +41,12 @@ public interface Message extends StringMap {
     String REST_MESSAGE = "org.apache.cxf.rest.message";
 
     /**
+     * Exchange property holding the name of the invoked resource operation for
+     * non-WSDL (e.g. JAX-RS) endpoints, used for logging, metrics and management.
+     */
+    String RESOURCE_OPERATION_NAME = "org.apache.cxf.resource.operation.name";
+
+    /**
      * Boolean property specifying if the message is a request message.
      */
     String REQUESTOR_ROLE = "org.apache.cxf.client";

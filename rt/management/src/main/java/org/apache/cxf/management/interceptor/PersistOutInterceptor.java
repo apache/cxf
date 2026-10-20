@@ -171,7 +171,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 String operationName = opInfo == null ? null : opInfo.getName().getLocalPart();
 
                 if (operationName == null) {
-                    Object nameProperty = message.getExchange().get("org.apache.cxf.resource.operation.name");
+                    Object nameProperty = message.getExchange().get(Message.RESOURCE_OPERATION_NAME);
                     if (nameProperty != null) {
                         operationName = "\"" + nameProperty.toString() + "\"";
                     }

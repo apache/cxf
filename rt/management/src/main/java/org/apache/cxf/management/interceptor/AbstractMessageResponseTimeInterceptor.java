@@ -178,7 +178,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
 
         if (operationName == null) {
-            Object nameProperty = ex.get("org.apache.cxf.resource.operation.name");
+            Object nameProperty = ex.get(Message.RESOURCE_OPERATION_NAME);
             if (nameProperty != null) {
                 operationName = "\"" + escapePatternChars(nameProperty.toString()) + "\"";
             }
