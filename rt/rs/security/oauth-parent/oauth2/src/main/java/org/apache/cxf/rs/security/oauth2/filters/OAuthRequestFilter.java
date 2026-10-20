@@ -22,7 +22,9 @@ import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -140,7 +142,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
         if (!permissions.isEmpty() && matchingPermissions.isEmpty()
             || allPermissionsMatch && (matchingPermissions.size() != permissions.size())
-            || !requiredScopes.isEmpty() && requiredScopes.size() != matchingPermissions.size()) {
+            || !requiredScopes.isEmpty() && !hasAllRequiredScopes(matchingPermissions)) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
@@ -229,6 +231,28 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         return foundValidScope;
     }
+
+    /**
+     * Checks that the token permissions matching the current request cover every configured
+     * required scope. Only called when required scopes have been set.
+     * <p>
+     * Subclasses overriding {@link #checkScopeProperty(String)} to match scopes more loosely
+     * (e.g. by pattern) should override this method as well, using {@link #getRequiredScopes()}.
+     *
+     * @param matchingPermissions the token permissions which passed the request URI, HTTP method
+     *        and {@link #checkScopeProperty(String)} checks
+     * @return true if every required scope is present among the matching permissions
+     */
+    protected boolean hasAllRequiredScopes(List<OAuthPermission> matchingPermissions) {
+        // Token scopes are not de-duplicated anywhere on the issuance path, so compare the set
+        // of matching scope names against the required scopes instead of the number of matches
+        Set<String> matchingScopes = new HashSet<>();
+        for (OAuthPermission perm : matchingPermissions) {
+            matchingScopes.add(perm.getPermission());
+        }
+        return matchingScopes.containsAll(requiredScopes);
+    }
+
     protected boolean checkScopeProperty(String scope) {
         if (!requiredScopes.isEmpty()) {
             return requiredScopes.contains(scope);
@@ -362,6 +386,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
 
     public void setRequiredScopes(List<String> requiredScopes) {
         this.requiredScopes = requiredScopes;
+    }
+
+    protected List<String> getRequiredScopes() {
+        return requiredScopes;
     }
 
     public void setAllPermissionsMatch(boolean allPermissionsMatch) {
