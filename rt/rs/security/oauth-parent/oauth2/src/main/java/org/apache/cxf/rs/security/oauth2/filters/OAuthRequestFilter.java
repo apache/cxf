@@ -239,7 +239,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         return foundValidScope;
     }
 
-    private boolean hasAllRequiredScopes(List<OAuthPermission> matchingPermissions) {
+    protected boolean hasAllRequiredScopes(List<OAuthPermission> matchingPermissions) {
         // Token scopes are not de-duplicated anywhere on the issuance path, so compare the set
         // of matching scope names against the required scopes instead of the number of matches
         Set<String> matchingScopes = new HashSet<>();
