@@ -62,7 +62,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInInterceptor.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
     private static final String RESOURCE_METHOD = "org.apache.cxf.resource.method";
-    private static final String RESOURCE_OPERATION_NAME = "org.apache.cxf.resource.operation.name";
 
     public JAXRSInInterceptor() {
         super(Phase.UNMARSHAL);
@@ -250,7 +249,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (numberOfResources > 1) {
             plainOperationName = cri.getServiceClass().getSimpleName() + "#" + plainOperationName;
         }
-        exchange.put(RESOURCE_OPERATION_NAME, plainOperationName);
+        exchange.put(Message.RESOURCE_OPERATION_NAME, plainOperationName);
 
         if (ori.isOneway()
             || PropertyUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {

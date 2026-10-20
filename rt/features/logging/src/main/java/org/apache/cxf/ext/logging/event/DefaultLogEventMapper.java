@@ -365,7 +365,7 @@ public class DefaultLogEventMapper {
      * @return
      */
     private boolean isRESTFault(Message message) {
-        Object opName = message.getExchange().get("org.apache.cxf.resource.operation.name");
+        Object opName = message.getExchange().get(Message.RESOURCE_OPERATION_NAME);
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         if (opName == null && responseCode == null) {
             return true;
