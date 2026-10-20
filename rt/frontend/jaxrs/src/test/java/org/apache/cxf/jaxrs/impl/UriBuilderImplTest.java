@@ -220,6 +220,42 @@ public class UriBuilderImplTest {
     }
 
     @Test
+    public void testTemplateUriDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromUri("http://foo.com")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/.org", template);
+    }
+
+    @Test
+    public void testTemplatePathDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/.org", template);
+    }
+    
+    @Test
+    public void testTemplateWithPathDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com/aaa")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/aaa/.org", template);
+    }
+
+    @Test
+    public void testTemplatePathDoesNotReplaceUri() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com/")
+            .path("http://bar.com")
+            .toTemplate();
+        assertThat(template, startsWith("http://foo.com/"));
+    }
+
+    @Test
     public void testResolveTemplate() {
         URI uri;
         uri = UriBuilder.fromPath("/{a}").resolveTemplate("a", "1").build();

@@ -238,7 +238,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 b.append(':').append(port);
             }
             if (thePath != null && thePath.length() > 0) {
-                b.append(thePath.startsWith("/") || b.length() == 0 || originalPathEmpty
+                b.append(thePath.startsWith("/") || b.length() == 0 || (originalPathEmpty && thePath.startsWith(";"))
                     ? thePath : '/' + thePath);
             }
             if (theQuery != null && theQuery.length() != 0) {
