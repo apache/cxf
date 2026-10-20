@@ -1193,7 +1193,7 @@ public abstract class AbstractClient implements Client {
     }
 
     protected void setPlainOperationNameProperty(Message outMessage, String name) {
-        outMessage.getExchange().put("org.apache.cxf.resource.operation.name", name);
+        outMessage.getExchange().put(Message.RESOURCE_OPERATION_NAME, name);
     }
 
     protected static Type getCallbackType(InvocationCallback<?> callback) {
