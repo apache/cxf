@@ -19,8 +19,10 @@
 package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collections;
 
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.message.Message;
@@ -34,6 +36,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 import org.junit.After;
 import org.junit.Test;
@@ -189,6 +192,36 @@ public class OAuthRequestFilterTest {
         assertEquals("api://preset", message.get(JwtConstants.EXPECTED_CLAIM_AUDIENCE));
     }
 
+    @Test
+    public void testRequiredScopesRejectDuplicatedScopeInsteadOfMissingOne() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.REQUEST_URL, "https://rs.example/orders");
+        setThreadLocalMessage(message);
+
+        String jwt = createSignedToken("api://orders", "read read");
+        OAuthRequestFilter filter = createJwtFilter(jwt);
+        filter.setAudience("api://orders");
+        filter.setRequiredScopes(Arrays.asList("read", "admin"));
+
+        assertThrows(ForbiddenException.class, () -> filter.validateRequest(message));
+    }
+
+    @Test
+    public void testRequiredScopesAcceptTokenWithAllRequiredScopes() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.REQUEST_URL, "https://rs.example/orders");
+        setThreadLocalMessage(message);
+
+        String jwt = createSignedToken("api://orders", "admin read read");
+        OAuthRequestFilter filter = createJwtFilter(jwt);
+        filter.setAudience("api://orders");
+        filter.setRequiredScopes(Arrays.asList("read", "admin"));
+
+        filter.validateRequest(message);
+
+        assertEquals(3, message.getContent(OAuthContext.class).getPermissions().size());
+    }
+
     private static OAuthRequestFilter createJwtFilter(String jwt) {
         JwtAccessTokenValidator validator = new JwtAccessTokenValidator();
         validator.setJwsVerifier(new HmacJwsSignatureVerifier(SIGNING_KEY, SignatureAlgorithm.HS256));
@@ -205,6 +238,10 @@ public class OAuthRequestFilterTest {
     }
 
     private static String createSignedToken(String audience) {
+        return createSignedToken(audience, null);
+    }
+
+    private static String createSignedToken(String audience, String scope) {
         long now = System.currentTimeMillis() / 1000;
         JwtClaims claims = new JwtClaims();
         claims.setIssuedAt(now);
@@ -212,6 +249,9 @@ public class OAuthRequestFilterTest {
         claims.setIssuer("https://as.example");
         claims.setClaim("client_id", "client");
         claims.setAudience(audience);
+        if (scope != null) {
+            claims.setClaim(OAuthConstants.SCOPE, scope);
+        }
 
         JwsJwtCompactProducer producer = new JwsJwtCompactProducer(new JwtToken(claims));
         return producer.signWith(new HmacJwsSignatureProvider(SIGNING_KEY, SignatureAlgorithm.HS256));
