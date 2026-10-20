@@ -75,6 +75,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 
@@ -84,6 +85,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 
@@ -93,6 +95,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 

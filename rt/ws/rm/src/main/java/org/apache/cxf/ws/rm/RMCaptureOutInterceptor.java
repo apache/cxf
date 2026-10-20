@@ -39,6 +39,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
+import org.apache.cxf.interceptor.AttachmentSaveInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
@@ -227,6 +228,8 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
 
         message.getInterceptorChain().add(new CaptureStart());
+        message.getInterceptorChain().add(new AttachmentSaveInterceptor(message.getAttachments(),
+            RMMessageConstants.SAVED_ATTACHMENTS));
         message.getInterceptorChain().add(new CaptureEnd());
     }
 

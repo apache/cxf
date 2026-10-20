@@ -42,6 +42,12 @@ public final class RMMessageConstants {
     /** Saved Content-Type before AttachmentOutInterceptor replaces it with multipart. */
     public static final String SAVED_CONTENT_TYPE = "org.apache.cxf.ws.rm.content.type";
 
+    /**
+     * Saved attachments before WS-Security may replace them with secured ones, whose content can only be read
+     * once. Retransmissions secure the saved attachments again.
+     */
+    public static final String SAVED_ATTACHMENTS = "org.apache.cxf.ws.rm.attachments";
+
     /** Variable holds reference to source streams of the attachments.
      * It must be an instance of {@link Closeable}. */
     public static final String ATTACHMENTS_CLOSEABLE = "org.apache.cxf.ws.rm.attachment.closeable";
