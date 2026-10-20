@@ -538,24 +538,25 @@ public class WebClientTest {
 
     @Test
     public void pathAllowsAddingURLAsPathElement() {
-        final WebClient webClient = WebClient.create("http://www.foo.com");
-        webClient.path("http://www.bar.com");
+        final WebClient webClient = WebClient.create("http://www.foo.com").path("http://www.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/"));
         assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
     }
 
     @Test
     public void preservesPreviouslyAddedPathParameters() {
-        final WebClient webClient = WebClient.create("http://www.foo.com");
-        webClient.path("foo");
-        webClient.path("bar");
-        webClient.path("http://www.bar.com");
-        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/foo/bar"));
+        final WebClient webClient = WebClient.create("http://www.foo.com")
+            .path("foo")
+            .path("bar")
+            .path("http://www.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/foo/bar/"));
+        assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
     }
 
     @Test
     public void outputOfUriUtilsEncodePathSegmentIsSafe() {
-        final WebClient webClient = WebClient.create("http://www.foo.com");
-        webClient.path("http:%2F%2Fwww.bar.com");
+        final WebClient webClient = WebClient.create("http://www.foo.com").path("http:%2F%2Fwww.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/"));
         assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
     }
 
