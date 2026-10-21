@@ -213,12 +213,44 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         wc.acceptEncoding("gzip,deflate");
         wc.encoding("gzip");
-        InputStream r = wc.get(InputStream.class);
-        assertNotNull(r);
-        GZIPInputStream in = new GZIPInputStream(r);
+        Response r = wc.get();
+        assertEquals("gzip", r.getHeaderString("Content-Encoding"));
+        assertEquals("Accept-Encoding", r.getHeaderString("Vary"));
+        GZIPInputStream in = new GZIPInputStream(r.readEntity(InputStream.class));
         String s = IOUtils.toString(in);
         in.close();
         assertTrue(s, s.contains("id>124"));
+    }
+
+    @Test
+    public void testGetBookQueryNoGZIP() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/";
+        WebClient wc = WebClient.create(address);
+        wc.acceptEncoding("identity");
+        Response r = wc.get();
+        assertNull(r.getHeaderString("Content-Encoding"));
+        // the response would have been compressed if the client had accepted gzip
+        assertEquals("Accept-Encoding", r.getHeaderString("Vary"));
+        String s = r.readEntity(String.class);
+        assertTrue(s, s.contains("id>124"));
+    }
+
+    @Test
+    public void testGetBookNotModifiedVary() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/response3/123";
+        for (String encoding : new String[] {"identity", null, "gzip"}) {
+            WebClient wc = WebClient.create(address).accept("application/xml");
+            if (encoding != null) {
+                wc.acceptEncoding(encoding);
+            }
+            wc.header("If-Modified-Since", "Wed, 21 Oct 2015 07:28:00 GMT");
+            try (Response response = wc.get()) {
+                assertEquals(304, response.getStatus());
+                assertEquals("Accept-Encoding", response.getHeaderString("Vary"));
+                assertNull(response.getHeaderString("Content-Encoding"));
+                assertFalse(response.hasEntity());
+            }
+        }
     }
 
     @Test
