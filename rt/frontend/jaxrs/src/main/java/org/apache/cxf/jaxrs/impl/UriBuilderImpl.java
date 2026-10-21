@@ -188,7 +188,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         // Always include the leading slash in order to prevent host overrides 
         if ((scheme != null || host != null || userInfo != null)
-                && thePath.length() != 0 && !(thePath.startsWith("/") || thePath.startsWith(";"))) {
+                && thePath.length() != 0 && !(thePath.startsWith("/") || !needsLeadingSlash(thePath))) {
             thePath = "/" + thePath;
         }
 
@@ -238,8 +238,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 b.append(':').append(port);
             }
             if (thePath != null && thePath.length() > 0) {
-                b.append(thePath.startsWith("/") || b.length() == 0 || (originalPathEmpty && thePath.startsWith(";"))
-                    ? thePath : '/' + thePath);
+                b.append(thePath.startsWith("/") || b.length() == 0
+                    || (originalPathEmpty && !needsLeadingSlash(thePath)) ? thePath : '/' + thePath);
             }
             if (theQuery != null && theQuery.length() != 0) {
                 b.append('?').append(theQuery);
@@ -251,6 +251,28 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             b.append('#').append(theFragment);
         }
         return b.toString();
+    }
+    
+    /**
+     * The URI parsing logic seems to be flawed and treats everything after @ 
+     * symbol as the host name, for example: 
+     * 
+     *    URI.create("http://foo.com;@evil.com").getHost() -> "evil.com"
+     *    URI.create("http://foo.com&@evil.com").getHost() -> "evil.com"
+     *    URI.create("http://foo.com+@evil.com").getHost() -> "evil.com"
+     * 
+     * The straightforward encoding of @ -> %40 does not work either:
+     *
+     *    URI.create("http://foo.com;%40evil.com").getHost() ->  null
+     * 
+     * It does not even matter if the userinfo part is already provided:
+     * 
+     *    URI.create("http://a:b@foo.com;%40evil.com").getHost() ->  null
+     *
+     * To workaround the issue, we have to include leading path slash all the time.
+     */
+    private boolean needsLeadingSlash(String path) {
+        return !path.startsWith(";") || path.indexOf('@') >= 0; /* check if @ is present */
     }
 
     private boolean isSchemeOpaque() {
