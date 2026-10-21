@@ -226,7 +226,34 @@ public class PersistenceUtilsTest {
         restored.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 1);
         restored.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, directory);
         restored.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, 16L);
-        assertThrows(CacheSizeExceededException.class, () -> PersistenceUtils.decodeRMContent(persisted, restored));
+        IOException error = assertThrows(IOException.class,
+            () -> PersistenceUtils.decodeRMContent(persisted, restored));
+        assertTrue(error.getCause() instanceof CacheSizeExceededException);
+        assertEquals("partial recovery must release the attachment caches", 0, directory.list().length);
+    }
+
+    @Test
+    public void testTooManyRecoveredAttachmentsReportedAsIOException() throws Exception {
+        Message source = new MessageImpl();
+        source.put(Message.CONTENT_TYPE, "text/xml");
+        Collection<Attachment> attachments = new ArrayList<>();
+        for (int i = 0; i < AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_COUNT + 2; i++) {
+            attachments.add(new AttachmentImpl("attachment-" + i,
+                new DataHandler(new ByteArrayDataSource("attachment content", "text/plain"))));
+        }
+        source.setAttachments(attachments);
+        RMMessage persisted = new RMMessage();
+        PersistenceUtils.encodeRMContent(persisted, source,
+            new ByteArrayInputStream(SOAP_PART.getBytes(StandardCharsets.UTF_8)));
+
+        File directory = temporaryFolder.newFolder();
+        Message restored = new MessageImpl();
+        restored.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 1);
+        restored.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, directory);
+        IOException error = assertThrows(IOException.class,
+            () -> PersistenceUtils.decodeRMContent(persisted, restored));
+        assertTrue(error.getCause() instanceof RuntimeException);
+        assertTrue(error.getCause().getCause() instanceof IOException);
         assertEquals("partial recovery must release the attachment caches", 0, directory.list().length);
     }
 

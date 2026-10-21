@@ -286,6 +286,16 @@ public final class PersistenceUtils {
     }
 
     public static void decodeRMContent(RMMessage rmmsg, Message msg) throws IOException {
+        try {
+            doDecodeRMContent(rmmsg, msg);
+        } catch (RuntimeException e) {
+            // Lazy attachment parsing and cache limits can fail with unchecked exceptions.
+            // Recovery handles a bad persisted message as an I/O failure and continues with the rest.
+            throw new IOException("Unable to decode persisted RM message", e);
+        }
+    }
+
+    private static void doDecodeRMContent(RMMessage rmmsg, Message msg) throws IOException {
         String contentType = rmmsg.getContentType();
         final CachedOutputStream cos = rmmsg.getContent();
         if ((null != contentType) && contentType.startsWith("multipart/related")) {
