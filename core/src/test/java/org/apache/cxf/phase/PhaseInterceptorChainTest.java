@@ -26,14 +26,19 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.logging.FaultListener;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.Service;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -339,6 +344,28 @@ public class PhaseInterceptorChainTest {
         assertEquals(1, p1.invoked);
         assertEquals(0, p1.faultInvoked);
         verifyPhaseInterceptorInvocations(p2, false, false);
+    }
+
+    @Test
+    public void testFaultDescriptionIncludesResourceOperation() throws Exception {
+        Service service = mock(Service.class);
+        when(service.getName()).thenReturn(new QName("http://test", "FirstResource"));
+        Exchange exchange = new ExchangeImpl();
+        exchange.put(Service.class, service);
+        exchange.put(Message.RESOURCE_OPERATION_NAME, "SecondResource#getItem");
+        when(message.getExchange()).thenReturn(exchange);
+
+        FaultListener listener = mock(FaultListener.class);
+        when(message.getContextualProperty(FaultListener.class.getName())).thenReturn(listener);
+
+        AbstractPhaseInterceptor<Message> p = setUpPhaseInterceptor("phase1", "p1");
+        setUpPhaseInterceptorInvocations(p, true, false);
+        chain.add(p);
+        chain.doIntercept(message);
+
+        verify(listener).faultOccurred(isA(Exception.class),
+                                       eq("'{http://test}FirstResource#SecondResource#getItem' "),
+                                       eq(message));
     }
 
     @Test
