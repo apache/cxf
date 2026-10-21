@@ -35,6 +35,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -192,9 +193,22 @@ public class SimpleAuthorizingInterceptorTest {
         in.handleMessage(message);
     }
 
+    @Test
+    public void testMethodSignatureRoles() throws Exception {
+        Method transfer = TestService.class.getMethod("transfer", String.class, long.class);
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.setMethodRolesMap(Collections.singletonMap("void transfer(java.lang.String, long)", "admin"));
+        assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(transfer));
+    }
+
     private static final class TestService {
         @SuppressWarnings("unused")
         public void echo() {
+
+        }
+
+        @SuppressWarnings("unused")
+        public void transfer(String account, long amount) {
 
         }
     }
