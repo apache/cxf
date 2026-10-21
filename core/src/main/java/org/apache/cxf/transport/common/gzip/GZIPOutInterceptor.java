@@ -57,7 +57,10 @@ import org.apache.cxf.phase.Phase;
  * see {@link GZIPInInterceptor}. This interceptor supports a compression
  * {@link #threshold} (default 1kB) - messages smaller than this threshold will
  * not be compressed. To force compression of all messages, set the threshold to
- * 0. This class was originally based on one of the CXF samples
+ * 0. For server responses with a payload content type eligible for compression,
+ * this interceptor always adds {@code Vary: Accept-Encoding}, even when the
+ * response is not compressed.
+ * This class was originally based on one of the CXF samples
  * (configuration_interceptor).
  */
 public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
