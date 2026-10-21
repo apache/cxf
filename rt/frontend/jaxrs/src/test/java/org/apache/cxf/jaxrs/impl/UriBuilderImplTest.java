@@ -220,8 +220,17 @@ public class UriBuilderImplTest {
     }
 
     @Test
+    public void testEncodedUserInfoAndUriWithMatrix() {
+        // The UriBuilder::fromUri will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromUri("http://foo.com;%40evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
     public void testUserInfoAndUriWithMatrix() {
-        // The URI will treat `evil.com` as the host name
+        // The UriBuilder::fromUri will treat `evil.com` as the host name
         UriBuilder ub = UriBuilder.fromUri("http://foo.com;@evil.com");
         URI uri = ub.build();
         assertEquals("http://foo.com;@evil.com", uri.toString());
@@ -229,14 +238,23 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndPathWithMatrix() {
-     // The URI will treat `evil.com` as the host name
+    public void testEncodedUserInfoSeparatorAndPathWithMatrix() {
+        // The UriBuilder::fromPath will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com;%40evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndPathWithMatrix() {
+        // The UriBuilder::fromPath will treat `evil.com` as the host name
         UriBuilder ub = UriBuilder.fromPath("http://foo.com;@evil.com");
         URI uri = ub.build();
         assertEquals("http://foo.com;@evil.com", uri.toString());
         assertThat(uri.getHost(), equalTo("evil.com"));
     }
-    
+
     @Test
     public void testPathWithUserInfoDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://a:b@foo.com");
@@ -272,7 +290,24 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndPathDoesNotChangeHost() {
+    public void testEncodedUserInfoSeparatorAndPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path(";%40evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;%40evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;%40evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;%40evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndPathDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
         assertEquals("http://foo.com", uri.toString());
@@ -289,7 +324,7 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndReplacePathDoesNotChangeHost() {
+    public void testUserInfoSeparatorAndReplacePathDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
         assertEquals("http://foo.com", uri.toString());
@@ -306,7 +341,7 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndReplaceMatrixDoesNotChangeHost() {
+    public void testUserInfoSeparatorAndReplaceMatrixDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
         assertEquals("http://foo.com", uri.toString());
@@ -323,7 +358,7 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndMatrixDoesNotChangeHost() {
+    public void testUserInfoSeparatorAndMatrixDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
         assertEquals("http://foo.com", uri.toString());
@@ -340,7 +375,7 @@ public class UriBuilderImplTest {
     }
 
     @Test
-    public void testUserInfoAndTemplatedPathDoesNotChangeHost() {
+    public void testUserInfoSeparatorAndTemplatedPathDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
         assertEquals("http://foo.com", uri.toString());

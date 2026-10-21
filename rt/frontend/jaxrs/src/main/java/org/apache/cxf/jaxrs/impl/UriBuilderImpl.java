@@ -186,9 +186,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment)
         throws URISyntaxException {
 
-        // Always include the leading slash in order to prevent host overrides 
+        // Always include the leading slash in order to prevent host overrides
         if ((scheme != null || host != null || userInfo != null)
-                && thePath.length() != 0 && !(thePath.startsWith("/") || !needsLeadingSlash(thePath))) {
+                && thePath.length() != 0 && (!thePath.startsWith("/") && needsLeadingSlash(thePath))) {
             thePath = "/" + thePath;
         }
 
@@ -252,10 +252,10 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
         return b.toString();
     }
-    
+
     /**
-     * The URI parsing logic seems to be flawed and treats everything after @ 
-     * symbol as the host name, for example: 
+     * The `;`, `&` and `+` are valid userinfo characters (RFC 3986), so a path
+     * glued to the host that contains `@` is parsed as userinfo.
      * 
      *    URI.create("http://foo.com;@evil.com").getHost() -> "evil.com"
      *    URI.create("http://foo.com&@evil.com").getHost() -> "evil.com"
@@ -272,7 +272,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      * To workaround the issue, we have to include leading path slash all the time.
      */
     private boolean needsLeadingSlash(String path) {
-        return !path.startsWith(";") || path.indexOf('@') >= 0; /* check if @ is present */
+        return !path.startsWith(";") 
+            || path.indexOf('@') >= 0 /* check if @ is present */
+            || path.indexOf("%40") >= 0; /* @ encoded */
     }
 
     private boolean isSchemeOpaque() {
