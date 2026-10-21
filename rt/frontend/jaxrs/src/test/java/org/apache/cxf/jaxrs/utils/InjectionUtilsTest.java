@@ -46,6 +46,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.jaxrs.resources.UserId;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -166,6 +167,14 @@ public class InjectionUtilsTest {
                                                          HelmId.class, null,
                                                          ParameterType.QUERY, null);
         assertEquals("Type is wrong", "a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", helmId.getId());
+    }
+
+    @Test
+    public void testInstantiateClassWithFactoryMethodInheritedFromNonPublicClass() {
+        UserId userId = InjectionUtils.handleParameter("a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", false, UserId.class,
+                                                         UserId.class, null,
+                                                         ParameterType.PATH, null);
+        assertEquals("Type is wrong", "a6f7357f-6e7e-40e5-9b4a-c455c23b10a2", userId.getId());
     }
 
     @Test
