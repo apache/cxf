@@ -27,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -657,11 +658,16 @@ public final class InjectionUtils {
         try {
             Method m = pClass.getMethod(methodName, new Class<?>[]{String.class});
             if (Modifier.isStatic(m.getModifiers())) {
+                if (!Modifier.isPublic(m.getDeclaringClass().getModifiers())) {
+                    // a public static method inherited from a non-public class (as generated
+                    // by e.g. Immutables) is not accessible via reflection without this
+                    ReflectionUtil.setAccessible(m);
+                }
                 return pClass.cast(m.invoke(null, new Object[]{value}));
             }
         } catch (NoSuchMethodException ex) {
             // no luck: try another factory methods
-        } catch (IllegalAccessException ex) {
+        } catch (IllegalAccessException | InaccessibleObjectException | SecurityException ex) {
             // factory method is not accessible: try another
         }
 
