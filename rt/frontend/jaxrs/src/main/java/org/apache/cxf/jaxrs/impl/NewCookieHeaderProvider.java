@@ -20,10 +20,12 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
+import java.util.Locale;
 
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
@@ -36,6 +38,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
     private static final String HTTP_ONLY = "HttpOnly";
+    private static final String SAME_SITE = "SameSite";
 
     /** from RFC 2068, token special case characters */
 
@@ -59,10 +62,14 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         Date expires = null;
         boolean httpOnly = false;
         int version = Cookie.DEFAULT_VERSION;
+        NewCookie.SameSite sameSite = null;
 
         String[] tokens = c.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
+            if (theToken.isEmpty()) {
+                continue;
+            }
 
             int sepIndex = theToken.indexOf('=');
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
@@ -78,7 +85,12 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 paramValue = stripQuotes(paramValue);
             }
 
-            if (paramName.equalsIgnoreCase(MAX_AGE)) {
+            if (name == null) {
+                // The first segment is always the cookie's name=value pair, whatever its name
+                // (RFC 6265, section 5.2); the segments after it are attributes, and unknown ones are ignored
+                name = paramName;
+                value = paramValue;
+            } else if (paramName.equalsIgnoreCase(MAX_AGE)) {
                 maxAge = Integer.parseInt(paramValue);
             } else if (paramName.equalsIgnoreCase(PATH)) {
                 path = paramValue;
@@ -94,9 +106,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 httpOnly = true;
             } else if (paramName.equalsIgnoreCase(VERSION)) {
                 version = Integer.parseInt(paramValue);
-            } else if (paramValue != null) {
-                name = paramName;
-                value = paramValue;
+            } else if (paramName.equalsIgnoreCase(SAME_SITE)) {
+                sameSite = toSameSite(paramValue);
             }
         }
 
@@ -104,7 +115,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             throw new IllegalArgumentException("Set-Cookie is malformed : " + c);
         }
 
-        return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly);
+        return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly,
+                             sameSite);
     }
 
     @Override
@@ -137,9 +149,26 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         if (value.isHttpOnly()) {
             sb.append(';').append(HTTP_ONLY);
         }
+        if (value.getSameSite() != null) {
+            String sameSite = StringUtils.capitalize(value.getSameSite().name().toLowerCase(Locale.ROOT));
+            sb.append(';').append(SAME_SITE).append('=').append(sameSite);
+        }
         sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
 
+    }
+
+    /**
+     * Matches the SameSite attribute value case-insensitively; an unrecognized value is ignored,
+     * as the RFC 6265bis draft specifies.
+     */
+    private static NewCookie.SameSite toSameSite(String attributeValue) {
+        for (NewCookie.SameSite sameSite : NewCookie.SameSite.values()) {
+            if (sameSite.name().equalsIgnoreCase(attributeValue)) {
+                return sameSite;
+            }
+        }
+        return null;
     }
 
     /**
