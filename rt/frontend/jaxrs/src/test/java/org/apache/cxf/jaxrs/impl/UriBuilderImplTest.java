@@ -375,6 +375,23 @@ public class UriBuilderImplTest {
     }
 
     @Test
+    public void testUserInfoSeparatorAndMatrixParamDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.matrixParam("param", "@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;param=@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;param=@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;param=@evil.com"));
+    }
+
+    @Test
     public void testUserInfoSeparatorAndTemplatedPathDoesNotChangeHost() {
         UriBuilder ub = UriBuilder.fromPath("http://foo.com");
         URI uri = ub.build();
