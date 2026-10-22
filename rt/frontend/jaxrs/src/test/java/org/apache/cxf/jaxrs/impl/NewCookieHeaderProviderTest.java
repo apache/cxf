@@ -187,6 +187,14 @@ public class NewCookieHeaderProviderTest {
     }
 
     @Test
+    public void testFromStringSkipsEmptySegments() {
+        NewCookie c = NewCookie.valueOf(" ; foo=bar;;Path=path");
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertEquals("path", c.getPath());
+    }
+
+    @Test
     public void testToStringWithSameSite() {
         NewCookie c = new NewCookie.Builder("foo").value("bar").path("path")
             .sameSite(NewCookie.SameSite.STRICT).build();

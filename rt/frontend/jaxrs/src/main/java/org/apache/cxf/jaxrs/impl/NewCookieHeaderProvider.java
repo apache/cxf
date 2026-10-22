@@ -65,6 +65,9 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         String[] tokens = c.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
+            if (theToken.isEmpty()) {
+                continue;
+            }
 
             int sepIndex = theToken.indexOf('=');
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
@@ -153,7 +156,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
 
     /**
      * Matches the SameSite attribute value case-insensitively; an unrecognized value is ignored,
-     * as RFC 6265bis requires.
+     * as the RFC 6265bis draft specifies.
      */
     private static NewCookie.SameSite toSameSite(String attributeValue) {
         for (NewCookie.SameSite sameSite : NewCookie.SameSite.values()) {
