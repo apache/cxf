@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class NewCookieHeaderProviderTest {
@@ -149,6 +150,58 @@ public class NewCookieHeaderProviderTest {
         NewCookie c = new NewCookie("foo", "bar (space)<>[]", "/path", "domain.com", "comment@comment:,", 2, true);
         assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
                      + "Path=/path;Secure;Version=1", c.toString());
+    }
+
+    @Test
+    public void testFromStringWithSameSite() {
+        NewCookie c = NewCookie.valueOf("foo=bar;SameSite=Lax;Path=/");
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertEquals("/", c.getPath());
+        assertEquals(NewCookie.SameSite.LAX, c.getSameSite());
+    }
+
+    @Test
+    public void testFromStringWithSameSiteIsCaseInsensitive() {
+        NewCookie c = NewCookie.valueOf("foo=bar; samesite=none; Secure");
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertTrue(c.isSecure());
+        assertEquals(NewCookie.SameSite.NONE, c.getSameSite());
+    }
+
+    @Test
+    public void testFromStringWithUnrecognizedSameSiteValue() {
+        NewCookie c = NewCookie.valueOf("foo=bar;SameSite=Unknown");
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertNull(c.getSameSite());
+    }
+
+    @Test
+    public void testFromStringIgnoresUnknownAttributes() {
+        NewCookie c = NewCookie.valueOf("foo=bar;Priority=High;Path=path");
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertEquals("path", c.getPath());
+    }
+
+    @Test
+    public void testToStringWithSameSite() {
+        NewCookie c = new NewCookie.Builder("foo").value("bar").path("path")
+            .sameSite(NewCookie.SameSite.STRICT).build();
+        assertEquals("foo=bar;Path=path;SameSite=Strict;Version=1", c.toString());
+    }
+
+    @Test
+    public void testSameSiteRoundTrip() {
+        NewCookie c = NewCookie.valueOf(
+            new NewCookie.Builder("foo").value("bar").sameSite(NewCookie.SameSite.NONE).secure(true).build()
+                .toString());
+        assertEquals("foo", c.getName());
+        assertEquals("bar", c.getValue());
+        assertTrue(c.isSecure());
+        assertEquals(NewCookie.SameSite.NONE, c.getSameSite());
     }
 
 }

@@ -36,6 +36,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
     private static final String HTTP_ONLY = "HttpOnly";
+    private static final String SAME_SITE = "SameSite";
 
     /** from RFC 2068, token special case characters */
 
@@ -59,6 +60,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         Date expires = null;
         boolean httpOnly = false;
         int version = Cookie.DEFAULT_VERSION;
+        NewCookie.SameSite sameSite = null;
 
         String[] tokens = c.split(";");
         for (String token : tokens) {
@@ -94,7 +96,10 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 httpOnly = true;
             } else if (paramName.equalsIgnoreCase(VERSION)) {
                 version = Integer.parseInt(paramValue);
-            } else if (paramValue != null) {
+            } else if (paramName.equalsIgnoreCase(SAME_SITE)) {
+                sameSite = toSameSite(paramValue);
+            } else if (paramValue != null && name == null) {
+                // The cookie's own name=value pair comes first; unrecognized attributes after it are ignored
                 name = paramName;
                 value = paramValue;
             }
@@ -104,7 +109,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             throw new IllegalArgumentException("Set-Cookie is malformed : " + c);
         }
 
-        return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly);
+        return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly,
+                             sameSite);
     }
 
     @Override
@@ -137,9 +143,36 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         if (value.isHttpOnly()) {
             sb.append(';').append(HTTP_ONLY);
         }
+        if (value.getSameSite() != null) {
+            sb.append(';').append(SAME_SITE).append('=').append(toAttributeValue(value.getSameSite()));
+        }
         sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
 
+    }
+
+    /**
+     * Matches the SameSite attribute value case-insensitively; an unrecognized value is ignored,
+     * as RFC 6265bis requires.
+     */
+    private static NewCookie.SameSite toSameSite(String attributeValue) {
+        for (NewCookie.SameSite sameSite : NewCookie.SameSite.values()) {
+            if (sameSite.name().equalsIgnoreCase(attributeValue)) {
+                return sameSite;
+            }
+        }
+        return null;
+    }
+
+    private static String toAttributeValue(NewCookie.SameSite sameSite) {
+        switch (sameSite) {
+        case STRICT:
+            return "Strict";
+        case LAX:
+            return "Lax";
+        default:
+            return "None";
+        }
     }
 
     /**
