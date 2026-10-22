@@ -187,6 +187,27 @@ public class NewCookieHeaderProviderTest {
     }
 
     @Test
+    public void testFromStringWithCookieNamedAfterAnAttribute() {
+        NewCookie c = NewCookie.valueOf("path=abc; Path=/");
+        assertEquals("path", c.getName());
+        assertEquals("abc", c.getValue());
+        assertEquals("/", c.getPath());
+    }
+
+    @Test
+    public void testFromStringWithCookieNamedSameSite() {
+        NewCookie c = NewCookie.valueOf("SameSite=Lax");
+        assertEquals("SameSite", c.getName());
+        assertEquals("Lax", c.getValue());
+        assertNull(c.getSameSite());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringWithoutNameValuePairIsMalformed() {
+        NewCookie.valueOf("Secure; foo=bar");
+    }
+
+    @Test
     public void testFromStringSkipsEmptySegments() {
         NewCookie c = NewCookie.valueOf(" ; foo=bar;;Path=path");
         assertEquals("foo", c.getName());

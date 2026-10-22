@@ -83,7 +83,12 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 paramValue = stripQuotes(paramValue);
             }
 
-            if (paramName.equalsIgnoreCase(MAX_AGE)) {
+            if (name == null) {
+                // The first segment is always the cookie's name=value pair, whatever its name
+                // (RFC 6265, section 5.2); the segments after it are attributes, and unknown ones are ignored
+                name = paramName;
+                value = paramValue;
+            } else if (paramName.equalsIgnoreCase(MAX_AGE)) {
                 maxAge = Integer.parseInt(paramValue);
             } else if (paramName.equalsIgnoreCase(PATH)) {
                 path = paramValue;
@@ -101,10 +106,6 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 version = Integer.parseInt(paramValue);
             } else if (paramName.equalsIgnoreCase(SAME_SITE)) {
                 sameSite = toSameSite(paramValue);
-            } else if (paramValue != null && name == null) {
-                // The cookie's own name=value pair comes first; unrecognized attributes after it are ignored
-                name = paramName;
-                value = paramValue;
             }
         }
 
