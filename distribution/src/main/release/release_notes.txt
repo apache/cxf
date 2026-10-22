@@ -18,6 +18,10 @@ New features include:
 
 Important notes:
 * 3.6 no longer supports Java 8.  Java11+ is required.
+* WS-RM attachments must be repeatable: each DataSource.getInputStream() call
+  must return a fresh stream positioned at the beginning. Persistence and
+  retransmission may read the original attachment more than once, including
+  when WS-Security signs or encrypts attachments.
 
 Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/36-migration-guide.html

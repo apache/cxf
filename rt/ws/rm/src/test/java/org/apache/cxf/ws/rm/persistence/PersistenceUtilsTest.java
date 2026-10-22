@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.rm.persistence;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +39,7 @@ import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentSerializer;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -47,12 +50,15 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -66,6 +72,9 @@ public class PersistenceUtilsTest {
 
     private static final String SOAP_PART = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<data/></soap:Envelope>";
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void testSerialiseDeserialiseAcknowledgement() {
@@ -190,6 +199,84 @@ public class PersistenceUtilsTest {
         String restored = (String) messageImpl.get(Message.CONTENT_TYPE);
         assertFalse("Content-Type should not be multipart after decode",
                      restored.startsWith("multipart/"));
+    }
+
+    @Test
+    public void testRecoveredAttachmentOnDiskCanBeReadRepeatedly() throws Exception {
+        checkRecoveredAttachmentOnDisk(3);
+    }
+
+    @Test
+    public void testRecoveredAttachmentOnDiskDiscardedWithoutReading() throws Exception {
+        checkRecoveredAttachmentOnDisk(0);
+    }
+
+    @Test
+    public void testRecoveredAttachmentCachesReleasedOnFailure() throws Exception {
+        Message source = new MessageImpl();
+        source.put(Message.CONTENT_TYPE, "text/xml");
+        addAttachment(source);
+        source.getAttachments().add(new AttachmentImpl("large.txt",
+            new DataHandler(new ByteArrayDataSource("too large for the configured attachment limit", "text/plain"))));
+        RMMessage persisted = new RMMessage();
+        PersistenceUtils.encodeRMContent(persisted, source,
+            new ByteArrayInputStream(SOAP_PART.getBytes(StandardCharsets.UTF_8)));
+
+        File directory = temporaryFolder.newFolder();
+        Message restored = new MessageImpl();
+        restored.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 1);
+        restored.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, directory);
+        restored.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, 16L);
+        IOException error = assertThrows(IOException.class,
+            () -> PersistenceUtils.decodeRMContent(persisted, restored));
+        assertTrue(error.getCause() instanceof CacheSizeExceededException);
+        assertEquals("partial recovery must release the attachment caches", 0, directory.list().length);
+    }
+
+    @Test
+    public void testTooManyRecoveredAttachmentsReportedAsIOException() throws Exception {
+        Message source = new MessageImpl();
+        source.put(Message.CONTENT_TYPE, "text/xml");
+        Collection<Attachment> attachments = new ArrayList<>();
+        for (int i = 0; i < AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_COUNT + 2; i++) {
+            attachments.add(new AttachmentImpl("attachment-" + i,
+                new DataHandler(new ByteArrayDataSource("attachment content", "text/plain"))));
+        }
+        source.setAttachments(attachments);
+        RMMessage persisted = new RMMessage();
+        PersistenceUtils.encodeRMContent(persisted, source,
+            new ByteArrayInputStream(SOAP_PART.getBytes(StandardCharsets.UTF_8)));
+
+        File directory = temporaryFolder.newFolder();
+        Message restored = new MessageImpl();
+        restored.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 1);
+        restored.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, directory);
+        IOException error = assertThrows(IOException.class,
+            () -> PersistenceUtils.decodeRMContent(persisted, restored));
+        assertTrue(error.getCause() instanceof RuntimeException);
+        assertTrue(error.getCause().getCause() instanceof IOException);
+        assertEquals("partial recovery must release the attachment caches", 0, directory.list().length);
+    }
+
+    private void checkRecoveredAttachmentOnDisk(int reads) throws Exception {
+        File directory = temporaryFolder.newFolder();
+        Message restored = new MessageImpl();
+        restored.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 1);
+        restored.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, directory);
+        PersistenceUtils.decodeRMContent(encodeOutbound("text/xml", false), restored);
+        Closeable cleanup = (Closeable)restored.get(RMMessageConstants.ATTACHMENTS_CLOSEABLE);
+        try {
+            assertTrue("the attachment must spill to disk", directory.list().length > 0);
+            Attachment attachment = restored.getAttachments().iterator().next();
+            for (int i = 0; i < reads; i++) {
+                try (InputStream in = attachment.getDataHandler().getInputStream()) {
+                    assertEquals("hello world!", IOUtils.toString(in));
+                }
+            }
+        } finally {
+            cleanup.close();
+        }
+        assertEquals("attachment cache files must be deleted on cleanup", 0, directory.list().length);
     }
 
     @Test

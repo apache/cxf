@@ -28,12 +28,17 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -43,8 +48,10 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -59,6 +66,7 @@ import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.manager.SequenceTerminationPolicyType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
+import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -515,6 +523,59 @@ public class RMManagerTest {
         CachedOutputStream cos1 = (CachedOutputStream) msg.get(RMMessageConstants.SAVED_CONTENT);
         assertStartsWith(cos1.getInputStream(), "<soap:Envelope");
         assertEquals(1, msg.getAttachments().size());
+    }
+
+    @Test
+    public void testRecoveryContinuesAfterInvalidAttachments() throws IOException {
+        manager = spy(new RMManager());
+        manager.setReliableEndpointsMap(new HashMap<>());
+        Endpoint endpoint = mock(Endpoint.class);
+        setUpEndpointForRecovery(endpoint, mock(EndpointInfo.class), mock(ServiceInfo.class),
+            mock(BindingInfo.class), mock(InterfaceInfo.class));
+        Conduit conduit = mock(Conduit.class);
+        SourceSequence source = mock(SourceSequence.class);
+        DestinationSequence destination = mock(DestinationSequence.class);
+        RMMessage validSource = createRecoveryMessage(1, 2L);
+        setUpRecoverReliableEndpointWithAttachment(endpoint, conduit, source, destination,
+            validSource, ArgumentCaptor.forClass(Message.class));
+        int tooMany = AttachmentDeserializer.DEFAULT_ATTACHMENT_MAX_COUNT + 2;
+        when(manager.getStore().getMessages(source.getIdentifier(), true))
+            .thenReturn(List.of(createRecoveryMessage(tooMany, 1L), validSource));
+        Identifier destinationId = new Identifier();
+        destinationId.setValue("D1");
+        when(destination.getIdentifier()).thenReturn(destinationId);
+        when(manager.getStore().getMessages(destinationId, false))
+            .thenReturn(List.of(createRecoveryMessage(tooMany, 1L), createRecoveryMessage(1, 2L)));
+
+        manager.recoverReliableEndpoint(endpoint, conduit);
+
+        ArgumentCaptor<Message> outgoing = ArgumentCaptor.forClass(Message.class);
+        verify(manager.getRetransmissionQueue()).addUnacknowledged(outgoing.capture());
+        assertEquals(Long.valueOf(2L), RMContextUtils.retrieveRMProperties(outgoing.getValue(), true)
+            .getSequence().getMessageNumber());
+        ArgumentCaptor<Message> incoming = ArgumentCaptor.forClass(Message.class);
+        verify(manager.getRedeliveryQueue()).addUndelivered(incoming.capture());
+        assertEquals(Long.valueOf(2L), RMContextUtils.retrieveRMProperties(incoming.getValue(), false)
+            .getSequence().getMessageNumber());
+        verify(destination).addDeliveringMessageNumber(2L);
+        verify(manager.getRetransmissionQueue()).start();
+        verify(manager.getRedeliveryQueue()).start();
+    }
+
+    private static RMMessage createRecoveryMessage(int count, long number) throws IOException {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, "text/xml");
+        List<Attachment> attachments = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            attachments.add(new AttachmentImpl("attachment-" + i,
+                new DataHandler(new ByteArrayDataSource("attachment content", "text/plain"))));
+        }
+        message.setAttachments(attachments);
+        RMMessage persisted = new RMMessage();
+        persisted.setMessageNumber(number);
+        PersistenceUtils.encodeRMContent(persisted, message,
+            new ByteArrayInputStream("<root/>".getBytes(StandardCharsets.UTF_8)));
+        return persisted;
     }
 
     Runnable setUpRecoverReliableEndpointWithAttachment(Endpoint endpoint,

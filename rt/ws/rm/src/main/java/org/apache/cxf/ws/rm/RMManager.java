@@ -21,6 +21,7 @@ package org.apache.cxf.ws.rm;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -639,6 +640,10 @@ public class RMManager {
                 // RMMessage content must be splitted into soap root message
                 // and attachments
                 PersistenceUtils.decodeRMContent(m, message);
+                if (message.getAttachments() != null) {
+                    // each retransmission secures the attachments again, see RetransmissionQueueImpl
+                    message.put(RMMessageConstants.SAVED_ATTACHMENTS, new ArrayList<>(message.getAttachments()));
+                }
                 RMContextUtils.setProtocolVariation(message, ss.getProtocol());
                 retransmissionQueue.addUnacknowledged(message);
             } catch (IOException e) {

@@ -23,11 +23,14 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.activation.DataSource;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.xml.bind.JAXBContext;
@@ -35,6 +38,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentSerializer;
 import org.apache.cxf.attachment.AttachmentUtil;
@@ -44,6 +48,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
@@ -225,7 +230,8 @@ public final class PersistenceUtils {
      */
     public static void encodeRMContent(RMMessage rmmsg, Message msg, CachedOutputStream msgContent)
         throws IOException {
-        if (msg.getAttachments() == null || msg.getAttachments().isEmpty()) {
+        Collection<Attachment> attachments = getAttachments(msg);
+        if (attachments == null || attachments.isEmpty()) {
             rmmsg.setContentType(getRootContentType(msg));
             rmmsg.setContent(msgContent);
         } else {
@@ -233,10 +239,20 @@ public final class PersistenceUtils {
         }
     }
 
+    /**
+     * Attachments of the message to persist: for a captured outbound message the saved ones, as WS-Security may
+     * have replaced the attachments of the message with secured ones, and the SOAP content is persisted unsecured.
+     */
+    private static Collection<Attachment> getAttachments(Message msg) {
+        Collection<Attachment> saved = CastUtils.cast((Collection<?>)msg.get(RMMessageConstants.SAVED_ATTACHMENTS));
+        return saved != null ? saved : msg.getAttachments();
+    }
+
     public static void encodeRMContent(RMMessage rmmsg, Message msg, InputStream msgContent)
         throws IOException {
         CachedOutputStream cos = new CachedOutputStream();
-        if (msg.getAttachments() == null || msg.getAttachments().isEmpty()) {
+        Collection<Attachment> attachments = getAttachments(msg);
+        if (attachments == null || attachments.isEmpty()) {
             rmmsg.setContentType(getRootContentType(msg));
             IOUtils.copyAndCloseInput(msgContent, cos);
             cos.flush();
@@ -244,7 +260,7 @@ public final class PersistenceUtils {
         } else {
             MessageImpl msgImpl1 = new MessageImpl();
             msgImpl1.setContent(OutputStream.class, cos);
-            msgImpl1.setAttachments(msg.getAttachments());
+            msgImpl1.setAttachments(attachments);
             // an outbound MTOM message is stored as an XOP package, so that it is resent as one
             boolean xop = MessageUtils.isOutbound(msg) && AttachmentUtil.isMtomEnabled(msg);
             String rootType = getRootContentType(msg);
@@ -270,6 +286,16 @@ public final class PersistenceUtils {
     }
 
     public static void decodeRMContent(RMMessage rmmsg, Message msg) throws IOException {
+        try {
+            doDecodeRMContent(rmmsg, msg);
+        } catch (RuntimeException e) {
+            // Lazy attachment parsing and cache limits can fail with unchecked exceptions.
+            // Recovery handles a bad persisted message as an I/O failure and continues with the rest.
+            throw new IOException("Unable to decode persisted RM message", e);
+        }
+    }
+
+    private static void doDecodeRMContent(RMMessage rmmsg, Message msg) throws IOException {
         String contentType = rmmsg.getContentType();
         final CachedOutputStream cos = rmmsg.getContent();
         if ((null != contentType) && contentType.startsWith("multipart/related")) {
@@ -283,7 +309,6 @@ public final class PersistenceUtils {
             IOUtils.copy(msg.getContent(InputStream.class), cosSoap);
             cosSoap.flush();
             msg.put(RMMessageConstants.SAVED_CONTENT, cosSoap);
-
             // restore the SOAP root content type, the multipart type is recreated when the message is sent
             String rootType = getRootContentType(msg);
             String xopWrappedType = getXopWrappedType(rootType);
@@ -295,12 +320,22 @@ public final class PersistenceUtils {
             msg.put(RMMessageConstants.SAVED_CONTENT_TYPE, rootType);
             msg.put(Message.CONTENT_TYPE, rootType);
 
-            // REVISIT -- At the moment references must be hold for retransmission
-            // and the final cleanup of the CachedOutputStream.
-            msg.put(RMMessageConstants.ATTACHMENTS_CLOSEABLE, new Closeable() {
-
+            List<AttachmentDataSource> attachmentCaches = new ArrayList<>();
+            Closeable cleanup = new Closeable() {
                 @Override
                 public void close() throws IOException {
+                    for (AttachmentDataSource ads : attachmentCaches) {
+                        ads.release();
+                        // Closing a reader after releasing the hold deletes an otherwise unused cache file.
+                        InputStream cached = ads.getInputStream();
+                        if (cached != null) {
+                            try {
+                                cached.close();
+                            } catch (IOException e) {
+                                // Ignore, but continue releasing the other caches and the persisted message.
+                            }
+                        }
+                    }
                     try {
                         is.close();
                     } catch (IOException e) {
@@ -313,7 +348,24 @@ public final class PersistenceUtils {
                     }
                 }
 
-            });
+            };
+            msg.put(RMMessageConstants.ATTACHMENTS_CLOSEABLE, cleanup);
+            // Keep disk-backed attachment caches until the message is acknowledged or discarded.
+            // Caching alone allows the last reader to delete the file after the first retransmission.
+            try {
+                for (Attachment a : msg.getAttachments()) {
+                    DataSource ds = a.getDataHandler().getDataSource();
+                    if (ds instanceof AttachmentDataSource) {
+                        AttachmentDataSource ads = (AttachmentDataSource)ds;
+                        ads.hold(msg);
+                        attachmentCaches.add(ads);
+                    }
+                }
+            } catch (IOException | RuntimeException e) {
+                cleanup.close();
+                cosSoap.close();
+                throw e;
+            }
         } else {
             msg.put(RMMessageConstants.SAVED_CONTENT, cos);
             msg.put(Message.CONTENT_TYPE, contentType);

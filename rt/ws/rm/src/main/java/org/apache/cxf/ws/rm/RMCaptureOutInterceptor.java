@@ -22,9 +22,14 @@ package org.apache.cxf.ws.rm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +47,7 @@ import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
@@ -228,7 +234,43 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
 
         message.getInterceptorChain().add(new CaptureStart());
+        message.getInterceptorChain().add(new AttachmentSaveInterceptor(message.getAttachments()));
         message.getInterceptorChain().add(new CaptureEnd());
+    }
+
+    /**
+     * Saves the attachments before they are replaced by the secured ones of WS-Security, which happens in
+     * the POST_PROTOCOL phase, or while the message is written with the streaming WS-Security. The
+     * attachments added by the marshalling, like the MTOM ones, are saved in the POST_MARSHAL phase, but
+     * not the secured ones, which have the IDs of the attachments they replace.
+     */
+    static class AttachmentSaveInterceptor extends AbstractPhaseInterceptor<Message> {
+        private final List<Attachment> attachments;
+
+        AttachmentSaveInterceptor(Collection<Attachment> attachments) {
+            super(Phase.POST_MARSHAL);
+            this.attachments = attachments == null ? new ArrayList<>() : new ArrayList<>(attachments);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            if (message.getAttachments() == null) {
+                return;
+            }
+            Set<String> ids = new HashSet<>();
+            Set<Attachment> saved = Collections.newSetFromMap(new IdentityHashMap<>());
+            saved.addAll(attachments);
+            for (Attachment a : attachments) {
+                ids.add(a.getId());
+            }
+            for (Attachment a : message.getAttachments()) {
+                String id = a.getId();
+                if ((id == null || ids.add(id)) && saved.add(a)) {
+                    attachments.add(a);
+                }
+            }
+            message.put(RMMessageConstants.SAVED_ATTACHMENTS, attachments);
+        }
     }
 
     private static class CaptureStart extends AbstractPhaseInterceptor<Message> {
