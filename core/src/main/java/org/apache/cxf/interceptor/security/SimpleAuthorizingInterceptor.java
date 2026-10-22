@@ -70,8 +70,8 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
         for (Class<?> cls : method.getParameterTypes()) {
             if (!first) {
                 b.append(", ");
-                first = false;
             }
+            first = false;
             b.append(cls.getName());
         }
         b.append(')');
