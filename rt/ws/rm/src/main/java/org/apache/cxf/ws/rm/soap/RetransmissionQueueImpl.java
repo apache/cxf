@@ -57,6 +57,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
@@ -65,6 +66,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -791,6 +793,25 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
     }
 
+    /**
+     * Prepares the message for its attachments to be written again. The flags of the attachment out interceptor
+     * are cleared and the Content-Type it replaced is restored. The attachments saved before WS-Security replaced
+     * them with secured ones, whose content can only be read once, are restored, as the retransmission secures
+     * them again.
+     */
+    private static void resetAttachments(SoapMessage message) {
+        message.remove(AttachmentOutInterceptor.ATTACHMENT_OUT_CHECKED);
+        String savedContentType = (String)message.get(RMMessageConstants.SAVED_CONTENT_TYPE);
+        if (savedContentType != null) {
+            message.put(org.apache.cxf.message.Message.CONTENT_TYPE, savedContentType);
+        }
+        Collection<Attachment> saved =
+            CastUtils.cast((Collection<?>)message.get(RMMessageConstants.SAVED_ATTACHMENTS));
+        if (saved != null) {
+            message.setAttachments(new ArrayList<>(saved));
+        }
+    }
+
     private void doResend(SoapMessage message) {
         InputStream is = null;
         try {
@@ -811,13 +832,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             message.setInterceptorChain(retransmitChain);
 
-            // clear flags for SOAP and attachment out interceptors so envelope and attachments will be written
+            // clear flag for SOAP out interceptor so envelope will be written
             message.remove(SoapOutInterceptor.WROTE_ENVELOPE_START);
-            message.remove(AttachmentOutInterceptor.ATTACHMENT_OUT_CHECKED);
-            String savedContentType = (String)message.get(RMMessageConstants.SAVED_CONTENT_TYPE);
-            if (savedContentType != null) {
-                message.put(org.apache.cxf.message.Message.CONTENT_TYPE, savedContentType);
-            }
+            resetAttachments(message);
 
             // discard all saved content
             Set<Class<?>> formats = message.getContentFormats();
