@@ -76,6 +76,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 
@@ -86,6 +87,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 
@@ -96,6 +98,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         getBefore().add(StaxOutInterceptor.class.getName());
         getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
         getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
+        getAfter().add(AttachmentOutInterceptor.class.getName());
         ending = createEndingInterceptor();
     }
 

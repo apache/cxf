@@ -20,6 +20,10 @@ New features include:
 
 Important notes:
 * CXF 4.1 now requires Java 17 as minimum
+* WS-RM attachments must be repeatable: each DataSource.getInputStream() call
+  must return a fresh stream positioned at the beginning. Persistence and
+  retransmission may read the original attachment more than once, including
+  when WS-Security signs or encrypts attachments.
 
 Users are encouraged to review the migration guide at:
 https://cxf.apache.org/docs/41-migration-guide.html
