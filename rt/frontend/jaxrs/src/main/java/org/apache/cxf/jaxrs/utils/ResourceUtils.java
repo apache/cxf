@@ -336,8 +336,18 @@ public final class ResourceUtils {
         }
         for (Method m : serviceClass.getMethods()) {
             if (m.isBridge() || m.isSynthetic()) {
-                //if a bridge/synthetic method isn't already mapped to something, go ahead and do it
                 Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(serviceClass, m);
+                if (annotatedMethod == m && m.isBridge()) {
+                    //no annotated method was found for the bridge other than itself, i.e. the JAX-RS
+                    //annotations were copied onto the bridge by the compiler but with the erased parameter
+                    //types, so if the method it bridges to is already mapped then reuse its operation
+                    Method bridged = findBridgedMethod(serviceClass, m);
+                    if (bridged != null && md.getOperationResourceInfo(bridged) != null) {
+                        bindResourceMethod(md, m, bridged);
+                        continue;
+                    }
+                }
+                //if a bridge/synthetic method isn't already mapped to something, go ahead and do it
                 if (!annotatedMethods.containsKey(annotatedMethod)) {
                     evaluateResourceMethod(cri, enableStatic, md, m, annotatedMethod);
                     annotatedMethods.put(annotatedMethod, m);
@@ -352,6 +362,33 @@ public final class ResourceUtils {
         cri.setMethodDispatcher(md);
     }
     
+    private static Method findBridgedMethod(Class<?> serviceClass, Method bridge) {
+        Class<?>[] bridgeParamTypes = bridge.getParameterTypes();
+        Method bridged = null;
+        for (Method m : serviceClass.getMethods()) {
+            if (m.isBridge() || m.isSynthetic()
+                || !m.getName().equals(bridge.getName())
+                || m.getDeclaringClass() != bridge.getDeclaringClass()
+                || m.getParameterCount() != bridgeParamTypes.length
+                || !bridge.getReturnType().isAssignableFrom(m.getReturnType())) {
+                continue;
+            }
+            Class<?>[] paramTypes = m.getParameterTypes();
+            boolean matches = true;
+            for (int i = 0; i < paramTypes.length && matches; i++) {
+                matches = bridgeParamTypes[i].isAssignableFrom(paramTypes[i]);
+            }
+            if (matches) {
+                if (bridged != null) {
+                    // ambiguous, more than one candidate
+                    return null;
+                }
+                bridged = m;
+            }
+        }
+        return bridged;
+    }
+
     private static void bindResourceMethod(MethodDispatcher md, Method m, Method bound) {
         final OperationResourceInfo ori = md.getOperationResourceInfo(bound);
         if (ori != null && !ori.getMethodToInvoke().equals(m)) {
