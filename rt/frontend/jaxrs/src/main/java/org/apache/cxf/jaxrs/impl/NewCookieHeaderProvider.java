@@ -20,10 +20,12 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
+import java.util.Locale;
 
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
@@ -148,7 +150,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             sb.append(';').append(HTTP_ONLY);
         }
         if (value.getSameSite() != null) {
-            sb.append(';').append(SAME_SITE).append('=').append(toAttributeValue(value.getSameSite()));
+            String sameSite = StringUtils.capitalize(value.getSameSite().name().toLowerCase(Locale.ROOT));
+            sb.append(';').append(SAME_SITE).append('=').append(sameSite);
         }
         sb.append(';').append(VERSION).append('=').append(value.getVersion());
         return sb.toString();
@@ -166,17 +169,6 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
             }
         }
         return null;
-    }
-
-    private static String toAttributeValue(NewCookie.SameSite sameSite) {
-        switch (sameSite) {
-        case STRICT:
-            return "Strict";
-        case LAX:
-            return "Lax";
-        default:
-            return "None";
-        }
     }
 
     /**

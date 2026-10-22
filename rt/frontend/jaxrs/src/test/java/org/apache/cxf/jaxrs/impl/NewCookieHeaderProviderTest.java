@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
+import java.util.Locale;
 
 import jakarta.ws.rs.core.NewCookie;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -220,6 +221,19 @@ public class NewCookieHeaderProviderTest {
         NewCookie c = new NewCookie.Builder("foo").value("bar").path("path")
             .sameSite(NewCookie.SameSite.STRICT).build();
         assertEquals("foo=bar;Path=path;SameSite=Strict;Version=1", c.toString());
+    }
+
+    @Test
+    public void testToStringWithSameSiteUnderTurkishLocale() {
+        Locale defaultLocale = Locale.getDefault();
+        Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+        try {
+            NewCookie c = new NewCookie.Builder("foo").value("bar")
+                .sameSite(NewCookie.SameSite.STRICT).build();
+            assertEquals("foo=bar;SameSite=Strict;Version=1", c.toString());
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 
     @Test
