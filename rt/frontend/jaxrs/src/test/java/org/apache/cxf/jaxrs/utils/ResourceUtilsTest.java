@@ -30,10 +30,15 @@ import java.util.Set;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.cxf.BusFactory;
@@ -170,6 +175,48 @@ public class ResourceUtilsTest {
         assertEquals("GET", ori.getHttpMethod());
     }
     
+    @Test
+    public void testInterfaceBridgeMethodsWithBeanParam() throws Exception {
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(VersionedUserResource.class,
+            VersionedUserResource.class, true, true);
+        assertNotNull(cri);
+        Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        assertEquals(2, oris.size());
+        for (OperationResourceInfo ori : oris) {
+            Method m = ori.getMethodToInvoke();
+            assertFalse(m.toString(), m.isBridge());
+            assertEquals(UserIdParam.class, m.getParameterTypes()[0]);
+        }
+
+        for (Method m : VersionedUserResource.class.getMethods()) {
+            if (m.isBridge()) {
+                OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(m);
+                assertNotNull(m.toString(), ori);
+                assertFalse(ori.getMethodToInvoke().isBridge());
+                assertEquals(m.getName(), ori.getMethodToInvoke().getName());
+            }
+        }
+    }
+
+    @Test
+    public void testBridgeMethodToAnnotatedSuperInterfaceMethod() throws Exception {
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(OverridingAnnotatedResource.class,
+            OverridingAnnotatedResource.class, true, true);
+        assertNotNull(cri);
+        Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        assertEquals(2, oris.size());
+
+        OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(
+            OverridingAnnotatedResource.class.getMethod("update", String.class));
+        assertEquals("PUT", ori.getHttpMethod());
+        assertEquals("/own", ori.getURITemplate().getValue());
+
+        ori = cri.getMethodDispatcher().getOperationResourceInfo(
+            OverridingAnnotatedResource.class.getMethod("update", Object.class));
+        assertEquals("POST", ori.getHttpMethod());
+        assertEquals("/base", ori.getURITemplate().getValue());
+    }
+
     @Test
     public void testClassResourceInfoWithBridgeMethod() throws Exception {
         ClassResourceInfo cri =
@@ -410,6 +457,62 @@ public class ResourceUtilsTest {
         @Override
         public SuperBook get() {
             return null;
+        }
+    }
+
+    public abstract static class RequestParam<T> {
+        @PathParam("id")
+        private String id;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+    }
+
+    public static class UserIdParam extends RequestParam<String> {
+
+    }
+
+    public interface VersionedResource<U, I extends RequestParam<String>> {
+        Response update(I idParam, U updateDto);
+
+        default Response updateByPost(I idParam, U updateDto) {
+            return update(idParam, updateDto);
+        }
+    }
+
+    @Path("/users")
+    public interface VersionedUserResource extends VersionedResource<Book, UserIdParam> {
+        @PATCH
+        @Path("{id}")
+        @Override
+        Response update(@BeanParam UserIdParam idParam, Book updateDto);
+
+        @POST
+        @Path("{id}")
+        @Override
+        default Response updateByPost(@BeanParam UserIdParam idParam, Book updateDto) {
+            return VersionedResource.super.updateByPost(idParam, updateDto);
+        }
+    }
+
+    public interface AnnotatedGenericResource<T> {
+        @POST
+        @Path("base")
+        String update(T dto);
+    }
+
+    @Path("/overriding")
+    public static class OverridingAnnotatedResource implements AnnotatedGenericResource<String> {
+        @PUT
+        @Path("own")
+        @Override
+        public String update(String dto) {
+            return dto;
         }
     }
 
