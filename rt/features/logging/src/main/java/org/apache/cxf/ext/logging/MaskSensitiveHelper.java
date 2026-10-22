@@ -139,10 +139,9 @@ public class MaskSensitiveHelper {
     public void maskHeaders(
             final Map<String, String> headerMap,
             final Set<String> sensitiveHeaderNames) {
-        sensitiveHeaderNames.stream()
-                .forEach(h -> {
-                    headerMap.computeIfPresent(h, (key, value) -> MASKED_HEADER_VALUE);
-                });
+        headerMap.replaceAll((name, value) -> value != null
+            && sensitiveHeaderNames.stream().anyMatch(sensitive -> sensitive.equalsIgnoreCase(name))
+                ? MASKED_HEADER_VALUE : value);
     }
 
     private String applyMasks(String originalLogString, Set<ReplacementPair> replacementPairs) {

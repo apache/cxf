@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.ext.logging;
 
+import java.lang.reflect.Proxy;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +34,7 @@ import java.util.stream.IntStream;
 
 import javax.security.auth.Subject;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.EventType;
@@ -205,5 +209,114 @@ public class DefaultLogEventMapperTest {
 
         LogEvent event = Subject.doAs(subject, (PrivilegedAction<LogEvent>) () -> mapper.map(message));
         assertThat(event.getPrincipal(), is(nullValue()));
+    }
+
+    @Test
+    public void testServletResponseHeaders() {
+        Map<String, List<String>> servletHeaders = new LinkedHashMap<>();
+        servletHeaders.put("X-Servlet-Header", Collections.singletonList("servlet"));
+        servletHeaders.put("X-Multi", Arrays.asList("a", "b"));
+        servletHeaders.put("x-protocol-header", Collections.singletonList("copied"));
+        servletHeaders.put("Set-Cookie", Collections.singletonList("secret"));
+        Map<String, List<String>> protocolHeaders = new HashMap<>();
+        protocolHeaders.put("X-Protocol-Header", Collections.singletonList("protocol"));
+
+        Message message = createServerOutMessage(servletHeaders, protocolHeaders);
+        LogEvent event = new DefaultLogEventMapper().map(message, Collections.singleton("Set-Cookie"));
+
+        assertEquals(EventType.RESP_OUT, event.getType());
+        Map<String, String> expected = new HashMap<>();
+        expected.put("X-Servlet-Header", "servlet");
+        expected.put("X-Multi", "[a, b]");
+        expected.put("X-Protocol-Header", "protocol");
+        expected.put("Set-Cookie", MASKED_HEADER_VALUE);
+        assertEquals(expected, event.getHeaders());
+    }
+
+    @Test
+    public void testServletResponseHeadersNotLoggedForRequest() {
+        Message message = createServerOutMessage(
+            Collections.singletonMap("X-Servlet-Header", Collections.singletonList("servlet")), null);
+        Message inMessage = new MessageImpl();
+        inMessage.setExchange(message.getExchange());
+        inMessage.put("HTTP.RESPONSE", message.get("HTTP.RESPONSE"));
+
+        LogEvent event = new DefaultLogEventMapper().map(inMessage, Collections.emptySet());
+
+        assertEquals(EventType.REQ_IN, event.getType());
+        assertEquals(Collections.emptyMap(), event.getHeaders());
+    }
+
+    @Test
+    public void testServletHeaderMaskingIgnoresCase() {
+        Message message = createServerOutMessage(
+            Collections.singletonMap("set-cookie", Collections.singletonList("secret")),
+            Collections.singletonMap("AUTHORIZATION", Collections.singletonList("token")));
+        LogEvent event = new DefaultLogEventMapper().map(message,
+            new HashSet<>(Arrays.asList("Set-Cookie", "Authorization")));
+        assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get("set-cookie"));
+        assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get("AUTHORIZATION"));
+    }
+
+    @Test
+    public void testSharedServletHeadersBeforeCopying() {
+        Map<String, List<String>> servletHeaders = new LinkedHashMap<>();
+        servletHeaders.put("set-cookie", Arrays.asList("servlet=1", "servlet=2"));
+        servletHeaders.put("link", Collections.singletonList("<servlet>"));
+        servletHeaders.put("x-shared", Collections.singletonList("servlet"));
+        Map<String, List<String>> protocolHeaders = new LinkedHashMap<>();
+        protocolHeaders.put("Set-Cookie", Collections.singletonList("jaxrs=1"));
+        protocolHeaders.put("Link", Collections.singletonList("<jaxrs>"));
+        protocolHeaders.put("X-Shared", Collections.singletonList("jaxrs"));
+        Message message = createServerOutMessage(servletHeaders, protocolHeaders);
+        Map<String, String> headers = new DefaultLogEventMapper().map(message).getHeaders();
+        assertEquals("[servlet=1, servlet=2, jaxrs=1]", headers.get("Set-Cookie"));
+        assertEquals("[<servlet>, <jaxrs>]", headers.get("Link"));
+        assertEquals("jaxrs", headers.get("X-Shared"));
+
+        message.put("org.apache.cxf.http.add-headers", true);
+        headers = new DefaultLogEventMapper().map(message).getHeaders();
+        assertEquals("[servlet, jaxrs]", headers.get("X-Shared"));
+    }
+
+    @Test
+    public void testSharedServletHeadersAfterCopying() {
+        Map<String, List<String>> servletHeaders = new LinkedHashMap<>();
+        servletHeaders.put("set-cookie", Arrays.asList("servlet=1", "jaxrs=1"));
+        servletHeaders.put("x-shared", Collections.singletonList("actual"));
+        Map<String, List<String>> protocolHeaders = new LinkedHashMap<>();
+        protocolHeaders.put("Set-Cookie", Collections.singletonList("jaxrs=1"));
+        protocolHeaders.put("X-Shared", Collections.singletonList("protocol"));
+        Message message = createServerOutMessage(servletHeaders, protocolHeaders);
+        message.put("http.headers.copied", "true");
+        Map<String, String> headers = new DefaultLogEventMapper().map(message).getHeaders();
+        assertEquals("[servlet=1, jaxrs=1]", headers.get("Set-Cookie"));
+        assertEquals("actual", headers.get("X-Shared"));
+    }
+
+    private static Message createServerOutMessage(Map<String, List<String>> servletHeaders,
+                                                  Map<String, List<String>> protocolHeaders) {
+        HttpServletResponse response = (HttpServletResponse)Proxy.newProxyInstance(
+            DefaultLogEventMapperTest.class.getClassLoader(), new Class<?>[] {HttpServletResponse.class},
+            (proxy, method, args) -> {
+                if ("getHeaderNames".equals(method.getName())) {
+                    return servletHeaders.keySet();
+                } else if ("getHeaders".equals(method.getName())) {
+                    return servletHeaders.get(args[0]);
+                }
+                throw new UnsupportedOperationException(method.getName());
+            });
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.setOutMessage(message);
+        exchange.put("org.apache.cxf.resource.operation.name", "test");
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(Message.REQUEST_URI, "test");
+        message.put("HTTP.RESPONSE", response);
+        if (protocolHeaders != null) {
+            message.put(Message.PROTOCOL_HEADERS, protocolHeaders);
+        }
+        return message;
     }
 }
