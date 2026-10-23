@@ -24,11 +24,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.security.SecurityContext;
 
 
 public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(SimpleAuthorizingInterceptor.class);
+    private static final Set<String> PRIMITIVE_TYPES = Set.of(
+        "boolean", "byte", "char", "short", "int", "long", "float", "double");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     protected Map<String, List<String>> methodRolesMap = new HashMap<>();
     protected Map<String, List<String>> userRolesMap = Collections.emptyMap();
@@ -80,7 +88,11 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
     @Override
     protected List<String> getExpectedRoles(Method method) {
-        List<String> roles = methodRolesMap.get(createMethodSig(method));
+        String sig = createMethodSig(method);
+        List<String> roles = methodRolesMap.get(sig);
+        if (roles == null) {
+            roles = methodRolesMap.get(normalizeMethodSig(sig));
+        }
         if (roles == null) {
             roles = methodRolesMap.get(method.getName());
         }
@@ -92,7 +104,11 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
 
     public void setMethodRolesMap(Map<String, String> rolesMap) {
-        methodRolesMap.putAll(parseRolesMap(rolesMap));
+        for (Map.Entry<String, List<String>> entry : parseRolesMap(rolesMap).entrySet()) {
+            String key = normalizeMethodSig(entry.getKey());
+            warnOnUnmatchableSig(key);
+            methodRolesMap.put(key, entry.getValue());
+        }
     }
 
     public void setUserRolesMap(Map<String, String> rolesMap) {
@@ -105,6 +121,38 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
     public void setCheckConfiguredRolesOnly(boolean checkConfiguredRolesOnly) {
         this.checkConfiguredRolesOnly = checkConfiguredRolesOnly;
+    }
+
+    /**
+     * Brings a method signature key into the format produced by {@link #createMethodSig(Method)},
+     * e.g. "void op(java.lang.String, long)", so that whitespace differences such as
+     * "op(java.lang.String,long)" do not prevent a configured role rule from matching.
+     * Keys that are not signatures are returned as is.
+     */
+    private static String normalizeMethodSig(String key) {
+        int open = key.indexOf('(');
+        int close = key.lastIndexOf(')');
+        if (open == -1 || close < open) {
+            return key;
+        }
+        String prefix = WHITESPACE.matcher(key.substring(0, open).trim()).replaceAll(" ");
+        String params = WHITESPACE.matcher(key.substring(open + 1, close)).replaceAll("");
+        return prefix + '(' + params.replace(",", ", ") + ')';
+    }
+
+    private static void warnOnUnmatchableSig(String key) {
+        int open = key.indexOf('(');
+        if (open == -1 || open + 1 >= key.length() - 1) {
+            return;
+        }
+        for (String param : key.substring(open + 1, key.length() - 1).split(", ")) {
+            // Class.getName() yields "java.lang.String", "long" or "[I", never "String" or "int[]"
+            if (param.endsWith("[]")
+                || param.indexOf('.') == -1 && !param.startsWith("[") && !PRIMITIVE_TYPES.contains(param)) {
+                LOG.warning("Method roles key \"" + key + "\" has the parameter type \"" + param
+                    + "\" which is not a Class.getName() type name, the key will not match any method");
+            }
+        }
     }
 
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
