@@ -365,6 +365,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected void serveStaticContent(HttpServletRequest request,
                                       HttpServletResponse response,
                                       String pathInfo) throws ServletException {
+        if (isProtectedPath(pathInfo)) {
+            sendNotFound(response);
+            return;
+        }
         try (InputStream is = getResourceAsStream(pathInfo)) {
             if (is == null) {
                 throw new ServletException("Static resource " + pathInfo + " is not available");
@@ -392,8 +396,36 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         return staticContentTypes.get(extension);
     }
 
+    /**
+     * The container never serves WEB-INF or META-INF directly to a client, but a RequestDispatcher
+     * and ServletContext.getResourceAsStream can reach them, so a request path naming either
+     * directory is not forwarded or served as static content.
+     */
+    private static boolean isProtectedPath(String path) {
+        if (path != null) {
+            for (String segment : path.split("/")) {
+                if ("WEB-INF".equalsIgnoreCase(segment) || "META-INF".equalsIgnoreCase(segment)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static void sendNotFound(HttpServletResponse response) throws ServletException {
+        try {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } catch (IOException ex) {
+            throw new ServletException(ex);
+        }
+    }
+
     protected void redirect(HttpServletRequest request, HttpServletResponse response, String pathInfo)
         throws ServletException {
+        if (isProtectedPath(pathInfo)) {
+            sendNotFound(response);
+            return;
+        }
         boolean customServletPath = dispatcherServletPath != null;
         String theServletPath = customServletPath ? dispatcherServletPath : "/";
 
