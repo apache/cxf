@@ -25,11 +25,7 @@ import java.util.List;
 
 import javax.wsdl.Binding;
 import javax.wsdl.Definition;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,6 +36,7 @@ import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
 import org.apache.cxf.binding.corba.wsdl.Object;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
@@ -271,21 +268,13 @@ public class ObjectReferenceVisitor extends VisitorBase {
             // Create an annotation which contains the CORBA binding for the element
             XmlSchemaAnnotation annotation = new XmlSchemaAnnotation();
             XmlSchemaAppInfo appInfo = new XmlSchemaAppInfo();
-            try {
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-                dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.newDocument();
-                Element el = doc.createElement("appinfo");
-                el.setTextContent("corba:binding=" + bindingName.getLocalPart());
-                // TODO: This is correct but the appinfo markup is never added to the
-                // schema.  Investigate.
-                appInfo.setMarkup(el.getChildNodes());
-            } catch (ParserConfigurationException ex) {
-                throw new RuntimeException("[ObjectReferenceVisitor: error creating endpoint schema]");
-            }
+            // Nothing is parsed here, only an empty document created, so DOMUtils' builder does.
+            Document doc = DOMUtils.createDocument();
+            Element el = doc.createElement("appinfo");
+            el.setTextContent("corba:binding=" + bindingName.getLocalPart());
+            // TODO: This is correct but the appinfo markup is never added to the
+            // schema.  Investigate.
+            appInfo.setMarkup(el.getChildNodes());
 
             annotation.getItems().add(appInfo);
 
