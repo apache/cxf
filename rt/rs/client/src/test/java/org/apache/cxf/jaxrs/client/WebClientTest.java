@@ -48,6 +48,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
@@ -533,6 +534,30 @@ public class WebClientTest {
 
         assertThat(wc1.getConfigurationReference(), is(nullValue()));
         assertThat(configuration.getBus().getState(), equalTo(BusState.SHUTDOWN));
+    }
+
+    @Test
+    public void pathAllowsAddingURLAsPathElement() {
+        final WebClient webClient = WebClient.create("http://www.foo.com").path("http://www.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/"));
+        assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
+    }
+
+    @Test
+    public void preservesPreviouslyAddedPathParameters() {
+        final WebClient webClient = WebClient.create("http://www.foo.com")
+            .path("foo")
+            .path("bar")
+            .path("http://www.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/foo/bar/"));
+        assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
+    }
+
+    @Test
+    public void outputOfUriUtilsEncodePathSegmentIsSafe() {
+        final WebClient webClient = WebClient.create("http://www.foo.com").path("http:%2F%2Fwww.bar.com");
+        assertThat(webClient.getCurrentURI().toString(), startsWith("http://www.foo.com/"));
+        assertThat(webClient.getCurrentURI().getHost(), equalTo("www.foo.com"));
     }
 
     private static final class ParamConverterProviderImpl implements ParamConverterProvider {

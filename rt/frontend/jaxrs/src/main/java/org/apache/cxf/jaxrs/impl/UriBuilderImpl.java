@@ -103,7 +103,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        return doBuild(false, true, values);
+        return build(values, true);
     }
 
     private static Map<String, Object> getResolvedTemplates(Map<String, Object> rtemplates) {
@@ -185,13 +185,16 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment)
         throws URISyntaxException {
+
+        // Always include the leading slash in order to prevent host overrides
+        if ((scheme != null || host != null || userInfo != null)
+                && thePath.length() != 0 && (!thePath.startsWith("/") && needsLeadingSlash(thePath))) {
+            thePath = "/" + thePath;
+        }
+
         if (fromEncoded) {
             return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
-            if ((scheme != null || host != null || userInfo != null)
-                && thePath.length() != 0 && !(thePath.startsWith("/") || thePath.startsWith(";"))) {
-                thePath = "/" + thePath;
-            }
             try {
                 return buildURIFromEncoded(thePath, theQuery, theFragment);
             } catch (Exception ex) {
@@ -235,8 +238,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 b.append(':').append(port);
             }
             if (thePath != null && thePath.length() > 0) {
-                b.append(thePath.startsWith("/") || b.length() == 0 || originalPathEmpty
-                    ? thePath : '/' + thePath);
+                b.append(thePath.startsWith("/") || b.length() == 0
+                    || (originalPathEmpty && !needsLeadingSlash(thePath)) ? thePath : '/' + thePath);
             }
             if (theQuery != null && theQuery.length() != 0) {
                 b.append('?').append(theQuery);
@@ -248,6 +251,30 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             b.append('#').append(theFragment);
         }
         return b.toString();
+    }
+
+    /**
+     * The `;`, `&` and `+` are valid userinfo characters (RFC 3986), so a path
+     * glued to the host that contains `@` is parsed as userinfo.
+     * 
+     *    URI.create("http://foo.com;@evil.com").getHost() -> "evil.com"
+     *    URI.create("http://foo.com&@evil.com").getHost() -> "evil.com"
+     *    URI.create("http://foo.com+@evil.com").getHost() -> "evil.com"
+     * 
+     * The straightforward encoding of @ -> %40 does not work either:
+     *
+     *    URI.create("http://foo.com;%40evil.com").getHost() ->  null
+     * 
+     * It does not even matter if the userinfo part is already provided:
+     * 
+     *    URI.create("http://a:b@foo.com;%40evil.com").getHost() ->  null
+     *
+     * To workaround the issue, we have to include leading path slash all the time.
+     */
+    private boolean needsLeadingSlash(String path) {
+        return !path.startsWith(";") 
+            || path.indexOf('@') >= 0 /* check if @ is present */
+            || path.indexOf("%40") >= 0; /* @ encoded */
     }
 
     private boolean isSchemeOpaque() {
@@ -262,7 +289,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     @Override
     public URI buildFromMap(Map<String, ?> map) throws IllegalArgumentException,
         UriBuilderException {
-        return doBuildFromMap(map, false, true);
+        return buildFromMap(map, true);
     }
 
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded,
@@ -548,7 +575,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
-        if (isAbsoluteUriPath(path)) {
+        // Only set uri when path is absolute and the current URI's is not set
+        // (scheme and host are all null). 
+        if (isAbsoluteUriPath(path) && scheme == null && host == null) {
             try {
                 URI uri = URI.create(path);
                 this.originalPathEmpty = StringUtils.isEmpty(uri.getPath());
@@ -778,7 +807,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     public UriBuilder replacePath(String path) {
         if (path == null) {
             clearPathAndMatrix();
-        } else if (isAbsoluteUriPath(path)) {
+        } else if (isAbsoluteUriPath(path) && scheme == null && host == null) {
+            // Only set uri when path is absolute and the current URI's is not set
+            // (scheme and host are all null). 
             clearPathAndMatrix();
             uri(URI.create(path));
         } else {

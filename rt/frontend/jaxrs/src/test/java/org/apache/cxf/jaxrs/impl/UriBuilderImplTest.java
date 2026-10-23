@@ -40,6 +40,9 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
@@ -134,7 +137,309 @@ public class UriBuilderImplTest {
         assertEquals("/?a=%25&a2=%7B%7D", uri.toString());
     }
 
+    @Test
+    public void testReplaceFullPath() {
+        UriBuilder ub = UriBuilder.fromPath("");
+        URI uri = ub.build();
+        assertEquals("", uri.toString());
+        uri = ub.replacePath("http://foo.com").build();
+        assertEquals("http://foo.com", uri.toString());
 
+        uri = ub.buildFromEncoded();
+        assertEquals("http://foo.com", uri.toString());
+    }
+
+    @Test
+    public void testReplaceFullPathWhenUriIsSet() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replacePath("http://bar.com/").build();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testBuildAndSetFullPath() {
+        UriBuilder ub = UriBuilder.fromPath("");
+        URI uri = ub.build();
+        assertEquals("", uri.toString());
+        uri = ub.path("http://foo.com").build();
+        assertEquals("http://foo.com", uri.toString());
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testBuildAndSetFullPathWhenUriIsSet() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path("http://bar.com/").build();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), startsWith("http://foo.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+
+        uri = ub.path(".org").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testReplacePathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replacePath(".org").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/.org"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testEncodedUserInfoAndUriWithMatrix() {
+        // The UriBuilder::fromUri will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromUri("http://foo.com;%40evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
+    public void testUserInfoAndUriWithMatrix() {
+        // The UriBuilder::fromUri will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromUri("http://foo.com;@evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
+    public void testEncodedUserInfoSeparatorAndPathWithMatrix() {
+        // The UriBuilder::fromPath will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com;%40evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndPathWithMatrix() {
+        // The UriBuilder::fromPath will treat `evil.com` as the host name
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com;@evil.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com;@evil.com", uri.toString());
+        assertThat(uri.getHost(), equalTo("evil.com"));
+    }
+
+    @Test
+    public void testPathWithUserInfoDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://a:b@foo.com");
+        URI uri = ub.build();
+        assertEquals("http://a:b@foo.com", uri.toString());
+        uri = ub.path(";@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://a:b@foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://a:b@foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://a:b@foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testUriWithUserInfoDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromUri("http://a:b@foo.com");
+        URI uri = ub.build();
+        assertEquals("http://a:b@foo.com", uri.toString());
+        uri = ub.path(";@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://a:b@foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://a:b@foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://a:b@foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testEncodedUserInfoSeparatorAndPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path(";%40evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;%40evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;%40evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;%40evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path(";@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndReplacePathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replacePath(";@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndReplaceMatrixDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.replaceMatrix("@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndMatrixDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.matrixParam("@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;@evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndMatrixParamDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.matrixParam("param", "@evil.com").build();
+        assertThat(uri.toString(), equalTo("http://foo.com/;param=@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded();
+        assertThat(uri.toString(), equalTo("http://foo.com/;param=@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        String template = ub.toTemplate();
+        assertThat(template, equalTo("http://foo.com/;param=@evil.com"));
+    }
+
+    @Test
+    public void testUserInfoSeparatorAndTemplatedPathDoesNotChangeHost() {
+        UriBuilder ub = UriBuilder.fromPath("http://foo.com");
+        URI uri = ub.build();
+        assertEquals("http://foo.com", uri.toString());
+        uri = ub.path("{x}").build(";@evil.com");
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+
+        uri = ub.buildFromEncoded(";@evil.com");
+        assertThat(uri.toString(), equalTo("http://foo.com/;@evil.com"));
+        assertThat(uri.getHost(), equalTo("foo.com"));
+    }
+
+    @Test
+    public void testTemplateUriDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromUri("http://foo.com")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/.org", template);
+    }
+
+    @Test
+    public void testTemplatePathDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/.org", template);
+    }
+    
+    @Test
+    public void testTemplateWithPathDoesNotChangeHost() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com/aaa")
+            .path(".org")
+            .toTemplate();
+        assertEquals("http://foo.com/aaa/.org", template);
+    }
+
+    @Test
+    public void testTemplatePathDoesNotReplaceUri() {
+        final String template = UriBuilder
+            .fromPath("http://foo.com/")
+            .path("http://bar.com")
+            .toTemplate();
+        assertThat(template, startsWith("http://foo.com/"));
+    }
 
     @Test
     public void testResolveTemplate() {
