@@ -83,6 +83,11 @@ public class Headers {
         this.message = message;
         this.headers = getSetProtocolHeaders(message);
     }
+    private Headers(Message message, Map<String, List<String>> headers) {
+        this.message = message;
+        this.headers = headers;
+    }
+
     public Headers() {
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.message = null;
@@ -516,30 +521,90 @@ public class Headers {
         boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String header = entry.getKey();
-            List<?> headerList = entry.getValue();
-
+            List<String> values = responseHeaderValues(header, entry.getValue(), addHeaders);
             if (addHeaders || isSingleHeader(header)) {
-                for (int i = 0; i < headerList.size(); i++) {
-                    Object headerObject = headerList.get(i);
-                    if (headerObject != null) {
-                        response.addHeader(header, headerObjectToString(headerObject));
-                    }
+                for (String value : values) {
+                    response.addHeader(header, value);
                 }
             } else {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < headerList.size(); i++) {
-                    Object headerObject = headerList.get(i);
-                    if (headerObject != null) {
-                        sb.append(headerObjectToString(headerObject));
-                    }
-
-                    if (i + 1 < headerList.size()) {
-                        sb.append(',');
-                    }
-                }
-                response.setHeader(header, sb.toString());
+                response.setHeader(header, values.get(0));
             }
         }
+    }
+
+    static Map<String, List<String>> getResponseHeaders(Message message, HttpServletResponse response) {
+        Map<String, List<String>> protocol = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<String>> original = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        if (original != null) {
+            protocol.putAll(original);
+        }
+        return new Headers(message, protocol).getResponseHeaders(response);
+    }
+
+    /** Returns a snapshot without modifying the servlet response or the protocol headers. */
+    private Map<String, List<String>> getResponseHeaders(HttpServletResponse response) {
+        boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
+        Map<String, List<String>> protocol = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            List<String> values = responseHeaderValues(entry.getKey(), entry.getValue(), addHeaders);
+            if (!values.isEmpty()) {
+                protocol.put(entry.getKey(), values);
+            }
+        }
+        String contentType = getContentTypeFromMessage();
+        boolean setContentType = !protocol.containsKey(Message.CONTENT_TYPE)
+            && contentType != null && isResponseBodyAvailable();
+        if (setContentType) {
+            protocol.put(Message.CONTENT_TYPE, Collections.singletonList(contentType));
+        }
+
+        Map<String, List<String>> effective = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        try {
+            for (String name : response.getHeaderNames()) {
+                effective.put(name, Collections.unmodifiableList(new ArrayList<>(response.getHeaders(name))));
+            }
+        } catch (RuntimeException ex) {
+            // Wrappers and recycled responses may not expose headers. Discard any partial
+            // snapshot and retain the protocol headers so optional inspection cannot fail a request.
+            return Collections.unmodifiableMap(protocol);
+        }
+        if (!PropertyUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED))) {
+            for (Map.Entry<String, List<String>> entry : protocol.entrySet()) {
+                String name = entry.getKey();
+                // The container replaces Content-Type, even when it is added with addHeader
+                if (!Message.CONTENT_TYPE.equalsIgnoreCase(name)
+                    && (addHeaders || isSingleHeader(name)) && effective.containsKey(name)) {
+                    List<String> combined = new ArrayList<>(effective.get(name));
+                    combined.addAll(entry.getValue());
+                    effective.put(name, Collections.unmodifiableList(combined));
+                } else {
+                    effective.put(name, entry.getValue());
+                }
+            }
+        }
+        return Collections.unmodifiableMap(effective);
+    }
+
+    private List<String> responseHeaderValues(String header, List<?> values, boolean addHeaders) {
+        if (addHeaders || isSingleHeader(header)) {
+            List<String> result = new ArrayList<>();
+            for (Object value : values) {
+                if (value != null) {
+                    result.add(headerObjectToString(value));
+                }
+            }
+            return Collections.unmodifiableList(result);
+        }
+        StringBuilder combined = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            if (values.get(i) != null) {
+                combined.append(headerObjectToString(values.get(i)));
+            }
+            if (i + 1 < values.size()) {
+                combined.append(',');
+            }
+        }
+        return Collections.singletonList(combined.toString());
     }
 
     private String headerObjectToString(Object headerObject) {
