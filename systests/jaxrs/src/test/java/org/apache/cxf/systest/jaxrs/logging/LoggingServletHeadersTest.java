@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs.logging;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -35,13 +37,20 @@ import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractServerTestServerBase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.Headers;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -94,7 +103,8 @@ public class LoggingServletHeadersTest extends AbstractBusClientServerTestBase {
             servletResponse.setHeader("x-servlet-secret", "servlet-secret-value");
             servletResponse.addHeader("Link", "<servlet>");
             return Response.ok("hello").header("X-Response-Header", "jaxrs").header("Set-Cookie", "jaxrs=1")
-                .header("X-Protocol-Secret", "protocol-secret-value").header("Link", "<jaxrs>").build();
+                .header("X-Protocol-Secret", "protocol-secret-value").header("Link", "<jaxrs>")
+                .header("X-Multi", "a").header("X-Multi", "b").build();
         }
 
         @GET
@@ -105,7 +115,8 @@ public class LoggingServletHeadersTest extends AbstractBusClientServerTestBase {
             servletResponse.setHeader("x-servlet-secret", "servlet-secret-value");
             servletResponse.addHeader("Link", "<servlet>");
             return Response.noContent().header("X-Response-Header", "jaxrs").header("Set-Cookie", "jaxrs=1")
-                .header("X-Protocol-Secret", "protocol-secret-value").header("Link", "<jaxrs>").build();
+                .header("X-Protocol-Secret", "protocol-secret-value").header("Link", "<jaxrs>")
+                .header("X-Multi", "a").header("X-Multi", "b").build();
         }
     }
 
@@ -129,6 +140,41 @@ public class LoggingServletHeadersTest extends AbstractBusClientServerTestBase {
         assertHeadersLogged("/headers/empty", 204);
     }
 
+    @Test
+    public void testTransportHeaderConstants() {
+        HttpServletResponse response = (HttpServletResponse)Proxy.newProxyInstance(
+            LoggingServletHeadersTest.class.getClassLoader(), new Class<?>[] {HttpServletResponse.class},
+            (proxy, method, args) -> {
+                if ("getHeaderNames".equals(method.getName())) {
+                    return Collections.singleton("x-shared");
+                } else if ("getHeaders".equals(method.getName())) {
+                    return Collections.singletonList("servlet");
+                }
+                throw new UnsupportedOperationException(method.getName());
+            });
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.setOutMessage(message);
+        exchange.put("org.apache.cxf.resource.operation.name", "test");
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(Message.REQUEST_URI, "test");
+        // Use the transport constants here to detect drift in the logging module's copies,
+        // without adding an HTTP transport dependency to the logging module.
+        message.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
+        message.put(Message.PROTOCOL_HEADERS,
+            Collections.singletonMap("X-Shared", Collections.singletonList("protocol")));
+        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        assertEquals("protocol", mapper.map(message).getHeaders().get("X-Shared"));
+
+        message.put(Headers.ADD_HEADERS_PROPERTY, true);
+        assertEquals("[servlet, protocol]", mapper.map(message).getHeaders().get("X-Shared"));
+
+        message.remove(Headers.ADD_HEADERS_PROPERTY);
+        message.put(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED, "true");
+        assertEquals("servlet", mapper.map(message).getHeaders().get("X-Shared"));
+    }
+
     private static void assertHeadersLogged(String path, int status) throws Exception {
         Response response = WebClient.create("http://localhost:" + PORT + path).get();
         assertEquals(status, response.getStatus());
@@ -145,6 +191,7 @@ public class LoggingServletHeadersTest extends AbstractBusClientServerTestBase {
         assertEquals(headers.toString(), "jaxrs", headers.get("X-Response-Header"));
         assertEquals(headers.toString(), "servlet", headers.get("X-Servlet-Header"));
         assertEquals(headers.toString(), "[<servlet>, <jaxrs>]", headers.get("Link"));
+        assertEquals("a,b", headers.get("X-Multi"));
         assertEquals("XXX", headers.get("Set-Cookie"));
         assertEquals("XXX", headers.get("x-servlet-secret"));
         assertEquals("XXX", headers.get("X-Protocol-Secret"));

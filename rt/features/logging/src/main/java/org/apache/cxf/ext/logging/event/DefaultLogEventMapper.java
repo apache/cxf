@@ -111,7 +111,12 @@ public class DefaultLogEventMapper {
         if (SERVLET_API_AVAILABLE && (event.getType() == EventType.RESP_OUT
             || event.getType() == EventType.FAULT_OUT)) {
             // headers added directly to the HttpServletResponse are not in the protocol headers
-            HttpServletResponseHeaders.addHeaders(message, headerMap);
+            try {
+                HttpServletResponseHeaders.addHeaders(message, headerMap);
+            } catch (LinkageError ex) {
+                // The optional Servlet API or helper may become unavailable after the initial check.
+                // Keep logging the protocol headers, including their sensitive-header masking below.
+            }
         }
         if (sensitiveProtocolHeaders != null && !sensitiveProtocolHeaders.isEmpty()) {
             maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);

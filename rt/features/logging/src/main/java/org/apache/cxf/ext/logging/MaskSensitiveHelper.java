@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.message.Message;
@@ -139,9 +140,18 @@ public class MaskSensitiveHelper {
     public void maskHeaders(
             final Map<String, String> headerMap,
             final Set<String> sensitiveHeaderNames) {
-        headerMap.replaceAll((name, value) -> value != null
-            && sensitiveHeaderNames.stream().anyMatch(sensitive -> sensitive.equalsIgnoreCase(name))
-                ? MASKED_HEADER_VALUE : value);
+        if (headerMap == null || headerMap.isEmpty()
+            || sensitiveHeaderNames == null || sensitiveHeaderNames.isEmpty()) {
+            return;
+        }
+        Set<String> sensitiveNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        for (String sensitiveName : sensitiveHeaderNames) {
+            if (sensitiveName != null) {
+                sensitiveNames.add(sensitiveName);
+            }
+        }
+        headerMap.replaceAll((name, value) -> name != null && value != null && sensitiveNames.contains(name)
+            ? MASKED_HEADER_VALUE : value);
     }
 
     private String applyMasks(String originalLogString, Set<ReplacementPair> replacementPairs) {
