@@ -104,6 +104,24 @@ class JCacheReplayCache implements ReplayCache {
     }
 
     /**
+     * Add the given identifier to the cache if, and only if, it is not already contained in it, as a
+     * single atomic operation. This overrides ReplayCache.addIfAbsent, whose default implementation is
+     * only atomic within a single JVM, whereas a JCache provider may be distributed.
+     * @param identifier The identifier to be added
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default
+     *               expiry is used.
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty
+     */
+    public boolean addIfAbsent(String identifier, Instant expiry) {
+        if (identifier == null || identifier.length() == 0) {
+            return false;
+        }
+
+        return cache.putIfAbsent(identifier, new EHCacheValue(identifier, expiry));
+    }
+
+    /**
      * Return true if the given identifier is contained in the cache
      * @param identifier The identifier to check
      */
