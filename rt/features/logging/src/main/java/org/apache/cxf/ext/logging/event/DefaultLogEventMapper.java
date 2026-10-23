@@ -62,6 +62,7 @@ public class DefaultLogEventMapper {
         DEFAULT_BINARY_CONTENT_MEDIA_TYPES = Collections.unmodifiableSet(mediaTypes);
     }
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
+    private static final boolean SERVLET_API_AVAILABLE = isServletApiAvailable();
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
@@ -107,6 +108,16 @@ public class DefaultLogEventMapper {
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
         Map<String, String> headerMap = getHeaders(message);
+        if (SERVLET_API_AVAILABLE && (event.getType() == EventType.RESP_OUT
+            || event.getType() == EventType.FAULT_OUT)) {
+            // headers added directly to the HttpServletResponse are not in the protocol headers
+            try {
+                HttpServletResponseHeaders.addHeaders(message, headerMap);
+            } catch (LinkageError ex) {
+                // The optional Servlet API or helper may become unavailable after the initial check.
+                // Keep logging the protocol headers, including their sensitive-header masking below.
+            }
+        }
         if (sensitiveProtocolHeaders != null && !sensitiveProtocolHeaders.isEmpty()) {
             maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
         }
@@ -173,6 +184,16 @@ public class DefaultLogEventMapper {
             // to throw UnsupportedOperationException if invoked when a Security Manager is not allowed.
             // see https://jdk.java.net/23/release-notes#JDK-8296244
             return Collections.emptySet();
+        }
+    }
+
+    private static boolean isServletApiAvailable() {
+        try {
+            Class.forName("jakarta.servlet.http.HttpServletResponse", false,
+                DefaultLogEventMapper.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
         }
     }
 
