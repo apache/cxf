@@ -1908,12 +1908,26 @@ public abstract class HTTPConduit
             }
 
             String allowedRedirectURI = (String)message.getContextualProperty(AUTO_REDIRECT_ALLOWED_URI);
-            if (allowedRedirectURI != null && !newURL.startsWith(allowedRedirectURI)) {
+            if (allowedRedirectURI != null && !isAllowedRedirectUri(newUri, newURL, allowedRedirectURI)) {
                 String msg = "Forbidden Redirect URI " + newURL + "detected on Conduit '" + conduitName;
                 LOG.log(Level.INFO, msg);
                 throw new IOException(msg);
             }
 
+        }
+    }
+
+    private static boolean isAllowedRedirectUri(URI newUri, String newURL, String allowedRedirectURI) {
+        if (!newURL.startsWith(allowedRedirectURI)) {
+            return false;
+        }
+        // A prefix match alone lets "https://host" also match "https://host@evil" or
+        // "https://host.evil", so the authority has to be the same as well
+        try {
+            String allowedAuthority = new URI(allowedRedirectURI).getRawAuthority();
+            return allowedAuthority == null || allowedAuthority.equals(newUri.getRawAuthority());
+        } catch (URISyntaxException ex) {
+            return false;
         }
     }
 
