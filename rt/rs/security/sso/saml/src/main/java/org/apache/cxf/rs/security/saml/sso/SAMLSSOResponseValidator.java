@@ -300,10 +300,8 @@ public class SAMLSSOResponseValidator {
 
         // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
         if (postBinding && replayCache != null) {
-            if (!replayCache.contains(id)) {
-                Instant expires = subjectConfData.getNotOnOrAfter();
-                replayCache.putId(id, expires);
-            } else {
+            Instant expires = subjectConfData.getNotOnOrAfter();
+            if (!replayCache.putIdIfAbsent(id, expires)) {
                 LOG.warning("Replay attack with token id: " + id);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
