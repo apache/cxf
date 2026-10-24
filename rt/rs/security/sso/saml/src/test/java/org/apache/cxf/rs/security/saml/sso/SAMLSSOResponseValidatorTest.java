@@ -28,6 +28,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -663,6 +669,144 @@ public class SAMLSSOResponseValidatorTest {
             fail("Failure expected on an unsigned Assertion");
         } catch (WSSecurityException ex) {
             // expected
+        }
+    }
+
+    @org.junit.Test
+    public void testReplayedResponseIsRejected() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+
+            SSOValidatorResponse validateSamlResponse = validator.validateSamlResponse(response, true);
+            assertEquals(response.getID(), validateSamlResponse.getResponseId());
+
+            // The same (POST binding) response is replayed
+            try {
+                validator.validateSamlResponse(copyResponse(response), true);
+                fail("Expected failure on replayed response");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    // Two copies of the same response are validated concurrently, with the replay cache arranged so
+    // that both threads look the assertion id up before either of them has stored it. Only one of
+    // them may be accepted.
+    @org.junit.Test
+    public void testConcurrentlyReplayedResponseIsAcceptedOnce() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+
+        final int threads = 2;
+        TokenReplayCache<String> replayCache = new InterleavingTokenReplayCache(threads);
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+
+            AtomicInteger accepted = new AtomicInteger();
+            List<Future<?>> futures = new ArrayList<>(threads);
+            for (int t = 0; t < threads; t++) {
+                final Response replayedResponse = copyResponse(response);
+                futures.add(executor.submit(() -> {
+                    try {
+                        validator.validateSamlResponse(replayedResponse, true);
+                        accepted.incrementAndGet();
+                    } catch (WSSecurityException ex) {
+                        // expected for all but one of the submissions
+                    }
+                    return null;
+                }));
+            }
+            for (Future<?> future : futures) {
+                future.get(30, TimeUnit.SECONDS);
+            }
+            assertEquals("The replayed response was accepted more than once", 1, accepted.get());
+        } finally {
+            executor.shutdownNow();
+            replayCache.close();
+        }
+    }
+
+    private SAMLSSOResponseValidator createReplayValidator(TokenReplayCache<String> replayCache) {
+        SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
+        validator.setEnforceAssertionsSigned(false);
+        validator.setIssuerIDP("http://cxf.apache.org/issuer");
+        validator.setAssertionConsumerURL("http://recipient.apache.org");
+        validator.setClientAddress("http://apache.org");
+        validator.setRequestId("12345");
+        validator.setSpIdentifier("http://service.apache.org");
+        validator.setReplayCache(replayCache);
+        return validator;
+    }
+
+    // Creates an independent copy of the response (with the same assertion id), as received by
+    // another concurrent request
+    private Response copyResponse(Response response) throws Exception {
+        Document doc = DOMUtils.createDocument();
+        Element responseElement = (Element)doc.importNode(response.getDOM(), true);
+        doc.appendChild(responseElement);
+        return (Response)OpenSAMLUtil.fromDom(responseElement);
+    }
+
+    /**
+     * A replay cache whose contains() call only returns once the expected number of threads have
+     * all called it, so that a non-atomic contains-then-putId replay check lets every one of them
+     * through, whereas putIdIfAbsent accepts exactly one.
+     */
+    private static final class InterleavingTokenReplayCache implements TokenReplayCache<String> {
+        private final TokenReplayCache<String> delegate;
+        private final CyclicBarrier barrier;
+
+        InterleavingTokenReplayCache(int threads) throws Exception {
+            this.delegate = new EHCacheTokenReplayCache();
+            this.barrier = new CyclicBarrier(threads);
+        }
+
+        @Override
+        public boolean contains(String id) {
+            try {
+                barrier.await(10, TimeUnit.SECONDS);
+            } catch (Exception ex) {
+                throw new IllegalStateException(ex);
+            }
+            return delegate.contains(id);
+        }
+
+        @Override
+        public void putId(String id) {
+            delegate.putId(id);
+        }
+
+        @Override
+        public void putId(String id, Instant expiry) {
+            delegate.putId(id, expiry);
+        }
+
+        @Override
+        public boolean putIdIfAbsent(String id, Instant expiry) {
+            return delegate.putIdIfAbsent(id, expiry);
+        }
+
+        @Override
+        public void close() throws java.io.IOException {
+            delegate.close();
         }
     }
 

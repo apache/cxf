@@ -140,6 +140,22 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
     }
 
     /**
+     * Add the given identifier to the cache if, and only if, it is not already contained in it, as a
+     * single atomic operation. JCache's putIfAbsent is atomic for a distributed provider as well.
+     * @param identifier The identifier to be added
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default expiry is used.
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty
+     */
+    @Override
+    public boolean putIdIfAbsent(String identifier, Instant expiry) {
+        if (identifier == null || "".equals(identifier)) {
+            return false;
+        }
+        return cache.putIfAbsent(identifier, new EHCacheValue(identifier, expiry));
+    }
+
+    /**
      * Return true if the given identifier is contained in the cache
      * @param identifier The identifier to check
      */
