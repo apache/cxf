@@ -201,6 +201,56 @@ public class SimpleAuthorizingInterceptorTest {
         assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(transfer));
     }
 
+    @Test
+    public void testMethodSignatureRolesIgnoreWhitespace() throws Exception {
+        Method transfer = TestService.class.getMethod("transfer", String.class, long.class);
+        for (String key : new String[] {"void transfer(java.lang.String,long)",
+            " void  transfer( java.lang.String ,  long ) ", "void transfer(java.lang.String,\tlong)"}) {
+            SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+            in.setMethodRolesMap(Collections.singletonMap(key, "admin"));
+            assertEquals(key, Collections.singletonList("admin"), in.getExpectedRoles(transfer));
+        }
+    }
+
+    @Test
+    public void testMethodSignatureRolesAddedDirectly() throws Exception {
+        Method transfer = TestService.class.getMethod("transfer", String.class, long.class);
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.methodRolesMap.put(in.createMethodSig(transfer), Collections.singletonList("admin"));
+        assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(transfer));
+    }
+
+    @Test
+    public void testCustomMethodSigAddedDirectly() throws Exception {
+        Method transfer = TestService.class.getMethod("transfer", String.class, long.class);
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
+            @Override
+            protected String createMethodSig(Method m) {
+                return super.createMethodSig(m).replace(", ", ",");
+            }
+        };
+        in.methodRolesMap.put(in.createMethodSig(transfer), Collections.singletonList("admin"));
+        assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(transfer));
+    }
+
+    @Test
+    public void testMethodSignatureRolesNoParameters() throws Exception {
+        Method echo = TestService.class.getMethod("echo");
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.setMethodRolesMap(Collections.singletonMap("void echo( )", "admin"));
+        assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(echo));
+    }
+
+    @Test
+    public void testSecureAnnotationsSignatureRoles() throws Exception {
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setSecuredObject(new AnnotatedService());
+        assertEquals(Collections.singletonList("admin"),
+            in.getExpectedRoles(AnnotatedService.class.getMethod("transfer", String.class, long.class)));
+        assertEquals(Collections.singletonList("user"),
+            in.getExpectedRoles(AnnotatedService.class.getMethod("transfer", String.class)));
+    }
+
     private static final class TestService {
         @SuppressWarnings("unused")
         public void echo() {
@@ -209,6 +259,18 @@ public class SimpleAuthorizingInterceptorTest {
 
         @SuppressWarnings("unused")
         public void transfer(String account, long amount) {
+
+        }
+    }
+
+    public static class AnnotatedService {
+        @javax.annotation.security.RolesAllowed("admin")
+        public void transfer(String account, long amount) {
+
+        }
+
+        @javax.annotation.security.RolesAllowed("user")
+        public void transfer(String account) {
 
         }
     }
