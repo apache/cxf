@@ -41,6 +41,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -58,9 +59,8 @@ public class AbstractHTTPServletTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         ByteArrayOutputStream bos = captureOutput(response);
 
-        servlet.doGet(mockRequest("/WEB-INF/web.xml"), response);
+        assertThrows(ServletException.class, () -> servlet.doGet(mockRequest("/WEB-INF/web.xml"), response));
 
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
         verify(sc, never()).getResourceAsStream(anyString());
         assertEquals("", bos.toString(StandardCharsets.UTF_8));
         assertFalse(servlet.invoked);
@@ -73,11 +73,28 @@ public class AbstractHTTPServletTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         ByteArrayOutputStream bos = captureOutput(response);
 
-        servlet.doGet(mockRequest("/meta-inf/context.xml"), response);
+        assertThrows(ServletException.class,
+            () -> servlet.doGet(mockRequest("/meta-inf/context.xml"), response));
 
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
         verify(sc, never()).getResourceAsStream(anyString());
         assertEquals("", bos.toString(StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void testCustomProtectedPathList() throws Exception {
+        ServletContext sc = mockServletContext("/WEB-INF/web.xml", WEB_XML);
+        ServletConfig config = mockServletConfig(sc, "static-resources-list", "/.*\\.xml");
+        when(config.getInitParameter("static-resources-protected-path-list")).thenReturn("/private/.*");
+        TestServlet servlet = new TestServlet(sc);
+        servlet.init(config);
+
+        assertThrows(ServletException.class, () -> servlet.doGet(mockRequest("/private/a.xml"),
+                                                                  mock(HttpServletResponse.class)));
+
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        ByteArrayOutputStream bos = captureOutput(response);
+        servlet.doGet(mockRequest("/WEB-INF/web.xml"), response);
+        assertEquals(WEB_XML, bos.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -89,7 +106,6 @@ public class AbstractHTTPServletTest {
 
         servlet.doGet(mockRequest("/index.xml"), response);
 
-        verify(response, never()).sendError(HttpServletResponse.SC_NOT_FOUND);
         assertEquals(WEB_XML, bos.toString(StandardCharsets.UTF_8));
     }
 
@@ -101,9 +117,9 @@ public class AbstractHTTPServletTest {
         TestServlet servlet = initServlet(sc, "redirects-list", "/.*\\.jsp");
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        servlet.doGet(mockRequest("/WEB-INF/views/admin.jsp"), response);
+        assertThrows(ServletException.class,
+            () -> servlet.doGet(mockRequest("/WEB-INF/views/admin.jsp"), response));
 
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
         verify(sc, never()).getRequestDispatcher(anyString());
         assertFalse(servlet.invoked);
     }
@@ -117,6 +133,12 @@ public class AbstractHTTPServletTest {
 
     private static TestServlet initServlet(ServletContext sc, String paramName, String paramValue)
         throws ServletException {
+        TestServlet servlet = new TestServlet(sc);
+        servlet.init(mockServletConfig(sc, paramName, paramValue));
+        return servlet;
+    }
+
+    private static ServletConfig mockServletConfig(ServletContext sc, String paramName, String paramValue) {
         ServletConfig config = mock(ServletConfig.class);
         when(config.getServletContext()).thenReturn(sc);
         when(config.getInitParameter(paramName)).thenReturn(paramValue);
@@ -125,9 +147,7 @@ public class AbstractHTTPServletTest {
         } else {
             when(config.getInitParameter("redirect-servlet-path")).thenReturn("/");
         }
-        TestServlet servlet = new TestServlet(sc);
-        servlet.init(config);
-        return servlet;
+        return config;
     }
 
     private static HttpServletRequest mockRequest(String pathInfo) {

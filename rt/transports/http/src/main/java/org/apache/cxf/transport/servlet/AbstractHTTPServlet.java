@@ -72,6 +72,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         Arrays.asList(new String[]{"POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"});
 
     private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
+    private static final String STATIC_RESOURCES_PROTECTED_PATHS_PARAMETER =
+        "static-resources-protected-path-list";
+    private static final String DEFAULT_STATIC_RESOURCES_PROTECTED_PATHS =
+        "(?i)/WEB-INF/.* (?i)/META-INF/.*";
     private static final String STATIC_WELCOME_FILE_PARAMETER = "static-welcome-file";
     private static final String STATIC_CACHE_CONTROL = "static-cache-control";
     private static final String STATIC_RESOURCES_MAP_RESOURCE = "/cxfServletStaticResourcesMap.txt";
@@ -102,6 +106,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     }
     
     private List<Pattern> staticResourcesList;
+    private List<Pattern> staticResourcesProtectedPathList;
     private String staticWelcomeFile;
     private List<Pattern> redirectList;
     private String dispatcherServletPath;
@@ -116,6 +121,9 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         super.init(servletConfig);
 
         staticResourcesList = parseListSequence(servletConfig.getInitParameter(STATIC_RESOURCES_PARAMETER));
+        String protectedPaths = servletConfig.getInitParameter(STATIC_RESOURCES_PROTECTED_PATHS_PARAMETER);
+        staticResourcesProtectedPathList = parseListSequence(protectedPaths != null
+            ? protectedPaths : DEFAULT_STATIC_RESOURCES_PROTECTED_PATHS);
         staticWelcomeFile = servletConfig.getInitParameter(STATIC_WELCOME_FILE_PARAMETER);
         redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
         redirectQueryCheck = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_QUERY_CHECK_PARAMETER));
@@ -366,8 +374,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
                                       HttpServletResponse response,
                                       String pathInfo) throws ServletException {
         if (isProtectedPath(pathInfo)) {
-            sendNotFound(response);
-            return;
+            throw new ServletException("Static resource " + pathInfo + " is not available");
         }
         try (InputStream is = getResourceAsStream(pathInfo)) {
             if (is == null) {
@@ -398,13 +405,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
 
     /**
      * The container never serves WEB-INF or META-INF directly to a client, but a RequestDispatcher
-     * and ServletContext.getResourceAsStream can reach them, so a request path naming either
-     * directory is not forwarded or served as static content.
+     * and ServletContext.getResourceAsStream can reach them, so a request path matching
+     * static-resources-protected-path-list is not forwarded or served as static content.
      */
-    private static boolean isProtectedPath(String path) {
-        if (path != null) {
-            for (String segment : path.split("/")) {
-                if ("WEB-INF".equalsIgnoreCase(segment) || "META-INF".equalsIgnoreCase(segment)) {
+    private boolean isProtectedPath(String path) {
+        if (path != null && staticResourcesProtectedPathList != null) {
+            for (Pattern pattern : staticResourcesProtectedPathList) {
+                if (pattern.matcher(path).matches()) {
                     return true;
                 }
             }
@@ -412,19 +419,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         return false;
     }
 
-    private static void sendNotFound(HttpServletResponse response) throws ServletException {
-        try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException ex) {
-            throw new ServletException(ex);
-        }
-    }
-
     protected void redirect(HttpServletRequest request, HttpServletResponse response, String pathInfo)
         throws ServletException {
         if (isProtectedPath(pathInfo)) {
-            sendNotFound(response);
-            return;
+            throw new ServletException("No RequestDispatcher can be created for path " + pathInfo);
         }
         boolean customServletPath = dispatcherServletPath != null;
         String theServletPath = customServletPath ? dispatcherServletPath : "/";
