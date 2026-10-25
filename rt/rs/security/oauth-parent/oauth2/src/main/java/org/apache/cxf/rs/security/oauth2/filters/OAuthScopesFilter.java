@@ -39,6 +39,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Context;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
@@ -93,8 +94,11 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             }
             // Subclasses are scanned before their superclasses and interfaces, so the most
             // specific declaration of a given signature is recorded first and kept
-            String signature = getMethodSignature(m);
+            String signature = ReflectionUtil.getMethodSignature(m);
             Scopes methodScopes = m.getAnnotation(Scopes.class);
+            // Each overload has its own signature and so its own rule. The rules are also
+            // collected by name, but that is only used as a fallback when the invoked
+            // method's signature was not recorded, and then all of them have to be met
             if (methodScopes != null) {
                 methodScopesBySignature.putIfAbsent(signature, methodScopes);
                 annotationScopesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(methodScopes);
@@ -158,7 +162,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     }
 
     private List<Scopes> getAnnotationScopes(Method m) {
-        String signature = getMethodSignature(m);
+        String signature = ReflectionUtil.getMethodSignature(m);
         // A method-level annotation anywhere in the hierarchy takes precedence over a
         // class-level one, otherwise an inherited class-level @Scopes would replace it
         Scopes scopes = methodScopesBySignature.get(signature);
@@ -183,18 +187,6 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             }
         }
         return false;
-    }
-
-    private static String getMethodSignature(Method m) {
-        StringBuilder sb = new StringBuilder(m.getName()).append('(');
-        Class<?>[] paramTypes = m.getParameterTypes();
-        for (int i = 0; i < paramTypes.length; i++) {
-            if (i > 0) {
-                sb.append(',');
-            }
-            sb.append(paramTypes[i].getName());
-        }
-        return sb.append(')').toString();
     }
 
     protected Method getTargetMethod() {

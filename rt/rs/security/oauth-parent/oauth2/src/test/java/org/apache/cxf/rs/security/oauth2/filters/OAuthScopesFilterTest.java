@@ -51,6 +51,18 @@ public class OAuthScopesFilterTest {
     }
 
     @Test
+    public void testOverloadedMethodsInSameClassKeepTheirOwnScopes() throws Exception {
+        Method readMethod = SameClassOverloadingService.class.getMethod("operation");
+        Method adminMethod = SameClassOverloadingService.class.getMethod("operation", String.class);
+
+        assertAllowed(new SameClassOverloadingService(), readMethod, "read");
+        assertForbidden(new SameClassOverloadingService(), readMethod, "admin");
+
+        assertAllowed(new SameClassOverloadingService(), adminMethod, "admin");
+        assertForbidden(new SameClassOverloadingService(), adminMethod, "read");
+    }
+
+    @Test
     public void testOverridingMethodScopesTakePrecedenceOverSuperclass() throws Exception {
         Method method = OverridingService.class.getMethod("operation");
 
@@ -179,6 +191,16 @@ public class OAuthScopesFilterTest {
     }
 
     public static class OverloadingService extends BaseService {
+        @Scopes("admin")
+        public void operation(String value) {
+        }
+    }
+
+    public static class SameClassOverloadingService {
+        @Scopes("read")
+        public void operation() {
+        }
+
         @Scopes("admin")
         public void operation(String value) {
         }
