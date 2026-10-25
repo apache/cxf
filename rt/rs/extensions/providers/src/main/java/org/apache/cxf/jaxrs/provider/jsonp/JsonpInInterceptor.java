@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider.jsonp;
 
+import java.util.regex.Pattern;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -35,6 +37,9 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String CALLBACK_PARAM = "_jsonp";
     public static final String CALLBACK_KEY = "JSONP.CALLBACK";
     public static final String DEFAULT_CALLBACK_VALUE = "callback";
+    // The callback is written verbatim in front of the JSON, so only allow
+    // (optionally dot-separated) JavaScript identifiers
+    private static final Pattern CALLBACK_PATTERN = Pattern.compile("[A-Za-z0-9_$.]+");
 
     private String callbackParam = CALLBACK_PARAM;
     private String defaultCallback = DEFAULT_CALLBACK_VALUE;
@@ -69,6 +74,8 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (mediaType != null && mediaType.equals(httpAcceptType)) {
                 return defaultCallback;
             }
+        } else if (!CALLBACK_PATTERN.matcher(callback).matches()) {
+            return null;
         }
         return callback;
     }

@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class JsonpInterceptorTest {
 
@@ -85,6 +86,39 @@ public class JsonpInterceptorTest {
             in.setCallbackParam("_jsonp");
         }
 
+    }
+
+    @Test
+    public void testJsonWithDottedCallback() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "angular.callbacks._0");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+
+        // Process the message
+        in.handleMessage(message);
+        preStream.handleMessage(message);
+        postStream.handleMessage(message);
+        assertEquals("angular.callbacks._0();", bos.toString());
+    }
+
+    @Test
+    public void testJsonWithInvalidCallback() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "alert(document.domain)//");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+
+        // Process the message
+        in.handleMessage(message);
+        preStream.handleMessage(message);
+        postStream.handleMessage(message);
+        assertNull(message.getExchange().get(JsonpInInterceptor.CALLBACK_KEY));
+        assertEquals("", bos.toString());
     }
 
     @Test
