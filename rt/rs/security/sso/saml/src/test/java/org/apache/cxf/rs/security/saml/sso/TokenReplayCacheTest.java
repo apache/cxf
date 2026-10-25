@@ -30,6 +30,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.apache.cxf.rs.security.saml.sso.jcache.JCacheTokenReplayCache;
@@ -156,7 +157,7 @@ public class TokenReplayCacheTest {
             List<Future<?>> futures = new ArrayList<>(threads);
             for (int t = 0; t < threads; t++) {
                 futures.add(executor.submit(() -> {
-                    barrier.await();
+                    barrier.await(10, TimeUnit.SECONDS);
                     for (int i = 0; i < identifiers; i++) {
                         if (replayCache.putIdIfAbsent(ids.get(i), expiry)) {
                             accepted.incrementAndGet(i);
@@ -166,10 +167,10 @@ public class TokenReplayCacheTest {
                 }));
             }
             for (Future<?> future : futures) {
-                future.get();
+                future.get(30, TimeUnit.SECONDS);
             }
         } finally {
-            executor.shutdown();
+            executor.shutdownNow();
             replayCache.close();
         }
 

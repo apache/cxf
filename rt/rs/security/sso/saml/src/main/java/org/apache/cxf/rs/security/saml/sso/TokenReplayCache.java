@@ -40,9 +40,13 @@ public interface TokenReplayCache<T> extends Closeable {
      * @param id The identifier to be added
      * @param expiry A custom expiry time for the identifier. Can be null in which case, the default
      *               expiry is used.
-     * @return true if the identifier was added, false if it was already contained in the cache
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty
      */
     default boolean putIdIfAbsent(T id, Instant expiry) {
+        if (id == null || "".equals(id)) {
+            return false;
+        }
         synchronized (this) {
             if (contains(id)) {
                 return false;
