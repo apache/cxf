@@ -78,7 +78,8 @@ public class SAMLSSOResponseValidator {
     /**
      * Validate a SAML 2 Protocol Response
      * @param samlResponse
-     * @param postBinding
+     * @param postBinding whether the Response was received via the POST binding. Replay detection
+     *                    of bearer assertions applies to all bindings, if a replay cache is configured.
      * @return a SSOValidatorResponse object
      * @throws WSSecurityException
      */
@@ -130,7 +131,7 @@ public class SAMLSSOResponseValidator {
                 && !assertion.getAuthnStatements().isEmpty()) {
                 org.opensaml.saml.saml2.core.Subject subject = assertion.getSubject();
                 org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf =
-                    validateAuthenticationSubject(subject, assertion.getID(), postBinding);
+                    validateAuthenticationSubject(subject, assertion.getID());
                 if (subjectConf != null) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
                     validAssertion = assertion;
@@ -253,7 +254,7 @@ public class SAMLSSOResponseValidator {
      * Validate the Subject (of an Authentication Statement).
      */
     private org.opensaml.saml.saml2.core.SubjectConfirmation validateAuthenticationSubject(
-        org.opensaml.saml.saml2.core.Subject subject, String id, boolean postBinding
+        org.opensaml.saml.saml2.core.Subject subject, String id
     ) throws WSSecurityException {
         if (subject.getSubjectConfirmations() == null) {
             return null;
@@ -264,7 +265,7 @@ public class SAMLSSOResponseValidator {
         for (org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf
             : subject.getSubjectConfirmations()) {
             if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod())) {
-                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData(), id, postBinding);
+                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData(), id);
                 validSubjectConf = subjectConf;
             }
         }
@@ -276,7 +277,7 @@ public class SAMLSSOResponseValidator {
      * Validate a (Bearer) Subject Confirmation
      */
     private void validateSubjectConfirmation(
-        org.opensaml.saml.saml2.core.SubjectConfirmationData subjectConfData, String id, boolean postBinding
+        org.opensaml.saml.saml2.core.SubjectConfirmationData subjectConfData, String id
     ) throws WSSecurityException {
         if (subjectConfData == null) {
             LOG.warning("Subject Confirmation Data of a Bearer Subject Confirmation is null");
@@ -298,8 +299,9 @@ public class SAMLSSOResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
-        // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
-        if (postBinding && replayCache != null) {
+        // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks. This
+        // applies to every binding, not just POST, as a Response received via GET can be replayed too
+        if (replayCache != null) {
             Instant expires = subjectConfData.getNotOnOrAfter();
             if (!replayCache.putIdIfAbsent(id, expires)) {
                 LOG.warning("Replay attack with token id: " + id);
