@@ -31,5 +31,30 @@ public interface TokenReplayCache<T> extends Closeable {
 
     void putId(T id, Instant expiry);
 
+    /**
+     * Add the given identifier to the cache if, and only if, it is not already contained in it, as a
+     * single atomic operation, so that concurrent requests carrying the same identifier cannot all
+     * pass a replay check before any of them has cached it. This default implementation only
+     * serializes calls within a single JVM; an implementation backed by a distributed cache should
+     * override it with the atomic put-if-absent operation of the underlying cache.
+     * @param id The identifier to be added
+     * @param expiry A custom expiry time for the identifier. Can be null in which case, the default
+     *               expiry is used.
+     * @return true if the identifier was added, false if it was already contained in the cache or is
+     *         null or empty
+     */
+    default boolean putIdIfAbsent(T id, Instant expiry) {
+        if (id == null || "".equals(id)) {
+            return false;
+        }
+        synchronized (this) {
+            if (contains(id)) {
+                return false;
+            }
+            putId(id, expiry);
+            return true;
+        }
+    }
+
     void close() throws IOException;
 }
