@@ -701,6 +701,43 @@ public class SAMLSSOResponseValidatorTest {
         }
     }
 
+    @org.junit.Test
+    public void testReplayedRedirectBindingResponseIsRejected() throws Exception {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+
+        Response response = createResponse(subjectConfirmationData);
+
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+
+            SSOValidatorResponse validateSamlResponse = validator.validateSamlResponse(response, false);
+            assertEquals(response.getID(), validateSamlResponse.getResponseId());
+
+            // The same (redirect binding) response is replayed
+            try {
+                validator.validateSamlResponse(copyResponse(response), false);
+                fail("Expected failure on replayed response");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+
+            // The same response is replayed via the POST binding
+            try {
+                validator.validateSamlResponse(copyResponse(response), true);
+                fail("Expected failure on replayed response");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+        } finally {
+            replayCache.close();
+        }
+    }
+
     // Two copies of the same response are validated concurrently, with the replay cache arranged so
     // that both threads look the assertion id up before either of them has stored it. Only one of
     // them may be accepted.
