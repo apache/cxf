@@ -53,8 +53,11 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
             context.setContextPath(contextPath);
             context.setBaseResource(ResourceFactory.of(new ContextHandler()).
                                     newClassPathResource(resourcePath));
-            context.setDescriptor(ResourceFactory.of(new ContextHandler()).
-                                  newClassPathResource(descriptor).getURI().toString());
+
+            if (descriptor != null) { 
+                context.setDescriptor(ResourceFactory.of(new ContextHandler()).
+                        newClassPathResource(descriptor).getURI().toString());
+            }
 
             Handler.Collection handlers = new Handler.Sequence();
             handlers.setHandlers(new Handler[] {context, new DefaultHandler()});
