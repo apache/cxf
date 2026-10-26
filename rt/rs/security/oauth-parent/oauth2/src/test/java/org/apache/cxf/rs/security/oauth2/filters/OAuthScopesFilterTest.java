@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.ForbiddenException;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
