@@ -170,6 +170,23 @@ public final class ReflectionUtil {
         }
     }
 
+    /**
+     * Returns the name and parameter types of a method, e.g. "foo(java.lang.String,int)".
+     * Overloaded methods have distinct signatures, while a method and the method it
+     * overrides (with the same erased parameter types) share one.
+     */
+    public static String getMethodSignature(final Method method) {
+        StringBuilder sb = new StringBuilder(method.getName()).append('(');
+        Class<?>[] paramTypes = method.getParameterTypes();
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append(paramTypes[i].getName());
+        }
+        return sb.append(')').toString();
+    }
+
     public static Field[] getDeclaredFields(final Class<?> cls) {
         return AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
             public Field[] run() {
