@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,6 +40,7 @@ import javax.ws.rs.core.Context;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
@@ -53,18 +56,29 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
 
     @Context
     private MessageContext mc;
+    // Scopes configured explicitly via setScopesMap/setScopesStringMap, keyed by method name
     private Map<String, List<String>> scopesMap = new HashMap<>();
     private Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
+    // Scopes discovered from @Scopes annotations. Method-level and class-level annotations
+    // are keyed by method signature so that overloaded methods do not share a rule and an
+    // annotation on an overriding method is not replaced by one from a superclass or interface
+    private final Map<String, Scopes> methodScopesBySignature = new HashMap<>();
+    private final Map<String, Scopes> classScopesBySignature = new HashMap<>();
+    // All the annotation-derived rules for a given method name, enforced together when the
+    // invoked method's signature is not recorded (e.g. it implements a generic interface method)
+    private final Map<String, Set<Scopes>> annotationScopesByName = new HashMap<>();
     private Set<String> confidentialClientMethods = new HashSet<>();
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         checkSecureClass(cls);
-        if (scopesMap.isEmpty()) {
+        if (annotationScopesByName.isEmpty()) {
             LOG.warning("The scopes map is empty");
         } else if (LOG.isLoggable(Level.FINE)) {
-            for (Map.Entry<String, List<String>> entry : scopesMap.entrySet()) {
-                LOG.fine("Method: " + entry.getKey() + ", scopes: " + entry.getValue());
+            for (Map.Entry<String, Set<Scopes>> entry : annotationScopesByName.entrySet()) {
+                for (Scopes scopes : entry.getValue()) {
+                    LOG.fine("Method: " + entry.getKey() + ", scopes: " + Arrays.asList(scopes.value()));
+                }
             }
         }
     }
@@ -79,11 +93,19 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             if (SKIP_METHODS.contains(m.getName())) {
                 continue;
             }
+            // Subclasses are scanned before their superclasses and interfaces, so the most
+            // specific declaration of a given signature is recorded first and kept
+            String signature = ReflectionUtil.getMethodSignature(m);
             Scopes methodScopes = m.getAnnotation(Scopes.class);
-            Scopes theScopes = methodScopes == null ? classScopes : methodScopes;
-            if (theScopes != null) {
-                scopesMap.put(m.getName(), Arrays.asList(theScopes.value()));
-                scopesMatchAllMap.put(m.getName(), theScopes.matchAll());
+            // Each overload has its own signature and so its own rule. The rules are also
+            // collected by name, but that is only used as a fallback when the invoked
+            // method's signature was not recorded, and then all of them have to be met
+            if (methodScopes != null) {
+                methodScopesBySignature.putIfAbsent(signature, methodScopes);
+                annotationScopesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(methodScopes);
+            } else if (classScopes != null) {
+                classScopesBySignature.putIfAbsent(signature, classScopes);
+                annotationScopesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(classScopes);
             }
 
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
@@ -114,27 +136,60 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
     }
     protected void checkScopes(Method m) {
-        List<String> methodScopes = scopesMap.get(m.getName());
-        if (methodScopes == null) {
+        List<Scopes> annotationScopes = getAnnotationScopes(m);
+        List<String> configuredScopes = scopesMap.get(m.getName());
+        if (annotationScopes.isEmpty() && configuredScopes == null) {
             return;
         }
-        boolean matchAll = scopesMatchAllMap.get(m.getName());
         OAuthContext context = OAuthContextUtils.getContext(mc);
         List<String> requestScopes = new LinkedList<>();
         for (OAuthPermission perm : context.getPermissions()) {
-            if (matchAll) {
-                requestScopes.add(perm.getPermission());
-            } else if (methodScopes.contains(perm.getPermission())) {
-                return;
-            }
+            requestScopes.add(perm.getPermission());
         }
 
-        if (!requestScopes.containsAll(methodScopes)) {
+        // Every rule which applies to the method has to be satisfied
+        boolean allowed = true;
+        for (Scopes scopes : annotationScopes) {
+            allowed &= isAllowed(requestScopes, Arrays.asList(scopes.value()), scopes.matchAll());
+        }
+        if (configuredScopes != null) {
+            allowed &= isAllowed(requestScopes, configuredScopes,
+                                 Boolean.TRUE.equals(scopesMatchAllMap.get(m.getName())));
+        }
+        if (!allowed) {
             LOG.warning("Scopes do not match");
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-
     }
+
+    private List<Scopes> getAnnotationScopes(Method m) {
+        String signature = ReflectionUtil.getMethodSignature(m);
+        // A method-level annotation anywhere in the hierarchy takes precedence over a
+        // class-level one, otherwise an inherited class-level @Scopes would replace it
+        Scopes scopes = methodScopesBySignature.get(signature);
+        if (scopes == null) {
+            scopes = classScopesBySignature.get(signature);
+        }
+        if (scopes != null) {
+            return Collections.singletonList(scopes);
+        }
+        Set<Scopes> scopesForName = annotationScopesByName.get(m.getName());
+        return scopesForName == null ? Collections.emptyList() : new ArrayList<>(scopesForName);
+    }
+
+    private static boolean isAllowed(List<String> requestScopes, List<String> methodScopes,
+                                     boolean matchAll) {
+        if (matchAll || methodScopes.isEmpty()) {
+            return requestScopes.containsAll(methodScopes);
+        }
+        for (String scope : requestScopes) {
+            if (methodScopes.contains(scope)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected Method getTargetMethod() {
         Method method = (Method)mc.get("org.apache.cxf.resource.method");
         if (method != null) {
