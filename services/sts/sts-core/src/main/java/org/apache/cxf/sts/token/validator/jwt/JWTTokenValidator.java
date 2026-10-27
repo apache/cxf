@@ -130,8 +130,12 @@ public class JWTTokenValidator implements TokenValidator {
         KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
         verificationProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
 
+        // The token must have been signed by this STS, so it is verified with the configured
+        // signature certificate only. The token headers are not passed on, as x5c, x5t and x5t#S256
+        // would otherwise select any certificate in the keystore, including trusted client
+        // certificates, as the verification key.
         JwsSignatureVerifier signatureVerifier =
-            JwsUtils.loadSignatureVerifier(verificationProperties, jwt.getJwsHeaders());
+            JwsUtils.loadSignatureVerifier(verificationProperties, null);
 
         if (!jwtConsumer.verifySignatureWith(signatureVerifier)) {
             return response;
