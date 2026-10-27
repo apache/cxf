@@ -695,69 +695,54 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * so the content length becomes known (sized). It is used when the chunked transfer is not allowed
      * but the content length is not specified up-front.
      */
-    private static final class HttpClientSizedBodyPublisher implements CloseableBodyPublisher {
-        private HTTPClientPolicy csPolicy;
-        private Supplier<ByteArrayInputStream> pin;
+    static final class HttpClientSizedBodyPublisher implements CloseableBodyPublisher {
+        private final HTTPClientPolicy csPolicy;
+        // Kept when the stream is closed: the caller of an asynchronous request closes the stream
+        // without waiting, possibly before the HttpClient has read the content length and the body
+        private final CloseableByteArrayOutputStream body;
         private HttpClientWrappedOutputStream stream;
-        private long contentLen;
 
-        private HttpClientSizedBodyPublisher(HttpClientWrappedOutputStream s, HTTPClientPolicy cs,
-                Supplier<ByteArrayInputStream> pin) {
+        HttpClientSizedBodyPublisher(HttpClientWrappedOutputStream s, HTTPClientPolicy cs,
+                CloseableByteArrayOutputStream body) {
             this.stream = s;
             this.csPolicy = cs;
-            this.pin = pin;
+            this.body = body;
         }
 
         public synchronized void close() {
-            if (stream != null) {
-                contentLen = stream.contentLen;
-                stream = null;
-            }
+            stream = null;
         }
 
         @Override
         public synchronized void subscribe(Subscriber<? super ByteBuffer> subscriber) {
             if (stream != null) {
                 stream.connectionComplete = true;
-                if (stream.pout != null) {
-                    synchronized (stream.pout) {
-                        stream.pout.notifyAll();
-                    }
-
-                    BodyPublishers.ofInputStream(pin).subscribe(subscriber);
-                    stream = null;
-                    pin = null;
-                    return;
-                }
             }
-            BodyPublishers.noBody().subscribe(subscriber);
+            synchronized (body) {
+                body.notifyAll();
+            }
+            BodyPublishers.ofInputStream(body::getInputStream).subscribe(subscriber);
         }
 
         @Override
         public long contentLength() {
-            if (stream != null && stream.pout != null) {
-                final CloseableByteArrayOutputStream baos = (CloseableByteArrayOutputStream) stream.pout;
-
-                try {
-                    synchronized (baos) {
-                        if (!baos.closed) {
-                            baos.wait(csPolicy.getConnectionTimeout());
-                        }
+            try {
+                synchronized (body) {
+                    if (!body.closed) {
+                        body.wait(csPolicy.getConnectionTimeout());
                     }
-                    contentLen = (int) baos.size();
-                } catch (InterruptedException e) {
-                    //ignore
                 }
+            } catch (InterruptedException e) {
+                //ignore
             }
-
-            return contentLen;
+            return body.size();
         }
     }
 
     /**
      * The {@link ByteArrayOutputStream} implementation that tracks the closeability state.
      */
-    private static final class CloseableByteArrayOutputStream extends ByteArrayOutputStream {
+    static final class CloseableByteArrayOutputStream extends ByteArrayOutputStream {
         private boolean closed;
 
         /**
@@ -1016,7 +1001,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 // buffer the request body stream until it is fully flushed by the client and only
                 // than send the request.
                 final CloseableByteArrayOutputStream baos = new CloseableByteArrayOutputStream();
-                this.publisher = new HttpClientSizedBodyPublisher(this, csPolicy, baos::getInputStream);
+                this.publisher = new HttpClientSizedBodyPublisher(this, csPolicy, baos);
                 pout = baos;
             }
 
