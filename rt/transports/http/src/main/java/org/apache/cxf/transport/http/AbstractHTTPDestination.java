@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -781,8 +780,7 @@ public abstract class AbstractHTTPDestination
          */
         public void prepare(Message message) throws IOException {
             message.put(HTTP_RESPONSE, response);
-            message.put(Message.RESPONSE_HEADERS,
-                        Collections.unmodifiableMap(new ServletResponseHeaders(message, response)));
+            message.put(Message.RESPONSE_HEADERS, ServletResponseHeaders.of(message, response));
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {
                 message.setContent(OutputStream.class,

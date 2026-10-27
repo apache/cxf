@@ -59,6 +59,9 @@ public class ServletResponseHeadersTest {
         assertEquals(Collections.singletonList("late"), view.get("x-servlet"));
         assertTrue(view.containsKey("x-protocol"));
         assertThrows(UnsupportedOperationException.class, () -> view.put("X", Collections.emptyList()));
+        assertThrows(UnsupportedOperationException.class, () -> view.remove("X-Servlet"));
+        assertThrows(UnsupportedOperationException.class, () -> view.remove("X-Missing"));
+        assertThrows(UnsupportedOperationException.class, view::clear);
         assertThrows(UnsupportedOperationException.class, () -> view.get("X-Servlet").add("changed"));
         assertThrows(UnsupportedOperationException.class, () -> view.entrySet().iterator().next()
             .setValue(Collections.singletonList("changed")));
@@ -180,7 +183,7 @@ public class ServletResponseHeadersTest {
     }
 
     private static Map<String, List<String>> view(Message message, HttpServletResponse response) {
-        Map<String, List<String>> view = Collections.unmodifiableMap(new ServletResponseHeaders(message, response));
+        Map<String, List<String>> view = ServletResponseHeaders.of(message, response);
         message.put(Message.RESPONSE_HEADERS, view);
         return view;
     }

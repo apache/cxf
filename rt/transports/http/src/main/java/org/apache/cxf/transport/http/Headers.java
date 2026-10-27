@@ -83,11 +83,6 @@ public class Headers {
         this.message = message;
         this.headers = getSetProtocolHeaders(message);
     }
-    private Headers(Message message, Map<String, List<String>> headers) {
-        this.message = message;
-        this.headers = headers;
-    }
-
     public Headers() {
         this.headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.message = null;
@@ -471,7 +466,7 @@ public class Headers {
         return PropertyUtils.isTrue(message.getContextualProperty(ALLOW_LOGGING_SENSITIVE_HEADERS));
     }
 
-    private String getContentTypeFromMessage() {
+    private static String getContentTypeFromMessage(Message message) {
         final String ct = (String)message.get(Message.CONTENT_TYPE);
         final String enc = (String)message.get(Message.ENCODING);
 
@@ -486,7 +481,7 @@ public class Headers {
 
     // Assumes that response body is not available only
     // if Content-Length is available and set to 0
-    private boolean isResponseBodyAvailable() {
+    private static boolean isResponseBodyAvailable(Map<String, List<String>> headers) {
         List<String> ctLen = headers.get("Content-Length");
         if (ctLen == null || ctLen.size() != 1) {
             return true;
@@ -501,7 +496,7 @@ public class Headers {
         return true;
     }
 
-    private boolean isSingleHeader(String header) {
+    private static boolean isSingleHeader(String header) {
         return HTTP_HEADERS_SETCOOKIE.equalsIgnoreCase(header) || HTTP_HEADERS_LINK.equalsIgnoreCase(header);
     }
 
@@ -511,10 +506,10 @@ public class Headers {
      * @param response the current ServletResponse
      */
     protected void copyToResponse(HttpServletResponse response) {
-        String contentType = getContentTypeFromMessage();
+        String contentType = getContentTypeFromMessage(message);
 
         if (!headers.containsKey(Message.CONTENT_TYPE) && contentType != null
-            && isResponseBodyAvailable()) {
+            && isResponseBodyAvailable(headers)) {
             response.setContentType(contentType);
         }
 
@@ -532,28 +527,25 @@ public class Headers {
         }
     }
 
+    /**
+     * Returns a snapshot of the response headers without modifying the servlet response or the message,
+     * unlike the Headers(Message) constructor, which may set the protocol headers of the message.
+     */
     static Map<String, List<String>> getResponseHeaders(Message message, HttpServletResponse response) {
-        Map<String, List<String>> protocol = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        Map<String, List<String>> original = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        if (original != null) {
-            protocol.putAll(original);
-        }
-        return new Headers(message, protocol).getResponseHeaders(response);
-    }
-
-    /** Returns a snapshot without modifying the servlet response or the protocol headers. */
-    private Map<String, List<String>> getResponseHeaders(HttpServletResponse response) {
         boolean addHeaders = MessageUtils.getContextualBoolean(message, ADD_HEADERS_PROPERTY, false);
         Map<String, List<String>> protocol = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            List<String> values = responseHeaderValues(entry.getKey(), entry.getValue(), addHeaders);
-            if (!values.isEmpty()) {
-                protocol.put(entry.getKey(), values);
+        Map<String, List<?>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        if (headers != null) {
+            for (Map.Entry<String, List<?>> entry : headers.entrySet()) {
+                List<String> values = responseHeaderValues(entry.getKey(), entry.getValue(), addHeaders);
+                if (!values.isEmpty()) {
+                    protocol.put(entry.getKey(), values);
+                }
             }
         }
-        String contentType = getContentTypeFromMessage();
+        String contentType = getContentTypeFromMessage(message);
         boolean setContentType = !protocol.containsKey(Message.CONTENT_TYPE)
-            && contentType != null && isResponseBodyAvailable();
+            && contentType != null && isResponseBodyAvailable(protocol);
         if (setContentType) {
             protocol.put(Message.CONTENT_TYPE, Collections.singletonList(contentType));
         }
@@ -585,7 +577,7 @@ public class Headers {
         return Collections.unmodifiableMap(effective);
     }
 
-    private List<String> responseHeaderValues(String header, List<?> values, boolean addHeaders) {
+    private static List<String> responseHeaderValues(String header, List<?> values, boolean addHeaders) {
         if (addHeaders || isSingleHeader(header)) {
             List<String> result = new ArrayList<>();
             for (Object value : values) {
@@ -607,7 +599,7 @@ public class Headers {
         return Collections.singletonList(combined.toString());
     }
 
-    private String headerObjectToString(Object headerObject) {
+    private static String headerObjectToString(Object headerObject) {
         if (headerObject.getClass() == String.class) {
             // Most likely
             return headerObject.toString();

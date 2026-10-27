@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.http;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,9 +35,14 @@ final class ServletResponseHeaders extends AbstractMap<String, List<String>> {
     private final Message message;
     private final HttpServletResponse response;
 
-    ServletResponseHeaders(Message message, HttpServletResponse response) {
+    private ServletResponseHeaders(Message message, HttpServletResponse response) {
         this.message = message;
         this.response = response;
+    }
+
+    /** Returns the view, which cannot be modified. */
+    static Map<String, List<String>> of(Message message, HttpServletResponse response) {
+        return Collections.unmodifiableMap(new ServletResponseHeaders(message, response));
     }
 
     @Override
