@@ -121,6 +121,12 @@ public interface Message extends StringMap {
     String REQUEST_URL = "org.apache.cxf.request.url";
 
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
+    /**
+     * Optional transport-provided, read-only {@code Map<String, List<String>>} of effective
+     * outgoing response headers. The view may be evaluated lazily to include headers added
+     * after transport preparation. Consumers must copy it before modifying or masking values.
+     */
+    String RESPONSE_HEADERS = Message.class.getName() + ".RESPONSE_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";
     String ERROR_MESSAGE = Message.class.getName() + ".ERROR_MESSAGE";
     String ENDPOINT_ADDRESS = Message.class.getName() + ".ENDPOINT_ADDRESS";

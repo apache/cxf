@@ -106,7 +106,7 @@ public class DefaultLogEventMapper {
         event.setHttpMethod(safeGet(message, Message.HTTP_REQUEST_METHOD));
         event.setContentType(safeGet(message, Message.CONTENT_TYPE));
 
-        Map<String, String> headerMap = getHeaders(message);
+        Map<String, String> headerMap = getHeaders(message, event.getType());
         if (sensitiveProtocolHeaders != null && !sensitiveProtocolHeaders.isEmpty()) {
             maskSensitiveHelper.maskHeaders(headerMap, sensitiveProtocolHeaders);
         }
@@ -176,8 +176,13 @@ public class DefaultLogEventMapper {
         }
     }
 
-    private Map<String, String> getHeaders(Message message) {
-        Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+    private Map<String, String> getHeaders(Message message, EventType type) {
+        Map<?, ?> responseHeaders = null;
+        if (type == EventType.RESP_OUT || type == EventType.FAULT_OUT) {
+            responseHeaders = (Map<?, ?>)message.get(Message.RESPONSE_HEADERS);
+        }
+        Map<String, List<Object>> headers = CastUtils.cast(responseHeaders != null
+            ? responseHeaders : (Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         Map<String, String> result = new HashMap<>();
         if (headers == null) {
             return result;
