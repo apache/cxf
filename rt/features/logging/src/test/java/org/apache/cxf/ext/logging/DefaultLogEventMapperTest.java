@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -133,6 +134,22 @@ public class DefaultLogEventMapperTest {
     }
 
     @Test
+    public void shouldMaskHeadersIgnoringNullNames() {
+        final DefaultLogEventMapper mapper = new DefaultLogEventMapper();
+        final Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        final Map<String, Object> headers = new HashMap<>();
+        headers.put(null, Arrays.asList("HTTP/1.1 200 OK"));
+        headers.put("testheader", Arrays.asList(TEST_HEADER_VALUE));
+        message.put(Message.PROTOCOL_HEADERS, headers);
+        final Set<String> sensitiveHeaders = new HashSet<>(Arrays.asList(null, TEST_HEADER_NAME));
+
+        LogEvent event = mapper.map(message, sensitiveHeaders);
+        assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get("testheader"));
+        assertEquals("HTTP/1.1 200 OK", event.getHeaders().get(null));
+    }
+
+    @Test
     public void testMapNullSensitiveProtocolHeaders() {
         DefaultLogEventMapper mapper = new DefaultLogEventMapper();
         Message message = new MessageImpl();
@@ -205,5 +222,75 @@ public class DefaultLogEventMapperTest {
 
         LogEvent event = Subject.doAs(subject, (PrivilegedAction<LogEvent>) () -> mapper.map(message));
         assertThat(event.getPrincipal(), is(nullValue()));
+    }
+
+    @Test
+    public void testResponseHeaderViewIsCopiedAndMasked() {
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Response", Collections.singletonList("effective"));
+        headers.put("set-cookie", Arrays.asList("secret=1", "secret=2"));
+        Message message = createServerOutMessage();
+        message.put(Message.RESPONSE_HEADERS, Collections.unmodifiableMap(headers));
+        message.put(Message.PROTOCOL_HEADERS,
+            Collections.singletonMap("X-Response", Collections.singletonList("protocol")));
+        LogEvent event = new DefaultLogEventMapper().map(message, Collections.singleton("Set-Cookie"));
+        assertEquals(EventType.RESP_OUT, event.getType());
+        assertEquals("effective", event.getHeaders().get("X-Response"));
+        assertEquals(MASKED_HEADER_VALUE, event.getHeaders().get("set-cookie"));
+        assertEquals(Arrays.asList("secret=1", "secret=2"), headers.get("set-cookie"));
+    }
+
+    @Test
+    public void testResponseHeadersNotUsedForRequest() {
+        Message message = createServerOutMessage();
+        Message inMessage = new MessageImpl();
+        inMessage.setExchange(message.getExchange());
+        inMessage.put(Message.RESPONSE_HEADERS,
+            Collections.singletonMap("X-Response", Collections.singletonList("response")));
+        inMessage.put(Message.PROTOCOL_HEADERS,
+            Collections.singletonMap("X-Request", Collections.singletonList("request")));
+        LogEvent event = new DefaultLogEventMapper().map(inMessage);
+        assertEquals(EventType.REQ_IN, event.getType());
+        assertEquals(Collections.singletonMap("X-Request", "request"), event.getHeaders());
+    }
+
+    @Test
+    public void testProtocolHeadersUsedWithoutResponseView() {
+        Message message = createServerOutMessage();
+        message.put(Message.PROTOCOL_HEADERS,
+            Collections.singletonMap("AUTHORIZATION", Collections.singletonList("secret")));
+        LogEvent event = new DefaultLogEventMapper().map(message, Collections.singleton("Authorization"));
+        assertEquals(Collections.singletonMap("AUTHORIZATION", MASKED_HEADER_VALUE), event.getHeaders());
+    }
+
+    @Test
+    public void testFaultUsesResponseHeaderView() {
+        Message message = createServerOutMessage();
+        message.getExchange().setOutFaultMessage(message);
+        message.put(Message.RESPONSE_HEADERS,
+            Collections.singletonMap("set-cookie", Collections.singletonList("secret")));
+        LogEvent event = new DefaultLogEventMapper().map(message, Collections.singleton("Set-Cookie"));
+        assertEquals(EventType.FAULT_OUT, event.getType());
+        assertEquals(Collections.singletonMap("set-cookie", MASKED_HEADER_VALUE), event.getHeaders());
+    }
+
+    @Test
+    public void testEmptyResponseViewIsAuthoritative() {
+        Message message = createServerOutMessage();
+        message.put(Message.RESPONSE_HEADERS, Collections.emptyMap());
+        message.put(Message.PROTOCOL_HEADERS,
+            Collections.singletonMap("X-Removed", Collections.singletonList("protocol")));
+        assertEquals(Collections.emptyMap(), new DefaultLogEventMapper().map(message).getHeaders());
+    }
+
+    private static Message createServerOutMessage() {
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.setOutMessage(message);
+        exchange.put("org.apache.cxf.resource.operation.name", "test");
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(Message.REQUEST_URI, "test");
+        return message;
     }
 }
