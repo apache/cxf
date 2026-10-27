@@ -47,7 +47,9 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
         if (!StringUtils.isEmpty(callback)) {
             context.getHeaders().putSingle(Message.CONTENT_TYPE,
                                            JAXRSUtils.toMediaType(getMediaType()));
-            context.getOutputStream().write((callback + getPaddingEnd()).getBytes(StandardCharsets.UTF_8));
+            context.getHeaders().putSingle("X-Content-Type-Options", "nosniff");
+            context.getOutputStream().write((JsonpInInterceptor.PADDING_START + callback + getPaddingEnd())
+                                                .getBytes(StandardCharsets.UTF_8));
         }
         context.proceed();
     }

@@ -37,12 +37,14 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String CALLBACK_PARAM = "_jsonp";
     public static final String CALLBACK_KEY = "JSONP.CALLBACK";
     public static final String DEFAULT_CALLBACK_VALUE = "callback";
+    public static final String PADDING_START = "/**/";
     // The callback is written verbatim in front of the JSON, so only allow
-    // (optionally dot-separated) JavaScript identifiers
-    private static final Pattern CALLBACK_PATTERN = Pattern.compile("[A-Za-z0-9_$.]+");
+    // (optionally dot-separated) JavaScript identifiers of a bounded length
+    public static final String DEFAULT_CALLBACK_PATTERN = "[A-Za-z0-9_$.]{1,128}";
 
     private String callbackParam = CALLBACK_PARAM;
     private String defaultCallback = DEFAULT_CALLBACK_VALUE;
+    private Pattern callbackPattern = Pattern.compile(DEFAULT_CALLBACK_PATTERN);
     private String acceptType;
     private String mediaType = JSONP_TYPE;
 
@@ -57,6 +59,10 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         String callbackValue = getCallbackValue(message);
         if (!StringUtils.isEmpty(callbackValue)) {
+            if (!callbackPattern.matcher(callbackValue).matches()) {
+                // not a usable callback name, serve plain JSON
+                return;
+            }
             if (getAcceptType() != null) {
                 // may be needed to enforce the selection of
                 // JSON-aware provider
@@ -74,8 +80,6 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (mediaType != null && mediaType.equals(httpAcceptType)) {
                 return defaultCallback;
             }
-        } else if (!CALLBACK_PATTERN.matcher(callback).matches()) {
-            return null;
         }
         return callback;
     }
@@ -110,5 +114,17 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public String getDefaultCallback() {
         return defaultCallback;
+    }
+
+    /**
+     * Sets the regular expression a callback name must match in full.
+     * Values which do not match are ignored and the response is plain JSON.
+     */
+    public void setCallbackPattern(String callbackPattern) {
+        this.callbackPattern = Pattern.compile(callbackPattern);
+    }
+
+    public String getCallbackPattern() {
+        return callbackPattern.pattern();
     }
 }

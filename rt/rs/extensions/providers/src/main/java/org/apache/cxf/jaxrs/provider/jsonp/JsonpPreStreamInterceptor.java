@@ -52,7 +52,7 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
         String callback = getCallbackValue(message);
         if (!StringUtils.isEmpty(callback)) {
             setContentType(message);
-            writeValue(message, callback + getPaddingEnd());
+            writeValue(message, JsonpInInterceptor.PADDING_START + callback + getPaddingEnd());
         }
     }
 
@@ -64,6 +64,7 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         headers.put(Message.CONTENT_TYPE, Collections.singletonList(getMediaType()));
+        headers.put("X-Content-Type-Options", Collections.singletonList("nosniff"));
     }
 
     public void setMediaType(String mediaType) {

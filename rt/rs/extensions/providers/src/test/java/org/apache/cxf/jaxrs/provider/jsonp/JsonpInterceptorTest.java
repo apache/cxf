@@ -21,6 +21,9 @@ package org.apache.cxf.jaxrs.provider.jsonp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.ws.rs.core.MediaType;
 import org.apache.cxf.message.ExchangeImpl;
@@ -62,7 +65,10 @@ public class JsonpInterceptorTest {
         in.handleMessage(message);
         preStream.handleMessage(message);
         postStream.handleMessage(message);
-        assertEquals("myCallback();", bos.toString());
+        assertEquals("/**/myCallback();", bos.toString());
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> headers = (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
+        assertEquals(Collections.singletonList("nosniff"), headers.get("X-Content-Type-Options"));
 
     }
 
@@ -81,7 +87,7 @@ public class JsonpInterceptorTest {
             in.handleMessage(message);
             preStream.handleMessage(message);
             postStream.handleMessage(message);
-            assertEquals("myCallback();", bos.toString());
+            assertEquals("/**/myCallback();", bos.toString());
         } finally {
             in.setCallbackParam("_jsonp");
         }
@@ -101,7 +107,29 @@ public class JsonpInterceptorTest {
         in.handleMessage(message);
         preStream.handleMessage(message);
         postStream.handleMessage(message);
-        assertEquals("angular.callbacks._0();", bos.toString());
+        assertEquals("/**/angular.callbacks._0();", bos.toString());
+    }
+
+    @Test
+    public void testJsonWithCustomCallbackPattern() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "angular.callbacks._0");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+
+        // Process the message
+        try {
+            in.setCallbackPattern("[A-Za-z0-9_]{1,32}");
+            in.handleMessage(message);
+            preStream.handleMessage(message);
+            postStream.handleMessage(message);
+            assertNull(message.getExchange().get(JsonpInInterceptor.CALLBACK_KEY));
+            assertEquals("", bos.toString());
+        } finally {
+            in.setCallbackPattern(JsonpInInterceptor.DEFAULT_CALLBACK_PATTERN);
+        }
     }
 
     @Test
@@ -110,6 +138,40 @@ public class JsonpInterceptorTest {
         message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         message.setExchange(new ExchangeImpl());
         message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "alert(document.domain)//");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+
+        // Process the message
+        in.handleMessage(message);
+        preStream.handleMessage(message);
+        postStream.handleMessage(message);
+        assertNull(message.getExchange().get(JsonpInInterceptor.CALLBACK_KEY));
+        assertEquals("", bos.toString());
+    }
+
+    @Test
+    public void testJsonWithInvalidCallbackAndJsonpAccept() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.ACCEPT_CONTENT_TYPE, JsonpInInterceptor.JSONP_TYPE);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "alert(document.domain)//");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        message.setContent(OutputStream.class, bos);
+
+        // Process the message: a rejected callback must not fall back to the default one
+        in.handleMessage(message);
+        preStream.handleMessage(message);
+        postStream.handleMessage(message);
+        assertNull(message.getExchange().get(JsonpInInterceptor.CALLBACK_KEY));
+        assertEquals("", bos.toString());
+    }
+
+    @Test
+    public void testJsonWithOverlongCallback() throws Exception {
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "a".repeat(129));
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
 
@@ -133,7 +195,7 @@ public class JsonpInterceptorTest {
         in.handleMessage(message);
         preStream.handleMessage(message);
         postStream.handleMessage(message);
-        assertEquals("callback();", bos.toString());
+        assertEquals("/**/callback();", bos.toString());
     }
 
     @Test
