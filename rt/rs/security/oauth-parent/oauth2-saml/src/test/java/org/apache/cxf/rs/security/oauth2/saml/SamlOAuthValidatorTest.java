@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import jakarta.ws.rs.NotAuthorizedException;
+import org.apache.cxf.rs.security.common.TokenReplayCache;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -40,6 +43,9 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class SamlOAuthValidatorTest {
 
@@ -75,6 +81,61 @@ public class SamlOAuthValidatorTest {
         validator.validate(null, wrapper);
     }
 
+    @Test
+    public void testReplayedAssertionIsRejected() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+        validator.setReplayCache(new TestTokenReplayCache());
+
+        SamlAssertionWrapper wrapper = createAssertion(tokenServiceAddress, null);
+        validator.validate(null, wrapper);
+
+        try {
+            validator.validate(null, wrapper);
+            fail("Expected failure on replayed assertion");
+        } catch (NotAuthorizedException ex) {
+            // expected
+        }
+
+        // A different assertion is still accepted
+        validator.validate(null, createAssertion(tokenServiceAddress, null));
+    }
+
+    // An assertion that fails validation is not cached, so it doesn't block the same ID later
+    @Test
+    public void testInvalidAssertionIsNotCached() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+        TestTokenReplayCache replayCache = new TestTokenReplayCache();
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+        validator.setClientAddress("192.0.2.10");
+        validator.setReplayCache(replayCache);
+
+        SamlAssertionWrapper wrapper = createAssertion(tokenServiceAddress, "192.0.2.20");
+        try {
+            validator.validate(null, wrapper);
+            fail("Expected failure on mismatching client address");
+        } catch (NotAuthorizedException ex) {
+            // expected
+        }
+        assertFalse(replayCache.contains(wrapper.getId()));
+    }
+
+    @Test
+    public void testReplayIsNotCheckedWithoutReplayCache() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+
+        SamlAssertionWrapper wrapper = createAssertion(tokenServiceAddress, null);
+        validator.validate(null, wrapper);
+        validator.validate(null, wrapper);
+    }
+
     private SamlAssertionWrapper createAssertion(String recipient, String clientAddress) throws Exception {
         SubjectConfirmationDataBean confirmationData = new SubjectConfirmationDataBean();
         confirmationData.setRecipient(recipient);
@@ -91,6 +152,30 @@ public class SamlOAuthValidatorTest {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(new TestSaml2CallbackHandler(conditions, confirmationData), samlCallback);
         return new SamlAssertionWrapper(samlCallback);
+    }
+
+    private static final class TestTokenReplayCache implements TokenReplayCache<String> {
+        private final Set<String> ids = ConcurrentHashMap.newKeySet();
+
+        @Override
+        public boolean contains(String id) {
+            return ids.contains(id);
+        }
+
+        @Override
+        public void putId(String id) {
+            ids.add(id);
+        }
+
+        @Override
+        public void putId(String id, Instant expiry) {
+            ids.add(id);
+        }
+
+        @Override
+        public void close() {
+            ids.clear();
+        }
     }
 
     private static class TestSaml2CallbackHandler implements CallbackHandler {

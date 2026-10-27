@@ -99,6 +99,11 @@ public class Saml2BearerGrantHandler extends AbstractGrantHandler {
         samlValidator = validator;
     }
 
+    /**
+     * Set the SamlOAuthValidator. The replay of SAML2 bearer grant assertions is only detected if a
+     * replay cache is set on the validator.
+     * @param validator the SamlOAuthValidator
+     */
     public void setSamlOAuthValidator(SamlOAuthValidator validator) {
         samlOAuthValidator = validator;
     }
