@@ -51,7 +51,9 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
             }
 
             if (!isJwsRequired()) {
-                return jwtConsumer.decryptWith(theDecryptor);
+                JwtToken jwt = jwtConsumer.decryptWith(theDecryptor);
+                validateToken(jwt);
+                return jwt;
             }
 
             JweDecryptionOutput decOutput = theDecryptor.decrypt(wrappedJwtToken);
