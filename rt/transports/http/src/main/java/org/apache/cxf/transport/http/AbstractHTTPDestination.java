@@ -780,6 +780,7 @@ public abstract class AbstractHTTPDestination
          */
         public void prepare(Message message) throws IOException {
             message.put(HTTP_RESPONSE, response);
+            message.put(Message.RESPONSE_HEADERS, ServletResponseHeaders.of(message, response));
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {
                 message.setContent(OutputStream.class,
