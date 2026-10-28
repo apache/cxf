@@ -136,8 +136,9 @@ public class MessageVerifier {
         // for the service case on a GET/HEAD request as there is no request, and also not required on
         // the client side unless it is an OK response that is not 204
         Integer status = (Integer)m.get(Message.RESPONSE_CODE);
-        if ((requestor && (status < 200 || status >= 300 || status == 204))
-            || (!requestor && ("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method)))) {
+        boolean noBodyExpected = (requestor && (status < 200 || status >= 300 || status == 204))
+            || (!requestor && ("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method)));
+        if (noBodyExpected && (messageBody == null || messageBody.length == 0)) {
             signedHeaders.remove("digest");
         }
 

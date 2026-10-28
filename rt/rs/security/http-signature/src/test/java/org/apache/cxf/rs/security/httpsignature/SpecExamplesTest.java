@@ -420,6 +420,86 @@ public class SpecExamplesTest {
         assertTrue(String.valueOf(result.get()), result.get() instanceof SignatureException);
     }
 
+    @Test
+    public void filterUnsignedBodyOnGetTest() throws IOException {
+        URI uri = URI.create("https://www.example.com/foo/1");
+        String method = "GET";
+
+        // The client signs a GET without a body, so no digest is added or signed
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("Host", Collections.singletonList("example.com"));
+        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        MessageSigner messageSigner = new MessageSigner(keyProvider, "Test",
+            Arrays.asList("(request-target)", "host", "date"));
+        messageSigner.sign(headers, "/foo/1", method);
+
+        MultivaluedMap<String, String> requestStringHeaders = new MultivaluedHashMap<>();
+        headers.forEach((header, value) -> requestStringHeaders.add(header, value.get(0)));
+
+        // A body can not be added to the signed GET request without a signed digest
+        AtomicReference<Exception> result = new AtomicReference<>();
+        doInPhaseInterceptor(new MessageImpl(), () -> {
+            ContainerRequestContext containerRequestContext =
+                getContainerRequestContextMock(uri, method, requestStringHeaders);
+            InputStream stream = new ByteArrayInputStream("{\"all\": true}".getBytes(StandardCharsets.UTF_8));
+            Mockito.when(containerRequestContext.getEntityStream()).thenReturn(stream);
+            result.set(runFilter(() -> createVerifySignatureFilter().filter(containerRequestContext)));
+        });
+        assertTrue(String.valueOf(result.get()), result.get() instanceof BadRequestException);
+
+        // The signed GET request without a body is still accepted
+        result.set(null);
+        doInPhaseInterceptor(new MessageImpl(), () -> {
+            ContainerRequestContext containerRequestContext =
+                getContainerRequestContextMock(uri, method, requestStringHeaders);
+            Mockito.when(containerRequestContext.getEntityStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+            result.set(runFilter(() -> createVerifySignatureFilter().filter(containerRequestContext)));
+        });
+        assertNull(result.get());
+    }
+
+    @Test
+    public void clientFilterUnsignedErrorResponseBodyTest() throws IOException {
+        // The service signs a response without a body, so no digest is added or signed
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        MessageSigner messageSigner = new MessageSigner(keyProvider, "Test");
+        messageSigner.sign(headers, "", "");
+
+        MultivaluedMap<String, String> responseHeaders = new MultivaluedHashMap<>();
+        headers.forEach((header, value) -> responseHeaders.add(header, value.get(0)));
+
+        for (int status : new int[] {204, 404}) {
+            // A body can not be added to a signed non-2xx or 204 response without a signed digest
+            assertTrue(verifyResponse(responseHeaders, status, "{\"all\": true}") instanceof SignatureException);
+
+            // The signed response without a body is still accepted
+            assertNull(verifyResponse(responseHeaders, status, ""));
+        }
+    }
+
+    private Exception verifyResponse(MultivaluedMap<String, String> responseHeaders, int status, String body) {
+        Message message = new MessageImpl();
+        message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+        message.put(Message.RESPONSE_CODE, status);
+        AtomicReference<Exception> result = new AtomicReference<>();
+        doInPhaseInterceptor(message, () -> {
+            ClientResponseContext responseContext = Mockito.mock(ClientResponseContext.class);
+            Mockito.when(responseContext.getHeaders()).thenReturn(responseHeaders);
+            InputStream stream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+            Mockito.when(responseContext.getEntityStream()).thenReturn(stream);
+
+            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            messageVerifier.setSecurityProvider(new MockSecurityProvider());
+            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+            VerifySignatureClientFilter verifySignatureFilter = new VerifySignatureClientFilter();
+            verifySignatureFilter.setMessageVerifier(messageVerifier);
+
+            result.set(runFilter(() -> verifySignatureFilter.filter(null, responseContext)));
+        });
+        return result.get();
+    }
+
     private VerifySignatureFilter createVerifySignatureFilter() {
         MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());

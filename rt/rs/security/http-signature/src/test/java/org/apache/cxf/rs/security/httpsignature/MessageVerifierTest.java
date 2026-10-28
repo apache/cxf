@@ -230,7 +230,7 @@ public class MessageVerifierTest {
                                                              Collections.singletonList("test"));
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), null);
     }
 
     @Test
@@ -243,7 +243,7 @@ public class MessageVerifierTest {
         MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), null);
     }
 
     @Test
