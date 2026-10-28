@@ -172,6 +172,25 @@ public class JWTTokenValidatorTest {
         // The STS keystore also holds the trusted certificate of "myclientkey". A token signed with
         // the client's own key must not be accepted as issued by the STS, even if its x5t header
         // points at that certificate.
+        TokenValidatorResponse validatorResponse =
+            validateTokenSignedByTrustedCertificate(new JWTTokenValidator());
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+
+    @org.junit.Test
+    public void testTokenSignedByTrustedCertificateWithX509KeyHeadersAllowed() throws Exception {
+        // With allowX509KeyHeaders enabled, the x5t header selects the trusted client certificate
+        JWTTokenValidator jwtTokenValidator = new JWTTokenValidator();
+        jwtTokenValidator.setAllowX509KeyHeaders(true);
+
+        TokenValidatorResponse validatorResponse =
+            validateTokenSignedByTrustedCertificate(jwtTokenValidator);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        assertEquals("admin", validatorResponse.getPrincipal().getName());
+    }
+
+    private TokenValidatorResponse validateTokenSignedByTrustedCertificate(
+        TokenValidator jwtTokenValidator) throws Exception {
         WSSConfig.init();
         Crypto clientCrypto = CryptoFactory.getInstance(getClientCryptoProperties());
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -194,7 +213,6 @@ public class JWTTokenValidatorTest {
             JwsUtils.getPrivateKeySignatureProvider(clientKey, SignatureAlgorithm.RS256));
 
         // Validate the token
-        TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
 
@@ -209,7 +227,7 @@ public class JWTTokenValidatorTest {
             jwtTokenValidator.validateToken(validatorParameters);
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
-        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+        return validatorResponse;
     }
 
     @org.junit.Test
