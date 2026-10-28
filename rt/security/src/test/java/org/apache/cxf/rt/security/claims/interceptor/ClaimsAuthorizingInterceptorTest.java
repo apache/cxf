@@ -22,6 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -226,6 +227,110 @@ public class ClaimsAuthorizingInterceptorTest {
         }
     }
 
+    @Test
+    public void testOverloadedMethodWithoutClaimsDoesNotRemoveClaims() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new OverloadingService());
+        Method adminMethod = OverloadingService.class.getMethod("delete", String.class);
+        Method unsecuredMethod = OverloadingService.class.getMethod("delete");
+
+        in.handleMessage(prepareMessage(adminMethod, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(adminMethod, createDefaultClaim("user")));
+
+        // A method without claims of its own has to meet the claims of its overloads
+        in.handleMessage(prepareMessage(unsecuredMethod, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(unsecuredMethod, createDefaultClaim("user")));
+    }
+
+    @Test
+    public void testOverloadedMethodsKeepTheirOwnClaims() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new OverloadingService());
+        Method adminMethod = OverloadingService.class.getMethod("update", String.class);
+        Method userMethod = OverloadingService.class.getMethod("update");
+
+        in.handleMessage(prepareMessage(adminMethod, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(adminMethod, createDefaultClaim("user")));
+        in.handleMessage(prepareMessage(userMethod, createDefaultClaim("user")));
+        assertDenied(in, prepareMessage(userMethod, createDefaultClaim("admin")));
+    }
+
+    @Test
+    public void testOverridingMethodClaimsTakePrecedenceOverSuperclass() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new OverridingService());
+        Method method = OverridingService.class.getMethod("update");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
+    }
+
+    @Test
+    public void testInterfaceClaimsAreEnforced() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new InterfaceService());
+        Method implMethod = InterfaceService.class.getMethod("delete");
+        Method interfaceMethod = SecuredApi.class.getMethod("delete");
+
+        in.handleMessage(prepareMessage(implMethod, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(implMethod, createDefaultClaim("user")));
+        assertDenied(in, prepareMessage(interfaceMethod, createDefaultClaim("user")));
+    }
+
+    @Test
+    public void testGenericInterfaceMethodClaimsAreEnforced() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new StringRepository());
+        Method updateMethod = StringRepository.class.getMethod("update", String.class);
+
+        // The erased interface signature does not match, so every rule for the name applies
+        in.handleMessage(prepareMessage(updateMethod, createDefaultClaim("admin", "user")));
+        assertDenied(in, prepareMessage(updateMethod, createDefaultClaim("user")));
+        assertDenied(in, prepareMessage(updateMethod, createDefaultClaim("admin")));
+    }
+
+    @Test
+    public void testMethodWithoutConfiguredClaimsIsDenied() throws Exception {
+        ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
+        in.setClaims(Collections.singletonMap("update",
+            Collections.singletonList(createDefaultClaimBean("admin"))));
+
+        in.handleMessage(prepareMessage(OverloadingService.class.getMethod("update"),
+            createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(OverloadingService.class.getMethod("delete"),
+            createDefaultClaim("admin")));
+    }
+
+    @Test
+    public void testConfiguredClaimsAreEnforcedTogetherWithAnnotations() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new OverloadingService());
+        in.setClaims(Collections.singletonMap("update",
+            Collections.singletonList(createDefaultClaimBean("manager"))));
+        Method method = OverloadingService.class.getMethod("update");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("user", "manager")));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("manager")));
+    }
+
+    private static ClaimsAuthorizingInterceptor createInterceptor(Object service) {
+        ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
+        in.setSecuredObject(service);
+        return in;
+    }
+
+    private static void assertDenied(ClaimsAuthorizingInterceptor in, Message m) {
+        try {
+            in.handleMessage(m);
+            fail("AccessDeniedException expected");
+        } catch (AccessDeniedException ex) {
+            // expected
+        }
+    }
+
+    private static ClaimBean createDefaultClaimBean(String value) {
+        org.apache.cxf.rt.security.claims.Claim claim = new org.apache.cxf.rt.security.claims.Claim();
+        claim.setClaimType(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
+        claim.addValue(value);
+        return new ClaimBean(claim, "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified",
+                             ClaimMode.STRICT, false);
+    }
+
     private void doTestClaims(String methodName,
             org.apache.cxf.rt.security.claims.Claim... claim)
         throws Exception {
@@ -245,6 +350,17 @@ public class ClaimsAuthorizingInterceptorTest {
                                    String roleName,
                                    org.apache.cxf.rt.security.claims.Claim... claim)
                                throws Exception {
+        return prepareMessage(cls.getMethod(methodName, new Class[]{}), roleName, claim);
+    }
+
+    private Message prepareMessage(Method method,
+                                   org.apache.cxf.rt.security.claims.Claim... claim) {
+        return prepareMessage(method, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, claim);
+    }
+
+    private Message prepareMessage(Method method,
+                                   String roleName,
+                                   org.apache.cxf.rt.security.claims.Claim... claim) {
         ClaimCollection claims = new ClaimCollection();
         Collections.addAll(claims, claim);
 
@@ -293,8 +409,7 @@ public class ClaimsAuthorizingInterceptorTest {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         m.put(SecurityContext.class, sc);
-        m.put("org.apache.cxf.resource.method",
-               cls.getMethod(methodName, new Class[]{}));
+        m.put("org.apache.cxf.resource.method", method);
         return m;
     }
 
@@ -363,6 +478,67 @@ public class ClaimsAuthorizingInterceptorTest {
     public static class TestService2 {
         @SecureRole("admin")
         public void test() {
+
+        }
+    }
+    public static class OverloadingService {
+        @Claim("admin")
+        public void delete(String id) {
+
+        }
+
+        public void delete() {
+
+        }
+
+        @Claim("admin")
+        public void update(String value) {
+
+        }
+
+        @Claim("user")
+        public void update() {
+
+        }
+    }
+    public static class BaseService {
+        @Claim("user")
+        public void update() {
+
+        }
+    }
+    public static class OverridingService extends BaseService {
+        @Override
+        @Claim("admin")
+        public void update() {
+
+        }
+    }
+    public interface SecuredApi {
+        @Claim("admin")
+        void delete();
+    }
+    public static class InterfaceService implements SecuredApi {
+        @Override
+        public void delete() {
+
+        }
+    }
+    public interface Repository<T> {
+        @Claim("admin")
+        void update(T value);
+
+        @Claim("user")
+        void update();
+    }
+    public static class StringRepository implements Repository<String> {
+        @Override
+        public void update(String value) {
+
+        }
+
+        @Override
+        public void update() {
 
         }
     }
