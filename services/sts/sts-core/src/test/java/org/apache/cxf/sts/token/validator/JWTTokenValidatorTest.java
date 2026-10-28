@@ -20,6 +20,8 @@ package org.apache.cxf.sts.token.validator;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.Set;
 
@@ -30,10 +32,16 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
+import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
+import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -56,9 +64,11 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.dom.engine.WSSConfig;
 
 import org.junit.BeforeClass;
 
@@ -155,6 +165,69 @@ public class JWTTokenValidatorTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+
+    @org.junit.Test
+    public void testTokenSignedByTrustedCertificate() throws Exception {
+        // The STS keystore also holds the trusted certificate of "myclientkey". A token signed with
+        // the client's own key must not be accepted as issued by the STS, even if its x5t header
+        // points at that certificate.
+        TokenValidatorResponse validatorResponse =
+            validateTokenSignedByTrustedCertificate(new JWTTokenValidator());
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+    }
+
+    @org.junit.Test
+    public void testTokenSignedByTrustedCertificateWithX509KeyHeadersAllowed() throws Exception {
+        // With allowX509KeyHeaders enabled, the x5t header selects the trusted client certificate
+        JWTTokenValidator jwtTokenValidator = new JWTTokenValidator();
+        jwtTokenValidator.setAllowX509KeyHeaders(true);
+
+        TokenValidatorResponse validatorResponse =
+            validateTokenSignedByTrustedCertificate(jwtTokenValidator);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        assertEquals("admin", validatorResponse.getPrincipal().getName());
+    }
+
+    private TokenValidatorResponse validateTokenSignedByTrustedCertificate(
+        TokenValidator jwtTokenValidator) throws Exception {
+        WSSConfig.init();
+        Crypto clientCrypto = CryptoFactory.getInstance(getClientCryptoProperties());
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("myclientkey");
+        X509Certificate clientCert = clientCrypto.getX509Certificates(cryptoType)[0];
+        PrivateKey clientKey = clientCrypto.getPrivateKey("myclientkey", "cspass");
+
+        JwsHeaders headers = new JwsHeaders(SignatureAlgorithm.RS256);
+        headers.setX509Thumbprint(Base64UrlUtility.encode(
+            MessageDigestUtils.createDigest(clientCert.getEncoded(), MessageDigestUtils.ALGO_SHA_1)));
+
+        JwtClaims claims = new JwtClaims();
+        claims.setIssuer("STS");
+        claims.setSubject("admin");
+        long now = System.currentTimeMillis() / 1000L;
+        claims.setIssuedAt(now);
+        claims.setExpiryTime(now + 300L);
+
+        String token = new JwsJwtCompactProducer(headers, claims).signWith(
+            JwsUtils.getPrivateKeySignatureProvider(clientKey, SignatureAlgorithm.RS256));
+
+        // Validate the token
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+
+        // Create a ValidateTarget consisting of a JWT Token
+        ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+
+        assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
+
+        TokenValidatorResponse validatorResponse =
+            jwtTokenValidator.validateToken(validatorParameters);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
+        return validatorResponse;
     }
 
     @org.junit.Test
@@ -419,6 +492,17 @@ public class JWTTokenValidatorTest {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
+
+        return properties;
+    }
+
+    private Properties getClientCryptoProperties() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
+        );
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "cspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/clientstore.jks");
 
         return properties;
     }
