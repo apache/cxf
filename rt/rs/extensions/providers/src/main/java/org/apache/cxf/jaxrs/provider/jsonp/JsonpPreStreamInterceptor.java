@@ -40,8 +40,10 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
  * Appends the jsonp callback to json responses when the '_jsonp' parameter has been set in the querystring.
  */
 public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor implements WriterInterceptor {
+    public static final String DEFAULT_PADDING_START = "/**/";
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
+    private String paddingStart = DEFAULT_PADDING_START;
     private String paddingEnd = "(";
 
     public JsonpPreStreamInterceptor() {
@@ -52,7 +54,7 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
         String callback = getCallbackValue(message);
         if (!StringUtils.isEmpty(callback)) {
             setContentType(message);
-            writeValue(message, JsonpInInterceptor.PADDING_START + callback + getPaddingEnd());
+            writeValue(message, getPaddingStart() + callback + getPaddingEnd());
         }
     }
 
@@ -73,6 +75,14 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
 
     public String getMediaType() {
         return mediaType;
+    }
+
+    public void setPaddingStart(String paddingStart) {
+        this.paddingStart = paddingStart;
+    }
+
+    public String getPaddingStart() {
+        return paddingStart;
     }
 
     public void setPaddingEnd(String paddingEnd) {

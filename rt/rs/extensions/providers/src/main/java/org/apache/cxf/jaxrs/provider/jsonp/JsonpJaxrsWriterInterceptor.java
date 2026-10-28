@@ -36,6 +36,7 @@ import org.apache.cxf.message.Message;
 public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
+    private String paddingStart = JsonpPreStreamInterceptor.DEFAULT_PADDING_START;
     private String paddingEnd = "(";
 
     public JsonpJaxrsWriterInterceptor() {
@@ -48,7 +49,7 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
             context.getHeaders().putSingle(Message.CONTENT_TYPE,
                                            JAXRSUtils.toMediaType(getMediaType()));
             context.getHeaders().putSingle("X-Content-Type-Options", "nosniff");
-            context.getOutputStream().write((JsonpInInterceptor.PADDING_START + callback + getPaddingEnd())
+            context.getOutputStream().write((getPaddingStart() + callback + getPaddingEnd())
                                                 .getBytes(StandardCharsets.UTF_8));
         }
         context.proceed();
@@ -60,6 +61,14 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
 
     public String getMediaType() {
         return mediaType;
+    }
+
+    public void setPaddingStart(String paddingStart) {
+        this.paddingStart = paddingStart;
+    }
+
+    public String getPaddingStart() {
+        return paddingStart;
     }
 
     public void setPaddingEnd(String paddingEnd) {

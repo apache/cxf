@@ -37,9 +37,9 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String CALLBACK_PARAM = "_jsonp";
     public static final String CALLBACK_KEY = "JSONP.CALLBACK";
     public static final String DEFAULT_CALLBACK_VALUE = "callback";
-    public static final String PADDING_START = "/**/";
     // The callback is written verbatim in front of the JSON, so only allow
-    // (optionally dot-separated) JavaScript identifiers of a bounded length
+    // letters, digits, '_', '$' and '.' (enough for plain and dotted callback
+    // names such as angular.callbacks._0) up to a bounded length
     public static final String DEFAULT_CALLBACK_PATTERN = "[A-Za-z0-9_$.]{1,128}";
 
     private String callbackParam = CALLBACK_PARAM;
@@ -119,9 +119,11 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     /**
      * Sets the regular expression a callback name must match in full.
      * Values which do not match are ignored and the response is plain JSON.
+     * A null value restores {@link #DEFAULT_CALLBACK_PATTERN}.
      */
     public void setCallbackPattern(String callbackPattern) {
-        this.callbackPattern = Pattern.compile(callbackPattern);
+        this.callbackPattern = Pattern.compile(callbackPattern == null
+            ? DEFAULT_CALLBACK_PATTERN : callbackPattern);
     }
 
     public String getCallbackPattern() {
