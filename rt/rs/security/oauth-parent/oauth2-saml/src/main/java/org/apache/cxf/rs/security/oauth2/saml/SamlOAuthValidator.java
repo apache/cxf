@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.common.TokenReplayCache;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -41,6 +42,7 @@ public class SamlOAuthValidator {
     private String issuer;
     private String clientAddress;
     private boolean subjectConfirmationDataRequired;
+    private TokenReplayCache<String> replayCache;
     public SamlOAuthValidator() {
     }
 
@@ -61,6 +63,19 @@ public class SamlOAuthValidator {
         clientAddress = value;
     }
 
+    /**
+     * Set the cache used to detect the replay of bearer assertions. If it is set, an assertion is
+     * rejected if its ID has already been seen, until the assertion expires. It is not set by default.
+     * @param replayCache the replay cache
+     */
+    public void setReplayCache(TokenReplayCache<String> replayCache) {
+        this.replayCache = replayCache;
+    }
+
+    public TokenReplayCache<String> getReplayCache() {
+        return replayCache;
+    }
+
     public void validate(Message message, SamlAssertionWrapper wrapper) {
         validateSAMLVersion(wrapper);
 
@@ -78,6 +93,42 @@ public class SamlOAuthValidator {
         if (!validateAuthenticationSubject(message, cs, wrapper.getSaml2().getSubject())) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
+
+        // This must be the last check, so that only an otherwise valid assertion is cached
+        checkReplay(wrapper, cs);
+    }
+
+    /**
+     * Bearer assertion IDs are cached until the assertion expires, so that the same assertion cannot be
+     * used more than once. This is done once per assertion, rather than per Subject Confirmation.
+     */
+    private void checkReplay(SamlAssertionWrapper wrapper, Conditions cs) {
+        if (replayCache == null) {
+            return;
+        }
+        Instant expiry = getReplayCacheExpiry(cs, wrapper.getSaml2().getSubject());
+        if (!replayCache.putIdIfAbsent(wrapper.getId(), expiry)) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+    }
+
+    /**
+     * The assertion ID must be cached for as long as the assertion can be accepted, so the latest of the
+     * NotOnOrAfter times of the Conditions and of the Bearer Subject Confirmations is used.
+     */
+    private static Instant getReplayCacheExpiry(Conditions cs, org.opensaml.saml.saml2.core.Subject subject) {
+        Instant expiry = cs != null ? cs.getNotOnOrAfter() : null;
+        if (subject != null && subject.getSubjectConfirmations() != null) {
+            for (SubjectConfirmation subjectConf : subject.getSubjectConfirmations()) {
+                SubjectConfirmationData subjectConfData = subjectConf.getSubjectConfirmationData();
+                if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod()) && subjectConfData != null
+                    && subjectConfData.getNotOnOrAfter() != null
+                    && (expiry == null || subjectConfData.getNotOnOrAfter().isAfter(expiry))) {
+                    expiry = subjectConfData.getNotOnOrAfter();
+                }
+            }
+        }
+        return expiry;
     }
 
     private void validateSAMLVersion(SamlAssertionWrapper assertionW) {
@@ -162,8 +213,6 @@ public class SamlOAuthValidator {
             || subjectConfData.getNotOnOrAfter().isBefore(Instant.now())) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-
-        //TODO: replay cache, same as with SAML SSO case
 
         // Check address
         if (subjectConfData.getAddress() != null

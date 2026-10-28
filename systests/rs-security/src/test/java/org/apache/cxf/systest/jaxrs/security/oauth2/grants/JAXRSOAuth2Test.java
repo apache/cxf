@@ -28,8 +28,10 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -65,6 +67,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -175,6 +178,83 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
                                                                new CustomGrant(),
                                                                extraParams);
         assertNotNull(at.getTokenKey());
+    }
+
+    // The same SAML2 bearer grant assertion can only be used once, when a replay cache is configured
+    @Test
+    public void testSAML2BearerGrantReplay() throws Exception {
+        // The replay endpoints are only configured for the JCache server
+        Assume.assumeTrue(JCACHE_PORT.equals(port));
+
+        String address = "https://localhost:" + port + "/oauth2-replay/token";
+        Saml2BearerGrant grant = new Saml2BearerGrant(createSignedAssertion(address, false));
+
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(createWebClient(address),
+                                                               new Consumer("alice", "alice"),
+                                                               grant,
+                                                               false);
+        assertNotNull(at.getTokenKey());
+
+        try {
+            OAuthClientUtils.getAccessToken(createWebClient(address),
+                                            new Consumer("alice", "alice"),
+                                            grant,
+                                            false);
+            fail("Failure expected on a replayed SAML2 bearer grant");
+        } catch (OAuthServiceException ex) {
+            assertEquals(OAuthConstants.INVALID_GRANT, ex.getError().getError());
+        }
+
+        // A new assertion is still accepted
+        at = OAuthClientUtils.getAccessToken(createWebClient(address),
+                                             new Consumer("alice", "alice"),
+                                             new Saml2BearerGrant(createSignedAssertion(address, false)),
+                                             false);
+        assertNotNull(at.getTokenKey());
+    }
+
+    // The same SAML2 client authentication assertion can only be used once, when a replay cache is
+    // configured
+    @Test
+    public void testSAML2BearerAuthenticationReplay() throws Exception {
+        // The replay endpoints are only configured for the JCache server
+        Assume.assumeTrue(JCACHE_PORT.equals(port));
+
+        String address = "https://localhost:" + port + "/oauth2-auth-replay/token";
+        String encodedAssertion = Base64UrlUtility.encode(createSignedAssertion(address, true));
+
+        Map<String, String> extraParams = new HashMap<>();
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(createWebClient(address),
+                                                               new CustomGrant(),
+                                                               extraParams);
+        assertNotNull(at.getTokenKey());
+
+        // The replayed assertion is rejected by the client authentication filter
+        Form form = new Form();
+        form.param(OAuthConstants.GRANT_TYPE, "custom_grant");
+        form.param(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        form.param(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
+        try (Response response = createWebClient(address).form(form)) {
+            assertEquals(401, response.getStatus());
+        }
+    }
+
+    private String createSignedAssertion(String audienceURI, boolean clientAuthentication) throws Exception {
+        Crypto crypto = new CryptoLoader().loadCrypto(CRYPTO_RESOURCE_PROPERTIES);
+        SelfSignInfo signInfo = new SelfSignInfo(crypto, "alice", "password");
+
+        SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(clientAuthentication);
+        if (clientAuthentication) {
+            samlCallbackHandler.setIssuer("alice");
+        }
+        samlCallbackHandler.setAudience(audienceURI);
+        SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(samlCallbackHandler, signInfo);
+        Document doc = DOMUtils.newDocument();
+        Element assertionElement = assertionWrapper.toDOM(doc);
+        return DOM2Writer.nodeToString(assertionElement);
     }
 
     @Test()
