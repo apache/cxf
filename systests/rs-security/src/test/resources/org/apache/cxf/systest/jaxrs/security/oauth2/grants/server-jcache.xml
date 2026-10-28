@@ -128,6 +128,48 @@ under the License.
             <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <!-- SAML2 bearer grant and client authentication with replay detection, using a JCache replay cache -->
+    <bean id="replayCache" class="org.apache.cxf.rs.security.common.jcache.JCacheTokenReplayCache"
+          destroy-method="close"/>
+    <bean id="replaySamlOAuthValidator" class="org.apache.cxf.rs.security.oauth2.saml.SamlOAuthValidator">
+        <property name="replayCache" ref="replayCache"/>
+    </bean>
+    <bean id="replaySamlGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.saml.Saml2BearerGrantHandler">
+        <property name="dataProvider" ref="dataProvider"/>
+        <property name="samlOAuthValidator" ref="replaySamlOAuthValidator"/>
+    </bean>
+    <bean id="replaySamlAuthHandler" class="org.apache.cxf.rs.security.oauth2.auth.saml.Saml2BearerAuthHandler">
+        <property name="samlOAuthValidator" ref="replaySamlOAuthValidator"/>
+    </bean>
+    <bean id="replayServiceBean" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+        <property name="dataProvider" ref="dataProvider"/>
+        <property name="grantHandlers">
+            <list>
+                <ref bean="replaySamlGrantHandler"/>
+                <ref bean="customGrantHandler"/>
+            </list>
+        </property>
+        <property name="canSupportPublicClients" value="true"/>
+    </bean>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2-jcache}/oauth2-replay">
+        <jaxrs:serviceBeans>
+            <ref bean="replayServiceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:properties>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2-jcache}/oauth2-auth-replay">
+        <jaxrs:serviceBeans>
+            <ref bean="replayServiceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="replaySamlAuthHandler"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2-jcache}/oauth2-auth-jwt">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

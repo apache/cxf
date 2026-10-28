@@ -50,6 +50,12 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     public Saml2BearerAuthHandler() {
     }
 
+    /**
+     * Set the SamlOAuthValidator. The replay of client authentication assertions is only detected if a
+     * replay cache is set on the validator, as clients may legitimately reuse an assertion until it
+     * expires.
+     * @param validator the SamlOAuthValidator
+     */
     public void setSamlOAuthValidator(SamlOAuthValidator validator) {
         samlOAuthValidator = validator;
     }
