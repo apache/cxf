@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.saml;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Form;
@@ -58,9 +59,13 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
             // containing the actual REQUEST URI client was using before being redirected
             // back to IDP - at the moment assume it's URI
             UriInfoImpl ui = new UriInfoImpl(message);
-            if (!samlRequestURI.startsWith(ui.getBaseUri().toString())) {
-                context.abortWith(Response.status(302).location(URI.create(samlRequestURI)).build());
-                return;
+            URI baseUri = ui.getBaseUri();
+            if (!samlRequestURI.startsWith(baseUri.toString())) {
+                URI location = getSameOriginLocation(samlRequestURI, baseUri);
+                if (location != null) {
+                    context.abortWith(Response.status(302).location(location).build());
+                    return;
+                }
             }
         }
         formData.remove(SAML_ELEMENT);
@@ -72,6 +77,23 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
         }
+    }
+
+    // RelayState is not covered by the assertion signature, so only redirect to
+    // a relative location or to one with the same scheme and authority as the service
+    private static URI getSameOriginLocation(String relayState, URI baseUri) {
+        try {
+            URI location = new URI(relayState);
+            if (location.getScheme() == null && location.getRawAuthority() == null
+                || baseUri.getScheme().equalsIgnoreCase(location.getScheme())
+                    && baseUri.getRawAuthority() != null
+                    && baseUri.getRawAuthority().equalsIgnoreCase(location.getRawAuthority())) {
+                return location;
+            }
+        } catch (URISyntaxException ex) {
+            // not a valid URI
+        }
+        return null;
     }
 
     private Form readFormData(Message message) {
