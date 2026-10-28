@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -26,6 +27,10 @@ import java.util.Collections;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweJwtCompactProducer;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -39,6 +44,7 @@ import static org.junit.Assert.fail;
 public class JwtAuthenticationFilterTest {
 
     private static final String AUDIENCE = "https://service.example.com";
+    private static final byte[] ENCRYPTION_KEY = "0123456789abcdef".getBytes(StandardCharsets.UTF_8);
 
     @Before
     public void setUp() throws Exception {
@@ -116,10 +122,47 @@ public class JwtAuthenticationFilterTest {
         }
     }
 
+    @Test
+    public void testEncryptedTokenAcceptedWithoutSignature() {
+        JwtAuthenticationFilter filter = createEncryptionOnlyFilter();
+        filter.getJwtToken(encrypt(createClaims(null)), createDecryptionProvider(), null);
+    }
+
+    @Test
+    public void testExpiredEncryptedTokenRejectedWithoutSignature() {
+        JwtAuthenticationFilter filter = createEncryptionOnlyFilter();
+        JwtClaims claims = createClaims(null);
+        ZonedDateTime past = ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(10L);
+        claims.setIssuedAt(past.toEpochSecond());
+        claims.setExpiryTime(past.plusMinutes(5L).toEpochSecond());
+        try {
+            filter.getJwtToken(encrypt(claims), createDecryptionProvider(), null);
+            fail("Failure expected on an expired encrypted token");
+        } catch (JwtException ex) {
+            // expected
+        }
+    }
+
     private static JwtAuthenticationFilter createFilter() {
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter();
         filter.setValidateAudience(false);
         return filter;
+    }
+
+    private static JwtAuthenticationFilter createEncryptionOnlyFilter() {
+        JwtAuthenticationFilter filter = createFilter();
+        filter.setJwsRequired(false);
+        filter.setJweRequired(true);
+        return filter;
+    }
+
+    private static String encrypt(JwtClaims claims) {
+        return new JweJwtCompactProducer(claims).encryptWith(
+            JweUtils.getDirectKeyJweEncryption(ENCRYPTION_KEY, ContentAlgorithm.A128GCM));
+    }
+
+    private static JweDecryptionProvider createDecryptionProvider() {
+        return JweUtils.getDirectKeyJweDecryption(ENCRYPTION_KEY, ContentAlgorithm.A128GCM);
     }
 
     private static JwtClaims createClaims(String issuer) {
