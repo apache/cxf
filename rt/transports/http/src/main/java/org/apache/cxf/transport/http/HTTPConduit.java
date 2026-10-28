@@ -1235,7 +1235,7 @@ public abstract class HTTPConduit
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
-                        handleResponseInternal();
+                        handleRetransmitsAndResponse();
                     } catch (Throwable e) {
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
                         outMessage.setContent(Exception.class, e);
@@ -1300,7 +1300,7 @@ public abstract class HTTPConduit
                         hasLoggedAsyncWarning = true;
                     }
                     LOG.fine("EXECUTOR_FULL");
-                    handleResponseInternal();
+                    handleRetransmitsAndResponse();
                 }
             }
         }
@@ -1415,12 +1415,14 @@ public abstract class HTTPConduit
                     cachedStream.closeFlowthroughStream();
                 }
 
+                boolean releaseCachedStream = true;
                 try {
                     handleResponse();
+                    // the thread that handles an asynchronous response retransmits the cached request
+                    releaseCachedStream = isSynchronous();
                 } finally {
-                    if (cachingForRetransmission && cachedStream != null) {
-                        cachedStream.close();
-                        cachedStream = null;
+                    if (releaseCachedStream) {
+                        releaseCachedStream();
                     }
                 }
             } catch (HttpRetryException e) {
@@ -1614,15 +1616,40 @@ public abstract class HTTPConduit
          * @throws IOException
          */
         protected void handleResponse() throws IOException {
-            // Process retransmits until we fall out.
-            handleRetransmits();
-
-            if (outMessage == null
-                || outMessage.getExchange() == null
-                || outMessage.getExchange().isSynchronous()) {
+            if (isSynchronous()) {
+                // Process retransmits until we fall out.
+                handleRetransmits();
                 handleResponseInternal();
             } else {
+                // the retransmits wait for the response, so they are processed with it,
+                // not to block the caller thread
                 handleResponseAsync();
+            }
+        }
+
+        private boolean isSynchronous() {
+            return outMessage == null
+                || outMessage.getExchange() == null
+                || outMessage.getExchange().isSynchronous();
+        }
+
+        /**
+         * Processes the retransmits, if any, and then the response of an asynchronous exchange,
+         * on the thread that handles the response.
+         */
+        private void handleRetransmitsAndResponse() throws IOException {
+            try {
+                handleRetransmits();
+            } finally {
+                releaseCachedStream();
+            }
+            handleResponseInternal();
+        }
+
+        private void releaseCachedStream() throws IOException {
+            if (cachingForRetransmission && cachedStream != null) {
+                cachedStream.close();
+                cachedStream = null;
             }
         }
 
