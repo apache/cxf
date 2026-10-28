@@ -2390,13 +2390,48 @@
             </properties>
         </profile>
         <profile>
+            <!-- Keep in sync with the bc-fips profile -->
             <id>fips</id>
             <activation>
                 <property>
                     <name>fips.enabled</name>
                 </property>
-	    </activation>
-	    <dependencies>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <org.apache.xml.security.securerandom.algorithm>PKCS11</org.apache.xml.security.securerandom.algorithm>
+                                <fips.enabled>true</fips.enabled>
+                            </systemPropertyVariables>
+                            <excludes>
+                                <!--fips: need to regenerate keys for systests/microprofile/client/weld tests which are out of CXF codebase-->
+                                <exclude>**/SslContextTest.java</exclude>
+                                <exclude>**/SslHostnameVerifierTest.java</exclude>
+                                <exclude>**/SslMutualTest.java</exclude>
+                                <exclude>**/SslTrustStoreTest.java</exclude>
+                                <!--fips: Kerberos are not supported on fips mode -->
+                                <exclude>**/JAXRSKerberosBookTest.java</exclude>
+                                <exclude>**/KerberosTokenTest.java</exclude>
+                                <exclude>**/SpnegoTokenTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Keep in sync with the fips profile, except for the bc-fips dependency -->
+            <id>bc-fips</id>
+            <activation>
+                <property>
+                    <name>bc-fips.enabled</name>
+                </property>
+            </activation>
+            <dependencies>
                 <dependency>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bc-fips</artifactId>
@@ -2412,6 +2447,7 @@
                             <systemPropertyVariables>
                                 <org.apache.xml.security.securerandom.algorithm>PKCS11</org.apache.xml.security.securerandom.algorithm>
                                 <fips.enabled>true</fips.enabled>
+                                <fips.security.provider>BCFIPS</fips.security.provider>
                             </systemPropertyVariables>
                             <excludes>
                                 <!--fips: need to regenerate keys for systests/microprofile/client/weld tests which are out of CXF codebase-->
