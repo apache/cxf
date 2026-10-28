@@ -49,7 +49,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 
 /**
- * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
+ * Validate a JWT Token. It is valid if it was issued and signed by this STS.
  */
 public class JWTTokenValidator implements TokenValidator {
 
@@ -58,6 +58,7 @@ public class JWTTokenValidator implements TokenValidator {
     private int ttl;
     private JWTRoleParser roleParser;
     private JWTRealmCodec realmCodec;
+    private boolean allowX509KeyHeaders;
 
     /**
      * Return true if this TokenValidator implementation is capable of validating the
@@ -130,8 +131,12 @@ public class JWTTokenValidator implements TokenValidator {
         KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
         verificationProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
 
+        // Unless allowX509KeyHeaders is enabled, the token headers are not passed on, so the token
+        // is verified with the configured signature certificate only. Otherwise x5c, x5t and
+        // x5t#S256 could select any certificate in the keystore as the verification key.
         JwsSignatureVerifier signatureVerifier =
-            JwsUtils.loadSignatureVerifier(verificationProperties, jwt.getJwsHeaders());
+            JwsUtils.loadSignatureVerifier(verificationProperties,
+                                           allowX509KeyHeaders ? jwt.getJwsHeaders() : null);
 
         if (!jwtConsumer.verifySignatureWith(signatureVerifier)) {
             return response;
@@ -209,5 +214,22 @@ public class JWTTokenValidator implements TokenValidator {
 
     public void setRealmCodec(JWTRealmCodec realmCodec) {
         this.realmCodec = realmCodec;
+    }
+
+    public boolean isAllowX509KeyHeaders() {
+        return allowX509KeyHeaders;
+    }
+
+    /**
+     * Whether to honor the x5c, x5t and x5t#S256 headers of the received token when selecting the
+     * verification certificate. The default is false, meaning the token is only verified with the
+     * certificate of the configured signature username.
+     *
+     * Enabling this makes every certificate in the STS signature crypto a trusted JWT issuer, and
+     * with x5c, so is anyone holding a certificate issued by a CA in that keystore. If it is enabled,
+     * ideally use a dedicated signature crypto that is not also used as a trust store.
+     */
+    public void setAllowX509KeyHeaders(boolean allowX509KeyHeaders) {
+        this.allowX509KeyHeaders = allowX509KeyHeaders;
     }
 }
