@@ -64,8 +64,8 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     // not share a rule
     private final Map<String, List<ScopesDeclaration>> declarationsBySignature = new HashMap<>();
     // The erased signatures a method overrides with a different signature, e.g. update(Object)
-    // for update(String) implementing update(T) of a generic interface, found via bridge methods
-    private final Map<String, Set<String>> bridgedSignatures = new HashMap<>();
+    // for update(String) implementing update(T) of Repository<String>
+    private final Map<String, Set<String>> overriddenSignatures = new HashMap<>();
     private final Map<String, Set<String>> signaturesByName = new HashMap<>();
     private final Set<Class<?>> securedClasses = new HashSet<>();
     private boolean annotationScopesFound;
@@ -109,8 +109,11 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             }
             signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
             annotationScopesFound |= methodScopes != null || classScopes != null;
-            if (m.isBridge() && m.getDeclaringClass() == cls) {
-                recordBridgedSignature(cls, m, signature);
+            if (!m.isBridge()) {
+                for (Method overridden : ReflectionUtil.getGenericallyOverriddenMethods(cls, m)) {
+                    overriddenSignatures.computeIfAbsent(signature, k -> new HashSet<>())
+                        .add(ReflectionUtil.getMethodSignature(overridden));
+                }
             }
 
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
@@ -175,36 +178,12 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         return declarer == null ? cls : declarer;
     }
 
-    private void recordBridgedSignature(Class<?> cls, Method bridge, String bridgeSignature) {
-        // A bridge method has the erased signature of the method it overrides and delegates
-        // to the method with the same name and narrower types, which may be inherited
-        for (Method m : cls.getMethods()) {
-            if (!m.isBridge() && m.getName().equals(bridge.getName())
-                && isAssignable(bridge.getParameterTypes(), m.getParameterTypes())) {
-                bridgedSignatures.computeIfAbsent(ReflectionUtil.getMethodSignature(m), k -> new HashSet<>())
-                    .add(bridgeSignature);
-            }
-        }
-    }
-
-    private static boolean isAssignable(Class<?>[] types, Class<?>[] subTypes) {
-        if (types.length != subTypes.length) {
-            return false;
-        }
-        for (int i = 0; i < types.length; i++) {
-            if (!types[i].isAssignableFrom(subTypes[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private List<Scopes> getAnnotationScopes(Method m) {
         String signature = ReflectionUtil.getMethodSignature(m);
         Set<String> signatures = new HashSet<>();
         if (declarationsBySignature.containsKey(signature)) {
             signatures.add(signature);
-            signatures.addAll(bridgedSignatures.getOrDefault(signature, Collections.emptySet()));
+            signatures.addAll(overriddenSignatures.getOrDefault(signature, Collections.emptySet()));
         } else {
             // The method is not one of the secured object's methods, so every rule
             // recorded for its name applies
@@ -219,22 +198,24 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
 
     private List<Scopes> getAnnotationScopes(String signature) {
         // Every @Scopes which applies to the method has to be met, from any class or interface
-        // in the hierarchy. A method-level @Scopes only replaces the class-level @Scopes of the
-        // class or interface which declares it
+        // in the hierarchy. A class-level @Scopes is replaced by a method-level @Scopes declared on
+        // the same class or interface, or on a subclass of it
         List<ScopesDeclaration> declarations =
             declarationsBySignature.getOrDefault(signature, Collections.emptyList());
         Set<Scopes> scopes = new LinkedHashSet<>();
         for (ScopesDeclaration declaration : declarations) {
-            if (declaration.methodLevel || !hasMethodScopes(declaration.declaringClass, declarations)) {
+            if (declaration.methodLevel || !isReplacedByMethodScopes(declaration, declarations)) {
                 scopes.add(declaration.scopes);
             }
         }
         return new ArrayList<>(scopes);
     }
 
-    private static boolean hasMethodScopes(Class<?> cls, List<ScopesDeclaration> declarations) {
+    private static boolean isReplacedByMethodScopes(ScopesDeclaration classDeclaration,
+                                                    List<ScopesDeclaration> declarations) {
         for (ScopesDeclaration declaration : declarations) {
-            if (declaration.methodLevel && declaration.declaringClass == cls) {
+            if (declaration.methodLevel
+                && classDeclaration.declaringClass.isAssignableFrom(declaration.declaringClass)) {
                 return true;
             }
         }
@@ -281,6 +262,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     }
 
     private static final class ScopesDeclaration {
+        // The class or interface the annotation is declared on
         private final Class<?> declaringClass;
         private final Scopes scopes;
         private final boolean methodLevel;

@@ -80,12 +80,19 @@ public class OAuthScopesFilterTest {
     }
 
     @Test
-    public void testOverridingMethodScopesApplyTogetherWithInterfaceClassScopes() throws Exception {
+    public void testOverridingMethodScopesReplaceInterfaceClassScopes() throws Exception {
         Method method = InterfaceOverridingService.class.getMethod("operation");
 
-        assertAllowed(new InterfaceOverridingService(), method, "read", "admin");
+        assertAllowed(new InterfaceOverridingService(), method, "admin");
         assertForbidden(new InterfaceOverridingService(), method, "read");
-        assertForbidden(new InterfaceOverridingService(), method, "admin");
+    }
+
+    @Test
+    public void testOverridingMethodScopesReplaceSuperclassClassScopes() throws Exception {
+        Method method = OverridingSubResource.class.getMethod("operation");
+
+        assertAllowed(new OverridingSubResource(), method, "admin");
+        assertForbidden(new OverridingSubResource(), method, "read");
     }
 
     @Test
@@ -179,6 +186,36 @@ public class OAuthScopesFilterTest {
         assertAllowed(new AdminApiReadService(), method, "read", "admin");
         assertForbidden(new AdminApiReadService(), method, "read");
         assertForbidden(new AdminApiReadService(), method, "admin");
+    }
+
+    @Test
+    public void testMethodScopesReplaceInheritedClassScopes() throws Exception {
+        Method method = InheritingAdminService.class.getMethod("adminOperation");
+        assertAllowed(new InheritingAdminService(), method, "admin");
+        assertForbidden(new InheritingAdminService(), method, "read");
+
+        Method redeclaredMethod = RedeclaringAdminService.class.getMethod("adminOperation");
+        assertAllowed(new RedeclaringAdminService(), redeclaredMethod, "admin");
+        assertForbidden(new RedeclaringAdminService(), redeclaredMethod, "read");
+    }
+
+    @Test
+    public void testUnrelatedOverloadIsNotLinkedToGenericInterfaceMethod() throws Exception {
+        Method integerMethod = OverloadingStringRepository.class.getMethod("update", Integer.class);
+        assertAllowed(new OverloadingStringRepository(), integerMethod, "read");
+        assertForbidden(new OverloadingStringRepository(), integerMethod, "admin");
+
+        Method stringMethod = OverloadingStringRepository.class.getMethod("update", String.class);
+        assertAllowed(new OverloadingStringRepository(), stringMethod, "admin");
+        assertForbidden(new OverloadingStringRepository(), stringMethod, "read");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodScopesApplyThroughTypeVariables() throws Exception {
+        Method method = TypedStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new TypedStringRepository(), method, "admin");
+        assertForbidden(new TypedStringRepository(), method, "read");
     }
 
     @Test
@@ -383,6 +420,59 @@ public class OAuthScopesFilterTest {
     public static class AdminApiReadService extends BaseService implements AdminApi {
         @Override
         public void operation() {
+        }
+    }
+
+    @Scopes("read")
+    public static class ClassScopesBaseResource {
+        public void operation() {
+        }
+    }
+
+    public static class OverridingSubResource extends ClassScopesBaseResource {
+        @Override
+        @Scopes("admin")
+        public void operation() {
+        }
+    }
+
+    public static class InheritingAdminService extends InheritedClassScopesBaseService {
+        @Scopes("admin")
+        public void adminOperation() {
+        }
+    }
+
+    @Scopes("read")
+    public static class RedeclaringAdminService extends InheritedClassScopesBaseService {
+        @Scopes("admin")
+        public void adminOperation() {
+        }
+    }
+
+    public static class OverloadingStringRepository implements Repository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
+        }
+
+        @Scopes("read")
+        public void update(Integer value) {
+        }
+    }
+
+    public abstract static class AbstractRepository<T> implements Repository<T> { //NOPMD
+    }
+
+    public static class TypedStringRepository extends AbstractRepository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
         }
     }
 
