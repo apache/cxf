@@ -726,6 +726,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         @Override
         public long contentLength() {
+            // The HttpClient is connected by now, so a trust decision can go ahead and write the body
+            synchronized (this) {
+                if (stream != null) {
+                    stream.connectionComplete = true;
+                }
+            }
             // The request is sent on the first write, so wait until the whole body is written
             long timeout = csPolicy.getConnectionTimeout();
             long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
@@ -1271,6 +1277,17 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             HttpClient cl = outMessage.get(HttpClient.class);
 
             while (!connectionComplete || !cl.sslContext().getClientSessionContext().getIds().hasMoreElements()) {
+                if (future.isCompletedExceptionally()) {
+                    // The request failed before the connection was complete, so it never will be
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                        throw new IOException("Could not send Message.", e.getCause());
+                    }
+                }
                 Thread.yield();
             }
             byte[] key = cl.sslContext().getClientSessionContext().getIds().nextElement();
