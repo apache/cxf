@@ -71,16 +71,18 @@ abstract class AbstractSignatureInFilter {
             return messageBody;
         }
 
-        // Verify digest if we have the appropriate header and a non-empty request body. Note that it is up to
-        // the MessageVerifier configuration, or the HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS
-        // configuration to require that the digest is signed (and hence present)
-        if (entityStream != null && headers.containsKey("Digest")) {
-            LOG.fine("Digesting message body");
+        // Always read the body so the MessageVerifier can require a signed digest when one is present
+        if (entityStream != null) {
             try {
                 messageBody = IOUtils.readBytesFromStream(entityStream);
             } catch (IOException e) {
-                throw new DigestFailureException("failed to validate the digest", e);
+                throw new DigestFailureException("failed to read the message body", e);
             }
+        }
+
+        // Verify digest if we have the appropriate header
+        if (messageBody != null && headers.containsKey("Digest")) {
+            LOG.fine("Digesting message body");
             DigestVerifier digestVerifier = new DigestVerifier();
 
             try {
