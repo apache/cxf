@@ -38,6 +38,7 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
     private String paddingStart = JsonpPreStreamInterceptor.DEFAULT_PADDING_START;
     private String paddingEnd = "(";
+    private boolean addNosniffHeader = true;
 
     public JsonpJaxrsWriterInterceptor() {
     }
@@ -48,7 +49,9 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
         if (!StringUtils.isEmpty(callback)) {
             context.getHeaders().putSingle(Message.CONTENT_TYPE,
                                            JAXRSUtils.toMediaType(getMediaType()));
-            context.getHeaders().putSingle("X-Content-Type-Options", "nosniff");
+            if (isAddNosniffHeader()) {
+                context.getHeaders().putSingle("X-Content-Type-Options", "nosniff");
+            }
             context.getOutputStream().write((getPaddingStart() + callback + getPaddingEnd())
                                                 .getBytes(StandardCharsets.UTF_8));
         }
@@ -77,6 +80,14 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
 
     public String getPaddingEnd() {
         return paddingEnd;
+    }
+
+    public void setAddNosniffHeader(boolean addNosniffHeader) {
+        this.addNosniffHeader = addNosniffHeader;
+    }
+
+    public boolean isAddNosniffHeader() {
+        return addNosniffHeader;
     }
 
     protected String getCallbackValue(Message message) {
