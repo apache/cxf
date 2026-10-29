@@ -63,19 +63,29 @@ public class OAuthScopesFilterTest {
     }
 
     @Test
-    public void testOverridingMethodScopesTakePrecedenceOverSuperclass() throws Exception {
+    public void testOverridingMethodScopesApplyTogetherWithSuperclassScopes() throws Exception {
         Method method = OverridingService.class.getMethod("operation");
 
-        assertAllowed(new OverridingService(), method, "admin");
+        assertAllowed(new OverridingService(), method, "read", "admin");
         assertForbidden(new OverridingService(), method, "read");
+        assertForbidden(new OverridingService(), method, "admin");
     }
 
     @Test
-    public void testOverridingMethodScopesTakePrecedenceOverInterfaceClassScopes() throws Exception {
+    public void testOverridingMethodCannotWeakenSuperclassScopes() throws Exception {
+        Method method = ReadOverridingService.class.getMethod("operation");
+
+        assertAllowed(new ReadOverridingService(), method, "read", "admin");
+        assertForbidden(new ReadOverridingService(), method, "read");
+    }
+
+    @Test
+    public void testOverridingMethodScopesApplyTogetherWithInterfaceClassScopes() throws Exception {
         Method method = InterfaceOverridingService.class.getMethod("operation");
 
-        assertAllowed(new InterfaceOverridingService(), method, "admin");
+        assertAllowed(new InterfaceOverridingService(), method, "read", "admin");
         assertForbidden(new InterfaceOverridingService(), method, "read");
+        assertForbidden(new InterfaceOverridingService(), method, "admin");
     }
 
     @Test
@@ -127,13 +137,65 @@ public class OAuthScopesFilterTest {
     public void testGenericInterfaceMethodScopesAreEnforced() throws Exception {
         Method updateMethod = StringRepository.class.getMethod("update", String.class);
 
-        // The erased interface signature does not match, so every rule for the name applies
-        assertAllowed(new StringRepository(), updateMethod, "admin", "read");
+        // update(String) overrides the erased update(Object), but not the update() overload
+        assertAllowed(new StringRepository(), updateMethod, "admin");
         assertForbidden(new StringRepository(), updateMethod, "read");
-        assertForbidden(new StringRepository(), updateMethod, "admin");
 
         Method readMethod = StringRepository.class.getMethod("update");
         assertAllowed(new StringRepository(), readMethod, "read");
+        assertForbidden(new StringRepository(), readMethod, "admin");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodScopesApplyTogetherWithClassScopes() throws Exception {
+        Method method = ClassScopesStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new ClassScopesStringRepository(), method, "user", "admin");
+        assertForbidden(new ClassScopesStringRepository(), method, "user");
+        assertForbidden(new ClassScopesStringRepository(), method, "admin");
+    }
+
+    @Test
+    public void testSubclassScopesApplyTogetherWithSuperclassMethodScopes() throws Exception {
+        Method method = AdminSubService.class.getMethod("operation");
+
+        assertAllowed(new AdminSubService(), method, "read", "admin");
+        assertForbidden(new AdminSubService(), method, "read");
+        assertForbidden(new AdminSubService(), method, "admin");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodScopesApplyToInheritedImplementation() throws Exception {
+        Method method = InheritingStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new InheritingStringRepository(), method, "admin");
+        assertForbidden(new InheritingStringRepository(), method, "read");
+    }
+
+    @Test
+    public void testMethodScopesFromUnrelatedSupertypesApplyTogether() throws Exception {
+        Method method = AdminApiReadService.class.getMethod("operation");
+
+        assertAllowed(new AdminApiReadService(), method, "read", "admin");
+        assertForbidden(new AdminApiReadService(), method, "read");
+        assertForbidden(new AdminApiReadService(), method, "admin");
+    }
+
+    @Test
+    public void testUnannotatedOverloadIsNotSecuredByOtherOverloads() throws Exception {
+        Method method = UnannotatedOverloadService.class.getMethod("delete");
+
+        assertAllowed(new UnannotatedOverloadService(), method, "user");
+        assertForbidden(new UnannotatedOverloadService(),
+                        UnannotatedOverloadService.class.getMethod("delete", String.class), "user");
+    }
+
+    @Test
+    public void testInheritedClassScopesApplyToSubclassMethods() throws Exception {
+        Method method = InheritedClassScopesService.class.getMethod("subclassOperation");
+
+        assertAllowed(new InheritedClassScopesService(), method, "read");
+        assertForbidden(new InheritedClassScopesService(), method, "write");
     }
 
     @Test
@@ -213,6 +275,19 @@ public class OAuthScopesFilterTest {
         }
     }
 
+    public static class AdminBaseService {
+        @Scopes("admin")
+        public void operation() {
+        }
+    }
+
+    public static class ReadOverridingService extends AdminBaseService {
+        @Override
+        @Scopes("read")
+        public void operation() {
+        }
+    }
+
     public static class UnannotatedOverridingService extends BaseService {
         @Override
         public void operation() {
@@ -248,6 +323,9 @@ public class OAuthScopesFilterTest {
         @Override
         public void operation() {
         }
+
+        public void subclassOperation() {
+        }
     }
 
     public interface Repository<T> {
@@ -265,6 +343,55 @@ public class OAuthScopesFilterTest {
 
         @Override
         public void update() {
+        }
+    }
+
+    @Scopes("user")
+    public static class ClassScopesStringRepository implements Repository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
+        }
+    }
+
+    @Scopes("admin")
+    public static class AdminSubService extends BaseService {
+        @Override
+        public void operation() {
+        }
+    }
+
+    public static class StringUpdater {
+        public void update(String value) {
+        }
+
+        public void update() {
+        }
+    }
+
+    public static class InheritingStringRepository extends StringUpdater implements Repository<String> {
+    }
+
+    public interface AdminApi {
+        @Scopes("admin")
+        void operation();
+    }
+
+    public static class AdminApiReadService extends BaseService implements AdminApi {
+        @Override
+        public void operation() {
+        }
+    }
+
+    public static class UnannotatedOverloadService {
+        @Scopes("admin")
+        public void delete(String id) {
+        }
+
+        public void delete() {
         }
     }
 
