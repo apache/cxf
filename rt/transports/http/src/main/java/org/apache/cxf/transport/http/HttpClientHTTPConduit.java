@@ -715,27 +715,37 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         @Override
         public synchronized void subscribe(Subscriber<? super ByteBuffer> subscriber) {
+            // The stream is only kept to signal that the connection is complete, which
+            // getHttpsURLConnectionInfo() waits for. It is null when the caller of an
+            // asynchronous request already closed it, so connectionComplete is not set then
             if (stream != null) {
                 stream.connectionComplete = true;
-            }
-            synchronized (body) {
-                body.notifyAll();
             }
             BodyPublishers.ofInputStream(body::getInputStream).subscribe(subscriber);
         }
 
         @Override
         public long contentLength() {
-            try {
-                synchronized (body) {
-                    if (!body.closed) {
-                        body.wait(csPolicy.getConnectionTimeout());
+            // The request is sent on the first write, so wait until the whole body is written
+            long timeout = csPolicy.getConnectionTimeout();
+            long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
+            synchronized (body) {
+                while (!body.closed) {
+                    long remaining = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
+                    if (timeout > 0 && remaining <= 0) {
+                        // Fail the request rather than send it with the length of a partial body
+                        throw new IllegalStateException("The request body was not written within "
+                            + timeout + " ms");
+                    }
+                    try {
+                        body.wait(timeout > 0 ? remaining : 0);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Interrupted while waiting for the request body", e);
                     }
                 }
-            } catch (InterruptedException e) {
-                //ignore
+                return body.size();
             }
-            return body.size();
         }
     }
 

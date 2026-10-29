@@ -22,7 +22,10 @@ package org.apache.cxf.systest.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -35,10 +38,9 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import com.sun.net.httpserver.HttpServer;
-
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -54,7 +56,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 /**
  * CXF-9135: an asynchronous call through the JDK HttpClient conduit with chunking disallowed must send
@@ -71,14 +75,16 @@ public class HttpClientAsyncNoChunkingTest {
         + "<echoResponse xmlns=\"urn:cxf9135\">hello</echoResponse></soap:Body></soap:Envelope>";
     private static final int CALLS = 10;
 
-    private static HttpServer server;
+    // the JDK server, not the HttpServer of this package
+    private static com.sun.net.httpserver.HttpServer server;
     private static ExecutorService executor;
     private static final List<String> RECEIVED = new CopyOnWriteArrayList<>();
 
     @BeforeClass
     public static void startServer() throws IOException {
         executor = Executors.newCachedThreadPool();
-        server = HttpServer.create(new InetSocketAddress("localhost", Integer.parseInt(PORT)), 0);
+        server = com.sun.net.httpserver.HttpServer.create(
+            new InetSocketAddress("localhost", Integer.parseInt(PORT)), 0);
         server.setExecutor(executor);
         // records how each request was framed and how much body it carried
         server.createContext("/echo", ex -> {
@@ -127,6 +133,65 @@ public class HttpClientAsyncNoChunkingTest {
         for (String received : RECEIVED) {
             assertFalse(received, received.startsWith("Content-Length=null"));
             assertTrue(received, received.endsWith("Transfer-Encoding=null, body=true"));
+        }
+    }
+
+    /**
+     * The request is sent on the first write, and the HttpClient waits up to the connection timeout for
+     * the rest of the body to know its length. A body written more slowly fails the call, rather than
+     * sending a Content-Length which does not match the body.
+     */
+    @Test
+    public void testWithoutChunkingFailsWhenTheBodyIsWrittenTooSlowly() throws Exception {
+        // the URLConnection conduit buffers the whole body before it sends the request
+        assumeFalse(Boolean.getBoolean("org.apache.cxf.transport.http.forceURLConnection"));
+        Dispatch<Source> dispatch = createDispatch();
+        ((HTTPConduit)((DispatchImpl<?>)dispatch).getClient().getConduit()).getClient()
+            .setConnectionTimeout(500);
+        try {
+            WebServiceException ex = assertThrows(WebServiceException.class,
+                () -> dispatch.invoke(new StreamSource(new SlowReader())));
+            assertTrue(stackTraceOf(ex), stackTraceOf(ex).contains("The request body was not written within 500 ms"));
+        } finally {
+            ((DispatchImpl<?>)dispatch).getClient().destroy();
+        }
+        assertTrue(RECEIVED.toString(), RECEIVED.isEmpty());
+    }
+
+    private static String stackTraceOf(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+
+    // A request larger than the writers' buffers, so the request is sent before it is fully written,
+    // which pauses for longer than the connection timeout after it started
+    private static final class SlowReader extends Reader {
+        private final Reader reader = new StringReader("<echo xmlns=\"urn:cxf9135\">"
+            + "x".repeat(256 * 1024) + "</echo>");
+        private int read;
+        private boolean paused;
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            if (!paused && read >= 128 * 1024) {
+                paused = true;
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException(e);
+                }
+            }
+            int n = reader.read(cbuf, off, Math.min(len, 8192));
+            if (n > 0) {
+                read += n;
+            }
+            return n;
+        }
+
+        @Override
+        public void close() {
         }
     }
 

@@ -40,6 +40,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -123,6 +124,80 @@ public class HttpClientSizedBodyPublisherTest {
         assertArrayEquals(new byte[0], readBody(publisher));
     }
 
+    /** Waking up the HttpClient thread without closing the stream must not return a partial length. */
+    @Test
+    public void testContentLengthWaitsAfterWakeupWithoutClose() throws Exception {
+        byte[] expected = body(REQUEST_SIZE);
+        CloseableByteArrayOutputStream body = new CloseableByteArrayOutputStream();
+        HttpClientWrappedOutputStream stream = stream(body);
+        HttpClientSizedBodyPublisher publisher = publisher(stream, body);
+
+        ExecutorService httpClient = Executors.newSingleThreadExecutor();
+        try {
+            CompletableFuture<Thread> httpClientThread = new CompletableFuture<>();
+            Future<Long> contentLength = httpClient.submit(() -> {
+                httpClientThread.complete(Thread.currentThread());
+                return publisher.contentLength();
+            });
+            awaitWaiting(httpClientThread.get(5, TimeUnit.SECONDS));
+            body.write(expected, 0, 10);
+            synchronized (body) {
+                body.notifyAll();
+            }
+            // let the HttpClient thread wake up, it has to wait again
+            Thread.sleep(100);
+            awaitWaiting(httpClientThread.get());
+            assertFalse(contentLength.isDone());
+
+            body.write(expected, 10, expected.length - 10);
+            closeLikeTheCaller(stream, body, publisher);
+
+            assertEquals(REQUEST_SIZE, contentLength.get(5, TimeUnit.SECONDS).longValue());
+            assertArrayEquals(expected, readBody(publisher));
+        } finally {
+            httpClient.shutdownNow();
+        }
+    }
+
+    /** A body which is not written within the timeout fails the request instead of sending a partial one. */
+    @Test
+    public void testContentLengthFailsWhenTheBodyIsNotWrittenInTime() throws Exception {
+        CloseableByteArrayOutputStream body = new CloseableByteArrayOutputStream();
+        HttpClientSizedBodyPublisher publisher = publisher(stream(body), body, 200);
+        body.write(body(REQUEST_SIZE), 0, 10);
+
+        long start = System.nanoTime();
+        IllegalStateException ex = assertThrows(IllegalStateException.class, publisher::contentLength);
+        assertTrue(ex.getMessage(), ex.getMessage().contains("200 ms"));
+        assertTrue(System.nanoTime() - start >= TimeUnit.MILLISECONDS.toNanos(190));
+    }
+
+    @Test
+    public void testContentLengthFailsWhenInterrupted() throws Exception {
+        CloseableByteArrayOutputStream body = new CloseableByteArrayOutputStream();
+        HttpClientSizedBodyPublisher publisher = publisher(stream(body), body);
+
+        ExecutorService httpClient = Executors.newSingleThreadExecutor();
+        try {
+            CompletableFuture<Thread> httpClientThread = new CompletableFuture<>();
+            Future<Boolean> interrupted = httpClient.submit(() -> {
+                httpClientThread.complete(Thread.currentThread());
+                try {
+                    publisher.contentLength();
+                    return false;
+                } catch (IllegalStateException e) {
+                    return Thread.currentThread().isInterrupted();
+                }
+            });
+            Thread thread = httpClientThread.get(5, TimeUnit.SECONDS);
+            awaitWaiting(thread);
+            thread.interrupt();
+            assertTrue(interrupted.get(5, TimeUnit.SECONDS));
+        } finally {
+            httpClient.shutdownNow();
+        }
+    }
+
     // The state of HttpClientWrappedOutputStream for a request of unknown length without chunking
     private static HttpClientWrappedOutputStream stream(CloseableByteArrayOutputStream body) {
         HttpClientWrappedOutputStream stream = mock(HttpClientWrappedOutputStream.class);
@@ -133,8 +208,13 @@ public class HttpClientSizedBodyPublisherTest {
 
     private static HttpClientSizedBodyPublisher publisher(HttpClientWrappedOutputStream stream,
             CloseableByteArrayOutputStream body) {
+        return publisher(stream, body, 30000);
+    }
+
+    private static HttpClientSizedBodyPublisher publisher(HttpClientWrappedOutputStream stream,
+            CloseableByteArrayOutputStream body, long connectionTimeout) {
         HTTPClientPolicy policy = new HTTPClientPolicy();
-        policy.setConnectionTimeout(30000);
+        policy.setConnectionTimeout(connectionTimeout);
         return new HttpClientSizedBodyPublisher(stream, policy, body);
     }
 
