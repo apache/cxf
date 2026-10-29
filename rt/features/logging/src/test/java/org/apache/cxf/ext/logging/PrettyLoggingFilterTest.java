@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  * 
  */
 
-public class TestPrettyLoggingFilter {
+public class PrettyLoggingFilterTest {
 
     @Test
     public void testWellformedXMLMessage() {

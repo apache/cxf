@@ -40,7 +40,7 @@ import org.apache.cxf.xkms.model.xkms.RevokeResultType;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CheckXKRSS {
+public class CheckXKRSSTest {
     @Test
     public void checkRegisterWithXKRSS() {
         RegisterRequestType request = new RegisterRequestType();

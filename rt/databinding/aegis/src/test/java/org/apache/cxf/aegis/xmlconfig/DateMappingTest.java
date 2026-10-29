@@ -35,7 +35,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestDateMapping {
+public class DateMappingTest {
     private AegisContext context;
     private TestUtilities testUtilities;
     private XMLOutputFactory xmlOutputFactory;
