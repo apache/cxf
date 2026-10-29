@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class CollectionTestsWithService extends AbstractAegisTest {
+public class CollectionWithServiceTest extends AbstractAegisTest {
 
     private CollectionServiceInterface csi;
     private CollectionService impl;
