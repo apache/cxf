@@ -41,9 +41,12 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
  * Appends the jsonp callback to json responses when the '_jsonp' parameter has been set in the querystring.
  */
 public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor implements WriterInterceptor {
+    public static final String DEFAULT_PADDING_START = "/**/";
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
+    private String paddingStart = DEFAULT_PADDING_START;
     private String paddingEnd = "(";
+    private boolean addNosniffHeader = true;
 
     public JsonpPreStreamInterceptor() {
         super(Phase.PRE_STREAM);
@@ -53,7 +56,7 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
         String callback = getCallbackValue(message);
         if (!StringUtils.isEmpty(callback)) {
             setContentType(message);
-            writeValue(message, callback + getPaddingEnd());
+            writeValue(message, getPaddingStart() + callback + getPaddingEnd());
         }
     }
 
@@ -65,6 +68,9 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         headers.put(Message.CONTENT_TYPE, Collections.singletonList(getMediaType()));
+        if (isAddNosniffHeader()) {
+            headers.put("X-Content-Type-Options", Collections.singletonList("nosniff"));
+        }
     }
 
     public void setMediaType(String mediaType) {
@@ -75,12 +81,28 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
         return mediaType;
     }
 
+    public void setPaddingStart(String paddingStart) {
+        this.paddingStart = paddingStart;
+    }
+
+    public String getPaddingStart() {
+        return paddingStart;
+    }
+
     public void setPaddingEnd(String paddingEnd) {
         this.paddingEnd = paddingEnd;
     }
 
     public String getPaddingEnd() {
         return paddingEnd;
+    }
+
+    public void setAddNosniffHeader(boolean addNosniffHeader) {
+        this.addNosniffHeader = addNosniffHeader;
+    }
+
+    public boolean isAddNosniffHeader() {
+        return addNosniffHeader;
     }
 
     @Override

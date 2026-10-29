@@ -598,7 +598,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         client.query("_jsonp", "callback");
         Response r = client.get();
         assertEquals("application/x-javascript", r.getMetadata().getFirst("Content-Type"));
-        assertEquals("callback({\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}});",
+        assertEquals("nosniff", r.getMetadata().getFirst("X-Content-Type-Options"));
+        assertEquals("/**/callback({\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}});",
                      IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
 
@@ -612,7 +613,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Response r = client.get();
         assertEquals("application/x-javascript", r.getMetadata().getFirst("Content-Type"));
         String response = IOUtils.readStringFromStream((InputStream)r.getEntity());
-        assertTrue(response.startsWith("callback({\"class\":\"org.apache.cxf.systest.jaxrs.Book\","));
+        assertTrue(response.startsWith("/**/callback({\"class\":\"org.apache.cxf.systest.jaxrs.Book\","));
         assertTrue(response.endsWith("});"));
         assertTrue(response.contains("\"id\":123"));
         assertTrue(response.contains("\"name\":\"CXF in Action\""));
