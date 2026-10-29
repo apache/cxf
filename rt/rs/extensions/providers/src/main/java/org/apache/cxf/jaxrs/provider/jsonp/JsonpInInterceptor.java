@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider.jsonp;
 
+import java.util.regex.Pattern;
+
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -35,9 +37,14 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String CALLBACK_PARAM = "_jsonp";
     public static final String CALLBACK_KEY = "JSONP.CALLBACK";
     public static final String DEFAULT_CALLBACK_VALUE = "callback";
+    // The callback is written verbatim in front of the JSON, so only allow
+    // letters, digits, '_', '$' and '.' (enough for plain and dotted callback
+    // names such as angular.callbacks._0) up to a bounded length
+    public static final String DEFAULT_CALLBACK_PATTERN = "[A-Za-z0-9_$.]{1,128}";
 
     private String callbackParam = CALLBACK_PARAM;
     private String defaultCallback = DEFAULT_CALLBACK_VALUE;
+    private Pattern callbackPattern = Pattern.compile(DEFAULT_CALLBACK_PATTERN);
     private String acceptType;
     private String mediaType = JSONP_TYPE;
 
@@ -52,6 +59,10 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         String callbackValue = getCallbackValue(message);
         if (!StringUtils.isEmpty(callbackValue)) {
+            if (!callbackPattern.matcher(callbackValue).matches()) {
+                // not a usable callback name, serve plain JSON
+                return;
+            }
             if (getAcceptType() != null) {
                 // may be needed to enforce the selection of
                 // JSON-aware provider
@@ -103,5 +114,19 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public String getDefaultCallback() {
         return defaultCallback;
+    }
+
+    /**
+     * Sets the regular expression a callback name must match in full.
+     * Values which do not match are ignored and the response is plain JSON.
+     * A null value restores {@link #DEFAULT_CALLBACK_PATTERN}.
+     */
+    public void setCallbackPattern(String callbackPattern) {
+        this.callbackPattern = Pattern.compile(callbackPattern == null
+            ? DEFAULT_CALLBACK_PATTERN : callbackPattern);
+    }
+
+    public String getCallbackPattern() {
+        return callbackPattern.pattern();
     }
 }
