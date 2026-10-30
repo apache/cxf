@@ -695,69 +695,70 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * so the content length becomes known (sized). It is used when the chunked transfer is not allowed
      * but the content length is not specified up-front.
      */
-    private static final class HttpClientSizedBodyPublisher implements CloseableBodyPublisher {
-        private HTTPClientPolicy csPolicy;
-        private Supplier<ByteArrayInputStream> pin;
+    static final class HttpClientSizedBodyPublisher implements CloseableBodyPublisher {
+        private final HTTPClientPolicy csPolicy;
+        // Kept when the stream is closed: the caller of an asynchronous request closes the stream
+        // without waiting, possibly before the HttpClient has read the content length and the body
+        private final CloseableByteArrayOutputStream body;
         private HttpClientWrappedOutputStream stream;
-        private long contentLen;
 
-        private HttpClientSizedBodyPublisher(HttpClientWrappedOutputStream s, HTTPClientPolicy cs,
-                Supplier<ByteArrayInputStream> pin) {
+        HttpClientSizedBodyPublisher(HttpClientWrappedOutputStream s, HTTPClientPolicy cs,
+                CloseableByteArrayOutputStream body) {
             this.stream = s;
             this.csPolicy = cs;
-            this.pin = pin;
+            this.body = body;
         }
 
         public synchronized void close() {
-            if (stream != null) {
-                contentLen = stream.contentLen;
-                stream = null;
-            }
+            stream = null;
         }
 
         @Override
         public synchronized void subscribe(Subscriber<? super ByteBuffer> subscriber) {
+            // The stream is only kept to signal that the connection is complete, which
+            // getHttpsURLConnectionInfo() waits for. It is null when the caller of an
+            // asynchronous request already closed it, so connectionComplete is not set then
             if (stream != null) {
                 stream.connectionComplete = true;
-                if (stream.pout != null) {
-                    synchronized (stream.pout) {
-                        stream.pout.notifyAll();
-                    }
-
-                    BodyPublishers.ofInputStream(pin).subscribe(subscriber);
-                    stream = null;
-                    pin = null;
-                    return;
-                }
             }
-            BodyPublishers.noBody().subscribe(subscriber);
+            BodyPublishers.ofInputStream(body::getInputStream).subscribe(subscriber);
         }
 
         @Override
         public long contentLength() {
-            if (stream != null && stream.pout != null) {
-                final CloseableByteArrayOutputStream baos = (CloseableByteArrayOutputStream) stream.pout;
-
-                try {
-                    synchronized (baos) {
-                        if (!baos.closed) {
-                            baos.wait(csPolicy.getConnectionTimeout());
-                        }
-                    }
-                    contentLen = (int) baos.size();
-                } catch (InterruptedException e) {
-                    //ignore
+            // The HttpClient is connected by now, so a trust decision can go ahead and write the body
+            synchronized (this) {
+                if (stream != null) {
+                    stream.connectionComplete = true;
                 }
             }
-
-            return contentLen;
+            // The request is sent on the first write, so wait until the whole body is written
+            long timeout = csPolicy.getConnectionTimeout();
+            long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
+            synchronized (body) {
+                while (!body.closed) {
+                    long remaining = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
+                    if (timeout > 0 && remaining <= 0) {
+                        // Fail the request rather than send it with the length of a partial body
+                        throw new IllegalStateException("The request body was not written within "
+                            + timeout + " ms");
+                    }
+                    try {
+                        body.wait(timeout > 0 ? remaining : 0);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Interrupted while waiting for the request body", e);
+                    }
+                }
+                return body.size();
+            }
         }
     }
 
     /**
      * The {@link ByteArrayOutputStream} implementation that tracks the closeability state.
      */
-    private static final class CloseableByteArrayOutputStream extends ByteArrayOutputStream {
+    static final class CloseableByteArrayOutputStream extends ByteArrayOutputStream {
         private boolean closed;
 
         /**
@@ -1016,7 +1017,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 // buffer the request body stream until it is fully flushed by the client and only
                 // than send the request.
                 final CloseableByteArrayOutputStream baos = new CloseableByteArrayOutputStream();
-                this.publisher = new HttpClientSizedBodyPublisher(this, csPolicy, baos::getInputStream);
+                this.publisher = new HttpClientSizedBodyPublisher(this, csPolicy, baos);
                 pout = baos;
             }
 
@@ -1276,6 +1277,17 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             HttpClient cl = outMessage.get(HttpClient.class);
 
             while (!connectionComplete || !cl.sslContext().getClientSessionContext().getIds().hasMoreElements()) {
+                if (future.isCompletedExceptionally()) {
+                    // The request failed before the connection was complete, so it never will be
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        if (e.getCause() instanceof IOException) {
+                            throw new Fault("Could not send Message.", LOG, (IOException)e.getCause());
+                        }
+                        throw new IOException("Could not send Message.", e.getCause());
+                    }
+                }
                 Thread.yield();
             }
             byte[] key = cl.sslContext().getClientSessionContext().getIds().nextElement();
