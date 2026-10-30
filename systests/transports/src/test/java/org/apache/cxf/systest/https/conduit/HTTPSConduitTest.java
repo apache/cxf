@@ -55,6 +55,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.WebServiceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
@@ -67,6 +68,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.https.HttpsBusServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
@@ -88,6 +90,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -117,6 +120,8 @@ import static org.junit.Assert.fail;
  */
 public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static final boolean IN_PROCESS = true;
+    // no server listens on this port
+    private static final String NO_SERVER_PORT = TestUtil.getPortNumber(HTTPSConduitTest.class);
 
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
     private static List<String> servers = new ArrayList<>();
@@ -646,6 +651,65 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             //              0 > trustDecider.wasCalled());
         }
         assertProxyRequestCount(0);
+    }
+
+    /**
+     * The trust decision is made after the request is sent and before its body is written. Without
+     * chunking, the HttpClient waits for the whole body before it sends the request, so it must let the
+     * trust decision go ahead.
+     */
+    @Test(timeout = 60000)
+    public void testHttpsTrustWithoutChunking() throws Exception {
+        startServer("Bethal");
+
+        Greeter bethal = createBethal(getPort("PORT4"), false);
+        HTTPConduit http = (HTTPConduit) ClientProxy.getClient(bethal).getConduit();
+
+        http.setTrustDecider(new MyHttpsTrustDecider("Bethal"));
+        assertEquals("Bonjour from Bethal", bethal.sayHi());
+
+        http.setTrustDecider(new MyHttpsTrustDecider("Nobody"));
+        assertThrows(WebServiceException.class, bethal::sayHi);
+    }
+
+    /**
+     * A request which fails before the connection is complete must fail the call, rather than leave
+     * the trust decision waiting for the connection.
+     */
+    @Test(timeout = 60000)
+    public void testHttpsTrustConnectionRefused() throws Exception {
+        for (boolean allowChunking : new boolean[] {true, false}) {
+            Greeter bethal = createBethal(NO_SERVER_PORT, allowChunking);
+            HTTPConduit http = (HTTPConduit) ClientProxy.getClient(bethal).getConduit();
+            http.setTrustDecider(new MyHttpsTrustDecider("Bethal"));
+
+            assertThrows(WebServiceException.class, bethal::sayHi);
+        }
+    }
+
+    private Greeter createBethal(String port, boolean allowChunking) throws Exception {
+        URL wsdl = getClass().getResource("greeting.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        Greeter bethal = service.getPort(bethalQ, Greeter.class);
+        updateAddressPort(bethal, port);
+
+        Client client = ClientProxy.getClient(bethal);
+        client.getRequestContext().put("share.httpclient.http.conduit", false);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setAutoRedirect(false);
+        httpClientPolicy.setAllowChunking(allowChunking);
+        AuthorizationPolicy authPolicy = new AuthorizationPolicy();
+        authPolicy.setUserName("Betty");
+        authPolicy.setPassword("password");
+
+        http.setClient(httpClientPolicy);
+        http.setTlsClientParameters(tlsClientParameters);
+        http.setAuthorization(authPolicy);
+        return bethal;
     }
 
     @Test
