@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
@@ -53,7 +54,18 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     private static final Set<String> SKIP_METHODS = new HashSet<>(
             Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
 
+    // Claims configured explicitly via setClaims, keyed by method name
     private Map<String, List<ClaimBean>> claims = new HashMap<>();
+    // The method-level and class-level @Claim/@Claims declarations which apply to each method
+    // signature in the secured object's hierarchy. Keying by signature means that overloaded
+    // methods do not share a rule
+    private final Map<String, List<ClaimsDeclaration>> declarationsBySignature = new HashMap<>();
+    // The erased signatures a method overrides with a different signature, e.g. update(Object)
+    // for update(String) implementing update(T) of Repository<String>
+    private final Map<String, Set<String>> overriddenSignatures = new HashMap<>();
+    private final Map<String, Set<String>> signaturesByName = new HashMap<>();
+    private final Set<Class<?>> securedClasses = new HashSet<>();
+    private boolean annotationClaimsFound;
     private Map<String, String> nameAliases = Collections.emptyMap();
     private Map<String, String> formatAliases = Collections.emptyMap();
 
@@ -82,7 +94,63 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     }
 
     protected boolean authorize(ClaimsSecurityContext sc, Method method) {
-        List<ClaimBean> list = claims.get(method.getName());
+        String signature = ReflectionUtil.getMethodSignature(method);
+        boolean securedMethod = declarationsBySignature.containsKey(signature);
+        Set<String> signatures = new HashSet<>();
+        if (securedMethod) {
+            signatures.add(signature);
+            signatures.addAll(overriddenSignatures.getOrDefault(signature, Collections.emptySet()));
+        } else {
+            // The method is not one of the secured object's methods, so every rule
+            // recorded for its name applies
+            signatures.addAll(signaturesByName.getOrDefault(method.getName(), Collections.emptySet()));
+        }
+        List<ClaimBean> requiredClaims = new ArrayList<>();
+        for (String s : signatures) {
+            requiredClaims.addAll(getAnnotationClaims(s));
+        }
+        List<ClaimBean> configuredClaims = claims.get(method.getName());
+        if (configuredClaims != null) {
+            requiredClaims.addAll(configuredClaims);
+        } else if (!securedMethod && requiredClaims.isEmpty()) {
+            // A method without claims requirements is only permitted if it is one of
+            // the secured object's methods
+            return false;
+        }
+        // Every claim which applies to the method has to be matched
+        return isAuthorized(sc, requiredClaims);
+    }
+
+    private List<ClaimBean> getAnnotationClaims(String signature) {
+        // Every @Claim which applies to the method has to be met, from any class or interface
+        // in the hierarchy. A class-level @Claim is replaced by a method-level @Claim of the same
+        // name and format declared on the same class or interface, or on a subclass of it
+        List<ClaimsDeclaration> declarations =
+            declarationsBySignature.getOrDefault(signature, Collections.emptyList());
+        List<ClaimBean> requiredClaims = new ArrayList<>();
+        for (ClaimsDeclaration declaration : declarations) {
+            for (ClaimBean bean : declaration.claims) {
+                if (declaration.methodLevel
+                    || !isClaimOverridden(bean, declaration.declaringClass, declarations)) {
+                    requiredClaims.add(bean);
+                }
+            }
+        }
+        return requiredClaims;
+    }
+
+    private static boolean isClaimOverridden(ClaimBean bean, Class<?> cls,
+                                             List<ClaimsDeclaration> declarations) {
+        for (ClaimsDeclaration declaration : declarations) {
+            if (declaration.methodLevel && cls.isAssignableFrom(declaration.declaringClass)
+                && isClaimOverridden(bean, declaration.claims)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isAuthorized(ClaimsSecurityContext sc, List<ClaimBean> list) {
         org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
 
         for (ClaimBean claimBean : list) {
@@ -129,13 +197,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         findClaims(cls);
-        if (claims.isEmpty()) {
+        if (!annotationClaimsFound) {
             LOG.warning("The claims list is empty, the service object is not protected");
         }
     }
 
     protected void findClaims(Class<?> cls) {
-        if (cls == null || cls == Object.class) {
+        if (cls == null || cls == Object.class || !securedClasses.add(cls)) {
             return;
         }
         List<ClaimBean> clsClaims =
@@ -147,26 +215,26 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             List<ClaimBean> methodClaims =
                 getClaims(m.getAnnotation(Claims.class), m.getAnnotation(Claim.class));
 
-            List<ClaimBean> allClaims = new ArrayList<>(methodClaims);
-            for (ClaimBean bean : clsClaims) {
-                if (isClaimOverridden(bean, methodClaims)) {
-                    continue;
-                }
-                allClaims.add(bean);
+            String signature = ReflectionUtil.getMethodSignature(m);
+            List<ClaimsDeclaration> declarations =
+                declarationsBySignature.computeIfAbsent(signature, k -> new ArrayList<>());
+            if (!methodClaims.isEmpty()) {
+                declarations.add(new ClaimsDeclaration(m.getDeclaringClass(), methodClaims, true));
             }
-
-            claims.put(m.getName(), allClaims);
-        }
-        if (!claims.isEmpty()) {
-            return;
+            if (!clsClaims.isEmpty()) {
+                declarations.add(new ClaimsDeclaration(cls, clsClaims, false));
+            }
+            signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
+            annotationClaimsFound |= !methodClaims.isEmpty() || !clsClaims.isEmpty();
+            if (!m.isBridge()) {
+                for (Method overridden : ReflectionUtil.getGenericallyOverriddenMethods(cls, m)) {
+                    overriddenSignatures.computeIfAbsent(signature, k -> new HashSet<>())
+                        .add(ReflectionUtil.getMethodSignature(overridden));
+                }
+            }
         }
 
         findClaims(cls.getSuperclass());
-
-        if (!claims.isEmpty()) {
-            return;
-        }
-
         for (Class<?> interfaceCls : cls.getInterfaces()) {
             findClaims(interfaceCls);
         }
@@ -224,4 +292,15 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         this.formatAliases = formatAliases;
     }
 
+    private static final class ClaimsDeclaration {
+        private final Class<?> declaringClass;
+        private final List<ClaimBean> claims;
+        private final boolean methodLevel;
+
+        ClaimsDeclaration(Class<?> declaringClass, List<ClaimBean> claims, boolean methodLevel) {
+            this.declaringClass = declaringClass;
+            this.claims = claims;
+            this.methodLevel = methodLevel;
+        }
+    }
 }
