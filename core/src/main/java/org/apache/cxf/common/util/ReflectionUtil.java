@@ -23,16 +23,28 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
@@ -185,6 +197,87 @@ public final class ReflectionUtil {
             sb.append(paramTypes[i].getName());
         }
         return sb.append(')').toString();
+    }
+
+    /**
+     * Returns the methods of the superclasses and interfaces of a class which one of its public
+     * methods overrides or implements with different (erased) parameter types, because the
+     * overridden method's parameter types are type variables. For example, for update(String) of
+     * a class implementing Repository&lt;String&gt;, update(T) of Repository is returned.
+     */
+    public static List<Method> getGenericallyOverriddenMethods(final Class<?> cls, final Method method) {
+        Map<TypeVariable<?>, Type> typeArguments = new HashMap<>();
+        Set<Class<?>> supertypes = new LinkedHashSet<>();
+        collectTypeArguments(cls, typeArguments, supertypes);
+
+        List<Method> overridden = new ArrayList<>();
+        Class<?>[] paramTypes = method.getParameterTypes();
+        for (Class<?> supertype : supertypes) {
+            for (Method m : getDeclaredMethods(supertype)) {
+                if (m.isBridge() || Modifier.isStatic(m.getModifiers())
+                    || Modifier.isPrivate(m.getModifiers())
+                    || !m.getName().equals(method.getName())
+                    || m.getParameterCount() != paramTypes.length
+                    || Arrays.equals(m.getParameterTypes(), paramTypes)) {
+                    continue;
+                }
+                Type[] genericParamTypes = m.getGenericParameterTypes();
+                boolean matches = genericParamTypes.length == paramTypes.length;
+                for (int i = 0; matches && i < paramTypes.length; i++) {
+                    matches = resolveType(genericParamTypes[i], typeArguments) == paramTypes[i];
+                }
+                if (matches) {
+                    overridden.add(m);
+                }
+            }
+        }
+        return overridden;
+    }
+
+    private static void collectTypeArguments(Type type, Map<TypeVariable<?>, Type> typeArguments,
+                                             Set<Class<?>> supertypes) {
+        final Class<?> cls;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType)type;
+            cls = (Class<?>)parameterizedType.getRawType();
+            TypeVariable<?>[] typeVariables = cls.getTypeParameters();
+            Type[] actualTypes = parameterizedType.getActualTypeArguments();
+            for (int i = 0; i < typeVariables.length && i < actualTypes.length; i++) {
+                typeArguments.putIfAbsent(typeVariables[i], actualTypes[i]);
+            }
+        } else if (type instanceof Class) {
+            cls = (Class<?>)type;
+        } else {
+            return;
+        }
+        if (cls == Object.class || !supertypes.add(cls)) {
+            return;
+        }
+        collectTypeArguments(cls.getGenericSuperclass(), typeArguments, supertypes);
+        for (Type interfaceType : cls.getGenericInterfaces()) {
+            collectTypeArguments(interfaceType, typeArguments, supertypes);
+        }
+    }
+
+    private static Class<?> resolveType(Type type, Map<TypeVariable<?>, Type> typeArguments) {
+        if (type instanceof Class) {
+            return (Class<?>)type;
+        } else if (type instanceof ParameterizedType) {
+            return (Class<?>)((ParameterizedType)type).getRawType();
+        } else if (type instanceof GenericArrayType) {
+            Class<?> componentType =
+                resolveType(((GenericArrayType)type).getGenericComponentType(), typeArguments);
+            return Array.newInstance(componentType, 0).getClass();
+        } else if (type instanceof WildcardType) {
+            return resolveType(((WildcardType)type).getUpperBounds()[0], typeArguments);
+        } else if (type instanceof TypeVariable) {
+            // A type variable which is not bound by the class's hierarchy resolves to its bound
+            Type actualType = typeArguments.get(type);
+            return actualType != null && actualType != type
+                ? resolveType(actualType, typeArguments)
+                : resolveType(((TypeVariable<?>)type).getBounds()[0], typeArguments);
+        }
+        return Object.class;
     }
 
     public static Field[] getDeclaredFields(final Class<?> cls) {
