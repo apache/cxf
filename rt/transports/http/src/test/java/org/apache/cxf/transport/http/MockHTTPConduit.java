@@ -107,6 +107,11 @@ public class MockHTTPConduit extends HTTPConduit {
         }
 
         @Override
+        protected void handleRetransmits() throws IOException {
+            // there is no response that could require a retransmission
+        }
+
+        @Override
         protected void handleResponseInternal() throws IOException {
             outMessage.put(Thread.class, Thread.currentThread());
         }

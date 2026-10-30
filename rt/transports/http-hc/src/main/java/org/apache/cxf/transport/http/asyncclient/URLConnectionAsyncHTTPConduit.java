@@ -867,8 +867,9 @@ public class URLConnectionAsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         protected void setupNewConnection(String newURL) throws IOException {
             httpResponse = null;
-            isAsync = outMessage != null && outMessage.getExchange() != null
-                && !outMessage.getExchange().isSynchronous();
+            // only used to retransmit: the thread that retransmits waits for the response and handles it,
+            // for an asynchronous exchange too, so the response must not be dispatched again when it is received
+            isAsync = false;
             exception = null;
             connectionFuture = null;
             session = null;
