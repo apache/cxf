@@ -238,6 +238,9 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
 
         for (int i = 0; i < 20; i++) {
             if (!singleProxy) {
+                if (bookStore != null) {
+                    WebClient.client(bookStore).close();
+                }
                 feature.getTargetSelector().close();
                 bookStore = getBookStore(inactiveReplica, feature);
             }
@@ -295,9 +298,13 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                                 boolean expectRandom) throws Exception {
         boolean randomized = false;
         String prevEndpoint = null;
+        WebClient bookStore = null;
         for (int i = 0; i < 20; i++) {
+            if (bookStore != null) {
+                bookStore.close();
+            }
             feature.getTargetSelector().close();
-            WebClient bookStore = getWebClient(inactiveReplica, feature);
+            bookStore = getWebClient(inactiveReplica, feature);
             verifyStrategy(bookStore, expectRandom
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
