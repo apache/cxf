@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,53 +60,61 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     // Scopes configured explicitly via setScopesMap/setScopesStringMap, keyed by method name
     private Map<String, List<String>> scopesMap = new HashMap<>();
     private Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
-    // Scopes discovered from @Scopes annotations. Method-level and class-level annotations
-    // are keyed by method signature so that overloaded methods do not share a rule and an
-    // annotation on an overriding method is not replaced by one from a superclass or interface
-    private final Map<String, Scopes> methodScopesBySignature = new HashMap<>();
-    private final Map<String, Scopes> classScopesBySignature = new HashMap<>();
-    // All the annotation-derived rules for a given method name, enforced together when the
-    // invoked method's signature is not recorded (e.g. it implements a generic interface method)
-    private final Map<String, Set<Scopes>> annotationScopesByName = new HashMap<>();
+    // The method-level and class-level @Scopes declarations which apply to each method signature
+    // in the secured object's hierarchy. Keying by signature means that overloaded methods do
+    // not share a rule
+    private final Map<String, List<ScopesDeclaration>> declarationsBySignature = new HashMap<>();
+    // The erased signatures a method overrides with a different signature, e.g. update(Object)
+    // for update(String) implementing update(T) of Repository<String>
+    private final Map<String, Set<String>> overriddenSignatures = new HashMap<>();
+    private final Map<String, Set<String>> signaturesByName = new HashMap<>();
+    private final Set<Class<?>> securedClasses = new HashSet<>();
+    private boolean annotationScopesFound;
     private Set<String> confidentialClientMethods = new HashSet<>();
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         checkSecureClass(cls);
-        if (annotationScopesByName.isEmpty()) {
+        if (!annotationScopesFound) {
             LOG.warning("The scopes map is empty");
         } else if (LOG.isLoggable(Level.FINE)) {
-            for (Map.Entry<String, Set<Scopes>> entry : annotationScopesByName.entrySet()) {
-                for (Scopes scopes : entry.getValue()) {
-                    LOG.fine("Method: " + entry.getKey() + ", scopes: " + Arrays.asList(scopes.value()));
+            for (String signature : declarationsBySignature.keySet()) {
+                for (Scopes scopes : getAnnotationScopes(signature)) {
+                    LOG.fine("Method: " + signature + ", scopes: " + Arrays.asList(scopes.value()));
                 }
             }
         }
     }
 
     protected void checkSecureClass(Class<?> cls) {
-        if (cls == null || cls == Object.class) {
+        if (cls == null || cls == Object.class || !securedClasses.add(cls)) {
             return;
         }
+        // The class-level @Scopes may be inherited from a superclass (@Scopes is @Inherited)
         Scopes classScopes = cls.getAnnotation(Scopes.class);
+        Class<?> classScopesDeclarer = getScopesDeclarer(cls);
         ConfidentialClient classConfClient = cls.getAnnotation(ConfidentialClient.class);
         for (Method m : cls.getMethods()) {
             if (SKIP_METHODS.contains(m.getName())) {
                 continue;
             }
-            // Subclasses are scanned before their superclasses and interfaces, so the most
-            // specific declaration of a given signature is recorded first and kept
             String signature = ReflectionUtil.getMethodSignature(m);
             Scopes methodScopes = m.getAnnotation(Scopes.class);
-            // Each overload has its own signature and so its own rule. The rules are also
-            // collected by name, but that is only used as a fallback when the invoked
-            // method's signature was not recorded, and then all of them have to be met
+            List<ScopesDeclaration> declarations =
+                declarationsBySignature.computeIfAbsent(signature, k -> new ArrayList<>());
             if (methodScopes != null) {
-                methodScopesBySignature.putIfAbsent(signature, methodScopes);
-                annotationScopesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(methodScopes);
-            } else if (classScopes != null) {
-                classScopesBySignature.putIfAbsent(signature, classScopes);
-                annotationScopesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(classScopes);
+                declarations.add(new ScopesDeclaration(m.getDeclaringClass(), methodScopes, true));
+            }
+            if (classScopes != null) {
+                declarations.add(new ScopesDeclaration(classScopesDeclarer, classScopes, false));
+            }
+            signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
+            annotationScopesFound |= methodScopes != null || classScopes != null;
+            if (!m.isBridge()) {
+                for (Method overridden : ReflectionUtil.getGenericallyOverriddenMethods(cls, m)) {
+                    overriddenSignatures.computeIfAbsent(signature, k -> new HashSet<>())
+                        .add(ReflectionUtil.getMethodSignature(overridden));
+                }
             }
 
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
@@ -162,19 +171,56 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
     }
 
+    private static Class<?> getScopesDeclarer(Class<?> cls) {
+        Class<?> declarer = cls;
+        while (declarer != null && declarer.getDeclaredAnnotation(Scopes.class) == null) {
+            declarer = declarer.getSuperclass();
+        }
+        return declarer == null ? cls : declarer;
+    }
+
     private List<Scopes> getAnnotationScopes(Method m) {
         String signature = ReflectionUtil.getMethodSignature(m);
-        // A method-level annotation anywhere in the hierarchy takes precedence over a
-        // class-level one, otherwise an inherited class-level @Scopes would replace it
-        Scopes scopes = methodScopesBySignature.get(signature);
-        if (scopes == null) {
-            scopes = classScopesBySignature.get(signature);
+        Set<String> signatures = new HashSet<>();
+        if (declarationsBySignature.containsKey(signature)) {
+            signatures.add(signature);
+            signatures.addAll(overriddenSignatures.getOrDefault(signature, Collections.emptySet()));
+        } else {
+            // The method is not one of the secured object's methods, so every rule
+            // recorded for its name applies
+            signatures.addAll(signaturesByName.getOrDefault(m.getName(), Collections.emptySet()));
         }
-        if (scopes != null) {
-            return Collections.singletonList(scopes);
+        Set<Scopes> scopes = new LinkedHashSet<>();
+        for (String s : signatures) {
+            scopes.addAll(getAnnotationScopes(s));
         }
-        Set<Scopes> scopesForName = annotationScopesByName.get(m.getName());
-        return scopesForName == null ? Collections.emptyList() : new ArrayList<>(scopesForName);
+        return new ArrayList<>(scopes);
+    }
+
+    private List<Scopes> getAnnotationScopes(String signature) {
+        // Every @Scopes which applies to the method has to be met, from any class or interface
+        // in the hierarchy. A class-level @Scopes is replaced by a method-level @Scopes declared on
+        // the same class or interface, or on a subclass of it
+        List<ScopesDeclaration> declarations =
+            declarationsBySignature.getOrDefault(signature, Collections.emptyList());
+        Set<Scopes> scopes = new LinkedHashSet<>();
+        for (ScopesDeclaration declaration : declarations) {
+            if (declaration.methodLevel || !isReplacedByMethodScopes(declaration, declarations)) {
+                scopes.add(declaration.scopes);
+            }
+        }
+        return new ArrayList<>(scopes);
+    }
+
+    private static boolean isReplacedByMethodScopes(ScopesDeclaration classDeclaration,
+                                                    List<ScopesDeclaration> declarations) {
+        for (ScopesDeclaration declaration : declarations) {
+            if (declaration.methodLevel
+                && classDeclaration.declaringClass.isAssignableFrom(declaration.declaringClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isAllowed(List<String> requestScopes, List<String> methodScopes,
@@ -216,5 +262,16 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         this.confidentialClientMethods = confidentialClientMethods;
     }
 
+    private static final class ScopesDeclaration {
+        // The class or interface the annotation is declared on
+        private final Class<?> declaringClass;
+        private final Scopes scopes;
+        private final boolean methodLevel;
 
+        ScopesDeclaration(Class<?> declaringClass, Scopes scopes, boolean methodLevel) {
+            this.declaringClass = declaringClass;
+            this.scopes = scopes;
+            this.methodLevel = methodLevel;
+        }
+    }
 }
