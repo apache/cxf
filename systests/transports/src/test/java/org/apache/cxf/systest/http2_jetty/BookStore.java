@@ -27,7 +27,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -46,6 +49,14 @@ public class BookStore {
     @Produces("text/plain")
     public byte[] getBookName() {
         return "CXF in Action".getBytes();
+    }
+
+    @POST
+    @Path("/echo")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public String echo(String body, @Context HttpServletRequest request) {
+        return request.getProtocol() + " " + body;
     }
 
     @GET
