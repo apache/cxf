@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Produces("application/json")
 @Consumes("application/json")
+@Deprecated(since = "4.2.5", forRemoval = true)
 public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
 
