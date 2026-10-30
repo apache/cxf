@@ -1415,13 +1415,13 @@ public abstract class HTTPConduit
                     cachedStream.closeFlowthroughStream();
                 }
 
-                boolean releaseCachedStream = true;
+                boolean handled = false;
                 try {
+                    // the cached request is released once the retransmits are done
                     handleResponse();
-                    // the thread that handles an asynchronous response retransmits the cached request
-                    releaseCachedStream = isSynchronous();
+                    handled = true;
                 } finally {
-                    if (releaseCachedStream) {
+                    if (!handled) {
                         releaseCachedStream();
                     }
                 }
@@ -1617,12 +1617,10 @@ public abstract class HTTPConduit
          */
         protected void handleResponse() throws IOException {
             if (isSynchronous()) {
-                // Process retransmits until we fall out.
-                handleRetransmits();
-                handleResponseInternal();
+                handleRetransmitsAndResponse();
             } else {
-                // the retransmits wait for the response, so they are processed with it,
-                // not to block the caller thread
+                // the retransmits wait for the response, so they are processed with it
+                // on the thread that handles the response, not to block the caller thread
                 handleResponseAsync();
             }
         }
@@ -1634,8 +1632,9 @@ public abstract class HTTPConduit
         }
 
         /**
-         * Processes the retransmits, if any, and then the response of an asynchronous exchange,
-         * on the thread that handles the response.
+         * Processes the retransmits until we fall out, and then the response. It runs on the
+         * caller thread for a synchronous exchange, and on the thread that handles the response
+         * for an asynchronous one. The cached request is released once the retransmits are done.
          */
         private void handleRetransmitsAndResponse() throws IOException {
             try {
