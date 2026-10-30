@@ -707,10 +707,8 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
         }
 
         protected void handleResponseAsync() throws IOException {
-            // The response hasn't been handled yet, should be handled asynchronously
-            if (httpResponse == null) {
-                isAsync = true;
-            }
+            // The response is handled when it is received, as isAsync is set for an asynchronous
+            // exchange. It is not set again, as a retransmission may already be in progress.
         }
 
         protected void closeInputStream() throws IOException {
@@ -884,8 +882,9 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
 
         protected void setupNewConnection(String newURL) throws IOException {
             httpResponse = null;
-            isAsync = outMessage != null && outMessage.getExchange() != null
-                && !outMessage.getExchange().isSynchronous();
+            // only used to retransmit: the thread that retransmits waits for the response and handles it,
+            // for an asynchronous exchange too, so the response must not be dispatched again when it is received
+            isAsync = false;
             exception = null;
             connectionFuture = null;
             session = null;
