@@ -42,10 +42,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.Types;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -54,6 +51,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -635,15 +633,9 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected Element downloadSchema(String schemaLocation) throws Exception {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-
-        DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
         Document document;
         try (URIResolver resolver = new URIResolver(schemaLocation)) {
-            document = documentBuilder.parse(resolver.getInputStream());
+            document = SecureDocumentBuilderFactory.newNSDocumentBuilder().parse(resolver.getInputStream());
         }
         return document.getDocumentElement();
     }
