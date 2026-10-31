@@ -233,44 +233,51 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 feature.getTargetSelector().close();
                 bookStore = getBookStore(inactiveReplica, feature);
             }
-            verifyStrategy(bookStore, expectRandom
-                              ? RandomStrategy.class
-                              : SequentialStrategy.class);
-            Exception ex = null;
             try {
-                if (expectServerException) {
-                    bookStore.getBook("9999");
-                    fail("Exception expected");
+                verifyStrategy(bookStore, expectRandom
+                                  ? RandomStrategy.class
+                                  : SequentialStrategy.class);
+                Exception ex = null;
+                try {
+                    if (expectServerException) {
+                        bookStore.getBook("9999");
+                        fail("Exception expected");
+                    } else {
+                        final long bookId = 123L;
+                        Book book = bookStore.echoBookElementJson(new Book("CXF", bookId));
+                        assertNotNull("expected non-null response", book);
+                        assertEquals("unexpected id", bookId, book.getId());
+                    }
+                } catch (Exception error) {
+                    if (!expectServerException) {
+                        //String currEndpoint = getCurrentEndpointAddress(bookStore);
+                        //assertEquals(currEndpoint, inactiveReplica);
+                        throw error;
+                    }
+                    ex = error;
+                }
+                String currEndpoint = getCurrentEndpointAddress(bookStore);
+                assertFalse(currEndpoint.equals(inactiveReplica));
+                if (expectRandom) {
+                    assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
                 } else {
-                    final long bookId = 123L;
-                    Book book = bookStore.echoBookElementJson(new Book("CXF", bookId));
-                    assertNotNull("expected non-null response", book);
-                    assertEquals("unexpected id", bookId, book.getId());
+                    assertEquals(activeReplica1, currEndpoint);
                 }
-            } catch (Exception error) {
-                if (!expectServerException) {
-                    //String currEndpoint = getCurrentEndpointAddress(bookStore);
-                    //assertEquals(currEndpoint, inactiveReplica);
-                    throw error;
+                if (expectServerException) {
+                    assertNotNull(ex);
+                    throw ex;
                 }
-                ex = error;
-            }
-            String currEndpoint = getCurrentEndpointAddress(bookStore);
-            assertFalse(currEndpoint.equals(inactiveReplica));
-            if (expectRandom) {
-                assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
-            } else {
-                assertEquals(activeReplica1, currEndpoint);
-            }
-            if (expectServerException) {
-                assertNotNull(ex);
-                throw ex;
-            }
 
-            if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
-                randomized = true;
+                if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
+                    randomized = true;
+                }
+                prevEndpoint = currEndpoint;
+            } finally {
+                // a single proxy is used by all iterations, so only a proxy of this iteration is closed
+                if (!singleProxy) {
+                    WebClient.client(bookStore).close();
+                }
             }
-            prevEndpoint = currEndpoint;
         }
         if (!singleProxy) {
             assertEquals("unexpected random/sequential distribution of failovers",
@@ -290,38 +297,42 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         for (int i = 0; i < 20; i++) {
             feature.getTargetSelector().close();
             WebClient bookStore = getWebClient(inactiveReplica, feature);
-            verifyStrategy(bookStore, expectRandom
-                              ? RandomStrategy.class
-                              : SequentialStrategy.class);
-            String bookId = expectServerException ? "9999" : "123";
-            bookStore.path("bookstore/books").path(bookId);
-            Exception ex = null;
             try {
-                Book book = bookStore.get(Book.class);
-                assertNotNull("expected non-null response", book);
-                assertEquals("unexpected id", 123L, book.getId());
-            } catch (Exception error) {
-                if (!expectServerException) {
-                    throw error;
+                verifyStrategy(bookStore, expectRandom
+                                  ? RandomStrategy.class
+                                  : SequentialStrategy.class);
+                String bookId = expectServerException ? "9999" : "123";
+                bookStore.path("bookstore/books").path(bookId);
+                Exception ex = null;
+                try {
+                    Book book = bookStore.get(Book.class);
+                    assertNotNull("expected non-null response", book);
+                    assertEquals("unexpected id", 123L, book.getId());
+                } catch (Exception error) {
+                    if (!expectServerException) {
+                        throw error;
+                    }
+                    ex = error;
                 }
-                ex = error;
-            }
-            String currEndpoint = getCurrentEndpointAddress(bookStore);
-            assertFalse(currEndpoint.equals(inactiveReplica));
-            if (expectRandom) {
-                assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
-            } else {
-                assertEquals(currEndpoint, activeReplica1);
-            }
-            if (expectServerException) {
-                assertNotNull(ex);
-                throw ex;
-            }
+                String currEndpoint = getCurrentEndpointAddress(bookStore);
+                assertFalse(currEndpoint.equals(inactiveReplica));
+                if (expectRandom) {
+                    assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
+                } else {
+                    assertEquals(currEndpoint, activeReplica1);
+                }
+                if (expectServerException) {
+                    assertNotNull(ex);
+                    throw ex;
+                }
 
-            if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
-                randomized = true;
+                if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
+                    randomized = true;
+                }
+                prevEndpoint = currEndpoint;
+            } finally {
+                bookStore.close();
             }
-            prevEndpoint = currEndpoint;
         }
         assertEquals("unexpected random/sequential distribution of failovers",
                      expectRandom,
