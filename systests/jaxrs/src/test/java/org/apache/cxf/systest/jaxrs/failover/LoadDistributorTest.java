@@ -32,6 +32,7 @@ import org.apache.cxf.clustering.LoadDistributorTargetSelector;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -152,18 +153,20 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
         int address3Count = 0;
         for (int i = 0; i < 20; i++) {
             BookStore bookStore = getBookStore(initialAddress, feature);
-            verifyStrategy(bookStore, SequentialStrategy.class);
-            String bookId = "123";
+            try (Client client = WebClient.client(bookStore)) {
+                verifyStrategy(bookStore, SequentialStrategy.class);
+                String bookId = "123";
 
-            Book book = bookStore.getBook(bookId);
-            assertNotNull("expected non-null response", book);
-            assertEquals("unexpected id", 123L, book.getId());
+                Book book = bookStore.getBook(bookId);
+                assertNotNull("expected non-null response", book);
+                assertEquals("unexpected id", 123L, book.getId());
 
-            String address = getCurrentEndpointAddress(bookStore);
-            if (Server.ADDRESS2.equals(address)) {
-                address2Count++;
-            } else if (Server.ADDRESS3.equals(address)) {
-                address3Count++;
+                String address = getCurrentEndpointAddress(bookStore);
+                if (Server.ADDRESS2.equals(address)) {
+                    address2Count++;
+                } else if (Server.ADDRESS3.equals(address)) {
+                    address3Count++;
+                }
             }
         }
         assertEquals(10, address2Count);
