@@ -36,7 +36,6 @@ import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
-import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -242,8 +241,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 feature.getTargetSelector().close();
                 bookStore = getBookStore(inactiveReplica, feature);
             }
-            // a single proxy is used by all iterations, so only a proxy of this iteration is closed
-            try (Client client = singleProxy ? null : WebClient.client(bookStore)) {
+            try {
                 verifyStrategy(bookStore, expectRandom
                                   ? RandomStrategy.class
                                   : SequentialStrategy.class);
@@ -282,6 +280,11 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                     randomized = true;
                 }
                 prevEndpoint = currEndpoint;
+            } finally {
+                // a single proxy is used by all iterations, so only a proxy of this iteration is closed
+                if (!singleProxy) {
+                    WebClient.client(bookStore).close();
+                }
             }
         }
         if (!singleProxy) {
@@ -301,7 +304,8 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         String prevEndpoint = null;
         for (int i = 0; i < 20; i++) {
             feature.getTargetSelector().close();
-            try (WebClient bookStore = getWebClient(inactiveReplica, feature)) {
+            WebClient bookStore = getWebClient(inactiveReplica, feature);
+            try {
                 verifyStrategy(bookStore, expectRandom
                                   ? RandomStrategy.class
                                   : SequentialStrategy.class);
@@ -334,6 +338,8 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                     randomized = true;
                 }
                 prevEndpoint = currEndpoint;
+            } finally {
+                bookStore.close();
             }
         }
         assertEquals("unexpected random/sequential distribution of failovers",

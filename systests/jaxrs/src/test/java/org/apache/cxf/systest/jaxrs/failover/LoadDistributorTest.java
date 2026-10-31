@@ -32,7 +32,6 @@ import org.apache.cxf.clustering.LoadDistributorTargetSelector;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -153,7 +152,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
         int address3Count = 0;
         for (int i = 0; i < 20; i++) {
             BookStore bookStore = getBookStore(initialAddress, feature);
-            try (Client client = WebClient.client(bookStore)) {
+            try {
                 verifyStrategy(bookStore, SequentialStrategy.class);
                 String bookId = "123";
 
@@ -167,6 +166,8 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
                 } else if (Server.ADDRESS3.equals(address)) {
                     address3Count++;
                 }
+            } finally {
+                WebClient.client(bookStore).close();
             }
         }
         assertEquals(10, address2Count);
