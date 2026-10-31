@@ -427,6 +427,36 @@ abstract class AbstractOAuthDataProviderTest {
         assertEquals("thumbprint", at2.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
     }
 
+    /**
+     * The binding follows the certificate on the current request, as it does for the initial grant,
+     * so a refresh without a certificate issues an unbound token.
+     */
+    @Test
+    public void testRefreshWithoutCertificateIssuesUnboundAccessToken() {
+        MessageContext mc = mock(MessageContext.class);
+        when(mc.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)).thenReturn("thumbprint");
+        getProvider().setMessageContext(mc);
+
+        Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        assertEquals("thumbprint", at.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+
+        when(mc.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)).thenReturn(null);
+
+        ServerAccessToken at2 = getProvider().refreshAccessToken(c, at.getRefreshToken(), Collections.emptyList());
+        assertNull(at2.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+        if (getProvider().isUseJwtFormatForAccessTokens()) {
+            JwtToken jwt = new JwsJwtCompactConsumer(at2.getTokenKey()).getJwtToken();
+            assertNull(jwt.getClaim(JwtConstants.CLAIM_CONFIRMATION));
+        }
+    }
+
     protected Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
