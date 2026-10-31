@@ -473,6 +473,39 @@ public class ClaimsAuthorizingInterceptorTest {
         assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
     }
 
+    @Test
+    public void testAliasesSetAfterSecuredObject() throws Exception {
+        ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
+        in.setSecuredObject(new AliasService());
+        in.setNameAliases(Collections.singletonMap("authentication", "http://authentication"));
+        in.setFormatAliases(Collections.singletonMap("claims", "http://claims"));
+        Method lax = AliasService.class.getMethod("laxClaim");
+        Method strict = AliasService.class.getMethod("strictClaim");
+
+        in.handleMessage(prepareMessage(lax, createClaim("http://authentication", "http://claims", "password")));
+        assertDenied(in, prepareMessage(lax,
+            createClaim("http://authentication", "http://claims", "smartcard")));
+        in.handleMessage(prepareMessage(strict,
+            createClaim("http://authentication", "http://claims", "password")));
+        assertDenied(in, prepareMessage(strict,
+            createClaim("http://authentication", "http://claims", "smartcard")));
+    }
+
+    @Test
+    public void testAliasesReplacedAfterSecuredObject() throws Exception {
+        ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
+        in.setNameAliases(Collections.singletonMap("authentication", "http://old-authentication"));
+        in.setFormatAliases(Collections.singletonMap("claims", "http://claims"));
+        in.setSecuredObject(new AliasService());
+        in.setNameAliases(Collections.singletonMap("authentication", "http://authentication"));
+        Method lax = AliasService.class.getMethod("laxClaim");
+
+        assertDenied(in, prepareMessage(lax,
+            createClaim("http://authentication", "http://claims", "smartcard")));
+        in.handleMessage(prepareMessage(lax,
+            createClaim("http://old-authentication", "http://claims", "smartcard")));
+    }
+
     private static ClaimsAuthorizingInterceptor createInterceptor(Object service) {
         ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
         in.setSecuredObject(service);
@@ -640,6 +673,16 @@ public class ClaimsAuthorizingInterceptorTest {
 
         }
     }
+    public static class AliasService {
+        @Claim(name = "authentication", format = "claims", value = "password", mode = ClaimMode.LAX)
+        public void laxClaim() {
+        }
+
+        @Claim(name = "authentication", format = "claims", value = "password")
+        public void strictClaim() {
+        }
+    }
+
     public static class TestService2 {
         @SecureRole("admin")
         public void test() {
