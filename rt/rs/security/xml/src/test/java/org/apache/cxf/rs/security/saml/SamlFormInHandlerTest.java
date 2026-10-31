@@ -38,6 +38,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 public class SamlFormInHandlerTest {
 
@@ -93,6 +94,24 @@ public class SamlFormInHandlerTest {
         assertNull(filter("http://app.example.com/", ALLOWED_ORIGIN));
         assertNull(filter("http://app.example.com:443/", ALLOWED_ORIGIN));
         assertNull(filter("https://app.example.com:8443/", ALLOWED_ORIGIN));
+    }
+
+    @Test
+    public void testInvalidAllowedOriginIsRejected() {
+        SamlFormInHandler handler = new SamlFormInHandler();
+        for (String origin : Arrays.asList(null, "app.example.com", "https://app.example.com/",
+            "https://app.example.com/app", "https://user@app.example.com", "https://app.example.com?a=b",
+            "https://app.example.com#a", "https://my_service", "mailto:admin@app.example.com", "https://[")) {
+            assertThrows(origin, IllegalArgumentException.class,
+                () -> handler.setAllowedRelayStateOrigins(Arrays.asList(origin)));
+        }
+    }
+
+    @Test
+    public void testValidAllowedOriginsAreAccepted() {
+        SamlFormInHandler handler = new SamlFormInHandler();
+        handler.setAllowedRelayStateOrigins(null);
+        handler.setAllowedRelayStateOrigins(Arrays.asList(ALLOWED_ORIGIN, "https://app.example.com:8443"));
     }
 
     @Test

@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -51,10 +52,33 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     /**
      * Set the origins a RelayState may redirect to in addition to the origin of the service,
      * for example https://app.example.com. Each entry is compared with the RelayState as an
-     * exact scheme, host and port, no entries are allowed by default.
+     * exact scheme, host and port, no entries are allowed by default and null resets to that.
+     *
+     * @throws IllegalArgumentException if an entry is null, has no scheme or host, or has
+     *         user info, a path, a query or a fragment
      */
     public void setAllowedRelayStateOrigins(List<String> allowedRelayStateOrigins) {
-        this.allowedRelayStateOrigins = allowedRelayStateOrigins.stream().map(URI::create).toList();
+        this.allowedRelayStateOrigins = allowedRelayStateOrigins == null
+            ? Collections.emptyList()
+            : allowedRelayStateOrigins.stream().map(SamlFormInHandler::parseOrigin).toList();
+    }
+
+    private static URI parseOrigin(String value) {
+        URI origin = null;
+        if (value != null) {
+            try {
+                origin = new URI(value);
+            } catch (URISyntaxException ex) {
+                // reported below
+            }
+        }
+        if (origin == null || origin.getScheme() == null || origin.getHost() == null
+            || origin.getRawUserInfo() != null || !origin.getRawPath().isEmpty()
+            || origin.getRawQuery() != null || origin.getRawFragment() != null) {
+            throw new IllegalArgumentException("Invalid RelayState origin " + value
+                + ": it must have a scheme and a host and no user info, path, query or fragment");
+        }
+        return origin;
     }
 
     @Override
@@ -81,9 +105,11 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
                     context.abortWith(Response.status(302).location(location).build());
                     return;
                 }
-                LOG.warning("Ignoring RelayState " + samlRequestURI.replaceAll("\\p{Cntrl}", "_")
-                    + ": it is not relative and its origin matches neither " + baseUri
-                    + " nor the allowed RelayState origins");
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Ignoring RelayState " + samlRequestURI.replaceAll("\\p{Cntrl}", "_")
+                        + ": it is not relative and its origin matches neither " + baseUri
+                        + " nor the allowed RelayState origins");
+                }
             }
         }
         formData.remove(SAML_ELEMENT);
