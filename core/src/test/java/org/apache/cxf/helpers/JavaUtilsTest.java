@@ -63,6 +63,7 @@ public class JavaUtilsTest {
 
     @Test
     public void testGetFIPSSecurityProviderDefault() {
+        Assume.assumeTrue(System.getProperty("fips.security.provider") == null);
         // Without the fips.security.provider property, should return null
         assertNull("FIPS security provider should be null by default",
                    JavaUtils.getFIPSSecurityProvider());

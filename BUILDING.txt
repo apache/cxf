@@ -37,6 +37,31 @@ Building
    all located in your local maven repository. It usually takes some time for 
    maven to download required dependencies in the first build.
 
+FIPS
+----
+
+The -Dfips.enabled=true system property enables CXF's FIPS runtime behavior.
+
+The fips.security.provider system property is optional. If it is not set, CXF
+lets JCA select the provider automatically, allowing applications on a JDK already
+configured for FIPS to use only -Dfips.enabled=true.
+
+When a provider is explicitly specified via fips.security.provider, CryptoUtils
+checks that it is available via java.security.Security.getProvider(providerName).
+To avoid any failures, add your FIPS security provider to your JRE's java.security file
+or pass a custom java.security file via java.security.properties system property
+or add it programmatically on application start.
+CXF does this for you only if fips.security.provider is BCFIPS (make sure you have
+org.bouncycastle:bc-fips in class path in that case).
+
+To build and test with the org.bouncycastle:bc-fips dependency, run Maven with
+-Dbc-fips.enabled. This activates the bc-fips profile, which also enables
+fips.enabled and sets fips.security.provider=BCFIPS in the test JVM.
+
+To build and test on a JDK already configured for FIPS without adding bc-fips,
+run Maven with -Dfips.enabled=true. This activates the fips profile. Both profiles
+apply the FIPS test exclusions and the PKCS11 SecureRandom setting.
+
 Building kit
 ------------
 1) From top level, run
