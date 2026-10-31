@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertNull;
 public class SamlFormInHandlerTest {
 
     private static final String BASE_ADDRESS = "https://sp.example.com/services";
+    private static final String ALLOWED_ORIGIN = "https://app.example.com";
 
     @After
     public void tearDown() throws Exception {
@@ -55,6 +57,42 @@ public class SamlFormInHandlerTest {
     @Test
     public void testRelayStateWithUserInfoIsNotFollowed() throws Exception {
         assertNull(filter("https://sp.example.com@evil.example.com/"));
+        assertNull(filter("https://user@sp.example.com/app/page"));
+    }
+
+    @Test
+    public void testProtocolRelativeRelayStateIsNotFollowed() throws Exception {
+        assertNull(filter("//evil.example.com/"));
+    }
+
+    @Test
+    public void testRelayStateOnAnotherPortIsNotFollowed() throws Exception {
+        assertNull(filter("https://sp.example.com:8443/app/page"));
+    }
+
+    @Test
+    public void testRelayStateWithExplicitDefaultPortIsFollowed() throws Exception {
+        Response r = filter("https://sp.example.com:443/app/page");
+        assertNotNull(r);
+        assertEquals(302, r.getStatus());
+        assertEquals("https://sp.example.com:443/app/page", r.getLocation().toString());
+    }
+
+    @Test
+    public void testRelayStateOnAllowedOriginIsFollowed() throws Exception {
+        Response r = filter(ALLOWED_ORIGIN + "/app/page", ALLOWED_ORIGIN);
+        assertNotNull(r);
+        assertEquals(302, r.getStatus());
+        assertEquals(ALLOWED_ORIGIN + "/app/page", r.getLocation().toString());
+    }
+
+    @Test
+    public void testRelayStateOnLookalikeOriginIsNotFollowed() throws Exception {
+        assertNull(filter("https://app.example.com@evil.example.com/", ALLOWED_ORIGIN));
+        assertNull(filter("https://app.example.com.evil.example.com/", ALLOWED_ORIGIN));
+        assertNull(filter("http://app.example.com/", ALLOWED_ORIGIN));
+        assertNull(filter("http://app.example.com:443/", ALLOWED_ORIGIN));
+        assertNull(filter("https://app.example.com:8443/", ALLOWED_ORIGIN));
     }
 
     @Test
@@ -78,7 +116,7 @@ public class SamlFormInHandlerTest {
         assertNull(filter(BASE_ADDRESS + "/resource"));
     }
 
-    private static Response filter(String relayState) throws Exception {
+    private static Response filter(String relayState, String... allowedOrigins) throws Exception {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.getExchange().setInMessage(message);
@@ -94,6 +132,7 @@ public class SamlFormInHandlerTest {
                 // the assertion is assumed to be valid
             }
         };
+        handler.setAllowedRelayStateOrigins(Arrays.asList(allowedOrigins));
         handler.filter(new ContainerRequestContextImpl(message, false, false));
         return message.getExchange().get(Response.class);
     }
