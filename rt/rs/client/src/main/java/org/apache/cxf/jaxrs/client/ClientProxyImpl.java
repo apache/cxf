@@ -320,7 +320,7 @@ public class ClientProxyImpl extends AbstractClient implements
             ClientState newState = getState().newState(uri, subHeaders,
                  getTemplateParametersMap(ori.getURITemplate(), pathParams));
             ClientProxyImpl proxyImpl = createProxy(newState, proxyLoader, subCri, false, inheritHeaders);
-            proxyImpl.setConfiguration(getConfiguration());
+            proxyImpl.setConfigurationReference(getConfigurationReference());
             return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         }
         headers.putAll(paramHeaders);
