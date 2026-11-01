@@ -298,18 +298,43 @@ public class JAXRSClientFactoryBeanTest {
         final Client client = (Client) superBookResource;
         final WebClient wc = WebClient.fromClient(client);
 
+        // a sub-resource proxy
         final Book book = superBookResource.getNewBook("id4", true);
         assertNotNull(book);
-        
+
         assertThat(wc.getConfigurationReference(), is(not(nullValue())));
-        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(3L));
 
         client.close();
+        assertThat(wc.getConfigurationReference().refCount(), equalTo(2L));
+
+        WebClient.client(book).close();
         assertThat(wc.getConfigurationReference().refCount(), equalTo(1L));
 
         wc.close();
         assertThat(wc.getConfigurationReference(), is(nullValue()));
 
+    }
+
+    @Test
+    public void testSubresourceProxySharesConfigurationReference() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStoreSubresourcesOnly.class);
+        BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
+        BookStoreSubresourcesOnly store2 = store.getItself();
+
+        final AbstractClient root = (AbstractClient)((InvocationHandlerAware)store).getInvocationHandler();
+        final AbstractClient sub = (AbstractClient)((InvocationHandlerAware)store2).getInvocationHandler();
+        assertSame(root.getConfigurationReference(), sub.getConfigurationReference());
+        assertThat(sub.getConfigurationReference().refCount(), equalTo(2L));
+
+        // closing the root proxy must not shut down the configuration the sub-resource proxy uses
+        WebClient.client(store).close();
+        assertThat(sub.getConfigurationReference().refCount(), equalTo(1L));
+
+        WebClient.client(store2).close();
+        assertThat(sub.getConfigurationReference(), is(nullValue()));
     }
 
     private final class TestFeature extends AbstractFeature {
