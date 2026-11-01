@@ -85,6 +85,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                     atReg.getClient(), atReg.getApprovedScope()),
             atReg.getSubject());
 
+        setCertificateThumbprintConfirmation(at);
+
+        if (isUseJwtFormatForAccessTokens()) {
+            convertToJWTAccessToken(at);
+        }
+
+        return at;
+    }
+
+    private void setCertificateThumbprintConfirmation(ServerAccessToken at) {
         if (messageContext != null) {
             String certCnf = (String)messageContext.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
             if (certCnf != null) {
@@ -92,12 +102,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 at.getExtraProperties().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf);
             }
         }
-
-        if (isUseJwtFormatForAccessTokens()) {
-            convertToJWTAccessToken(at);
-        }
-
-        return at;
     }
 
     //CHECKSTYLE:OFF
@@ -474,6 +478,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 oldRefreshToken.getExtraProperties(), oldRefreshToken.getGrantCode(),
                 oldRefreshToken.getGrantType(), oldRefreshToken.getNonce(),
                 null, theNewScopes, oldRefreshToken.getSubject());
+
+        setCertificateThumbprintConfirmation(at);
 
         if (isUseJwtFormatForAccessTokens()) {
             convertToJWTAccessToken(at);

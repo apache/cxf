@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
@@ -48,6 +50,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 abstract class AbstractOAuthDataProviderTest {
     private static KeyPair keyPair;
@@ -401,6 +405,56 @@ abstract class AbstractOAuthDataProviderTest {
 
         // Client A's original access token must remain usable.
         assertNotNull(getProvider().getAccessToken(atA.getTokenKey()));
+    }
+
+    @Test
+    public void testRefreshedAccessTokenKeepsCertificateBinding() {
+        MessageContext mc = mock(MessageContext.class);
+        when(mc.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)).thenReturn("thumbprint");
+        getProvider().setMessageContext(mc);
+
+        Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        assertEquals("thumbprint", at.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+
+        ServerAccessToken at2 = getProvider().refreshAccessToken(c, at.getRefreshToken(), Collections.emptyList());
+        assertEquals("thumbprint", at2.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+    }
+
+    /**
+     * The binding follows the certificate on the current request, as it does for the initial grant,
+     * so a refresh without a certificate issues an unbound token.
+     */
+    @Test
+    public void testRefreshWithoutCertificateIssuesUnboundAccessToken() {
+        MessageContext mc = mock(MessageContext.class);
+        when(mc.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)).thenReturn("thumbprint");
+        getProvider().setMessageContext(mc);
+
+        Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atr.setSubject(c.getResourceOwnerSubject());
+
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        assertEquals("thumbprint", at.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+
+        when(mc.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)).thenReturn(null);
+
+        ServerAccessToken at2 = getProvider().refreshAccessToken(c, at.getRefreshToken(), Collections.emptyList());
+        assertNull(at2.getExtraProperties().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256));
+        if (getProvider().isUseJwtFormatForAccessTokens()) {
+            JwtToken jwt = new JwsJwtCompactConsumer(at2.getTokenKey()).getJwtToken();
+            assertNull(jwt.getClaim(JwtConstants.CLAIM_CONFIRMATION));
+        }
     }
 
     protected Client addClient(String clientId, String userLogin) {
