@@ -289,12 +289,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * Close the conduit
      */
     public void close() {
-        if (clientRef != null) {
-            clientRef.release();
+        // release each reference only once, even if the conduit is closed concurrently
+        final RefCount<HttpClient> ref;
+        initializationLock.lock();
+        try {
+            ref = clientRef;
             clientRef = null;
+        } finally {
+            initializationLock.unlock();
         }
-        deferredClientRefs.forEach(RefCount::release);
-        deferredClientRefs.clear();
+        if (ref != null) {
+            ref.release();
+        }
+        RefCount<HttpClient> deferred;
+        while ((deferred = deferredClientRefs.poll()) != null) {
+            deferred.release();
+        }
         defaultAddress = null;
         super.close();
     }
