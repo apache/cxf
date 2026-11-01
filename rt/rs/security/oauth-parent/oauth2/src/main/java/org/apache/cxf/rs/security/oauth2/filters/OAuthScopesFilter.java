@@ -57,8 +57,8 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     @Context
     private MessageContext mc;
     // Scopes configured explicitly via setScopesMap/setScopesStringMap, keyed by method name
-    private Map<String, List<String>> scopesMap = new HashMap<>();
-    private Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
+    private final Map<String, List<String>> scopesMap = new HashMap<>();
+    private final Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
     // The method-level and class-level @Scopes declarations which apply to each method signature
     // in the secured object's hierarchy. Keying by signature means that overloaded methods do
     // not share a rule
@@ -69,7 +69,10 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     private final Map<String, Set<String>> signaturesByName = new HashMap<>();
     private final Set<Class<?>> securedClasses = new HashSet<>();
     private boolean annotationScopesFound;
-    private Set<String> confidentialClientMethods = new HashSet<>();
+    // Methods configured explicitly via setConfidentialClientMethods, and methods found from
+    // @ConfidentialClient annotations, kept apart so the setter cannot discard the latter
+    private final Set<String> confidentialClientMethods = new HashSet<>();
+    private final Set<String> annotationConfidentialClientMethods = new HashSet<>();
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
@@ -118,7 +121,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
 
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
             if (classConfClient != null || mConfClient != null) {
-                confidentialClientMethods.add(m.getName());
+                annotationConfidentialClientMethods.add(m.getName());
             }
         }
         checkSecureClass(cls.getSuperclass());
@@ -134,7 +137,8 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         checkScopes(m);
     }
     protected void checkClient(Method m) {
-        if (confidentialClientMethods.contains(m.getName())) {
+        if (confidentialClientMethods.contains(m.getName())
+            || annotationConfidentialClientMethods.contains(m.getName())) {
             OAuthContext context = OAuthContextUtils.getContext(mc);
             if (!context.isClientConfidential()) {
                 LOG.warning("Non confidential client " + context.getClientId()
@@ -244,7 +248,10 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     }
 
     public void setScopesMap(Map<String, List<String>> scopesMap) {
-        this.scopesMap = scopesMap;
+        // Add to, rather than replace, the scopes already configured, e.g. via setScopesStringMap
+        if (scopesMap != null) {
+            this.scopesMap.putAll(scopesMap);
+        }
     }
 
     public void setScopesStringMap(Map<String, String> scopesStringMap) {
@@ -254,11 +261,16 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     }
 
     public void setScopesMatchAllMap(Map<String, Boolean> scopesMatchAllMap) {
-        this.scopesMatchAllMap = scopesMatchAllMap;
+        if (scopesMatchAllMap != null) {
+            this.scopesMatchAllMap.putAll(scopesMatchAllMap);
+        }
     }
 
     public void setConfidentialClientMethods(Set<String> confidentialClientMethods) {
-        this.confidentialClientMethods = confidentialClientMethods;
+        this.confidentialClientMethods.clear();
+        if (confidentialClientMethods != null) {
+            this.confidentialClientMethods.addAll(confidentialClientMethods);
+        }
     }
 
     private static final class ScopesDeclaration {
