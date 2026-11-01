@@ -65,6 +65,9 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     private final Map<String, Set<String>> overriddenSignatures = new HashMap<>();
     private final Map<String, Set<String>> signaturesByName = new HashMap<>();
     private final Set<Class<?>> securedClasses = new HashSet<>();
+    // The classes passed to setSecuredObject, so their claims can be resolved again
+    // if the aliases change afterwards
+    private final List<Class<?>> securedObjectClasses = new ArrayList<>();
     private boolean annotationClaimsFound;
     private Map<String, String> nameAliases = Collections.emptyMap();
     private Map<String, String> formatAliases = Collections.emptyMap();
@@ -196,6 +199,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
+        securedObjectClasses.add(cls);
         findClaims(cls);
         if (!annotationClaimsFound) {
             LOG.warning("The claims list is empty, the service object is not protected");
@@ -285,11 +289,32 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     }
 
     public void setNameAliases(Map<String, String> nameAliases) {
-        this.nameAliases = nameAliases;
+        this.nameAliases = nameAliases == null ? Collections.emptyMap() : nameAliases;
+        resolveSecuredObjectClaims();
     }
 
     public void setFormatAliases(Map<String, String> formatAliases) {
-        this.formatAliases = formatAliases;
+        this.formatAliases = formatAliases == null ? Collections.emptyMap() : formatAliases;
+        resolveSecuredObjectClaims();
+    }
+
+    /**
+     * The aliases are applied when the annotation claims are read, so read them again for any
+     * secured object which was set before the aliases. Otherwise the claims would keep the
+     * unresolved names, which never match, and a ClaimMode.LAX claim would always pass.
+     */
+    private void resolveSecuredObjectClaims() {
+        if (securedObjectClasses.isEmpty()) {
+            return;
+        }
+        declarationsBySignature.clear();
+        overriddenSignatures.clear();
+        signaturesByName.clear();
+        securedClasses.clear();
+        annotationClaimsFound = false;
+        for (Class<?> cls : securedObjectClasses) {
+            findClaims(cls);
+        }
     }
 
     private static final class ClaimsDeclaration {
