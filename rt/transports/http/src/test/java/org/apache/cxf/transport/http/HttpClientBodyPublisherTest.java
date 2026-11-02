@@ -44,6 +44,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+/**
+ * See https://issues.apache.org/jira/browse/CXF-9267
+ */
 public class HttpClientBodyPublisherTest {
 
     private static final int REQUEST_SIZE = 206;

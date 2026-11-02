@@ -685,6 +685,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     stream = null;
                 }
             }
+            // See https://issues.apache.org/jira/browse/CXF-9267
             if (pin != null) {
                 BodyPublishers.ofInputStream(pin).subscribe(subscriber);
                 pin = null;
