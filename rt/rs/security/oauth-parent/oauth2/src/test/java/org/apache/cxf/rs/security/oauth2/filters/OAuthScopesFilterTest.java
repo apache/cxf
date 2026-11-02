@@ -247,6 +247,59 @@ public class OAuthScopesFilterTest {
         assertThrows(ForbiddenException.class, () -> filter(filter, method, "admin"));
     }
 
+    @Test
+    public void testConfidentialClientAnnotationKeptWhenMethodsConfiguredAfterSecuredObject()
+        throws Exception {
+        Method transfer = ConfidentialClientService.class.getMethod("transfer");
+        Method list = ConfidentialClientService.class.getMethod("list");
+
+        OAuthScopesFilter filter = createFilter(new ConfidentialClientService());
+        filter.setConfidentialClientMethods(Collections.singleton("list"));
+        filter(filter, transfer, true, "read");
+        assertThrows(ForbiddenException.class, () -> filter(filter, transfer, false, "read"));
+        filter(filter, list, true, "read");
+        assertThrows(ForbiddenException.class, () -> filter(filter, list, false, "read"));
+    }
+
+    @Test
+    public void testConfidentialClientAnnotationKeptWhenMethodsConfiguredBeforeSecuredObject()
+        throws Exception {
+        Method transfer = ConfidentialClientService.class.getMethod("transfer");
+        Method list = ConfidentialClientService.class.getMethod("list");
+
+        OAuthScopesFilter filter = new OAuthScopesFilter();
+        filter.setConfidentialClientMethods(Collections.singleton("list"));
+        filter.setSecuredObject(new ConfidentialClientService());
+        assertThrows(ForbiddenException.class, () -> filter(filter, transfer, false, "read"));
+        assertThrows(ForbiddenException.class, () -> filter(filter, list, false, "read"));
+    }
+
+    @Test
+    public void testScopesMapDoesNotDiscardScopesStringMap() throws Exception {
+        Method transfer = ConfiguredService.class.getMethod("transfer");
+        Method list = ConfiguredService.class.getMethod("list");
+
+        OAuthScopesFilter filter = new OAuthScopesFilter();
+        filter.setScopesStringMap(Collections.singletonMap("transfer", "write"));
+        filter.setScopesMap(Collections.singletonMap("list", Collections.singletonList("read")));
+        filter(filter, transfer, "write");
+        assertThrows(ForbiddenException.class, () -> filter(filter, transfer, "read"));
+        filter(filter, list, "read");
+        assertThrows(ForbiddenException.class, () -> filter(filter, list, "write"));
+    }
+
+    @Test
+    public void testScopesMatchAllMapDoesNotDiscardEarlierEntries() throws Exception {
+        Method transfer = ConfiguredService.class.getMethod("transfer");
+
+        OAuthScopesFilter filter = new OAuthScopesFilter();
+        filter.setScopesStringMap(Collections.singletonMap("transfer", "read write"));
+        filter.setScopesMatchAllMap(Collections.singletonMap("transfer", Boolean.TRUE));
+        filter.setScopesMatchAllMap(Collections.singletonMap("list", Boolean.TRUE));
+        filter(filter, transfer, "read", "write");
+        assertThrows(ForbiddenException.class, () -> filter(filter, transfer, "read"));
+    }
+
     private static void assertAllowed(Object service, Method method, String... scopes) throws Exception {
         filter(createFilter(service), method, scopes);
     }
@@ -263,11 +316,17 @@ public class OAuthScopesFilterTest {
     }
 
     private static void filter(OAuthScopesFilter filter, Method method, String... scopes) throws Exception {
+        filter(filter, method, false, scopes);
+    }
+
+    private static void filter(OAuthScopesFilter filter, Method method, boolean confidentialClient,
+                               String... scopes) throws Exception {
         List<OAuthPermission> permissions = new ArrayList<>();
         for (String scope : scopes) {
             permissions.add(new OAuthPermission(scope));
         }
         OAuthContext context = new OAuthContext(new UserSubject("alice"), null, permissions, "code");
+        context.setClientConfidential(confidentialClient);
 
         MessageContext mc = mock(MessageContext.class);
         when(mc.get("org.apache.cxf.resource.method")).thenReturn(method);
@@ -483,6 +542,23 @@ public class OAuthScopesFilterTest {
         }
 
         public void delete() {
+        }
+    }
+
+    public static class ConfidentialClientService {
+        @ConfidentialClient
+        public void transfer() {
+        }
+
+        public void list() {
+        }
+    }
+
+    public static class ConfiguredService {
+        public void transfer() {
+        }
+
+        public void list() {
         }
     }
 
