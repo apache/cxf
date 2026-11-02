@@ -37,5 +37,11 @@ jobs:
       - name: Build with Apache Maven
         if: ${{ matrix.os != 'windows-latest' }} 
         run: mvn -U clean install -Djava.awt.headless=true -fae -B -Peverything
+      - name: Test with Bouncy Castle FIPS
+        run: >-
+          mvn -B -ntp -pl core,rt/security -am test
+          -Dtest=JavaUtilsTest,CryptoUtilsFipsTest,CryptoUtilsTest
+          -Dsurefire.failIfNoSpecifiedTests=false
+          -Dbc-fips.enabled=true
     env: 
        MAVEN_OPTS: "-Xmx1024M"

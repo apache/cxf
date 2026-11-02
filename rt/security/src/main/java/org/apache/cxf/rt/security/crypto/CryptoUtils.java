@@ -21,6 +21,7 @@ package org.apache.cxf.rt.security.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -72,18 +73,32 @@ public final class CryptoUtils {
 
     static {
         if (JavaUtils.isFIPSEnabled()) {
-            Provider currentProvider = Security.getProvider(JavaUtils.getFIPSSecurityProvider() != null
-                                           ? JavaUtils.getFIPSSecurityProvider() : "BCFIPS");
-            if (currentProvider == null) {
-                try {
-                    Class<? extends Provider> clazz = 
-                        (Class<? extends Provider>)CryptoUtils.class.getClassLoader()
-                        .loadClass("org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider");
-                    Provider provider = clazz.getDeclaredConstructor().newInstance();
-                    Security.addProvider(provider);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    
+            String securityProviderName = JavaUtils.getFIPSSecurityProvider();
+            if (securityProviderName != null) {
+                Provider currentProvider = Security.getProvider(securityProviderName);
+                if (currentProvider == null) {
+                    if ("BCFIPS".equals(securityProviderName)) {
+                        /* Make sure BouncyCastleFipsProvider is added to java.security.Security
+                         * if it is selected via fips.security.provider */
+                        try {
+                            Class<? extends Provider> clazz =
+                                    (Class<? extends Provider>)CryptoUtils.class.getClassLoader()
+                                            .loadClass("org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider");
+                            Provider provider = clazz.getDeclaredConstructor().newInstance();
+                            Security.addProvider(provider);
+                        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                                 | IllegalAccessException | NoSuchMethodException e) {
+                            throw new RuntimeException("Could not add " + securityProviderName
+                                    + " to java.security.Security.", e);
+                        }
+                    } else {
+                        throw new IllegalStateException("The security provider " + securityProviderName
+                                + " selected via fips.security.provider system property is not available in"
+                                + " java.security.Security. You may want to add it programmatically on application"
+                                + " start or by adding it to java.security file of your Java runtime environment"
+                                + " or by passing a custom java.security file via java.security.properties system"
+                                + " property.");
+                    }
                 }
             }
         }
