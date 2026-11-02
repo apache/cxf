@@ -20,9 +20,12 @@ package org.apache.cxf.interceptor.security;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -42,6 +45,12 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
 
     private String annotationClassName = DEFAULT_ANNOTATION_CLASS_NAME;
+    // The classes passed to setSecuredObject, so their roles can be read again if the
+    // annotation class changes afterwards
+    private final List<Class<?>> securedObjectClasses = new ArrayList<>();
+    // The methodRolesMap entries added from the annotations, so they can be replaced
+    // without touching the entries configured via setMethodRolesMap
+    private final Map<String, List<String>> annotationRoles = new HashMap<>();
 
     public SecureAnnotationsInterceptor() {
         this(true);
@@ -58,10 +67,41 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             ex.printStackTrace();
             throw new IllegalArgumentException("Annotation class " + name + " is not available");
         }
+        resolveSecuredObjectRoles();
     }
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
+        securedObjectClasses.add(cls);
+        addRoles(cls, Collections.emptyMap());
+    }
+
+    /**
+     * The roles are read from the annotations when the secured object is set, so read them
+     * again with the new annotation class for any secured object which was set before it.
+     * Otherwise the roles would come from the default annotation class, and a service using
+     * another annotation would be left unprotected.
+     */
+    private void resolveSecuredObjectRoles() {
+        if (securedObjectClasses.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, List<String>> entry : annotationRoles.entrySet()) {
+            // Keep an entry which setMethodRolesMap has replaced since
+            if (methodRolesMap.get(entry.getKey()) == entry.getValue()) {
+                methodRolesMap.remove(entry.getKey());
+            }
+        }
+        annotationRoles.clear();
+        // What is left was configured via setMethodRolesMap after the secured object, so it
+        // takes precedence, as it would have if the annotation class had been set first
+        Map<String, List<String>> configuredRoles = new HashMap<>(methodRolesMap);
+        for (Class<?> cls : securedObjectClasses) {
+            addRoles(cls, configuredRoles);
+        }
+    }
+
+    private void addRoles(Class<?> cls, Map<String, List<String>> configuredRoles) {
         Map<String, String> rolesMap = new HashMap<>();
         findRoles(cls, rolesMap);
         if (rolesMap.isEmpty()) {
@@ -71,7 +111,20 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                 LOG.fine("Method: " + entry.getKey() + ", roles: " + entry.getValue());
             }
         }
+        Map<String, List<String>> previousRoles = new HashMap<>(methodRolesMap);
         super.setMethodRolesMap(rolesMap);
+        // Record the entries the annotations added or replaced, using the keys as stored
+        // by setMethodRolesMap, and restore any configured entry they replaced
+        for (Map.Entry<String, List<String>> entry : methodRolesMap.entrySet()) {
+            if (entry.getValue() != previousRoles.get(entry.getKey())) {
+                List<String> configured = configuredRoles.get(entry.getKey());
+                if (configured != null) {
+                    entry.setValue(configured);
+                } else {
+                    annotationRoles.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
     }
 
     protected void findRoles(Class<?> cls, Map<String, String> rolesMap) {
