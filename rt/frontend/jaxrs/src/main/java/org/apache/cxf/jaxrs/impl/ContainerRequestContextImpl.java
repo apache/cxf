@@ -138,8 +138,11 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         // changing to toString() seems to have adverse effects downstream. Needs more investigation.
         HttpUtils.resetRequestURI(m, requestUri.getRawPath());
         String query = requestUri.getRawQuery();
-        if (query != null) {
+        if (!StringUtils.isEmpty(query)) {
             m.put(Message.QUERY_STRING, query);
+        } else {
+            // the new URI has no or an empty query, so the query of the old one must not stay
+            m.remove(Message.QUERY_STRING);
         }
     }
 
