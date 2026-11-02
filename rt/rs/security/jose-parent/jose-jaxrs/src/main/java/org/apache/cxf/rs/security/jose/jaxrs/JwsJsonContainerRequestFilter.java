@@ -41,8 +41,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (isMethodWithNoContent(context.getMethod())
-            || isCheckEmptyStream() && !context.hasEntity()) {
+        if ((isMethodWithNoContent(context.getMethod()) || isCheckEmptyStream())
+            && !context.hasEntity()) {
             return;
         }
         final String content = IOUtils.readStringFromStream(context.getEntityStream());

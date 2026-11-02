@@ -36,9 +36,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isMethodWithNoContent(req.getMethod())
-            || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+        if (isStatusCodeWithNoContent(res.getStatus())
+            || (isMethodWithNoContent(req.getMethod()) || isCheckEmptyStream()) && !res.hasEntity()) {
             return;
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(res.getEntityStream());

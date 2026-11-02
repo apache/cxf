@@ -46,6 +46,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class JwsJsonContainerRequestFilterTest {
@@ -95,6 +96,40 @@ public class JwsJsonContainerRequestFilterTest {
                      headers.getFirst(HttpHeaders.CONTENT_TYPE));
         assertEquals(payload,
                      IOUtils.readStringFromStream(message.getContent(java.io.InputStream.class)));
+    }
+
+    @Test
+    public void testDeleteBodySignedWithWrongKeyIsRejected() throws Exception {
+        JwsJsonProducer producer = new JwsJsonProducer("{\"id\":\"123\"}");
+        producer.signWith(new HmacJwsSignatureProvider(BAD_KEY, SignatureAlgorithm.HS256),
+                          createHeaders("application/json"));
+        byte[] signedDocument = producer.getJwsJsonSignedDocument().getBytes(StandardCharsets.UTF_8);
+
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.HTTP_REQUEST_METHOD, "DELETE");
+        message.setContent(java.io.InputStream.class, new ByteArrayInputStream(signedDocument));
+
+        MetadataMap<String, String> headers = new MetadataMap<>();
+        headers.putSingle(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.putSingle(HttpHeaders.CONTENT_LENGTH, Integer.toString(signedDocument.length));
+        message.put(Message.PROTOCOL_HEADERS, headers);
+
+        JwsJsonContainerRequestFilter filter = new JwsJsonContainerRequestFilter();
+        filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
+        filter.setValidateHttpHeaders(false);
+
+        runInPhase(message, () -> {
+            try {
+                filter.filter(new ContainerRequestContextImpl(message, true, false));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        Response response = message.getExchange().get(Response.class);
+        assertNotNull(response);
+        assertEquals(400, response.getStatus());
     }
 
     private String createSignedDocument(String payload) {

@@ -36,8 +36,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (isMethodWithNoContent(context.getMethod())
-            || isCheckEmptyStream() && !context.hasEntity()) {
+        if ((isMethodWithNoContent(context.getMethod()) || isCheckEmptyStream())
+            && !context.hasEntity()) {
             return;
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(context.getEntityStream());

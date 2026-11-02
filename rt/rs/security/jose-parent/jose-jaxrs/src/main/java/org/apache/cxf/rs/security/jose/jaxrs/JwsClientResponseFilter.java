@@ -39,9 +39,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isMethodWithNoContent(req.getMethod())
-            || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+        if (isStatusCodeWithNoContent(res.getStatus())
+            || (isMethodWithNoContent(req.getMethod()) || isCheckEmptyStream()) && !res.hasEntity()) {
             return;
         }
         final String content = IOUtils.readStringFromStream(res.getEntityStream());
