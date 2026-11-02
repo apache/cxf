@@ -1022,7 +1022,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (csPolicy.isAllowChunking() || contentLen >= 0) {
                 final PipedInputStream pin = new PipedInputStream(csPolicy.getChunkLength() <= 0
                         ? 4096 : csPolicy.getChunkLength());
-                this.publisher = new HttpClientBodyPublisher(this, () -> pin);
+                this.publisher = new HttpClientBodyPublisher(this, contentLen != 0 ? () -> pin : null);
                 if (contentLen != 0) {
                     pout = new HttpClientPipedOutputStream(this, pin, csPolicy, publisher);
                 }
