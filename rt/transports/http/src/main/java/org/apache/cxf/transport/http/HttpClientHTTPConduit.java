@@ -653,12 +653,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     /**
      * The {@link BodyPublisher} that wraps around the output stream.
      */
-    private static final class HttpClientBodyPublisher implements CloseableBodyPublisher {
+    static final class HttpClientBodyPublisher implements CloseableBodyPublisher {
         private Supplier<InputStream> pin;
         private HttpClientWrappedOutputStream stream;
         private long contentLen;
 
-        private HttpClientBodyPublisher(HttpClientWrappedOutputStream s, Supplier<InputStream> pin) {
+        HttpClientBodyPublisher(HttpClientWrappedOutputStream s, Supplier<InputStream> pin) {
             this.stream = s;
             this.pin = pin;
         }
@@ -682,13 +682,16 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     if (stream != null) {
                         contentLen = stream.contentLen;
                     }
-                    BodyPublishers.ofInputStream(pin).subscribe(subscriber);
                     stream = null;
-                    pin = null;
-                    return;
                 }
             }
-            BodyPublishers.noBody().subscribe(subscriber);
+            if (pin != null) {
+                BodyPublishers.ofInputStream(pin).subscribe(subscriber);
+                pin = null;
+            } else {
+                // Avoiding java.io.IOException: Pipe closed if pin already subscribed
+                BodyPublishers.noBody().subscribe(subscriber);
+            }
         }
 
         @Override
