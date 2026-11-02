@@ -24,7 +24,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -38,6 +41,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,6 +88,80 @@ public class SecureAnnotationsInterceptorTest {
         in.handleMessage(message);
     }
 
+    @Test(expected = AccessDeniedException.class)
+    public void testAnnotationClassNameSetAfterSecuredObject() {
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setSecuredObject(new TestService2());
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        in.handleMessage(message);
+    }
+
+    @Test
+    public void testAnnotationClassNameChangeReplacesAnnotationRoles() throws Exception {
+        Method echo = MixedService.class.getMethod("echo");
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setSecuredObject(new MixedService());
+        assertEquals(Collections.singletonList("defaultRole"), in.getExpectedRoles(echo));
+
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        assertEquals(Collections.singletonList("secureRole"), in.getExpectedRoles(echo));
+    }
+
+    @Test
+    public void testAnnotationClassNameChangeKeepsConfiguredMethodRoles() throws Exception {
+        Method echo = MixedService.class.getMethod("echo");
+        Method other = MixedService.class.getMethod("other");
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setSecuredObject(new MixedService());
+        in.setMethodRolesMap(Collections.singletonMap("other", "admin"));
+
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        assertEquals(Collections.singletonList("secureRole"), in.getExpectedRoles(echo));
+        assertEquals(Collections.singletonList("admin"), in.getExpectedRoles(other));
+    }
+
+    @Test
+    public void testConfiguredMethodNameRolesKeptAfterAnnotationClassChange() throws Exception {
+        Method echo = MixedService.class.getMethod("echo");
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setSecuredObject(new MixedService());
+        in.setMethodRolesMap(Collections.singletonMap("echo", "admin"));
+
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        // As when the annotation class is set first: the annotation's signature key takes
+        // precedence, and the configured method name entry is kept
+        assertEquals(Collections.singletonList("secureRole"), in.getExpectedRoles(echo));
+        assertEquals(Collections.singletonList("admin"), in.methodRolesMap.get("echo"));
+    }
+
+    @Test
+    public void testConfiguredMethodRolesMatchAnnotationClassSetFirst() throws Exception {
+        Method echo = MixedService.class.getMethod("echo");
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        in.setSecuredObject(new MixedService());
+        in.setMethodRolesMap(Collections.singletonMap("echo", "admin"));
+
+        assertEquals(Collections.singletonList("secureRole"), in.getExpectedRoles(echo));
+        assertEquals(Collections.singletonList("admin"), in.methodRolesMap.get("echo"));
+    }
+
+    @Test
+    public void testAnnotationClassNameChangeWithCustomMethodSig() throws Exception {
+        Method echo = MixedService.class.getMethod("echo");
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor() {
+            @Override
+            protected String createMethodSig(Method m) {
+                return "  " + super.createMethodSig(m) + " ";
+            }
+        };
+        in.setSecuredObject(new MixedService());
+        in.setAnnotationClassName(SecureRolesAllowed.class.getName());
+        assertEquals(Collections.singletonList("secureRole"), in.getExpectedRoles(echo));
+        for (List<String> roles : in.methodRolesMap.values()) {
+            assertEquals(Collections.singletonList("secureRole"), roles);
+        }
+    }
 
     @Retention (RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE, ElementType.METHOD })
@@ -100,6 +178,16 @@ public class SecureAnnotationsInterceptorTest {
     private static final class TestService2 {
         @SecureRolesAllowed("baz")
         public void echo() {
+        }
+    }
+
+    private static final class MixedService {
+        @RolesAllowed("defaultRole")
+        @SecureRolesAllowed("secureRole")
+        public void echo() {
+        }
+
+        public void other() {
         }
     }
 
