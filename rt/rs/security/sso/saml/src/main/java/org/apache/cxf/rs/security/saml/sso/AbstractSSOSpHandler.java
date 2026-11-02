@@ -32,6 +32,7 @@ import jakarta.annotation.PreDestroy;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
@@ -54,6 +55,8 @@ public class AbstractSSOSpHandler {
     private String idpServiceAddress;
     private String issuerId;
     private boolean supportUnsolicited;
+    private boolean httpOnlyCookie = true;
+    private boolean secureCookie;
 
     static {
         OpenSAMLUtil.initSamlEngine();
@@ -134,9 +137,58 @@ public class AbstractSSOSpHandler {
             contextCookie += ";Expires=" + cookieExpires;
         }
 
-        //TODO: Consider adding an 'HttpOnly' attribute
+        if (httpOnlyCookie) {
+            // The cookie value is the key to the security context or relay state
+            // held by the SP, so keep it out of reach of scripts
+            contextCookie += ";HttpOnly";
+        }
+
+        if (secureCookie || isSecureRequest(JAXRSUtils.getCurrentMessage())) {
+            contextCookie += ";Secure";
+        }
 
         return contextCookie;
+    }
+
+    protected boolean isSecureRequest(Message m) {
+        if (m == null) {
+            return false;
+        }
+        Object address = m.get(Message.REQUEST_URL);
+        if (address == null) {
+            address = m.get(Message.BASE_PATH);
+        }
+        if (address == null) {
+            address = m.get(Message.ENDPOINT_ADDRESS);
+        }
+        return address != null && address.toString().startsWith("https://");
+    }
+
+    /**
+     * Set whether the cookies created by this handler have the HttpOnly attribute.
+     * The default is true.
+     * @param httpOnlyCookie whether to add the HttpOnly attribute
+     */
+    public void setHttpOnlyCookie(boolean httpOnlyCookie) {
+        this.httpOnlyCookie = httpOnlyCookie;
+    }
+
+    public boolean isHttpOnlyCookie() {
+        return httpOnlyCookie;
+    }
+
+    /**
+     * Set whether the cookies created by this handler always have the Secure attribute.
+     * The default is false, in which case the attribute is added only when the current
+     * request was received over HTTPS.
+     * @param secureCookie whether to always add the Secure attribute
+     */
+    public void setSecureCookie(boolean secureCookie) {
+        this.secureCookie = secureCookie;
+    }
+
+    public boolean isSecureCookie() {
+        return secureCookie;
     }
 
     public void setStateProvider(SPStateManager stateProvider) {
