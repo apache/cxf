@@ -31,8 +31,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import org.apache.cxf.common.logging.LogUtils;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.FormUtils;
@@ -62,7 +62,9 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     public void setAllowedRelayStateOrigins(List<String> allowedRelayStateOrigins) {
         this.allowedRelayStateOrigins = allowedRelayStateOrigins == null
             ? Collections.emptyList()
-            : allowedRelayStateOrigins.stream().map(SamlFormInHandler::parseOrigin).collect(Collectors.toUnmodifiableList());
+            : allowedRelayStateOrigins
+                .stream()
+                .map(SamlFormInHandler::parseOrigin).collect(Collectors.toUnmodifiableList());
     }
 
     private static URI parseOrigin(String value) {

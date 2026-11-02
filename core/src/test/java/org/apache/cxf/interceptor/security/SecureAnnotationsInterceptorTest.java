@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
+
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
