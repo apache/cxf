@@ -323,6 +323,25 @@ public class SecureAnnotationsInterceptorTest {
     }
 
     @Test
+    public void testSubclassClassRolesDoNotApplyToInheritedAnnotatedMethods() throws Exception {
+        // As in JSR-250, the inherited method keeps the roles of the superclass which declares it
+        Method target = AdminInheritingService.class.getMethod("operation");
+
+        assertAllowed(new AdminInheritingService(), target, "user");
+        assertDenied(new AdminInheritingService(), target, "admin");
+        assertDenied(new AdminInheritingService(), target);
+    }
+
+    @Test
+    public void testSubclassClassRolesApplyToInheritedUnannotatedMethods() throws Exception {
+        Method target = AdminInheritingService.class.getMethod("unannotatedOperation");
+
+        assertAllowed(new AdminInheritingService(), target, "admin");
+        assertDenied(new AdminInheritingService(), target, "user");
+        assertDenied(new AdminInheritingService(), target);
+    }
+
+    @Test
     public void testMethodRolesFromUnrelatedSupertypesApplyTogether() throws Exception {
         Method target = AdminApiUserService.class.getMethod("operation");
 
@@ -568,6 +587,15 @@ public class SecureAnnotationsInterceptorTest {
         @Override
         public void operation() {
         }
+    }
+
+    public static class UnannotatedMethodBaseService extends BaseService {
+        public void unannotatedOperation() {
+        }
+    }
+
+    @RolesAllowed("admin")
+    public static class AdminInheritingService extends UnannotatedMethodBaseService {
     }
 
     public interface AdminOperationApi {

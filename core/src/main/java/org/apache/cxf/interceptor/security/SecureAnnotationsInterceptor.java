@@ -145,7 +145,10 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             if (methodRoles != null) {
                 declarations.add(new RolesDeclaration(m.getDeclaringClass(), methodRoles, true));
             }
-            if (classRoles != null) {
+            // As in JSR-250, a class-level annotation does not apply to a method inherited from
+            // a superclass which has its own method-level annotation, only to the class's own
+            // methods and to unannotated inherited methods
+            if (classRoles != null && (methodRoles == null || m.getDeclaringClass() == cls)) {
                 declarations.add(new RolesDeclaration(classRolesDeclarer, classRoles, false));
             }
             signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
