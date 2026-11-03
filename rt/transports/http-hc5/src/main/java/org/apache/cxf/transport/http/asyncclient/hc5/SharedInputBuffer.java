@@ -97,6 +97,9 @@ public class SharedInputBuffer extends ExpandableBuffer {
             }
 
             if (!buffer().hasRemaining() && !this.endOfStream) {
+                // Wake up a reader waiting for data first: only the reader signals suspendInput,
+                // once it has drained the buffer
+                this.condition.signalAll();
                 try {
                     suspendInput.await();
                 } catch (InterruptedException ex) {
