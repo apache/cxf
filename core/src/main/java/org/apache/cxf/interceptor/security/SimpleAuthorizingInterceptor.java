@@ -88,6 +88,15 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
     @Override
     protected List<String> getExpectedRoles(Method method) {
+        List<String> roles = getConfiguredRoles(method);
+        return roles != null ? roles : globalRoles;
+    }
+
+    /**
+     * Returns the roles configured for a method in the method roles map, by signature or by
+     * method name, or null if none are configured. The global roles are not taken into account.
+     */
+    protected List<String> getConfiguredRoles(Method method) {
         String sig = createMethodSig(method);
         List<String> roles = methodRolesMap.get(sig);
         if (roles == null) {
@@ -96,10 +105,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
         if (roles == null) {
             roles = methodRolesMap.get(method.getName());
         }
-        if (roles != null) {
-            return roles;
-        }
-        return globalRoles;
+        return roles;
     }
 
 
