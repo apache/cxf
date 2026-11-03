@@ -96,18 +96,17 @@ public class SharedInputBuffer extends ExpandableBuffer {
                 this.endOfStream = true;
             }
 
+            // Wake up a reader waiting for data before waiting for the buffer to be drained: only
+            // the reader signals suspendInput, once it has drained the buffer
+            this.condition.signalAll();
+
             if (!buffer().hasRemaining() && !this.endOfStream) {
-                // Wake up a reader waiting for data first: only the reader signals suspendInput,
-                // once it has drained the buffer
-                this.condition.signalAll();
                 try {
                     suspendInput.await();
                 } catch (InterruptedException ex) {
                     throw new IOException("Interrupted while waiting buffer to be drained ");
                 }
             }
-
-            this.condition.signalAll();
 
             if (totalRead > 0) {
                 return totalRead;
