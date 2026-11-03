@@ -153,7 +153,29 @@ abstract class AbstractSignatureInFilter {
 
         final String finalSignatureAlgorithm = signatureAlgorithm;
         final Provider provider = Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
-        return new MessageVerifier(keyId -> publicKey, keyId -> provider, keyId -> finalSignatureAlgorithm);
+        MessageVerifier verifier =
+            new MessageVerifier(keyId -> publicKey, keyId -> provider, keyId -> finalSignatureAlgorithm);
+        verifier.setTimeToLive(getContextualInteger(m,
+            HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, MessageVerifier.DEFAULT_TIME_TO_LIVE));
+        verifier.setFutureTimeToLive(getContextualInteger(m,
+            HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_FUTURE_TIME_TO_LIVE,
+            MessageVerifier.DEFAULT_FUTURE_TIME_TO_LIVE));
+        return verifier;
+    }
+
+    private static int getContextualInteger(Message m, String key, int defaultValue) {
+        Object value = m.getContextualProperty(key);
+        if (value instanceof Number) {
+            return ((Number)value).intValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt((String)value);
+            } catch (NumberFormatException ex) {
+                LOG.warning("Incorrect integer value of " + value + " specified for: " + key);
+            }
+        }
+        return defaultValue;
     }
 
     protected abstract void handleException(Exception ex);

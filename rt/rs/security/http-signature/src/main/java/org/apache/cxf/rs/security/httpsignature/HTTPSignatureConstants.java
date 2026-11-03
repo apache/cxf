@@ -52,6 +52,20 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
      */
     public static final String RSSEC_HTTP_SIGNATURE_DIGEST_ALGORITHM = "rs.security.http.signature.digest.algorithm";
 
+    /**
+     * The maximum age in seconds of a signed "Date" header on an inbound request or response. A message whose
+     * signed "Date" is older than this is rejected, so that a captured signed message can not be replayed
+     * after its time to live has passed. The default is 300 seconds, a value of 0 or less disables the check.
+     */
+    public static final String RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE = "rs.security.http.signature.time.to.live";
+
+    /**
+     * The number of seconds a signed "Date" header on an inbound request or response may be in the future,
+     * to allow for clock skew. The default is 60 seconds, a negative value disables the check.
+     */
+    public static final String RSSEC_HTTP_SIGNATURE_FUTURE_TIME_TO_LIVE =
+        "rs.security.http.signature.future.time.to.live";
+
 
     private HTTPSignatureConstants() {
         // complete

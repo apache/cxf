@@ -18,17 +18,21 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
@@ -36,8 +40,18 @@ import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
+import org.tomitribe.auth.signatures.Signature;
 
 public class MessageVerifier {
+    /**
+     * The default maximum age in seconds of a signed "Date" header
+     */
+    public static final int DEFAULT_TIME_TO_LIVE = 300;
+    /**
+     * The default number of seconds a signed "Date" header may be in the future
+     */
+    public static final int DEFAULT_FUTURE_TIME_TO_LIVE = 60;
+
     private static final Logger LOG = LogUtils.getL7dLogger(MessageVerifier.class);
 
     private AlgorithmProvider algorithmProvider;
@@ -46,6 +60,8 @@ public class MessageVerifier {
     private final SignatureValidator signatureValidator;
     private final List<String> requiredHeaders;
     private boolean addDefaultRequiredHeaders = true;
+    private int timeToLive = DEFAULT_TIME_TO_LIVE;
+    private int futureTimeToLive = DEFAULT_FUTURE_TIME_TO_LIVE;
 
     public MessageVerifier(KeyProvider keyProvider) {
         this(keyProvider, (List<String>)null);
@@ -151,7 +167,46 @@ public class MessageVerifier {
                                     method,
                                     uri,
                                     signedHeaders);
+        verifyDateHeader(messageHeaders);
         LOG.fine("Finished signature verification");
+    }
+
+    /**
+     * Reject a message whose signed "Date" header is outside the configured time window, so that a captured
+     * signed message can not be replayed once its time to live has passed. A "Date" header which is not
+     * covered by the signature is ignored, as it can be changed along with the rest of the unsigned message.
+     */
+    private void verifyDateHeader(Map<String, List<String>> messageHeaders) {
+        if (timeToLive <= 0 && futureTimeToLive < 0) {
+            return;
+        }
+        List<String> signedHeaders = Signature.fromString(messageHeaders.get("Signature").get(0)).getHeaders();
+        if (!signedHeaders.contains("date")) {
+            return;
+        }
+        String date = null;
+        for (Map.Entry<String, List<String>> entry : messageHeaders.entrySet()) {
+            if ("date".equalsIgnoreCase(entry.getKey()) && !entry.getValue().isEmpty()) {
+                date = entry.getValue().get(0);
+                break;
+            }
+        }
+        if (date == null) {
+            return;
+        }
+        final long dateTime;
+        try {
+            dateTime = HttpUtils.getHttpDateFormat().parse(date).getTime();
+        } catch (ParseException ex) {
+            throw new InvalidSignatureException("the signed Date header can not be parsed");
+        }
+        long now = System.currentTimeMillis();
+        if (timeToLive > 0 && now - dateTime > TimeUnit.SECONDS.toMillis(timeToLive)) {
+            throw new InvalidSignatureException("the signed Date header is older than the time to live");
+        }
+        if (futureTimeToLive >= 0 && dateTime - now > TimeUnit.SECONDS.toMillis(futureTimeToLive)) {
+            throw new InvalidSignatureException("the signed Date header is in the future");
+        }
     }
 
     private void inspectMultipleSignatureHeaders(Map<String, List<String>> responseHeaders) {
@@ -176,6 +231,30 @@ public class MessageVerifier {
      */
     public void setAddDefaultRequiredHeaders(boolean addDefaultRequiredHeaders) {
         this.addDefaultRequiredHeaders = addDefaultRequiredHeaders;
+    }
+
+    public int getTimeToLive() {
+        return timeToLive;
+    }
+
+    /**
+     * Set the maximum age in seconds of a signed "Date" header. A message whose signed "Date" is older
+     * than this is rejected. The default is 300 seconds, a value of 0 or less disables the check.
+     */
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
+    }
+
+    public int getFutureTimeToLive() {
+        return futureTimeToLive;
+    }
+
+    /**
+     * Set the number of seconds a signed "Date" header may be in the future, to allow for clock skew.
+     * The default is 60 seconds, a negative value disables the check.
+     */
+    public void setFutureTimeToLive(int futureTimeToLive) {
+        this.futureTimeToLive = futureTimeToLive;
     }
 
 }

@@ -23,6 +23,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -283,6 +285,58 @@ public class MessageVerifierTest {
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), null);
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void staleSignedDateHeaderFails() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void futureSignedDateHeaderFails() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void signedDateHeaderWithinTimeToLivePasses() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-4)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void staleUnsignedDateHeaderIsIgnored() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        new MessageSigner(keyId -> keyPair.getPrivate(), KEY_ID, Collections.singletonList("host"))
+            .sign(headers, URI, METHOD);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void staleSignedDateHeaderPassesWithoutTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier noTtlVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        noTtlVerifier.setSecurityProvider(new MockSecurityProvider());
+        noTtlVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        noTtlVerifier.setAddDefaultRequiredHeaders(false);
+        noTtlVerifier.setTimeToLive(0);
+        noTtlVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    private static String httpDate(int minutesFromNow) {
+        return DateTimeFormatter.RFC_1123_DATE_TIME.format(
+            ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(minutesFromNow));
     }
 
     private static void createAndAddSignature(Map<String, List<String>> headers) throws IOException {

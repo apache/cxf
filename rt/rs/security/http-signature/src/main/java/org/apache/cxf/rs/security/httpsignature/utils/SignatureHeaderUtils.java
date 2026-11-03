@@ -21,9 +21,8 @@ package org.apache.cxf.rs.security.httpsignature.utils;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Collections;
@@ -42,8 +41,7 @@ public final class SignatureHeaderUtils {
      * Add a date header at the current time using the ZoneOffset. Date format is http
      */
     public static void addDateHeader(Map<String, List<String>> messageHeaders, ZoneOffset zoneOffset) {
-        String date = DateTimeFormatter.RFC_1123_DATE_TIME
-                .format(LocalDateTime.now().atZone(Clock.system(zoneOffset).getZone()));
+        String date = DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(zoneOffset));
         messageHeaders.put("Date", Collections.singletonList(date));
     }
 
