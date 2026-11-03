@@ -47,7 +47,7 @@ public class JMSEndpoint {
 
     /**
      * All parameters with this prefix will go to jndiParameters and be used
-     * as the jndi inital context properties
+     * as the jndi initial context properties
      */
     public static final String JNDI_PARAMETER_NAME_PREFIX = "jndi-";
 

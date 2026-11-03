@@ -65,7 +65,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
 
             invocations.getAndIncrement();
             if (null == faultMode) {
-                // no exception occured
+                // no exception occurred
             } else {
                 switch (faultMode) {
                 case CHECKED_APPLICATION_FAULT:
