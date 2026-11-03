@@ -506,6 +506,36 @@ public class ClaimsAuthorizingInterceptorTest {
             createClaim("http://old-authentication", "http://claims", "smartcard")));
     }
 
+    @Test
+    public void testSubclassClassClaimsDoNotApplyToInheritedAnnotatedMethods() throws Exception {
+        // The inherited method keeps the claims of the superclass which declares it
+        ClaimsAuthorizingInterceptor in = createInterceptor(new AdminInheritingService());
+        Method method = AdminInheritingService.class.getMethod("update");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("user")));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("admin")));
+    }
+
+    @Test
+    public void testSubclassClassClaimsApplyToInheritedUnannotatedMethods() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new AdminInheritingService());
+        Method method = AdminInheritingService.class.getMethod("unannotatedOperation");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
+    }
+
+    @Test
+    public void testSubclassClassClaimsOfOtherTypesApplyToInheritedAnnotatedMethods() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new LocationInheritingService());
+        Method method = LocationInheritingService.class.getMethod("update");
+        org.apache.cxf.rt.security.claims.Claim location = createClaim("http://location",
+            "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified", "UK");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("user"), location));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
+    }
+
     private static ClaimsAuthorizingInterceptor createInterceptor(Object service) {
         ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
         in.setSecuredObject(service);
@@ -714,6 +744,17 @@ public class ClaimsAuthorizingInterceptorTest {
         public void update() {
 
         }
+    }
+    public static class UnannotatedMethodBaseService extends BaseService {
+        public void unannotatedOperation() {
+
+        }
+    }
+    @Claim("admin")
+    public static class AdminInheritingService extends UnannotatedMethodBaseService {
+    }
+    @Claim(name = "http://location", value = "UK")
+    public static class LocationInheritingService extends BaseService {
     }
     public static class OverridingService extends BaseService {
         @Override
