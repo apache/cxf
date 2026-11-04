@@ -33,8 +33,10 @@ import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientRequest;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponse;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponseWithoutEntity;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.runInPhase;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class JwsJsonClientResponseFilterTest {
@@ -61,6 +63,14 @@ public class JwsJsonClientResponseFilterTest {
         } catch (JwsException ex) {
             // expected
         }
+    }
+
+    @Test
+    public void testResponseWithoutEntityIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponseWithoutEntity();
+        runInPhase(() -> createFilter().filter(clientRequest("GET"), res));
+
+        assertNull(res.getEntityStream());
     }
 
     private static JwsJsonClientResponseFilter createFilter() {

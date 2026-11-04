@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -34,12 +35,13 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        final InputStream entityStream = res.getEntityStream();
         if (isMethodWithNoContent(req.getMethod())
             || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+            || entityStream == null) {
             return;
         }
-        final byte[] encryptedContent = IOUtils.readBytesFromStream(res.getEntityStream());
+        final byte[] encryptedContent = IOUtils.readBytesFromStream(entityStream);
         if (encryptedContent.length == 0) {
             return;
         }

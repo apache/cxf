@@ -86,6 +86,11 @@ public class AbstractJweDecryptingFilter {
         return checkEmptyStream;
     }
 
+    /**
+     * No longer has any effect: the filters always read the entity stream and skip
+     * a missing or empty one. A Content-Length: 0 header alone is not trusted, as the
+     * stream may still carry a body.
+     */
     public void setCheckEmptyStream(boolean checkEmptyStream) {
         this.checkEmptyStream = checkEmptyStream;
     }
@@ -96,6 +101,11 @@ public class AbstractJweDecryptingFilter {
      * present, whatever the method, as JAX-RS binds an entity parameter for
      * DELETE, GET and the other methods too. Subclasses may override this
      * to skip specific methods entirely.
+     * <p>
+     * This used to return true for DELETE, GET, HEAD, OPTIONS and TRACE requests and
+     * for responses to DELETE, HEAD and OPTIONS. An override that extends
+     * super.isMethodWithNoContent and still needs those methods skipped entirely
+     * has to list them itself.
      */
     protected boolean isMethodWithNoContent(String method) {
         return false;

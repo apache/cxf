@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.runInPhase;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequest;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequestWithoutStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -80,8 +81,29 @@ public class JwsContainerRequestFilterTest {
         assertNull(message.getExchange().get(Response.class));
     }
 
+    @Test
+    public void testCheckEmptyStreamDoesNotTrustZeroContentLength() throws Exception {
+        Message message = serverRequest("POST", sign(PAYLOAD, BAD_KEY), "0");
+        filter(message, true);
+
+        assertRejected(message);
+    }
+
+    @Test
+    public void testGetWithoutEntityStreamIsAccepted() throws Exception {
+        Message message = serverRequestWithoutStream("GET");
+        filter(message);
+
+        assertNull(message.getExchange().get(Response.class));
+    }
+
     private static void filter(Message message) throws Exception {
+        filter(message, false);
+    }
+
+    private static void filter(Message message, boolean checkEmptyStream) throws Exception {
         JwsContainerRequestFilter filter = new JwsContainerRequestFilter();
+        filter.setCheckEmptyStream(checkEmptyStream);
         filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
         filter.setValidateHttpHeaders(false);
         runInPhase(message, () -> filter.filter(new ContainerRequestContextImpl(message, true, false)));

@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -34,11 +35,11 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweContainerRequestFilter extends AbstractJweDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (isMethodWithNoContent(context.getMethod())
-            || isCheckEmptyStream() && !context.hasEntity()) {
+        final InputStream entityStream = context.getEntityStream();
+        if (isMethodWithNoContent(context.getMethod()) || entityStream == null) {
             return;
         }
-        final byte[] encryptedContent = IOUtils.readBytesFromStream(context.getEntityStream());
+        final byte[] encryptedContent = IOUtils.readBytesFromStream(entityStream);
         if (encryptedContent.length == 0) {
             return;
         }

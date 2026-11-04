@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -37,12 +38,13 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        final InputStream entityStream = res.getEntityStream();
         if (isMethodWithNoContent(req.getMethod())
             || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+            || entityStream == null) {
             return;
         }
-        final String content = IOUtils.readStringFromStream(res.getEntityStream());
+        final String content = IOUtils.readStringFromStream(entityStream);
         if (StringUtils.isEmpty(content)) {
             return;
         }

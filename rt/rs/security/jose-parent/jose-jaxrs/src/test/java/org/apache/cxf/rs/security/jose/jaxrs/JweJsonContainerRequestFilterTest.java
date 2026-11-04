@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.message.Message;
@@ -33,7 +34,9 @@ import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.runInPhase;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequest;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequestWithoutStream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class JweJsonContainerRequestFilterTest {
     private static final byte[] KEY = "0123456789abcdef".getBytes(StandardCharsets.UTF_8);
@@ -48,6 +51,17 @@ public class JweJsonContainerRequestFilterTest {
         runInPhase(message, () -> filter.filter(new ContainerRequestContextImpl(message, true, false)));
 
         assertEquals(PAYLOAD, IOUtils.readStringFromStream(message.getContent(InputStream.class)));
+    }
+
+    @Test
+    public void testGetWithoutEntityStreamIsAccepted() throws Exception {
+        Message message = serverRequestWithoutStream("GET");
+
+        JweJsonContainerRequestFilter filter = new JweJsonContainerRequestFilter();
+        filter.setDecryptionProvider(JweUtils.getDirectKeyJweDecryption(KEY, ContentAlgorithm.A128GCM));
+        runInPhase(message, () -> filter.filter(new ContainerRequestContextImpl(message, true, false)));
+
+        assertNull(message.getExchange().get(Response.class));
     }
 
     private static byte[] encrypt(String payload) {

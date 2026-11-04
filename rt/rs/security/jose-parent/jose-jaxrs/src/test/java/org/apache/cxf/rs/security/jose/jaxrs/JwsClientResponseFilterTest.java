@@ -33,7 +33,9 @@ import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientRequest;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponse;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponseWithoutEntity;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class JwsClientResponseFilterTest {
@@ -68,6 +70,27 @@ public class JwsClientResponseFilterTest {
         createFilter().filter(clientRequest("DELETE"), res);
 
         assertEquals("", IOUtils.readStringFromStream(res.getEntityStream()));
+    }
+
+    @Test
+    public void testCheckEmptyStreamDoesNotTrustZeroContentLength() throws Exception {
+        ClientResponseContext res = clientResponse(sign(PAYLOAD, BAD_KEY), "0");
+        JwsClientResponseFilter filter = createFilter();
+        filter.setCheckEmptyStream(true);
+        try {
+            filter.filter(clientRequest("POST"), res);
+            fail("Failure expected on a body signed with the wrong key despite Content-Length: 0");
+        } catch (JwsException ex) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testResponseWithoutEntityIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponseWithoutEntity();
+        createFilter().filter(clientRequest("GET"), res);
+
+        assertNull(res.getEntityStream());
     }
 
     private static JwsClientResponseFilter createFilter() {

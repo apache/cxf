@@ -31,7 +31,9 @@ import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequest;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequestWithoutStream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class JweContainerRequestFilterTest {
     private static final byte[] KEY = "0123456789abcdef".getBytes(StandardCharsets.UTF_8);
@@ -46,6 +48,17 @@ public class JweContainerRequestFilterTest {
         filter.filter(new ContainerRequestContextImpl(message, true, false));
 
         assertEquals(PAYLOAD, IOUtils.readStringFromStream(message.getContent(InputStream.class)));
+    }
+
+    @Test
+    public void testGetWithoutEntityStreamIsAccepted() throws Exception {
+        Message message = serverRequestWithoutStream("GET");
+
+        JweContainerRequestFilter filter = new JweContainerRequestFilter();
+        filter.setDecryptionProvider(JweUtils.getDirectKeyJweDecryption(KEY, ContentAlgorithm.A128GCM));
+        filter.filter(new ContainerRequestContextImpl(message, true, false));
+
+        assertNull(message.getContent(InputStream.class));
     }
 
     private static byte[] encrypt(String payload) {

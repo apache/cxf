@@ -62,6 +62,17 @@ final class JoseFilterTestSupport {
         return message;
     }
 
+    /**
+     * A request with no entity stream at all, as the local transport sends a GET.
+     */
+    static Message serverRequestWithoutStream(String httpMethod) {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        message.put(Message.PROTOCOL_HEADERS, new MetadataMap<String, String>());
+        return message;
+    }
+
     static ClientRequestContext clientRequest(String httpMethod) {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
@@ -74,13 +85,29 @@ final class JoseFilterTestSupport {
      * A 200 response whose entity is the raw response stream, as ClientResponseFilterInterceptor builds it.
      */
     static ClientResponseContext clientResponse(byte[] body) {
+        return clientResponse(body, Integer.toString(body.length));
+    }
+
+    static ClientResponseContext clientResponse(byte[] body, String contentLength) {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.RESPONSE_CODE, 200);
         message.setContent(InputStream.class, new ByteArrayInputStream(body));
-        message.put(Message.PROTOCOL_HEADERS, headers(Integer.toString(body.length)));
+        message.put(Message.PROTOCOL_HEADERS, headers(contentLength));
         ResponseImpl response = (ResponseImpl)JAXRSUtils.toResponseBuilder(200)
             .entity(message.getContent(InputStream.class)).build();
+        return new ClientResponseContextImpl(response, message);
+    }
+
+    /**
+     * A 200 response with no entity, so that getEntityStream() returns null.
+     */
+    static ClientResponseContext clientResponseWithoutEntity() {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.RESPONSE_CODE, 200);
+        message.put(Message.PROTOCOL_HEADERS, new MetadataMap<String, String>());
+        ResponseImpl response = (ResponseImpl)JAXRSUtils.toResponseBuilder(200).build();
         return new ClientResponseContextImpl(response, message);
     }
 

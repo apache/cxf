@@ -31,8 +31,10 @@ import org.junit.Test;
 
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientRequest;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponse;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponseWithoutEntity;
 import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.runInPhase;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class JweJsonClientResponseFilterTest {
     private static final byte[] KEY = "0123456789abcdef".getBytes(StandardCharsets.UTF_8);
@@ -47,6 +49,17 @@ public class JweJsonClientResponseFilterTest {
         runInPhase(() -> filter.filter(clientRequest("DELETE"), res));
 
         assertEquals(PAYLOAD, IOUtils.readStringFromStream(res.getEntityStream()));
+    }
+
+    @Test
+    public void testResponseWithoutEntityIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponseWithoutEntity();
+
+        JweJsonClientResponseFilter filter = new JweJsonClientResponseFilter();
+        filter.setDecryptionProvider(JweUtils.getDirectKeyJweDecryption(KEY, ContentAlgorithm.A128GCM));
+        runInPhase(() -> filter.filter(clientRequest("GET"), res));
+
+        assertNull(res.getEntityStream());
     }
 
     private static byte[] encrypt(String payload) {

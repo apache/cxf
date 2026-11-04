@@ -132,6 +132,25 @@ public class JwsJsonContainerRequestFilterTest {
         assertEquals(400, response.getStatus());
     }
 
+    @Test
+    public void testGetWithoutEntityStreamIsAccepted() throws Exception {
+        Message message = JoseFilterTestSupport.serverRequestWithoutStream("GET");
+
+        JwsJsonContainerRequestFilter filter = new JwsJsonContainerRequestFilter();
+        filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
+
+        runInPhase(message, () -> {
+            try {
+                filter.filter(new ContainerRequestContextImpl(message, true, false));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        assertNull(message.getContent(Exception.class));
+        assertNull(message.getExchange().get(Response.class));
+    }
+
     private String createSignedDocument(String payload) {
         JwsJsonProducer producer = new JwsJsonProducer(payload);
         producer.signWith(new HmacJwsSignatureProvider(BAD_KEY, SignatureAlgorithm.HS256),
