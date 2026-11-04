@@ -35,6 +35,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -147,6 +148,82 @@ public class HttpClientHTTPConduitSharedClientTest {
         assertSame(strictClient, client2);
     }
 
+    @Test
+    public void testHostnameVerifierIsNotShared() throws Exception {
+        TrustManager[] trustManagers = {new TestTrustManager()};
+        HttpClientHTTPConduit conduit1 = newConduit("https");
+        TLSClientParameters tls1 = new TLSClientParameters();
+        tls1.setTrustManagers(trustManagers);
+        tls1.setHostnameVerifier((host, session) -> true);
+        conduit1.setTlsClientParameters(tls1);
+
+        // the hostname verifier is part of the client's trust managers
+        HttpClientHTTPConduit conduit2 = newConduit("https");
+        TLSClientParameters tls2 = new TLSClientParameters();
+        tls2.setTrustManagers(trustManagers);
+        conduit2.setTlsClientParameters(tls2);
+        assertNotSame(prepare(conduit1), prepare(conduit2));
+    }
+
+    @Test
+    public void testNamedGroupsAreNotShared() throws Exception {
+        HttpClientHTTPConduit conduit1 = newConduit("https");
+        TLSClientParameters tls1 = new TLSClientParameters();
+        tls1.setNamedGroups(new ArrayList<>(List.of("x25519")));
+        conduit1.setTlsClientParameters(tls1);
+
+        HttpClientHTTPConduit conduit2 = newConduit("https");
+        conduit2.setTlsClientParameters(new TLSClientParameters());
+        assertNotSame(prepare(conduit1), prepare(conduit2));
+    }
+
+    @Test
+    public void testChangedCipherSuitesFilter() throws Exception {
+        HttpClientHTTPConduit conduit = newConduit("https");
+        TLSClientParameters tls = new TLSClientParameters();
+        FiltersType filters = new FiltersType();
+        filters.getInclude().add(".*_AES_128_.*");
+        tls.setCipherSuitesFilter(filters);
+        conduit.setTlsClientParameters(tls);
+        HttpClient client = prepare(conduit);
+
+        // the filter of the conduit is changed in place after its first call
+        filters.getInclude().add(".*_AES_256_.*");
+        assertNotSame(client, prepare(conduit));
+    }
+
+    @Test
+    public void testPerRequestSettingsKeepClient() throws Exception {
+        HttpClientHTTPConduit conduit = newConduit("http");
+        HttpClient client = prepare(conduit);
+
+        // settings which are applied to each request, not to the client, alternate between calls
+        for (int i = 0; i < 4; i++) {
+            HTTPClientPolicy policy = new HTTPClientPolicy();
+            policy.setReceiveTimeout(i % 2 == 0 ? 1000 : 2000);
+            assertSame(client, prepare(conduit, policy, true));
+            conduit.getClient().setReceiveTimeout(i % 2 == 0 ? 3000 : 4000);
+            assertSame(client, prepare(conduit));
+        }
+    }
+
+    @Test
+    public void testAlternatingSettingsReuseClients() throws Exception {
+        HttpClientHTTPConduit conduit = newConduit("http");
+        HttpClient client1 = prepare(conduit, null, false);
+        conduit.getClient().setConnectionTimeout(1000);
+        HttpClient client2 = prepare(conduit, null, false);
+        assertNotSame(client1, client2);
+
+        // switching back and forth between the two settings does not build a client each time
+        for (int i = 0; i < 4; i++) {
+            conduit.getClient().setConnectionTimeout(30000);
+            assertSame(client1, prepare(conduit, null, false));
+            conduit.getClient().setConnectionTimeout(1000);
+            assertSame(client2, prepare(conduit, null, false));
+        }
+    }
+
     private HttpClientHTTPConduit newConduit(String scheme) throws Exception {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(scheme + "://backend.example/test");
@@ -157,8 +234,19 @@ public class HttpClientHTTPConduitSharedClientTest {
     }
 
     private static HttpClient prepare(HttpClientHTTPConduit conduit) throws Exception {
+        return prepare(conduit, null, true);
+    }
+
+    private static HttpClient prepare(HttpClientHTTPConduit conduit, HTTPClientPolicy policy,
+                                      boolean shareClient) throws Exception {
         Message message = new MessageImpl();
         message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        if (policy != null) {
+            message.put(HTTPClientPolicy.class, policy);
+        }
+        if (!shareClient) {
+            message.put("share.httpclient.http.conduit", Boolean.FALSE);
+        }
         conduit.prepare(message);
         HttpClient client = message.get(HttpClient.class);
         assertNotNull(client);

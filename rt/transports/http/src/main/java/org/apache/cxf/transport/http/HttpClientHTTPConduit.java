@@ -88,6 +88,7 @@ import javax.net.ssl.SSLSession;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -95,7 +96,6 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -108,7 +108,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private static final String HTTPS_RESET_HTTPCLIENT_CONDUIT = "https.reset.httpclient.http.conduit";
 
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
-    private static final ClientPolicyCalculator POLICY_CALCULATOR = new ClientPolicyCalculator();
     private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
     volatile RefCount<HttpClient> clientRef;
     volatile URI sslURL;
@@ -194,7 +193,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
          * Whether the client was built from settings equal to these ones
          */
         boolean matches(HTTPClientPolicy otherPolicy, TLSClientParameters otherClientParameters) {
-            return samePolicy(policy, otherPolicy) && sameClientParameters(clientParameters, otherClientParameters);
+            return samePolicy(policy, otherPolicy) && clientParameters.equals(otherClientParameters);
         }
     }
 
@@ -257,16 +256,17 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         super(b, ei, t);
     }
 
+    /**
+     * Compares only the settings a client is built from: the connection timeout, the proxy and the
+     * version. The other settings are applied to each request, so changing them keeps the client
+     */
     private static boolean samePolicy(HTTPClientPolicy p1, HTTPClientPolicy p2) {
-        // the version and the non proxy hosts are used to build the client too
-        return POLICY_CALCULATOR.equals(p1, p2)
-            && Objects.equals(p1.getVersion(), p2.getVersion())
-            && Objects.equals(p1.getNonProxyHosts(), p2.getNonProxyHosts());
-    }
-
-    private static boolean sameClientParameters(TLSClientParameters p1, TLSClientParameters p2) {
-        // the named groups are used to build the client too
-        return p1.equals(p2) && Objects.equals(p1.getNamedGroups(), p2.getNamedGroups());
+        return p1.getConnectionTimeout() == p2.getConnectionTimeout()
+            && Objects.equals(p1.getProxyServer(), p2.getProxyServer())
+            && Objects.equals(p1.getProxyServerPort(), p2.getProxyServerPort())
+            && p1.getProxyServerType() == p2.getProxyServerType()
+            && Objects.equals(p1.getNonProxyHosts(), p2.getNonProxyHosts())
+            && Objects.equals(p1.getVersion(), p2.getVersion());
     }
 
     /**
@@ -274,18 +274,24 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * the key of the cached client, or the proxies it uses
      */
     private static HTTPClientPolicy copyOf(HTTPClientPolicy policy) {
-        final HTTPClientPolicy copy = POLICY_CALCULATOR.intersect(policy, policy);
-        if (copy == null) {
-            return policy;
+        final HTTPClientPolicy copy = new HTTPClientPolicy();
+        copy.setConnectionTimeout(policy.getConnectionTimeout());
+        if (policy.isSetProxyServer()) {
+            copy.setProxyServer(policy.getProxyServer());
         }
-        if (policy.isSetVersion()) {
-            copy.setVersion(policy.getVersion());
+        if (policy.isSetProxyServerPort()) {
+            copy.setProxyServerPort(policy.getProxyServerPort());
+        }
+        if (policy.isSetProxyServerType()) {
+            copy.setProxyServerType(policy.getProxyServerType());
         }
         if (policy.isSetNonProxyHosts()) {
             copy.setNonProxyHosts(policy.getNonProxyHosts());
         }
-        // fall back to the policy itself if the copy misses anything the client is built from
-        return samePolicy(copy, policy) ? copy : policy;
+        if (policy.isSetVersion()) {
+            copy.setVersion(policy.getVersion());
+        }
+        return copy;
     }
 
     private static TLSClientParameters copyOf(TLSClientParameters params) {
@@ -308,14 +314,19 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             copy.setTrustManagers(params.getTrustManagers().clone());
         }
         copy.setCipherSuites(new ArrayList<>(params.getCipherSuites()));
-        copy.setCipherSuitesFilter(params.getCipherSuitesFilter());
+        if (params.getCipherSuitesFilter() != null) {
+            final FiltersType filters = new FiltersType();
+            filters.getInclude().addAll(params.getCipherSuitesFilter().getInclude());
+            filters.getExclude().addAll(params.getCipherSuitesFilter().getExclude());
+            copy.setCipherSuitesFilter(filters);
+        }
         copy.setSecureRandom(params.getSecureRandom());
+        // the client is not built from the certificate constraints, they are checked for each response
         copy.setCertConstraints(params.getCertConstraints());
         copy.setSecureSocketProtocol(params.getSecureSocketProtocol());
         copy.setCertAlias(params.getCertAlias());
         copy.setNamedGroups(new ArrayList<>(params.getNamedGroups()));
-        // fall back to the parameters themselves if the copy misses anything they are compared by
-        return sameClientParameters(copy, params) ? copy : params;
+        return copy;
     }
 
     /**
@@ -333,6 +344,43 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         } finally {
             initializationLock.unlock();
         }
+    }
+
+    /**
+     * Stops using the client if the HTTPS address or the settings it was built from have changed
+     * @return whether the client was reset because the HTTPS address has changed
+     */
+    private boolean resetClientIfChanged(Message message, URI uri, HTTPClientPolicy csPolicy,
+                                         TLSClientParameters clientParameters) {
+        boolean httpsReset = false;
+        if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
+            sslURL = null;
+
+            // Reset the client in case of HTTPS URL change
+            httpsReset = MessageUtils.getContextualBoolean(message, HTTPS_RESET_HTTPCLIENT_CONDUIT, true);
+            if (httpsReset) {
+                resetClient(clientRef);
+            }
+        }
+        // Reset the client if the settings it was built from have changed since
+        final RefCount<HttpClient> ref = clientRef;
+        if (ref != null && !ref.matches(csPolicy, clientParameters)) {
+            resetClient(ref);
+        }
+        return httpsReset;
+    }
+
+    /**
+     * Takes back a client this conduit has stopped using, if it was built from these settings.
+     * The conduit still holds its reference, so it has not been released
+     */
+    private RefCount<HttpClient> takeDeferredClient(HTTPClientPolicy policy, TLSClientParameters params) {
+        for (RefCount<HttpClient> ref : deferredClientRefs) {
+            if (ref.matches(policy, params) && deferredClientRefs.remove(ref)) {
+                return ref;
+            }
+        }
+        return null;
     }
 
     private static Set<String> getRestrictedHeaders() {
@@ -461,21 +509,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             return;
         }
 
-        if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
-            sslURL = null;
-
-            // Reset the client in case of HTTPS URL change
-            final boolean httpsResetHttpClient = MessageUtils.getContextualBoolean(message,
-                HTTPS_RESET_HTTPCLIENT_CONDUIT, true);
-            if (httpsResetHttpClient) {
-                resetClient(clientRef);
-            }
-        }
-        // Reset the client if the settings it was built from have changed since
-        final RefCount<HttpClient> ref = clientRef;
-        if (ref != null && !ref.matches(csPolicy, clientParameters)) {
-            resetClient(ref);
-        }
+        final boolean httpsReset = resetClientIfChanged(message, uri, csPolicy, clientParameters);
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -550,6 +584,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             initializationLock.lock();
             try {
                 cl = clientRef;
+                if (cl == null && !httpsReset) {
+                    // switching back to the settings of a client this conduit has used before
+                    cl = takeDeferredClient(clientPolicy, clientParametersCopy);
+                    clientRef = cl;
+                }
                 if (cl == null) {
                     final boolean shareHttpClient = MessageUtils.getContextualBoolean(message,
                         SHARE_HTTPCLIENT_CONDUIT, true);

@@ -191,6 +191,9 @@ public class TLSClientParameters extends TLSParameterBase {
         if (sslContext != null) {
             hash = hash * 41 + System.identityHashCode(sslContext);
         }
+        if (hostnameVerifier != null) {
+            hash = hash * 41 + System.identityHashCode(hostnameVerifier);
+        }
         hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
         hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
         hash = hash(hash, sslCacheTimeout);
@@ -214,6 +217,7 @@ public class TLSClientParameters extends TLSParameterBase {
         if (serverNames != null) {
             hash = hash(hash, serverNames);
         }
+        hash = hash(hash, getNamedGroups());
         return hash;
     }
     private int hash(int i, Object o) {
@@ -242,6 +246,7 @@ public class TLSClientParameters extends TLSParameterBase {
             boolean eq = disableCNCheck == that.disableCNCheck;
             eq &= sslSocketFactory == that.sslSocketFactory;
             eq &= sslContext == that.sslContext;
+            eq &= hostnameVerifier == that.hostnameVerifier;
             eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
             eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
             eq &= sslCacheTimeout == that.sslCacheTimeout;
@@ -250,6 +255,7 @@ public class TLSClientParameters extends TLSParameterBase {
             eq &= Objects.equals(protocol, that.protocol);
             eq &= Objects.equals(provider, that.provider);
             eq &= equals(ciphersuites, that.ciphersuites);
+            eq &= Objects.equals(getNamedGroups(), that.getNamedGroups());
             eq &= Objects.deepEquals(keyManagers, that.keyManagers);
             eq &= Objects.deepEquals(trustManagers, that.trustManagers);
             if (cipherSuiteFilters != null) {
