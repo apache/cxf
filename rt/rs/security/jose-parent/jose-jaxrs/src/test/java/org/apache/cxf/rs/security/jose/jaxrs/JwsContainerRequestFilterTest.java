@@ -18,28 +18,23 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 
-import org.junit.After;
 import org.junit.Test;
 
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.runInPhase;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.serverRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -51,15 +46,10 @@ public class JwsContainerRequestFilterTest {
         + "c8kZSYzAQ1uTRC_egZ_8cgZSZa9T5nmQ";
     private static final String PAYLOAD = "{\"id\":\"123\"}";
 
-    @After
-    public void tearDown() throws Exception {
-        setThreadLocalMessage(null);
-    }
-
     @Test
     public void testDeleteBodyIsVerified() throws Exception {
-        Message message = createMessage("DELETE", sign(PAYLOAD, GOOD_KEY));
-        createFilter().filter(new ContainerRequestContextImpl(message, true, false));
+        Message message = serverRequest("DELETE", sign(PAYLOAD, GOOD_KEY));
+        filter(message);
 
         assertNull(message.getExchange().get(Response.class));
         assertEquals(PAYLOAD, IOUtils.readStringFromStream(message.getContent(InputStream.class)));
@@ -67,59 +57,47 @@ public class JwsContainerRequestFilterTest {
 
     @Test
     public void testDeleteBodySignedWithWrongKeyIsRejected() throws Exception {
-        Message message = createMessage("DELETE", sign(PAYLOAD, BAD_KEY));
-        createFilter().filter(new ContainerRequestContextImpl(message, true, false));
+        Message message = serverRequest("DELETE", sign(PAYLOAD, BAD_KEY));
+        filter(message);
 
+        assertRejected(message);
+    }
+
+    @Test
+    public void testZeroContentLengthDoesNotSkipVerification() throws Exception {
+        // the header claims there is no body but the stream has one: the stream decides
+        Message message = serverRequest("DELETE", sign(PAYLOAD, BAD_KEY), "0");
+        filter(message);
+
+        assertRejected(message);
+    }
+
+    @Test
+    public void testGetWithoutBodyIsAccepted() throws Exception {
+        Message message = serverRequest("GET", new byte[0]);
+        filter(message);
+
+        assertNull(message.getExchange().get(Response.class));
+    }
+
+    private static void filter(Message message) throws Exception {
+        JwsContainerRequestFilter filter = new JwsContainerRequestFilter();
+        filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
+        filter.setValidateHttpHeaders(false);
+        runInPhase(message, () -> filter.filter(new ContainerRequestContextImpl(message, true, false)));
+    }
+
+    private static void assertRejected(Message message) {
         Response response = message.getExchange().get(Response.class);
         assertNotNull(response);
         assertEquals(400, response.getStatus());
     }
 
-    @Test
-    public void testGetWithoutBodyIsAccepted() throws Exception {
-        Message message = createMessage("GET", "");
-        createFilter().filter(new ContainerRequestContextImpl(message, true, false));
-
-        assertNull(message.getExchange().get(Response.class));
-    }
-
-    private static JwsContainerRequestFilter createFilter() {
-        JwsContainerRequestFilter filter = new JwsContainerRequestFilter();
-        filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
-        filter.setValidateHttpHeaders(false);
-        return filter;
-    }
-
-    private static String sign(String payload, String key) {
+    private static byte[] sign(String payload, String key) {
         JwsHeaders headers = new JwsHeaders(SignatureAlgorithm.HS256);
         headers.setContentType("application/json");
         return new JwsCompactProducer(headers, payload)
-            .signWith(new HmacJwsSignatureProvider(key, SignatureAlgorithm.HS256));
-    }
-
-    private static Message createMessage(String httpMethod, String body) throws Exception {
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        Message message = new MessageImpl();
-        message.setExchange(new ExchangeImpl());
-        message.put(Message.HTTP_REQUEST_METHOD, httpMethod);
-        message.setContent(InputStream.class, new ByteArrayInputStream(bytes));
-        MetadataMap<String, String> headers = new MetadataMap<>();
-        headers.putSingle("Content-Type", "application/jose");
-        headers.putSingle("Content-Length", Integer.toString(bytes.length));
-        message.put(Message.PROTOCOL_HEADERS, headers);
-        setThreadLocalMessage(message);
-        return message;
-    }
-
-    private static void setThreadLocalMessage(Message message) throws Exception {
-        Field f = PhaseInterceptorChain.class.getDeclaredField("CURRENT_MESSAGE");
-        f.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        ThreadLocal<Message> tl = (ThreadLocal<Message>) f.get(null);
-        if (message == null) {
-            tl.remove();
-        } else {
-            tl.set(message);
-        }
+            .signWith(new HmacJwsSignatureProvider(key, SignatureAlgorithm.HS256))
+            .getBytes(StandardCharsets.UTF_8);
     }
 }

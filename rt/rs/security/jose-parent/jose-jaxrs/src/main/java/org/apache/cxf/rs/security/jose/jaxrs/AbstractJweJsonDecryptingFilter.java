@@ -101,4 +101,15 @@ public class AbstractJweJsonDecryptingFilter {
     public void setCheckEmptyStream(boolean checkEmptyStream) {
         this.checkEmptyStream = checkEmptyStream;
     }
+
+    /**
+     * Returns true if the entity must not be read for the given HTTP method.
+     * By default no method is skipped: an entity is always decrypted when one is
+     * present, whatever the method, as JAX-RS binds an entity parameter for
+     * DELETE, GET and the other methods too. Subclasses may override this
+     * to skip specific methods entirely.
+     */
+    protected boolean isMethodWithNoContent(String method) {
+        return false;
+    }
 }

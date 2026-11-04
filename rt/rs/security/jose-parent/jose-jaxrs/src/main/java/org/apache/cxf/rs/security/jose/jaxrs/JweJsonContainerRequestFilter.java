@@ -22,12 +22,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import jakarta.annotation.Priority;
-import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
@@ -38,8 +36,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweException;
 public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if ((isMethodWithNoContent(context.getMethod()) || isCheckEmptyStream())
-            && !context.hasEntity()) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(context.getEntityStream());
@@ -63,9 +61,4 @@ public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilt
             return;
         }
     }
-    
-    protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
-    }
-    
 }

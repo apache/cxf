@@ -22,13 +22,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import jakarta.annotation.Priority;
-import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -36,8 +34,9 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweClientResponseFilter extends AbstractJweDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
-        if (isStatusCodeWithNoContent(res.getStatus())
-                || (isMethodWithNoContent(req.getMethod()) || isCheckEmptyStream()) && !res.hasEntity()) {
+        if (isMethodWithNoContent(req.getMethod())
+                || isStatusCodeWithNoContent(res.getStatus())
+                || isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(res.getEntityStream());
@@ -55,10 +54,6 @@ public class JweClientResponseFilter extends AbstractJweDecryptingFilter impleme
         if (super.isValidateHttpHeaders()) {
             super.validateHttpHeadersIfNeeded(res.getHeaders(), out.getHeaders());
         }
-    }
-
-    protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
     }
 
     protected boolean isStatusCodeWithNoContent(int statusCode) {

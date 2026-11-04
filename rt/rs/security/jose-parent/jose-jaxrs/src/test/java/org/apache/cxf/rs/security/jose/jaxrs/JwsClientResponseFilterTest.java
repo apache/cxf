@@ -18,15 +18,10 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 
-import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientResponseContext;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.HmacJwsSignatureVerifier;
@@ -36,6 +31,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 
 import org.junit.Test;
 
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientRequest;
+import static org.apache.cxf.rs.security.jose.jaxrs.JoseFilterTestSupport.clientResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -48,21 +45,29 @@ public class JwsClientResponseFilterTest {
 
     @Test
     public void testDeleteResponseIsVerified() throws Exception {
-        InputStream[] entity = {stream(sign(PAYLOAD, GOOD_KEY))};
-        createFilter().filter(request("DELETE"), response(entity));
+        ClientResponseContext res = clientResponse(sign(PAYLOAD, GOOD_KEY));
+        createFilter().filter(clientRequest("DELETE"), res);
 
-        assertEquals(PAYLOAD, IOUtils.readStringFromStream(entity[0]));
+        assertEquals(PAYLOAD, IOUtils.readStringFromStream(res.getEntityStream()));
     }
 
     @Test
     public void testDeleteResponseSignedWithWrongKeyIsRejected() throws Exception {
-        InputStream[] entity = {stream(sign(PAYLOAD, BAD_KEY))};
+        ClientResponseContext res = clientResponse(sign(PAYLOAD, BAD_KEY));
         try {
-            createFilter().filter(request("DELETE"), response(entity));
+            createFilter().filter(clientRequest("DELETE"), res);
             fail("Failure expected on a DELETE response signed with the wrong key");
         } catch (JwsException ex) {
             // expected
         }
+    }
+
+    @Test
+    public void testEmptyDeleteResponseIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponse(new byte[0]);
+        createFilter().filter(clientRequest("DELETE"), res);
+
+        assertEquals("", IOUtils.readStringFromStream(res.getEntityStream()));
     }
 
     private static JwsClientResponseFilter createFilter() {
@@ -72,45 +77,11 @@ public class JwsClientResponseFilterTest {
         return filter;
     }
 
-    private static String sign(String payload, String key) {
+    private static byte[] sign(String payload, String key) {
         JwsHeaders headers = new JwsHeaders(SignatureAlgorithm.HS256);
         headers.setContentType("application/json");
         return new JwsCompactProducer(headers, payload)
-            .signWith(new HmacJwsSignatureProvider(key, SignatureAlgorithm.HS256));
-    }
-
-    private static InputStream stream(String content) {
-        return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static ClientRequestContext request(String httpMethod) {
-        return (ClientRequestContext)Proxy.newProxyInstance(
-            JwsClientResponseFilterTest.class.getClassLoader(),
-            new Class<?>[] {ClientRequestContext.class},
-            (proxy, method, args) -> "getMethod".equals(method.getName()) ? httpMethod : null);
-    }
-
-    private static ClientResponseContext response(InputStream[] entity) {
-        MetadataMap<String, String> headers = new MetadataMap<>();
-        return (ClientResponseContext)Proxy.newProxyInstance(
-            JwsClientResponseFilterTest.class.getClassLoader(),
-            new Class<?>[] {ClientResponseContext.class},
-            (proxy, method, args) -> {
-                switch (method.getName()) {
-                case "getStatus":
-                    return 200;
-                case "hasEntity":
-                    return !IOUtils.isEmpty(entity[0]);
-                case "getEntityStream":
-                    return entity[0];
-                case "setEntityStream":
-                    entity[0] = (InputStream)args[0];
-                    return null;
-                case "getHeaders":
-                    return headers;
-                default:
-                    throw new UnsupportedOperationException(method.getName());
-                }
-            });
+            .signWith(new HmacJwsSignatureProvider(key, SignatureAlgorithm.HS256))
+            .getBytes(StandardCharsets.UTF_8);
     }
 }
