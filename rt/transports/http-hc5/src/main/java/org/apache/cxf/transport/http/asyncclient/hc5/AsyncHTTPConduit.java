@@ -313,7 +313,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             basicEntity = (MutableHttpEntity)entity.getEntity();
             basicEntity.setChunked(isChunking);
             
-            final int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
+            final int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 32 * 1024;
             inbuf = new SharedInputBuffer(bufSize);
             outbuf = new SharedOutputBuffer(bufSize);
             isAsync = outMessage != null && outMessage.getExchange() != null
