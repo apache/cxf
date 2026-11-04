@@ -351,11 +351,61 @@ public class SecureAnnotationsInterceptorTest {
     }
 
     @Test
-    public void testGenericInterfaceMethodRolesStillApply() throws Exception {
+    public void testGenericInterfaceMethodRolesAreEnforced() throws Exception {
+        // update(String) overrides the erased update(Object), but not the update() overload
         Method target = StringRepository.class.getMethod("update", String.class);
-
+        assertAllowed(new StringRepository(), target, "admin");
         assertDenied(new StringRepository(), target, "user");
         assertDenied(new StringRepository(), target);
+
+        Method userMethod = StringRepository.class.getMethod("update");
+        assertAllowed(new StringRepository(), userMethod, "user");
+        assertDenied(new StringRepository(), userMethod, "admin");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodRolesApplyTogetherWithClassRoles() throws Exception {
+        Method target = ClassRolesStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new ClassRolesStringRepository(), target, "user", "admin");
+        assertDenied(new ClassRolesStringRepository(), target, "user");
+        assertDenied(new ClassRolesStringRepository(), target, "admin");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodRolesApplyToInheritedImplementation() throws Exception {
+        Method target = InheritingStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new InheritingStringRepository(), target, "admin");
+        assertDenied(new InheritingStringRepository(), target, "user");
+    }
+
+    @Test
+    public void testGenericInterfaceMethodRolesApplyThroughTypeVariables() throws Exception {
+        Method target = TypedStringRepository.class.getMethod("update", String.class);
+
+        assertAllowed(new TypedStringRepository(), target, "admin");
+        assertDenied(new TypedStringRepository(), target, "user");
+    }
+
+    @Test
+    public void testUnrelatedOverloadIsNotLinkedToGenericInterfaceMethod() throws Exception {
+        Method integerMethod = OverloadingStringRepository.class.getMethod("update", Integer.class);
+        assertAllowed(new OverloadingStringRepository(), integerMethod, "user");
+        assertDenied(new OverloadingStringRepository(), integerMethod, "admin");
+
+        Method stringMethod = OverloadingStringRepository.class.getMethod("update", String.class);
+        assertAllowed(new OverloadingStringRepository(), stringMethod, "admin");
+        assertDenied(new OverloadingStringRepository(), stringMethod, "user");
+    }
+
+    @Test
+    public void testUnannotatedOverloadIsNotSecuredByOtherOverloads() throws Exception {
+        Method target = UnannotatedOverloadService.class.getMethod("delete");
+
+        assertAllowed(new UnannotatedOverloadService(), target, "user");
+        assertDenied(new UnannotatedOverloadService(),
+                     UnannotatedOverloadService.class.getMethod("delete", String.class), "user");
     }
 
     @Test
@@ -624,6 +674,64 @@ public class SecureAnnotationsInterceptorTest {
 
         @Override
         public void update() {
+        }
+    }
+
+    @RolesAllowed("user")
+    public static class ClassRolesStringRepository implements Repository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
+        }
+    }
+
+    public static class StringUpdater {
+        public void update(String value) {
+        }
+
+        public void update() {
+        }
+    }
+
+    public static class InheritingStringRepository extends StringUpdater implements Repository<String> {
+    }
+
+    public abstract static class AbstractRepository<T> implements Repository<T> { // NOPMD
+    }
+
+    public static class TypedStringRepository extends AbstractRepository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
+        }
+    }
+
+    public static class OverloadingStringRepository implements Repository<String> {
+        @Override
+        public void update(String value) {
+        }
+
+        @Override
+        public void update() {
+        }
+
+        @RolesAllowed("user")
+        public void update(Integer value) {
+        }
+    }
+
+    public static class UnannotatedOverloadService {
+        @RolesAllowed("admin")
+        public void delete(String id) {
+        }
+
+        public void delete() {
         }
     }
 
