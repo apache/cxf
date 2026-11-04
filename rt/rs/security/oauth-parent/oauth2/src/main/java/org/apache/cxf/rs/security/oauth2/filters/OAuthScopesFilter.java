@@ -108,7 +108,10 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             if (methodScopes != null) {
                 declarations.add(new ScopesDeclaration(m.getDeclaringClass(), methodScopes, true));
             }
-            if (classScopes != null) {
+            // A class-level @Scopes does not apply to a method inherited from a superclass which
+            // has its own method-level @Scopes, only to the class's own methods and to
+            // unannotated inherited methods
+            if (classScopes != null && (methodScopes == null || m.getDeclaringClass() == cls)) {
                 declarations.add(new ScopesDeclaration(classScopesDeclarer, classScopes, false));
             }
             signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
