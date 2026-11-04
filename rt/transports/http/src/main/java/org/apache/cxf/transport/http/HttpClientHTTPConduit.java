@@ -653,12 +653,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     /**
      * The {@link BodyPublisher} that wraps around the output stream.
      */
-    private static final class HttpClientBodyPublisher implements CloseableBodyPublisher {
+    static final class HttpClientBodyPublisher implements CloseableBodyPublisher {
         private Supplier<InputStream> pin;
         private HttpClientWrappedOutputStream stream;
         private long contentLen;
 
-        private HttpClientBodyPublisher(HttpClientWrappedOutputStream s, Supplier<InputStream> pin) {
+        HttpClientBodyPublisher(HttpClientWrappedOutputStream s, Supplier<InputStream> pin) {
             this.stream = s;
             this.pin = pin;
         }
@@ -682,13 +682,17 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     if (stream != null) {
                         contentLen = stream.contentLen;
                     }
-                    BodyPublishers.ofInputStream(pin).subscribe(subscriber);
                     stream = null;
-                    pin = null;
-                    return;
                 }
             }
-            BodyPublishers.noBody().subscribe(subscriber);
+            // See https://issues.apache.org/jira/browse/CXF-9267
+            if (pin != null) {
+                BodyPublishers.ofInputStream(pin).subscribe(subscriber);
+                pin = null;
+            } else {
+                // Avoiding java.io.IOException: Pipe closed if pin already subscribed
+                BodyPublishers.noBody().subscribe(subscriber);
+            }
         }
 
         @Override
@@ -1018,7 +1022,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             if (csPolicy.isAllowChunking() || contentLen >= 0) {
                 final PipedInputStream pin = new PipedInputStream(csPolicy.getChunkLength() <= 0
                         ? 4096 : csPolicy.getChunkLength());
-                this.publisher = new HttpClientBodyPublisher(this, () -> pin);
+                this.publisher = new HttpClientBodyPublisher(this, contentLen != 0 ? () -> pin : null);
                 if (contentLen != 0) {
                     pout = new HttpClientPipedOutputStream(this, pin, csPolicy, publisher);
                 }

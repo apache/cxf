@@ -50,6 +50,13 @@ public class BookStore {
         return "CXF in Action".getBytes();
     }
 
+    @GET
+    @Path("/pluto")
+    @Produces("text/plain")
+    public byte[] getPluto(@Context HttpServletRequest request) {
+        return (request.getProtocol() + " CXF in Action - Pluto").getBytes(StandardCharsets.UTF_8);
+    }
+
     @POST
     @Path("/echo")
     @Consumes("text/plain")
