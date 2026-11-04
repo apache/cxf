@@ -52,6 +52,9 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     // the secured object's hierarchy. Keying by signature means that overloaded methods do not
     // share a rule
     private final Map<String, List<RolesDeclaration>> declarationsBySignature = new HashMap<>();
+    // The erased signatures a method overrides with a different signature, e.g. update(Object)
+    // for update(String) implementing update(T) of Repository<String>
+    private final Map<String, Set<String>> overriddenSignatures = new HashMap<>();
     private final Map<String, Set<String>> signaturesByName = new HashMap<>();
     private final Set<Class<?>> securedClasses = new HashSet<>();
     // The classes passed to setSecuredObject, so their roles can be read again if the
@@ -93,6 +96,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             return;
         }
         declarationsBySignature.clear();
+        overriddenSignatures.clear();
         signaturesByName.clear();
         securedClasses.clear();
         for (Class<?> cls : securedObjectClasses) {
@@ -152,6 +156,12 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                 declarations.add(new RolesDeclaration(classRolesDeclarer, classRoles, false));
             }
             signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
+            if (!m.isBridge()) {
+                for (Method overridden : ReflectionUtil.getGenericallyOverriddenMethods(cls, m)) {
+                    overriddenSignatures.computeIfAbsent(signature, k -> new HashSet<>())
+                        .add(ReflectionUtil.getMethodSignature(overridden));
+                }
+            }
         }
         findRoles(cls.getSuperclass(), rolesMap);
         for (Class<?> interfaceCls : cls.getInterfaces()) {
@@ -205,18 +215,21 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     }
 
     private List<List<String>> getAnnotationRoles(Method method) {
-        List<List<String>> rules = getAnnotationRoles(ReflectionUtil.getMethodSignature(method));
-        if (!rules.isEmpty()) {
-            return rules;
+        String signature = ReflectionUtil.getMethodSignature(method);
+        Set<String> signatures = new HashSet<>();
+        if (declarationsBySignature.containsKey(signature)) {
+            signatures.add(signature);
+            signatures.addAll(overriddenSignatures.getOrDefault(signature, Collections.emptySet()));
+        } else {
+            // The method is not one of the secured object's methods, so every rule
+            // recorded for its name applies
+            signatures.addAll(signaturesByName.getOrDefault(method.getName(), Collections.emptySet()));
         }
-        // No rule applies to the method's signature, e.g. because it implements a generic
-        // interface method whose erased signature differs, so every rule recorded for its
-        // name applies
-        Set<List<String>> nameRules = new LinkedHashSet<>();
-        for (String s : signaturesByName.getOrDefault(method.getName(), Collections.emptySet())) {
-            nameRules.addAll(getAnnotationRoles(s));
+        Set<List<String>> rules = new LinkedHashSet<>();
+        for (String s : signatures) {
+            rules.addAll(getAnnotationRoles(s));
         }
-        return new ArrayList<>(nameRules);
+        return new ArrayList<>(rules);
     }
 
     private List<List<String>> getAnnotationRoles(String signature) {
