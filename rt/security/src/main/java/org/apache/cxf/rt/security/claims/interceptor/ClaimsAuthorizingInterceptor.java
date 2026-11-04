@@ -225,8 +225,20 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             if (!methodClaims.isEmpty()) {
                 declarations.add(new ClaimsDeclaration(m.getDeclaringClass(), methodClaims, true));
             }
-            if (!clsClaims.isEmpty()) {
-                declarations.add(new ClaimsDeclaration(cls, clsClaims, false));
+            // A class-level @Claim does not apply to a method inherited from a superclass which
+            // has its own method-level @Claim of the same name and format, only to the class's
+            // own methods and to the other claims of inherited methods
+            List<ClaimBean> classClaims = clsClaims;
+            if (!methodClaims.isEmpty() && m.getDeclaringClass() != cls) {
+                classClaims = new ArrayList<>();
+                for (ClaimBean bean : clsClaims) {
+                    if (!isClaimOverridden(bean, methodClaims)) {
+                        classClaims.add(bean);
+                    }
+                }
+            }
+            if (!classClaims.isEmpty()) {
+                declarations.add(new ClaimsDeclaration(cls, classClaims, false));
             }
             signaturesByName.computeIfAbsent(m.getName(), k -> new HashSet<>()).add(signature);
             annotationClaimsFound |= !methodClaims.isEmpty() || !clsClaims.isEmpty();
