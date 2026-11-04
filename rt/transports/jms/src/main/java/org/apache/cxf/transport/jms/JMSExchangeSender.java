@@ -27,7 +27,7 @@ interface JMSExchangeSender {
 
     /**
      * Sends the outMessage of the given exchange with the given payload.
-     * If the exchange is not oneway a reply should be recieved
+     * If the exchange is not oneway a reply should be received
      * and set as inMessage
      *
      * @param exchange

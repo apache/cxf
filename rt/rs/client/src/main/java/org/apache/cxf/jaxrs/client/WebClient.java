@@ -359,8 +359,8 @@ public class WebClient extends AbstractClient {
      * Does HTTP invocation
      * @param httpMethod HTTP method
      * @param body request body, can be null
-     * @return JAXRS Response, entity may hold a string representaion of
-     *         error message if client or server error occured
+     * @return JAXRS Response, entity may hold a string representation of
+     *         error message if client or server error occurred
      */
     public Response invoke(String httpMethod, Object body) {
         return doInvoke(httpMethod, body, null, Response.class, Response.class);
