@@ -26,8 +26,8 @@ limitations under the License.
   in-scope repos and where they sit: `apache/cxf-fediz` (WS-Federation SSO — its own distinct runtime
   surface, addressed in its own model/addendum), and `apache/cxf-xjc-utils` + `apache/cxf-build-utils`
   (**build-time codegen / build tooling** — out of the *runtime* threat model; see §3).
-- **Modelled against:** `apache/cxf` `main`/HEAD (2026-05-31), covering supported lines 3.6.x / 4.0.x /
-  4.1.x *(documented — SECURITY.md)*.
+- **Modelled against:** `apache/cxf` `main`/HEAD (2026-05-31), covering supported lines 3.6.x / 4.1.x /
+  4.2.x *(documented — SECURITY.md)*.
 - **Status:** **DRAFT** Produced by the ASF Security team via the
   `threat-model-producer` rubric (<https://gist.github.com/potiuk/da14a826283038ddfe38cc9fe6310573>).
 - **Version binding:** versioned with the project; reports triaged against the model as it stood at the
@@ -210,7 +210,7 @@ restrictions are relaxed; ReDoS in any regex-based routing.
   providers); set body-size limits.
 - **Disable or allow-list remote WSDL/schema/MTOM resolution** to close SSRF.
 - Validate **client-side** responses as untrusted when CXF consumes a remote service.
-- Track <https://cxf.apache.org/security-advisories.html> and stay on a supported line (3.6.x / 4.0.x / 4.1.x).
+- Track <https://cxf.apache.org/security-advisories.html> and stay on a supported line (3.6.x / 4.1.x / 4.2.x).
 
 ## §11 Known misuse patterns
 
