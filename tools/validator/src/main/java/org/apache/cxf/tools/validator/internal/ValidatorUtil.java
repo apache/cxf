@@ -33,10 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,6 +42,7 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -144,16 +142,7 @@ public final class ValidatorUtil {
             return docMap;
         }
 
-        final DocumentBuilder docBuilder;
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setNamespaceAware(true);
-            docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new ToolException(e);
-        }
+        final DocumentBuilder docBuilder = SecureDocumentBuilderFactory.newNSDocumentBuilder();
 
         //
         // Remove the scheme part of a URI - need to escape spaces in
