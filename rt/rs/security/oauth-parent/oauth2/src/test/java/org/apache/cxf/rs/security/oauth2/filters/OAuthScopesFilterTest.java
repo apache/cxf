@@ -180,6 +180,23 @@ public class OAuthScopesFilterTest {
     }
 
     @Test
+    public void testSubclassClassScopesDoNotApplyToInheritedAnnotatedMethods() throws Exception {
+        // The inherited method keeps the scopes of the superclass which declares it
+        Method method = AdminInheritingService.class.getMethod("operation");
+
+        assertAllowed(new AdminInheritingService(), method, "read");
+        assertForbidden(new AdminInheritingService(), method, "admin");
+    }
+
+    @Test
+    public void testSubclassClassScopesApplyToInheritedUnannotatedMethods() throws Exception {
+        Method method = AdminInheritingService.class.getMethod("unannotatedOperation");
+
+        assertAllowed(new AdminInheritingService(), method, "admin");
+        assertForbidden(new AdminInheritingService(), method, "read");
+    }
+
+    @Test
     public void testMethodScopesFromUnrelatedSupertypesApplyTogether() throws Exception {
         Method method = AdminApiReadService.class.getMethod("operation");
 
@@ -346,6 +363,15 @@ public class OAuthScopesFilterTest {
         @Scopes("read")
         public void inherited() {
         }
+    }
+
+    public static class UnannotatedMethodBaseService extends BaseService {
+        public void unannotatedOperation() {
+        }
+    }
+
+    @Scopes("admin")
+    public static class AdminInheritingService extends UnannotatedMethodBaseService {
     }
 
     public static class OverloadingService extends BaseService {
