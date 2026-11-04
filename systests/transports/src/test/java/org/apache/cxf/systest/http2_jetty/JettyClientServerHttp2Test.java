@@ -49,6 +49,38 @@ public class JettyClientServerHttp2Test extends AbstractJettyClientServerHttp2Te
         createStaticBus();
     }
 
+    @Test(timeout = 60000)
+    public void testGetWithChunkingHttp2() throws Exception {
+        // the URLConnection conduit does not support HTTP/2
+        assumeFalse(Boolean.getBoolean("org.apache.cxf.transport.http.forceURLConnection"));
+        final WebClient wc = WebClient
+                .create(getAddress() + getContext() + "/web/bookstore/pluto")
+                .accept("text/plain");
+
+        final ClientConfiguration config = WebClient.getConfig(wc);
+        config.getRequestContext().put(HTTPConduit.FORCE_HTTP_VERSION, "2");
+        final HTTPConduit conduit = config.getHttpConduit();
+        conduit.getClient().setAllowChunking(true);
+        TLSClientParameters params = new TLSClientParameters();
+        params.setTrustManagers(InsecureTrustManager.getNoOpX509TrustManagers());
+        params.setDisableCNCheck(true);
+        conduit.setTlsClientParameters(params);
+        conduit.setTrustDecider(new MessageTrustDecider() {
+            @Override
+            public void establishTrust(String conduitName, URLConnectionInfo connectionInfo, Message message)
+                    throws UntrustedURLConnectionIOException {
+                String peer = ((HttpsURLConnectionInfo)connectionInfo).getPeerPrincipal().getName();
+                if (!peer.contains("OU=Bethal")) {
+                    throw new UntrustedURLConnectionIOException("Untrusted peer " + peer);
+                }
+            }
+        });
+
+        try (Response resp = wc.get()) {
+            assertEquals(200, resp.getStatus());
+            assertEquals("HTTP/2.0 CXF in Action - Pluto", resp.readEntity(String.class));
+        }
+    }
     
     /**
      * The trust decision is made after the request is sent and before its body is written. Without
