@@ -159,7 +159,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     private int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout().toMillisecondsIntBound();
     private boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepAlive();
     private boolean tcpNoDelay = true;
-    private int bufferSize = 16 * 1024;
+    private int bufferSize = 32 * 1024; // Http1Config::INIT_BUF_SIZE
 
     AsyncHTTPConduitFactory() {
         super();
