@@ -193,6 +193,66 @@ public class SimpleAuthorizingInterceptorTest {
         in.handleMessage(message);
     }
 
+    @Test(expected = AccessDeniedException.class)
+    public void testDenyWithDenyRolesFromUserRolesMap() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("role1");
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void testDenyWithDenyRolesFromSecurityContextAndUserRolesMap() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("testRole");
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test
+    public void testPermitWithDenyRolesAndUserRolesMap() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("frogs");
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test
+    public void testPermitWithDenyRolesUserNotInUserRolesMap() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("frogs");
+        in.setUserRolesMap(Collections.singletonMap("otherUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void testDenyWithDenyRolesConfigurationOnly() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("role1");
+        in.setCheckConfiguredRolesOnly(true);
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test
+    public void testPermitWithDenyRolesConfigurationOnly() {
+        // Only the configured roles are checked, so the security context's testRole is ignored
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("testRole");
+        in.setCheckConfiguredRolesOnly(true);
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
+    @Test
+    public void testPermitWithDenyRolesConfigurationOnlyNoUserRolesMap() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("frogs");
+        in.setCheckConfiguredRolesOnly(true);
+        in.handleMessage(message);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void testDenyAllConfigurationOnly() {
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("*");
+        in.setCheckConfiguredRolesOnly(true);
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.handleMessage(message);
+    }
+
     @Test
     public void testMethodSignatureRoles() throws Exception {
         Method transfer = TestService.class.getMethod("transfer", String.class, long.class);

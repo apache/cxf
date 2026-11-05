@@ -33,8 +33,8 @@ import org.apache.cxf.security.SecurityContext;
 
 public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInterceptor<Message> {
 
+    protected static final String ALL_ROLES = "*";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthorizingInInterceptor.class);
-    private static final String ALL_ROLES = "*";
     private boolean allowAnonymousUsers = true;
 
     public AbstractAuthorizingInInterceptor() {
