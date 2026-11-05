@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -212,6 +213,29 @@ public class HttpClientHTTPConduitSharedClientTest {
         replaced.setCertConstraints(certConstraints("CN=three"));
         conduit.setTlsClientParameters(replaced);
         assertSame(client, prepareWithChain(conduit));
+    }
+
+    @Test
+    public void testHttpClientIsNotUsedForHttps() throws Exception {
+        TrustManager[] trustManagers = {new TestTrustManager()};
+        HttpClientHTTPConduit conduit1 = newConduit("http");
+        TLSClientParameters tls1 = new TLSClientParameters();
+        tls1.setTrustManagers(trustManagers);
+        conduit1.setTlsClientParameters(tls1);
+        HttpClient httpClient = prepare(conduit1);
+
+        // a client for http is built without the TLS parameters, so a conduit for https with
+        // the same parameters must not get it
+        HttpClientHTTPConduit conduit2 = newConduit("https");
+        TLSClientParameters tls2 = new TLSClientParameters();
+        tls2.setTrustManagers(trustManagers);
+        conduit2.setTlsClientParameters(tls2);
+        HttpClient httpsClient = prepare(conduit2);
+        assertNotSame(httpClient, httpsClient);
+        assertNotSame(SSLContext.getDefault(), httpsClient.sslContext());
+
+        // nor the conduit for http itself, when its address changes to https
+        assertNotSame(httpClient, prepare(conduit1, "https://backend.example/test"));
     }
 
     @Test

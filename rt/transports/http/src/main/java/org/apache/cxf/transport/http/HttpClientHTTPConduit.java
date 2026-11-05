@@ -119,7 +119,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     private static final class RefCount<T extends HttpClient> {
         private final AtomicLong count;
-        // Copies of the settings the client was built from
+        // Copies of the settings the client was built from, no TLS parameters if it was built for http
         private final TLSClientParameters clientParameters;
         private final HTTPClientPolicy policy;
         private final T client;
@@ -196,7 +196,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
          * Whether the client was built from settings equal to these ones
          */
         boolean matches(HTTPClientPolicy otherPolicy, TLSClientParameters otherClientParameters) {
-            return samePolicy(policy, otherPolicy) && clientParameters.equals(otherClientParameters);
+            return samePolicy(policy, otherPolicy) && Objects.equals(clientParameters, otherClientParameters);
         }
     }
 
@@ -530,7 +530,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         // the client keeps copies of the settings it is built from, so that it is not
         // affected by later changes to the settings of this, or any other, conduit
         final HTTPClientPolicy clientPolicy = copyOf(csPolicy, ctimeout, verc);
-        final TLSClientParameters clientParametersCopy = copyOf(clientParameters);
+        // a client for http is built without the TLS parameters, so it must not be used for https
+        final TLSClientParameters clientParametersCopy =
+            "https".equals(uri.getScheme()) ? copyOf(clientParameters) : null;
         final boolean httpsReset = resetClientIfChanged(message, uri, clientPolicy, clientParametersCopy);
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
