@@ -52,6 +52,11 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
     @Override
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
+        if (deny) {
+            // The user is authorized only if they have none of the deny roles, whether from
+            // the security context or from the user roles map
+            return !hasAnyRole(sc, roles);
+        }
         if (!checkConfiguredRolesOnly && !super.isUserInRole(sc, roles, deny)) {
             return false;
         }
@@ -69,6 +74,24 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
             return false;
         }
         return !checkConfiguredRolesOnly;
+    }
+
+    private boolean hasAnyRole(SecurityContext sc, List<String> roles) {
+        if (roles.size() == 1 && ALL_ROLES.equals(roles.get(0))) {
+            return true;
+        }
+        if (!checkConfiguredRolesOnly && super.isUserInRole(sc, roles, false)) {
+            return true;
+        }
+        List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());
+        if (userRoles != null) {
+            for (String role : roles) {
+                if (userRoles.contains(role)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected String createMethodSig(Method method) {
