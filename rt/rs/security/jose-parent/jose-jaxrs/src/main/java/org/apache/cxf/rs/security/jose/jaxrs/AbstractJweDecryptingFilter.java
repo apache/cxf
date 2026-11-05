@@ -82,6 +82,10 @@ public class AbstractJweDecryptingFilter {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
 
+    /**
+     * @deprecated has no effect, see {@link #setCheckEmptyStream(boolean)}.
+     */
+    @Deprecated
     public boolean isCheckEmptyStream() {
         return checkEmptyStream;
     }
@@ -90,7 +94,10 @@ public class AbstractJweDecryptingFilter {
      * No longer has any effect: the filters always read the entity stream and skip
      * a missing or empty one. A Content-Length: 0 header alone is not trusted, as the
      * stream may still carry a body.
+     *
+     * @deprecated has no effect.
      */
+    @Deprecated
     public void setCheckEmptyStream(boolean checkEmptyStream) {
         this.checkEmptyStream = checkEmptyStream;
     }

@@ -46,6 +46,7 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
         }
         final String content = IOUtils.readStringFromStream(entityStream);
         if (StringUtils.isEmpty(content)) {
+            res.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();

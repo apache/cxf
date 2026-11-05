@@ -133,6 +133,26 @@ public class JwsJsonContainerRequestFilterTest {
     }
 
     @Test
+    public void testGetWithoutBodyIsAccepted() throws Exception {
+        Message message = JoseFilterTestSupport.serverRequest("GET", new byte[0]);
+
+        JwsJsonContainerRequestFilter filter = new JwsJsonContainerRequestFilter();
+        filter.setSignatureVerifier(new HmacJwsSignatureVerifier(GOOD_KEY, SignatureAlgorithm.HS256));
+
+        runInPhase(message, () -> {
+            try {
+                filter.filter(new ContainerRequestContextImpl(message, true, false));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        assertNull(message.getContent(Exception.class));
+        assertNull(message.getExchange().get(Response.class));
+        assertEquals("", IOUtils.readStringFromStream(message.getContent(java.io.InputStream.class)));
+    }
+
+    @Test
     public void testGetWithoutEntityStreamIsAccepted() throws Exception {
         Message message = JoseFilterTestSupport.serverRequestWithoutStream("GET");
 

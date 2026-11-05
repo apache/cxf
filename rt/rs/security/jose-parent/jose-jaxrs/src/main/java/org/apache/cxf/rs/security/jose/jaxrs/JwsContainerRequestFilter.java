@@ -47,6 +47,7 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
         }
         final String content = IOUtils.readStringFromStream(entityStream);
         if (StringUtils.isEmpty(content)) {
+            context.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(content);

@@ -50,6 +50,17 @@ public class JweClientResponseFilterTest {
     }
 
     @Test
+    public void testEmptyDeleteResponseIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponse(new byte[0]);
+
+        JweClientResponseFilter filter = new JweClientResponseFilter();
+        filter.setDecryptionProvider(JweUtils.getDirectKeyJweDecryption(KEY, ContentAlgorithm.A128GCM));
+        filter.filter(clientRequest("DELETE"), res);
+
+        assertEquals("", IOUtils.readStringFromStream(res.getEntityStream()));
+    }
+
+    @Test
     public void testResponseWithoutEntityIsAccepted() throws Exception {
         ClientResponseContext res = clientResponseWithoutEntity();
 

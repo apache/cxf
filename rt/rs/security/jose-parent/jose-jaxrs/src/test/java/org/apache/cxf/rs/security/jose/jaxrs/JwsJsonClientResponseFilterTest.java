@@ -66,6 +66,14 @@ public class JwsJsonClientResponseFilterTest {
     }
 
     @Test
+    public void testEmptyDeleteResponseIsAccepted() throws Exception {
+        ClientResponseContext res = clientResponse(new byte[0]);
+        runInPhase(() -> createFilter().filter(clientRequest("DELETE"), res));
+
+        assertEquals("", IOUtils.readStringFromStream(res.getEntityStream()));
+    }
+
+    @Test
     public void testResponseWithoutEntityIsAccepted() throws Exception {
         ClientResponseContext res = clientResponseWithoutEntity();
         runInPhase(() -> createFilter().filter(clientRequest("GET"), res));

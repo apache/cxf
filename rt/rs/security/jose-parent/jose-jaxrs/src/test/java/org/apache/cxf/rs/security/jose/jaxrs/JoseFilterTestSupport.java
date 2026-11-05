@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import jakarta.ws.rs.client.ClientRequestContext;
@@ -57,7 +59,7 @@ final class JoseFilterTestSupport {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.HTTP_REQUEST_METHOD, httpMethod);
-        message.setContent(InputStream.class, new ByteArrayInputStream(body));
+        message.setContent(InputStream.class, new TransportInputStream(body));
         message.put(Message.PROTOCOL_HEADERS, headers(contentLength));
         return message;
     }
@@ -92,7 +94,7 @@ final class JoseFilterTestSupport {
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.RESPONSE_CODE, 200);
-        message.setContent(InputStream.class, new ByteArrayInputStream(body));
+        message.setContent(InputStream.class, new TransportInputStream(body));
         message.put(Message.PROTOCOL_HEADERS, headers(contentLength));
         ResponseImpl response = (ResponseImpl)JAXRSUtils.toResponseBuilder(200)
             .entity(message.getContent(InputStream.class)).build();
@@ -148,5 +150,46 @@ final class JoseFilterTestSupport {
         headers.putSingle(HttpHeaders.CONTENT_TYPE, "application/jose");
         headers.putSingle(HttpHeaders.CONTENT_LENGTH, contentLength);
         return headers;
+    }
+
+    /**
+     * Fails on use once closed, as a servlet or HTTP client input stream does.
+     */
+    private static final class TransportInputStream extends FilterInputStream {
+        private boolean closed;
+
+        TransportInputStream(byte[] body) {
+            super(new ByteArrayInputStream(body));
+        }
+
+        @Override
+        public int read() throws IOException {
+            checkOpen();
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            checkOpen();
+            return super.read(b, off, len);
+        }
+
+        @Override
+        public int available() throws IOException {
+            checkOpen();
+            return super.available();
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
+        }
+
+        private void checkOpen() throws IOException {
+            if (closed) {
+                throw new IOException("Stream closed");
+            }
+        }
     }
 }

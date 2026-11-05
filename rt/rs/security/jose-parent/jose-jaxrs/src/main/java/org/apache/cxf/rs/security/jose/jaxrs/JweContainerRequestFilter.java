@@ -41,6 +41,7 @@ public class JweContainerRequestFilter extends AbstractJweDecryptingFilter imple
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(entityStream);
         if (encryptedContent.length == 0) {
+            context.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JweDecryptionOutput out = decrypt(encryptedContent);

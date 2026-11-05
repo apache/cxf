@@ -43,6 +43,7 @@ public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilt
         }
         final byte[] encryptedContent = IOUtils.readBytesFromStream(entityStream);
         if (encryptedContent.length == 0) {
+            context.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         try {

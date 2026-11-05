@@ -73,6 +73,7 @@ public class JwsClientResponseFilterTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testCheckEmptyStreamDoesNotTrustZeroContentLength() throws Exception {
         ClientResponseContext res = clientResponse(sign(PAYLOAD, BAD_KEY), "0");
         JwsClientResponseFilter filter = createFilter();

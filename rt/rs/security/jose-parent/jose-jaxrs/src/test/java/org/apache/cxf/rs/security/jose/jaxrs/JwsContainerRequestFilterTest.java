@@ -79,6 +79,7 @@ public class JwsContainerRequestFilterTest {
         filter(message);
 
         assertNull(message.getExchange().get(Response.class));
+        assertEquals("", IOUtils.readStringFromStream(message.getContent(InputStream.class)));
     }
 
     @Test
@@ -101,6 +102,7 @@ public class JwsContainerRequestFilterTest {
         filter(message, false);
     }
 
+    @SuppressWarnings("deprecation")
     private static void filter(Message message, boolean checkEmptyStream) throws Exception {
         JwsContainerRequestFilter filter = new JwsContainerRequestFilter();
         filter.setCheckEmptyStream(checkEmptyStream);

@@ -54,6 +54,18 @@ public class JweJsonContainerRequestFilterTest {
     }
 
     @Test
+    public void testGetWithoutBodyIsAccepted() throws Exception {
+        Message message = serverRequest("GET", new byte[0]);
+
+        JweJsonContainerRequestFilter filter = new JweJsonContainerRequestFilter();
+        filter.setDecryptionProvider(JweUtils.getDirectKeyJweDecryption(KEY, ContentAlgorithm.A128GCM));
+        runInPhase(message, () -> filter.filter(new ContainerRequestContextImpl(message, true, false)));
+
+        assertNull(message.getExchange().get(Response.class));
+        assertEquals("", IOUtils.readStringFromStream(message.getContent(InputStream.class)));
+    }
+
+    @Test
     public void testGetWithoutEntityStreamIsAccepted() throws Exception {
         Message message = serverRequestWithoutStream("GET");
 
