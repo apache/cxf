@@ -112,7 +112,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     volatile RefCount<HttpClient> clientRef;
     volatile URI sslURL;
     private final ReentrantLock initializationLock = new ReentrantLock();
+    // clients this conduit has stopped using, released on close() as they could still be in use
     private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
+    // those of them the conduit may take back when it switches back to their settings
+    private final Queue<RefCount<HttpClient>> reusableClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
         private final AtomicLong count;
@@ -271,11 +274,12 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     /**
      * Copies the settings a client is built from, so that changes to the conduit's policy do not change
-     * the key of the cached client, or the proxies it uses
+     * the key of the cached client, or the proxies it uses. The connection timeout and the version are
+     * the ones in effect for the request, which the message can override
      */
-    private static HTTPClientPolicy copyOf(HTTPClientPolicy policy) {
+    private static HTTPClientPolicy copyOf(HTTPClientPolicy policy, int connectionTimeout, String version) {
         final HTTPClientPolicy copy = new HTTPClientPolicy();
-        copy.setConnectionTimeout(policy.getConnectionTimeout());
+        copy.setConnectionTimeout(connectionTimeout);
         if (policy.isSetProxyServer()) {
             copy.setProxyServer(policy.getProxyServer());
         }
@@ -288,8 +292,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         if (policy.isSetNonProxyHosts()) {
             copy.setNonProxyHosts(policy.getNonProxyHosts());
         }
-        if (policy.isSetVersion()) {
-            copy.setVersion(policy.getVersion());
+        if (version != null) {
+            copy.setVersion(version);
         }
         return copy;
     }
@@ -321,8 +325,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             copy.setCipherSuitesFilter(filters);
         }
         copy.setSecureRandom(params.getSecureRandom());
-        // the client is not built from the certificate constraints, they are checked for each response
-        copy.setCertConstraints(params.getCertConstraints());
+        // the certificate constraints are left out: the client is not built from them, they are
+        // checked for each response, so changing them must not replace the client
         copy.setSecureSocketProtocol(params.getSecureSocketProtocol());
         copy.setCertAlias(params.getCertAlias());
         copy.setNamedGroups(new ArrayList<>(params.getNamedGroups()));
@@ -332,13 +336,21 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     /**
      * Stops using the client, without releasing it immediately since it could be in use,
      * by moving it off to the deferred release queue
+     * @param reusable whether the conduit may take the client back later. After an HTTPS address
+     *        change, neither this client nor the ones deferred before may be used again
      */
-    private void resetClient(RefCount<HttpClient> ref) {
+    private void resetClient(RefCount<HttpClient> ref, boolean reusable) {
         initializationLock.lock();
         try {
+            if (!reusable) {
+                RefCount<HttpClient> deferred;
+                while ((deferred = reusableClientRefs.poll()) != null) {
+                    deferredClientRefs.add(deferred);
+                }
+            }
             // only once, if several requests reset the same client at the same time
             if (ref != null && clientRef == ref) {
-                deferredClientRefs.add(ref);
+                (reusable ? reusableClientRefs : deferredClientRefs).add(ref);
                 clientRef = null;
             }
         } finally {
@@ -350,7 +362,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * Stops using the client if the HTTPS address or the settings it was built from have changed
      * @return whether the client was reset because the HTTPS address has changed
      */
-    private boolean resetClientIfChanged(Message message, URI uri, HTTPClientPolicy csPolicy,
+    private boolean resetClientIfChanged(Message message, URI uri, HTTPClientPolicy clientPolicy,
                                          TLSClientParameters clientParameters) {
         boolean httpsReset = false;
         if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
@@ -359,13 +371,13 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             // Reset the client in case of HTTPS URL change
             httpsReset = MessageUtils.getContextualBoolean(message, HTTPS_RESET_HTTPCLIENT_CONDUIT, true);
             if (httpsReset) {
-                resetClient(clientRef);
+                resetClient(clientRef, false);
             }
         }
         // Reset the client if the settings it was built from have changed since
         final RefCount<HttpClient> ref = clientRef;
-        if (ref != null && !ref.matches(csPolicy, clientParameters)) {
-            resetClient(ref);
+        if (ref != null && !ref.matches(clientPolicy, clientParameters)) {
+            resetClient(ref, true);
         }
         return httpsReset;
     }
@@ -375,8 +387,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * The conduit still holds its reference, so it has not been released
      */
     private RefCount<HttpClient> takeDeferredClient(HTTPClientPolicy policy, TLSClientParameters params) {
-        for (RefCount<HttpClient> ref : deferredClientRefs) {
-            if (ref.matches(policy, params) && deferredClientRefs.remove(ref)) {
+        for (RefCount<HttpClient> ref : reusableClientRefs) {
+            if (ref.matches(policy, params) && reusableClientRefs.remove(ref)) {
                 return ref;
             }
         }
@@ -414,22 +426,23 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
      * Close the conduit
      */
     public void close() {
-        // release each reference only once, even if the conduit is closed concurrently
-        final RefCount<HttpClient> ref;
+        // release each reference only once, even if the conduit is closed concurrently, and take
+        // them all under the lock, so that a concurrent request does not take a deferred one back
+        final List<RefCount<HttpClient>> refs = new ArrayList<>();
         initializationLock.lock();
         try {
-            ref = clientRef;
+            if (clientRef != null) {
+                refs.add(clientRef);
+            }
             clientRef = null;
+            refs.addAll(deferredClientRefs);
+            deferredClientRefs.clear();
+            refs.addAll(reusableClientRefs);
+            reusableClientRefs.clear();
         } finally {
             initializationLock.unlock();
         }
-        if (ref != null) {
-            ref.release();
-        }
-        RefCount<HttpClient> deferred;
-        while ((deferred = deferredClientRefs.poll()) != null) {
-            deferred.release();
-        }
+        refs.forEach(RefCount::release);
         defaultAddress = null;
         super.close();
     }
@@ -509,7 +522,16 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             return;
         }
 
-        final boolean httpsReset = resetClientIfChanged(message, uri, csPolicy, clientParameters);
+        final int ctimeout = determineConnectionTimeout(message, csPolicy);
+        String verc = (String)message.getContextualProperty(FORCE_HTTP_VERSION);
+        if (verc == null) {
+            verc = csPolicy.getVersion();
+        }
+        // the client keeps copies of the settings it is built from, so that it is not
+        // affected by later changes to the settings of this, or any other, conduit
+        final HTTPClientPolicy clientPolicy = copyOf(csPolicy, ctimeout, verc);
+        final TLSClientParameters clientParametersCopy = copyOf(clientParameters);
+        final boolean httpsReset = resetClientIfChanged(message, uri, clientPolicy, clientParametersCopy);
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -520,11 +542,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
         RefCount<HttpClient> cl = clientRef;
         if (cl == null) {
-            int ctimeout = determineConnectionTimeout(message, csPolicy);
-            // the client keeps copies of the settings it is built from, so that it is not
-            // affected by later changes to the settings of this, or any other, conduit
-            final HTTPClientPolicy clientPolicy = copyOf(csPolicy);
-            final TLSClientParameters clientParametersCopy = copyOf(clientParameters);
             ProxySelector ps = new ProxyFactoryProxySelector(proxyFactory, clientPolicy);
 
             HttpClient.Builder cb = HttpClient.newBuilder()
@@ -571,10 +588,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 } catch (GeneralSecurityException e) {
                     throw new IOException(e);
                 }
-            }
-            String verc = (String)message.getContextualProperty(FORCE_HTTP_VERSION);
-            if (verc == null) {
-                verc = csPolicy.getVersion();
             }
             if ("1.1".equals(HTTP_VERSION) || "1.1".equals(verc)) {
                 cb.version(Version.HTTP_1_1);

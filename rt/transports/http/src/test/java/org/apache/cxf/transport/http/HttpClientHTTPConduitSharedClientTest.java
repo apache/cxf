@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -35,9 +36,12 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
+import org.apache.cxf.configuration.security.DNConstraintsType;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
@@ -193,6 +197,24 @@ public class HttpClientHTTPConduitSharedClientTest {
     }
 
     @Test
+    public void testChangedCertConstraintsKeepClient() throws Exception {
+        HttpClientHTTPConduit conduit = newConduit("https");
+        TLSClientParameters tls = new TLSClientParameters();
+        tls.setCertConstraints(certConstraints("CN=one"));
+        conduit.setTlsClientParameters(tls);
+        HttpClient client = prepareWithChain(conduit);
+
+        // the certificate constraints are checked for each response, the client is not built from them,
+        // so changing them, in place or by replacing them, keeps the client
+        tls.getCertConstraints().getSubjectDNConstraints().getRegularExpression().add("CN=two");
+        assertSame(client, prepareWithChain(conduit));
+        TLSClientParameters replaced = new TLSClientParameters();
+        replaced.setCertConstraints(certConstraints("CN=three"));
+        conduit.setTlsClientParameters(replaced);
+        assertSame(client, prepareWithChain(conduit));
+    }
+
+    @Test
     public void testPerRequestSettingsKeepClient() throws Exception {
         HttpClientHTTPConduit conduit = newConduit("http");
         HttpClient client = prepare(conduit);
@@ -224,6 +246,58 @@ public class HttpClientHTTPConduitSharedClientTest {
         }
     }
 
+    @Test
+    public void testConnectionTimeoutOfMessage() throws Exception {
+        // the connection timeout of the request context is the one the client is built with
+        Message message = newMessage(true);
+        message.put(Message.CONNECTION_TIMEOUT, 1000);
+        assertEquals(Optional.of(Duration.ofSeconds(1)), prepare(newConduit("http"), message).connectTimeout());
+
+        // so a conduit without it does not get that client
+        HttpClientHTTPConduit conduit = newConduit("http");
+        assertEquals(Optional.of(Duration.ofSeconds(30)), prepare(conduit).connectTimeout());
+
+        // and setting it later is not ignored
+        message = newMessage(true);
+        message.put(Message.CONNECTION_TIMEOUT, 1000);
+        assertEquals(Optional.of(Duration.ofSeconds(1)), prepare(conduit, message).connectTimeout());
+    }
+
+    @Test
+    public void testForcedVersionOfMessage() throws Exception {
+        Message message = newMessage(true);
+        message.put(HTTPConduit.FORCE_HTTP_VERSION, "1.1");
+        assertEquals(HttpClient.Version.HTTP_1_1, prepare(newConduit("http"), message).version());
+
+        HttpClientHTTPConduit conduit = newConduit("http");
+        assertEquals(HttpClient.Version.HTTP_2, prepare(conduit).version());
+
+        message = newMessage(true);
+        message.put(HTTPConduit.FORCE_HTTP_VERSION, "1.1");
+        assertEquals(HttpClient.Version.HTTP_1_1, prepare(conduit, message).version());
+    }
+
+    @Test
+    public void testClientsResetForNewHttpsAddressAreNotReused() throws Exception {
+        HttpClientHTTPConduit conduit = newConduit("https");
+        HttpClient client1 = prepare(conduit, "https://backend1.example/test");
+        conduit.getClient().setConnectionTimeout(1000);
+        HttpClient client2 = prepare(conduit, "https://backend1.example/test");
+        assertNotSame(client1, client2);
+
+        // the HTTPS address changes, so neither client may be used again
+        HttpClient client3 = prepare(conduit, "https://backend2.example/test");
+        assertNotSame(client2, client3);
+        conduit.getClient().setConnectionTimeout(30000);
+        HttpClient client4 = prepare(conduit, "https://backend2.example/test");
+        assertNotSame(client1, client4);
+        assertNotSame(client3, client4);
+
+        // but the clients built since can be
+        conduit.getClient().setConnectionTimeout(1000);
+        assertSame(client3, prepare(conduit, "https://backend2.example/test"));
+    }
+
     private HttpClientHTTPConduit newConduit(String scheme) throws Exception {
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress(scheme + "://backend.example/test");
@@ -239,18 +313,48 @@ public class HttpClientHTTPConduitSharedClientTest {
 
     private static HttpClient prepare(HttpClientHTTPConduit conduit, HTTPClientPolicy policy,
                                       boolean shareClient) throws Exception {
-        Message message = new MessageImpl();
-        message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        Message message = newMessage(shareClient);
         if (policy != null) {
             message.put(HTTPClientPolicy.class, policy);
         }
+        return prepare(conduit, message);
+    }
+
+    private static HttpClient prepare(HttpClientHTTPConduit conduit, String address) throws Exception {
+        Message message = newMessage(false);
+        message.put(Message.ENDPOINT_ADDRESS, address);
+        return prepare(conduit, message);
+    }
+
+    private static Message newMessage(boolean shareClient) {
+        Message message = new MessageImpl();
+        message.put(Message.HTTP_REQUEST_METHOD, "GET");
         if (!shareClient) {
             message.put("share.httpclient.http.conduit", Boolean.FALSE);
         }
+        return message;
+    }
+
+    private static HttpClient prepare(HttpClientHTTPConduit conduit, Message message) throws Exception {
         conduit.prepare(message);
         HttpClient client = message.get(HttpClient.class);
         assertNotNull(client);
         return client;
+    }
+
+    private static HttpClient prepareWithChain(HttpClientHTTPConduit conduit) throws Exception {
+        // the certificate constraints add an interceptor to the chain of the message
+        Message message = newMessage(true);
+        message.setInterceptorChain(new PhaseInterceptorChain(new TreeSet<>()));
+        return prepare(conduit, message);
+    }
+
+    private static CertificateConstraintsType certConstraints(String subject) {
+        DNConstraintsType constraints = new DNConstraintsType();
+        constraints.getRegularExpression().add(subject);
+        CertificateConstraintsType certConstraints = new CertificateConstraintsType();
+        certConstraints.setSubjectDNConstraints(constraints);
+        return certConstraints;
     }
 
     private static void setProxy(HTTPClientPolicy policy, String host, int port) {
