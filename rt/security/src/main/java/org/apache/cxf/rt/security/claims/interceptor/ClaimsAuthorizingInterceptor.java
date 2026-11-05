@@ -53,6 +53,9 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
 
     private static final Set<String> SKIP_METHODS = new HashSet<>(
             Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
+    // The SAML 2.0 default for an Attribute without a NameFormat, and the @Claim default format
+    private static final String UNSPECIFIED_NAME_FORMAT =
+        "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
 
     // Claims configured explicitly via setClaims, keyed by method name
     private Map<String, List<ClaimBean>> claims = new HashMap<>();
@@ -157,16 +160,23 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
 
         for (ClaimBean claimBean : list) {
+            String claimType = claimBean.getClaim().getClaimType();
             org.apache.cxf.rt.security.claims.Claim matchingClaim = null;
             for (org.apache.cxf.rt.security.claims.Claim cl : actualClaims) {
+                if (claimType == null) {
+                    break;
+                }
                 if (cl instanceof SAMLClaim) {
-                    // If it's a SAMLClaim the name + nameformat must match what's configured
-                    if (((SAMLClaim)cl).getName().equals(claimBean.getClaim().getClaimType())
-                        && ((SAMLClaim)cl).getNameFormat().equals(claimBean.getClaimFormat())) {
+                    // If it's a SAMLClaim the name + nameformat must match what's configured. The
+                    // NameFormat is optional, in which case it is the unspecified name format
+                    SAMLClaim samlClaim = (SAMLClaim)cl;
+                    if (claimType.equals(samlClaim.getName())
+                        && getNameFormat(claimBean.getClaimFormat())
+                            .equals(getNameFormat(samlClaim.getNameFormat()))) {
                         matchingClaim = cl;
                         break;
                     }
-                } else if (cl.getClaimType().equals(claimBean.getClaim().getClaimType())) {
+                } else if (claimType.equals(cl.getClaimType())) {
                     matchingClaim = cl;
                     break;
                 }
@@ -256,6 +266,10 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         }
     }
 
+    private static String getNameFormat(String nameFormat) {
+        return nameFormat == null ? UNSPECIFIED_NAME_FORMAT : nameFormat;
+    }
+
     private static boolean isClaimOverridden(ClaimBean bean, List<ClaimBean> mClaims) {
         for (ClaimBean methodBean : mClaims) {
             if (bean.getClaim().getClaimType().equals(methodBean.getClaim().getClaimType())
@@ -270,13 +284,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             Claims claimsAnn, Claim claimAnn) {
         List<ClaimBean> claimsList = new ArrayList<>();
 
-        final List<Claim> annClaims;
+        // Both @Claims and @Claim may be present, in which case all their claims apply
+        final List<Claim> annClaims = new ArrayList<>();
         if (claimsAnn != null) {
-            annClaims = Arrays.asList(claimsAnn.value());
-        } else if (claimAnn != null) {
-            annClaims = Collections.singletonList(claimAnn);
-        } else {
-            annClaims = Collections.emptyList();
+            annClaims.addAll(Arrays.asList(claimsAnn.value()));
+        }
+        if (claimAnn != null) {
+            annClaims.add(claimAnn);
         }
         for (Claim ann : annClaims) {
             org.apache.cxf.rt.security.claims.Claim claim = new org.apache.cxf.rt.security.claims.Claim();
