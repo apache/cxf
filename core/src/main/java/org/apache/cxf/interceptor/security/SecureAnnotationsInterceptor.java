@@ -82,6 +82,13 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             throw new IllegalArgumentException("Annotation class " + name
                 + " is not an annotation with a String or String[] value()");
         }
+        // The annotation may not be public, e.g. an application's package-private annotation
+        try {
+            ReflectionUtil.setAccessible(annotationClass.getMethod("value"));
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("The value() of annotation class " + name
+                + " can not be accessed", ex);
+        }
         annotationClassName = name;
         resolveSecuredObjectRoles();
     }
@@ -296,7 +303,8 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
         for (Annotation ann : anns) {
             if (ann.annotationType().getName().equals(annotationClassName)) {
                 try {
-                    Object roles = ann.annotationType().getMethod("value").invoke(ann);
+                    Object roles =
+                        ReflectionUtil.setAccessible(ann.annotationType().getMethod("value")).invoke(ann);
                     if (roles instanceof String[]) {
                         return Arrays.asList((String[])roles);
                     } else if (roles instanceof String) {
