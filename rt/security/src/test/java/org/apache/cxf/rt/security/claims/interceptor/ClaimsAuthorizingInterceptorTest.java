@@ -536,6 +536,43 @@ public class ClaimsAuthorizingInterceptorTest {
         assertDenied(in, prepareMessage(method, createDefaultClaim("user")));
     }
 
+    @Test
+    public void testClaimWithoutNameFormat() throws Exception {
+        // A SAML attribute without a NameFormat has the unspecified name format, the default
+        ClaimsAuthorizingInterceptor in = createInterceptor(new NameFormatService());
+        Method method = NameFormatService.class.getMethod("defaultFormat");
+
+        in.handleMessage(prepareMessage(method,
+            createClaim(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, null, "admin")));
+        assertDenied(in, prepareMessage(method,
+            createClaim(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, null, "user")));
+    }
+
+    @Test
+    public void testClaimWithoutNameFormatDoesNotMatchOtherFormat() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new NameFormatService());
+        Method method = NameFormatService.class.getMethod("specificFormat");
+
+        assertDenied(in, prepareMessage(method, createClaim("http://cxf/roles", null, "admin")));
+        in.handleMessage(prepareMessage(method, createClaim("http://cxf/roles", "http://claims", "admin")));
+    }
+
+    @Test
+    public void testClaimAndClaimsAnnotationsAreCombined() throws Exception {
+        ClaimsAuthorizingInterceptor in = createInterceptor(new CombinedClaimsService());
+        Method method = CombinedClaimsService.class.getMethod("update");
+        org.apache.cxf.rt.security.claims.Claim location = createClaim("http://location",
+            "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified", "UK");
+
+        in.handleMessage(prepareMessage(method, createDefaultClaim("admin"), location));
+        assertDenied(in, prepareMessage(method, createDefaultClaim("admin")));
+        assertDenied(in, prepareMessage(method, location));
+
+        Method classMethod = CombinedClaimsService.class.getMethod("list");
+        in.handleMessage(prepareMessage(classMethod, createDefaultClaim("user"), location));
+        assertDenied(in, prepareMessage(classMethod, createDefaultClaim("user")));
+    }
+
     private static ClaimsAuthorizingInterceptor createInterceptor(Object service) {
         ClaimsAuthorizingInterceptor in = new ClaimsAuthorizingInterceptor();
         in.setSecuredObject(service);
@@ -755,6 +792,30 @@ public class ClaimsAuthorizingInterceptorTest {
     }
     @Claim(name = "http://location", value = "UK")
     public static class LocationInheritingService extends BaseService {
+    }
+    public static class NameFormatService {
+        @Claim("admin")
+        public void defaultFormat() {
+
+        }
+
+        @Claim(name = "http://cxf/roles", format = "http://claims", value = "admin")
+        public void specificFormat() {
+
+        }
+    }
+    @Claims({@Claim(name = "http://location", value = "UK") })
+    @Claim("user")
+    public static class CombinedClaimsService {
+        @Claims({@Claim(name = "http://location", value = "UK") })
+        @Claim("admin")
+        public void update() {
+
+        }
+
+        public void list() {
+
+        }
     }
     public static class OverridingService extends BaseService {
         @Override
