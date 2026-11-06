@@ -88,7 +88,6 @@ import javax.net.ssl.SSLSession;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -299,37 +298,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     }
 
     private static TLSClientParameters copyOf(TLSClientParameters params) {
-        final TLSClientParameters copy = new TLSClientParameters();
-        copy.setDisableCNCheck(params.isDisableCNCheck());
-        copy.setSSLSocketFactory(params.getSSLSocketFactory());
-        copy.setSslCacheTimeout(params.getSslCacheTimeout());
-        copy.setUseHttpsURLConnectionDefaultSslSocketFactory(params.isUseHttpsURLConnectionDefaultSslSocketFactory());
-        copy.setUseHttpsURLConnectionDefaultHostnameVerifier(params.isUseHttpsURLConnectionDefaultHostnameVerifier());
-        copy.setHostnameVerifier(params.getHostnameVerifier());
-        copy.setSslContext(params.getSslContext());
-        if (params.getServerNames() != null) {
-            copy.setServerNames(new ArrayList<>(params.getServerNames()));
-        }
-        copy.setJsseProvider(params.getJsseProvider());
-        if (params.getKeyManagers() != null) {
-            copy.setKeyManagers(params.getKeyManagers().clone());
-        }
-        if (params.getTrustManagers() != null) {
-            copy.setTrustManagers(params.getTrustManagers().clone());
-        }
-        copy.setCipherSuites(new ArrayList<>(params.getCipherSuites()));
-        if (params.getCipherSuitesFilter() != null) {
-            final FiltersType filters = new FiltersType();
-            filters.getInclude().addAll(params.getCipherSuitesFilter().getInclude());
-            filters.getExclude().addAll(params.getCipherSuitesFilter().getExclude());
-            copy.setCipherSuitesFilter(filters);
-        }
-        copy.setSecureRandom(params.getSecureRandom());
+        final TLSClientParameters copy = params.copy();
         // the certificate constraints are left out: the client is not built from them, they are
         // checked for each response, so changing them must not replace the client
-        copy.setSecureSocketProtocol(params.getSecureSocketProtocol());
-        copy.setCertAlias(params.getCertAlias());
-        copy.setNamedGroups(new ArrayList<>(params.getNamedGroups()));
+        copy.setCertConstraints(null);
         return copy;
     }
 
