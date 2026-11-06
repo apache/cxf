@@ -67,14 +67,13 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
 
         Element root = doc.getDocumentElement();
 
-        byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
-
         String symKeyAlgo = getEncodingMethodAlgorithm(root);
 
-        if (encProps != null && encProps.getEncryptionSymmetricKeyAlgo() != null
-            && !encProps.getEncryptionSymmetricKeyAlgo().equals(symKeyAlgo)) {
+        if (!EncryptionUtils.isSymmetricKeyAlgoAllowed(encProps, symKeyAlgo)) {
             throwFault("Encryption Symmetric Key Algorithm is not supported", null);
         }
+
+        byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
 
 
         byte[] decryptedPayload = null;
@@ -92,7 +91,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                StandardCharsets.UTF_8));
         } catch (Exception ex) {
-            throwFault("Payload document can not be created", ex);
+            throwFault("Payload can not be decrypted", ex);
         }
         message.setContent(XMLStreamReader.class,
                            new W3CDOMStreamReader(payloadDoc));

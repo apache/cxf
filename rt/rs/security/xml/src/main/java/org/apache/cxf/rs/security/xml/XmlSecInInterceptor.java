@@ -255,9 +255,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == SecurityEventConstants.AlgorithmSuite) {
                     checkSignatureTransform((AlgorithmSuiteSecurityEvent)securityEvent);
-                    if (encryptionProperties != null) {
-                        checkEncryptionAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
-                    }
+                    checkEncryptionAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
                     if (sigProps != null) {
                         checkSignatureAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
                     }
@@ -288,10 +286,11 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     private void checkEncryptionAlgorithms(AlgorithmSuiteSecurityEvent event)
         throws XMLSecurityException {
         if (XMLSecurityConstants.Enc.equals(event.getAlgorithmUsage())
-            && encryptionProperties.getEncryptionSymmetricKeyAlgo() != null
-            && !encryptionProperties.getEncryptionSymmetricKeyAlgo().equals(event.getAlgorithmURI())) {
+            && !EncryptionUtils.isSymmetricKeyAlgoAllowed(encryptionProperties, event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", new Object[] {"The symmetric encryption algorithm "
                                            + event.getAlgorithmURI() + " is not allowed"});
+        } else if (encryptionProperties == null) {
+            return;
         } else if ((XMLSecurityConstants.Sym_Key_Wrap.equals(event.getAlgorithmUsage())
             || XMLSecurityConstants.Asym_Key_Wrap.equals(event.getAlgorithmUsage()))
             && encryptionProperties.getEncryptionKeyTransportAlgo() != null
