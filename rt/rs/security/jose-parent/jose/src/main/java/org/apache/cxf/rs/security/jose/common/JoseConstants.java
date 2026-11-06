@@ -74,6 +74,13 @@ public final class JoseConstants extends RSSecurityConstants {
     public static final String RSSEC_ACCEPT_PUBLIC_KEY = "rs.security.accept.public.key";
 
     /**
+     * Whether the x5c, x5t and x5t#S256 headers received for signature validation select the certificate
+     * even when a key store alias is configured. The default is "false", meaning the certificate of the
+     * alias is used, or an x5c certificate issued by it.
+     */
+    public static final String RSSEC_ACCEPT_X509_KEY_HEADERS = "rs.security.accept.x509.key.headers";
+
+    /**
      * TODO documentation for these
      */
     public static final String RSSEC_KEY_STORE_JWKSET = "rs.security.keystore.jwkset";
