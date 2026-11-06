@@ -406,6 +406,7 @@ public final class JwsUtils {
             JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE));
         if (inHeaders != null) {
             inHeaderKid = inHeaders.getKeyId();
+            final String pinnedAlias = getPinnedAlias(m, props, inHeaders);
             //TODO: optionally validate inHeaders.getAlgorithm against a property in props
             if (inHeaders.getHeader(JoseConstants.HEADER_JSON_WEB_KEY) != null) {
                 JsonWebKey publicJwk = inHeaders.getJsonWebKey();
@@ -424,10 +425,10 @@ public final class JwsUtils {
                 // With an alias configured, the x5c certificate must be the certificate of the alias
                 // or be issued by it, unless the X.509 headers have been explicitly accepted
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
-                KeyManagementUtils.validateCertificateChain(m, props, chain, getPinnedAlias(m, props, inHeaders));
+                KeyManagementUtils.validateCertificateChain(m, props, chain, pinnedAlias);
                 return getPublicKeySignatureVerifier(chain.get(0),
                                                      inHeaders.getSignatureAlgorithm());
-            } else if (getPinnedAlias(m, props, inHeaders) != null) {
+            } else if (pinnedAlias != null) {
                 // With an alias configured, the certificate of the alias is used
                 LOG.fine("Ignoring X.509 thumbprint headers as a key store alias is configured");
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {

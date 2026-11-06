@@ -361,6 +361,7 @@ public final class KeyManagementUtils {
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
         validateCertificateChain(PhaseInterceptorChain.getCurrentMessage(), storeProperties, inCerts, null);
     }
+
     /**
      * Validate the certificate chain against the trusted certificates of the key store, or, if trustedAlias
      * is not null, against the certificate of that alias only.
