@@ -130,6 +130,9 @@ public class JWTTokenValidator implements TokenValidator {
         }
         KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
         verificationProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
+        if (allowX509KeyHeaders) {
+            verificationProperties.put(JoseConstants.RSSEC_ACCEPT_X509_KEY_HEADERS, "true");
+        }
 
         // Unless allowX509KeyHeaders is enabled, the token headers are not passed on, so the token
         // is verified with the configured signature certificate only. Otherwise x5c, x5t and

@@ -18,21 +18,30 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.common.JoseException;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.KeyType;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 import org.junit.Test;
 
@@ -130,6 +139,94 @@ public class JwsUtilsTest {
         List<String> chain = key.getX509Chain();
         assertNotNull(chain);
         assertEquals(2, chain.size());
+    }
+
+    @Test
+    public void testLoadSignatureVerifierWithX509HeadersUsesAlias() throws Exception {
+        // The trust store holds the certificates of alice, bob and a CA which issued carol's certificate
+        Properties p = trustStoreProperties("alice");
+
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("alice", false, false)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("alice", true, false)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("alice", false, true)));
+        // The certificate of the configured alias is used
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("bob", false, false)));
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("bob", true, false)));
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("bob", true, true)));
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("bob", false, true)));
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("carol", false, true)));
+        // unless the X.509 headers have been explicitly accepted, which select the certificate as before
+        p.put(JoseConstants.RSSEC_ACCEPT_X509_KEY_HEADERS, "true");
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("bob", true, false)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("bob", false, true)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("carol", false, true)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("alice", false, false)));
+    }
+
+    @Test
+    public void testLoadSignatureVerifierWithX509ChainIssuedByAlias() throws Exception {
+        // An x5c certificate issued by the certificate of the configured alias is accepted
+        Properties p = trustStoreProperties("ca");
+
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("carol", false, true)));
+        assertFalse(verifyWithLoadedVerifier(p, signWithX509Headers("bob", false, true)));
+    }
+
+    @Test
+    public void testLoadSignatureVerifierWithX509HeadersWithoutAlias() throws Exception {
+        // Without an alias, the x5c and x5t headers select the certificate as before
+        Properties p = trustStoreProperties(null);
+
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("alice", true, false)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("bob", true, false)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("bob", false, true)));
+        assertTrue(verifyWithLoadedVerifier(p, signWithX509Headers("carol", false, true)));
+    }
+
+    private static Properties trustStoreProperties(String alias) {
+        Properties p = new Properties();
+        p.put(JoseConstants.RSSEC_KEY_STORE_TYPE, "PKCS12");
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE, "org/apache/cxf/rs/security/jose/jws/trust.p12");
+        p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
+        p.put(JoseConstants.RSSEC_SIGNATURE_ALGORITHM, "RS256");
+        if (alias != null) {
+            p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
+        }
+        return p;
+    }
+
+    private static String signWithX509Headers(String signer, boolean thumbprint, boolean chain) throws Exception {
+        KeyStore signers = KeyStore.getInstance("PKCS12");
+        try (InputStream is = JwsUtilsTest.class.getResourceAsStream("signers.p12")) {
+            signers.load(is, "password".toCharArray());
+        }
+        X509Certificate[] certs = Arrays.copyOf(signers.getCertificateChain(signer),
+            signers.getCertificateChain(signer).length, X509Certificate[].class);
+
+        JwsHeaders headers = new JwsHeaders(SignatureAlgorithm.RS256);
+        if (thumbprint) {
+            headers.setX509Thumbprint(Base64UrlUtility.encode(
+                MessageDigestUtils.createDigest(certs[0].getEncoded(), MessageDigestUtils.ALGO_SHA_1)));
+            headers.setX509ThumbprintSHA256(Base64UrlUtility.encode(
+                MessageDigestUtils.createDigest(certs[0].getEncoded(), MessageDigestUtils.ALGO_SHA_256)));
+        }
+        if (chain) {
+            headers.setX509Chain(KeyManagementUtils.encodeX509CertificateChain(certs));
+        }
+        JwsCompactProducer producer = new JwsCompactProducer(headers, "payload");
+        return producer.signWith(JwsUtils.getPrivateKeySignatureProvider(
+            (PrivateKey)signers.getKey(signer, "password".toCharArray()), SignatureAlgorithm.RS256));
+    }
+
+    private static boolean verifyWithLoadedVerifier(Properties props, String jws) {
+        JwsCompactConsumer consumer = new JwsCompactConsumer(jws);
+        try {
+            JwsSignatureVerifier verifier =
+                JwsUtils.loadSignatureVerifier(createMessage(), props, consumer.getJwsHeaders());
+            return consumer.verifySignatureWith(verifier);
+        } catch (JoseException ex) {
+            return false;
+        }
     }
 
     private static Message createMessage() {

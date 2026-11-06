@@ -35,10 +35,12 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -357,21 +359,40 @@ public final class KeyManagementUtils {
 
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
-        Message message = PhaseInterceptorChain.getCurrentMessage();
+        validateCertificateChain(PhaseInterceptorChain.getCurrentMessage(), storeProperties, inCerts, null);
+    }
+
+    /**
+     * Validate the certificate chain against the trusted certificates of the key store, or, if trustedAlias
+     * is not null, against the certificate of that alias only.
+     */
+    public static void validateCertificateChain(Message message, Properties storeProperties,
+                                                List<X509Certificate> inCerts, String trustedAlias) {
         KeyStore ks = loadPersistKeyStore(message, storeProperties);
         String enableRevocationProp = storeProperties.getProperty(RSSecurityConstants.RSSEC_ENABLE_REVOCATION);
-        if (enableRevocationProp == null) {
+        if (enableRevocationProp == null && message != null) {
             enableRevocationProp = (String)message.getContextualProperty(JoseConstants.RSSEC_ENABLE_REVOCATION);
         }
         boolean enableRevocation = enableRevocationProp != null && Boolean.parseBoolean(enableRevocationProp);
-        validateCertificateChain(ks, inCerts, enableRevocation);
+        validateCertificateChain(ks, trustedAlias, inCerts, enableRevocation);
     }
-    private static void validateCertificateChain(KeyStore ks, List<X509Certificate> inCerts, boolean enableRevocation) {
+    private static void validateCertificateChain(KeyStore ks, String trustedAlias, List<X509Certificate> inCerts,
+                                                 boolean enableRevocation) {
         // Initial chain validation, to be enhanced as needed
         try {
             X509CertSelector certSelect = new X509CertSelector();
             certSelect.setCertificate(inCerts.get(0));
-            PKIXBuilderParameters pbParams = new PKIXBuilderParameters(ks, certSelect);
+            final PKIXBuilderParameters pbParams;
+            if (trustedAlias == null) {
+                pbParams = new PKIXBuilderParameters(ks, certSelect);
+            } else {
+                X509Certificate trustedCert = (X509Certificate)ks.getCertificate(trustedAlias);
+                if (trustedCert == null) {
+                    throw new JoseException("No certificate found for alias " + trustedAlias);
+                }
+                pbParams = new PKIXBuilderParameters(
+                    Collections.singleton(new TrustAnchor(trustedCert, null)), certSelect);
+            }
             pbParams.addCertStore(CertStore.getInstance("Collection",
                                                         new CollectionCertStoreParameters(inCerts)));
             pbParams.setMaxPathLength(-1);
