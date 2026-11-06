@@ -171,6 +171,33 @@ public class SecureAnnotationsInterceptorTest {
     }
 
     @Test
+    public void testSingleRoleAnnotation() throws Exception {
+        Method target = SingleRoleService.class.getMethod("operation");
+
+        SecureAnnotationsInterceptor in = createInterceptor(new SingleRoleService(), SingleRole.class);
+        assertAllowed(in, target, "admin");
+        assertDenied(in, target, "user");
+        assertDenied(in, target);
+    }
+
+    @Test
+    public void testAnnotationClassWithoutRolesValueIsRejected() throws Exception {
+        SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
+        assertThrows(IllegalArgumentException.class,
+            () -> in.setAnnotationClassName(IntValueRoles.class.getName()));
+        assertThrows(IllegalArgumentException.class,
+            () -> in.setAnnotationClassName(NoValueRoles.class.getName()));
+        assertThrows(IllegalArgumentException.class,
+            () -> in.setAnnotationClassName(String.class.getName()));
+
+        // The annotation class is unchanged
+        in.setSecuredObject(new SameClassOverloadingService());
+        Method target = SameClassOverloadingService.class.getMethod("operation");
+        assertAllowed(in, target, "user");
+        assertDenied(in, target, "admin");
+    }
+
+    @Test
     public void testOverloadedSubclassMethodKeepsItsOwnRoles() throws Exception {
         Method adminMethod = OverloadingService.class.getMethod("operation", String.class);
         Method userMethod = OverloadingService.class.getMethod("operation");
@@ -745,6 +772,29 @@ public class SecureAnnotationsInterceptorTest {
     @Target({ElementType.TYPE, ElementType.METHOD })
     public @interface SecureRolesAllowed {
         String[] value();
+    }
+
+    @Retention (RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD })
+    public @interface SingleRole {
+        String value();
+    }
+
+    @Retention (RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD })
+    public @interface IntValueRoles {
+        int value();
+    }
+
+    @Retention (RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD })
+    public @interface NoValueRoles {
+    }
+
+    public static class SingleRoleService {
+        @SingleRole("admin")
+        public void operation() {
+        }
     }
 
     private static final class TestService {
