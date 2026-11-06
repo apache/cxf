@@ -20,15 +20,14 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.annotation.Priority;
-import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 
@@ -36,13 +35,15 @@ import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
 public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        final InputStream entityStream = res.getEntityStream();
         if (isMethodWithNoContent(req.getMethod())
             || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+            || entityStream == null) {
             return;
         }
-        final byte[] encryptedContent = IOUtils.readBytesFromStream(res.getEntityStream());
+        final byte[] encryptedContent = IOUtils.readBytesFromStream(entityStream);
         if (encryptedContent.length == 0) {
+            res.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JweDecryptionOutput out = decrypt(encryptedContent);
@@ -56,10 +57,6 @@ public class JweJsonClientResponseFilter extends AbstractJweJsonDecryptingFilter
         if (super.isValidateHttpHeaders()) {
             super.validateHttpHeadersIfNeeded(res.getHeaders(), out.getHeaders());
         }
-    }
-
-    protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
     }
 
     protected boolean isStatusCodeWithNoContent(int statusCode) {

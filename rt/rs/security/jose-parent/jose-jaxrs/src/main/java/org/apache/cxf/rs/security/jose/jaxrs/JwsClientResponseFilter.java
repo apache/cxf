@@ -20,16 +20,15 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.annotation.Priority;
-import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
 import jakarta.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
@@ -39,13 +38,15 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JwsClientResponseFilter extends AbstractJwsReaderProvider implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext req, ClientResponseContext res) throws IOException {
+        final InputStream entityStream = res.getEntityStream();
         if (isMethodWithNoContent(req.getMethod())
             || isStatusCodeWithNoContent(res.getStatus())
-            || isCheckEmptyStream() && !res.hasEntity()) {
+            || entityStream == null) {
             return;
         }
-        final String content = IOUtils.readStringFromStream(res.getEntityStream());
+        final String content = IOUtils.readStringFromStream(entityStream);
         if (StringUtils.isEmpty(content)) {
+            res.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(content);
@@ -65,10 +66,6 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         if (super.isValidateHttpHeaders()) {
             super.validateHttpHeadersIfNeeded(res.getHeaders(), p.getJwsHeaders());
         }
-    }
-
-    protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoResponseContent(method);
     }
 
     protected boolean isStatusCodeWithNoContent(int statusCode) {
