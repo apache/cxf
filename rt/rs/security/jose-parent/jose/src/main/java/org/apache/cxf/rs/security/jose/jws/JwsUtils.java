@@ -406,6 +406,7 @@ public final class JwsUtils {
             JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE));
         if (inHeaders != null) {
             inHeaderKid = inHeaders.getKeyId();
+            final String pinnedAlias = getPinnedAlias(m, props, inHeaders);
             //TODO: optionally validate inHeaders.getAlgorithm against a property in props
             if (inHeaders.getHeader(JoseConstants.HEADER_JSON_WEB_KEY) != null) {
                 JsonWebKey publicJwk = inHeaders.getJsonWebKey();
@@ -421,10 +422,15 @@ public final class JwsUtils {
                 // Fall through to loading the verification key from the JWK set below.
                 LOG.fine("Ignoring X.509 headers as the configured key store type is jwk");
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_CHAIN) != null) {
+                // With an alias configured, the x5c certificate must be the certificate of the alias
+                // or be issued by it, unless the X.509 headers have been explicitly accepted
                 List<X509Certificate> chain = KeyManagementUtils.toX509CertificateChain(inHeaders.getX509Chain());
-                KeyManagementUtils.validateCertificateChain(props, chain);
+                KeyManagementUtils.validateCertificateChain(m, props, chain, pinnedAlias);
                 return getPublicKeySignatureVerifier(chain.get(0),
                                                      inHeaders.getSignatureAlgorithm());
+            } else if (pinnedAlias != null) {
+                // With an alias configured, the certificate of the alias is used
+                LOG.fine("Ignoring X.509 thumbprint headers as a key store alias is configured");
             } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT) != null) {
                 X509Certificate foundCert =
                     KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509Thumbprint(),
@@ -472,6 +478,13 @@ public final class JwsUtils {
             throw new JwsException(JwsException.Error.NO_VERIFIER);
         }
         return theVerifier;
+    }
+
+    private static String getPinnedAlias(Message m, Properties props, JwsHeaders inHeaders) {
+        if (JoseUtils.checkBooleanProperty(inHeaders, props, m, JoseConstants.RSSEC_ACCEPT_X509_KEY_HEADERS)) {
+            return null;
+        }
+        return props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
     }
 
     public static Properties loadJwsProperties(Message m, String propLoc) {
