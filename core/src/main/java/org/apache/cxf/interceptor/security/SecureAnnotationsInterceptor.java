@@ -69,14 +69,30 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     }
 
     public void setAnnotationClassName(String name) {
+        final Class<?> annotationClass;
         try {
-            ClassLoaderUtils.loadClass(name, SecureAnnotationsInterceptor.class);
-            annotationClassName = name;
+            annotationClass = ClassLoaderUtils.loadClass(name, SecureAnnotationsInterceptor.class);
         } catch (Throwable ex) {
             ex.printStackTrace();
             throw new IllegalArgumentException("Annotation class " + name + " is not available");
         }
+        // The roles are read from the annotation's value(), so reject an annotation without one
+        // rather than leave the methods it is on unprotected
+        if (!annotationClass.isAnnotation() || !hasRolesValue(annotationClass)) {
+            throw new IllegalArgumentException("Annotation class " + name
+                + " is not an annotation with a String or String[] value()");
+        }
+        annotationClassName = name;
         resolveSecuredObjectRoles();
+    }
+
+    private static boolean hasRolesValue(Class<?> annotationClass) {
+        try {
+            Class<?> valueType = annotationClass.getMethod("value").getReturnType();
+            return valueType == String.class || valueType == String[].class;
+        } catch (NoSuchMethodException ex) {
+            return false;
+        }
     }
 
     public void setSecuredObject(Object object) {
@@ -280,13 +296,18 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
         for (Annotation ann : anns) {
             if (ann.annotationType().getName().equals(annotationClassName)) {
                 try {
-                    Method valueMethod = ann.annotationType().getMethod("value");
-                    String[] roles = (String[])valueMethod.invoke(ann);
-                    return Arrays.asList(roles);
+                    Object roles = ann.annotationType().getMethod("value").invoke(ann);
+                    if (roles instanceof String[]) {
+                        return Arrays.asList((String[])roles);
+                    } else if (roles instanceof String) {
+                        return Collections.singletonList((String)roles);
+                    }
+                    LOG.warning("The value of " + ann + " is not a String or String[]");
                 } catch (Exception ex) {
-                    // ignore
+                    LOG.log(Level.WARNING, "The roles of " + ann + " can not be read", ex);
                 }
-                break;
+                // The method is protected by the annotation, so deny every user
+                return Collections.emptyList();
             }
         }
         return null;
