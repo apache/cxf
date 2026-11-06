@@ -70,12 +70,40 @@ public class AbstractJwsReaderProvider {
         this.protectedHttpHeaders = protectedHttpHeaders;
     }
 
+    /**
+     * @deprecated has no effect, see {@link #setCheckEmptyStream(boolean)}.
+     */
+    @Deprecated
     public boolean isCheckEmptyStream() {
         return checkEmptyStream;
     }
 
+    /**
+     * No longer has any effect: the filters always read the entity stream and skip
+     * a missing or empty one. A Content-Length: 0 header alone is not trusted, as the
+     * stream may still carry a body.
+     *
+     * @deprecated has no effect.
+     */
+    @Deprecated
     public void setCheckEmptyStream(boolean checkEmptyStream) {
         this.checkEmptyStream = checkEmptyStream;
+    }
+
+    /**
+     * Returns true if the entity must not be read for the given HTTP method.
+     * By default no method is skipped: an entity is always verified when one is
+     * present, whatever the method, as JAX-RS binds an entity parameter for
+     * DELETE, GET and the other methods too. Subclasses may override this
+     * to skip specific methods entirely.
+     * <p>
+     * This used to return true for DELETE, GET, HEAD, OPTIONS and TRACE requests and
+     * for responses to DELETE, HEAD and OPTIONS. An override that extends
+     * super.isMethodWithNoContent and still needs those methods skipped entirely
+     * has to list them itself.
+     */
+    protected boolean isMethodWithNoContent(String method) {
+        return false;
     }
     
 }

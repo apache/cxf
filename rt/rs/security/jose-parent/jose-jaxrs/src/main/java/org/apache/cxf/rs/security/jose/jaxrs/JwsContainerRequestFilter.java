@@ -20,16 +20,15 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 
 import jakarta.annotation.Priority;
-import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
@@ -42,12 +41,13 @@ import org.apache.cxf.security.SecurityContext;
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (isMethodWithNoContent(context.getMethod())
-            || isCheckEmptyStream() && !context.hasEntity()) {
+        final InputStream entityStream = context.getEntityStream();
+        if (isMethodWithNoContent(context.getMethod()) || entityStream == null) {
             return;
         }
-        final String content = IOUtils.readStringFromStream(context.getEntityStream());
+        final String content = IOUtils.readStringFromStream(entityStream);
         if (StringUtils.isEmpty(content)) {
+            context.setEntityStream(new ByteArrayInputStream(new byte[0]));
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(content);
@@ -97,9 +97,5 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             };
         }
         return null;
-    }
-    
-    protected boolean isMethodWithNoContent(String method) {
-        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
 }
