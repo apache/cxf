@@ -44,6 +44,7 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class EndpointReferenceUtilsTest {
@@ -125,6 +126,59 @@ public class EndpointReferenceUtilsTest {
         }
     }
 
+    @Test
+    public void testGetSchemaDoesNotFetchRemoteImportedSchema() throws Exception {
+        try (LocalHttpProbeServer probeServer = new LocalHttpProbeServer()) {
+            String importedNamespace = "urn:test:endpoint:reference:utils:imported";
+            String schemaText =
+                "<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
+                + "targetNamespace='" + NAMESPACE + "' elementFormDefault='qualified'>"
+                + "<xsd:import namespace='" + importedNamespace + "' "
+                + "schemaLocation='http://127.0.0.1:" + probeServer.getPort() + "/imported.xsd'/>"
+                + "<xsd:element name='value' type='xsd:string'/>"
+                + "</xsd:schema>";
+            Document doc = StaxUtils.read(new ByteArrayInputStream(schemaText.getBytes(StandardCharsets.UTF_8)));
+
+            // Only the SchemaInfo element carries the import, so it is resolved by getSchema itself
+            ServiceInfo serviceInfo = createServiceInfo(MEMORY_SYSTEM_ID);
+            serviceInfo.getSchemas().iterator().next().setElement(doc.getDocumentElement());
+
+            Schema schema = EndpointReferenceUtils.getSchema(serviceInfo, null);
+
+            probeServer.awaitCompletion();
+            assertFalse("Remote imported schema should not be fetched", probeServer.wasConnected());
+            assertNull("A schema with an unresolvable import cannot be built", schema);
+        }
+    }
+
+    @Test
+    public void testGetSchemaResolvesLocalImportedSchema() throws Exception {
+        String importedNamespace = "urn:test:endpoint:reference:utils:imported";
+        File importedXsd = tempFolder.newFile("local-imported.xsd");
+        Files.write(importedXsd.toPath(), ("<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
+            + "targetNamespace='" + importedNamespace + "'>"
+            + "<xsd:element name='other' type='xsd:string'/>"
+            + "</xsd:schema>").getBytes(StandardCharsets.UTF_8));
+
+        String schemaText =
+            "<xsd:schema xmlns:xsd='http://www.w3.org/2001/XMLSchema' "
+            + "xmlns:imp='" + importedNamespace + "' "
+            + "targetNamespace='" + NAMESPACE + "' elementFormDefault='qualified'>"
+            + "<xsd:import namespace='" + importedNamespace + "' "
+            + "schemaLocation='" + importedXsd.toURI().toString() + "'/>"
+            + "<xsd:element name='value'><xsd:complexType><xsd:sequence>"
+            + "<xsd:element ref='imp:other'/>"
+            + "</xsd:sequence></xsd:complexType></xsd:element>"
+            + "</xsd:schema>";
+        Document doc = StaxUtils.read(new ByteArrayInputStream(schemaText.getBytes(StandardCharsets.UTF_8)));
+
+        ServiceInfo serviceInfo = createServiceInfo(MEMORY_SYSTEM_ID);
+        serviceInfo.getSchemas().iterator().next().setElement(doc.getDocumentElement());
+
+        // The reference to imp:other only compiles if the local import was resolved
+        assertNotNull(EndpointReferenceUtils.getSchema(serviceInfo, null));
+    }
+
     private File writeSchemaWithExternalDtd(String name, String namespace, int port) throws Exception {
         String schemaText =
             "<?xml version='1.0'?>"
@@ -167,19 +221,25 @@ public class EndpointReferenceUtilsTest {
         private LocalHttpProbeServer() throws Exception {
             this.serverSocket = new ServerSocket(0);
             this.serverSocket.setSoTimeout(750);
-            this.thread = new Thread(this::acceptOneConnection, "EndpointReferenceUtilsTest-HttpProbe");
+            this.thread = new Thread(this::acceptConnections, "EndpointReferenceUtilsTest-HttpProbe");
             this.thread.setDaemon(true);
             this.thread.start();
         }
 
-        private void acceptOneConnection() {
-            try (Socket socket = serverSocket.accept()) {
-                connected.set(true);
-                OutputStream out = socket.getOutputStream();
-                out.write("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
-                out.flush();
-            } catch (Exception ex) {
-                // timeout/no connection is expected for this test
+        // Answer every connection until none arrives within the accept timeout, so that a second
+        // request (e.g. one by the resolver and one by the SchemaFactory) cannot block the test
+        private void acceptConnections() {
+            while (true) {
+                try (Socket socket = serverSocket.accept()) {
+                    connected.set(true);
+                    OutputStream out = socket.getOutputStream();
+                    out.write("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n"
+                        .getBytes(StandardCharsets.US_ASCII));
+                    out.flush();
+                } catch (Exception ex) {
+                    // timeout/no connection is expected for this test
+                    return;
+                }
             }
         }
 

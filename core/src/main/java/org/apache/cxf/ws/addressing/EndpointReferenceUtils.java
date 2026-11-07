@@ -207,6 +207,14 @@ public final class EndpointReferenceUtils {
                 if (systemId == null) {
                     systemId = publicId;
                 }
+                if (systemId != null && !URIResolver.isLocalReference(systemId, baseURI)) {
+                    // The ACCESS_EXTERNAL_SCHEMA restriction set on the SchemaFactory does not apply to
+                    // inputs returned from this resolver, and is not supported by every SchemaFactory
+                    // (e.g. Apache Xerces), which would fetch the schema itself if null was returned.
+                    // So only fetch local schemas here and return an empty input for remote ones.
+                    LOG.warning("Not resolving remote Schema " + systemId);
+                    return createInput(systemId, new byte[0]);
+                }
                 if (systemId != null) {
                     // Run inside doPrivileged so that sm.checkPermission() calls
                     // inside the resolver chain (SecurityActions.fileExists) stop
