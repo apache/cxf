@@ -59,7 +59,7 @@ public class IssueEncryptedUnitTest {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     /**
      * Test to successfully issue a (dummy) encrypted token.

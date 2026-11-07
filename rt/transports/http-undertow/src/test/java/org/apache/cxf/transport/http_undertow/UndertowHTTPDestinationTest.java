@@ -512,7 +512,7 @@ public class UndertowHTTPDestinationTest {
     private UndertowHTTPDestination setUpDestination()
         throws Exception {
         return setUpDestination(false, false);
-    };
+    }
 
     private UndertowHTTPDestination setUpDestination(
             boolean contextMatchOnStem, boolean mockedBus)

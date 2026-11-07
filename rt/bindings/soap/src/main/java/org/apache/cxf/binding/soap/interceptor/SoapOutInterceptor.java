@@ -391,5 +391,5 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         }
 
 
-    };
+    }
 }

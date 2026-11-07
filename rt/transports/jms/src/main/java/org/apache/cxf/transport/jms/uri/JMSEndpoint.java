@@ -453,7 +453,7 @@ public class JMSEndpoint {
         this.jndiTransactionManagerName = jndiTransactionManagerName;
     }
 
-    public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
+    public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT }
 
     public enum MessageType {
         BYTE("byte"),

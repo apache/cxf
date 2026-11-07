@@ -111,7 +111,7 @@ public class ModelMBeanAssembler {
         boolean read;
         boolean write;
         boolean is;
-    };
+    }
 
 
     //get the attribut information for the method

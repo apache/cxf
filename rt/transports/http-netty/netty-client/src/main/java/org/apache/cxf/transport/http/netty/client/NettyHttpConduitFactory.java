@@ -63,7 +63,7 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
             }
             return ASYNC_ONLY;
         }
-    };
+    }
 
     UseAsyncPolicy policy;
     public NettyHttpConduitFactory() {

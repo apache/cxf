@@ -63,7 +63,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     final TestParam test;
 

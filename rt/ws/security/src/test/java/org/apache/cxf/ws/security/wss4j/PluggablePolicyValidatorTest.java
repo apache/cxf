@@ -182,6 +182,6 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             }
         }
 
-    };
+    }
 
 }

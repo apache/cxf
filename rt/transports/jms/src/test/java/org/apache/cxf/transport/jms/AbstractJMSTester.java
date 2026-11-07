@@ -72,7 +72,7 @@ public abstract class AbstractJMSTester {
     protected static EmbeddedActiveMQ broker;
     private static final String MESSAGE_CONTENT = "HelloWorld";
 
-    protected enum ExchangePattern { oneway, requestReply };
+    protected enum ExchangePattern { oneway, requestReply }
 
     private final AtomicReference<Message> inMessage = new AtomicReference<>();
     private final AtomicReference<Message> destMessage = new AtomicReference<>();

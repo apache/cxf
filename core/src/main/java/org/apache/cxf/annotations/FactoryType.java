@@ -57,7 +57,7 @@ public @interface FactoryType {
         Session,
         Pooled, //args[0] is the size of the pool
         PerRequest
-    };
+    }
 
     final class DEFAULT implements Factory {
         public Object create(Exchange e) throws Throwable {

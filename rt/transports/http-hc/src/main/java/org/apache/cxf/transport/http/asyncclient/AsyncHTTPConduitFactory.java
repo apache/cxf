@@ -112,7 +112,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             }
             return ASYNC_ONLY;
         }
-    };
+    }
 
     volatile PoolingNHttpClientConnectionManager connectionManager;
     volatile CloseableHttpAsyncClient client;

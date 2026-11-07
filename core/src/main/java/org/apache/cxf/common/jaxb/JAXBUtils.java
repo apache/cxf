@@ -105,7 +105,7 @@ public final class JAXBUtils {
         SETTER,
         VARIABLE,
         CONSTANT
-    };
+    }
 
     private static final char[] XML_NAME_PUNCTUATION_CHARS = new char[] {
         /* hyphen                       */ '\u002D',

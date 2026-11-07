@@ -43,7 +43,7 @@ public class WSSecurity10Server extends AbstractBusTestServerBase {
                 ? "org/apache/cxf/systest/ws/wssec10/server_restricted-fips.xml"
                     : "org/apache/cxf/systest/ws/wssec10/server_restricted.xml";
         }
-    };
+    }
 
     public WSSecurity10Server() throws Exception {
 

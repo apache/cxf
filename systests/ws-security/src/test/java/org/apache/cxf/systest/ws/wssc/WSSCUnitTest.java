@@ -412,6 +412,6 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
             this.securityToken = securityToken;
         }
 
-    };
+    }
 
 }

@@ -46,7 +46,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     final TestParam test;
 

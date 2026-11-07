@@ -56,7 +56,7 @@ public class URIConfiguredConduitTest {
     private enum SyncType {
         sync,
         async
-    };
+    }
 
     @Rule public EmbeddedActiveMQResource server = new EmbeddedActiveMQResource(0);
 

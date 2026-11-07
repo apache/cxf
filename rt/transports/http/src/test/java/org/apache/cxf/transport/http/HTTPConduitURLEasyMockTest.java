@@ -76,8 +76,8 @@ public class HTTPConduitURLEasyMockTest {
     
     private enum ResponseStyle {
         NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED, ONEWAY_NONE, ONEWAY_STREAM_CLOSED
-    };
-    private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
+    }
+    private enum ResponseDelimiter { LENGTH, CHUNKED, EOF }
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
     private static final String PAYLOAD = "message payload";

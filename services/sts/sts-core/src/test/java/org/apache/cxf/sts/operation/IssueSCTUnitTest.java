@@ -82,7 +82,7 @@ public class IssueSCTUnitTest {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     @BeforeClass
     public static void init() throws TokenStoreException {

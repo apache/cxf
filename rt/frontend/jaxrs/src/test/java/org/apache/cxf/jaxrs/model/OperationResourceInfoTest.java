@@ -53,11 +53,11 @@ public class OperationResourceInfoTest {
         @Produces("text/plain")
         public void doIt() {
             // empty
-        };
+        }
         @Consumes("application/atom+xml")
         public void doThat() {
             // empty
-        };
+        }
 
     }
     

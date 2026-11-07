@@ -53,7 +53,7 @@ public class EnumTypeTest extends AbstractAegisTest {
             return name() + "*";
         }
 
-    };
+    }
 
     @Before
     public void setUp() throws Exception {

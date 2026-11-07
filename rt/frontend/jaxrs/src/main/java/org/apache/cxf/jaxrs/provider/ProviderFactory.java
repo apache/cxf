@@ -150,7 +150,7 @@ public abstract class ProviderFactory {
             }
             return null;
         }
-    };
+    }
 
     private static final LazyProviderClass DATA_SOURCE_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.DataSourceProvider");

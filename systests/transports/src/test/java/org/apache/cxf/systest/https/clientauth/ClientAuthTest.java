@@ -554,6 +554,6 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             return true;
         }
 
-    };
+    }
 
 }

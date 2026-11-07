@@ -43,7 +43,7 @@ public class WSSecurity10StaxServer extends AbstractBusTestServerBase {
                 ? "org/apache/cxf/systest/ws/wssec10/stax-server_restricted-fips.xml"
                     : "org/apache/cxf/systest/ws/wssec10/stax-server_restricted.xml";
         }
-    };
+    }
 
     public WSSecurity10StaxServer() throws Exception {
 

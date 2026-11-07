@@ -446,7 +446,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             return ns;
         }
 
-    };
+    }
 
 
 }

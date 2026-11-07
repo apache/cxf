@@ -128,7 +128,7 @@ public final class WSDLConstants {
         WSDL11,
         WSDL20,
         UNKNOWN
-    };
+    }
 
     private WSDLConstants() {
     }
