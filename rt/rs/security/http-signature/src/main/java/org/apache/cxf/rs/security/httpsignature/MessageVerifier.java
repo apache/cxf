@@ -60,8 +60,8 @@ public class MessageVerifier {
     private final SignatureValidator signatureValidator;
     private final List<String> requiredHeaders;
     private boolean addDefaultRequiredHeaders = true;
-    private int timeToLive = DEFAULT_TIME_TO_LIVE;
-    private int futureTimeToLive = DEFAULT_FUTURE_TIME_TO_LIVE;
+    private Integer timeToLive;
+    private Integer futureTimeToLive;
 
     public MessageVerifier(KeyProvider keyProvider) {
         this(keyProvider, (List<String>)null);
@@ -167,7 +167,7 @@ public class MessageVerifier {
                                     method,
                                     uri,
                                     signedHeaders);
-        verifyDateHeader(messageHeaders);
+        verifyDateHeader(messageHeaders, m);
         LOG.fine("Finished signature verification");
     }
 
@@ -175,38 +175,62 @@ public class MessageVerifier {
      * Reject a message whose signed "Date" header is outside the configured time window, so that a captured
      * signed message can not be replayed once its time to live has passed. A "Date" header which is not
      * covered by the signature is ignored, as it can be changed along with the rest of the unsigned message.
+     * Values set on this class take precedence over the contextual properties.
      */
-    private void verifyDateHeader(Map<String, List<String>> messageHeaders) {
-        if (timeToLive <= 0 && futureTimeToLive < 0) {
+    private void verifyDateHeader(Map<String, List<String>> messageHeaders, Message m) {
+        int ttl = timeToLive != null ? timeToLive
+            : getContextualInteger(m, HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, DEFAULT_TIME_TO_LIVE);
+        int futureTtl = futureTimeToLive != null ? futureTimeToLive
+            : getContextualInteger(m, HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_FUTURE_TIME_TO_LIVE,
+                                   DEFAULT_FUTURE_TIME_TO_LIVE);
+        if (ttl <= 0 && futureTtl <= 0) {
             return;
         }
         List<String> signedHeaders = Signature.fromString(messageHeaders.get("Signature").get(0)).getHeaders();
         if (!signedHeaders.contains("date")) {
             return;
         }
-        String date = null;
+        // Check the same value that was signed, see SignatureHeaderUtils.mapHeaders
+        List<String> dates = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : messageHeaders.entrySet()) {
-            if ("date".equalsIgnoreCase(entry.getKey()) && !entry.getValue().isEmpty()) {
-                date = entry.getValue().get(0);
-                break;
+            if ("date".equalsIgnoreCase(entry.getKey())) {
+                dates.addAll(entry.getValue());
             }
         }
-        if (date == null) {
+        if (dates.isEmpty()) {
             return;
+        }
+        if (dates.size() > 1) {
+            throw new InvalidSignatureException("there are multiple signed Date header values");
         }
         final long dateTime;
         try {
-            dateTime = HttpUtils.getHttpDateFormat().parse(date).getTime();
+            dateTime = HttpUtils.getHttpDateFormat().parse(dates.get(0)).getTime();
         } catch (ParseException ex) {
             throw new InvalidSignatureException("the signed Date header can not be parsed");
         }
         long now = System.currentTimeMillis();
-        if (timeToLive > 0 && now - dateTime > TimeUnit.SECONDS.toMillis(timeToLive)) {
+        if (ttl > 0 && now - dateTime > TimeUnit.SECONDS.toMillis(ttl)) {
             throw new InvalidSignatureException("the signed Date header is older than the time to live");
         }
-        if (futureTimeToLive >= 0 && dateTime - now > TimeUnit.SECONDS.toMillis(futureTimeToLive)) {
+        if (futureTtl > 0 && dateTime - now > TimeUnit.SECONDS.toMillis(futureTtl)) {
             throw new InvalidSignatureException("the signed Date header is in the future");
         }
+    }
+
+    private static int getContextualInteger(Message m, String key, int defaultValue) {
+        Object value = m.getContextualProperty(key);
+        if (value instanceof Number) {
+            return ((Number)value).intValue();
+        }
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt((String)value);
+            } catch (NumberFormatException ex) {
+                LOG.warning("Incorrect integer value of " + value + " specified for: " + key);
+            }
+        }
+        return defaultValue;
     }
 
     private void inspectMultipleSignatureHeaders(Map<String, List<String>> responseHeaders) {
@@ -233,25 +257,35 @@ public class MessageVerifier {
         this.addDefaultRequiredHeaders = addDefaultRequiredHeaders;
     }
 
-    public int getTimeToLive() {
+    /**
+     * Return the configured maximum age in seconds of a signed "Date" header, or null if it was not set on
+     * this class, in which case the contextual property or the default of 300 seconds is used.
+     */
+    public Integer getTimeToLive() {
         return timeToLive;
     }
 
     /**
      * Set the maximum age in seconds of a signed "Date" header. A message whose signed "Date" is older
-     * than this is rejected. The default is 300 seconds, a value of 0 or less disables the check.
+     * than this is rejected. This takes precedence over the "rs.security.http.signature.time.to.live"
+     * contextual property. The default is 300 seconds, a value of 0 or less disables the check.
      */
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
     }
 
-    public int getFutureTimeToLive() {
+    /**
+     * Return the configured number of seconds a signed "Date" header may be in the future, or null if it was
+     * not set on this class, in which case the contextual property or the default of 60 seconds is used.
+     */
+    public Integer getFutureTimeToLive() {
         return futureTimeToLive;
     }
 
     /**
      * Set the number of seconds a signed "Date" header may be in the future, to allow for clock skew.
-     * The default is 60 seconds, a negative value disables the check.
+     * This takes precedence over the "rs.security.http.signature.future.time.to.live" contextual property.
+     * The default is 60 seconds, a value of 0 or less disables the check.
      */
     public void setFutureTimeToLive(int futureTimeToLive) {
         this.futureTimeToLive = futureTimeToLive;

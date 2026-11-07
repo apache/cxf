@@ -26,6 +26,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Map;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
@@ -332,6 +334,40 @@ public class MessageVerifierTest {
         noTtlVerifier.setAddDefaultRequiredHeaders(false);
         noTtlVerifier.setTimeToLive(0);
         noTtlVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void staleSignedDateHeaderFailsWithContextualTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-4)));
+        createAndAddSignature(headers);
+        Message message = new MessageImpl();
+        message.put(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, "120");
+        messageVerifier.verifyMessage(headers, METHOD, URI, message, MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void explicitTimeToLiveTakesPrecedence() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setTimeToLive(900);
+        Message message = new MessageImpl();
+        message.put(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, "120");
+        verifier.verifyMessage(headers, METHOD, URI, message, MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void multipleSignedDateHeaderValuesFail() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Arrays.asList(httpDate(0), httpDate(-10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
     }
 
     private static String httpDate(int minutesFromNow) {

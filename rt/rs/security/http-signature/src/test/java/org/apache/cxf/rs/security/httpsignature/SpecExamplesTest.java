@@ -490,12 +490,13 @@ public class SpecExamplesTest {
         return result.get();
     }
 
-    // The spec examples carry a fixed Date from 2014, so the signed Date time to live check is disabled
+    // The spec examples carry a fixed Date from 2014, so the signed Date checks are disabled
     private static MessageVerifier createSpecExampleVerifier() {
         MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.setTimeToLive(0);
+        messageVerifier.setFutureTimeToLive(0);
         return messageVerifier;
     }
 
