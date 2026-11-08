@@ -629,7 +629,7 @@ public final class SSLUtils {
         public javax.security.cert.X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
             return session.getPeerCertificateChain();
         }
-    };
+    }
 
     /**
      * Applies the given named groups to {@code SSLParameters} via reflection.

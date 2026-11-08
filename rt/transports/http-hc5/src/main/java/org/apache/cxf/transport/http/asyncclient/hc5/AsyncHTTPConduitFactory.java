@@ -119,7 +119,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             }
             return ASYNC_ONLY;
         }
-    };
+    }
     
     /**
      * See please https://issues.apache.org/jira/browse/CXF-8678 and 

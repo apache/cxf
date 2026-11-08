@@ -486,7 +486,7 @@ public class NettyHttpDestinationTest {
     private NettyHttpDestination setUpDestination()
         throws Exception {
         return setUpDestination(false, false);
-    };
+    }
 
     private NettyHttpDestination setUpDestination(
             boolean contextMatchOnStem, boolean mockedBus)

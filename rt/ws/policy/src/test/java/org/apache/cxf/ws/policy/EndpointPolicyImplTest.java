@@ -68,7 +68,7 @@ public class EndpointPolicyImplTest {
         @Override
         void finalizeConfig(Message m) {
         }
-    };
+    }
 
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         @SuppressWarnings("unchecked")

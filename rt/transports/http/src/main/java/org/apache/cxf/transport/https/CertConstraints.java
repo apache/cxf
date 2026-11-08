@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public class CertConstraints {
 
-    public enum Combinator { ANY, ALL };
+    public enum Combinator { ANY, ALL }
 
     private static class DNConstraints {
 

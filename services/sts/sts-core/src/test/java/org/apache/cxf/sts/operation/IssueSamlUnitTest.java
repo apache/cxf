@@ -105,7 +105,7 @@ public class IssueSamlUnitTest {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     /**
      * Test to successfully issue a Saml 1.1 token.

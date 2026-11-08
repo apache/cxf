@@ -310,7 +310,7 @@ public class MessageListenerTest {
         public void onException(JMSException ex) {
             exception = ex;
         }
-    };
+    }
 
     private static Configuration getConfiguration() {
         try {

@@ -486,7 +486,7 @@ public class JettyHTTPDestinationTest {
     private JettyHTTPDestination setUpDestination()
         throws Exception {
         return setUpDestination(false, false);
-    };
+    }
 
     private JettyHTTPDestination setUpDestination(
             boolean contextMatchOnStem, boolean mockedBus)

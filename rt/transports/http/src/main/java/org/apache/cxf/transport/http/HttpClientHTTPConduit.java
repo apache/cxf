@@ -603,7 +603,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             }
         }
 
-    };
+    }
     private static final class HttpClientFilteredInputStream extends FilterInputStream {
         boolean closed;
 

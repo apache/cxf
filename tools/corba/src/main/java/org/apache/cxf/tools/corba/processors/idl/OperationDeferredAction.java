@@ -31,7 +31,7 @@ public class OperationDeferredAction implements SchemaDeferredAction {
     protected XmlSchemaElement element;
 
     public OperationDeferredAction() {
-    };
+    }
 
     public OperationDeferredAction(ArgType arg) {
         argType = arg;

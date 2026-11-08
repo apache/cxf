@@ -64,7 +64,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
 
     static {
         unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
-    };
+    }
 
     final TestParam test;
 

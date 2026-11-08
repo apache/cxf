@@ -58,7 +58,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     public enum Statement {
         AUTHN, ATTR, AUTHZ
-    };
+    }
 
     protected String subjectName;
     protected String subjectQualifier;

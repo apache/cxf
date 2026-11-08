@@ -174,6 +174,6 @@ public class SourceProviderTest {
 
         protected MessageContext getContext() {
             return new MessageContextImpl(m);
-        };
+        }
     }
 }

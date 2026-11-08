@@ -513,5 +513,5 @@ public class RetransmissionQueueImplTest {
             includeAckRequested = false;
             resent.clear();
         }
-    };
+    }
 }

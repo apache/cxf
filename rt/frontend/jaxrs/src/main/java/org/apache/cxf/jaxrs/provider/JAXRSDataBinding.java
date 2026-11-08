@@ -191,5 +191,5 @@ public class JAXRSDataBinding extends AbstractDataBinding {
             // complete
         }
 
-    };
+    }
 }

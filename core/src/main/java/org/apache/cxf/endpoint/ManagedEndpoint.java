@@ -42,7 +42,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     protected final Endpoint endpoint;
     protected final Server server;
 
-    private enum State { CREATED, STARTED, STOPPED };
+    private enum State { CREATED, STARTED, STOPPED }
     private State state = State.CREATED;
 
     public ManagedEndpoint(Bus b, Endpoint ep, Server s) {

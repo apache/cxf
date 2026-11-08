@@ -160,5 +160,5 @@ public class EntityPartBuilderImpl implements EntityPart.Builder {
             }
             return message;
         }
-    };
+    }
 }
