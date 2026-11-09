@@ -550,6 +550,11 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     // switches back to its settings or its HTTPS address changes. Keep a single reference
                     if (deferredClientRefs.remove(cl)) {
                         cl.release();
+                        // the conduit held the deferred reference and has just acquired another one,
+                        // so the release should never close the client
+                        if (cl.isClosed()) {
+                            throw new IllegalStateException("The client has been closed already");
+                        }
                     }
 
                     if (!"https".equals(uri.getScheme())
