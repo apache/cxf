@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,8 +33,10 @@ import java.util.logging.Logger;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
+import javax.cache.configuration.CompleteConfiguration;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.CreatedExpiryPolicy;
+import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.spi.CachingProvider;
 
 import org.apache.cxf.Bus;
@@ -110,12 +113,54 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
             cacheManager.getCache(cacheKey, String.class, EHCacheValue.class);
         cache = configuredCache != null ? configuredCache : createCache(cacheManager, cacheKey);
 
-        // With the default configuration, the cache uses EHCacheExpiry, which holds an entry for at most
-        // its max TTL. Without a configuration that defines the cache, it gets the same max TTL from
-        // createCache. How long a cache defined by some other configuration holds an entry for is not
-        // known.
-        boolean defaultConfig = configFileURL == null || defaultConfigFile.equals(configFile);
-        maxTTL = defaultConfig ? Duration.ofSeconds(EHCacheExpiry.MAX_TTL) : null;
+        // The max TTL is read from the JCache expiry policy of the cache, if the provider can return it.
+        // Ehcache cannot for a cache whose expiry comes from its own configuration, but the default
+        // configuration is known to use EHCacheExpiry, which holds an entry for at most its max TTL. How
+        // long a cache defined by some other configuration holds an entry for is not known.
+        ExpiryPolicy expiryPolicy = getExpiryPolicy(cache);
+        if (expiryPolicy != null) {
+            maxTTL = getMaxTTL(expiryPolicy);
+        } else {
+            boolean defaultConfig = configFileURL == null || defaultConfigFile.equals(configFile);
+            maxTTL = defaultConfig ? Duration.ofSeconds(EHCacheExpiry.MAX_TTL) : null;
+        }
+    }
+
+    /**
+     * Return the JCache expiry policy of the cache, or null if the JCache provider cannot return it
+     * (Ehcache cannot, for a cache whose expiry comes from its own configuration)
+     */
+    private static ExpiryPolicy getExpiryPolicy(Cache<String, EHCacheValue> cache) {
+        try {
+            @SuppressWarnings("unchecked")
+            CompleteConfiguration<String, EHCacheValue> configuration =
+                cache.getConfiguration(CompleteConfiguration.class);
+            return configuration.getExpiryPolicyFactory().create();
+        } catch (RuntimeException ex) {
+            LOG.log(Level.FINE, "The expiry policy of the replay cache is not available", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Return the maximum time for which a cache with the given expiry policy holds an entry: the shortest
+     * of the durations the policy sets when an entry is created, accessed or updated (as an access or an
+     * update can shorten how long an entry is held), or null if the policy does not expire entries.
+     */
+    static Duration getMaxTTL(ExpiryPolicy expiryPolicy) {
+        Duration maxTTL = null;
+        for (javax.cache.expiry.Duration duration : Arrays.asList(expiryPolicy.getExpiryForCreation(),
+            expiryPolicy.getExpiryForAccess(), expiryPolicy.getExpiryForUpdate())) {
+            // A null duration (on access or update) leaves the expiry of the entry unchanged
+            if (duration != null && !duration.isEternal()) {
+                Duration ttl =
+                    Duration.ofMillis(duration.getTimeUnit().toMillis(duration.getDurationAmount()));
+                if (maxTTL == null || ttl.compareTo(maxTTL) < 0) {
+                    maxTTL = ttl;
+                }
+            }
+        }
+        return maxTTL;
     }
 
     /**
@@ -201,8 +246,10 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
     }
 
     /**
-     * Return the maximum time for which this cache holds an identifier: the max TTL of 12 hours with the
-     * default configuration, or null (not known) with some other configuration
+     * Return the maximum time for which this cache holds an identifier, as read from its JCache expiry
+     * policy, or the max TTL of 12 hours with the default configuration (whose expiry Ehcache cannot
+     * return as a JCache expiry policy). It is null if this is not known, or if the cache does not expire
+     * identifiers.
      */
     @Override
     public Duration getMaxTTL() {

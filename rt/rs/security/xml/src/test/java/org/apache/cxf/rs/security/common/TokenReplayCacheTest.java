@@ -195,8 +195,22 @@ public class TokenReplayCacheTest {
         }
     }
 
+    // The max TTL of a cache that a configuration does not define is read from the expiry policy it is
+    // created with, whatever the configuration
+    @Test
+    public void testMaxTTLReadFromExpiryPolicy() throws Exception {
+        TokenReplayCache<String> replayCache = new JCacheTokenReplayCache(
+            "cxf.rs.security.replay.cache.test-" + UUID.randomUUID(),
+            "/custom-replay-jcache.xml", "/cxf-rs-security-replay-jcache.xml", null) { };
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
+        }
+    }
+
     // How long a cache defined by a configuration other than the default one holds an entry for is not
-    // known
+    // known (Ehcache cannot return its expiry as a JCache expiry policy)
     @Test
     public void testMaxTTLOfCustomConfiguration() throws Exception {
         TokenReplayCache<String> replayCache = new JCacheTokenReplayCache("/custom-replay-jcache.xml");

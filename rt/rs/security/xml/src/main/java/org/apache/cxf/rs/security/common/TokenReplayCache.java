@@ -63,8 +63,9 @@ public interface TokenReplayCache<T> extends Closeable {
     /**
      * Return the maximum time for which this cache holds an identifier. An identifier whose token is
      * valid for longer than this can be replayed once it has expired from the cache, so a replay check
-     * should reject such a token.
-     * @return the maximum time for which this cache holds an identifier, or null if this is not known
+     * should reject such a token. An identifier may still be evicted sooner if the cache is full.
+     * @return the maximum time for which this cache holds an identifier, or null if this is not known, or
+     *         if the cache does not expire identifiers
      */
     default Duration getMaxTTL() {
         return null;
