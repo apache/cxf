@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.saml;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class SamlOAuthValidator {
     private String clientAddress;
     private boolean subjectConfirmationDataRequired;
     private TokenReplayCache<String> replayCache;
+    private boolean allowAssertionsBeyondReplayCacheTTL;
     public SamlOAuthValidator() {
     }
 
@@ -76,6 +78,15 @@ public class SamlOAuthValidator {
         return replayCache;
     }
 
+    /**
+     * Whether to accept an assertion that is valid for longer than the replay cache can hold its ID (see
+     * TokenReplayCache#getMaxTTL()). Such an assertion can be replayed once its ID has expired from the
+     * cache, so the default is false.
+     */
+    public void setAllowAssertionsBeyondReplayCacheTTL(boolean allowAssertionsBeyondReplayCacheTTL) {
+        this.allowAssertionsBeyondReplayCacheTTL = allowAssertionsBeyondReplayCacheTTL;
+    }
+
     public void validate(Message message, SamlAssertionWrapper wrapper) {
         validateSAMLVersion(wrapper);
 
@@ -107,6 +118,13 @@ public class SamlOAuthValidator {
             return;
         }
         Instant expiry = getReplayCacheExpiry(cs, wrapper.getSaml2().getSubject());
+        // The cache only holds the ID for so long. An assertion that is valid for longer could be
+        // replayed once its ID has expired from the cache, so reject it
+        Duration maxTTL = replayCache.getMaxTTL();
+        if (!allowAssertionsBeyondReplayCacheTTL && maxTTL != null && expiry != null
+            && expiry.isAfter(Instant.now().plus(maxTTL))) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
         if (!replayCache.putIdIfAbsent(wrapper.getId(), expiry)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }

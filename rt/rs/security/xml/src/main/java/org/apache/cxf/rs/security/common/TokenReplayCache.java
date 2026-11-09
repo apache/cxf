@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.common;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -57,6 +58,16 @@ public interface TokenReplayCache<T> extends Closeable {
             putId(id, expiry);
             return true;
         }
+    }
+
+    /**
+     * Return the maximum time for which this cache holds an identifier. An identifier whose token is
+     * valid for longer than this can be replayed once it has expired from the cache, so a replay check
+     * should reject such a token.
+     * @return the maximum time for which this cache holds an identifier, or null if this is not known
+     */
+    default Duration getMaxTTL() {
+        return null;
     }
 
     void close() throws IOException;
