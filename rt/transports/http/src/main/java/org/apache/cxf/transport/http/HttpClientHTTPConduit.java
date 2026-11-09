@@ -113,8 +113,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     private final ReentrantLock initializationLock = new ReentrantLock();
     // clients this conduit has stopped using, released on close() as they could still be in use
     private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
-    // those of them the conduit may take back when it switches back to their settings
-    private final Queue<RefCount<HttpClient>> reusableClientRefs = new ConcurrentLinkedQueue<>();
 
     private static final class RefCount<T extends HttpClient> {
         private final AtomicLong count;
@@ -308,21 +306,13 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     /**
      * Stops using the client, without releasing it immediately since it could be in use,
      * by moving it off to the deferred release queue
-     * @param reusable whether the conduit may take the client back later. After an HTTPS address
-     *        change, neither this client nor the ones deferred before may be used again
      */
-    private void resetClient(RefCount<HttpClient> ref, boolean reusable) {
+    private void resetClient(RefCount<HttpClient> ref) {
         initializationLock.lock();
         try {
-            if (!reusable) {
-                RefCount<HttpClient> deferred;
-                while ((deferred = reusableClientRefs.poll()) != null) {
-                    deferredClientRefs.add(deferred);
-                }
-            }
             // only once, if several requests reset the same client at the same time
             if (ref != null && clientRef == ref) {
-                (reusable ? reusableClientRefs : deferredClientRefs).add(ref);
+                deferredClientRefs.add(ref);
                 clientRef = null;
             }
         } finally {
@@ -332,39 +322,22 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     /**
      * Stops using the client if the HTTPS address or the settings it was built from have changed
-     * @return whether the client was reset because the HTTPS address has changed
      */
-    private boolean resetClientIfChanged(Message message, URI uri, HTTPClientPolicy clientPolicy,
-                                         TLSClientParameters clientParameters) {
-        boolean httpsReset = false;
+    private void resetClientIfChanged(Message message, URI uri, HTTPClientPolicy clientPolicy,
+                                      TLSClientParameters clientParameters) {
         if (sslURL != null && isSslTargetDifferent(sslURL, uri)) {
             sslURL = null;
 
             // Reset the client in case of HTTPS URL change
-            httpsReset = MessageUtils.getContextualBoolean(message, HTTPS_RESET_HTTPCLIENT_CONDUIT, true);
-            if (httpsReset) {
-                resetClient(clientRef, false);
+            if (MessageUtils.getContextualBoolean(message, HTTPS_RESET_HTTPCLIENT_CONDUIT, true)) {
+                resetClient(clientRef);
             }
         }
         // Reset the client if the settings it was built from have changed since
         final RefCount<HttpClient> ref = clientRef;
         if (ref != null && !ref.matches(clientPolicy, clientParameters)) {
-            resetClient(ref, true);
+            resetClient(ref);
         }
-        return httpsReset;
-    }
-
-    /**
-     * Takes back a client this conduit has stopped using, if it was built from these settings.
-     * The conduit still holds its reference, so it has not been released
-     */
-    private RefCount<HttpClient> takeDeferredClient(HTTPClientPolicy policy, TLSClientParameters params) {
-        for (RefCount<HttpClient> ref : reusableClientRefs) {
-            if (ref.matches(policy, params) && reusableClientRefs.remove(ref)) {
-                return ref;
-            }
-        }
-        return null;
     }
 
     private static Set<String> getRestrictedHeaders() {
@@ -409,8 +382,6 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             clientRef = null;
             refs.addAll(deferredClientRefs);
             deferredClientRefs.clear();
-            refs.addAll(reusableClientRefs);
-            reusableClientRefs.clear();
         } finally {
             initializationLock.unlock();
         }
@@ -505,7 +476,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
         // a client for http is built without the TLS parameters, so it must not be used for https
         final TLSClientParameters clientParametersCopy =
             "https".equals(uri.getScheme()) ? copyOf(clientParameters) : null;
-        final boolean httpsReset = resetClientIfChanged(message, uri, clientPolicy, clientParametersCopy);
+        resetClientIfChanged(message, uri, clientPolicy, clientParametersCopy);
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -571,16 +542,16 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             initializationLock.lock();
             try {
                 cl = clientRef;
-                if (cl == null && !httpsReset) {
-                    // switching back to the settings of a client this conduit has used before
-                    cl = takeDeferredClient(clientPolicy, clientParametersCopy);
-                    clientRef = cl;
-                }
                 if (cl == null) {
                     final boolean shareHttpClient = MessageUtils.getContextualBoolean(message,
                         SHARE_HTTPCLIENT_CONDUIT, true);
                     cl = CLIENTS_CACHE.computeIfAbsent(shareHttpClient, clientPolicy, clientParametersCopy,
                         () -> cb.build());
+                    // the cache may hand back a shared client this conduit has stopped using, when it
+                    // switches back to its settings or its HTTPS address changes. Keep a single reference
+                    if (deferredClientRefs.remove(cl)) {
+                        cl.release();
+                    }
 
                     if (!"https".equals(uri.getScheme())
                         && !KNOWN_HTTP_VERBS_WITH_NO_CONTENT.contains(httpRequestMethod)

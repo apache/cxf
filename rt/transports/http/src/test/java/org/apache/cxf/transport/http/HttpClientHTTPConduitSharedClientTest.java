@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
@@ -26,6 +27,7 @@ import java.net.http.HttpClient;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -254,19 +256,21 @@ public class HttpClientHTTPConduitSharedClientTest {
     }
 
     @Test
-    public void testAlternatingSettingsReuseClients() throws Exception {
+    public void testAlternatingSettingsKeepOneReferencePerClient() throws Exception {
         HttpClientHTTPConduit conduit = newConduit("http");
-        HttpClient client1 = prepare(conduit, null, false);
+        HttpClient client1 = prepare(conduit);
         conduit.getClient().setConnectionTimeout(1000);
-        HttpClient client2 = prepare(conduit, null, false);
+        HttpClient client2 = prepare(conduit);
         assertNotSame(client1, client2);
 
-        // switching back and forth between the two settings does not build a client each time
+        // switching back and forth between the two settings gets the shared clients back, and the
+        // conduit does not keep a further reference to them each time
         for (int i = 0; i < 4; i++) {
             conduit.getClient().setConnectionTimeout(30000);
-            assertSame(client1, prepare(conduit, null, false));
+            assertSame(client1, prepare(conduit));
             conduit.getClient().setConnectionTimeout(1000);
-            assertSame(client2, prepare(conduit, null, false));
+            assertSame(client2, prepare(conduit));
+            assertEquals(1, deferredClientRefs(conduit).size());
         }
     }
 
@@ -316,10 +320,12 @@ public class HttpClientHTTPConduitSharedClientTest {
         HttpClient client4 = prepare(conduit, "https://backend2.example/test");
         assertNotSame(client1, client4);
         assertNotSame(client3, client4);
+    }
 
-        // but the clients built since can be
-        conduit.getClient().setConnectionTimeout(1000);
-        assertSame(client3, prepare(conduit, "https://backend2.example/test"));
+    private static Collection<?> deferredClientRefs(HttpClientHTTPConduit conduit) throws Exception {
+        Field field = HttpClientHTTPConduit.class.getDeclaredField("deferredClientRefs");
+        field.setAccessible(true);
+        return (Collection<?>)field.get(conduit);
     }
 
     private HttpClientHTTPConduit newConduit(String scheme) throws Exception {
