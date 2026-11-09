@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.common;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.apache.cxf.rs.security.common.jcache.JCacheTokenReplayCache;
+import org.apache.wss4j.common.cache.EHCacheExpiry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,7 @@ import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -160,6 +163,61 @@ public class TokenReplayCacheTest {
 
         for (int i = 0; i < identifiers; i++) {
             assertEquals("Identifier " + i + " was accepted more than once", 1, accepted.get(i));
+        }
+    }
+
+    // The default configuration holds an identifier for at most the max TTL of EHCacheExpiry
+    @Test
+    public void testMaxTTL() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    // A cache that the configuration does not define is created with a fixed TTL of the max TTL
+    @Test
+    public void testMaxTTLOfCreatedCache() throws Exception {
+        TokenReplayCache<String> replayCache = new JCacheTokenReplayCache(
+            "cxf.rs.security.replay.cache.test-" + UUID.randomUUID(),
+            "/cxf-rs-security-replay-jcache.xml", "/cxf-rs-security-replay-jcache.xml", null) { };
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+
+            String id = UUID.randomUUID().toString();
+            assertTrue(replayCache.putIdIfAbsent(id, null));
+            assertTrue(replayCache.contains(id));
+            assertFalse(replayCache.putIdIfAbsent(id, null));
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    // The max TTL of a cache that a configuration does not define is read from the expiry policy it is
+    // created with, whatever the configuration
+    @Test
+    public void testMaxTTLReadFromExpiryPolicy() throws Exception {
+        TokenReplayCache<String> replayCache = new JCacheTokenReplayCache(
+            "cxf.rs.security.replay.cache.test-" + UUID.randomUUID(),
+            "/custom-replay-jcache.xml", "/cxf-rs-security-replay-jcache.xml", null) { };
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    // How long a cache defined by a configuration other than the default one holds an entry for is not
+    // known (Ehcache cannot return its expiry as a JCache expiry policy)
+    @Test
+    public void testMaxTTLOfCustomConfiguration() throws Exception {
+        TokenReplayCache<String> replayCache = new JCacheTokenReplayCache("/custom-replay-jcache.xml");
+        try {
+            assertNull(replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
         }
     }
 

@@ -22,12 +22,14 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheReplayCache;
 import org.apache.wss4j.common.cache.EHCacheValue;
 import org.apache.wss4j.common.util.Loader;
@@ -160,6 +162,18 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         }
         EHCacheValue element = cache.get(identifier);
         return element != null;
+    }
+
+    /**
+     * Return the maximum time for which this cache holds an identifier: the max TTL of EHCacheExpiry if
+     * the cache uses it (as the default configuration does), or null (not known) otherwise
+     */
+    @Override
+    public Duration getMaxTTL() {
+        if (cache.getRuntimeConfiguration().getExpiryPolicy() instanceof EHCacheExpiry) {
+            return Duration.ofSeconds(EHCacheExpiry.MAX_TTL);
+        }
+        return null;
     }
 
     public synchronized void close() {

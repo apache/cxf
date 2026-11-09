@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.apache.cxf.rs.security.saml.sso.jcache.JCacheTokenReplayCache;
+import org.apache.wss4j.common.cache.EHCacheExpiry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -176,6 +178,17 @@ public class TokenReplayCacheTest {
 
         for (int i = 0; i < identifiers; i++) {
             assertEquals("Identifier " + i + " was accepted more than once", 1, accepted.get(i));
+        }
+    }
+
+    // The default configuration holds an identifier for at most the max TTL of EHCacheExpiry
+    @Test
+    public void testMaxTTL() throws Exception {
+        TokenReplayCache<String> replayCache = createCache();
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
         }
     }
 

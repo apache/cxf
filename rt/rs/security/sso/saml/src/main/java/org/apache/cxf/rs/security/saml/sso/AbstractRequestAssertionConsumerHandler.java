@@ -70,6 +70,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private boolean keyInfoMustBeAvailable = true;
     private boolean checkClientAddress = true;
     private boolean enforceResponseSigned;
+    private boolean allowAssertionsBeyondReplayCacheTTL;
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
@@ -114,6 +115,15 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
      */
     public void setEnforceKnownIssuer(boolean enforceKnownIssuer) {
         this.enforceKnownIssuer = enforceKnownIssuer;
+    }
+
+    /**
+     * Whether to accept an Assertion that is valid for longer than the replay cache can hold its
+     * identifier (see TokenReplayCache#getMaxTTL()). Such an Assertion can be replayed once its identifier
+     * has expired from the cache, so the default is false.
+     */
+    public void setAllowAssertionsBeyondReplayCacheTTL(boolean allowAssertionsBeyondReplayCacheTTL) {
+        this.allowAssertionsBeyondReplayCacheTTL = allowAssertionsBeyondReplayCacheTTL;
     }
 
     public void setSupportBase64Encoding(boolean supportBase64Encoding) {
@@ -357,6 +367,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             ssoResponseValidator.setEnforceResponseSigned(enforceResponseSigned);
             ssoResponseValidator.setEnforceKnownIssuer(enforceKnownIssuer);
             ssoResponseValidator.setReplayCache(getReplayCache());
+            ssoResponseValidator.setAllowAssertionsBeyondReplayCacheTTL(allowAssertionsBeyondReplayCacheTTL);
 
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
         } catch (Exception ex) {

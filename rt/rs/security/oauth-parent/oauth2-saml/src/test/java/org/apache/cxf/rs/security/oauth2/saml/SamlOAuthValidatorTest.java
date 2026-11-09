@@ -136,15 +136,78 @@ public class SamlOAuthValidatorTest {
         validator.validate(null, wrapper);
     }
 
+    // An assertion that is valid for longer than the replay cache can hold its ID could be replayed once
+    // the ID has expired from the cache, so it is rejected
+    @Test
+    public void testAssertionValidBeyondReplayCacheTTLIsRejected() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+        TestTokenReplayCache replayCache = new TestTokenReplayCache(Duration.ofHours(12));
+        validator.setReplayCache(replayCache);
+
+        SamlAssertionWrapper wrapper = createAssertion(tokenServiceAddress, null, Duration.ofHours(24));
+        try {
+            validator.validate(null, wrapper);
+            fail("Expected failure as the assertion is valid for longer than the replay cache holds it");
+        } catch (NotAuthorizedException ex) {
+            // expected
+        }
+        assertFalse(replayCache.contains(wrapper.getId()));
+
+        // An assertion that the cache can hold is accepted
+        validator.validate(null, createAssertion(tokenServiceAddress, null));
+    }
+
+    @Test
+    public void testAssertionValidBeyondReplayCacheTTLIsAllowed() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+        validator.setReplayCache(new TestTokenReplayCache(Duration.ofHours(12)));
+        validator.setAllowAssertionsBeyondReplayCacheTTL(true);
+
+        SamlAssertionWrapper wrapper = createAssertion(tokenServiceAddress, null, Duration.ofHours(24));
+        validator.validate(null, wrapper);
+
+        // A replay is still detected
+        try {
+            validator.validate(null, wrapper);
+            fail("Expected failure on replayed assertion");
+        } catch (NotAuthorizedException ex) {
+            // expected
+        }
+    }
+
+    // A replay cache that does not say how long it holds an ID for is not checked
+    @Test
+    public void testAssertionValidBeyondUnknownReplayCacheTTL() throws Exception {
+        String tokenServiceAddress = "https://service.example.org/token";
+
+        SamlOAuthValidator validator = new SamlOAuthValidator();
+        validator.setAccessTokenServiceAddress(tokenServiceAddress);
+        validator.setReplayCache(new TestTokenReplayCache());
+
+        validator.validate(null, createAssertion(tokenServiceAddress, null, Duration.ofHours(24)));
+    }
+
     private SamlAssertionWrapper createAssertion(String recipient, String clientAddress) throws Exception {
+        return createAssertion(recipient, clientAddress, Duration.ofMinutes(5));
+    }
+
+    private SamlAssertionWrapper createAssertion(
+        String recipient, String clientAddress, Duration validity
+    ) throws Exception {
         SubjectConfirmationDataBean confirmationData = new SubjectConfirmationDataBean();
         confirmationData.setRecipient(recipient);
         confirmationData.setAddress(clientAddress);
-        confirmationData.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        confirmationData.setNotAfter(Instant.now().plus(validity));
 
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(Instant.now().minusSeconds(30));
-        conditions.setNotAfter(Instant.now().plus(Duration.ofMinutes(5)));
+        conditions.setNotAfter(Instant.now().plus(validity));
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList(recipient));
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
@@ -156,6 +219,20 @@ public class SamlOAuthValidatorTest {
 
     private static final class TestTokenReplayCache implements TokenReplayCache<String> {
         private final Set<String> ids = ConcurrentHashMap.newKeySet();
+        private final Duration maxTTL;
+
+        TestTokenReplayCache() {
+            this(null);
+        }
+
+        TestTokenReplayCache(Duration maxTTL) {
+            this.maxTTL = maxTTL;
+        }
+
+        @Override
+        public Duration getMaxTTL() {
+            return maxTTL;
+        }
 
         @Override
         public boolean contains(String id) {
