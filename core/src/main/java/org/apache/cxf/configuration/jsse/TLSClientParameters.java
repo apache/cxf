@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.configuration.jsse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.configuration.security.FiltersType;
 
 /**
  * This class extends {@link TLSParameterBase} with client-specific
@@ -191,6 +193,9 @@ public class TLSClientParameters extends TLSParameterBase {
         if (sslContext != null) {
             hash = hash * 41 + System.identityHashCode(sslContext);
         }
+        if (hostnameVerifier != null) {
+            hash = hash * 41 + System.identityHashCode(hostnameVerifier);
+        }
         hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
         hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
         hash = hash(hash, sslCacheTimeout);
@@ -214,6 +219,7 @@ public class TLSClientParameters extends TLSParameterBase {
         if (serverNames != null) {
             hash = hash(hash, serverNames);
         }
+        hash = hash(hash, getNamedGroups());
         return hash;
     }
     private int hash(int i, Object o) {
@@ -242,6 +248,7 @@ public class TLSClientParameters extends TLSParameterBase {
             boolean eq = disableCNCheck == that.disableCNCheck;
             eq &= sslSocketFactory == that.sslSocketFactory;
             eq &= sslContext == that.sslContext;
+            eq &= hostnameVerifier == that.hostnameVerifier;
             eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
             eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
             eq &= sslCacheTimeout == that.sslCacheTimeout;
@@ -250,6 +257,7 @@ public class TLSClientParameters extends TLSParameterBase {
             eq &= Objects.equals(protocol, that.protocol);
             eq &= Objects.equals(provider, that.provider);
             eq &= equals(ciphersuites, that.ciphersuites);
+            eq &= Objects.equals(getNamedGroups(), that.getNamedGroups());
             eq &= Objects.deepEquals(keyManagers, that.keyManagers);
             eq &= Objects.deepEquals(trustManagers, that.trustManagers);
             if (cipherSuiteFilters != null) {
@@ -300,6 +308,40 @@ public class TLSClientParameters extends TLSParameterBase {
      */
     public void setSslContext(SSLContext sslContext) {
         this.sslContext = sslContext;
+    }
+
+    /**
+     * Returns a copy of these parameters, which later changes to them do not affect. The arrays, the
+     * lists and the cipher suites filter are copied, while the objects they hold, such as the key and
+     * trust managers, are shared, as are the certificate constraints.
+     */
+    public TLSClientParameters copy() {
+        final TLSClientParameters copy = new TLSClientParameters();
+        copy.disableCNCheck = disableCNCheck;
+        copy.sslSocketFactory = sslSocketFactory;
+        copy.sslCacheTimeout = sslCacheTimeout;
+        copy.useHttpsURLConnectionDefaultSslSocketFactory = useHttpsURLConnectionDefaultSslSocketFactory;
+        copy.useHttpsURLConnectionDefaultHostnameVerifier = useHttpsURLConnectionDefaultHostnameVerifier;
+        copy.hostnameVerifier = hostnameVerifier;
+        copy.sslContext = sslContext;
+        if (serverNames != null) {
+            copy.serverNames = new ArrayList<>(serverNames);
+        }
+        copy.keyManagers = keyManagers == null ? null : keyManagers.clone();
+        copy.trustManagers = trustManagers == null ? null : trustManagers.clone();
+        copy.provider = provider;
+        copy.ciphersuites = ciphersuites == null ? null : new ArrayList<>(ciphersuites);
+        if (cipherSuiteFilters != null) {
+            copy.cipherSuiteFilters = new FiltersType();
+            copy.cipherSuiteFilters.getInclude().addAll(cipherSuiteFilters.getInclude());
+            copy.cipherSuiteFilters.getExclude().addAll(cipherSuiteFilters.getExclude());
+        }
+        copy.certConstraints = certConstraints;
+        copy.secureRandom = secureRandom;
+        copy.protocol = protocol;
+        copy.certAlias = certAlias;
+        copy.namedGroups = namedGroups == null ? null : new ArrayList<>(namedGroups);
+        return copy;
     }
 
     public static String[] getPreferredClientProtocols() {
