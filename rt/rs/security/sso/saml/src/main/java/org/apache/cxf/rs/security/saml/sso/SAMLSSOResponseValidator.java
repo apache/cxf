@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,6 +51,7 @@ public class SAMLSSOResponseValidator {
     private boolean enforceKnownIssuer = true;
     private boolean enforceStrictIssuerMatch;
     private TokenReplayCache<String> replayCache;
+    private boolean allowAssertionsBeyondReplayCacheTTL;
 
     /**
      * Enforce that Assertions contained in the Response must be signed (if the Response itself is not
@@ -303,6 +305,14 @@ public class SAMLSSOResponseValidator {
         // applies to every binding, not just POST, as a Response received via GET can be replayed too
         if (replayCache != null) {
             Instant expires = subjectConfData.getNotOnOrAfter();
+            // The cache only holds the identifier for so long. An Assertion that is valid for longer
+            // could be replayed once its identifier has expired from the cache, so reject it
+            Duration maxTTL = replayCache.getMaxTTL();
+            if (!allowAssertionsBeyondReplayCacheTTL && maxTTL != null
+                && expires.isAfter(Instant.now().plus(maxTTL))) {
+                LOG.warning("The Assertion " + id + " is valid for longer than the replay cache can hold it");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
             if (!replayCache.putIdIfAbsent(id, expires)) {
                 LOG.warning("Replay attack with token id: " + id);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -417,6 +427,15 @@ public class SAMLSSOResponseValidator {
 
     public void setReplayCache(TokenReplayCache<String> replayCache) {
         this.replayCache = replayCache;
+    }
+
+    /**
+     * Whether to accept an Assertion that is valid for longer than the replay cache can hold its
+     * identifier (see TokenReplayCache#getMaxTTL()). Such an Assertion can be replayed once its identifier
+     * has expired from the cache, so the default is false.
+     */
+    public void setAllowAssertionsBeyondReplayCacheTTL(boolean allowAssertionsBeyondReplayCacheTTL) {
+        this.allowAssertionsBeyondReplayCacheTTL = allowAssertionsBeyondReplayCacheTTL;
     }
 
     public boolean isEnforceResponseSigned() {

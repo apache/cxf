@@ -781,6 +781,60 @@ public class SAMLSSOResponseValidatorTest {
         }
     }
 
+    // An assertion that is valid for longer than the replay cache can hold its id could be replayed once
+    // the id has expired from the cache, so it is rejected
+    @org.junit.Test
+    public void testAssertionValidBeyondReplayCacheTTLIsRejected() throws Exception {
+        Response response = createResponse(createLongLivedSubjectConfirmationData());
+
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+            try {
+                validator.validateSamlResponse(response, true);
+                fail("Expected failure as the assertion is valid for longer than the replay cache holds it");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    @org.junit.Test
+    public void testAssertionValidBeyondReplayCacheTTLIsAllowed() throws Exception {
+        Response response = createResponse(createLongLivedSubjectConfirmationData());
+
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+            validator.setAllowAssertionsBeyondReplayCacheTTL(true);
+
+            SSOValidatorResponse validateSamlResponse = validator.validateSamlResponse(response, true);
+            assertEquals(response.getID(), validateSamlResponse.getResponseId());
+
+            // A replay is still detected
+            try {
+                validator.validateSamlResponse(copyResponse(response), true);
+                fail("Expected failure on replayed response");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    // Valid for 24 hours, longer than the max TTL of 12 hours of the default replay cache
+    private static SubjectConfirmationDataBean createLongLivedSubjectConfirmationData() {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(Instant.now().plus(Duration.ofHours(24)));
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+        return subjectConfirmationData;
+    }
+
     private SAMLSSOResponseValidator createReplayValidator(TokenReplayCache<String> replayCache) {
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
