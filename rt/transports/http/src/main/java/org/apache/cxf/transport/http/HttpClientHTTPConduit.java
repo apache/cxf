@@ -66,11 +66,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
@@ -111,8 +109,9 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
     volatile RefCount<HttpClient> clientRef;
     volatile URI sslURL;
     private final ReentrantLock initializationLock = new ReentrantLock();
-    // clients this conduit has stopped using, released on close() as they could still be in use
-    private final Queue<RefCount<HttpClient>> deferredClientRefs = new ConcurrentLinkedQueue<>();
+    // clients this conduit has stopped using, released on close() as they could still be in use,
+    // only accessed under initializationLock
+    private final List<RefCount<HttpClient>> deferredClientRefs = new ArrayList<>();
 
     private static final class RefCount<T extends HttpClient> {
         private final AtomicLong count;
@@ -305,7 +304,7 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     /**
      * Stops using the client, without releasing it immediately since it could be in use,
-     * by moving it off to the deferred release queue
+     * by moving it off to the deferred release list
      */
     private void resetClient(RefCount<HttpClient> ref) {
         initializationLock.lock();
