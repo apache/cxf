@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
@@ -115,13 +117,15 @@ public class HttpClientHTTPConduitAsyncFailureTest {
     }
 
     /**
-     * The failure must be reported once: either to the caller, by an exception from the stream, as
-     * the out chain then reports it, or else to the fault observer
+     * The refused connection must be reported once: either to the caller, by an exception from the
+     * stream, as the out chain then reports it, or else to the fault observer
      */
     private static void assertReportedOnce(Message message, IORunnable send) throws Exception {
         AtomicInteger faults = new AtomicInteger();
+        AtomicReference<Throwable> reported = new AtomicReference<>();
         CountDownLatch faultReported = new CountDownLatch(1);
         ((PhaseInterceptorChain)message.getInterceptorChain()).setFaultObserver(m -> {
+            reported.compareAndSet(null, m.getContent(Exception.class));
             faults.incrementAndGet();
             faultReported.countDown();
         });
@@ -129,6 +133,7 @@ public class HttpClientHTTPConduitAsyncFailureTest {
         try {
             send.run();
         } catch (IOException | RuntimeException ex) {
+            reported.compareAndSet(null, ex);
             failures++;
         }
         if (failures == 0) {
@@ -136,6 +141,17 @@ public class HttpClientHTTPConduitAsyncFailureTest {
         }
         Thread.sleep(500);
         assertEquals("the failure was reported more than once", 1, failures + faults.get());
+        assertTrue("the failure reported is not the refused connection: " + reported.get(),
+            hasCause(reported.get(), ConnectException.class));
+    }
+
+    private static boolean hasCause(Throwable t, Class<? extends Throwable> cls) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (cls.isInstance(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Waits until the connection of the request has been refused, and its callbacks have run */
