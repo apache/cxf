@@ -25,9 +25,12 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +53,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
+import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.opensaml.saml.common.SignableSAMLObject;
@@ -835,6 +839,93 @@ public class SAMLSSOResponseValidatorTest {
         return subjectConfirmationData;
     }
 
+    // An Assertion may contain more than one Bearer Subject Confirmation. It is checked for a replay once,
+    // rather than once per Subject Confirmation (which would reject it as a replay of itself), and its
+    // ID is cached until the latest NotOnOrAfter of them
+    @org.junit.Test
+    public void testAssertionWithTwoBearerSubjectConfirmations() throws Exception {
+        Instant notOnOrAfter = Instant.now().plus(Duration.ofMinutes(5));
+        Instant laterNotOnOrAfter = notOnOrAfter.plus(Duration.ofMinutes(5));
+        Response response = createResponse(createSubjectConfirmationData(notOnOrAfter), null, null,
+            createSubjectConfirmationData(laterNotOnOrAfter));
+
+        RecordingTokenReplayCache replayCache = new RecordingTokenReplayCache();
+        SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+
+        SSOValidatorResponse validateSamlResponse = validator.validateSamlResponse(response, true);
+        assertEquals(response.getID(), validateSamlResponse.getResponseId());
+        // NotOnOrAfter is serialized with millisecond precision
+        assertEquals(laterNotOnOrAfter.truncatedTo(ChronoUnit.MILLIS), replayCache.lastExpiry);
+
+        // The same response is replayed
+        try {
+            validator.validateSamlResponse(copyResponse(response), true);
+            fail("Expected failure on replayed response");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+
+    // The ID of an Assertion is cached until the latest NotOnOrAfter of its Bearer Subject Confirmations,
+    // so the Assertion is rejected if any of them is valid for longer than the replay cache can hold it
+    @org.junit.Test
+    public void testSecondBearerSubjectConfirmationBeyondReplayCacheTTL() throws Exception {
+        Response response = createResponse(
+            createSubjectConfirmationData(Instant.now().plus(Duration.ofMinutes(5))), null, null,
+            createSubjectConfirmationData(Instant.now().plus(Duration.ofHours(24))));
+
+        TokenReplayCache<String> replayCache = new EHCacheTokenReplayCache();
+        try {
+            SAMLSSOResponseValidator validator = createReplayValidator(replayCache);
+            try {
+                validator.validateSamlResponse(response, true);
+                fail("Expected failure as the assertion is valid for longer than the replay cache holds it");
+            } catch (WSSecurityException ex) {
+                // expected
+            }
+        } finally {
+            replayCache.close();
+        }
+    }
+
+    private static SubjectConfirmationDataBean createSubjectConfirmationData(Instant notOnOrAfter) {
+        SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
+        subjectConfirmationData.setAddress("http://apache.org");
+        subjectConfirmationData.setInResponseTo("12345");
+        subjectConfirmationData.setNotAfter(notOnOrAfter);
+        subjectConfirmationData.setRecipient("http://recipient.apache.org");
+        return subjectConfirmationData;
+    }
+
+    /**
+     * A TokenReplayCache that records the expiry it was last asked to cache an ID for
+     */
+    private static final class RecordingTokenReplayCache implements TokenReplayCache<String> {
+        private final Set<String> ids = ConcurrentHashMap.newKeySet();
+        private Instant lastExpiry;
+
+        @Override
+        public boolean contains(String id) {
+            return ids.contains(id);
+        }
+
+        @Override
+        public void putId(String id) {
+            putId(id, null);
+        }
+
+        @Override
+        public void putId(String id, Instant expiry) {
+            lastExpiry = expiry;
+            ids.add(id);
+        }
+
+        @Override
+        public void close() {
+            ids.clear();
+        }
+    }
+
     private SAMLSSOResponseValidator createReplayValidator(TokenReplayCache<String> replayCache) {
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -912,6 +1003,19 @@ public class SAMLSSOResponseValidatorTest {
         List<AudienceRestrictionBean> audienceRestrictions,
         String authnClassRef
     ) throws Exception {
+        return createResponse(subjectConfirmationData, audienceRestrictions, authnClassRef, null);
+    }
+
+    /**
+     * Create a Response, with an Assertion with a second Bearer Subject Confirmation if
+     * secondSubjectConfirmationData is not null
+     */
+    private Response createResponse(
+        SubjectConfirmationDataBean subjectConfirmationData,
+        List<AudienceRestrictionBean> audienceRestrictions,
+        String authnClassRef,
+        SubjectConfirmationDataBean secondSubjectConfirmationData
+    ) throws Exception {
         Document doc = DOMUtils.createDocument();
 
         Status status =
@@ -947,6 +1051,13 @@ public class SAMLSSOResponseValidatorTest {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+
+        if (secondSubjectConfirmationData != null) {
+            assertion.getSaml2().getSubject().getSubjectConfirmations().add(
+                SAML2ComponentBuilder.createSubjectConfirmation(SAML2Constants.CONF_BEARER,
+                    SAML2ComponentBuilder.createSubjectConfirmationData(secondSubjectConfirmationData, null),
+                    null));
+        }
 
         response.getAssertions().add(assertion.getSaml2());
 

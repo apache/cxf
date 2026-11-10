@@ -133,9 +133,11 @@ public class SAMLSSOResponseValidator {
                 && !assertion.getAuthnStatements().isEmpty()) {
                 org.opensaml.saml.saml2.core.Subject subject = assertion.getSubject();
                 org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf =
-                    validateAuthenticationSubject(subject, assertion.getID());
+                    validateAuthenticationSubject(subject);
                 if (subjectConf != null) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
+                    // This must come after the other checks, so that only a valid Assertion is cached
+                    checkReplay(subject, assertion.getID());
                     validAssertion = assertion;
                     sessionNotOnOrAfter = null;
 
@@ -256,7 +258,7 @@ public class SAMLSSOResponseValidator {
      * Validate the Subject (of an Authentication Statement).
      */
     private org.opensaml.saml.saml2.core.SubjectConfirmation validateAuthenticationSubject(
-        org.opensaml.saml.saml2.core.Subject subject, String id
+        org.opensaml.saml.saml2.core.Subject subject
     ) throws WSSecurityException {
         if (subject.getSubjectConfirmations() == null) {
             return null;
@@ -267,7 +269,7 @@ public class SAMLSSOResponseValidator {
         for (org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf
             : subject.getSubjectConfirmations()) {
             if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod())) {
-                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData(), id);
+                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData());
                 validSubjectConf = subjectConf;
             }
         }
@@ -276,10 +278,47 @@ public class SAMLSSOResponseValidator {
     }
 
     /**
+     * Bearer Assertion IDs are cached until the Assertion expires, to detect replay attacks. This applies
+     * to every binding, not just POST, as a Response received via GET can be replayed too. An Assertion may
+     * contain more than one Bearer Subject Confirmation, so this is done once per Assertion, and the ID is
+     * cached until the latest NotOnOrAfter of its (already validated) Bearer Subject Confirmations.
+     */
+    private void checkReplay(org.opensaml.saml.saml2.core.Subject subject, String id)
+        throws WSSecurityException {
+        if (replayCache == null) {
+            return;
+        }
+
+        Instant expires = null;
+        for (org.opensaml.saml.saml2.core.SubjectConfirmation subjectConf
+            : subject.getSubjectConfirmations()) {
+            if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod())) {
+                Instant notOnOrAfter = subjectConf.getSubjectConfirmationData().getNotOnOrAfter();
+                if (expires == null || notOnOrAfter.isAfter(expires)) {
+                    expires = notOnOrAfter;
+                }
+            }
+        }
+
+        // The cache only holds the identifier for so long. An Assertion that is valid for longer
+        // could be replayed once its identifier has expired from the cache, so reject it
+        Duration maxTTL = replayCache.getMaxTTL();
+        if (!allowAssertionsBeyondReplayCacheTTL && maxTTL != null
+            && expires.isAfter(Instant.now().plus(maxTTL))) {
+            LOG.warning("The Assertion " + id + " is valid for longer than the replay cache can hold it");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        if (!replayCache.putIdIfAbsent(id, expires)) {
+            LOG.warning("Replay attack with token id: " + id);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+
+    /**
      * Validate a (Bearer) Subject Confirmation
      */
     private void validateSubjectConfirmation(
-        org.opensaml.saml.saml2.core.SubjectConfirmationData subjectConfData, String id
+        org.opensaml.saml.saml2.core.SubjectConfirmationData subjectConfData
     ) throws WSSecurityException {
         if (subjectConfData == null) {
             LOG.warning("Subject Confirmation Data of a Bearer Subject Confirmation is null");
@@ -299,24 +338,6 @@ public class SAMLSSOResponseValidator {
             || subjectConfData.getNotOnOrAfter().isBefore(Instant.now())) {
             LOG.warning("Subject Conf Data does not contain NotOnOrAfter or it has expired");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        }
-
-        // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks. This
-        // applies to every binding, not just POST, as a Response received via GET can be replayed too
-        if (replayCache != null) {
-            Instant expires = subjectConfData.getNotOnOrAfter();
-            // The cache only holds the identifier for so long. An Assertion that is valid for longer
-            // could be replayed once its identifier has expired from the cache, so reject it
-            Duration maxTTL = replayCache.getMaxTTL();
-            if (!allowAssertionsBeyondReplayCacheTTL && maxTTL != null
-                && expires.isAfter(Instant.now().plus(maxTTL))) {
-                LOG.warning("The Assertion " + id + " is valid for longer than the replay cache can hold it");
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-            }
-            if (!replayCache.putIdIfAbsent(id, expires)) {
-                LOG.warning("Replay attack with token id: " + id);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-            }
         }
 
         // Check address
