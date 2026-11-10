@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -28,8 +29,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.awaitility.Awaitility;
+
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 
 public class SharedInputBufferTest {
@@ -79,6 +84,37 @@ public class SharedInputBufferTest {
         } finally {
             inbuf.shutdown();
             executor.shutdownNow();
+        }
+    }
+    
+    @Test
+    public void testCloseWhenDataBlockFillsBuffer() throws Exception {
+        final CountDownLatch consumerWaiting = new CountDownLatch(1);
+        final SharedInputBuffer inbuf = new SharedInputBuffer(1024);
+        final byte[] data = new byte[4096];
+
+        final Thread t = new Thread(() -> {
+            try {
+                // No reader, the consumer should be blocked waiting for input
+                inbuf.consumeContent(ByteBuffer.wrap(data), false);
+                consumerWaiting.countDown();
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
+
+        try {
+            t.start();
+
+            // Await until the consumer thread enters the WAITING state (waiting for condition) 
+            Awaitility.await().atMost(10, TimeUnit.SECONDS).untilAsserted(() ->
+                assertThat(t.getState(), equalTo(Thread.State.WAITING))
+            );
+
+            inbuf.close();
+            assertThat(consumerWaiting.await(10, TimeUnit.SECONDS), equalTo(true));
+        } finally {
+            inbuf.shutdown();
         }
     }
 }
