@@ -72,7 +72,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
     }
 
     public int consumeContent(final ByteBuffer buffer, boolean last) throws IOException {
-        if (this.shutdown) {
+        if (this.shutdown || this.endOfStream) {
             return -1;
         }
 
@@ -100,7 +100,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
             // the reader signals suspendInput, once it has drained the buffer
             this.condition.signalAll();
 
-            if (!buffer().hasRemaining() && !this.endOfStream) {
+            if (!buffer().hasRemaining() && !this.endOfStream && !this.shutdown) {
                 try {
                     suspendInput.await();
                 } catch (InterruptedException ex) {
@@ -186,6 +186,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         this.endOfStream = true;
         this.lock.lock();
         try {
+            this.suspendInput.signalAll();
             this.condition.signalAll();
         } finally {
             this.lock.unlock();
@@ -199,6 +200,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         this.shutdown = true;
         this.lock.lock();
         try {
+            this.suspendInput.signalAll();
             this.condition.signalAll();
         } finally {
             this.lock.unlock();
