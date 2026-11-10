@@ -84,6 +84,13 @@ public class AttachmentDeserializer {
     public static final int DEFAULT_MAX_HEADER_SIZE =
         SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-header-size", 300);
 
+    /**
+     * The maximum length of a MIME boundary (excluding the leading "--"). RFC 2046 limits
+     * boundaries to 70 characters. The default is 70.
+     */
+    public static final int DEFAULT_MAX_BOUNDARY_LENGTH =
+        SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-boundary-length", 70);
+
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
     private static final Pattern CONTENT_TYPE_BOUNDARY_PATTERN = Pattern.compile("boundary=\"?([^\";]*)");
@@ -168,6 +175,7 @@ public class AttachmentDeserializer {
                 throw new IOException("Couldn't determine the boundary from the message!");
             }
             boundary = boundaryString.getBytes(StandardCharsets.UTF_8);
+            AttachmentDeserializerUtil.checkBoundaryLength(boundary);
 
             stream = new PushbackInputStream(message.getContent(InputStream.class), PUSHBACK_AMOUNT);
             if (!AttachmentDeserializerUtil.readTillFirstBoundary(stream, boundary)) {

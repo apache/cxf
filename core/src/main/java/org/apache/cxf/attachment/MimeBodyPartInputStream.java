@@ -38,6 +38,11 @@ public class MimeBodyPartInputStream extends InputStream {
                                    byte[] boundaryParam,
                                    int pbsize) {
         super();
+        if (boundaryParam == null || boundaryParam.length == 0
+            || boundaryParam.length > AttachmentDeserializer.DEFAULT_MAX_BOUNDARY_LENGTH + 2) {
+            // +2 for the leading "--"
+            throw new IllegalArgumentException("Invalid MIME boundary length");
+        }
         this.inStream = inStreamParam;
         this.boundary = boundaryParam;
         this.pbAmount = pbsize;

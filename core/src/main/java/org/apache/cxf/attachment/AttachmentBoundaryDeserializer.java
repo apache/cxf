@@ -61,6 +61,7 @@ public class AttachmentBoundaryDeserializer {
         }
 
         final byte[] boundary = boundaryString.getBytes(StandardCharsets.UTF_8);
+        AttachmentDeserializerUtil.checkBoundaryLength(boundary);
         if (!AttachmentDeserializerUtil.readTillFirstBoundary(stream, boundary)) {
             throw new IOException("Couldn't find MIME boundary: " + boundaryString);
         }

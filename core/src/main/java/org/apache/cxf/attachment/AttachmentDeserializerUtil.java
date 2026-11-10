@@ -36,6 +36,22 @@ final class AttachmentDeserializerUtil {
 
     private AttachmentDeserializerUtil() {
     }
+
+    /**
+     * Reject boundaries that are longer than permitted (RFC 2046 limits a boundary to 70
+     * characters). The boundary scan cost is proportional to the boundary length, so an
+     * overly long attacker-supplied boundary can be used to burn CPU.
+     *
+     * @param boundary the boundary, including the leading "--"
+     * @throws IOException if the boundary is empty or too long
+     */
+    static void checkBoundaryLength(byte[] boundary) throws IOException {
+        // +2 for the leading "--"
+        if (boundary == null || boundary.length <= 2
+            || boundary.length > AttachmentDeserializer.DEFAULT_MAX_BOUNDARY_LENGTH + 2) {
+            throw new IOException("Invalid MIME boundary length");
+        }
+    }
     
     /**
      * Move the read pointer to the begining of the first part read till the end
