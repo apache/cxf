@@ -1161,22 +1161,21 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 future = cl.sendAsync(request, handler);
             }
             future.exceptionally(ex -> {
-                // Record the failure on the message so the close() invoked below
-                // does not treat this as an un-sent request and resend it: the
-                // shared WrappedOutputStream#close() already skips
-                // handleHeadersTrustCaching() once outMessage carries an Exception
-                // (CXF-9250).
-                outMessage.setContent(Exception.class,
-                        ex instanceof Exception ? (Exception) ex : new IOException(ex));
-                if (pout != null) {
-                    synchronized (pout) {
-                        pout.notifyAll();
+                // Only release a writer waiting for the connection or blocked on the body. The
+                // caller still closes the stream, and the failure is reported from there, by the
+                // response handling getting it from the future. Closing the whole stream here
+                // would send a request without a body again, and recording the failure on the
+                // message would keep the caller's close() from reporting it.
+                final OutputStream out = pout;
+                if (out != null) {
+                    synchronized (out) {
+                        out.notifyAll();
                     }
-                }
-                try {
-                    close();
-                } catch (IOException e) {
-                    ex.addSuppressed(e);
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        ex.addSuppressed(e);
+                    }
                 }
                 return null;
             });
