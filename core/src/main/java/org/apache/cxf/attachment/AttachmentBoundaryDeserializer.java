@@ -39,6 +39,7 @@ public class AttachmentBoundaryDeserializer {
     
     private final int maxHeaderLength;
     private final int maxHeadersCount;
+    private final int maxBoundaryLength;
     private final Message message;
 
     public AttachmentBoundaryDeserializer(Message message) {
@@ -49,6 +50,9 @@ public class AttachmentBoundaryDeserializer {
         this.maxHeadersCount = MessageUtils.getContextualInteger(message,
             AttachmentDeserializer.ATTACHMENT_HEADERS_MAX_COUNT, 
                 AttachmentDeserializer.DEFAULT_ATTACHMENT_HEADERS_MAX_COUNT);
+        this.maxBoundaryLength = MessageUtils.getContextualInteger(message,
+            AttachmentDeserializer.ATTACHMENT_MAX_BOUNDARY_LENGTH,
+                AttachmentDeserializer.DEFAULT_MAX_BOUNDARY_LENGTH);
     }
 
     public Attachment read(InputStream body) throws IOException {
@@ -61,6 +65,7 @@ public class AttachmentBoundaryDeserializer {
         }
 
         final byte[] boundary = boundaryString.getBytes(StandardCharsets.UTF_8);
+        AttachmentDeserializerUtil.checkBoundaryLength(boundary, maxBoundaryLength);
         if (!AttachmentDeserializerUtil.readTillFirstBoundary(stream, boundary)) {
             throw new IOException("Couldn't find MIME boundary: " + boundaryString);
         }
