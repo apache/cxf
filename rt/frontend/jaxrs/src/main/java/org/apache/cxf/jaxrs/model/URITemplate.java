@@ -44,6 +44,9 @@ public final class URITemplate {
     public static final String LIMITED_REGEX_SUFFIX = "(/.*)?";
     public static final String FINAL_MATCH_GROUP = "FINAL_MATCH_GROUP";
     private static final String DEFAULT_PATH_VARIABLE_REGEX = "([^/]+?)";
+    // For an unconstrained variable directly followed by another, e.g. {a} in {a}{b}: the lazy
+    // default only ever binds one character there, and matching exactly one avoids backtracking.
+    private static final String ADJACENT_PATH_VARIABLE_REGEX = "([^/])";
     private static final String CHARACTERS_TO_ESCAPE = ".*+$()";
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
@@ -65,9 +68,10 @@ public final class URITemplate {
         CurlyBraceTokenizer tok = new CurlyBraceTokenizer(template);
         uriChunks = new ArrayList<>();
         while (tok.hasNext()) {
-            String templatePart = tok.next();
-            UriChunk chunk = UriChunk.createUriChunk(templatePart);
-            uriChunks.add(chunk);
+            uriChunks.add(UriChunk.createUriChunk(tok.next()));
+        }
+        for (int c = 0; c < uriChunks.size(); c++) {
+            UriChunk chunk = uriChunks.get(c);
             if (chunk instanceof Literal) {
                 String encodedValue = HttpUtils.encodePartiallyEncoded(chunk.getValue(), false);
                 String substr = escapeCharacters(encodedValue);
@@ -90,6 +94,8 @@ public final class URITemplate {
                         patternBuilder.append(pattern);
                         patternBuilder.append(')');
                     }
+                } else if (isUnconstrainedVariable(c + 1)) {
+                    patternBuilder.append(ADJACENT_PATH_VARIABLE_REGEX);
                 } else {
                     patternBuilder.append(DEFAULT_PATH_VARIABLE_REGEX);
                 }
@@ -105,6 +111,14 @@ public final class URITemplate {
         patternBuilder.append(LIMITED_REGEX_SUFFIX);
 
         templateRegexPattern = Pattern.compile(patternBuilder.toString());
+    }
+
+    private boolean isUnconstrainedVariable(int index) {
+        if (index >= uriChunks.size()) {
+            return false;
+        }
+        UriChunk chunk = uriChunks.get(index);
+        return chunk instanceof Variable && ((Variable)chunk).getPattern() == null;
     }
 
     public String getLiteralChars() {
