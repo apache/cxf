@@ -799,4 +799,45 @@ public class URITemplateTest {
         assertTrue("should match '/cxf' url", t2.match("/cxf", values));
         Assert.assertEquals("cxf", values.get("project").get(0));
     }
+
+    @Test
+    public void testAdjacentVariables() {
+        URITemplate t = new URITemplate("/{a}{b}{c}.json");
+        MultivaluedMap<String, String> values = new MetadataMap<>();
+        assertTrue(t.match("/xyz123.json", values));
+        assertEquals("x", values.getFirst("a"));
+        assertEquals("y", values.getFirst("b"));
+        assertEquals("z123", values.getFirst("c"));
+        assertEquals("/", values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+
+        values.clear();
+        assertFalse(t.match("/xy.json", values));
+
+        values.clear();
+        t = new URITemplate("/{a}{b}/rest");
+        assertTrue(t.match("/abc/rest/more", values));
+        assertEquals("a", values.getFirst("a"));
+        assertEquals("bc", values.getFirst("b"));
+        assertEquals("/more", values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+    }
+
+    @Test
+    public void testAdjacentVariablesWithCustomRegex() {
+        // Only an unconstrained variable followed by an unconstrained variable is limited to one char
+        URITemplate t = new URITemplate("/{a}{b:\\d+}");
+        MultivaluedMap<String, String> values = new MetadataMap<>();
+        assertTrue(t.match("/abc123", values));
+        assertEquals("abc", values.getFirst("a"));
+        assertEquals("123", values.getFirst("b"));
+    }
+
+    @Test(timeout = 5000)
+    public void testAdjacentVariablesNoBacktracking() {
+        URITemplate t = new URITemplate("/{a}{b}{c}.json");
+        StringBuilder sb = new StringBuilder("/");
+        for (int i = 0; i < 4096; i++) {
+            sb.append('a');
+        }
+        assertFalse(t.match(sb.toString(), new MetadataMap<>()));
+    }
 }
