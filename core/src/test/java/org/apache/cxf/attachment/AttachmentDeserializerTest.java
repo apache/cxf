@@ -717,6 +717,69 @@ public class AttachmentDeserializerTest {
     }
 
     @Test
+    public void testBoundaryTooLong() throws Exception {
+        StringBuilder boundary = new StringBuilder();
+        IntStream.range(0, 2040).forEach(i -> boundary.append('A'));
+        boundary.append('B');
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("--").append(boundary).append("\r\n")
+            .append("Content-Type: text/xml; charset=UTF-8\r\n")
+            .append("\r\n")
+            .append("<envelope/>\r\n")
+            .append("--").append(boundary).append("--\r\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related; boundary=\"" + boundary + "\"");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+
+        assertThrows("Failure expected on too long boundary", IOException.class,
+            () -> ad.initializeAttachments());
+    }
+
+    @Test
+    public void testBoundaryMaxLengthContextualProperty() throws Exception {
+        StringBuilder boundary = new StringBuilder();
+        IntStream.range(0, 100).forEach(i -> boundary.append('A'));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("--").append(boundary).append("\r\n")
+            .append("Content-Type: text/xml; charset=UTF-8\r\n")
+            .append("\r\n")
+            .append("<envelope/>\r\n")
+            .append("--").append(boundary).append("--\r\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related; boundary=\"" + boundary + "\"");
+        msg.put(AttachmentDeserializer.ATTACHMENT_MAX_BOUNDARY_LENGTH, "100");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+        assertEquals("<envelope/>", IOUtils.toString(msg.getContent(InputStream.class)));
+    }
+
+    @Test
+    public void testBoundaryMaxLength() throws Exception {
+        StringBuilder boundary = new StringBuilder();
+        IntStream.range(0, 70).forEach(i -> boundary.append('A'));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("--").append(boundary).append("\r\n")
+            .append("Content-Type: text/xml; charset=UTF-8\r\n")
+            .append("\r\n")
+            .append("<envelope/>\r\n")
+            .append("--").append(boundary).append("--\r\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related; boundary=\"" + boundary + "\"");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+        assertEquals("<envelope/>", IOUtils.toString(msg.getContent(InputStream.class)));
+    }
+
+    @Test
     public void testAttachmentHeaderSize() throws Exception {
         final Random random = new Random();
 
