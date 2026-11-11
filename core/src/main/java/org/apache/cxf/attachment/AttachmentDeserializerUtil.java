@@ -43,12 +43,13 @@ final class AttachmentDeserializerUtil {
      * overly long attacker-supplied boundary can be used to burn CPU.
      *
      * @param boundary the boundary, including the leading "--"
+     * @param maxBoundaryLength the maximum boundary length, excluding the leading "--"
      * @throws IOException if the boundary is empty or too long
      */
-    static void checkBoundaryLength(byte[] boundary) throws IOException {
+    static void checkBoundaryLength(byte[] boundary, int maxBoundaryLength) throws IOException {
         // +2 for the leading "--"
         if (boundary == null || boundary.length <= 2
-            || boundary.length > AttachmentDeserializer.DEFAULT_MAX_BOUNDARY_LENGTH + 2) {
+            || boundary.length > maxBoundaryLength + 2) {
             throw new IOException("Invalid MIME boundary length");
         }
     }
