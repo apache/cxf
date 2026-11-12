@@ -31,6 +31,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -44,6 +46,8 @@ import org.junit.runners.Parameterized;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -130,9 +134,65 @@ public class ReadHeadersInterceptorTest {
         assertEquals(expectedTransferredAttributeCount, attributes.getLength());
     }
 
+    @Test
+    public void testWhitespaceAndCommentsBeforeHeader() throws Exception {
+        SoapMessage message = setUpMessage(("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"
+            + "\n  <!-- comment -->\n  "
+            + "<soap:Header><x:AuthToken xmlns:x='http://example.com/schema'>Token</x:AuthToken></soap:Header>"
+            + "<soap:Body><ns2:payload xmlns:ns2='urn:tmp:foo'/></soap:Body>"
+            + "</soap:Envelope>").getBytes());
+        interceptor.handleMessage(message);
+        assertEquals(1, message.getHeaders().size());
+    }
+
+    @Test
+    public void testNoHeader() throws Exception {
+        SoapMessage message = setUpMessage(("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"
+            + "<soap:Body><ns2:payload xmlns:ns2='urn:tmp:foo'/></soap:Body>"
+            + "</soap:Envelope>").getBytes());
+        interceptor.handleMessage(message);
+        assertTrue(message.getHeaders().isEmpty());
+    }
+
+    @Test
+    public void testUnexpectedElementBeforeBody() throws Exception {
+        SoapMessage message = setUpMessage(("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"
+            + "<foo><bar/></foo>"
+            + "<soap:Body><ns2:payload xmlns:ns2='urn:tmp:foo'/></soap:Body>"
+            + "</soap:Envelope>").getBytes());
+        SoapFault fault = assertThrows(SoapFault.class, () -> interceptor.handleMessage(message));
+        assertEquals(Soap11.getInstance().getSender(), fault.getFaultCode());
+    }
+
+    @Test
+    public void testUnexpectedElementBeforeHeader() throws Exception {
+        SoapMessage message = setUpMessage(("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"
+            + "<soap:Fault/>"
+            + "<soap:Header><x:AuthToken xmlns:x='http://example.com/schema'>Token</x:AuthToken></soap:Header>"
+            + "<soap:Body><ns2:payload xmlns:ns2='urn:tmp:foo'/></soap:Body>"
+            + "</soap:Envelope>").getBytes());
+        assertThrows(SoapFault.class, () -> interceptor.handleMessage(message));
+    }
+
+    @Test
+    public void testUnexpectedElementBeforeBodySoap12() throws Exception {
+        SoapMessage message = new SoapMessage(Soap12.getInstance());
+        message.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(new ByteArrayInputStream(
+            ("<soap:Envelope xmlns:soap='http://www.w3.org/2003/05/soap-envelope'>"
+            + "<foo/>"
+            + "<soap:Body><ns2:payload xmlns:ns2='urn:tmp:foo'/></soap:Body>"
+            + "</soap:Envelope>").getBytes())));
+        SoapFault fault = assertThrows(SoapFault.class, () -> interceptor.handleMessage(message));
+        assertEquals(Soap12.getInstance().getSender(), fault.getFaultCode());
+    }
+
     private SoapMessage setUpMessage() throws Exception {
+        return setUpMessage(TEST_SOAP);
+    }
+
+    private SoapMessage setUpMessage(byte[] soap) throws Exception {
         SoapMessage message = new SoapMessage(Soap11.getInstance());
-        message.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(new ByteArrayInputStream(TEST_SOAP)));
+        message.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(new ByteArrayInputStream(soap)));
         return message;
     }
 

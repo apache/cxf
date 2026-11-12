@@ -358,6 +358,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         private final String header;
         private final String body;
         private final String envelope;
+        private final SoapVersion version;
         private final List<XMLEvent> events = new ArrayList<>(8);
         private List<XMLEvent> envEvents;
         private List<XMLEvent> bodyEvents;
@@ -378,6 +379,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         }
 
         HeadersProcessor(SoapVersion version) {
+            this.version = version;
             this.header = version.getHeader().getLocalPart();
             this.ns = version.getEnvelope().getNamespaceURI();
             this.envelope = version.getEnvelope().getLocalPart();
@@ -392,6 +394,9 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 switch (event) {
                 case XMLStreamConstants.START_ELEMENT:
                     read++;
+                    if (doc == null && read == 2) {
+                        checkEnvelopeChild(reader);
+                    }
                     addEvent(eventFactory.createStartElement(new QName(reader.getNamespaceURI(), reader
                                                             .getLocalName(), reader.getPrefix()), null, null));
                     for (int i = 0; i < reader.getNamespaceCount(); i++) {
@@ -440,6 +445,18 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             }
 
             return doc;
+        }
+
+        /**
+         * Before the SOAP Body, the only child the Envelope may have is the SOAP Header. Reject anything
+         * else here, as the events read before the Header are buffered in memory.
+         */
+        private void checkEnvelopeChild(XMLStreamReader reader) {
+            if (!ns.equals(reader.getNamespaceURI())
+                || !header.equals(reader.getLocalName()) && !body.equals(reader.getLocalName())) {
+                throw new SoapFault(new Message("UNEXPECTED_ENVELOPE_CHILD", LOG, reader.getName()),
+                                    version.getSender());
+            }
         }
 
         private void addEvent(XMLEvent event) {
