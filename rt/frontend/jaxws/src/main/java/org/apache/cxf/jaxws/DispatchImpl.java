@@ -264,7 +264,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     }
     private RuntimeException mapException(Exception ex) {
         if (ex instanceof Fault && ex.getCause() instanceof IOException) {
-            throw new WebServiceException(ex.getMessage(), ex.getCause());
+            return new WebServiceException(ex.getMessage(), ex.getCause());
         }
 
         if (getBinding() instanceof HTTPBinding) {
