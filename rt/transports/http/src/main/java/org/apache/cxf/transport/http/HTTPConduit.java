@@ -1245,7 +1245,7 @@ public abstract class HTTPConduit
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
-                        handleRetransmitsAndResponseAsync();
+                        handleRetransmitsAndResponseOnWorkqueue();
                     } catch (Throwable e) {
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
                         outMessage.setContent(Exception.class, e);
@@ -1660,11 +1660,12 @@ public abstract class HTTPConduit
         }
 
         /**
-         * Processes the retransmits and the response on the thread that handles the response of an
-         * asynchronous exchange. A failure of the retransmits is reported as it was when they were
-         * processed by the caller: as close() maps it, and the out chain then reports it.
+         * Processes the retransmits and the response on the workqueue, see
+         * {@link #handleResponseOnWorkqueue(boolean, boolean)}. A failure of the retransmits is
+         * reported as it was when they were processed by the caller: as close() maps it, and the
+         * out chain then reports it.
          */
-        private void handleRetransmitsAndResponseAsync() throws IOException {
+        private void handleRetransmitsAndResponseOnWorkqueue() throws IOException {
             try {
                 handleRetransmits();
             } catch (HttpRetryException e) {
