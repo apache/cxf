@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,7 @@ import com.sun.net.httpserver.HttpServer;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.Service;
+import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -89,6 +91,8 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class AsyncRetransmitTest {
     public static final String PORT = TestUtil.getPortNumber(AsyncRetransmitTest.class);
+    // nothing listens on it
+    public static final String REFUSED_PORT = TestUtil.getPortNumber(AsyncRetransmitTest.class, 2);
     private static final QName SERVICE = new QName("urn:cxf7232", "EchoService");
     private static final QName PORT_NAME = new QName("urn:cxf7232", "EchoPort");
     private static final String REQUEST = "<echo xmlns=\"urn:cxf7232\">hello</echo>";
@@ -285,6 +289,38 @@ public class AsyncRetransmitTest {
         } finally {
             destroy(dispatch);
         }
+    }
+
+    @Test
+    public void testMaxRetransmitsConnectionRefused() throws Exception {
+        HTTPClientPolicy policy = new HTTPClientPolicy();
+        policy.setMaxRetransmits(1);
+        Dispatch<Source> dispatch = createDispatch("/echo", policy);
+        String address = "http://localhost:" + REFUSED_PORT + "/echo";
+        dispatch.getRequestContext().put(Message.ENDPOINT_ADDRESS, address);
+        Throwable failure;
+        try {
+            Response<Source> response = dispatch.invokeAsync(new StreamSource(new StringReader(REQUEST)));
+            try {
+                response.get(30, TimeUnit.SECONDS);
+                fail("A refused connection must fail the asynchronous response");
+                return;
+            } catch (ExecutionException ex) {
+                failure = ex.getCause();
+            }
+        } catch (WebServiceException ex) {
+            // the connection may already be refused while the caller thread sends the request
+            failure = ex;
+        } finally {
+            destroy(dispatch);
+        }
+        // reported as when the retransmits were processed by the caller thread
+        assertEquals("Could not send Message.", failure.getMessage());
+        Throwable cause = failure.getCause();
+        while (cause != null && !(cause instanceof ConnectException)) {
+            cause = cause.getCause();
+        }
+        assertNotNull("Expected the refused connection: " + failure, cause);
     }
 
     private void invokeAsync(String path, HTTPClientPolicy policy) throws Exception {
