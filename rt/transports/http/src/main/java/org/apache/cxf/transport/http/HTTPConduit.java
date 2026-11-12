@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -47,6 +49,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
@@ -62,6 +65,8 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
@@ -222,6 +227,11 @@ public abstract class HTTPConduit
      * is used in authorization loop protection.
      */
     private static final String KEY_AUTH_URLS = "AuthURLs";
+
+    /**
+     * The messages of the faults of the out chain for a failure of the conduit
+     */
+    private static final ResourceBundle SENDER_BUNDLE = BundleUtils.getBundle(MessageSenderInterceptor.class);
 
     /**
      *  This field holds a reference to the CXF bus associated this conduit.
@@ -1235,7 +1245,7 @@ public abstract class HTTPConduit
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
-                        handleRetransmitsAndResponse();
+                        handleRetransmitsAndResponseOnWorkqueue();
                     } catch (Throwable e) {
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
                         outMessage.setContent(Exception.class, e);
@@ -1428,20 +1438,24 @@ public abstract class HTTPConduit
             } catch (HttpRetryException e) {
                 handleHttpRetryException(e);
             } catch (IOException e) {
-                String origMessage = e.getMessage();
-                if (origMessage != null && origMessage.contains(url.toString())) {
-                    throw e;
-                }
-                throw mapException(e.getClass().getSimpleName()
-                                   + " invoking " + url + ": "
-                                   + getExceptionMessage(e), e,
-                                   IOException.class);
+                throw mapException(e);
             } catch (RuntimeException e) {
                 throw mapException(e.getClass().getSimpleName()
                                    + " invoking " + url + ": "
                                    + getExceptionMessage(e), e,
                                    RuntimeException.class);
             }
+        }
+
+        private IOException mapException(IOException e) {
+            String origMessage = e.getMessage();
+            if (origMessage != null && origMessage.contains(url.toString())) {
+                return e;
+            }
+            return mapException(e.getClass().getSimpleName()
+                                + " invoking " + url + ": "
+                                + getExceptionMessage(e), e,
+                                IOException.class);
         }
 
         protected String getExceptionMessage(Throwable t) {
@@ -1643,6 +1657,43 @@ public abstract class HTTPConduit
                 releaseCachedStream();
             }
             handleResponseInternal();
+        }
+
+        /**
+         * Processes the retransmits and the response on the workqueue, see
+         * {@link #handleResponseOnWorkqueue(boolean, boolean)}. A failure of the retransmits is
+         * reported as it was when they were processed by the caller: as close() maps it, and the
+         * out chain then reports it.
+         */
+        private void handleRetransmitsAndResponseOnWorkqueue() throws IOException {
+            try {
+                handleRetransmits();
+            } catch (HttpRetryException e) {
+                try {
+                    handleHttpRetryException(e);
+                } catch (IOException ex) {
+                    throw sendFault(ex);
+                }
+            } catch (IOException e) {
+                throw sendFault(mapException(e));
+            } catch (RuntimeException e) {
+                throw mapException(e.getClass().getSimpleName()
+                                   + " invoking " + url + ": "
+                                   + getExceptionMessage(e), e,
+                                   RuntimeException.class);
+            } finally {
+                releaseCachedStream();
+            }
+            handleResponseInternal();
+        }
+
+        /**
+         * The fault of the out chain for a failure of the conduit, as reported by
+         * {@link MessageSenderInterceptor.MessageSenderEndingInterceptor}
+         */
+        private Fault sendFault(IOException e) {
+            return new Fault(new org.apache.cxf.common.i18n.Message(e instanceof SocketTimeoutException
+                ? "COULD_NOT_RECEIVE" : "COULD_NOT_SEND", SENDER_BUNDLE), e);
         }
 
         private void releaseCachedStream() throws IOException {
