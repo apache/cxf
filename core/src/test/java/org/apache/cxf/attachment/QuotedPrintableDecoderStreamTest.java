@@ -64,4 +64,29 @@ public class QuotedPrintableDecoderStreamTest {
         // a byte >= 0x80 following the '=' marker must not index the decode table negatively
         assertThrows(IOException.class, () -> decode(new byte[] {'=', (byte)0xff, 'A'}));
     }
+
+    @Test
+    public void testSoftLineBreak() throws Exception {
+        assertArrayEquals("hello world".getBytes(StandardCharsets.US_ASCII),
+                          decode("hello =\r\nworld".getBytes(StandardCharsets.US_ASCII)));
+    }
+
+    @Test
+    public void testSpaceBeforeSoftLineBreak() throws Exception {
+        // the character after a space and a soft line break must not be lost
+        assertArrayEquals("  a".getBytes(StandardCharsets.US_ASCII),
+                          decode(" =\r\n a ".getBytes(StandardCharsets.US_ASCII)));
+    }
+
+    @Test
+    public void testManySoftLineBreaks() throws Exception {
+        // a long run of soft line breaks must not overflow the stack
+        String encoded = "=\r\n".repeat(200_000) + "X";
+        assertArrayEquals("X".getBytes(StandardCharsets.US_ASCII),
+                          decode(encoded.getBytes(StandardCharsets.US_ASCII)));
+
+        encoded = " =\r\n".repeat(200_000) + "X";
+        assertArrayEquals((" ".repeat(200_000) + "X").getBytes(StandardCharsets.US_ASCII),
+                          decode(encoded.getBytes(StandardCharsets.US_ASCII)));
+    }
 }
