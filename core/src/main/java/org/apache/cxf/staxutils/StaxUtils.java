@@ -2118,7 +2118,7 @@ public final class StaxUtils {
     }
 
     public static boolean isSecureReader(XMLStreamReader reader, Message message) {
-        if (reader instanceof DepthRestrictingStreamReader) {
+        if (reader instanceof DocumentDepthProperties) {
             return true;
         }
         try {
@@ -2139,15 +2139,6 @@ public final class StaxUtils {
         Integer messageMaxTextLength = PropertyUtils.getInteger(message, MAX_TEXT_LENGTH);
         Long messageMaxElementCount = PropertyUtils.getLong(message, MAX_ELEMENT_COUNT);
         Long messageMaxXMLCharacters = PropertyUtils.getLong(message, MAX_XML_CHARACTERS);
-        if (!isSecureReader(xreader, message)) {
-            // A reader that doesn't support the Woodstox limits, such as a FastInfoset parser, doesn't get
-            // the default limits from the input factory, so enforce the element limits with a wrapper
-            long maxElementCount = messageMaxElementCount != null ? messageMaxElementCount : MAX_ELEMENT_COUNT_VAL;
-            return new DepthRestrictingStreamReader(xreader, new DocumentDepthProperties(
-                (int)Math.min(maxElementCount, Integer.MAX_VALUE),
-                messageMaxElementDepth != null ? messageMaxElementDepth : MAX_ELEMENT_DEPTH_VAL,
-                messageMaxChildElements != null ? messageMaxChildElements : MAX_CHILD_ELEMENTS_VAL));
-        }
         return configureReader(xreader, messageMaxChildElements, messageMaxElementDepth,
                                messageMaxAttributeCount, messageMaxAttributeSize, messageMaxTextLength,
                                messageMaxElementCount, messageMaxXMLCharacters);
