@@ -18,12 +18,17 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +37,7 @@ import java.util.Map;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
@@ -45,6 +51,10 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class MessageVerifierTest {
     private static final String KEY_ID = "testVerifier";
@@ -283,6 +293,149 @@ public class MessageVerifierTest {
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), null);
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void staleSignedDateHeaderFails() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void futureSignedDateHeaderFails() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void signedDateHeaderWithinTimeToLivePasses() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-4)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void staleUnsignedDateHeaderIsIgnored() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        new MessageSigner(keyId -> keyPair.getPrivate(), KEY_ID, Collections.singletonList("host"))
+            .sign(headers, URI, METHOD);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void staleSignedDateHeaderPassesWithoutTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier noTtlVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        noTtlVerifier.setSecurityProvider(new MockSecurityProvider());
+        noTtlVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        noTtlVerifier.setAddDefaultRequiredHeaders(false);
+        noTtlVerifier.setTimeToLive(0);
+        noTtlVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void staleSignedDateHeaderFailsWithContextualTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-4)));
+        createAndAddSignature(headers);
+        Message message = new MessageImpl();
+        message.put(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, "120");
+        messageVerifier.verifyMessage(headers, METHOD, URI, message, MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void explicitTimeToLiveTakesPrecedence() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setTimeToLive(900);
+        Message message = new MessageImpl();
+        message.put(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE, "120");
+        verifier.verifyMessage(headers, METHOD, URI, message, MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void multipleSignedDateHeaderValuesFail() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Arrays.asList(httpDate(0), httpDate(-10)));
+        createAndAddSignature(headers);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void futureSignedDateHeaderFailsWithZeroFutureTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(1)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setFutureTimeToLive(0);
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void futureSignedDateHeaderPassesWithNegativeFutureTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setFutureTimeToLive(-1);
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void timeToLiveCanBeSetAsBeanProperties() throws Exception {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        setBeanProperty(verifier, "timeToLive", 900);
+        setBeanProperty(verifier, "futureTimeToLive", 0);
+        assertEquals(Integer.valueOf(900), verifier.getTimeToLive());
+        assertEquals(Integer.valueOf(0), verifier.getFutureTimeToLive());
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    // Set the property the way Spring/Blueprint bean configuration does, through JavaBeans introspection
+    private static void setBeanProperty(Object bean, String name, Object value) throws Exception {
+        for (PropertyDescriptor pd : Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()) {
+            if (name.equals(pd.getName())) {
+                assertNotNull(name + " is not writable", pd.getWriteMethod());
+                pd.getWriteMethod().invoke(bean, value);
+                return;
+            }
+        }
+        fail("no bean property " + name);
+    }
+
+    private static String httpDate(int minutesFromNow) {
+        return DateTimeFormatter.RFC_1123_DATE_TIME.format(
+            ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(minutesFromNow));
     }
 
     private static void createAndAddSignature(Map<String, List<String>> headers) throws IOException {

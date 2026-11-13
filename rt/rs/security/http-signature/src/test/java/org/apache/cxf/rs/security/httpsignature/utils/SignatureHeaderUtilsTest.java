@@ -18,9 +18,17 @@
  */
 package org.apache.cxf.rs.security.httpsignature.utils;
 
+import java.text.ParseException;
+import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SignatureHeaderUtilsTest {
 
@@ -57,6 +65,17 @@ public class SignatureHeaderUtilsTest {
     @org.junit.Test(expected = DigestFailureException.class)
     public void testCreateDigestHeaderSHA1() {
         SignatureHeaderUtils.createDigestHeader("xyz", "SHA-1");
+    }
+
+    @org.junit.Test
+    public void testAddDateHeaderIsCurrentTime() throws ParseException {
+        // The header must hold the current instant whatever the system time zone and the requested offset
+        for (ZoneOffset offset : new ZoneOffset[] {ZoneOffset.UTC, ZoneOffset.ofHours(-7), ZoneOffset.ofHours(9)}) {
+            Map<String, List<String>> headers = new HashMap<>();
+            SignatureHeaderUtils.addDateHeader(headers, offset);
+            long date = HttpUtils.getHttpDateFormat().parse(headers.get("Date").get(0)).getTime();
+            assertTrue(Math.abs(System.currentTimeMillis() - date) < 60000L);
+        }
     }
 
 }
