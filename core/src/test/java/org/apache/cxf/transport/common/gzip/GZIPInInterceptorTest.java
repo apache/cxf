@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.cxf.helpers.IOUtils;
@@ -39,6 +40,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class GZIPInInterceptorTest {
 
@@ -67,6 +69,29 @@ public class GZIPInInterceptorTest {
         new GZIPInInterceptor().handleMessage(message);
         InputStream in = message.getContent(InputStream.class);
         assertThrows(IOException.class, () -> IOUtils.readBytesFromStream(in));
+    }
+
+    @Test
+    public void testStreamClosedWhenSizeExceeded() throws Exception {
+        AtomicBoolean closed = new AtomicBoolean();
+        InputStream body = new ByteArrayInputStream(gzip(new byte[10 * 1024 * 1024])) {
+            @Override
+            public void close() throws IOException {
+                closed.set(true);
+                super.close();
+            }
+        };
+        Message message = createMessage(body);
+        message.put(GZIPInInterceptor.GZIP_MAX_DECOMPRESSED_SIZE, 1024L * 1024);
+        new GZIPInInterceptor().handleMessage(message);
+        InputStream in = message.getContent(InputStream.class);
+
+        IOException ex = assertThrows(IOException.class, () -> IOUtils.readBytesFromStream(in));
+        assertTrue(closed.get());
+        // any further read reports the same error rather than reading from the closed stream
+        assertEquals(ex.getMessage(), assertThrows(IOException.class, () -> in.read()).getMessage());
+        assertEquals(ex.getMessage(), assertThrows(IOException.class, () -> in.read(new byte[16])).getMessage());
+        assertEquals(ex.getMessage(), assertThrows(IOException.class, () -> in.skip(16)).getMessage());
     }
 
     @Test
@@ -105,6 +130,10 @@ public class GZIPInInterceptorTest {
     }
 
     private static Message createMessage(byte[] body) {
+        return createMessage(new ByteArrayInputStream(body));
+    }
+
+    private static Message createMessage(InputStream body) {
         Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         exchange.setInMessage(message);
@@ -113,7 +142,7 @@ public class GZIPInInterceptorTest {
         Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         headers.put("Content-Encoding", Collections.singletonList("gzip"));
         message.put(Message.PROTOCOL_HEADERS, headers);
-        message.setContent(InputStream.class, new ByteArrayInputStream(body));
+        message.setContent(InputStream.class, body);
         return message;
     }
 }
