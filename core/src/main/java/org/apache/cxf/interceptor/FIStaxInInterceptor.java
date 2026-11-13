@@ -22,6 +22,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.InputStream;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
@@ -31,6 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * Creates an XMLStreamReader from the InputStream on the Message.
@@ -51,12 +53,17 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
 
-    private XMLStreamReader getParser(InputStream in) {
+    private XMLStreamReader getParser(InputStream in, Message message) {
         StAXDocumentParser parser = new StAXDocumentParser(in);
         parser.setStringInterning(true);
         parser.setForceStreamClose(true);
         parser.setInputStream(in);
-        return parser;
+        try {
+            // apply the same element limits as for XML
+            return StaxUtils.configureReader(parser, message);
+        } catch (XMLStreamException e) {
+            throw new Fault(e);
+        }
     }
 
     public void handleMessage(Message message) {
@@ -69,7 +76,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (ct != null && ct.indexOf("fastinfoset") != -1
             && message.getContent(InputStream.class) != null
             && message.getContent(XMLStreamReader.class) == null) {
-            message.setContent(XMLStreamReader.class, getParser(message.getContent(InputStream.class)));
+            message.setContent(XMLStreamReader.class, getParser(message.getContent(InputStream.class), message));
             //add the StaxInEndingInterceptor which will close the reader
             message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
 
