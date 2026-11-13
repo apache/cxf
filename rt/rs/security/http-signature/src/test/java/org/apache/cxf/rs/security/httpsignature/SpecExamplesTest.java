@@ -34,6 +34,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,6 +67,7 @@ import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter;
 import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
+import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -137,10 +139,8 @@ public class SpecExamplesTest {
 
         // Now check we validate the Date header as expected on an empty header list
         headers.put("Signature", Collections.singletonList(expectedHeader));
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+        MessageVerifier messageVerifier = createSpecExampleVerifier();
         messageVerifier.setAddDefaultRequiredHeaders(false);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
                 new MessageImpl(), MESSAGE_BODY.getBytes());
     }
@@ -178,10 +178,8 @@ public class SpecExamplesTest {
             assertEquals(signatureHeader.replaceAll("headers=\"date\",", ""), expectedHeader);
     
             // Verify that the request signature can be verified by the filter
-            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            MessageVerifier messageVerifier = createSpecExampleVerifier();
             messageVerifier.setAddDefaultRequiredHeaders(false);
-            messageVerifier.setSecurityProvider(new MockSecurityProvider());
-            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
     
             VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
             verifySignatureFilter.setMessageVerifier(messageVerifier);
@@ -211,10 +209,8 @@ public class SpecExamplesTest {
 
         assertEquals(signatureHeader, expectedHeader);
 
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+        MessageVerifier messageVerifier = createSpecExampleVerifier();
         messageVerifier.setAddDefaultRequiredHeaders(false);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
                 new MessageImpl(), MESSAGE_BODY.getBytes());
     }
@@ -255,10 +251,8 @@ public class SpecExamplesTest {
             assertEquals(signatureHeader, expectedHeader);
     
             // Verify that the request signature can be verified by the filter
-            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            MessageVerifier messageVerifier = createSpecExampleVerifier();
             messageVerifier.setAddDefaultRequiredHeaders(false);
-            messageVerifier.setSecurityProvider(new MockSecurityProvider());
-            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
     
             VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
             verifySignatureFilter.setMessageVerifier(messageVerifier);
@@ -288,9 +282,7 @@ public class SpecExamplesTest {
 
         assertEquals(signatureHeader, expectedHeader);
 
-        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
-        messageVerifier.setSecurityProvider(new MockSecurityProvider());
-        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        MessageVerifier messageVerifier = createSpecExampleVerifier();
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog",
                 new MessageImpl(), MESSAGE_BODY.getBytes());
     }
@@ -332,10 +324,8 @@ public class SpecExamplesTest {
             assertEquals(signatureHeader, expectedHeader);
     
             // Verify that the request signature can be verified by the filter
-            MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+            MessageVerifier messageVerifier = createSpecExampleVerifier();
             messageVerifier.setAddDefaultRequiredHeaders(false);
-            messageVerifier.setSecurityProvider(new MockSecurityProvider());
-            messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
     
             VerifySignatureFilter verifySignatureFilter = new VerifySignatureFilter();
             verifySignatureFilter.setMessageVerifier(messageVerifier);
@@ -357,7 +347,7 @@ public class SpecExamplesTest {
         // The client signs a DELETE without a body, so no digest is added or signed
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Host", Collections.singletonList("example.com"));
-        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        SignatureHeaderUtils.addDateHeader(headers, ZoneOffset.UTC);
         MessageSigner messageSigner = new MessageSigner(keyProvider, "Test",
             Arrays.asList("(request-target)", "host", "date"));
         messageSigner.sign(headers, "/foo/1", method);
@@ -391,7 +381,7 @@ public class SpecExamplesTest {
     public void clientFilterUnsignedResponseBodyTest() throws IOException {
         // The service signs a response without a body, so no digest is added or signed
         Map<String, List<String>> headers = new HashMap<>();
-        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        SignatureHeaderUtils.addDateHeader(headers, ZoneOffset.UTC);
         MessageSigner messageSigner = new MessageSigner(keyProvider, "Test");
         messageSigner.sign(headers, "", "");
 
@@ -428,7 +418,7 @@ public class SpecExamplesTest {
         // The client signs a GET without a body, so no digest is added or signed
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Host", Collections.singletonList("example.com"));
-        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        SignatureHeaderUtils.addDateHeader(headers, ZoneOffset.UTC);
         MessageSigner messageSigner = new MessageSigner(keyProvider, "Test",
             Arrays.asList("(request-target)", "host", "date"));
         messageSigner.sign(headers, "/foo/1", method);
@@ -462,7 +452,7 @@ public class SpecExamplesTest {
     public void clientFilterUnsignedErrorResponseBodyTest() throws IOException {
         // The service signs a response without a body, so no digest is added or signed
         Map<String, List<String>> headers = new HashMap<>();
-        headers.put("Date", Collections.singletonList("Sun, 05 Jan 2014 21:31:40 GMT"));
+        SignatureHeaderUtils.addDateHeader(headers, ZoneOffset.UTC);
         MessageSigner messageSigner = new MessageSigner(keyProvider, "Test");
         messageSigner.sign(headers, "", "");
 
@@ -498,6 +488,16 @@ public class SpecExamplesTest {
             result.set(runFilter(() -> verifySignatureFilter.filter(null, responseContext)));
         });
         return result.get();
+    }
+
+    // The spec examples carry a fixed Date from 2014, so the signed Date checks are disabled
+    private static MessageVerifier createSpecExampleVerifier() {
+        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
+        messageVerifier.setSecurityProvider(new MockSecurityProvider());
+        messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        messageVerifier.setTimeToLive(0);
+        messageVerifier.setFutureTimeToLive(-1);
+        return messageVerifier;
     }
 
     private VerifySignatureFilter createVerifySignatureFilter() {

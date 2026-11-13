@@ -24,6 +24,17 @@ Important notes:
   must return a fresh stream positioned at the beginning. Persistence and
   retransmission may read the original attachment more than once, including
   when WS-Security signs or encrypts attachments.
+* HTTP Signature: when an inbound request or response signs the "Date" header,
+  MessageVerifier now rejects it if the Date is more than 300 seconds old or
+  more than 60 seconds in the future. Deployments that sign "Date" with more
+  clock skew than this, or send fixed dates, will start failing. The limits can
+  be changed with "rs.security.http.signature.time.to.live" and
+  "rs.security.http.signature.future.time.to.live" (or the MessageVerifier
+  setters). A time to live of 0 or less disables the age check, a future time to
+  live of 0 allows no clock skew and a negative value disables the future check.
+  The check only gives replay protection when "date" is signed and listed in
+  "rs.security.http.signature.in.headers", and a message can still be replayed
+  within the time window.
 
 Users are encouraged to review the migration guide at:
 https://cxf.apache.org/docs/41-migration-guide.html
