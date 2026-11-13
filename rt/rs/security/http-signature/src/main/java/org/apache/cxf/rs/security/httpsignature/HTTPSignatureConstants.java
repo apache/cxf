@@ -67,9 +67,10 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
 
     /**
      * The number of seconds a signed "Date" header on an inbound request or response may be in the future,
-     * to allow for clock skew. The default is 60 seconds, a value of 0 or less disables the check. A value set
-     * directly on the MessageVerifier takes precedence. See RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE for the limits
-     * of this check.
+     * to allow for clock skew. The default is 60 seconds, a value of 0 allows no clock skew and a negative value
+     * disables the check. With the check disabled, a message with a signed "Date" in the future stays within the
+     * time to live until that date. A value set directly on the MessageVerifier takes precedence. See
+     * RSSEC_HTTP_SIGNATURE_TIME_TO_LIVE for the limits of this check.
      */
     public static final String RSSEC_HTTP_SIGNATURE_FUTURE_TIME_TO_LIVE =
         "rs.security.http.signature.future.time.to.live";

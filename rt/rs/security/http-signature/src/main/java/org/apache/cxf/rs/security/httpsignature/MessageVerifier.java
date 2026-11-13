@@ -183,7 +183,9 @@ public class MessageVerifier {
         int futureTtl = futureTimeToLive != null ? futureTimeToLive
             : getContextualInteger(m, HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_FUTURE_TIME_TO_LIVE,
                                    DEFAULT_FUTURE_TIME_TO_LIVE);
-        if (ttl <= 0 && futureTtl <= 0) {
+        // A time to live of 0 would reject every message, so 0 or less disables the age check. For the future
+        // check 0 means no clock skew is allowed and only a negative value disables it.
+        if (ttl <= 0 && futureTtl < 0) {
             return;
         }
         List<String> signedHeaders = Signature.fromString(messageHeaders.get("Signature").get(0)).getHeaders();
@@ -213,7 +215,7 @@ public class MessageVerifier {
         if (ttl > 0 && now - dateTime > TimeUnit.SECONDS.toMillis(ttl)) {
             throw new InvalidSignatureException("the signed Date header is older than the time to live");
         }
-        if (futureTtl > 0 && dateTime - now > TimeUnit.SECONDS.toMillis(futureTtl)) {
+        if (futureTtl >= 0 && dateTime - now > TimeUnit.SECONDS.toMillis(futureTtl)) {
             throw new InvalidSignatureException("the signed Date header is in the future");
         }
     }
@@ -268,9 +270,10 @@ public class MessageVerifier {
     /**
      * Set the maximum age in seconds of a signed "Date" header. A message whose signed "Date" is older
      * than this is rejected. This takes precedence over the "rs.security.http.signature.time.to.live"
-     * contextual property. The default is 300 seconds, a value of 0 or less disables the check.
+     * contextual property. The default is 300 seconds, a value of 0 or less disables the check, and null
+     * falls back to the contextual property.
      */
-    public void setTimeToLive(int timeToLive) {
+    public void setTimeToLive(Integer timeToLive) {
         this.timeToLive = timeToLive;
     }
 
@@ -285,9 +288,11 @@ public class MessageVerifier {
     /**
      * Set the number of seconds a signed "Date" header may be in the future, to allow for clock skew.
      * This takes precedence over the "rs.security.http.signature.future.time.to.live" contextual property.
-     * The default is 60 seconds, a value of 0 or less disables the check.
+     * The default is 60 seconds, a value of 0 allows no clock skew, a negative value disables the check, and
+     * null falls back to the contextual property. With the check disabled, a message with a signed "Date" in
+     * the future stays within the time to live until that date.
      */
-    public void setFutureTimeToLive(int futureTimeToLive) {
+    public void setFutureTimeToLive(Integer futureTimeToLive) {
         this.futureTimeToLive = futureTimeToLive;
     }
 

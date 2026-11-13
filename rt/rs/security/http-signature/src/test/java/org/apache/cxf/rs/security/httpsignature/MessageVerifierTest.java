@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -49,6 +51,10 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class MessageVerifierTest {
     private static final String KEY_ID = "testVerifier";
@@ -368,6 +374,63 @@ public class MessageVerifierTest {
         headers.put("Date", Arrays.asList(httpDate(0), httpDate(-10)));
         createAndAddSignature(headers);
         messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test(expected = InvalidSignatureException.class)
+    public void futureSignedDateHeaderFailsWithZeroFutureTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(1)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setFutureTimeToLive(0);
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void futureSignedDateHeaderPassesWithNegativeFutureTimeToLive() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        verifier.setFutureTimeToLive(-1);
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    @Test
+    public void timeToLiveCanBeSetAsBeanProperties() throws Exception {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Date", Collections.singletonList(httpDate(-10)));
+        createAndAddSignature(headers);
+
+        MessageVerifier verifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        verifier.setSecurityProvider(new MockSecurityProvider());
+        verifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        verifier.setAddDefaultRequiredHeaders(false);
+        setBeanProperty(verifier, "timeToLive", 900);
+        setBeanProperty(verifier, "futureTimeToLive", 0);
+        assertEquals(Integer.valueOf(900), verifier.getTimeToLive());
+        assertEquals(Integer.valueOf(0), verifier.getFutureTimeToLive());
+        verifier.verifyMessage(headers, METHOD, URI, new MessageImpl(), MESSAGE_BODY.getBytes());
+    }
+
+    // Set the property the way Spring/Blueprint bean configuration does, through JavaBeans introspection
+    private static void setBeanProperty(Object bean, String name, Object value) throws Exception {
+        for (PropertyDescriptor pd : Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()) {
+            if (name.equals(pd.getName())) {
+                assertNotNull(name + " is not writable", pd.getWriteMethod());
+                pd.getWriteMethod().invoke(bean, value);
+                return;
+            }
+        }
+        fail("no bean property " + name);
     }
 
     private static String httpDate(int minutesFromNow) {

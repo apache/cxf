@@ -496,7 +496,7 @@ public class SpecExamplesTest {
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.setTimeToLive(0);
-        messageVerifier.setFutureTimeToLive(0);
+        messageVerifier.setFutureTimeToLive(-1);
         return messageVerifier;
     }
 
