@@ -42,8 +42,13 @@ public final class DefaultApplicationFactory {
 
         DefaultApplication(final List<ClassResourceInfo> cris, final Set<String> resourcePackages) {
             this.serviceClasses = cris.stream().map(ClassResourceInfo::getServiceClass).
-                    filter(cls -> (resourcePackages == null || resourcePackages.isEmpty()) || resourcePackages.stream().
-                            anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg))).collect(Collectors.toSet());
+                    filter(cls -> {
+                        if (resourcePackages == null || resourcePackages.isEmpty()) {
+                            return true;
+                        }
+                        final String name = cls.getPackage().getName();
+                        return resourcePackages.stream().anyMatch(pkg -> name.equals(pkg) || name.startsWith(pkg + '.'));
+                    }).collect(Collectors.toSet());
         }
 
         @Override

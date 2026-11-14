@@ -677,8 +677,11 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
         }
 
         private static boolean filterByPackage(final Class<?> cls, final Set<String> packages) {
-            return (packages == null || packages.isEmpty())
-                    || packages.stream().anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
+            if (packages == null || packages.isEmpty()) {
+                return true;
+            }
+            final String name = cls.getPackage().getName();
+            return packages.stream().anyMatch(pkg -> name.equals(pkg) || name.startsWith(pkg + '.'));
         }
 
         private static boolean filterByClassName(final Class<?> cls, final Set<String> classes) {
