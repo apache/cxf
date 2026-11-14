@@ -26,6 +26,8 @@ import java.security.cert.X509Certificate;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -45,7 +47,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
@@ -138,6 +142,68 @@ public class XmlSecInInterceptorTest {
         } catch (XMLStreamException ex) {
             assertTrue(ex.getMessage().contains("is not allowed"));
         }
+    }
+
+    @Test
+    public void testCbcEncryptionIsRejectedByDefault() throws Exception {
+        try {
+            decrypt(encrypt(XMLCipher.AES_256), null);
+            fail("Failure expected on AES-CBC content encryption");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage().contains("is not allowed"));
+        }
+    }
+
+    @Test
+    public void testDefaultEncryption() throws Exception {
+        Element root = decrypt(encrypt(null), null);
+
+        assertEquals("CXF", DOMUtils.getFirstElement(root).getTextContent());
+    }
+
+    @Test
+    public void testConfiguredCbcEncryption() throws Exception {
+        EncryptionProperties encProps = new EncryptionProperties();
+        encProps.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_256);
+        Element root = decrypt(encrypt(XMLCipher.AES_256), encProps);
+
+        assertEquals("CXF", DOMUtils.getFirstElement(root).getTextContent());
+    }
+
+    private static Document encrypt(String symEncAlgo) throws Exception {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        message.put(SecurityConstants.ENCRYPT_USERNAME, "alice");
+
+        Document doc = DOMUtils.createDocument();
+        doc.appendChild(createBook(doc, "CXF"));
+
+        XmlEncOutInterceptor interceptor = new XmlEncOutInterceptor();
+        if (symEncAlgo != null) {
+            interceptor.setSymmetricEncAlgorithm(symEncAlgo);
+        }
+        return interceptor.encryptDocument(message, doc);
+    }
+
+    private static Element decrypt(Document doc, EncryptionProperties encProps) throws Exception {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        message.put(SecurityConstants.CALLBACK_HANDLER, (CallbackHandler)callbacks -> {
+            for (Callback callback : callbacks) {
+                ((WSPasswordCallback)callback).setPassword("password");
+            }
+        });
+        byte[] bytes = StaxUtils.toString(doc).getBytes(StandardCharsets.UTF_8);
+        message.setContent(InputStream.class, new ByteArrayInputStream(bytes));
+        message.setInterceptorChain(new PhaseInterceptorChain(new PhaseManagerImpl().getInPhases()));
+
+        XmlSecInInterceptor interceptor = new XmlSecInInterceptor();
+        interceptor.setEncryptionProperties(encProps);
+        interceptor.handleMessage(message);
+        return StaxUtils.read(message.getContent(XMLStreamReader.class)).getDocumentElement();
     }
 
     private static void assertRejected(Document doc) throws Exception {

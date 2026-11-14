@@ -23,6 +23,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
+import java.util.Set;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
@@ -36,8 +37,20 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 public final class EncryptionUtils {
+    // Unauthenticated CBC modes expose a padding oracle against captured messages, so only
+    // AES-GCM is accepted for decryption unless a symmetric algorithm is configured
+    private static final Set<String> DEFAULT_SYMMETRIC_KEY_ALGOS =
+        Set.of(XMLCipher.AES_128_GCM, XMLCipher.AES_192_GCM, XMLCipher.AES_256_GCM);
+
     private EncryptionUtils() {
 
+    }
+
+    static boolean isSymmetricKeyAlgoAllowed(EncryptionProperties encProps, String symKeyAlgo) {
+        if (encProps != null && encProps.getEncryptionSymmetricKeyAlgo() != null) {
+            return encProps.getEncryptionSymmetricKeyAlgo().equals(symKeyAlgo);
+        }
+        return DEFAULT_SYMMETRIC_KEY_ALGOS.contains(symKeyAlgo);
     }
 
     public static Cipher initCipherWithCert(String keyEncAlgo, int mode, X509Certificate cert)

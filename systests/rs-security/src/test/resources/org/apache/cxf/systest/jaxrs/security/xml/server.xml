@@ -54,7 +54,6 @@ under the License.
     </bean>
     <bean id="encProps" class="org.apache.cxf.rs.security.xml.EncryptionProperties">
         <property name="encryptionKeyTransportAlgo" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
-        <property name="encryptionSymmetricKeyAlgo" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     </bean>
     <bean id="xmlSigInHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler">
     </bean>
@@ -83,7 +82,6 @@ under the License.
         <property name="encryptionProperties" ref="encProps"/>
     </bean>
     <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
-        <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
     <bean id="xmlEncOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
         <property name="encryptionProperties" ref="encProps"/>

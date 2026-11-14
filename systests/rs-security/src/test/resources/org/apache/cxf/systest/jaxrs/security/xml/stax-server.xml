@@ -54,7 +54,6 @@ under the License.
     </bean>
     <bean id="encProps" class="org.apache.cxf.rs.security.xml.EncryptionProperties">
         <property name="encryptionKeyTransportAlgo" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
-        <property name="encryptionSymmetricKeyAlgo" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     </bean>
     <bean id="xmlSigInHandler" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
         <property name="requireSignature" value="true"/>
@@ -102,11 +101,9 @@ under the License.
     <bean id="xmlSecOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="signRequest" value="true"/>
         <property name="encryptRequest" value="true"/>
-        <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
     <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlSecOutInterceptor">
         <property name="encryptRequest" value="true"/>
-        <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsig">
         <jaxrs:serviceBeans>
