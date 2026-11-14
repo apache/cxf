@@ -29,12 +29,15 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.CallbackHandler;
 
 import jakarta.annotation.PreDestroy;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -54,6 +57,9 @@ public class AbstractSSOSpHandler {
     private String idpServiceAddress;
     private String issuerId;
     private boolean supportUnsolicited;
+    private boolean httpOnlyCookie = true;
+    private boolean secureCookie;
+    private String sameSite = "Lax";
 
     static {
         OpenSAMLUtil.initSamlEngine();
@@ -134,9 +140,102 @@ public class AbstractSSOSpHandler {
             contextCookie += ";Expires=" + cookieExpires;
         }
 
-        //TODO: Consider adding an 'HttpOnly' attribute
+        if (httpOnlyCookie) {
+            // The cookie value is the key to the security context or relay state
+            // held by the SP, so keep it out of reach of scripts
+            contextCookie += ";HttpOnly";
+        }
+
+        if (secureCookie || isSecureRequest(JAXRSUtils.getCurrentMessage())) {
+            contextCookie += ";Secure";
+        }
+
+        if (sameSite != null) {
+            contextCookie += ";SameSite=" + sameSite;
+        }
 
         return contextCookie;
+    }
+
+    /**
+     * Determine whether the current request was received over HTTPS, in which case the
+     * cookies created by this handler get the Secure attribute.
+     * <p>
+     * The servlet request is checked first, so that a container configured for a TLS
+     * terminating proxy (e.g. Tomcat's RemoteIpValve) is honored. Without a servlet
+     * request this falls back on a best-effort check of the scheme of the request URL
+     * or base path.
+     * @param m the current message, may be null
+     * @return true if the request was received over HTTPS, false otherwise, including
+     *         when m is null or the scheme cannot be determined
+     */
+    protected boolean isSecureRequest(Message m) {
+        if (m == null) {
+            return false;
+        }
+        Object request = m.get(AbstractHTTPDestination.HTTP_REQUEST);
+        if (request instanceof HttpServletRequest) {
+            return ((HttpServletRequest) request).isSecure();
+        }
+        Object address = m.get(Message.REQUEST_URL);
+        if (address == null) {
+            address = m.get(Message.BASE_PATH);
+        }
+        return address != null && address.toString().regionMatches(true, 0, "https://", 0, 8);
+    }
+
+    /**
+     * Set whether the cookies created by this handler have the HttpOnly attribute.
+     * The default is true.
+     * @param httpOnlyCookie whether to add the HttpOnly attribute
+     */
+    public void setHttpOnlyCookie(boolean httpOnlyCookie) {
+        this.httpOnlyCookie = httpOnlyCookie;
+    }
+
+    /**
+     * Get whether the cookies created by this handler have the HttpOnly attribute.
+     * @return whether the HttpOnly attribute is added
+     */
+    public boolean isHttpOnlyCookie() {
+        return httpOnlyCookie;
+    }
+
+    /**
+     * Set whether the cookies created by this handler always have the Secure attribute.
+     * The default is false, in which case the attribute is added only when the current
+     * request was received over HTTPS.
+     * @param secureCookie whether to always add the Secure attribute
+     */
+    public void setSecureCookie(boolean secureCookie) {
+        this.secureCookie = secureCookie;
+    }
+
+    /**
+     * Get whether the cookies created by this handler always have the Secure attribute.
+     * @return whether the Secure attribute is always added, regardless of the request scheme
+     */
+    public boolean isSecureCookie() {
+        return secureCookie;
+    }
+
+    /**
+     * Set the value of the SameSite attribute of the cookies created by this handler.
+     * The default is "Lax", which still lets the browser send the cookies on the top-level
+     * redirect back to the application after the IdP has posted to the RACS. "Strict" breaks
+     * that first request. A null value leaves the attribute out.
+     * @param sameSite the SameSite attribute value, or null to leave the attribute out
+     */
+    public void setSameSite(String sameSite) {
+        this.sameSite = sameSite;
+    }
+
+    /**
+     * Get the value of the SameSite attribute of the cookies created by this handler.
+     * @return the SameSite attribute value, or null if the attribute is left out
+     */
+    public String getSameSite() {
+        return sameSite;
     }
 
     public void setStateProvider(SPStateManager stateProvider) {
