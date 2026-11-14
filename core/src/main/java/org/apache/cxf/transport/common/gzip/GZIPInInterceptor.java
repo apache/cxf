@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.common.gzip;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -50,6 +52,13 @@ import org.apache.cxf.phase.Phase;
  */
 public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
 
+    /**
+     * The maximum size in bytes that a gzip-encoded message may decompress to. A negative value means
+     * no limit. The default is 100 MB.
+     */
+    public static final String GZIP_MAX_DECOMPRESSED_SIZE = "gzip-max-decompressed-size";
+    public static final long DEFAULT_GZIP_MAX_DECOMPRESSED_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.gzip-max-decompressed-size", 100 * 1024 * 1024);
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(GZIPInInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(GZIPInInterceptor.class);
@@ -88,7 +97,11 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                     }
 
                     // wrap an unzipping stream around the original one
-                    GZIPInputStream zipInput = new GZIPInputStream(is);
+                    InputStream zipInput = new GZIPInputStream(is);
+                    long maxSize = getMaxDecompressedSize(message);
+                    if (maxSize >= 0) {
+                        zipInput = new SizeLimitedInputStream(zipInput, maxSize);
+                    }
                     message.setContent(InputStream.class, zipInput);
 
                     // remove content encoding header as we've now dealt with it
@@ -112,4 +125,89 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    private static long getMaxDecompressedSize(Message message) {
+        Object maxSize = message.getContextualProperty(GZIP_MAX_DECOMPRESSED_SIZE);
+        if (maxSize instanceof Number) {
+            return ((Number)maxSize).longValue();
+        } else if (maxSize instanceof String) {
+            try {
+                return Long.parseLong(((String)maxSize).trim());
+            } catch (NumberFormatException ex) {
+                LOG.warning("Invalid value for " + GZIP_MAX_DECOMPRESSED_SIZE + ": " + maxSize);
+            }
+        }
+        return DEFAULT_GZIP_MAX_DECOMPRESSED_SIZE;
+    }
+
+    /**
+     * Throws an IOException once more than the given number of bytes has been read, to guard against
+     * a small compressed message that decompresses to a very large one. The underlying stream is closed
+     * at that point, and any further read throws the same exception.
+     */
+    private static final class SizeLimitedInputStream extends FilterInputStream {
+        private final long maxSize;
+        private long count;
+        private boolean exceeded;
+
+        SizeLimitedInputStream(InputStream in, long maxSize) {
+            super(in);
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        public int read() throws IOException {
+            checkNotExceeded();
+            int b = super.read();
+            if (b != -1) {
+                checkSize(1);
+            }
+            return b;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            checkNotExceeded();
+            int n = super.read(b, off, len);
+            if (n > 0) {
+                checkSize(n);
+            }
+            return n;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            checkNotExceeded();
+            long skipped = super.skip(n);
+            if (skipped > 0) {
+                checkSize(skipped);
+            }
+            return skipped;
+        }
+
+        @Override
+        public boolean markSupported() {
+            return false;
+        }
+
+        private void checkSize(long n) throws IOException {
+            count += n;
+            if (count > maxSize) {
+                exceeded = true;
+                // the stream can't be used any further, so close it to release the Inflater straight away
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    // ignore, the size limit error is the one to report
+                }
+                checkNotExceeded();
+            }
+        }
+
+        private void checkNotExceeded() throws IOException {
+            if (exceeded) {
+                throw new IOException(new org.apache.cxf.common.i18n.Message("GZIP_MAX_SIZE_EXCEEDED",
+                                                                             BUNDLE, maxSize).toString());
+            }
+        }
+    }
 }
