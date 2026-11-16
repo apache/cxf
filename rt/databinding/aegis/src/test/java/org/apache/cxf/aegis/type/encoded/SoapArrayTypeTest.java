@@ -18,15 +18,20 @@
  */
 package org.apache.cxf.aegis.type.encoded;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
+import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 public class SoapArrayTypeTest extends AbstractEncodedTest {
     private static final String[][][] ARRAY_2_3_4 = new String[][][] {
@@ -326,6 +332,82 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testDeclaredSizeTooLarge() throws Exception {
+        // a huge declared size must be rejected before anything of that size is allocated
+        Context context = getContext();
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[2000000000]", ""));
+    }
+
+    @Test
+    public void testDeclaredSizeOverflow() throws Exception {
+        // 65536 * 65536 overflows an int
+        Context context = getContext();
+        assertThrows(DatabindingException.class,
+            () -> createArrayType(int[][].class).readObject(reader("xsd:int[65536,65536]", ""), context));
+    }
+
+    @Test
+    public void testMaxTotalArrayElementsPerMessage() throws Exception {
+        // the total limit applies to all the arrays read from a message
+        Context context = getContext();
+        assertEquals(600000, readIntArray(context, "xsd:int[600000]", "").length);
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[600000]", ""));
+
+        // a new message starts again
+        assertEquals(600000, readIntArray(getContext(), "xsd:int[600000]", "").length);
+    }
+
+    @Test
+    public void testMaxArrayElementsFromMessage() throws Exception {
+        // the array size limit applies to each array separately
+        Message message = new MessageImpl();
+        message.put(SoapArrayType.MAX_ARRAY_ELEMENTS, "10");
+        Context context = getContext();
+        context.setProperty(Message.class.getName(), message);
+        assertArrayEquals(new int[] {1, 2, 0, 0, 0, 0, 0, 0, 0, 0},
+                          readIntArray(context, "xsd:int[10]", "<n>1</n><n>2</n>"));
+        assertEquals(10, readIntArray(context, "xsd:int[10]", "").length);
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[11]", ""));
+
+        message.put(SoapArrayType.MAX_ARRAY_ELEMENTS, -1);
+        message.put(SoapArrayType.MAX_TOTAL_ARRAY_ELEMENTS, -1);
+        Context unlimited = getContext();
+        unlimited.setProperty(Message.class.getName(), message);
+        assertEquals(2000000, readIntArray(unlimited, "xsd:int[2000000]", "").length);
+    }
+
+    @Test
+    public void testMaxTotalArrayElementsFromMessage() throws Exception {
+        Message message = new MessageImpl();
+        message.put(SoapArrayType.MAX_TOTAL_ARRAY_ELEMENTS, 15);
+        Context context = getContext();
+        context.setProperty(Message.class.getName(), message);
+        assertEquals(10, readIntArray(context, "xsd:int[10]", "").length);
+        assertEquals(5, readIntArray(context, "xsd:int[5]", "").length);
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[1]", ""));
+    }
+
+    @Test
+    public void testSparseArrayPositionOutOfRange() throws Exception {
+        Context context = getContext();
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[2]",
+            "<n soapenc:position='[-1]'>1</n>"));
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[2]",
+            "<n soapenc:position='[2]'>1</n>"));
+    }
+
+    private int[] readIntArray(Context context, String arrayType, String elements) throws Exception {
+        return (int[]) createArrayType(int[].class).readObject(reader(arrayType, elements), context);
+    }
+
+    private static ElementReader reader(String arrayType, String elements) throws Exception {
+        String xml = "<b:numbers xmlns:b='urn:Bean' xmlns:xsd='http://www.w3.org/2001/XMLSchema'"
+            + " xmlns:soapenc='http://schemas.xmlsoap.org/soap/encoding/' soapenc:arrayType='" + arrayType + "'>"
+            + elements + "</b:numbers>";
+        return new ElementReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
     }
 
     private SoapArrayType createArrayType(Class<?> typeClass) {

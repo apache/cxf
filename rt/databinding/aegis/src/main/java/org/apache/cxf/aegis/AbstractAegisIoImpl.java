@@ -26,6 +26,7 @@ import javax.xml.validation.Schema;
 
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 
 /**
  * Common implementation of the Aegis data readers and writer.
@@ -58,6 +59,9 @@ public abstract class AbstractAegisIoImpl  {
     public void setProperty(String prop, Object value) {
         if (DataReader.FAULT.equals(prop)) {
             context.setFault((Fault)value);
+        } else if (Message.class.getName().equals(prop)) {
+            // make the message available to types that read configuration from it
+            context.setProperty(prop, value);
         }
     }
 
