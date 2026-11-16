@@ -350,8 +350,8 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
     }
 
     @Test
-    public void testMaxArrayElementsPerMessage() throws Exception {
-        // the limit applies to the total of all the arrays read from a message
+    public void testMaxTotalArrayElementsPerMessage() throws Exception {
+        // the total limit applies to all the arrays read from a message
         Context context = getContext();
         assertEquals(600000, readIntArray(context, "xsd:int[600000]", "").length);
         assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[600000]", ""));
@@ -362,18 +362,32 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
 
     @Test
     public void testMaxArrayElementsFromMessage() throws Exception {
+        // the array size limit applies to each array separately
         Message message = new MessageImpl();
         message.put(SoapArrayType.MAX_ARRAY_ELEMENTS, "10");
         Context context = getContext();
         context.setProperty(Message.class.getName(), message);
         assertArrayEquals(new int[] {1, 2, 0, 0, 0, 0, 0, 0, 0, 0},
                           readIntArray(context, "xsd:int[10]", "<n>1</n><n>2</n>"));
-        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[1]", "<n>1</n>"));
+        assertEquals(10, readIntArray(context, "xsd:int[10]", "").length);
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[11]", ""));
 
         message.put(SoapArrayType.MAX_ARRAY_ELEMENTS, -1);
+        message.put(SoapArrayType.MAX_TOTAL_ARRAY_ELEMENTS, -1);
         Context unlimited = getContext();
         unlimited.setProperty(Message.class.getName(), message);
         assertEquals(2000000, readIntArray(unlimited, "xsd:int[2000000]", "").length);
+    }
+
+    @Test
+    public void testMaxTotalArrayElementsFromMessage() throws Exception {
+        Message message = new MessageImpl();
+        message.put(SoapArrayType.MAX_TOTAL_ARRAY_ELEMENTS, 15);
+        Context context = getContext();
+        context.setProperty(Message.class.getName(), message);
+        assertEquals(10, readIntArray(context, "xsd:int[10]", "").length);
+        assertEquals(5, readIntArray(context, "xsd:int[5]", "").length);
+        assertThrows(DatabindingException.class, () -> readIntArray(context, "xsd:int[1]", ""));
     }
 
     @Test

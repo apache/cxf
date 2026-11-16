@@ -48,19 +48,28 @@ import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeVa
 
 public class SoapArrayType extends AegisType {
     /**
-     * The maximum total number of elements of the SOAP encoded arrays read from a message. Each array is
-     * created at the size declared in its arrayType attribute, however many elements are actually sent,
-     * so this limits the memory a message can make the service allocate. The default is 1000000, and a
+     * The maximum number of elements of a SOAP encoded array, as declared in its arrayType attribute. Each
+     * array is created at its declared size, however many elements are actually sent. The default is
+     * 1000000, and a negative value means no limit. It can be set as a message (endpoint or client)
+     * property, or as a system property.
+     */
+    public static final String MAX_ARRAY_ELEMENTS = "org.apache.cxf.aegis.encoded.maxArrayElements";
+    /**
+     * The maximum total number of elements of all the SOAP encoded arrays read from a message, as declared
+     * in their arrayType attributes. Together with {@link #MAX_ARRAY_ELEMENTS}, this limits the memory a
+     * message can make the service allocate, however many arrays it contains. The default is 1000000, and a
      * negative value means no limit. It can be set as a message (endpoint or client) property, or as a
      * system property.
      */
-    public static final String MAX_ARRAY_ELEMENTS = "org.apache.cxf.aegis.encoded.maxArrayElements";
+    public static final String MAX_TOTAL_ARRAY_ELEMENTS = "org.apache.cxf.aegis.encoded.maxTotalArrayElements";
 
     private static final Logger LOG = LogUtils.getL7dLogger(SoapArrayType.class);
     private static final String SOAP_ENCODING_NS_1_1 = Soap11.getInstance().getSoapEncodingStyle();
     private static final QName SOAP_ARRAY_POSITION = new QName(SOAP_ENCODING_NS_1_1, "position");
     private static final int DEFAULT_MAX_ARRAY_ELEMENTS =
         SystemPropertyAction.getInteger(MAX_ARRAY_ELEMENTS, 1000000);
+    private static final int DEFAULT_MAX_TOTAL_ARRAY_ELEMENTS =
+        SystemPropertyAction.getInteger(MAX_TOTAL_ARRAY_ELEMENTS, 1000000);
     private static final String ARRAY_ELEMENT_COUNT = SoapArrayType.class.getName() + ".elementCount";
 
     private QName componentName;
@@ -131,7 +140,8 @@ public class SoapArrayType extends AegisType {
 
     /**
      * Calculate the number of elements of the array from its declared dimensions, and check it against the
-     * limit on the total number of array elements in the message, before anything of that size is allocated.
+     * limits on the size of an array and on the total number of array elements in the message, before
+     * anything of that size is allocated.
      */
     private int reserveArrayElements(Context context, ArrayTypeInfo arrayTypeInfo) {
         long size = 1;
@@ -143,30 +153,36 @@ public class SoapArrayType extends AegisType {
             }
         }
 
+        int maxElements = getLimit(context, MAX_ARRAY_ELEMENTS, DEFAULT_MAX_ARRAY_ELEMENTS);
+        if (maxElements >= 0 && size > maxElements) {
+            throw new DatabindingException("The size of the array " + arrayTypeInfo + " in " + getSchemaType()
+                    + " exceeds the maximum array size of " + maxElements);
+        }
+
         Long count = context.getProperty(ARRAY_ELEMENT_COUNT, Long.class);
         long total = size + (count == null ? 0 : count);
-        int maxElements = getMaxArrayElements(context);
-        if (maxElements >= 0 && total > maxElements) {
+        int maxTotalElements = getLimit(context, MAX_TOTAL_ARRAY_ELEMENTS, DEFAULT_MAX_TOTAL_ARRAY_ELEMENTS);
+        if (maxTotalElements >= 0 && total > maxTotalElements) {
             throw new DatabindingException("The size of the array " + arrayTypeInfo + " in " + getSchemaType()
-                    + " exceeds the maximum number of array elements in a message of " + maxElements);
+                    + " exceeds the maximum total number of array elements in a message of " + maxTotalElements);
         }
         context.setProperty(ARRAY_ELEMENT_COUNT, total);
         return (int)size;
     }
 
-    private static int getMaxArrayElements(Context context) {
+    private static int getLimit(Context context, String key, int defaultValue) {
         Message message = context.getProperty(Message.class.getName(), Message.class);
-        Object value = message == null ? null : message.getContextualProperty(MAX_ARRAY_ELEMENTS);
+        Object value = message == null ? null : message.getContextualProperty(key);
         if (value instanceof Number) {
             return ((Number)value).intValue();
         } else if (value instanceof String) {
             try {
                 return Integer.parseInt(((String)value).trim());
             } catch (NumberFormatException ex) {
-                throw new DatabindingException("Invalid value for " + MAX_ARRAY_ELEMENTS + ": " + value);
+                throw new DatabindingException("Invalid value for " + key + ": " + value);
             }
         }
-        return DEFAULT_MAX_ARRAY_ELEMENTS;
+        return defaultValue;
     }
 
     protected List<Object> readCollection(MessageReader reader,
