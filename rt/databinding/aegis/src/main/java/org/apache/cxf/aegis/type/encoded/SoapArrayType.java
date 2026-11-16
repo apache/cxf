@@ -39,15 +39,38 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeValue;
 
 public class SoapArrayType extends AegisType {
+    /**
+     * The maximum number of elements of a SOAP encoded array, as declared in its arrayType attribute. Each
+     * array is created at its declared size, however many elements are actually sent. The default is
+     * 1000000, and a negative value means no limit. It can be set as a message (endpoint or client)
+     * property, or as a system property.
+     */
+    public static final String MAX_ARRAY_ELEMENTS = "org.apache.cxf.aegis.encoded.maxArrayElements";
+    /**
+     * The maximum total number of elements of all the SOAP encoded arrays read from a message, as declared
+     * in their arrayType attributes. Together with {@link #MAX_ARRAY_ELEMENTS}, this limits the memory a
+     * message can make the service allocate, however many arrays it contains. The default is 1000000, and a
+     * negative value means no limit. It can be set as a message (endpoint or client) property, or as a
+     * system property.
+     */
+    public static final String MAX_TOTAL_ARRAY_ELEMENTS = "org.apache.cxf.aegis.encoded.maxTotalArrayElements";
+
     private static final Logger LOG = LogUtils.getL7dLogger(SoapArrayType.class);
     private static final String SOAP_ENCODING_NS_1_1 = Soap11.getInstance().getSoapEncodingStyle();
     private static final QName SOAP_ARRAY_POSITION = new QName(SOAP_ENCODING_NS_1_1, "position");
+    private static final int DEFAULT_MAX_ARRAY_ELEMENTS =
+        SystemPropertyAction.getInteger(MAX_ARRAY_ELEMENTS, 1000000);
+    private static final int DEFAULT_MAX_TOTAL_ARRAY_ELEMENTS =
+        SystemPropertyAction.getInteger(MAX_TOTAL_ARRAY_ELEMENTS, 1000000);
+    private static final String ARRAY_ELEMENT_COUNT = SoapArrayType.class.getName() + ".elementCount";
 
     private QName componentName;
 
@@ -70,10 +93,7 @@ public class SoapArrayType extends AegisType {
             }
 
             // calculate max size
-            int maxSize = 1;
-            for (int dimension : arrayTypeInfo.getDimensions()) {
-                maxSize *= dimension;
-            }
+            int maxSize = reserveArrayElements(context, arrayTypeInfo);
 
             // verify offset doesn't exceed maximum size
             if (arrayTypeInfo.getOffset() >= maxSize) {
@@ -116,6 +136,53 @@ public class SoapArrayType extends AegisType {
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument.", e);
         }
+    }
+
+    /**
+     * Calculate the number of elements of the array from its declared dimensions, and check it against the
+     * limits on the size of an array and on the total number of array elements in the message, before
+     * anything of that size is allocated.
+     */
+    private int reserveArrayElements(Context context, ArrayTypeInfo arrayTypeInfo) {
+        long size = 1;
+        for (int dimension : arrayTypeInfo.getDimensions()) {
+            size *= dimension;
+            if (size > Integer.MAX_VALUE) {
+                throw new DatabindingException("The size of the array " + arrayTypeInfo + " in "
+                        + getSchemaType() + " is too large");
+            }
+        }
+
+        int maxElements = getLimit(context, MAX_ARRAY_ELEMENTS, DEFAULT_MAX_ARRAY_ELEMENTS);
+        if (maxElements >= 0 && size > maxElements) {
+            throw new DatabindingException("The size of the array " + arrayTypeInfo + " in " + getSchemaType()
+                    + " exceeds the maximum array size of " + maxElements);
+        }
+
+        Long count = context.getProperty(ARRAY_ELEMENT_COUNT, Long.class);
+        long total = size + (count == null ? 0 : count);
+        int maxTotalElements = getLimit(context, MAX_TOTAL_ARRAY_ELEMENTS, DEFAULT_MAX_TOTAL_ARRAY_ELEMENTS);
+        if (maxTotalElements >= 0 && total > maxTotalElements) {
+            throw new DatabindingException("The size of the array " + arrayTypeInfo + " in " + getSchemaType()
+                    + " exceeds the maximum total number of array elements in a message of " + maxTotalElements);
+        }
+        context.setProperty(ARRAY_ELEMENT_COUNT, total);
+        return (int)size;
+    }
+
+    private static int getLimit(Context context, String key, int defaultValue) {
+        Message message = context.getProperty(Message.class.getName(), Message.class);
+        Object value = message == null ? null : message.getContextualProperty(key);
+        if (value instanceof Number) {
+            return ((Number)value).intValue();
+        } else if (value instanceof String) {
+            try {
+                return Integer.parseInt(((String)value).trim());
+            } catch (NumberFormatException ex) {
+                throw new DatabindingException("Invalid value for " + key + ": " + value);
+            }
+        }
+        return defaultValue;
     }
 
     protected List<Object> readCollection(MessageReader reader,
@@ -167,7 +234,7 @@ public class SoapArrayType extends AegisType {
                 values.add(value);
             } else {
                 int valuesPosition = readValuesPosition(position, arrayTypeInfo.getDimensions());
-                if (valuesPosition > maxSize) {
+                if (valuesPosition < 0 || valuesPosition >= maxSize) {
                     throw new DatabindingException("Array position " + valuesPosition + " in "
                             + getSchemaType() + " exceeds the maximum size of " + maxSize);
                 }
@@ -207,6 +274,9 @@ public class SoapArrayType extends AegisType {
                     int tokenId = i * 2;
 
                     index[i] = Integer.parseInt(tokens.get(tokenId));
+                    if (index[i] < 0 || index[i] >= dimensions.get(i)) {
+                        throw new IllegalStateException("Position " + index[i] + " is outside the array");
+                    }
 
                     if (tokenId + 1 < tokens.size() && !",".equals(tokens.get(tokenId + 1))) {
                         throw new IllegalStateException(
