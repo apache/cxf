@@ -54,20 +54,11 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     private static boolean unrestrictedPoliciesInstalled =
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
 
-    private static boolean runTests;
-
     private static SimpleKdcServer kerbyServer;
 
     @BeforeClass
     public static void startServers() throws Exception {
         WSSConfig.init();
-
-        //
-        // This test fails with the IBM JDK
-        //
-        if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            runTests = true;
-        }
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
@@ -123,7 +114,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverSymmetric() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -136,7 +127,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverSymmetricDerived() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -149,7 +140,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverSymmetricEncryptBeforeSigning() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -162,7 +153,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverTransport() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -176,7 +167,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverTransportEndorsing() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -190,7 +181,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testSpnegoOverTransportEndorsingSP11() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -205,7 +196,7 @@ public class SpnegoTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     @org.junit.Ignore
     public void testSpnegoOverSymmetricSecureConversation() throws Exception {
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 

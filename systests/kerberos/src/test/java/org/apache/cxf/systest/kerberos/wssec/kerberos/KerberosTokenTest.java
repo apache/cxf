@@ -61,21 +61,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     private static boolean unrestrictedPoliciesInstalled =
         SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
 
-    private static boolean runTests;
-
     private static SimpleKdcServer kerbyServer;
 
     @BeforeClass
     public static void startServers() throws Exception {
 
         WSSConfig.init();
-
-        //
-        // This test fails with the IBM JDK
-        //
-        if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            runTests = true;
-        }
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
@@ -152,10 +143,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKerberosOverTransport() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         String portName = "DoubleItKerberosTransportPort";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, false, STAX_PORT2);
@@ -165,10 +152,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKerberosOverTransportDifferentConfiguration() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         String portName = "DoubleItKerberosTransportPort2";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, false, STAX_PORT2);
@@ -178,10 +161,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKerberosOverTransportKeytabs() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         String portName = "DoubleItKerberosTransportPort3";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, true, PORT2);
@@ -190,7 +169,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetric() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -204,7 +183,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricSupporting() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -218,7 +197,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosSupporting() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -232,7 +211,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverAsymmetric() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -246,7 +225,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverTransportEndorsing() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -260,7 +239,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverAsymmetricEndorsing() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -275,7 +254,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricProtection() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -289,7 +268,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricDerivedProtection() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -305,7 +284,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverAsymmetricSignedEndorsing() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -320,7 +299,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverAsymmetricSignedEncrypted() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -334,7 +313,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricEndorsingEncrypted() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -349,7 +328,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricSignedEndorsingEncrypted() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -364,7 +343,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testKerberosOverSymmetricSecureConversation() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -383,7 +362,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testWSTrustKerberosToken() throws Exception {
 
-        if (!runTests || !unrestrictedPoliciesInstalled) {
+        if (!unrestrictedPoliciesInstalled) {
             return;
         }
 
@@ -396,10 +375,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKerberosViaCustomTokenAction() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = KerberosTokenTest.class.getResource("client.xml");
 
