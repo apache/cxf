@@ -46,19 +46,10 @@ public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
     private static final String KERBEROS_CONFIG_FILE =
         "org/apache/cxf/systest/kerberos/jaxrs/kerberos/kerberosClient.xml";
 
-    private static boolean runTests;
-
     private static SimpleKdcServer kerbyServer;
 
     @BeforeClass
     public static void startServers() throws Exception {
-
-        //
-        // This test fails with the IBM JDK
-        //
-        if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            runTests = true;
-        }
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
@@ -107,10 +98,6 @@ public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookWithConfigInHttpConduit() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         doTestGetBook123Proxy(KERBEROS_CONFIG_FILE);
     }
 
@@ -134,10 +121,6 @@ public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBookWithInterceptor() throws Exception {
-        if (!runTests) {
-            return;
-        }
-
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
 
         KerberosAuthOutInterceptor kbInterceptor = new KerberosAuthOutInterceptor();
