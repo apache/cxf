@@ -1784,8 +1784,16 @@ public abstract class HTTPConduit
                     }
                     //REVISIT move the decoupled destination property name into api
                     Endpoint ep = exchange.getEndpoint();
-                    if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
-                            getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+                    EndpointInfo ei = ep == null ? null : ep.getEndpointInfo();
+                    boolean decoupled = ei != null && ei.getProperty(
+                        "org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination") != null;
+                    if (in == null && !isOneway(exchange) && decoupled) {
+                        // The SOAP reply arrives separately and may already have completed the exchange.
+                        // An empty acknowledgement must neither replace it nor complete its inbound chain,
+                        // including through an incoming observer when explicit 202 propagation is enabled.
+                        return;
+                    }
+                    if (ei != null && !decoupled) {
                         // remove callback so that it won't be invoked twice
                         ClientCallback cc = exchange.remove(ClientCallback.class);
                         if (null != cc) {
