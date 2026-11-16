@@ -113,6 +113,8 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     private volatile SSLContext sslContext;
     private volatile SSLSession session;
     private volatile CloseableHttpAsyncClient client;
+    // the policy the client was got for from the factory, to release it on close()
+    private HTTPClientPolicy clientPolicy;
 
     public AsyncHTTPConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, AsyncHTTPConduitFactory factory) 
             throws IOException {
@@ -125,6 +127,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             throws IOException {
         
         if (client == null) {
+            clientPolicy = getClient();
             client = factory.createClient(this, tlsStrategy);
         }
         if (client == null) {
@@ -1004,8 +1007,17 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
     @Override
     public void close() {
         super.close();
-        if (factory != null) {
-            factory.close(this.getClient());
+        final HTTPClientPolicy policy;
+        final CloseableHttpAsyncClient httpClient;
+        synchronized (this) {
+            // release the client only once, and only if this conduit got one
+            policy = clientPolicy;
+            httpClient = client;
+            clientPolicy = null;
+            client = null;
+        }
+        if (factory != null && policy != null) {
+            factory.release(policy, httpClient);
         }
     }
 

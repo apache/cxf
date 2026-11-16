@@ -129,10 +129,22 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     private static class AsyncClient {
         private final PoolingAsyncClientConnectionManager connectionManager;
         private final CloseableHttpAsyncClient client;
+        // the conduits using the client, only changed within clients.compute() and computeIfPresent(),
+        // which hold the lock of the map entry, so it needs no further synchronization
+        private int references;
         
         AsyncClient(PoolingAsyncClientConnectionManager connectionManager, CloseableHttpAsyncClient client) {
             this.connectionManager = connectionManager;
             this.client = client;
+        }
+        
+        AsyncClient acquire() {
+            references++;
+            return this;
+        }
+        
+        int release() {
+            return --references;
         }
         
         public CloseableHttpAsyncClient getClient() {
@@ -331,14 +343,12 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
-    public synchronized void setupNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
-        final AsyncClient client = clients.get(clientPolicy);
-
-        if (client != null) {
-            return;
-        }
-        
-        clients.computeIfAbsent(clientPolicy, key -> createNIOClient(key, tlsStrategy));
+    public void setupNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
+        // acquire a reference for the pre-created client too, so that every entry in the map is
+        // held by at least one reference and a conduit that later uses and closes this client does
+        // not shut it down. The mapping function runs only when absent, so repeated calls add no
+        // further reference.
+        clients.computeIfAbsent(clientPolicy, key -> createNIOClient(key, tlsStrategy).acquire());
     }
     
     private AsyncClient createNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
@@ -421,8 +431,10 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c, final TlsStrategy tlsStrategy) 
             throws IOException {
 
+        // conduits with the same policy share the client, and each one releases it with close()
         return clients
-            .computeIfAbsent(c.getClient(), key -> createNIOClient(key, tlsStrategy))
+            .compute(c.getClient(), (key, client) -> (client != null ? client : createNIOClient(key, tlsStrategy))
+                .acquire())
             .getClient();
     }
     
@@ -464,8 +476,21 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
-    public void close(HTTPClientPolicy clientPolicy) {
-        final AsyncClient client = clients.remove(clientPolicy);
+    /**
+     * Releases the client a conduit got from {@link #createClient} for this policy, and shuts it down once
+     * no conduit uses it any longer. Does nothing if the policy now maps to another client: update() has
+     * replaced the one the conduit got, and has already shut it down.
+     */
+    void release(HTTPClientPolicy clientPolicy, CloseableHttpAsyncClient httpClient) {
+        final AsyncClient[] released = new AsyncClient[1];
+        clients.computeIfPresent(clientPolicy, (key, client) -> {
+            if (client.getClient() != httpClient || client.release() > 0) {
+                return client;
+            }
+            released[0] = client;
+            return null;
+        });
+        final AsyncClient client = released[0];
         if (client != null) {
             shutdown(client.getClient());
             client.getConnectionManager().close();

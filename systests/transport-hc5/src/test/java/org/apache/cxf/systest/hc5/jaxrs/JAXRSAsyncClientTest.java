@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +121,28 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (jakarta.ws.rs.ProcessingException e) {
             //expected!!!
         }
+    }
+
+    @Test
+    public void testClosingClientWithSamePolicyKeepsCallsOfOtherClients() throws Exception {
+        // the conduits of WebClients configured with the same policy share one hc5 client
+        HTTPClientPolicy policy = new HTTPClientPolicy();
+        policy.setReceiveTimeout(5000);
+        String address = "http://localhost:" + PORT + "/bookstore/patch";
+        WebClient wc = createWebClientWithPolicy(address, policy);
+        WebClient other = createWebClientWithPolicy(address, policy);
+        assertEquals("Patch", other.invoke("PATCH", new Book("Patch", 123L), Book.class).getName());
+
+        // the server answers this call after 2 s, so the other WebClient is closed while it is in flight
+        Future<Book> book = CompletableFuture.supplyAsync(
+            () -> wc.invoke("PATCH", new Book("Timeout", 123L), Book.class));
+        Thread.sleep(500);
+        other.close();
+        assertEquals("Timeout", book.get(10, TimeUnit.SECONDS).getName());
+
+        // and the later calls succeed too
+        assertEquals("Patch", wc.invoke("PATCH", new Book("Patch", 124L), Book.class).getName());
+        wc.close();
     }
 
     @Test
@@ -549,6 +572,12 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     private WebClient createWebClient(String address, Object ... providers) {
         final WebClient wc = WebClient.create(address, Arrays.asList(providers));
         WebClient.getConfig(wc).getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, true);
+        return wc;
+    }
+
+    private WebClient createWebClientWithPolicy(String address, HTTPClientPolicy policy) {
+        final WebClient wc = createWebClient(address).type("application/xml");
+        WebClient.getConfig(wc).getHttpConduit().setClient(policy);
         return wc;
     }
 
