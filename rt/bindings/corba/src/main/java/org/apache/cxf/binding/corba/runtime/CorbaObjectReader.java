@@ -19,6 +19,7 @@
 package org.apache.cxf.binding.corba.runtime;
 
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -55,11 +56,13 @@ import org.omg.CORBA.Any;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.TypeCodePackage.BadKind;
 import org.omg.CORBA.portable.InputStream;
 
 public class CorbaObjectReader {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaObjectReader.class);
+    private static final int OCTET_CHUNK_SIZE = 64 * 1024;
 
     private InputStream stream;
 
@@ -514,15 +517,14 @@ public class CorbaObjectReader {
 
     public void readSequence(CorbaObjectHandler obj) throws CorbaBindingException {
         if (obj instanceof CorbaOctetSequenceHandler) {
-            int length = stream.read_ulong();
-            byte[] value = new byte[length];
-            stream.read_octet_array(value, 0, length);
-            ((CorbaOctetSequenceHandler) obj).setValue(value);
+            int length = readSequenceLength(obj);
+            ((CorbaOctetSequenceHandler) obj).setValue(readOctets(length));
         } else {
             CorbaSequenceHandler sequenceObj = (CorbaSequenceHandler)obj;
             List<CorbaObjectHandler> seqElements = sequenceObj.getElements();
-            int length = stream.read_ulong();
-            List<CorbaObjectHandler> elements = new ArrayList<>(length);
+            int length = readSequenceLength(obj);
+            // don't size the list from the length in the message, it grows as the elements are read
+            List<CorbaObjectHandler> elements = new ArrayList<>();
 
             // Simply checking the bound won't handle our recursive types.  We need to check for the
             // existance of template, which will be present for all unbounded sequences and for bound
@@ -544,12 +546,68 @@ public class CorbaObjectReader {
                 sequenceObj.setElements(elements);
             } else {
                 // We have a bounded sequence and the object should already be pre-built
+                if (length > seqElements.size()) {
+                    throw new CorbaBindingException("Sequence length " + length
+                        + " exceeds the number of elements " + seqElements.size());
+                }
                 for (int i = 0; i < length; ++i) {
                     read(seqElements.get(i));
                 }
                 sequenceObj.setElements(seqElements.subList(0, length));
             }
         }
+    }
+
+    /**
+     * Read a sequence length from the stream. It is controlled by the sender, so check that it is
+     * non-negative and within the bound of the sequence type before it is used.
+     */
+    private int readSequenceLength(CorbaObjectHandler obj) {
+        int length = stream.read_ulong();
+        if (length < 0) {
+            // an unsigned long larger than Integer.MAX_VALUE
+            throw new CorbaBindingException("Sequence length " + Integer.toUnsignedLong(length)
+                + " is too large");
+        }
+        int bound = getSequenceBound(obj.getTypeCode());
+        if (bound > 0 && length > bound) {
+            throw new CorbaBindingException("Sequence length " + length + " exceeds the bound " + bound);
+        }
+        return length;
+    }
+
+    private static int getSequenceBound(TypeCode tc) {
+        try {
+            while (tc != null && tc.kind().value() == TCKind._tk_alias) {
+                tc = tc.content_type();
+            }
+            return tc == null ? 0 : tc.length();
+        } catch (BadKind ex) {
+            // not a sequence type code, so there is no bound
+            return 0;
+        }
+    }
+
+    /**
+     * Read a sequence of octets. A large sequence is read in chunks, so that memory is only allocated as
+     * the data actually arrives, rather than up front for whatever length the sender declared.
+     */
+    private byte[] readOctets(int length) {
+        if (length <= OCTET_CHUNK_SIZE) {
+            byte[] value = new byte[length];
+            stream.read_octet_array(value, 0, length);
+            return value;
+        }
+        ByteArrayOutputStream value = new ByteArrayOutputStream(OCTET_CHUNK_SIZE);
+        byte[] chunk = new byte[OCTET_CHUNK_SIZE];
+        int remaining = length;
+        while (remaining > 0) {
+            int size = Math.min(remaining, chunk.length);
+            stream.read_octet_array(chunk, 0, size);
+            value.write(chunk, 0, size);
+            remaining -= size;
+        }
+        return value.toByteArray();
     }
 
     public void readObjectReference(CorbaObjectReferenceHandler objRefObj) throws CorbaBindingException {
