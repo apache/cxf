@@ -22,6 +22,7 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -118,9 +119,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     };
     
     /**
-     * See please https://issues.apache.org/jira/browse/CXF-8678 and 
-     * https://issues.apache.org/jira/browse/HTTPCLIENT-2209, the context propagation
-     * is necessary to remove per-HTTPClientPolicy caching.
+     * The client of a conduit, with its connection manager. Each conduit has its own client, which it shuts
+     * down on close(), see please https://issues.apache.org/jira/browse/CXF-9140.
      */
     private static class AsyncClient {
         private final PoolingAsyncClientConnectionManager connectionManager;
@@ -140,7 +140,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
-    private volatile Map<HTTPClientPolicy, AsyncClient> clients = new ConcurrentHashMap<>();
+    // the clients of the conduits, to shut them down with the factory
+    private final Set<AsyncClient> clients = ConcurrentHashMap.newKeySet();
 
     private boolean isShutdown;
     private UseAsyncPolicy policy;
@@ -183,9 +184,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     private void restartReactor() {
-        final Map<HTTPClientPolicy, AsyncClient> clients2 = clients;
-        clients = new ConcurrentHashMap<>();
-        shutdown(clients2);
+        shutdownClients();
     }
 
     private boolean setProperties(Map<String, Object> s) {
@@ -205,8 +204,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
 
         if (!clients.isEmpty()) {
-            for (Map.Entry<HTTPClientPolicy, AsyncClient> entry: clients.entrySet()) {
-                final PoolingAsyncClientConnectionManager connectionManager = entry.getValue().getConnectionManager();
+            for (AsyncClient client: clients) {
+                final PoolingAsyncClientConnectionManager connectionManager = client.getConnectionManager();
                 connectionManager.setMaxTotal(maxConnections);
                 connectionManager.setDefaultMaxPerRoute(maxPerRoute);
             }
@@ -289,17 +288,13 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     public void shutdown() {
-        shutdown(clients);
-        clients.clear();
+        shutdownClients();
         isShutdown = true;
     }
 
-    private static void shutdown(Map<HTTPClientPolicy, AsyncClient> clients) {
-        if (!clients.isEmpty()) {
-            for (Map.Entry<HTTPClientPolicy, AsyncClient> entry: clients.entrySet()) {
-                shutdown(entry.getValue().getClient());
-                entry.getValue().getConnectionManager().close();
-            }
+    private void shutdownClients() {
+        for (AsyncClient client: clients) {
+            release(client);
         }
     }
 
@@ -326,14 +321,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
-    public synchronized void setupNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
-        final AsyncClient client = clients.get(clientPolicy);
-
-        if (client != null) {
-            return;
-        }
-        
-        clients.computeIfAbsent(clientPolicy, key -> createNIOClient(key, tlsStrategy));
+    /**
+     * @deprecated each conduit creates its own client, so there is no client to set up for a policy
+     */
+    @Deprecated
+    public void setupNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
     }
     
     private AsyncClient createNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
@@ -411,9 +403,10 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c, final TlsStrategy tlsStrategy) 
             throws IOException {
 
-        return clients
-            .computeIfAbsent(c.getClient(), key -> createNIOClient(key, tlsStrategy))
-            .getClient();
+        // a new client for each conduit, which shuts it down with release() on close()
+        final AsyncClient client = createNIOClient(c.getClient(), tlsStrategy);
+        clients.add(client);
+        return client.getClient();
     }
     
     int getMaxConnections() {
@@ -454,9 +447,22 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
+    /**
+     * @deprecated each conduit has its own client, which it shuts down on close()
+     */
+    @Deprecated
     public void close(HTTPClientPolicy clientPolicy) {
-        final AsyncClient client = clients.remove(clientPolicy);
-        if (client != null) {
+    }
+
+    /**
+     * Shuts down the client a conduit got from {@link #createClient}.
+     */
+    void release(CloseableHttpAsyncClient httpClient) {
+        clients.stream().filter(c -> c.getClient() == httpClient).findAny().ifPresent(this::release);
+    }
+
+    private void release(AsyncClient client) {
+        if (clients.remove(client)) {
             shutdown(client.getClient());
             client.getConnectionManager().close();
         }
