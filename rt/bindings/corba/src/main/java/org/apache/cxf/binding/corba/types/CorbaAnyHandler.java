@@ -31,6 +31,7 @@ public class CorbaAnyHandler extends CorbaObjectHandler {
     private Any value;
     private CorbaObjectHandler containedType;
     private CorbaTypeMap typeMap;
+    private int nestingDepth;
 
     public CorbaAnyHandler(QName anyName,
                            QName anyIdlType,
@@ -67,5 +68,17 @@ public class CorbaAnyHandler extends CorbaObjectHandler {
 
     public void setValue(Any v) throws CorbaBindingException {
         value = v;
+    }
+
+    /**
+     * The depth at which this Any is nested in the message, so that the nesting depth of its contents can
+     * be limited when they are read.
+     */
+    public int getNestingDepth() {
+        return nestingDepth;
+    }
+
+    public void setNestingDepth(int depth) {
+        nestingDepth = depth;
     }
 }
