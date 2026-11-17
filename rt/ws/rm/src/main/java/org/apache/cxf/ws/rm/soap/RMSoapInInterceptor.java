@@ -244,10 +244,11 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         ProtocolVariation protocol =
             ProtocolVariation.findVariant(consts.getWSRMNamespace(), maps.getNamespaceURI());
 
-        // A partial response to an application request, e.g. the acknowledgements for a Sequence with an
-        // anonymous AcksTo while the reply goes to a decoupled endpoint: the exchange stays with the
-        // application operation, for the reply
-        if (MessageUtils.isPartialResponse(message) && isApplicationRequest(message.getExchange())) {
+        // A partial response to a two-way application request, e.g. the acknowledgements for a Sequence
+        // with an anonymous AcksTo while the reply goes to a decoupled endpoint: the exchange stays with
+        // the application operation, for the reply.
+        if (MessageUtils.isPartialResponse(message) && !message.getExchange().isOneWay()
+            && isApplicationRequest(message.getExchange())) {
             LOG.fine("Partial response to an application request, not updating service model info");
             return;
         }
@@ -359,7 +360,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
 
     private static boolean isApplicationRequest(Exchange exchange) {
         Message request = exchange.getOutMessage();
-        AddressingProperties maps = request == null ? null : RMContextUtils.retrieveMAPs(request, false, true);
+        AddressingProperties maps = request == null ? null : ContextUtils.retrieveMAPs(request, false, true, false);
         return maps != null && maps.getAction() != null
             && !RMContextUtils.isRMProtocolMessage(maps.getAction().getValue());
     }
