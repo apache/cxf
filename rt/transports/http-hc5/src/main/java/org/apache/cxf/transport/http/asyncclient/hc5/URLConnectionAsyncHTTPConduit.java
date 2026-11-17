@@ -989,8 +989,14 @@ public class URLConnectionAsyncHTTPConduit extends URLConnectionHTTPConduit {
     @Override
     public void close() {
         super.close();
-        if (factory != null) {
-            factory.close(this.getClient());
+        final CloseableHttpAsyncClient httpClient;
+        synchronized (this) {
+            // shut the client down once, and only if this conduit got one
+            httpClient = client;
+            client = null;
+        }
+        if (factory != null && httpClient != null) {
+            factory.release(httpClient);
         }
     }
 
