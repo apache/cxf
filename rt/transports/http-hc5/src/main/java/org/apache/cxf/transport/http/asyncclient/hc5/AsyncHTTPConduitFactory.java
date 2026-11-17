@@ -22,6 +22,7 @@ package org.apache.cxf.transport.http.asyncclient.hc5;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -144,7 +145,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     // the clients of the conduits, to shut them down with the factory
-    private final Map<CloseableHttpAsyncClient, AsyncClient> clients = new ConcurrentHashMap<>();
+    private final Set<AsyncClient> clients = ConcurrentHashMap.newKeySet();
 
     private boolean isShutdown;
     private UseAsyncPolicy policy;
@@ -208,7 +209,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         bufferSize = getInt(s.get(BUFFER_SIZE), bufferSize);
 
         if (!clients.isEmpty()) {
-            for (AsyncClient client: clients.values()) {
+            for (AsyncClient client: clients) {
                 final PoolingAsyncClientConnectionManager connectionManager = client.getConnectionManager();
                 connectionManager.setMaxTotal(maxConnections);
                 connectionManager.setDefaultMaxPerRoute(maxPerRoute);
@@ -297,7 +298,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     private void shutdownClients() {
-        for (CloseableHttpAsyncClient client: clients.keySet()) {
+        for (AsyncClient client: clients) {
             release(client);
         }
     }
@@ -414,7 +415,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
         // a new client for each conduit, which shuts it down with release() on close()
         final AsyncClient client = createNIOClient(c.getClient(), tlsStrategy);
-        clients.put(client.getClient(), client);
+        clients.add(client);
         return client.getClient();
     }
     
@@ -467,8 +468,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
      * Shuts down the client a conduit got from {@link #createClient}.
      */
     void release(CloseableHttpAsyncClient httpClient) {
-        final AsyncClient client = clients.remove(httpClient);
-        if (client != null) {
+        clients.stream().filter(c -> c.getClient() == httpClient).findAny().ifPresent(this::release);
+    }
+
+    private void release(AsyncClient client) {
+        if (clients.remove(client)) {
             shutdown(client.getClient());
             client.getConnectionManager().close();
         }
