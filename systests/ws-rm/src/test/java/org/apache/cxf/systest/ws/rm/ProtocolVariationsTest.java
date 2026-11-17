@@ -388,6 +388,37 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testDefaultDecoupledAnonymousAcksTo() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
+
+        // the acknowledgements come in the HTTP responses to the requests, the replies at the decoupled endpoint
+        greeterBus.getExtension(RMManager.class).getSourcePolicy().setAcksTo(Names.WSA_ANONYMOUS_ADDRESS);
+
+        assertEquals("ONE", greeter.greetMe("one"));
+        assertEquals("TWO", greeter.greetMe("two"));
+        assertEquals("THREE", greeter.greetMe("three"));
+
+        verifyTwowayNonAnonymousAnonymousAcksTo(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
+    }
+
+    @Test
+    public void testRM11DecoupledAnonymousAcksTo() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
+
+        // WS-RM 1.1 and WS-A 1.0
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names.WSA_NAMESPACE_NAME);
+        greeterBus.getExtension(RMManager.class).getSourcePolicy().setAcksTo(Names.WSA_ANONYMOUS_ADDRESS);
+
+        assertEquals("ONE", greeter.greetMe("one"));
+        assertEquals("TWO", greeter.greetMe("two"));
+        assertEquals("THREE", greeter.greetMe("three"));
+
+        verifyTwowayNonAnonymousAnonymousAcksTo(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
+    }
+
+    @Test
     public void testTerminateSequenceDefault() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
 
@@ -500,6 +531,24 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[4], false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
+    }
+
+    private void verifyTwowayNonAnonymousAnonymousAcksTo(String wsaUri, RMConstants consts) throws Exception {
+
+        // CreateSequence and three greetMe messages out; createSequenceResponse, three greetMeResponse
+        // messages and the acknowledgements of the three greetMe messages (in their HTTP responses) in
+
+        awaitMessages(4, 7);
+
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
+            inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
+
+        mf.verifyMessages(4, true);
+        mf.verifyActions(new String[] {consts.getCreateSequenceAction(), GREETME_ACTION, GREETME_ACTION,
+                                       GREETME_ACTION}, true);
+        mf.verifyMessages(7, false);
+        mf.verifyAcknowledgements(3, false, true);
+        mf.verifyAcknowledgementRange(1, 3);
     }
 
     // --- test utilities ---

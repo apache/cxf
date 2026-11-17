@@ -21,6 +21,7 @@ package org.apache.cxf.ws.rm.soap;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -29,14 +30,24 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
+import org.apache.cxf.ws.rm.AbstractRMInterceptor;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMContextUtils;
+import org.apache.cxf.ws.rm.RMException;
+import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
@@ -46,9 +57,15 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RMSoapInInterceptorTest {
 
@@ -154,6 +171,62 @@ public class RMSoapInInterceptorTest {
         assertEquals(s.getMessageNumber(), MSG2_MESSAGE_NUMBER);
 
         assertNull(rmps.getAcks());
+    }
+
+    @Test
+    public void testPartialResponseToTwoWayRequestKeepsExchange() throws XMLStreamException {
+        // e.g. the acknowledgements for a Sequence with an anonymous AcksTo, with a decoupled endpoint
+        SoapMessage message = setUpPartialResponse(false);
+        BindingOperationInfo boi = new BindingOperationInfo();
+        message.getExchange().put(BindingOperationInfo.class, boi);
+        RMSoapInInterceptor codec = new RMSoapInInterceptor();
+        codec.handleMessage(message);
+
+        // the exchange stays with the application operation, for the reply
+        assertSame(boi, message.getExchange().getBindingOperationInfo());
+        assertFalse(message.getExchange().isOneWay());
+        // and the acknowledgements are still decoded
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        assertEquals(1, rmps.getAcks().size());
+    }
+
+    @Test
+    public void testPartialResponseToOneWayRequestUpdatesExchange() throws Exception {
+        SoapMessage message = setUpPartialResponse(true);
+        RMManager manager = mock(RMManager.class);
+        RMException failure = new RMException(new Exception("no reliable endpoint"));
+        when(manager.getReliableEndpoint(message)).thenThrow(failure);
+        AbstractRMInterceptor<?> rmInterceptor = mock(AbstractRMInterceptor.class);
+        when(rmInterceptor.getManager()).thenReturn(manager);
+        InterceptorChain chain = mock(InterceptorChain.class);
+        when(chain.getIterator()).thenReturn(List.<Interceptor<? extends Message>>of(rmInterceptor).listIterator());
+        message.setInterceptorChain(chain);
+        RMSoapInInterceptor codec = new RMSoapInInterceptor();
+        try {
+            codec.handleMessage(message);
+            fail("expected the exchange to be updated with the reliable endpoint");
+        } catch (SoapFault ex) {
+            assertSame(failure, ex.getCause());
+        }
+        verify(manager).getReliableEndpoint(message);
+    }
+
+    private SoapMessage setUpPartialResponse(boolean oneWay) throws XMLStreamException {
+        SoapMessage message = setUpInboundMessage("resources/Acknowledgment2.xml");
+        message.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
+        RMContextUtils.retrieveMAPs(message, false, false)
+            .setAction(ContextUtils.getAttributedURI(RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION));
+
+        Exchange exchange = new ExchangeImpl();
+        exchange.setOneWay(oneWay);
+        Message request = new MessageImpl();
+        request.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+        AddressingProperties requestMaps = new AddressingProperties();
+        requestMaps.setAction(ContextUtils.getAttributedURI("http://cxf.apache.org/greeter_control/Greeter/greetMe"));
+        RMContextUtils.storeMAPs(requestMaps, request, true, true);
+        exchange.setOutMessage(request);
+        message.setExchange(exchange);
+        return message;
     }
 
     private SoapMessage setUpInboundMessage(String resource) throws XMLStreamException {
