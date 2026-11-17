@@ -125,7 +125,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testClosingClientWithSamePolicyKeepsCallsOfOtherClients() throws Exception {
-        // the conduits of WebClients configured with the same policy share one hc5 client
+        // WebClients configured with the same policy, each one with its own hc5 client
         HTTPClientPolicy policy = new HTTPClientPolicy();
         policy.setReceiveTimeout(5000);
         String address = "http://localhost:" + PORT + "/bookstore/patch";

@@ -122,29 +122,16 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
     
     /**
-     * See please https://issues.apache.org/jira/browse/CXF-8678 and 
-     * https://issues.apache.org/jira/browse/HTTPCLIENT-2209, the context propagation
-     * is necessary to remove per-HTTPClientPolicy caching.
+     * The client of a conduit, with its connection manager. Each conduit has its own client, which it shuts
+     * down on close(), see please https://issues.apache.org/jira/browse/CXF-9140.
      */
     private static class AsyncClient {
         private final PoolingAsyncClientConnectionManager connectionManager;
         private final CloseableHttpAsyncClient client;
-        // the conduits using the client, only changed within clients.compute() and computeIfPresent(),
-        // which hold the lock of the map entry, so it needs no further synchronization
-        private int references;
         
         AsyncClient(PoolingAsyncClientConnectionManager connectionManager, CloseableHttpAsyncClient client) {
             this.connectionManager = connectionManager;
             this.client = client;
-        }
-        
-        AsyncClient acquire() {
-            references++;
-            return this;
-        }
-        
-        int release() {
-            return --references;
         }
         
         public CloseableHttpAsyncClient getClient() {
@@ -156,7 +143,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
-    private volatile Map<HTTPClientPolicy, AsyncClient> clients = new ConcurrentHashMap<>();
+    // the clients of the conduits, to shut them down with the factory
+    private final Map<CloseableHttpAsyncClient, AsyncClient> clients = new ConcurrentHashMap<>();
 
     private boolean isShutdown;
     private UseAsyncPolicy policy;
@@ -199,9 +187,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     private void restartReactor() {
-        final Map<HTTPClientPolicy, AsyncClient> clients2 = clients;
-        clients = new ConcurrentHashMap<>();
-        shutdown(clients2);
+        shutdownClients();
     }
 
     private boolean setProperties(Map<String, Object> s) {
@@ -222,8 +208,8 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         bufferSize = getInt(s.get(BUFFER_SIZE), bufferSize);
 
         if (!clients.isEmpty()) {
-            for (Map.Entry<HTTPClientPolicy, AsyncClient> entry: clients.entrySet()) {
-                final PoolingAsyncClientConnectionManager connectionManager = entry.getValue().getConnectionManager();
+            for (AsyncClient client: clients.values()) {
+                final PoolingAsyncClientConnectionManager connectionManager = client.getConnectionManager();
                 connectionManager.setMaxTotal(maxConnections);
                 connectionManager.setDefaultMaxPerRoute(maxPerRoute);
             }
@@ -306,17 +292,13 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     public void shutdown() {
-        shutdown(clients);
-        clients.clear();
+        shutdownClients();
         isShutdown = true;
     }
 
-    private static void shutdown(Map<HTTPClientPolicy, AsyncClient> clients) {
-        if (!clients.isEmpty()) {
-            for (Map.Entry<HTTPClientPolicy, AsyncClient> entry: clients.entrySet()) {
-                shutdown(entry.getValue().getClient());
-                entry.getValue().getConnectionManager().close();
-            }
+    private void shutdownClients() {
+        for (CloseableHttpAsyncClient client: clients.keySet()) {
+            release(client);
         }
     }
 
@@ -343,12 +325,11 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
     }
 
+    /**
+     * @deprecated each conduit creates its own client, so there is no client to set up for a policy
+     */
+    @Deprecated
     public void setupNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
-        // acquire a reference for the pre-created client too, so that every entry in the map is
-        // held by at least one reference and a conduit that later uses and closes this client does
-        // not shut it down. The mapping function runs only when absent, so repeated calls add no
-        // further reference.
-        clients.computeIfAbsent(clientPolicy, key -> createNIOClient(key, tlsStrategy).acquire());
     }
     
     private AsyncClient createNIOClient(HTTPClientPolicy clientPolicy, final TlsStrategy tlsStrategy) {
@@ -431,11 +412,10 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public CloseableHttpAsyncClient createClient(final URLConnectionHTTPConduit c, final TlsStrategy tlsStrategy) 
             throws IOException {
 
-        // conduits with the same policy share the client, and each one releases it with close()
-        return clients
-            .compute(c.getClient(), (key, client) -> (client != null ? client : createNIOClient(key, tlsStrategy))
-                .acquire())
-            .getClient();
+        // a new client for each conduit, which shuts it down with release() on close()
+        final AsyncClient client = createNIOClient(c.getClient(), tlsStrategy);
+        clients.put(client.getClient(), client);
+        return client.getClient();
     }
     
     int getMaxConnections() {
@@ -477,20 +457,17 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     /**
-     * Releases the client a conduit got from {@link #createClient} for this policy, and shuts it down once
-     * no conduit uses it any longer. Does nothing if the policy now maps to another client: update() has
-     * replaced the one the conduit got, and has already shut it down.
+     * @deprecated each conduit has its own client, which it shuts down on close()
      */
-    void release(HTTPClientPolicy clientPolicy, CloseableHttpAsyncClient httpClient) {
-        final AsyncClient[] released = new AsyncClient[1];
-        clients.computeIfPresent(clientPolicy, (key, client) -> {
-            if (client.getClient() != httpClient || client.release() > 0) {
-                return client;
-            }
-            released[0] = client;
-            return null;
-        });
-        final AsyncClient client = released[0];
+    @Deprecated
+    public void close(HTTPClientPolicy clientPolicy) {
+    }
+
+    /**
+     * Shuts down the client a conduit got from {@link #createClient}.
+     */
+    void release(CloseableHttpAsyncClient httpClient) {
+        final AsyncClient client = clients.remove(httpClient);
         if (client != null) {
             shutdown(client.getClient());
             client.getConnectionManager().close();

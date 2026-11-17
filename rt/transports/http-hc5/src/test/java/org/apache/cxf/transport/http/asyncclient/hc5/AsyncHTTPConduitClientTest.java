@@ -35,12 +35,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
 
 /**
- * Conduits with the same policy share one hc5 client, which must stay open while a conduit uses it
+ * Each conduit has its own hc5 client, also when conduits have the same policy, and closing a conduit
+ * shuts down only its own client
  */
-public class AsyncHTTPConduitSharedClientTest {
+public class AsyncHTTPConduitClientTest {
     private Bus bus;
     private AsyncHTTPConduitFactory factory;
     private final HTTPClientPolicy policy = new HTTPClientPolicy();
@@ -61,16 +61,18 @@ public class AsyncHTTPConduitSharedClientTest {
     public void testClosingConduitKeepsClientOfOtherConduits() throws Exception {
         AsyncHTTPConduit conduit1 = newConduit();
         AsyncHTTPConduit conduit2 = newConduit();
-        CloseableHttpAsyncClient client = awaitActive(conduit1.getHttpAsyncClient(null));
-        assertSame(client, conduit2.getHttpAsyncClient(null));
+        CloseableHttpAsyncClient client1 = awaitActive(conduit1.getHttpAsyncClient(null));
+        CloseableHttpAsyncClient client2 = awaitActive(conduit2.getHttpAsyncClient(null));
+        assertNotSame(client1, client2);
 
         conduit1.close();
-        // closing it again, as a finalizer may do, does not release the client twice
+        // closing it again, as a finalizer may do, does no harm
         conduit1.close();
-        assertEquals(IOReactorStatus.ACTIVE, client.getStatus());
+        assertNotEquals(IOReactorStatus.ACTIVE, client1.getStatus());
+        assertEquals(IOReactorStatus.ACTIVE, client2.getStatus());
 
         conduit2.close();
-        assertNotEquals(IOReactorStatus.ACTIVE, client.getStatus());
+        assertNotEquals(IOReactorStatus.ACTIVE, client2.getStatus());
     }
 
     @Test
@@ -78,7 +80,6 @@ public class AsyncHTTPConduitSharedClientTest {
         AsyncHTTPConduit conduit = newConduit();
         CloseableHttpAsyncClient client = awaitActive(conduit.getHttpAsyncClient(null));
 
-        // a conduit that has not got the client does not release it
         newConduit().close();
         assertEquals(IOReactorStatus.ACTIVE, client.getStatus());
         conduit.close();
@@ -90,7 +91,7 @@ public class AsyncHTTPConduitSharedClientTest {
         CloseableHttpAsyncClient client = awaitActive(conduit.getHttpAsyncClient(null));
         conduit.close();
 
-        // a conduit used after it was closed does not keep using the client it released
+        // a conduit used after it was closed does not keep using the client it shut down
         CloseableHttpAsyncClient newClient = conduit.getHttpAsyncClient(null);
         assertNotSame(client, newClient);
         awaitActive(newClient);
@@ -98,41 +99,28 @@ public class AsyncHTTPConduitSharedClientTest {
     }
 
     @Test
-    public void testPreCreatedClientStaysOpenAfterConduitsClose() throws Exception {
-        factory.setupNIOClient(policy, null);
-        // setting it up again adds no further reference
-        factory.setupNIOClient(policy, null);
-        AsyncHTTPConduit conduit = newConduit();
-        CloseableHttpAsyncClient client = awaitActive(conduit.getHttpAsyncClient(null));
-        conduit.close();
-        assertEquals(IOReactorStatus.ACTIVE, client.getStatus());
-
-        // a later conduit gets the same pre-created client
-        AsyncHTTPConduit conduit2 = newConduit();
-        assertSame(client, conduit2.getHttpAsyncClient(null));
-        conduit2.close();
-        assertEquals(IOReactorStatus.ACTIVE, client.getStatus());
-
-        factory.shutdown();
-        assertNotEquals(IOReactorStatus.ACTIVE, client.getStatus());
-    }
-
-    @Test
-    public void testUpdateDoesNotReleaseClientOfOtherConduits() throws Exception {
+    public void testUpdateDoesNotShutDownClientOfOtherConduits() throws Exception {
         AsyncHTTPConduit conduit1 = newConduit();
-        CloseableHttpAsyncClient client1 = awaitActive(conduit1.getHttpAsyncClient(null));
+        awaitActive(conduit1.getHttpAsyncClient(null));
 
-        // a property that needs a restart of the reactor replaces the clients
+        // a property that needs a restart of the reactor shuts the clients down
         factory.update(Collections.singletonMap(AsyncHTTPConduitFactory.SO_KEEPALIVE, "true"));
         AsyncHTTPConduit conduit2 = newConduit();
         CloseableHttpAsyncClient client2 = awaitActive(conduit2.getHttpAsyncClient(null));
-        assertNotSame(client1, client2);
 
-        // the conduit that got the replaced client does not release the new one
+        // the conduit that had a client before does not shut down the new one
         conduit1.close();
         assertEquals(IOReactorStatus.ACTIVE, client2.getStatus());
-
         conduit2.close();
+    }
+
+    @Test
+    public void testShutdownShutsDownClientsOfConduits() throws Exception {
+        CloseableHttpAsyncClient client1 = awaitActive(newConduit().getHttpAsyncClient(null));
+        CloseableHttpAsyncClient client2 = awaitActive(newConduit().getHttpAsyncClient(null));
+
+        factory.shutdown();
+        assertNotEquals(IOReactorStatus.ACTIVE, client1.getStatus());
         assertNotEquals(IOReactorStatus.ACTIVE, client2.getStatus());
     }
 
