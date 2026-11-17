@@ -52,6 +52,7 @@ import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.TCKind;
@@ -61,16 +62,47 @@ import org.omg.CORBA.portable.InputStream;
 
 public class CorbaObjectReader {
 
+    /**
+     * The maximum depth to which values can be nested in a CORBA message, including values nested inside an
+     * Any. The default is 100, and a negative value means no limit. It is set as a system property.
+     */
+    public static final String MAX_NESTING_DEPTH = "org.apache.cxf.corba.maxNestingDepth";
+
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaObjectReader.class);
     private static final int OCTET_CHUNK_SIZE = 64 * 1024;
+    private static final int MAX_NESTING_DEPTH_VAL = SystemPropertyAction.getInteger(MAX_NESTING_DEPTH, 100);
 
     private InputStream stream;
+    private int depth;
 
     public CorbaObjectReader(InputStream inStream) {
+        this(inStream, 0);
+    }
+
+    /**
+     * @param inStream the stream to read from
+     * @param depth the depth at which the data in the stream is nested, for the contents of an Any
+     */
+    public CorbaObjectReader(InputStream inStream, int depth) {
         stream = inStream;
+        this.depth = depth;
     }
 
     public void read(CorbaObjectHandler obj) throws CorbaBindingException {
+        // the nesting depth is controlled by the sender, so limit it rather than recursing without bound
+        if (MAX_NESTING_DEPTH_VAL >= 0 && depth >= MAX_NESTING_DEPTH_VAL) {
+            throw new CorbaBindingException("The maximum nesting depth of " + MAX_NESTING_DEPTH_VAL
+                + " has been exceeded");
+        }
+        depth++;
+        try {
+            readValue(obj);
+        } finally {
+            depth--;
+        }
+    }
+
+    private void readValue(CorbaObjectHandler obj) throws CorbaBindingException {
         switch (obj.getTypeCode().kind().value()) {
         case TCKind._tk_boolean:
             ((CorbaPrimitiveHandler)obj).setValue(this.readBoolean());
@@ -118,6 +150,8 @@ public class CorbaObjectReader {
             break;
         case TCKind._tk_any:
             ((CorbaAnyHandler)obj).setValue(this.readAny());
+            // the contents of the Any are read later, starting from this depth
+            ((CorbaAnyHandler)obj).setNestingDepth(depth);
             break;
 
         // Now for the complex types
