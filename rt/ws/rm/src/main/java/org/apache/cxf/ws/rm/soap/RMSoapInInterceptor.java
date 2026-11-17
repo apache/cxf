@@ -48,6 +48,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.Service;
@@ -243,6 +244,15 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         ProtocolVariation protocol =
             ProtocolVariation.findVariant(consts.getWSRMNamespace(), maps.getNamespaceURI());
 
+        // A partial response to a two-way application request, e.g. the acknowledgements for a Sequence
+        // with an anonymous AcksTo while the reply goes to a decoupled endpoint: the exchange stays with
+        // the application operation, for the reply.
+        if (MessageUtils.isPartialResponse(message) && !message.getExchange().isOneWay()
+            && isApplicationRequest(message.getExchange())) {
+            LOG.fine("Partial response to an application request, not updating service model info");
+            return;
+        }
+
         LOG.info("Updating service model info in exchange");
 
         RMManager manager = getManager(message);
@@ -346,6 +356,13 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             chain.add(new BareInInterceptor());
             LOG.fine("Added BareInInterceptor to chain.");
         }
+    }
+
+    private static boolean isApplicationRequest(Exchange exchange) {
+        Message request = exchange.getOutMessage();
+        AddressingProperties maps = request == null ? null : ContextUtils.retrieveMAPs(request, false, true, false);
+        return maps != null && maps.getAction() != null
+            && !RMContextUtils.isRMProtocolMessage(maps.getAction().getValue());
     }
 
     private RMManager getManager(SoapMessage message) {
