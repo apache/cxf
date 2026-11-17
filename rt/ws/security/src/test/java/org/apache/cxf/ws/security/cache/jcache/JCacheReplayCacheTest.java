@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.cache.jcache;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicIntegerArray;
+
+import org.apache.wss4j.common.cache.EHCacheExpiry;
 
 import org.junit.Test;
 
@@ -102,6 +105,17 @@ public class JCacheReplayCacheTest {
 
         for (int i = 0; i < identifiers; i++) {
             assertEquals("Identifier " + i + " was accepted more than once", 1, accepted.get(i));
+        }
+    }
+
+    // The cache keeps every entry for the default TTL, so that is the longest it can hold one for
+    @Test
+    public void testMaxTTL() throws Exception {
+        JCacheReplayCache replayCache = new JCacheReplayCache("cxf.jcache.replay.test-" + UUID.randomUUID());
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL), replayCache.getMaxTTL());
+        } finally {
+            replayCache.close();
         }
     }
 }

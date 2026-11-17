@@ -133,6 +133,16 @@ class JCacheReplayCache implements ReplayCache {
         return element != null;
     }
 
+    /**
+     * Return the maximum time for which this cache holds an identifier. WSS4J uses this to reject a
+     * SAML OneTimeUse Assertion that is valid for longer, as it could be replayed once its identifier
+     * had expired from the cache. This implements ReplayCache.getMaxTTL() in versions of WSS4J that
+     * define it, so it is declared without @Override.
+     */
+    public java.time.Duration getMaxTTL() {
+        return java.time.Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL);
+    }
+
     // Only exposed for testing
     EHCacheValue get(String identifier) {
         return cache.get(identifier);
