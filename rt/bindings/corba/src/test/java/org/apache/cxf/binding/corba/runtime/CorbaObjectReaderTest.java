@@ -25,12 +25,14 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.corba.CorbaBindingException;
 import org.apache.cxf.binding.corba.types.CorbaArrayHandler;
 import org.apache.cxf.binding.corba.types.CorbaEnumHandler;
 import org.apache.cxf.binding.corba.types.CorbaExceptionHandler;
 import org.apache.cxf.binding.corba.types.CorbaFixedHandler;
 import org.apache.cxf.binding.corba.types.CorbaObjectHandler;
 import org.apache.cxf.binding.corba.types.CorbaObjectReferenceHandler;
+import org.apache.cxf.binding.corba.types.CorbaOctetSequenceHandler;
 import org.apache.cxf.binding.corba.types.CorbaPrimitiveHandler;
 import org.apache.cxf.binding.corba.types.CorbaSequenceHandler;
 import org.apache.cxf.binding.corba.types.CorbaStructHandler;
@@ -55,8 +57,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class CorbaObjectReaderTest {
@@ -547,5 +551,103 @@ public class CorbaObjectReaderTest {
 
         reader.readObjectReference(obj);
         assertTrue(obj.getReference()._is_equivalent(objRef));
+    }
+
+    @Test
+    public void testReadOctetSequence() {
+        // larger than the chunk size, so it is read in chunks
+        byte[] data = new byte[200000];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte)i;
+        }
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_ulong(data.length);
+        oStream.write_octet_array(data, 0, data.length);
+
+        CorbaOctetSequenceHandler obj = createOctetSequenceHandler(0);
+        new CorbaObjectReader(oStream.create_input_stream()).readSequence(obj);
+        assertArrayEquals(data, obj.getValue());
+    }
+
+    @Test
+    public void testReadOctetSequenceLengthLargerThanData() {
+        // the length in the message must not be allocated up front, reading just fails when the data runs out
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_ulong(Integer.MAX_VALUE);
+        oStream.write_octet_array(new byte[16], 0, 16);
+
+        CorbaObjectReader reader = new CorbaObjectReader(oStream.create_input_stream());
+        assertThrows(RuntimeException.class, () -> reader.readSequence(createOctetSequenceHandler(0)));
+    }
+
+    @Test
+    public void testReadSequenceLengthTooLarge() {
+        // 0xFFFFFFFF is larger than any Java array
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_ulong(-1);
+
+        CorbaObjectReader reader = new CorbaObjectReader(oStream.create_input_stream());
+        assertThrows(CorbaBindingException.class, () -> reader.readSequence(createOctetSequenceHandler(0)));
+    }
+
+    @Test
+    public void testReadSequenceExceedsBound() {
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_ulong(5);
+        oStream.write_octet_array(new byte[5], 0, 5);
+        CorbaObjectReader reader = new CorbaObjectReader(oStream.create_input_stream());
+        assertThrows(CorbaBindingException.class, () -> reader.readSequence(createOctetSequenceHandler(4)));
+
+        // a bounded sequence of strings, with more elements in the message than the bound
+        QName stringIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "string", CorbaConstants.NP_WSDL_CORBA);
+        QName seqIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "sequence", CorbaConstants.NP_WSDL_CORBA);
+        Sequence seqType = new Sequence();
+        seqType.setBound(2);
+        seqType.setElemtype(stringIdlType);
+        TypeCode seqTC = orb.create_sequence_tc(2, orb.get_primitive_tc(TCKind.tk_string));
+        CorbaSequenceHandler obj = new CorbaSequenceHandler(new QName("Seq"), seqIdlType, seqTC, seqType);
+        for (int i = 0; i < 2; ++i) {
+            obj.addElement(new CorbaPrimitiveHandler(new QName("item"), stringIdlType,
+                                                     orb.get_primitive_tc(TCKind.tk_string), null));
+        }
+        oStream = orb.create_output_stream();
+        oStream.write_ulong(3);
+        for (int i = 0; i < 3; ++i) {
+            oStream.write_string("s" + i);
+        }
+        CorbaObjectReader stringReader = new CorbaObjectReader(oStream.create_input_stream());
+        assertThrows(CorbaBindingException.class, () -> stringReader.readSequence(obj));
+    }
+
+    @Test
+    public void testReadUnboundedSequenceLengthLargerThanData() {
+        // the list of elements must not be sized from the length in the message
+        QName longIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "long", CorbaConstants.NP_WSDL_CORBA);
+        QName seqIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "sequence", CorbaConstants.NP_WSDL_CORBA);
+        Sequence seqType = new Sequence();
+        seqType.setBound(0);
+        seqType.setElemtype(longIdlType);
+        TypeCode longTC = orb.get_primitive_tc(TCKind.tk_long);
+        CorbaSequenceHandler obj = new CorbaSequenceHandler(new QName("Seq"), seqIdlType,
+                                                            orb.create_sequence_tc(0, longTC), seqType);
+        obj.setTemplateElement(new CorbaPrimitiveHandler(new QName("item"), longIdlType, longTC, null));
+
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_ulong(Integer.MAX_VALUE);
+        oStream.write_long(1);
+        oStream.write_long(2);
+        CorbaObjectReader reader = new CorbaObjectReader(oStream.create_input_stream());
+        assertThrows(RuntimeException.class, () -> reader.readSequence(obj));
+    }
+
+    private CorbaOctetSequenceHandler createOctetSequenceHandler(int bound) {
+        QName octetIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "octet", CorbaConstants.NP_WSDL_CORBA);
+        QName seqIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "sequence", CorbaConstants.NP_WSDL_CORBA);
+        Sequence seqType = new Sequence();
+        seqType.setBound(bound);
+        seqType.setElemtype(octetIdlType);
+        seqType.setType(new QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
+        TypeCode seqTC = orb.create_sequence_tc(bound, orb.get_primitive_tc(TCKind.tk_octet));
+        return new CorbaOctetSequenceHandler(new QName("Seq"), seqIdlType, seqTC, seqType);
     }
 }
