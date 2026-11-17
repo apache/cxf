@@ -21,15 +21,18 @@ package org.apache.cxf.binding.corba.types;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaBindingException;
+import org.apache.cxf.binding.corba.runtime.CorbaObjectReader;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
+import org.omg.CORBA.portable.OutputStream;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
@@ -67,6 +70,28 @@ public class CorbaAnyEventProducerTest {
         // must be limited across them rather than recursing once per level
         CorbaAnyHandler handler = createAnyHandler(nestedAny(150));
         assertThrows(CorbaBindingException.class, () -> new CorbaAnyEventProducer(handler, null, orb));
+    }
+
+    @Test
+    public void testNestedAnyFromMessage() {
+        // marshal the nested Any and read it back through the reader, as it would arrive in a message
+        CorbaAnyHandler handler = readAnyFromMessage(nestedAny(10));
+        assertEquals(1, handler.getNestingDepth());
+        assertNotNull(new CorbaAnyEventProducer(handler, null, orb).getAttributes());
+    }
+
+    @Test
+    public void testNestedAnyFromMessageTooDeep() {
+        CorbaAnyHandler handler = readAnyFromMessage(nestedAny(150));
+        assertThrows(CorbaBindingException.class, () -> new CorbaAnyEventProducer(handler, null, orb));
+    }
+
+    private CorbaAnyHandler readAnyFromMessage(Any value) {
+        OutputStream out = orb.create_output_stream();
+        out.write_any(value);
+        CorbaAnyHandler handler = createAnyHandler(null);
+        new CorbaObjectReader(out.create_input_stream()).read(handler);
+        return handler;
     }
 
     private CorbaAnyHandler createAnyHandler(Any value) {

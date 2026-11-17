@@ -65,6 +65,8 @@ public class CorbaObjectReader {
     /**
      * The maximum depth to which values can be nested in a CORBA message, including values nested inside an
      * Any. The default is 100, and a negative value means no limit. It is set as a system property.
+     * Each struct, exception, union, sequence, array or Any counts as one level, so a value of a recursive
+     * type, such as a struct containing a sequence of itself, uses two levels for each level of recursion.
      */
     public static final String MAX_NESTING_DEPTH = "org.apache.cxf.corba.maxNestingDepth";
 
