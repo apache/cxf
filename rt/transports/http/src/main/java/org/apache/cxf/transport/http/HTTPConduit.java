@@ -1802,6 +1802,7 @@ public abstract class HTTPConduit
                         exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
 
                         exchange.setInMessage(inMessage);
+                        exchange.notifyAll();
                     }
                     if (MessageUtils.getContextualBoolean(outMessage,
                             Message.PROPAGATE_202_RESPONSE_ONEWAY_OR_PARTIAL, false)) {

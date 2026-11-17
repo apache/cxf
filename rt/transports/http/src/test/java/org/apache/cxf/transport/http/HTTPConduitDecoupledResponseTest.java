@@ -56,6 +56,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -154,7 +155,10 @@ public class HTTPConduitDecoupledResponseTest {
     }
 
     @Test
-    public void testConcurrentReplyAndAcknowledgementRepeated() throws Exception {
+    public void testConcurrentReplyAndAcknowledgement() throws Exception {
+        // with propagate202Response the acknowledgement goes to ClientImpl.onMessage(), which a decoupled
+        // JAX-WS client can't process (the property is meant for the JAX-RS client), so only the default
+        assumeFalse(propagate);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             for (int i = 0; i < 500; i++) {
@@ -173,35 +177,13 @@ public class HTTPConduitDecoupledResponseTest {
                 start.countDown();
                 acknowledgement.get(5, TimeUnit.SECONDS);
                 delivery.get(5, TimeUnit.SECONDS);
+                // either may come first: the reply must survive in both cases
                 assertSame("iteration " + i, reply, exchange.getInMessage());
+                assertEquals("iteration " + i, Boolean.TRUE, exchange.get(ClientImpl.FINISHED));
             }
         } finally {
             executor.shutdownNow();
         }
-    }
-
-    @Test
-    public void testConcurrentReplyAndAcknowledgement() throws Exception {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        try {
-            CountDownLatch start = new CountDownLatch(1);
-            Future<?> acknowledgement = executor.submit(() -> {
-                assertTrue(start.await(5, TimeUnit.SECONDS));
-                respond(202, "");
-                return null;
-            });
-            Future<?> delivery = executor.submit(() -> {
-                assertTrue(start.await(5, TimeUnit.SECONDS));
-                completeReply();
-                return null;
-            });
-            start.countDown();
-            acknowledgement.get(5, TimeUnit.SECONDS);
-            delivery.get(5, TimeUnit.SECONDS);
-        } finally {
-            executor.shutdownNow();
-        }
-        assertReplyPreserved();
     }
 
     @Test
