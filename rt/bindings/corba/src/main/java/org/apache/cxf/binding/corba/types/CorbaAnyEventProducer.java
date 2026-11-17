@@ -121,7 +121,8 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
         }
 
         InputStream is = a.create_input_stream();
-        CorbaObjectReader reader = new CorbaObjectReader(is);
+        // carry on counting the nesting depth from the Any, so that nested Anys can't recurse without bound
+        CorbaObjectReader reader = new CorbaObjectReader(is, handler.getNestingDepth());
         reader.read(result);
 
         return result;

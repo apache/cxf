@@ -650,4 +650,20 @@ public class CorbaObjectReaderTest {
         TypeCode seqTC = orb.create_sequence_tc(bound, orb.get_primitive_tc(TCKind.tk_octet));
         return new CorbaOctetSequenceHandler(new QName("Seq"), seqIdlType, seqTC, seqType);
     }
+
+    @Test
+    public void testReadNestingDepth() {
+        OutputStream oStream = orb.create_output_stream();
+        oStream.write_long(1);
+        oStream.write_long(2);
+        InputStream iStream = oStream.create_input_stream();
+        QName longIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "long", CorbaConstants.NP_WSDL_CORBA);
+
+        // a value at the maximum depth of 100 can be read, but not one nested any deeper
+        new CorbaObjectReader(iStream, 99).read(new CorbaPrimitiveHandler(new QName("item"), longIdlType,
+                                                        orb.get_primitive_tc(TCKind.tk_long), null));
+        CorbaObjectReader reader = new CorbaObjectReader(iStream, 100);
+        assertThrows(CorbaBindingException.class, () -> reader.read(
+            new CorbaPrimitiveHandler(new QName("item"), longIdlType, orb.get_primitive_tc(TCKind.tk_long), null)));
+    }
 }
