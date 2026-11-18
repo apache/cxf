@@ -211,19 +211,36 @@ public class WSDLGetUtils {
             }
             if (ref != null) {
                 // we are able to map this, but for some reason the default key passed in cannot
-                // be used for a direct lookup, we need to create a unique import key
-                int count = 1;
-                while (smp.containsKey("_import" + count + ".xsd")) {
-                    count++;
-                }
-                key = "_import" + count + ".xsd";
-                smp.put(key, ref);
+                // be used for a direct lookup, so we need a unique import key for it
+                key = getImportKey(smp, ref);
             }
         }
         if (ref != null) {
             return base + "?xsd=" + key.replace(" ", "%20");
         }
         return null;
+    }
+
+    /**
+     * Get the import key for a schema that can't be looked up directly. The key already created for the
+     * schema is reused, so that serving the same document repeatedly doesn't keep adding new keys to the
+     * map, which lives as long as the service.
+     */
+    private static String getImportKey(Map<String, SchemaReference> smp, SchemaReference ref) {
+        for (Map.Entry<String, SchemaReference> entry : smp.entrySet()) {
+            if (entry.getValue() == ref && entry.getKey().startsWith("_import")) {
+                return entry.getKey();
+            }
+        }
+        // claim a free key atomically, so that concurrent requests can't be given the same key for
+        // different schemas
+        for (int count = 1;; count++) {
+            String key = "_import" + count + ".xsd";
+            SchemaReference existing = smp.putIfAbsent(key, ref);
+            if (existing == null || existing == ref) {
+                return key;
+            }
+        }
     }
 
     @Deprecated
