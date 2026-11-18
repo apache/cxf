@@ -649,9 +649,11 @@ public class ClientImpl
             completeExchange(exchange);
         }
 
-        // Grab the response objects if there are any
+        // Grab the response objects if there are any: from the response this is called with
+        // (asynchronous calls), as another message may have replaced the exchange's meanwhile
         List<Object> resList = null;
-        Message inMsg = exchange.getInMessage();
+        boolean inbound = Boolean.TRUE.equals(message.get(Message.INBOUND_MESSAGE));
+        Message inMsg = inbound ? message : exchange.getInMessage();
         if (inMsg != null) {
             if (null != resContext) {
                 resContext.putAll(inMsg);
@@ -663,7 +665,16 @@ public class ClientImpl
         }
 
         // check for an incoming fault
-        ex = getException(exchange);
+        if (inbound) {
+            // Resolve an asynchronous response's failure from that response as well: another
+            // inbound message may have replaced the exchange's input while it was processed.
+            ex = message.getContent(Exception.class);
+            if (ex == null && exchange.getOutFaultMessage() != null) {
+                ex = exchange.getOutFaultMessage().getContent(Exception.class);
+            }
+        } else {
+            ex = getException(exchange);
+        }
 
         if (ex != null) {
             throw ex;
@@ -840,7 +851,14 @@ public class ClientImpl
             message.getExchange().put(Endpoint.class, endpoint);
         }
         message = endpoint.getBinding().createMessage(message);
-        message.getExchange().setInMessage(message);
+        synchronized (message.getExchange()) {
+            // the messages of a decoupled call can arrive in any order: one that arrives after
+            // another has finished the exchange (e.g. a partial response) is processed, but
+            // must not replace the response
+            if (!isFinished(message.getExchange())) {
+                message.getExchange().setInMessage(message);
+            }
+        }
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);
@@ -964,8 +982,8 @@ public class ClientImpl
                 BusFactory.setThreadDefaultBus(origBus);
             }
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message)
-                    || message.getContent(Exception.class) != null) {
+                if (!isFinished(message.getExchange())
+                    && (!isPartialResponse(message) || message.getContent(Exception.class) != null)) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
                     message.getExchange().notifyAll();
@@ -1162,6 +1180,10 @@ public class ClientImpl
 
     public final synchronized void setConduitSelector(ConduitSelector selector) {
         conduitSelector = selector == null ? new UpfrontConduitSelector() : selector;
+    }
+
+    private static boolean isFinished(Exchange exchange) {
+        return Boolean.TRUE.equals(exchange.get(FINISHED));
     }
 
     private boolean isPartialResponse(Message in) {
