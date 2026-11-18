@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -34,6 +35,7 @@ import jakarta.xml.bind.Marshaller;
 import org.apache.cxf.binding.xml.XMLConstants;
 import org.apache.cxf.binding.xml.XMLFault;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_doc_lit.PingMeFault;
@@ -80,7 +82,8 @@ public class XMLFaultOutInterceptorTest extends TestBase {
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals(XMLFault.XML_FAULT_STRING, dxr.getLocalName());
-        assertEquals(fault.toString(), dxr.getElementText());
+        // the cause class name must not be leaked, only the fault message
+        assertEquals("TEST_FAULT", dxr.getElementText());
 
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
@@ -89,6 +92,43 @@ public class XMLFaultOutInterceptorTest extends TestBase {
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals("faultDetail", dxr.getLocalName());
+    }
+
+    @Test
+    public void testFaultCauseNotLeakedByDefault() throws Exception {
+        Fault fault = new Fault(new org.apache.cxf.common.i18n.Message("Application fault",
+                                    (ResourceBundle) null),
+                                new IllegalStateException("internal db host=10.0.0.1"));
+        assertEquals("Application fault", writeAndReadFaultString(fault));
+    }
+
+    @Test
+    public void testFaultCauseIncludedWhenEnabled() throws Exception {
+        xmlMessage.put(Message.EXCEPTION_MESSAGE_CAUSE_ENABLED, Boolean.TRUE);
+        Fault fault = new Fault(new org.apache.cxf.common.i18n.Message("Application fault",
+                                    (ResourceBundle) null),
+                                new IllegalStateException("internal detail"));
+        assertEquals("Application fault Caused by: internal detail", writeAndReadFaultString(fault));
+    }
+
+    private String writeAndReadFaultString(Fault fault) throws Exception {
+        OutputStream outputStream = new ByteArrayOutputStream();
+        xmlMessage.setContent(OutputStream.class, outputStream);
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(outputStream);
+        xmlMessage.setContent(XMLStreamWriter.class, writer);
+        xmlMessage.setContent(Exception.class, fault);
+
+        out.handleMessage(xmlMessage);
+        outputStream.flush();
+
+        DepthXMLStreamReader dxr = new DepthXMLStreamReader(getXMLReader());
+        dxr.nextTag();
+        StaxUtils.toNextElement(dxr);
+        assertEquals(XMLFault.XML_FAULT_ROOT, dxr.getLocalName());
+        dxr.nextTag();
+        StaxUtils.toNextElement(dxr);
+        assertEquals(XMLFault.XML_FAULT_STRING, dxr.getLocalName());
+        return dxr.getElementText();
     }
 
     private XMLStreamReader getXMLReader() throws Exception {
