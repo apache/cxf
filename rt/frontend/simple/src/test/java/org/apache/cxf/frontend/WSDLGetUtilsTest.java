@@ -18,8 +18,14 @@
  */
 package org.apache.cxf.frontend;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.wsdl.extensions.schema.SchemaReference;
 
@@ -28,6 +34,8 @@ import com.ibm.wsdl.extensions.schema.SchemaReferenceImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class WSDLGetUtilsTest {
 
@@ -55,5 +63,49 @@ public class WSDLGetUtilsTest {
         assertEquals(BASE + "?xsd=_import2.xsd", utils.mapUri(null, BASE, smp, "c.xsd", null, DOCUMENT));
         assertEquals(BASE + "?xsd=_import2.xsd", utils.mapUri(null, BASE, smp, "c.xsd", null, DOCUMENT));
         assertEquals(4, smp.size());
+    }
+
+    @Test
+    public void testImportKeysConcurrent() throws Exception {
+        // schemas served concurrently must never be given the same key
+        int schemas = 20;
+        Map<String, SchemaReference> smp = new ConcurrentHashMap<>();
+        List<SchemaReference> refs = new ArrayList<>();
+        for (int i = 0; i < schemas; i++) {
+            SchemaReference ref = new SchemaReferenceImpl();
+            refs.add(ref);
+            smp.put("http://localhost/schemas/s" + i + ".xsd", ref);
+        }
+        WSDLGetUtils utils = new WSDLGetUtils();
+
+        int threads = 8;
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        try {
+            CountDownLatch start = new CountDownLatch(1);
+            List<Future<List<String>>> results = new ArrayList<>();
+            for (int t = 0; t < threads; t++) {
+                results.add(executor.submit(() -> {
+                    start.await();
+                    List<String> links = new ArrayList<>();
+                    for (int i = 0; i < schemas; i++) {
+                        links.add(utils.mapUri(null, BASE, smp, "s" + i + ".xsd", null, DOCUMENT));
+                    }
+                    return links;
+                }));
+            }
+            start.countDown();
+
+            for (Future<List<String>> result : results) {
+                List<String> links = result.get();
+                for (int i = 0; i < schemas; i++) {
+                    String key = links.get(i).substring((BASE + "?xsd=").length());
+                    assertSame(refs.get(i), smp.get(key));
+                }
+            }
+        } finally {
+            executor.shutdown();
+        }
+        // at most a few extra keys from requests that raced to create the first one for a schema
+        assertTrue(smp.size() <= schemas + schemas * threads);
     }
 }

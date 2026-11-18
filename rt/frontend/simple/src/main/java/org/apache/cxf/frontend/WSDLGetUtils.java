@@ -227,19 +227,19 @@ public class WSDLGetUtils {
      * map, which lives as long as the service.
      */
     private static String getImportKey(Map<String, SchemaReference> smp, SchemaReference ref) {
-        synchronized (smp) {
-            for (Map.Entry<String, SchemaReference> entry : smp.entrySet()) {
-                if (entry.getValue() == ref && entry.getKey().startsWith("_import")) {
-                    return entry.getKey();
-                }
+        for (Map.Entry<String, SchemaReference> entry : smp.entrySet()) {
+            if (entry.getValue() == ref && entry.getKey().startsWith("_import")) {
+                return entry.getKey();
             }
-            int count = 1;
-            while (smp.containsKey("_import" + count + ".xsd")) {
-                count++;
-            }
+        }
+        // claim a free key atomically, so that concurrent requests can't be given the same key for
+        // different schemas
+        for (int count = 1;; count++) {
             String key = "_import" + count + ".xsd";
-            smp.put(key, ref);
-            return key;
+            SchemaReference existing = smp.putIfAbsent(key, ref);
+            if (existing == null || existing == ref) {
+                return key;
+            }
         }
     }
 
