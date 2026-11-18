@@ -60,6 +60,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.ClientCallback;
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -1792,9 +1793,17 @@ public abstract class HTTPConduit
                             cc.handleResponse(null, null);
                         }
                     }
-                    exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
+                    synchronized (exchange) {
+                        if (Boolean.TRUE.equals(exchange.get(ClientImpl.FINISHED))) {
+                            // the response has already arrived separately (e.g. at a decoupled endpoint)
+                            // and completed the exchange: this acknowledgement must not replace it
+                            return;
+                        }
+                        exchange.put("IN_CHAIN_COMPLETE", Boolean.TRUE);
 
-                    exchange.setInMessage(inMessage);
+                        exchange.setInMessage(inMessage);
+                        exchange.notifyAll();
+                    }
                     if (MessageUtils.getContextualBoolean(outMessage,
                             Message.PROPAGATE_202_RESPONSE_ONEWAY_OR_PARTIAL, false)) {
                         incomingObserver.onMessage(inMessage);
