@@ -19,13 +19,11 @@
 package org.apache.cxf.transport.http_undertow;
 
 
-import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.servlet.handlers.ServletRequestContext;
 import io.undertow.servlet.spec.HttpServletRequestImpl;
 import io.undertow.servlet.spec.HttpServletResponseImpl;
 import io.undertow.servlet.spec.ServletContextImpl;
-import io.undertow.util.Headers;
 
 public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
 
@@ -58,18 +56,7 @@ public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
             response.getOutputStream().write(responseStr.getBytes());
             response.flushBuffer();
         } catch (Throwable t) {
-            t.printStackTrace();
-            if (undertowExchange.isResponseChannelAvailable()) {
-                undertowExchange.setStatusCode(500);
-                final String errorPage = "<html><head><title>Error</title>"
-                    + "</head><body>Internal Error 500" + t.getMessage()
-                    + "</body></html>";
-                undertowExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH,
-                                                          Integer.toString(errorPage.length()));
-                undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
-                Sender sender = undertowExchange.getResponseSender();
-                sender.send(errorPage);
-            }
+            sendInternalError(undertowExchange, t);
         }
     }
 
