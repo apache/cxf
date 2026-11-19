@@ -33,6 +33,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.FaultUtils;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -87,8 +88,7 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
                                         "http://cxf.apache.org/bindings/xformat");
             StaxUtils.writeStartElement(writer, prefix, "faultstring",
                                         "http://cxf.apache.org/bindings/xformat");
-            Throwable t = f.getCause();
-            writer.writeCharacters(t == null ? f.getMessage() : t.toString());
+            writer.writeCharacters(FaultUtils.getFaultString(message, f));
             // fault string
             writer.writeEndElement();
             // call StaxUtils to write Fault detail.

@@ -40,6 +40,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.NullConduitSelector;
 import org.apache.cxf.endpoint.PreexistingConduitSelector;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.FaultUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.io.DelegatingInputStream;
@@ -212,7 +213,7 @@ final class InternalContextUtils {
                     }
 
                     // send the partial response to requester
-                    partialResponse.put("forced.faultstring",
+                    partialResponse.put(FaultUtils.FORCED_FAULT_STRING,
                                         "The server sent HTTP status code :"
                                             + inMessage.getExchange().get(Message.RESPONSE_CODE));
                     partialResponse.setContent(Exception.class, exception);
