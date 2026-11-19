@@ -103,8 +103,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         throws Exception {
 
         String symEncAlgo = encProps.getEncryptionSymmetricKeyAlgo() == null
-            ? JavaUtils.isFIPSEnabled() ? XMLCipher.AES_256_GCM : XMLCipher.AES_256
-                : encProps.getEncryptionSymmetricKeyAlgo();
+            ? XMLCipher.AES_256_GCM : encProps.getEncryptionSymmetricKeyAlgo();
 
         byte[] secretKey = getSymmetricKey(symEncAlgo);
 

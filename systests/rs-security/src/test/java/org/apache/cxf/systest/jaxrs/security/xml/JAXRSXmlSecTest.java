@@ -30,7 +30,6 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
@@ -534,10 +533,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
 
         EncryptionProperties encryptionProperties = new EncryptionProperties();
-        encryptionProperties.setEncryptionSymmetricKeyAlgo(
-                             JavaUtils.isFIPSEnabled() 
-                             ? XMLCipher.AES_128_GCM
-                                 : XMLCipher.AES_128);
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128_GCM);
         encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         encryptionProperties.setEncryptionDigestAlgo(XMLCipher.SHA256);
 
@@ -557,9 +553,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
 
         EncryptionProperties encryptionProperties = new EncryptionProperties();
-        encryptionProperties.setEncryptionSymmetricKeyAlgo(JavaUtils.isFIPSEnabled() 
-                             ? XMLCipher.AES_128_GCM
-                                 : XMLCipher.AES_128);
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128_GCM);
         encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_ISSUER_SERIAL);
 
         doTestPostEncryptedBook(
@@ -628,9 +622,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                                         boolean streaming)
         throws Exception {
         EncryptionProperties encryptionProperties = new EncryptionProperties();
-        encryptionProperties.setEncryptionSymmetricKeyAlgo(JavaUtils.isFIPSEnabled() 
-                             ? XMLCipher.AES_128_GCM
-                                 : XMLCipher.AES_128);
+        encryptionProperties.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_128_GCM);
         encryptionProperties.setEncryptionKeyIdType(RSSecurityUtils.X509_CERT);
         doTestPostEncryptedBook(
             address, sign, properties, encryptionProperties, false, test.streaming
@@ -754,9 +746,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
         XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
         encInterceptor.setKeyIdentifierType(RSSecurityUtils.X509_CERT);
-        encInterceptor.setSymmetricEncAlgorithm(JavaUtils.isFIPSEnabled() 
-                             ? XMLCipher.AES_128_GCM
-                                 : XMLCipher.AES_128);
+        encInterceptor.setSymmetricEncAlgorithm(XMLCipher.AES_128_GCM);
         bean.getOutInterceptors().add(encInterceptor);
         bean.getInInterceptors().add(new XmlEncInInterceptor());
         bean.getInInterceptors().add(new XmlSigInInterceptor());
