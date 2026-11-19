@@ -19,10 +19,17 @@
 
 package org.apache.cxf.transport.http_undertow;
 
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.commons_text.StringEscapeUtils;
 
 import io.undertow.io.Sender;
 import io.undertow.server.HttpHandler;
@@ -37,6 +44,11 @@ import io.undertow.util.Headers;
 
 
 public class UndertowHTTPHandler implements HttpHandler {
+
+    private static final Logger LOG = LogUtils.getLogger(UndertowHTTPHandler.class);
+    private static final String ERROR_PAGE_START = "<html><head><title>Error</title>"
+        + "</head><body>Internal Error 500";
+    private static final String ERROR_PAGE_END = "</body></html>";
 
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "jakarta.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "jakarta.servlet.request.X509Certificate";
@@ -122,19 +134,35 @@ public class UndertowHTTPHandler implements HttpHandler {
             undertowHTTPDestination.doService(servletContext, request, response);
 
         } catch (Throwable t) {
-            t.printStackTrace();
-            if (undertowExchange.isResponseChannelAvailable()) {
-                undertowExchange.setStatusCode(500);
-                final String errorPage = "<html><head><title>Error</title>"
-                    + "</head><body>Internal Error 500" + t.getMessage()
-                    + "</body></html>";
-                undertowExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH,
-                                                          Integer.toString(errorPage.length()));
-                undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
-                Sender sender = undertowExchange.getResponseSender();
-                sender.send(errorPage);
-            }
+            sendInternalError(undertowExchange, t);
         }
+    }
+
+    protected void sendInternalError(HttpServerExchange undertowExchange, Throwable t) {
+        LOG.log(Level.WARNING, "Error processing request", t);
+        if (undertowExchange.isResponseChannelAvailable()) {
+            String errorPage = ERROR_PAGE_START;
+            if (isIncludeExceptionMessage() && t.getMessage() != null) {
+                errorPage += " " + StringEscapeUtils.escapeHtml4(t.getMessage());
+            }
+            errorPage += ERROR_PAGE_END;
+            byte[] body = errorPage.getBytes(StandardCharsets.UTF_8);
+            undertowExchange.setStatusCode(500);
+            undertowExchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, Integer.toString(body.length));
+            undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html; charset=UTF-8");
+            Sender sender = undertowExchange.getResponseSender();
+            sender.send(errorPage, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * The exception message is only included (HTML-escaped) in the error page if the
+     * {@link Message#EXCEPTION_MESSAGE_CAUSE_ENABLED} bus property is set to "true", as it may contain
+     * request data or internal details. The exception is always logged.
+     */
+    private boolean isIncludeExceptionMessage() {
+        Bus b = getBus();
+        return b != null && PropertyUtils.isTrue(b.getProperty(Message.EXCEPTION_MESSAGE_CAUSE_ENABLED));
     }
 
 
