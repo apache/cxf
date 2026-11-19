@@ -1217,7 +1217,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testPropogateException2() throws Exception {
         String data = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
             + "<ns1:faultstring xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
-            + "org.apache.cxf.systest.jaxrs.BookNotFoundFault: Book Exception</ns1:faultstring>"
+            + "Book Exception</ns1:faultstring>"
             + "</ns1:XMLFault>";
         getAndCompare("http://localhost:" + PORT + "/bookstore/propagate-exception2",
                       data, "application/xml", null, 500);
