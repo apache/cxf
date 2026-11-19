@@ -71,6 +71,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -759,12 +760,28 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         Throwable t = linked != null ? linked : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION",
                              BUNDLE, sb.toString()).toString();
-        handleExceptionEnd(t, message, read);
+        handleExceptionEnd(t, getExceptionResponseMessage(message, read), read);
     }
 
     protected void handleXMLStreamException(XMLStreamException e, boolean read) {
         StringBuilder sb = handleExceptionStart(e);
-        handleExceptionEnd(e, sb.toString(), read);
+        handleExceptionEnd(e, getExceptionResponseMessage(sb.toString(), read), read);
+    }
+
+    /**
+     * Returns the text to send in the error response entity. The underlying parser or JAXB
+     * exception details (already logged by {@link #handleExceptionStart(Exception)}) are only
+     * returned when {@link Message#EXCEPTION_MESSAGE_CAUSE_ENABLED} is set, otherwise a
+     * generic message is returned so that internal details are not disclosed to the peer.
+     */
+    protected String getExceptionResponseMessage(String detailedMessage, boolean read) {
+        MessageContext context = getContext();
+        if (context != null
+            && PropertyUtils.isTrue(context.getContextualProperty(Message.EXCEPTION_MESSAGE_CAUSE_ENABLED))) {
+            return detailedMessage;
+        }
+        return new org.apache.cxf.common.i18n.Message(read ? "ENTITY_READ_ERROR" : "ENTITY_WRITE_ERROR",
+                                                      BUNDLE).toString();
     }
 
     public void setOutTransformElements(Map<String, String> outElements) {
