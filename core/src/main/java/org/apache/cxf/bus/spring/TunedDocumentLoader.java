@@ -23,9 +23,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -39,10 +39,13 @@ import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
+import org.apache.commons.xml.secure.SecureSAXParserFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -56,6 +59,11 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 class TunedDocumentLoader extends DefaultDocumentLoader {
     private static final Logger LOG = LogUtils.getL7dLogger(TunedDocumentLoader.class);
 
+    private static final String NAMESPACE_PREFIXES_FEATURE = "http://xml.org/sax/features/namespace-prefixes";
+
+    /** The Woodstox SAX factory, or {@code null} when Woodstox is not on the classpath. */
+    private static final Class<?> WOODSTOX_SAX_PARSER_CLASS;
+
     private static boolean hasFastInfoSet;
 
     static {
@@ -68,32 +76,34 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             LOG.fine("FastInfoset not found on classpath. Disabling context load optimizations.");
             hasFastInfoSet = false;
         }
+        Class<?> woodstox = null;
+        try {
+            woodstox = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
+                                                  TunedDocumentLoader.class);
+        } catch (Throwable e) {
+            LOG.fine("Woodstox not found on classpath. Using any other SAX parser.");
+        }
+        WOODSTOX_SAX_PARSER_CLASS = woodstox;
     }
-    private SAXParserFactory saxParserFactory;
-    private SAXParserFactory nsasaxParserFactory;
+    private final SAXParserFactory saxParserFactory;
+    private final SAXParserFactory nsasaxParserFactory;
 
     TunedDocumentLoader() {
-        try {
-            Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
-                                                      TunedDocumentLoader.class);
-            saxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
-            nsasaxParserFactory = (SAXParserFactory)cls.getDeclaredConstructor().newInstance();
-        } catch (Throwable e) {
-            //woodstox not found, use any other Stax parser
-            saxParserFactory = SAXParserFactory.newInstance();
-            nsasaxParserFactory = SAXParserFactory.newInstance();
+        if (WOODSTOX_SAX_PARSER_CLASS != null) {
+            final String name = WOODSTOX_SAX_PARSER_CLASS.getName();
+            final ClassLoader loader = WOODSTOX_SAX_PARSER_CLASS.getClassLoader();
+            saxParserFactory = SecureSAXParserFactory.newInstance(name, loader);
+            nsasaxParserFactory = SecureSAXParserFactory.newNSInstance(name, loader);
+        } else {
+            saxParserFactory = SecureSAXParserFactory.newInstance();
+            nsasaxParserFactory = SecureSAXParserFactory.newNSInstance();
         }
 
         try {
-            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
-            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes",
-                                           true);
-            saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            nsasaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            nsasaxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        } catch (Throwable e) {
-            //ignore
+            nsasaxParserFactory.setFeature(NAMESPACE_PREFIXES_FEATURE, true);
+        } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
+            LOG.log(Level.FINE, "This implementation does not support `" + NAMESPACE_PREFIXES_FEATURE + "`. "
+                    + "Namespace declarations will not be reported as attributes.", e);
         }
 
     }

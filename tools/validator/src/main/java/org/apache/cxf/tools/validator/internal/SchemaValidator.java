@@ -33,10 +33,7 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -54,6 +51,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 
+import org.apache.commons.xml.secure.SecureDocumentBuilderFactory;
+import org.apache.commons.xml.secure.SecureSAXParserFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.URIParserUtil;
@@ -104,15 +103,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
     }
 
     public boolean validate(String wsdlsource, String[] schemas) throws ToolException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        try {
-            docFactory.setNamespaceAware(true);
-            docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new ToolException(e);
-        }
+        docBuilder = SecureDocumentBuilderFactory.newNSDocumentBuilder();
 
         String systemId = URIParserUtil.getAbsoluteURI(wsdlsource);
         InputSource is = new InputSource(systemId);
@@ -187,11 +178,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
     public boolean validate(InputSource wsdlsource, String[] schemas) throws ToolException {
         Schema schema;
         try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setFeature("http://xml.org/sax/features/namespaces", true);
-            saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            saxFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            saxParser = saxFactory.newSAXParser();
+            saxParser = SecureSAXParserFactory.newNSSAXParser();
 
             if (defaultSchemas != null) {
                 schemas = addSchemas(defaultSchemas, schemas);
@@ -217,8 +204,6 @@ public class SchemaValidator extends AbstractDefinitionValidator {
             throw new ToolException("Cannot get the wsdl " + wsdlsource.getSystemId(), ioe);
         } catch (SAXException saxEx) {
             throw new ToolException(saxEx);
-        } catch (ParserConfigurationException e) {
-            throw new ToolException(e);
         }
         return true;
     }
