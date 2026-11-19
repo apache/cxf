@@ -44,6 +44,11 @@
                 </property>
             </bean>
         </jaxrs:providers>
+        <jaxrs:properties>
+            <!-- testAddInvalidXmlBook, testAddInvalidJsonBook and
+                 testAddInvalidBookDuplicateElementJson check the validation error detail -->
+            <entry key="exceptionMessageCauseEnabled" value="true"/>
+        </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server id="bookservice2" address="/thebooks/bookstore">
         <jaxrs:serviceBeans>
@@ -54,6 +59,10 @@
             <ref bean="jsonProvider"/>
             <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
         </jaxrs:providers>
+        <jaxrs:properties>
+            <!-- testAddInvalidXmlBook and testAddInvalidJsonBook check the validation error detail -->
+            <entry key="exceptionMessageCauseEnabled" value="true"/>
+        </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server id="bookform" bus="cxf2" address="/thebooksform">
         <jaxrs:serviceBeans>
