@@ -27,12 +27,16 @@ import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.management.ObjectName;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
@@ -40,6 +44,7 @@ import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
@@ -47,8 +52,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -231,6 +239,62 @@ public class UndertowHTTPServerEngineTest {
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.xnio:type=Xnio,provider=\"nio\",worker=\"*\""), null));
         assertEquals("Could not find 0 Undertow Server: " + s, 0, s.size());
+    }
+
+    @Test
+    public void testInternalErrorPageDoesNotEchoExceptionMessage() throws Exception {
+        UndertowHTTPDestination destination = mock(UndertowHTTPDestination.class);
+        doThrow(new RuntimeException("<script>alert('xss')</script>"))
+            .when(destination).doService(any(ServletContext.class), any(HttpServletRequest.class),
+                                         any(HttpServletResponse.class));
+
+        UndertowHTTPServerEngine engine = factory.createUndertowHTTPServerEngine(PORT1, "http");
+        String urlStr = "http://localhost:" + PORT1 + "/error";
+        engine.addServant(new URL(urlStr), new UndertowHTTPHandler(destination, true));
+        try {
+            HttpURLConnection connection = (HttpURLConnection)new URL(urlStr).openConnection();
+            assertEquals(500, connection.getResponseCode());
+            String body;
+            try (InputStream in = connection.getErrorStream()) {
+                body = IOUtils.toString(in);
+            }
+            assertTrue(body, body.contains("Internal Error 500"));
+            assertFalse(body, body.contains("<script>"));
+            assertFalse(body, body.contains("xss"));
+        } finally {
+            engine.removeServant(new URL(urlStr));
+        }
+    }
+
+    @Test
+    public void testInternalErrorPageEscapesExceptionMessageWhenEnabled() throws Exception {
+        Bus destinationBus = mock(Bus.class);
+        when(destinationBus.getProperty(Message.EXCEPTION_MESSAGE_CAUSE_ENABLED))
+            .thenReturn("true");
+        UndertowHTTPDestination destination = mock(UndertowHTTPDestination.class);
+        when(destination.getBus()).thenReturn(destinationBus);
+        doThrow(new RuntimeException("<script>alert('xss')</script> \u00e9"))
+            .when(destination).doService(any(ServletContext.class), any(HttpServletRequest.class),
+                                         any(HttpServletResponse.class));
+
+        UndertowHTTPServerEngine engine = factory.createUndertowHTTPServerEngine(PORT1, "http");
+        String urlStr = "http://localhost:" + PORT1 + "/error2";
+        engine.addServant(new URL(urlStr), new UndertowHTTPHandler(destination, true));
+        try {
+            HttpURLConnection connection = (HttpURLConnection)new URL(urlStr).openConnection();
+            assertEquals(500, connection.getResponseCode());
+            byte[] bytes;
+            try (InputStream in = connection.getErrorStream()) {
+                bytes = IOUtils.readBytesFromStream(in);
+            }
+            assertEquals(connection.getContentLength(), bytes.length);
+            String body = new String(bytes, StandardCharsets.UTF_8);
+            assertTrue(body, body.contains("Internal Error 500"));
+            assertTrue(body, body.contains("&lt;script&gt;alert('xss')&lt;/script&gt;"));
+            assertFalse(body, body.contains("<script>"));
+        } finally {
+            engine.removeServant(new URL(urlStr));
+        }
     }
 
     private static String getResponse(String target) throws Exception {
