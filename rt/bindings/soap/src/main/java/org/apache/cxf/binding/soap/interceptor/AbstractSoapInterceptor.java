@@ -119,25 +119,4 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             }
         }
     }
-
-    static String getFaultMessage(SoapMessage message, SoapFault fault) {
-        if (message.get("forced.faultstring") != null) {
-            return (String) message.get("forced.faultstring");
-        }
-        boolean config = MessageUtils.getContextualBoolean(message, Message.EXCEPTION_MESSAGE_CAUSE_ENABLED, false);
-        if (fault.getMessage() != null) {
-            if (config && fault.getCause() != null
-                && fault.getCause().getMessage() != null && !fault.getMessage().equals(fault.getCause().getMessage())) {
-                return fault.getMessage() + " Caused by: " + fault.getCause().getMessage();
-            }
-            return fault.getMessage();
-        } else if (config && fault.getCause() != null) {
-            if (fault.getCause().getMessage() != null) {
-                return fault.getCause().getMessage();
-            }
-            return fault.getCause().toString();
-        } else {
-            return "Fault occurred while processing.";
-        }
-    }
 }

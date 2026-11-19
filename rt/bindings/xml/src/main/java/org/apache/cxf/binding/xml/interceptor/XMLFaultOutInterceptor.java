@@ -32,6 +32,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.helpers.NSStack;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.FaultUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -67,8 +68,7 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
                     XMLConstants.NS_XML_FORMAT);
             StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_STRING,
                     XMLConstants.NS_XML_FORMAT);
-            Throwable t = xmlFault.getCause();
-            writer.writeCharacters(t == null ? xmlFault.getMessage() : t.toString());
+            writer.writeCharacters(FaultUtils.getFaultString(message, xmlFault));
             // fault string
             writer.writeEndElement();
             // call StaxUtils to write Fault detail.
