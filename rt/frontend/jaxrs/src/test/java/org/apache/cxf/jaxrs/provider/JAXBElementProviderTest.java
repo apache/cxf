@@ -110,6 +110,38 @@ import static org.mockito.Mockito.when;
 public class JAXBElementProviderTest {
 
     @Test
+    public void testReadMalformedXmlDoesNotLeakParserMessage() throws Exception {
+        JAXBElementProvider<Book> p = new JAXBElementProvider<>();
+        p.setMessageContext(new MessageContextImpl(createMessage()));
+        String entity = readMalformedBook(p);
+        assertEquals("Message body could not be read", entity);
+    }
+
+    @Test
+    public void testReadMalformedXmlParserMessageWhenEnabled() throws Exception {
+        JAXBElementProvider<Book> p = new JAXBElementProvider<>();
+        Message m = createMessage();
+        m.put(Message.EXCEPTION_MESSAGE_CAUSE_ENABLED, Boolean.TRUE);
+        p.setMessageContext(new MessageContextImpl(m));
+        String entity = readMalformedBook(p);
+        assertTrue(entity, entity.startsWith("JAXBException occurred"));
+    }
+
+    private static String readMalformedBook(JAXBElementProvider<Book> p) throws Exception {
+        byte[] malformed = "<Book><name>CXF</nam></Book>".getBytes(StandardCharsets.UTF_8);
+        try {
+            p.readFrom(Book.class, null, new Annotation[]{},
+                       MediaType.valueOf(MediaType.APPLICATION_XML), null,
+                       new ByteArrayInputStream(malformed));
+            fail("BadRequestException expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(400, ex.getResponse().getStatus());
+            return (String)ex.getResponse().getEntity();
+        }
+        return null;
+    }
+
+    @Test
     public void testReadFromISO() throws Exception {
 
         String eWithAcute = "\u00E9";
