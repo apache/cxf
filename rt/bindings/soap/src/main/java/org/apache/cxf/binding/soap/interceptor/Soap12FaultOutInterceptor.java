@@ -36,6 +36,7 @@ import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11F
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.FaultUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbortedInvocationException;
@@ -131,7 +132,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                     lang = getLangCode();
                 }
                 writer.writeAttribute("xml", "http://www.w3.org/XML/1998/namespace", "lang", lang);
-                writer.writeCharacters(getFaultMessage(message, fault));
+                writer.writeCharacters(FaultUtils.getFaultString(message, fault));
                 writer.writeEndElement();
                 writer.writeEndElement();
 
