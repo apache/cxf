@@ -41,6 +41,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AttachmentSerializerTest {
@@ -303,6 +304,74 @@ public class AttachmentSerializerTest {
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(1);
         assertEquals(null, part.getHeader("X-Injected"));
+    }
+
+    @Test
+    public void testDecodedCidLineBreaksAreStripped() throws Exception {
+        // %0D%0A only becomes a line break when the cid: URL is decoded
+        AttachmentImpl a = newAttachment("cid:a%0D%0AX-Injected:%20yes@cxf.apache.org",
+                                         "application/octet-stream");
+        MimeBodyPart part = writeAndParseAttachment(a);
+        assertEquals("<aX-Injected: yes@cxf.apache.org>", part.getHeader("Content-ID")[0]);
+        assertNull(part.getHeader("X-Injected"));
+    }
+
+    @Test
+    public void testDecodedContentIdDomainLineBreaksAreStripped() throws Exception {
+        AttachmentImpl a = newAttachment("a@cxf.apache.org%0D%0AX-Injected:%20yes",
+                                         "application/octet-stream");
+        MimeBodyPart part = writeAndParseAttachment(a);
+        assertEquals("<a@cxf.apache.orgX-Injected: yes>", part.getHeader("Content-ID")[0]);
+        assertNull(part.getHeader("X-Injected"));
+    }
+
+    @Test
+    public void testRawContentIdLineBreaksAreStripped() throws Exception {
+        AttachmentImpl a = newAttachment("a@cxf.apache.org\r\nX-Injected: yes",
+                                         "application/octet-stream");
+        MimeBodyPart part = writeAndParseAttachment(a);
+        assertNull(part.getHeader("X-Injected"));
+    }
+
+    @Test
+    public void testContentTypeLineBreaksAreStripped() throws Exception {
+        AttachmentImpl a = newAttachment("test.xml", "application/octet-stream\r\nX-Injected: yes");
+        MimeBodyPart part = writeAndParseAttachment(a);
+        assertNull(part.getHeader("X-Injected"));
+    }
+
+    private AttachmentImpl newAttachment(String contentId, String contentType) throws Exception {
+        AttachmentImpl a = new AttachmentImpl(contentId);
+        InputStream is = getClass().getResourceAsStream("my.wav");
+        a.setDataHandler(new DataHandler(new ByteArrayDataSource(is, contentType)));
+        return a;
+    }
+
+    private static MimeBodyPart writeAndParseAttachment(AttachmentImpl a) throws Exception {
+        MessageImpl msg = new MessageImpl();
+        Collection<Attachment> atts = new ArrayList<>();
+        atts.add(a);
+        msg.setAttachments(atts);
+        msg.put(Message.CONTENT_TYPE, "application/soap+xml");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        msg.setContent(OutputStream.class, out);
+
+        AttachmentSerializer serializer = new AttachmentSerializer(msg);
+        serializer.writeProlog();
+        out.write("<soap:Body/>".getBytes());
+        serializer.writeAttachments();
+        out.flush();
+
+        String ct = (String) msg.get(Message.CONTENT_TYPE);
+        DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
+        MimeMultipart mpart = new MimeMultipart(source);
+        Session session = Session.getDefaultInstance(new Properties());
+        MimeMessage inMsg = new MimeMessage(session);
+        inMsg.setContent(mpart);
+        inMsg.addHeaderLine("Content-Type: " + ct);
+        MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
+        return (MimeBodyPart) multipart.getBodyPart(1);
     }
 
     private static String escapeQuotes(String s) {
