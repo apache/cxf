@@ -723,9 +723,12 @@ public final class CryptoUtils {
     public static Certificate loadCertificate(KeyStore keyStore, String alias) {
         try {
             if (alias == null) {
-                throw new SecurityException("No keystore alias was defined");
-            }
-            if (!keyStore.containsAlias(alias)) {
+                if (keyStore.size() == 1) {
+                    alias = keyStore.aliases().nextElement();
+                } else {
+                    throw new SecurityException("No keystore alias was defined");
+                }
+            } else if (!keyStore.containsAlias(alias)) {
                 throw new SecurityException("No alias exists in the keystore for: " + alias);
             }
             return keyStore.getCertificate(alias);
