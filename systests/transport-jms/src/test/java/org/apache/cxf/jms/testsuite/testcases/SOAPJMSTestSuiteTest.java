@@ -23,16 +23,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import jakarta.jms.BytesMessage;
 import jakarta.jms.Connection;
 import jakarta.jms.DeliveryMode;
 import jakarta.jms.Destination;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebServiceException;
@@ -337,7 +340,9 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     public void test1002() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1002");
 
-        twoWayTestWithCreateMessage(testcase);
+        // A StreamMessage is not read by default (allowObjectMessages=false) and must be
+        // rejected with the SOAP/JMS unsupportedJMSMessageFormat fault
+        twoWayTestWithCreateMessage(testcase, "unsupportedJMSMessageFormat");
     }
 
     @Test
@@ -411,7 +416,9 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     public void test1102() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1102");
 
-        twoWayTestWithCreateMessage(testcase);
+        // A StreamMessage is not read by default (allowObjectMessages=false) and must be
+        // rejected with the SOAP/JMS unsupportedJMSMessageFormat fault
+        twoWayTestWithCreateMessage(testcase, "unsupportedJMSMessageFormat");
     }
 
     @Test
@@ -634,6 +641,11 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     }
 
     public void twoWayTestWithCreateMessage(final TestCaseType testcase) throws Exception {
+        twoWayTestWithCreateMessage(testcase, null);
+    }
+
+    private void twoWayTestWithCreateMessage(final TestCaseType testcase, String expectedInReplyBody)
+        throws Exception {
         String address = testcase.getAddress();
 
         EndpointInfo endpointInfo = new EndpointInfo();
@@ -653,11 +665,26 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             Message replyMessage = JMSUtil.receive(session, replyToDestination,
                                                    jmsMessage.getJMSMessageID(), 10000, true);
             checkReplyMessage(replyMessage, testcase);
+            if (expectedInReplyBody != null) {
+                String body = getBody(replyMessage);
+                assertTrue("Reply did not contain " + expectedInReplyBody + ": " + body,
+                           body.contains(expectedInReplyBody));
+            }
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
         } finally {
             closer.close();
         }
+    }
+
+    private static String getBody(Message message) throws JMSException {
+        if (message instanceof TextMessage) {
+            return ((TextMessage)message).getText();
+        }
+        BytesMessage bytesMessage = (BytesMessage)message;
+        byte[] bytes = new byte[(int)bytesMessage.getBodyLength()];
+        bytesMessage.readBytes(bytes);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     private void checkReplyMessage(Message replyMessage, TestCaseType testcase) throws JMSException {
