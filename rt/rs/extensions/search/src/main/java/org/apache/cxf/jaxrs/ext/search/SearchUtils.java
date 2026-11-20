@@ -133,11 +133,13 @@ public final class SearchUtils {
         return value;
     }
 
+    /**
+     * Escapes a value for use in a single-quoted SQL string literal by doubling every single quote.
+     * Every quote is doubled, including in values that already contain a doubled quote: the value is
+     * treated as raw input, and must not be escaped beforehand.
+     */
     public static String duplicateSingleQuoteIfNeeded(String value) {
-        if (value.indexOf('\'') != -1 && value.indexOf("\'\'") == -1) {
-            value = value.replaceAll("\'", "\'\'");
-        }
-        return value;
+        return value.replace("'", "''");
     }
 
     public static boolean containsEscapedChar(String value) {
