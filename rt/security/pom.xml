@@ -32,8 +32,16 @@
     </parent>
     <properties>
         <cxf.module.name>org.apache.cxf.security</cxf.module.name>
+        <cxf.osgi.import>javax.cache*;resolution:=optional</cxf.osgi.import>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${cxf.jcache.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -47,6 +55,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${cxf.ehcache3.version}</version>
+            <classifier>jakarta</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>

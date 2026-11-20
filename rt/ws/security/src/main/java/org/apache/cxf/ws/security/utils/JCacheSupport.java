@@ -24,6 +24,8 @@ import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.configuration.MutableConfiguration;
 
+import org.apache.cxf.rt.security.utils.JCacheUtils;
+
 public final class JCacheSupport {
     private JCacheSupport() {
     }
@@ -36,14 +38,6 @@ public final class JCacheSupport {
     public static <K, V> Cache<K, V> getOrCreate(CacheManager cacheManager, String name, Class<K> kclass,
             Class<V> vclass, Function<MutableConfiguration<K, V>, MutableConfiguration<K, V>> customizer) {
 
-        final Cache<K, V> cache = cacheManager.getCache(name, kclass, vclass);
-        if (cache != null) {
-            return cache;
-        }
-
-        MutableConfiguration<K, V> cacheConfiguration = new MutableConfiguration<>();
-        cacheConfiguration = customizer.apply(cacheConfiguration.setTypes(kclass, vclass));
-
-        return cacheManager.createCache(name, cacheConfiguration);
+        return JCacheUtils.getOrCreate(cacheManager, name, kclass, vclass, customizer);
     }
 }

@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.JCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 
 public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     implements AuthorizationCodeDataProvider {
@@ -138,8 +139,11 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     }
 
     @Override
-    public void close() {
-        grantCache.close();
+    public synchronized void close() {
+        if (grantCache != null) {
+            JCacheUtils.release(grantCache);
+            grantCache = null;
+        }
         super.close();
     }
 }
