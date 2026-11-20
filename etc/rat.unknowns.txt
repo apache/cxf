@@ -191,7 +191,6 @@ part of the work around CXF-1000:
  !????? ./distribution/src/main/release/samples/wsdl_first_https/certs/wibble-ra-cert.pem
  !????? ./distribution/src/main/release/samples/wsdl_first_https/certs/wibble.chain
  !????? ./distribution/src/main/release/samples/wsdl_first_https/src/demo/hw_https/resources/abigcompany_ca.pem 
- !????? ./rt/transports/http/src/test/java/org/apache/cxf/transport/https/resources/abigcompany_ca.pem
  !????? ./rt/ws/security/src/test/java/META-INF/cxf/key.rsa
  !????? ./rt/ws/security/src/test/java/org/apache/cxf/ws/security/wss4j/signed.xml
  !????? ./rt/ws/security/src/test/java/org/apache/cxf/ws/security/wss4j/signed_invalid.xml
