@@ -19,13 +19,70 @@
 
 package org.apache.cxf.jaxrs.swagger.ui;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SwaggerUIResourceLocatorTest {
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Test
+    public void testPathTraversalIsRejected() throws Exception {
+        SwaggerUiResourceLocator locator = createFileLocator();
+        String[] paths = {
+            "../secret.txt",
+            "/../secret.txt",
+            "css/../../secret.txt",
+            "..",
+            "%2e%2e/secret.txt",
+            "%2E%2E%2Fsecret.txt",
+            "%252e%252e/secret.txt",
+            "..%5csecret.txt",
+            "..\\secret.txt",
+            "%zz/secret.txt"
+        };
+        for (String path : paths) {
+            assertFalse("Must not resolve: " + path, locator.exists(path));
+            try {
+                locator.locate(path);
+                fail("Expected MalformedURLException for: " + path);
+            } catch (MalformedURLException ex) {
+                // expected
+            }
+        }
+    }
+
+    @Test
+    public void testResourcesInsideRootAreLocated() throws Exception {
+        SwaggerUiResourceLocator locator = createFileLocator();
+        assertTrue(locator.exists("index.html"));
+        assertTrue(locator.exists("/index.html"));
+        assertTrue(locator.exists(""));
+        assertTrue(locator.exists("swagger-ui..min.js"));
+        assertTrue(locator.exists("a+b.js"));
+        assertEquals("index.html", new File(locator.locate("index.html").toURI()).getName());
+    }
+
+    private SwaggerUiResourceLocator createFileLocator() throws Exception {
+        File base = tempFolder.getRoot();
+        Files.write(new File(base, "secret.txt").toPath(), "secret".getBytes());
+        File root = tempFolder.newFolder("swagger-ui");
+        for (String name : new String[] {"index.html", "swagger-ui..min.js", "a+b.js"}) {
+            Files.write(new File(root, name).toPath(), "ui".getBytes());
+        }
+        return new SwaggerUiResourceLocator(root.toURI().toString());
+    }
 
     @Test(expected = MalformedURLException.class)
     public void testLocateWithBadCharactersInUrl() throws MalformedURLException {
