@@ -25,11 +25,14 @@ import java.net.URI;
 import java.net.URL;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.UrlUtils;
 
 /**
  * Swagger UI resource locator
  */
 public class SwaggerUiResourceLocator {
+    private static final int MAX_DECODE_PASSES = 3;
+
     private final String swaggerUiRoot;
 
     public SwaggerUiResourceLocator(String swaggerUiRoot) {
@@ -50,6 +53,9 @@ public class SwaggerUiResourceLocator {
         if (resourcePath.startsWith("/")) {
             resourcePath = resourcePath.substring(1);
         }
+        if (isTraversal(resourcePath)) {
+            throw new MalformedURLException("Invalid Swagger UI resource path");
+        }
         URL ret;
 
         try {
@@ -58,6 +64,35 @@ public class SwaggerUiResourceLocator {
             throw new MalformedURLException(ex.getMessage());
         }
         return ret;
+    }
+
+    /**
+     * Checks whether the resource path could escape the Swagger UI root: whether it contains a ".."
+     * segment or a backslash once percent-decoded. The path is decoded until it no longer changes,
+     * as the URL handler (e.g. for file: URLs) may decode it again.
+     */
+    private static boolean isTraversal(String resourcePath) {
+        String decoded = resourcePath;
+        boolean stable = false;
+        try {
+            for (int i = 0; i < MAX_DECODE_PASSES && !stable; i++) {
+                String next = UrlUtils.pathDecode(decoded);
+                stable = next.equals(decoded);
+                decoded = next;
+            }
+        } catch (IllegalArgumentException ex) {
+            // invalid percent-encoding
+            return true;
+        }
+        if (!stable || decoded.indexOf('\\') != -1) {
+            return true;
+        }
+        for (String segment : decoded.split("/")) {
+            if ("..".equals(segment)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
