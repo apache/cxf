@@ -209,7 +209,7 @@ public class AttachmentSerializer {
     private void writeHeaders(String contentType, String attachmentId,
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\nContent-Type: ");
-        writer.write(contentType);
+        writer.write(stripLineBreaks(contentType));
 
         // Content-Transfer-Encoding is deprecated (see please https://www.rfc-editor.org/rfc/rfc7578#page-6)
         if (!MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(multipartType)) {
@@ -229,9 +229,10 @@ public class AttachmentSerializer {
             // character to their equivalent US-ASCII characters, and enclosing the
             // remaining parts with an angle bracket pair, "<" and ">".  
             //
+            // Line breaks are stripped after decoding, as %0D%0A would otherwise decode into a raw CR/LF
             if (attachmentId.startsWith("cid:")) {
-                writer.write(decode(attachmentId.substring(4),
-                    StandardCharsets.UTF_8));
+                writer.write(stripLineBreaks(decode(attachmentId.substring(4),
+                    StandardCharsets.UTF_8)));
             } else { 
                 //
                 // RFC-2392 (https://datatracker.ietf.org/doc/html/rfc2392) says:
@@ -249,9 +250,9 @@ public class AttachmentSerializer {
                     final String decoded = tryDecode(address[1], StandardCharsets.UTF_8);
                     // If the domain part is encoded, decode it 
                     if (!decoded.equalsIgnoreCase(address[1])) {
-                        writer.write(address[0] + "@" + decoded);
+                        writer.write(stripLineBreaks(address[0] + "@" + decoded));
                     } else {
-                        writer.write(attachmentId);
+                        writer.write(stripLineBreaks(attachmentId));
                     }
                 } else {
                     writer.write(URLEncoder.encode(attachmentId, StandardCharsets.UTF_8.name()));
