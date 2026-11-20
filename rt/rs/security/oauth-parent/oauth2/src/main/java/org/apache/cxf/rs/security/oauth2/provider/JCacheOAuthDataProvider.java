@@ -28,7 +28,6 @@ import java.util.Set;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
-import javax.cache.configuration.MutableConfiguration;
 import javax.cache.spi.CachingProvider;
 
 import org.apache.cxf.Bus;
@@ -40,6 +39,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.apache.cxf.rs.security.oauth2.utils.JwtTokenUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 
 import static org.apache.cxf.jaxrs.utils.ResourceUtils.getClasspathResourceURL;
 
@@ -55,6 +55,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     private Cache<String, String> jwtAccessTokenCache;
     private final Cache<String, RefreshToken> refreshTokenCache;
     private boolean storeJwtTokenKeyOnly;
+    private boolean closed;
     private JoseJwtConsumer jwtTokenConsumer;
 
     public JCacheOAuthDataProvider() {
@@ -193,16 +194,19 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public void close() {
-
-        clientCache.close();
-        refreshTokenCache.close();
-        if (accessTokenCache != null) {
-            accessTokenCache.close();
-        } else {
-            jwtAccessTokenCache.close();
+    public synchronized void close() {
+        if (closed) {
+            return;
         }
-        cacheManager.close();
+        closed = true;
+        JCacheUtils.release(clientCache);
+        JCacheUtils.release(refreshTokenCache);
+        if (accessTokenCache != null) {
+            JCacheUtils.release(accessTokenCache);
+        } else {
+            JCacheUtils.release(jwtAccessTokenCache);
+        }
+        JCacheUtils.releaseCacheManager(cacheManager);
     }
 
     protected static <V extends ServerAccessToken> V getToken(Cache<String, V> cache, String key) {
@@ -278,6 +282,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         return OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn());
     }
 
+    /** The manager is released with JCacheUtils.releaseCacheManager, which close() does. */
     protected static CacheManager createCacheManager(String configFile, Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus(true);
@@ -294,24 +299,14 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             configFileURI = provider.getDefaultURI();
         }
 
-        return provider.getCacheManager(configFileURI, Thread.currentThread().getContextClassLoader());
+        return JCacheUtils.getCacheManager(provider, configFileURI, Thread.currentThread().getContextClassLoader());
     }
 
     protected static <K, V> Cache<K, V> createCache(CacheManager cacheManager,
                                                     String cacheKey, Class<K> keyType, Class<V> valueType) {
 
-        Cache<K, V> cache = cacheManager.getCache(cacheKey, keyType, valueType);
-        if (cache == null) {
-            cache = cacheManager.createCache(
-                cacheKey,
-                new MutableConfiguration<K, V>()
-                    .setTypes(keyType, valueType)
-                    .setStoreByValue(true)
-                    .setStatisticsEnabled(false)
-            );
-        }
-
-        return cache;
+        return JCacheUtils.getOrCreate(cacheManager, cacheKey, keyType, valueType,
+            configuration -> configuration.setStoreByValue(true).setStatisticsEnabled(false));
     }
 
     public boolean isStoreJwtTokenKeyOnly() {

@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.ws.security.cache.jcache;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +32,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
+import javax.cache.Cache;
+import javax.cache.Caching;
+
 import org.apache.wss4j.common.cache.EHCacheExpiry;
+import org.apache.wss4j.common.cache.EHCacheValue;
 
 import org.junit.Test;
 
@@ -40,6 +48,116 @@ import static org.junit.Assert.assertTrue;
  * Some unit tests for the JCacheReplayCache
  */
 public class JCacheReplayCacheTest {
+
+    @Test
+    public void testClosingOtherCacheAndRepeatedClose() throws Exception {
+        String name = UUID.randomUUID().toString();
+        JCacheReplayCache first = new JCacheReplayCache(name);
+        JCacheReplayCache same = new JCacheReplayCache(name);
+        JCacheReplayCache different = new JCacheReplayCache(UUID.randomUUID().toString());
+        try {
+            first.add("same");
+            different.add("different");
+            first.close();
+            first.close();
+            assertTrue(same.contains("same"));
+            assertTrue(different.contains("different"));
+        } finally {
+            first.close();
+            same.close();
+            different.close();
+        }
+    }
+
+    @Test
+    public void testExplicitExpiryAndReplacement() throws Exception {
+        TestClock clock = new TestClock();
+        JCacheReplayCache cache = new JCacheReplayCache(UUID.randomUUID().toString(), 10000, clock);
+        try {
+            cache.add("short", clock.instant().plusSeconds(1));
+            assertTrue(cache.addIfAbsent("atomic", clock.instant().plusSeconds(1)));
+            assertTrue(cache.contains("short"));
+            clock.advance(2);
+            assertFalse(cache.contains("short"));
+            assertTrue(cache.addIfAbsent("atomic", clock.instant().plusSeconds(30)));
+            assertFalse(cache.addIfAbsent("atomic", null));
+            clock.advance(31);
+            assertFalse(cache.contains("atomic"));
+        } finally {
+            cache.close();
+        }
+    }
+
+    @Test
+    public void testLongExpiryAndDefaultBounds() throws Exception {
+        TestClock clock = new TestClock();
+        JCacheReplayCache cache = new JCacheReplayCache(UUID.randomUUID().toString(), 10000, clock);
+        try {
+            Instant longExpiry = clock.instant().plusSeconds(7200);
+            cache.add("long", longExpiry);
+            cache.add("default");
+            cache.add("past", clock.instant().minusSeconds(1));
+            cache.add("now", clock.instant());
+            cache.add("too-long", clock.instant().plusSeconds(43201));
+            assertEquals(longExpiry, cache.get("long").getExpiry());
+            assertEquals(clock.instant().plusSeconds(3600), cache.get("past").getExpiry());
+            assertEquals(cache.get("past").getExpiry(), cache.get("now").getExpiry());
+            assertEquals(cache.get("past").getExpiry(), cache.get("too-long").getExpiry());
+            clock.advance(3601);
+            assertTrue(cache.contains("long"));
+            assertFalse(cache.contains("default"));
+            assertFalse(cache.contains("past"));
+            clock.advance(3600);
+            assertFalse(cache.contains("long"));
+        } finally {
+            cache.close();
+        }
+    }
+
+    /**
+     * Ehcache evicts an identifier at its own expiry, even if it is not looked up again, and a
+     * replaced identifier gets the expiry of its new value.
+     */
+    @Test
+    public void testEhcacheEvictsAtEntryExpiry() throws Exception {
+        String name = UUID.randomUUID().toString();
+        JCacheReplayCache cache = new JCacheReplayCache(name);
+        try {
+            Cache<String, EHCacheValue> store = Caching.getCachingProvider().getCacheManager()
+                .getCache(name, String.class, EHCacheValue.class);
+            cache.add("short", Instant.now().plusSeconds(1));
+            cache.add("replaced", Instant.now().plusSeconds(1));
+            cache.add("replaced", Instant.now().plusSeconds(60));
+            Thread.sleep(1500);
+            assertFalse(store.containsKey("short"));
+            assertTrue(store.containsKey("replaced"));
+        } finally {
+            cache.close();
+        }
+    }
+
+    private static final class TestClock extends Clock {
+        private Instant now = Instant.now();
+
+        void advance(long seconds) {
+            now = now.plusSeconds(seconds);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            return Clock.fixed(now, zone);
+        }
+
+        @Override
+        public Instant instant() {
+            return now;
+        }
+    }
 
     @Test
     public void testAddIfAbsent() throws Exception {
@@ -70,13 +188,30 @@ public class JCacheReplayCacheTest {
      */
     @Test
     public void testConcurrentAddIfAbsent() throws Exception {
-        JCacheReplayCache replayCache = new JCacheReplayCache("cxf.jcache.replay.test-" + UUID.randomUUID());
+        assertConcurrentAddIfAbsent(false);
+    }
+
+    @Test
+    public void testConcurrentAddIfAbsentAfterExpiry() throws Exception {
+        assertConcurrentAddIfAbsent(true);
+    }
+
+    private void assertConcurrentAddIfAbsent(boolean expired) throws Exception {
+        TestClock clock = new TestClock();
+        JCacheReplayCache replayCache = new JCacheReplayCache(
+            "cxf.jcache.replay.test-" + UUID.randomUUID(), 10000, clock);
 
         final int threads = 8;
         final int identifiers = 500;
         List<String> ids = new ArrayList<>(identifiers);
         for (int i = 0; i < identifiers; i++) {
             ids.add(UUID.randomUUID().toString());
+        }
+        if (expired) {
+            for (String id : ids) {
+                replayCache.add(id, clock.instant().plusSeconds(1));
+            }
+            clock.advance(2);
         }
         AtomicIntegerArray accepted = new AtomicIntegerArray(identifiers);
         CyclicBarrier barrier = new CyclicBarrier(threads);
@@ -108,12 +243,20 @@ public class JCacheReplayCacheTest {
         }
     }
 
-    // The cache keeps every entry for the default TTL, so that is the longest it can hold one for
+    // An identifier whose expiry is the max TTL away is held until then
     @Test
     public void testMaxTTL() throws Exception {
-        JCacheReplayCache replayCache = new JCacheReplayCache("cxf.jcache.replay.test-" + UUID.randomUUID());
+        TestClock clock = new TestClock();
+        JCacheReplayCache replayCache =
+            new JCacheReplayCache("cxf.jcache.replay.test-" + UUID.randomUUID(), 10000, clock);
         try {
-            assertEquals(Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL), replayCache.getMaxTTL());
+            Duration maxTTL = replayCache.getMaxTTL();
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.MAX_TTL), maxTTL);
+            assertTrue(replayCache.addIfAbsent("id", clock.instant().plus(maxTTL)));
+            clock.advance(maxTTL.getSeconds() - 1);
+            assertFalse(replayCache.addIfAbsent("id", clock.instant().plusSeconds(60)));
+            clock.advance(1);
+            assertFalse(replayCache.contains("id"));
         } finally {
             replayCache.close();
         }

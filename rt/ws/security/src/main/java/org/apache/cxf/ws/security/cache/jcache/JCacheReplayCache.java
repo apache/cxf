@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.cache.jcache;
 
+import java.io.Serializable;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -26,11 +28,15 @@ import java.util.concurrent.TimeUnit;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
+import javax.cache.configuration.Configuration;
+import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.Duration;
-import javax.cache.expiry.ExpiryPolicy;
+import javax.cache.expiry.ModifiedExpiryPolicy;
+import javax.cache.processor.EntryProcessor;
+import javax.cache.processor.MutableEntry;
 import javax.cache.spi.CachingProvider;
 
-import org.apache.cxf.ws.security.utils.JCacheSupport;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheValue;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -43,39 +49,31 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 class JCacheReplayCache implements ReplayCache {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(JCacheReplayCache.class);
+    private static final String EHCACHE_PROVIDER = "org.ehcache.jsr107.EhcacheCachingProvider";
 
     private final Cache<String, EHCacheValue> cache;
     private final CacheManager cacheManager;
-    private final String key;
+    private final Clock clock;
+    private boolean closed;
 
     JCacheReplayCache(String key) throws WSSecurityException {
         this(key, 10000);
     }
 
     JCacheReplayCache(String key, long heapEntries) throws WSSecurityException {
-        this.key = Objects.requireNonNull(key);
+        this(key, heapEntries, Clock.systemUTC());
+    }
+
+    JCacheReplayCache(String key, long heapEntries, Clock clock) throws WSSecurityException {
+        Objects.requireNonNull(key);
+        this.clock = Objects.requireNonNull(clock);
 
         // Do some checking on the arguments
         try {
             final CachingProvider cachingProvider = Caching.getCachingProvider();
             cacheManager = cachingProvider.getCacheManager(); 
-            cache = JCacheSupport.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
-                cacheConfiguration -> cacheConfiguration.setExpiryPolicyFactory(() -> new ExpiryPolicy() {
-                    @Override
-                    public Duration getExpiryForCreation() {
-                        return new Duration(TimeUnit.SECONDS, EHCacheExpiry.DEFAULT_TTL);
-                    }
-                    
-                    @Override
-                    public Duration getExpiryForAccess() {
-                        return null;
-                    }
-                    
-                    @Override
-                    public Duration getExpiryForUpdate() {
-                        return null;
-                    }
-                }));
+            cache = JCacheUtils.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
+                () -> configuration(cachingProvider, clock));
         } catch (Exception ex) {
             LOG.error("Error configuring JCacheReplayCache: {}", ex.getMessage());
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
@@ -100,7 +98,7 @@ class JCacheReplayCache implements ReplayCache {
             return;
         }
 
-        cache.put(identifier, new EHCacheValue(identifier, expiry));
+        cache.put(identifier, value(identifier, expiry, clock.instant()));
     }
 
     /**
@@ -118,7 +116,8 @@ class JCacheReplayCache implements ReplayCache {
             return false;
         }
 
-        return cache.putIfAbsent(identifier, new EHCacheValue(identifier, expiry));
+        Instant now = clock.instant();
+        return cache.invoke(identifier, new AddIfAbsent(), value(identifier, expiry, now), now);
     }
 
     /**
@@ -126,33 +125,87 @@ class JCacheReplayCache implements ReplayCache {
      * @param identifier The identifier to check
      */
     public boolean contains(String identifier) {
-        if (cache == null) {
-            return false;
-        }
-        EHCacheValue element = cache.get(identifier);
-        return element != null;
+        return get(identifier) != null;
     }
 
     /**
      * Return the maximum time for which this cache holds an identifier. WSS4J uses this to reject a
      * SAML OneTimeUse Assertion that is valid for longer, as it could be replayed once its identifier
-     * had expired from the cache. This implements ReplayCache.getMaxTTL() in versions of WSS4J that
-     * define it, so it is declared without @Override.
+     * had expired from the cache. An identifier is held until its own expiry, up to the max TTL.
+     * This implements ReplayCache.getMaxTTL() in versions of WSS4J that define it, so it is declared
+     * without @Override.
      */
     public java.time.Duration getMaxTTL() {
-        return java.time.Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL);
+        return java.time.Duration.ofSeconds(EHCacheExpiry.MAX_TTL);
     }
 
     // Only exposed for testing
     EHCacheValue get(String identifier) {
-        return cache.get(identifier);
+        return cache.invoke(identifier, new ReadEntry(), clock.instant());
     }
 
     @Override
     public synchronized void close() {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(key);
-            cacheManager.close();
+        if (!closed) {
+            closed = true;
+            JCacheUtils.release(cache);
+        }
+    }
+
+    /**
+     * Entry processors enforce the expiry of each identifier atomically. A JCache expiry policy cannot
+     * inspect values, so Ehcache evicts each identifier at its own expiry, while other providers only
+     * bound the retention of identifiers that are not looked up again by MAX_TTL.
+     */
+    private static Configuration<String, EHCacheValue> configuration(CachingProvider provider, Clock clock) {
+        if (EHCACHE_PROVIDER.equals(provider.getClass().getName())) {
+            return EhcacheReplayExpiry.configuration(clock);
+        }
+        return new MutableConfiguration<String, EHCacheValue>()
+            .setTypes(String.class, EHCacheValue.class)
+            .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(
+                new Duration(TimeUnit.SECONDS, EHCacheExpiry.MAX_TTL)));
+    }
+
+    private EHCacheValue value(String identifier, Instant expiry, Instant now) {
+        // as EHCacheExpiry does, an expiry that is not in the future gets the default TTL
+        if (expiry == null || !expiry.isAfter(now) || expiry.isAfter(now.plusSeconds(EHCacheExpiry.MAX_TTL))) {
+            expiry = now.plusSeconds(EHCacheExpiry.DEFAULT_TTL);
+        }
+        return new EHCacheValue(identifier, expiry);
+    }
+
+    private static boolean expired(EHCacheValue value, Instant now) {
+        return value.getExpiry() != null && !value.getExpiry().isAfter(now);
+    }
+
+    private static final class ReadEntry implements EntryProcessor<String, EHCacheValue, EHCacheValue>, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public EHCacheValue process(MutableEntry<String, EHCacheValue> entry, Object... arguments) {
+            if (!entry.exists()) {
+                return null;
+            }
+            EHCacheValue value = entry.getValue();
+            if (expired(value, (Instant)arguments[0])) {
+                entry.remove();
+                return null;
+            }
+            return value;
+        }
+    }
+
+    private static final class AddIfAbsent implements EntryProcessor<String, EHCacheValue, Boolean>, Serializable {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Boolean process(MutableEntry<String, EHCacheValue> entry, Object... arguments) {
+            if (entry.exists() && !expired(entry.getValue(), (Instant)arguments[1])) {
+                return false;
+            }
+            entry.setValue((EHCacheValue)arguments[0]);
+            return true;
         }
     }
 
