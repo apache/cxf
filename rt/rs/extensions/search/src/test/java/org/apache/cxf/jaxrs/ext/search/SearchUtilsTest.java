@@ -53,4 +53,21 @@ public class SearchUtilsTest {
     public void testSqlWildcardString5() {
         assertEquals("%", SearchUtils.toSqlWildcardString("*", false));
     }
+
+    @Test
+    public void testDuplicateSingleQuoteNoQuotes() {
+        assertEquals("abc", SearchUtils.duplicateSingleQuoteIfNeeded("abc"));
+    }
+
+    @Test
+    public void testDuplicateSingleQuote() {
+        assertEquals("O''Brien", SearchUtils.duplicateSingleQuoteIfNeeded("O'Brien"));
+    }
+
+    @Test
+    public void testDuplicateSingleQuoteWhenValueAlreadyContainsDoubledQuote() {
+        // A doubled quote must not stop the remaining quotes from being escaped
+        assertEquals("a'''' OR ''1''=''1",
+                     SearchUtils.duplicateSingleQuoteIfNeeded("a'' OR '1'='1"));
+    }
 }
