@@ -34,6 +34,9 @@ import jakarta.jms.TextMessage;
  * String <=> {@link jakarta.jms.TextMessage}
  * byte[] <=> {@link jakarta.jms.BytesMessage}
  * Serializable object <=> {@link jakarta.jms.ObjectMessage}
+ * <p>
+ * Inbound {@link jakarta.jms.ObjectMessage} and {@link jakarta.jms.StreamMessage} are rejected
+ * unless allowObjectMessage is enabled.
  */
 public class JMSMessageConverter {
 
@@ -82,6 +85,11 @@ public class JMSMessageConverter {
             }
             return ((ObjectMessage)message).getObject();
         } else if (message instanceof StreamMessage) {
+            // StreamMessage.readObject() may deserialize provider-specific object values,
+            // so it is subject to the same configuration gate as ObjectMessage
+            if (!allowObjectMessage) {
+                throw new JMSException("StreamMessage is disabled by configuration");
+            }
             StreamMessage streamMessage = (StreamMessage)message;
             return streamMessage.readObject();
         } else {
