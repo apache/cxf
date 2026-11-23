@@ -18,14 +18,24 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.net.URI;
+
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.provider.JCacheOAuthDataProvider;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class JCacheLifecycleTest {
+    private static final String CONFIG = "cxf-oauth2-jcache.xml";
+
     @Test
     public void testSharedCodeAndOAuthProvidersSurviveClose() {
         JCacheCodeDataProvider first = new JCacheCodeDataProvider();
@@ -49,5 +59,39 @@ public class JCacheLifecycleTest {
             same.close();
             oauth.close();
         }
+    }
+
+    /**
+     * A constructor that fails after obtaining the manager of a configuration file releases it, so that it
+     * is closed (and its disk store unlocked) rather than kept open.
+     */
+    @Test
+    public void testFailedConstructionReleasesManager() throws Exception {
+        CacheManager manager = conflictingCache("lifecycle-refresh");
+        assertThrows(RuntimeException.class, () -> new JCacheOAuthDataProvider(CONFIG, null,
+            "lifecycle-client", "lifecycle-access", "lifecycle-refresh"));
+        assertTrue(manager.isClosed());
+
+        manager = conflictingCache("lifecycle-code");
+        assertThrows(RuntimeException.class, () -> new JCacheCodeDataProvider(CONFIG, null,
+            "lifecycle-client", "lifecycle-code", "lifecycle-access", "lifecycle-refresh"));
+        assertTrue(manager.isClosed());
+    }
+
+    // A request still in flight after close fails as on a closed cache, not with a NullPointerException
+    @Test
+    public void testUseAfterClose() {
+        JCacheCodeDataProvider provider = new JCacheCodeDataProvider();
+        provider.close();
+        assertThrows(IllegalStateException.class, () -> provider.getCodeGrant("code"));
+    }
+
+    // a cache of the given name, with other types than the providers use, in their configuration's manager
+    private static CacheManager conflictingCache(String name) throws Exception {
+        URI uri = JCacheLifecycleTest.class.getResource("/" + CONFIG).toURI();
+        CacheManager manager = Caching.getCachingProviders().iterator().next()
+            .getCacheManager(uri, Thread.currentThread().getContextClassLoader());
+        manager.createCache(name, new MutableConfiguration<Integer, Integer>().setTypes(Integer.class, Integer.class));
+        return manager;
     }
 }

@@ -89,16 +89,26 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
                                    boolean storeJwtTokenKeyOnly) {
 
         cacheManager = createCacheManager(configFileURL, bus);
-        clientCache = createCache(cacheManager, clientCacheKey, String.class, Client.class);
-
         this.storeJwtTokenKeyOnly = storeJwtTokenKeyOnly;
-        if (storeJwtTokenKeyOnly) {
-            jwtAccessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, String.class);
-        } else {
-            accessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, ServerAccessToken.class);
+        Cache<String, Client> clients = null;
+        Cache<String, RefreshToken> refreshTokens = null;
+        try {
+            clients = createCache(cacheManager, clientCacheKey, String.class, Client.class);
+            if (storeJwtTokenKeyOnly) {
+                jwtAccessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, String.class);
+            } else {
+                accessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class,
+                                               ServerAccessToken.class);
+            }
+            refreshTokens = createCache(cacheManager, refreshTokenCacheKey, String.class, RefreshToken.class);
+        } catch (RuntimeException ex) {
+            // release what was obtained, so that the manager (and its disk store) is not kept open
+            releaseAll(clients, accessTokenCache, jwtAccessTokenCache, null);
+            JCacheUtils.releaseCacheManager(cacheManager);
+            throw ex;
         }
-
-        refreshTokenCache = createCache(cacheManager, refreshTokenCacheKey, String.class, RefreshToken.class);
+        clientCache = clients;
+        refreshTokenCache = refreshTokens;
     }
 
     @Override
@@ -199,14 +209,16 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             return;
         }
         closed = true;
-        JCacheUtils.release(clientCache);
-        JCacheUtils.release(refreshTokenCache);
-        if (accessTokenCache != null) {
-            JCacheUtils.release(accessTokenCache);
-        } else {
-            JCacheUtils.release(jwtAccessTokenCache);
-        }
+        releaseAll(clientCache, accessTokenCache, jwtAccessTokenCache, refreshTokenCache);
         JCacheUtils.releaseCacheManager(cacheManager);
+    }
+
+    private static void releaseAll(Cache<?, ?>... caches) {
+        for (Cache<?, ?> cache : caches) {
+            if (cache != null) {
+                JCacheUtils.release(cache);
+            }
+        }
     }
 
     protected static <V extends ServerAccessToken> V getToken(Cache<String, V> cache, String key) {

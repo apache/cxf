@@ -24,10 +24,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Supplier;
 
+import javax.cache.Cache;
 import javax.cache.configuration.Configuration;
 
 import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheValue;
+import org.ehcache.config.CacheRuntimeConfiguration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.expiry.ExpiryPolicy;
@@ -40,7 +42,7 @@ import org.ehcache.jsr107.Eh107Configuration;
 final class EhcacheReplayExpiry implements ExpiryPolicy<String, EHCacheValue> {
     private final Clock clock;
 
-    private EhcacheReplayExpiry(Clock clock) {
+    EhcacheReplayExpiry(Clock clock) {
         this.clock = clock;
     }
 
@@ -51,6 +53,18 @@ final class EhcacheReplayExpiry implements ExpiryPolicy<String, EHCacheValue> {
                 ResourcePoolsBuilder.heap(Long.MAX_VALUE))
                 .withExpiry(new EhcacheReplayExpiry(clock))
                 .build());
+    }
+
+    /** Whether the cache evicts each identifier at its own expiry with this policy. */
+    static boolean isUsedBy(Cache<String, EHCacheValue> cache) {
+        try {
+            @SuppressWarnings("unchecked")
+            Eh107Configuration<String, EHCacheValue> configuration = cache.getConfiguration(Eh107Configuration.class);
+            return configuration.unwrap(CacheRuntimeConfiguration.class).getExpiryPolicy()
+                instanceof EhcacheReplayExpiry;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 
     @Override

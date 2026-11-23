@@ -41,6 +41,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
     private long codeLifetime = 10 * 60;
     private Cache<String, ServerAuthorizationCodeGrant> grantCache;
+    private boolean grantCacheReleased;
 
     protected JCacheCodeDataProvider() {
         this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
@@ -68,7 +69,12 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
                                      String refreshTokenKey,
                                      boolean storeJwtTokenKeyOnly) {
         super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey, storeJwtTokenKeyOnly);
-        grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
+        try {
+            grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
+        } catch (RuntimeException ex) {
+            super.close();
+            throw ex;
+        }
     }
 
 
@@ -140,9 +146,10 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
     @Override
     public synchronized void close() {
-        if (grantCache != null) {
+        // keep the reference, so that a request still in flight fails as on a closed cache, not with an NPE
+        if (!grantCacheReleased) {
+            grantCacheReleased = true;
             JCacheUtils.release(grantCache);
-            grantCache = null;
         }
         super.close();
     }

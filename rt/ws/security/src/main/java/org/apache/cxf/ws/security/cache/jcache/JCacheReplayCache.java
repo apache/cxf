@@ -44,16 +44,22 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * An in-memory JCache based implementation of the ReplayCache interface.
- * The default TTL is 60 minutes and the max TTL is 12 hours.
+ * The default TTL is 60 minutes and the max TTL is 12 hours. With Ehcache (the same copy that CXF sees),
+ * each identifier is held until its own expiry, up to the max TTL; with other providers, every identifier
+ * is held for the default TTL.
  */
 class JCacheReplayCache implements ReplayCache {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(JCacheReplayCache.class);
     private static final String EHCACHE_PROVIDER = "org.ehcache.jsr107.EhcacheCachingProvider";
+    private static final String[] EHCACHE_CLASSES = {
+        "org.ehcache.jsr107.Eh107Configuration", "org.ehcache.expiry.ExpiryPolicy"
+    };
 
     private final Cache<String, EHCacheValue> cache;
     private final CacheManager cacheManager;
     private final Clock clock;
+    private final boolean entryExpiry;
     private boolean closed;
 
     JCacheReplayCache(String key) throws WSSecurityException {
@@ -65,15 +71,35 @@ class JCacheReplayCache implements ReplayCache {
     }
 
     JCacheReplayCache(String key, long heapEntries, Clock clock) throws WSSecurityException {
+        this(key, clock, null);
+    }
+
+    /**
+     * @param ehcacheExpiry whether to use Ehcache's per-entry expiry, or null to use it if the provider is
+     *                      the same copy of Ehcache that CXF sees
+     */
+    JCacheReplayCache(String key, Clock clock, Boolean ehcacheExpiry) throws WSSecurityException {
         Objects.requireNonNull(key);
         this.clock = Objects.requireNonNull(clock);
 
         // Do some checking on the arguments
         try {
             final CachingProvider cachingProvider = Caching.getCachingProvider();
-            cacheManager = cachingProvider.getCacheManager(); 
-            cache = JCacheUtils.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
-                () -> configuration(cachingProvider, clock));
+            cacheManager = cachingProvider.getCacheManager();
+            Cache<String, EHCacheValue> entryExpiryCache = null;
+            if (ehcacheExpiry != null ? ehcacheExpiry : isSameEhcache(cachingProvider)) {
+                try {
+                    entryExpiryCache = JCacheUtils.getOrCreate(cacheManager, key, String.class, EHCacheValue.class,
+                        () -> EhcacheReplayExpiry.configuration(clock));
+                } catch (LinkageError | IllegalArgumentException | ClassCastException ex) {
+                    LOG.warn("Ehcache per-entry expiry is not available for the replay cache, every identifier "
+                        + "is held for the default TTL: {}", ex.toString());
+                }
+            }
+            cache = entryExpiryCache != null ? entryExpiryCache : JCacheUtils.getOrCreate(cacheManager, key,
+                String.class, EHCacheValue.class, JCacheReplayCache::defaultTtlConfiguration);
+            // the cache may already exist with another configuration, so check the one it has
+            entryExpiry = entryExpiryCache != null && EhcacheReplayExpiry.isUsedBy(entryExpiryCache);
         } catch (Exception ex) {
             LOG.error("Error configuring JCacheReplayCache: {}", ex.getMessage());
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
@@ -131,12 +157,12 @@ class JCacheReplayCache implements ReplayCache {
     /**
      * Return the maximum time for which this cache holds an identifier. WSS4J uses this to reject a
      * SAML OneTimeUse Assertion that is valid for longer, as it could be replayed once its identifier
-     * had expired from the cache. An identifier is held until its own expiry, up to the max TTL.
-     * This implements ReplayCache.getMaxTTL() in versions of WSS4J that define it, so it is declared
-     * without @Override.
+     * had expired from the cache. With Ehcache's per-entry expiry an identifier is held until its own
+     * expiry, up to the max TTL; otherwise it is held for the default TTL. This implements
+     * ReplayCache.getMaxTTL() in versions of WSS4J that define it, so it is declared without @Override.
      */
     public java.time.Duration getMaxTTL() {
-        return java.time.Duration.ofSeconds(EHCacheExpiry.MAX_TTL);
+        return java.time.Duration.ofSeconds(entryExpiry ? EHCacheExpiry.MAX_TTL : EHCacheExpiry.DEFAULT_TTL);
     }
 
     // Only exposed for testing
@@ -154,17 +180,40 @@ class JCacheReplayCache implements ReplayCache {
 
     /**
      * Entry processors enforce the expiry of each identifier atomically. A JCache expiry policy cannot
-     * inspect values, so Ehcache evicts each identifier at its own expiry, while other providers only
-     * bound the retention of identifiers that are not looked up again by MAX_TTL.
+     * inspect values, so without Ehcache's per-entry expiry every identifier is held for the default TTL
+     * from when it was last written (an identifier with a shorter expiry is treated as absent once it has
+     * passed), and getMaxTTL reports the default TTL.
      */
-    private static Configuration<String, EHCacheValue> configuration(CachingProvider provider, Clock clock) {
-        if (EHCACHE_PROVIDER.equals(provider.getClass().getName())) {
-            return EhcacheReplayExpiry.configuration(clock);
-        }
+    private static Configuration<String, EHCacheValue> defaultTtlConfiguration() {
         return new MutableConfiguration<String, EHCacheValue>()
             .setTypes(String.class, EHCacheValue.class)
             .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(
-                new Duration(TimeUnit.SECONDS, EHCacheExpiry.MAX_TTL)));
+                new Duration(TimeUnit.SECONDS, EHCacheExpiry.DEFAULT_TTL)));
+    }
+
+    /**
+     * Whether the provider is Ehcache, loaded from the same classes as CXF sees: otherwise (an unwired
+     * optional OSGi import, or Ehcache in an application with CXF in a shared library) CXF cannot build an
+     * Ehcache configuration the provider accepts.
+     */
+    static boolean isSameEhcache(CachingProvider provider) {
+        if (!EHCACHE_PROVIDER.equals(provider.getClass().getName())) {
+            return false;
+        }
+        for (String name : EHCACHE_CLASSES) {
+            if (!isSameClass(name, JCacheReplayCache.class.getClassLoader(), provider.getClass().getClassLoader())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean isSameClass(String name, ClassLoader ours, ClassLoader theirs) {
+        try {
+            return Class.forName(name, false, ours) == Class.forName(name, false, theirs);
+        } catch (ClassNotFoundException | LinkageError ex) {
+            return false;
+        }
     }
 
     private EHCacheValue value(String identifier, Instant expiry, Instant now) {

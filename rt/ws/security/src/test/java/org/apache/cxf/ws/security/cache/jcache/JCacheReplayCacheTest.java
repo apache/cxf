@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.cache.jcache;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,10 +32,12 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import javax.cache.configuration.CompleteConfiguration;
 
 import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheValue;
@@ -42,6 +46,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -128,12 +133,85 @@ public class JCacheReplayCacheTest {
             cache.add("short", Instant.now().plusSeconds(1));
             cache.add("replaced", Instant.now().plusSeconds(1));
             cache.add("replaced", Instant.now().plusSeconds(60));
-            Thread.sleep(1500);
+            // poll rather than sleep a fixed time, so that a slow machine does not fail the test
+            long deadline = System.currentTimeMillis() + 30000;
+            while (store.containsKey("short") && System.currentTimeMillis() < deadline) {
+                Thread.sleep(100);
+            }
             assertFalse(store.containsKey("short"));
             assertTrue(store.containsKey("replaced"));
         } finally {
             cache.close();
         }
+    }
+
+    // The expiry Ehcache is given for each identifier, on the test clock
+    @Test
+    public void testEhcacheExpiryDurations() {
+        TestClock clock = new TestClock();
+        EhcacheReplayExpiry expiry = new EhcacheReplayExpiry(clock);
+        Instant now = clock.instant();
+        EHCacheValue shortValue = new EHCacheValue("id", now.plusSeconds(30));
+        EHCacheValue longValue = new EHCacheValue("id", now.plusSeconds(7200));
+        assertEquals(Duration.ofSeconds(30), expiry.getExpiryForCreation("id", shortValue));
+        assertEquals(Duration.ofSeconds(7200), expiry.getExpiryForUpdate("id", () -> shortValue, longValue));
+        assertEquals(Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL),
+            expiry.getExpiryForCreation("id", new EHCacheValue("id", null)));
+        clock.advance(31);
+        assertEquals(Duration.ZERO, expiry.getExpiryForCreation("id", shortValue));
+        assertNull(expiry.getExpiryForAccess("id", () -> longValue));
+    }
+
+    // Without Ehcache's per-entry expiry, every identifier is held for the default TTL, which is reported
+    @Test
+    public void testDefaultTtlWithoutEhcacheExpiry() throws Exception {
+        TestClock clock = new TestClock();
+        String name = "cxf.jcache.replay.test-" + UUID.randomUUID();
+        JCacheReplayCache cache = new JCacheReplayCache(name, clock, false);
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL), cache.getMaxTTL());
+            Cache<String, EHCacheValue> store = Caching.getCachingProvider().getCacheManager()
+                .getCache(name, String.class, EHCacheValue.class);
+            @SuppressWarnings("unchecked")
+            CompleteConfiguration<String, EHCacheValue> configuration =
+                store.getConfiguration(CompleteConfiguration.class);
+            javax.cache.expiry.ExpiryPolicy policy = configuration.getExpiryPolicyFactory().create();
+            assertEquals(new javax.cache.expiry.Duration(TimeUnit.SECONDS, EHCacheExpiry.DEFAULT_TTL),
+                policy.getExpiryForCreation());
+            assertEquals(policy.getExpiryForCreation(), policy.getExpiryForUpdate());
+
+            // an identifier is still treated as absent once its own, shorter, expiry has passed
+            assertTrue(cache.addIfAbsent("id", clock.instant().plusSeconds(60)));
+            assertFalse(cache.addIfAbsent("id", null));
+            clock.advance(60);
+            assertFalse(cache.contains("id"));
+        } finally {
+            cache.close();
+        }
+    }
+
+    // A cache that already exists without the per-entry expiry is reported with the default TTL
+    @Test
+    public void testExistingCacheWithoutEhcacheExpiry() throws Exception {
+        String name = "cxf.jcache.replay.test-" + UUID.randomUUID();
+        JCacheReplayCache first = new JCacheReplayCache(name, Clock.systemUTC(), false);
+        JCacheReplayCache second = new JCacheReplayCache(name, Clock.systemUTC(), null);
+        try {
+            assertEquals(Duration.ofSeconds(EHCacheExpiry.DEFAULT_TTL), second.getMaxTTL());
+        } finally {
+            first.close();
+            second.close();
+        }
+    }
+
+    @Test
+    public void testEhcacheDetection() {
+        assertTrue(JCacheReplayCache.isSameEhcache(Caching.getCachingProvider()));
+        String name = "org.ehcache.jsr107.Eh107Configuration";
+        ClassLoader ours = JCacheReplayCache.class.getClassLoader();
+        assertTrue(JCacheReplayCache.isSameClass(name, ours, ours));
+        // a class loader that cannot see Ehcache, as with an unwired optional OSGi import
+        assertFalse(JCacheReplayCache.isSameClass(name, ours, new URLClassLoader(new URL[0], null)));
     }
 
     private static final class TestClock extends Clock {
