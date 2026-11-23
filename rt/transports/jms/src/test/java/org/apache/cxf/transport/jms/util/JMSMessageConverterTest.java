@@ -20,12 +20,14 @@ package org.apache.cxf.transport.jms.util;
 
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
+import javax.jms.StreamMessage;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class JMSMessageConverterTest {
@@ -50,6 +52,31 @@ public class JMSMessageConverterTest {
         when(objectMessage.getObject()).thenReturn("payload");
 
         Object payload = converter.fromMessage(objectMessage);
+        assertEquals("payload", payload);
+    }
+
+    @Test
+    public void testStreamMessageIsRejectedByDefault() throws Exception {
+        JMSMessageConverter converter = new JMSMessageConverter();
+        StreamMessage streamMessage = mock(StreamMessage.class);
+
+        try {
+            converter.fromMessage(streamMessage);
+            fail("Expected JMSException to be thrown");
+        } catch (JMSException ex) {
+            assertEquals("StreamMessage is disabled by configuration", ex.getMessage());
+        }
+        // The body must not be read (and so not deserialized) when the message is rejected
+        verifyNoInteractions(streamMessage);
+    }
+
+    @Test
+    public void testStreamMessageCanBeEnabled() throws Exception {
+        JMSMessageConverter converter = new JMSMessageConverter(true);
+        StreamMessage streamMessage = mock(StreamMessage.class);
+        when(streamMessage.readObject()).thenReturn("payload");
+
+        Object payload = converter.fromMessage(streamMessage);
         assertEquals("payload", payload);
     }
 }

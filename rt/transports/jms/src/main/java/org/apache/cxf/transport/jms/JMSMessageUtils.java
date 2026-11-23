@@ -36,6 +36,7 @@ import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -53,6 +54,8 @@ import org.apache.cxf.transport.jms.util.JMSUtil;
  */
 final class JMSMessageUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSMessageUtils.class);
+
+    private static final String STREAM_MESSAGE_TYPE = "stream";
 
     private JMSMessageUtils() {
 
@@ -86,6 +89,14 @@ final class JMSMessageUtils {
                                               Message message,
                                               boolean allowObjectMessage)
         throws UnsupportedEncodingException, JMSException {
+        if (message instanceof StreamMessage && !allowObjectMessage) {
+            // Do not read the body: StreamMessage.readObject() may deserialize provider-specific
+            // object values. Report the message as an unsupported format instead, so that the
+            // SOAP/JMS binding can reply with an unsupportedJMSMessageFormat fault.
+            inMessage.setContent(InputStream.class, new ByteArrayInputStream(new byte[0]));
+            setMessageTypeHeader(inMessage, STREAM_MESSAGE_TYPE);
+            return;
+        }
         final String messageType;
         Object converted = new JMSMessageConverter(allowObjectMessage).fromMessage(message);
         if (converted instanceof String) {
@@ -97,6 +108,10 @@ final class JMSMessageUtils {
         } else {
             messageType = "unknown";
         }
+        setMessageTypeHeader(inMessage, messageType);
+    }
+
+    private static void setMessageTypeHeader(org.apache.cxf.message.Message inMessage, String messageType) {
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)inMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         headers.put(JMSConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
