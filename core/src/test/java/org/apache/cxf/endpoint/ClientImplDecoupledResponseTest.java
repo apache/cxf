@@ -219,6 +219,41 @@ public class ClientImplDecoupledResponseTest {
     }
 
     @Test
+    public void testAcknowledgementOfAsyncOneWayCall() throws Exception {
+        // a one-way call gets no reply on the decoupled endpoint: the acknowledgement completes it
+        decoupled();
+        exchange.setOneWay(true);
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        client.onMessage(acknowledgement());
+        assertEquals(Boolean.TRUE, exchange.get(ClientImpl.FINISHED));
+        assertNull(callback.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testSoapFaultArrivingWhileAsyncFailureIsResolved() throws Exception {
+        // a partial response with a SOAP fault becomes the exchange's in fault message after the reply
+        // was found to be the exchange's in message, but before getException(Exchange) reads the exchange
+        AtomicBoolean arrived = new AtomicBoolean();
+        client = new ClientImpl(bus, endpoint, selector) {
+            @Override
+            protected Exception getException(Exchange e) {
+                if (arrived.compareAndSet(false, true)) {
+                    Message partial = partialResponse();
+                    partial.setContent(Exception.class, new IllegalStateException("late partial fault"));
+                    e.setInMessage(null);
+                    e.setInFaultMessage(partial);
+                }
+                return super.getException(e);
+            }
+        };
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        client.onMessage(reply());
+        assertArrayEquals(RESULT.toArray(), callback.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
     public void testSoapFaultPartialResponseAfterReply() throws Exception {
         // as CheckFaultInterceptor does for a SOAP fault: the in fault chain makes the message the
         // in fault message of the exchange, and clears its in message

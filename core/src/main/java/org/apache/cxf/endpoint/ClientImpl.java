@@ -785,12 +785,22 @@ public class ClientImpl
     /**
      * Returns the failure of a call whose response is the given inbound message (null if there is none).
      * While that message is still the exchange's in (or in fault) message, this is getException(Exchange);
-     * if a message that arrived later has replaced it, it is the response's own failure, or else an
+     * if a message that arrived later has replaced it, or has become the exchange's in fault message
+     * meanwhile (e.g. a partial response with a SOAP fault), it is the response's own failure, or else an
      * outbound fault.
      */
     protected Exception getException(Exchange exchange, Message response) {
-        if (response == null || response == exchange.getInMessage() || response == exchange.getInFaultMessage()) {
+        Message inFault = exchange.getInFaultMessage();
+        if (response == null || response == inFault) {
             return getException(exchange);
+        }
+        if (inFault == null && response == exchange.getInMessage()) {
+            Exception ex = getException(exchange);
+            // the in fault message is only ever set, so if it is still unset, getException(Exchange)
+            // cannot have read a fault that arrived after the response
+            if (exchange.getInFaultMessage() == null) {
+                return ex;
+            }
         }
         Exception ex = response.getContent(Exception.class);
         if (ex == null && exchange.getOutFaultMessage() != null) {
@@ -1195,7 +1205,9 @@ public class ClientImpl
         return Boolean.TRUE.equals(exchange.get(FINISHED));
     }
 
-    // the messages of a decoupled call can arrive in any order
+    // the messages of a decoupled call can arrive in any order. A message that arrives after the exchange
+    // is finished still runs the inbound chain, but the exchange's in message stays the response: client
+    // interceptors read the message they are given, not exchange.getInMessage()
     private static void receive(Message message) {
         if (isDecoupledAcknowledgement(message)) {
             // the response arrives separately: the acknowledgement, which can come first, must not
@@ -1217,9 +1229,11 @@ public class ClientImpl
         return response != null ? response : exchange.getInMessage();
     }
 
-    // an HTTP 202 without content, which acknowledges a call whose response goes to a decoupled endpoint
+    // an HTTP 202 without content, which acknowledges a call whose response goes to a decoupled endpoint.
+    // A one-way call gets no other response, so there the 202 is the response
     private static boolean isDecoupledAcknowledgement(Message message) {
-        if (!Integer.valueOf(202).equals(message.get(Message.RESPONSE_CODE))
+        if (message.getExchange().isOneWay()
+            || !Integer.valueOf(202).equals(message.get(Message.RESPONSE_CODE))
             || message.getContent(InputStream.class) != null) {
             return false;
         }
