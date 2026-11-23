@@ -37,6 +37,7 @@ import org.apache.cxf.transport.servlet.ServletDestination;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -78,6 +79,26 @@ public class RequestPreprocessorTest {
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("POST", m.get(Message.HTTP_REQUEST_METHOD));
         assertEquals("application/xml", m.get(Message.ACCEPT_CONTENT_TYPE));
+    }
+
+    @Test
+    public void testCTypeQuery() {
+        Message m = mockMessage("http://localhost:8080", "/bar", "_ctype=json", "POST");
+        m.put(Message.CONTENT_TYPE, "text/plain");
+        RequestPreprocessor sqh = new RequestPreprocessor();
+        sqh.preprocess(m, new UriInfoImpl(m, null));
+        assertEquals("application/json", m.get(Message.CONTENT_TYPE));
+    }
+
+    @Test
+    public void testTypeQueriesDisabled() {
+        Message m = mockMessage("http://localhost:8080", "/bar", "_type=xml&_ctype=json", "POST");
+        m.put(Message.CONTENT_TYPE, "text/plain");
+        m.put("org.apache.cxf.jaxrs.allow.query.type.override", false);
+        RequestPreprocessor sqh = new RequestPreprocessor();
+        sqh.preprocess(m, new UriInfoImpl(m, null));
+        assertEquals("text/plain", m.get(Message.CONTENT_TYPE));
+        assertNull(m.get(Message.ACCEPT_CONTENT_TYPE));
     }
 
     private Message mockMessage(String baseAddress,

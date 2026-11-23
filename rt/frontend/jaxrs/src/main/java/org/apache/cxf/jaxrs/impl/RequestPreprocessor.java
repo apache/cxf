@@ -43,6 +43,12 @@ public class RequestPreprocessor {
      */
     private static final String ALLOW_HTTP_METHOD_OVERRIDE = "org.apache.cxf.jaxrs.allow.http.method.override";
 
+    /**
+     * Whether to allow the client to override the Accept and Content-Type headers via the ACCEPT_QUERY
+     * and CTYPE_QUERY query parameters. The default is true.
+     */
+    private static final String ALLOW_QUERY_TYPE_OVERRIDE = "org.apache.cxf.jaxrs.allow.query.type.override";
+
     private static final String ACCEPT_QUERY = "_type";
     private static final String CTYPE_QUERY = "_ctype";
     private static final String METHOD_QUERY = "_method";
@@ -87,8 +93,10 @@ public class RequestPreprocessor {
         handleLanguageMappings(m, u);
 
         MultivaluedMap<String, String> queries = u.getQueryParameters();
-        handleTypeQuery(m, queries);
-        handleCType(m, queries);
+        if (MessageUtils.getContextualBoolean(m, ALLOW_QUERY_TYPE_OVERRIDE, true)) {
+            handleTypeQuery(m, queries);
+            handleCType(m, queries);
+        }
         handleMethod(m, queries, new HttpHeadersImpl(m));
         return new UriInfoImpl(m, null).getPath();
     }
