@@ -93,8 +93,8 @@ public class JMSConfiguration {
      */
     private boolean useObjectMessageFallback;
     /**
-     * Inbound only: when true, ObjectMessage deserialization is allowed.
-     * When false, inbound ObjectMessage is rejected.
+     * Inbound only: when true, ObjectMessage and StreamMessage deserialization is allowed.
+     * When false, inbound ObjectMessage and StreamMessage are rejected.
      */
     private boolean allowObjectMessages;
     private boolean pubSubDomain;
@@ -309,14 +309,14 @@ public class JMSConfiguration {
     }
 
     /**
-     * Inbound only: controls whether ObjectMessage deserialization is permitted.
+     * Inbound only: controls whether ObjectMessage and StreamMessage deserialization is permitted.
      */
     public boolean isAllowObjectMessages() {
         return allowObjectMessages;
     }
 
     /**
-     * Inbound only: controls whether ObjectMessage deserialization is permitted.
+     * Inbound only: controls whether ObjectMessage and StreamMessage deserialization is permitted.
      */
     public void setAllowObjectMessages(boolean allowObjectMessages) {
         this.allowObjectMessages = allowObjectMessages;
