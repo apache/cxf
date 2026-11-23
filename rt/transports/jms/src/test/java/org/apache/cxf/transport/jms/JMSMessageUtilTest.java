@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.jms.ObjectMessage;
 import jakarta.jms.StreamMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
@@ -85,6 +86,39 @@ public class JMSMessageUtilTest {
         when(streamMessage.readObject()).thenReturn("payload");
 
         Message inMessage = JMSMessageUtils.asCXFMessage(streamMessage,
+                                                         JMSConstants.JMS_SERVER_REQUEST_HEADERS, true);
+
+        assertEquals(Collections.singletonList(JMSConstants.TEXT_MESSAGE_TYPE),
+                     getProtocolHeaders(inMessage).get(JMSConstants.JMS_MESSAGE_TYPE));
+        assertNotNull(inMessage.getContent(Reader.class));
+    }
+
+    @Test
+    public void testObjectMessageIsReportedAsUnsupportedByDefault() throws Exception {
+        ObjectMessage objectMessage = mock(ObjectMessage.class);
+        when(objectMessage.getPropertyNames()).thenReturn(Collections.emptyEnumeration());
+
+        Message inMessage = JMSMessageUtils.asCXFMessage(objectMessage,
+                                                         JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+
+        assertEquals(Collections.singletonList("object"),
+                     getProtocolHeaders(inMessage).get(JMSConstants.JMS_MESSAGE_TYPE));
+        assertNull(inMessage.getContent(Reader.class));
+        InputStream in = inMessage.getContent(InputStream.class);
+        assertNotNull(in);
+        assertEquals(-1, in.read());
+        // The body must not be read (and so not deserialized)
+        verify(objectMessage, never()).getObject();
+        verify(objectMessage, never()).getBody(any());
+    }
+
+    @Test
+    public void testObjectMessageIsReadWhenAllowed() throws Exception {
+        ObjectMessage objectMessage = mock(ObjectMessage.class);
+        when(objectMessage.getPropertyNames()).thenReturn(Collections.emptyEnumeration());
+        when(objectMessage.getObject()).thenReturn("payload");
+
+        Message inMessage = JMSMessageUtils.asCXFMessage(objectMessage,
                                                          JMSConstants.JMS_SERVER_REQUEST_HEADERS, true);
 
         assertEquals(Collections.singletonList(JMSConstants.TEXT_MESSAGE_TYPE),
