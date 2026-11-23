@@ -50,6 +50,8 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -59,6 +61,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.DestroyFailedException;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.CompressionUtils;
@@ -70,6 +73,8 @@ import org.apache.cxf.helpers.JavaUtils;
  * Encryption helpers
  */
 public final class CryptoUtils {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(CryptoUtils.class);
 
     static {
         if (JavaUtils.isFIPSEnabled()) {
@@ -723,9 +728,13 @@ public final class CryptoUtils {
     public static Certificate loadCertificate(KeyStore keyStore, String alias) {
         try {
             if (alias == null) {
-                throw new SecurityException("No keystore alias was defined");
-            }
-            if (!keyStore.containsAlias(alias)) {
+                if (keyStore.size() == 1) {
+                    alias = keyStore.aliases().nextElement();
+                    LOG.log(Level.FINE, "No keystore alias specified; use single available {}", alias);
+                } else {
+                    throw new SecurityException("No keystore alias was defined");
+                }
+            } else if (!keyStore.containsAlias(alias)) {
                 throw new SecurityException("No alias exists in the keystore for: " + alias);
             }
             return keyStore.getCertificate(alias);
