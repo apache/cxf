@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.HttpMethod;
@@ -43,6 +45,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -74,6 +77,7 @@ import org.apache.cxf.phase.Phase;
 @Priority(Priorities.AUTHENTICATION - 1)
 public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     ContainerResponseFilter {
+    private static final Logger LOG = LogUtils.getLogger(CrossOriginResourceSharingFilter.class);
     private static final String SPACE_PATTERN = " ";
     private static final String FIELD_COMMA_PATTERN = ",";
 
@@ -98,6 +102,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private List<String> exposeHeaders = Collections.emptyList();
     private Integer maxAge;
     private Integer preflightFailStatus = 200;
+    private final AtomicBoolean allOriginsWithCredentialsWarningLogged = new AtomicBoolean();
     private boolean defaultOptionsMethodsHandlePreflight;
     private boolean findResourceMethod = true;
     private boolean blockCorsIfUnauthorized;
@@ -324,6 +329,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         boolean allowCreds = effectiveAllowCredentials(ann);
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, allowCreds);
 
+        warnIfAllOriginsWithCredentials(ann);
+
         String originResponse;
         if (!allowCreds && effectiveAllowAllOrigins(ann)) {
             originResponse = "*";
@@ -383,6 +390,24 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                 addHeaders(responseContext, CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, rqAllowedHeaders, false);
             }
         }
+    }
+
+    /**
+     * Logs a one-time warning if all origins are allowed together with credentials. Browsers do not
+     * accept "Access-Control-Allow-Origin: *" with credentials, so in this case the request Origin is
+     * reflected, which allows credentialed cross-origin requests from any site.
+     *
+     * @return true if the warning was logged by this call
+     */
+    boolean warnIfAllOriginsWithCredentials(CrossOriginResourceSharing ann) {
+        if (effectiveAllowCredentials(ann) && effectiveAllowAllOrigins(ann)
+            && allOriginsWithCredentialsWarningLogged.compareAndSet(false, true)) {
+            LOG.warning("CORS is configured to allow all origins together with credentials, so the request "
+                + "Origin is reflected and credentialed cross-origin requests are allowed from any site. "
+                + "Configure \"allowOrigins\" with the origins that should be trusted.");
+            return true;
+        }
+        return false;
     }
 
     private boolean effectiveAllowAllOrigins(CrossOriginResourceSharing ann) {
