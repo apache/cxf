@@ -30,11 +30,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.interceptor.InFaultChainInitiatorObserver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.EndpointInfo;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +46,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +64,7 @@ public class ClientImplDecoupledResponseTest {
     private static final List<Object> RESULT = List.of("Hello Paul!");
 
     private Bus bus;
+    private Endpoint endpoint;
     private ConduitSelector selector;
     private ClientImpl client;
     private Exchange exchange;
@@ -69,7 +76,7 @@ public class ClientImplDecoupledResponseTest {
         Binding binding = mock(Binding.class);
         when(binding.createMessage(any(Message.class))).thenAnswer(i -> i.getArgument(0));
         when(binding.getInInterceptors()).thenReturn(new ArrayList<>());
-        Endpoint endpoint = mock(Endpoint.class);
+        endpoint = mock(Endpoint.class);
         when(endpoint.getBinding()).thenReturn(binding);
         when(endpoint.getService()).thenReturn(mock(Service.class));
         when(endpoint.getInInterceptors()).thenReturn(new ArrayList<>());
@@ -176,6 +183,84 @@ public class ClientImplDecoupledResponseTest {
         ExecutionException ex = assertThrows(ExecutionException.class,
             () -> callback.get(5, TimeUnit.SECONDS));
         assertSame(failure, ex.getCause());
+    }
+
+    @Test
+    public void testAcknowledgementBeforeReply() throws Exception {
+        // with propagate202Response the HTTP 202 usually arrives first, on the calling thread
+        decoupled();
+        client.onMessage(acknowledgement());
+        assertNull("the acknowledgement must not finish the exchange", exchange.get(ClientImpl.FINISHED));
+
+        Message reply = reply();
+        client.onMessage(reply);
+        assertReplyKept(reply);
+    }
+
+    @Test
+    public void testAcknowledgementBeforeAsyncReply() throws Exception {
+        decoupled();
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        client.onMessage(acknowledgement());
+        assertFalse("the acknowledgement must not complete the callback", callback.isDone());
+
+        client.onMessage(reply());
+        assertArrayEquals(RESULT.toArray(), callback.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testAcknowledgementWithoutDecoupledDestination() throws Exception {
+        // without a decoupled endpoint, the acknowledgement is the response
+        Message ack = acknowledgement();
+        client.onMessage(ack);
+        assertEquals(Boolean.TRUE, exchange.get(ClientImpl.FINISHED));
+        assertSame(ack, exchange.getInMessage());
+    }
+
+    @Test
+    public void testSoapFaultPartialResponseAfterReply() throws Exception {
+        // as CheckFaultInterceptor does for a SOAP fault: the in fault chain makes the message the
+        // in fault message of the exchange, and clears its in message
+        IllegalStateException lateFault = new IllegalStateException("late partial fault");
+        client.getInInterceptors().add(new AbstractPhaseInterceptor<Message>(Phase.POST_PROTOCOL) {
+            public void handleMessage(Message message) {
+                if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))) {
+                    message.getInterceptorChain().abort();
+                    message.setContent(Exception.class, lateFault);
+                    new InFaultChainInitiatorObserver(bus).onMessage(message);
+                }
+            }
+        });
+        Message reply = reply();
+        client.onMessage(reply);
+        client.onMessage(partialResponse());
+
+        // what a synchronous call returns once the reply has finished the exchange
+        assertArrayEquals(RESULT.toArray(), client.processResult(outMessage, exchange, null, null));
+    }
+
+    @Test
+    public void testOverriddenGetExceptionForAsyncCalls() throws Exception {
+        IllegalStateException failure = new IllegalStateException("from the subclass");
+        client = new ClientImpl(bus, endpoint, selector) {
+            @Override
+            protected Exception getException(Exchange e) {
+                return failure;
+            }
+        };
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        client.onMessage(reply());
+        ExecutionException ex = assertThrows(ExecutionException.class,
+            () -> callback.get(5, TimeUnit.SECONDS));
+        assertSame(failure, ex.getCause());
+    }
+
+    private void decoupled() {
+        EndpointInfo info = new EndpointInfo();
+        info.setProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination", new Object());
+        when(endpoint.getEndpointInfo()).thenReturn(info);
     }
 
     private void assertReplyKept(Message reply) throws Exception {
