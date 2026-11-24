@@ -102,6 +102,26 @@ public class XmlEncInHandlerTest {
     }
 
     @Test
+    public void testSymmetricAlgorithmCheckedBeforeKeyDecryption() {
+        AbstractXmlEncInHandler handler = new AbstractXmlEncInHandler() {
+            @Override
+            protected byte[] getSymmetricKeyBytes(Message message, Element encDataElement) {
+                throw new AssertionError("The EncryptedKey must not be processed");
+            }
+        };
+        EncryptionProperties encProps = new EncryptionProperties();
+        encProps.setEncryptionSymmetricKeyAlgo(XMLCipher.AES_256_GCM);
+        handler.setEncryptionProperties(encProps);
+        try {
+            handler.decryptContent(createMessage());
+            fail("Expected the request to be rejected");
+        } catch (WebApplicationException ex) {
+            assertEquals(400, ex.getResponse().getStatus());
+            assertEquals("Encryption Symmetric Key Algorithm is not supported", ex.getResponse().getEntity());
+        }
+    }
+
+    @Test
     public void testEncryptedKeyBase64Failure() {
         assertDecryptionFailed(() -> decryptSymmetricKey("!!! not base64 !!!"));
     }

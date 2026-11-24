@@ -73,8 +73,8 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
 
         Element root = doc.getDocumentElement();
 
-        byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
-
+        // Check the content encryption algorithm before the EncryptedKey is processed, so that the
+        // private key is not used for a message that is going to be rejected anyway
         String symKeyAlgo = getEncodingMethodAlgorithm(root);
 
         if (encProps != null && encProps.getEncryptionSymmetricKeyAlgo() != null
@@ -82,6 +82,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             throwFault("Encryption Symmetric Key Algorithm is not supported", null);
         }
 
+        byte[] symmetricKeyBytes = getSymmetricKeyBytes(message, root);
 
         byte[] decryptedPayload = null;
         try {
