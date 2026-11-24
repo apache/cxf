@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
+
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 

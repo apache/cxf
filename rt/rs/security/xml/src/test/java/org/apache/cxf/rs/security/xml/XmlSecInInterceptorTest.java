@@ -26,11 +26,11 @@ import java.security.cert.X509Certificate;
 import java.util.ListIterator;
 import java.util.Properties;
 
-import javax.ws.rs.WebApplicationException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.ws.rs.WebApplicationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
