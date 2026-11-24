@@ -35,6 +35,11 @@ import javax.cache.spi.CachingProvider;
  * obtained it here releases it, if it was created here. A manager obtained here for a configuration
  * URI is closed when its last user releases it; the provider's default manager may be shared with
  * the application, so it is never closed.
+ * <p>
+ * The caches and managers are held strongly until they are released, so every user must release
+ * what it obtained here, e.g. by closing the replay cache, token store or data provider that uses
+ * it; otherwise they, and the class loader of the application that created them, stay reachable
+ * after the application is undeployed.
  */
 public final class JCacheUtils {
     private static final Map<Cache<?, ?>, Reference> CACHES = new IdentityHashMap<>();

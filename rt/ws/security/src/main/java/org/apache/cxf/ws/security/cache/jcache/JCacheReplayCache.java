@@ -83,6 +83,7 @@ class JCacheReplayCache implements ReplayCache {
         this.clock = Objects.requireNonNull(clock);
 
         // Do some checking on the arguments
+        Cache<String, EHCacheValue> acquired = null;
         try {
             final CachingProvider cachingProvider = Caching.getCachingProvider();
             cacheManager = cachingProvider.getCacheManager();
@@ -96,14 +97,18 @@ class JCacheReplayCache implements ReplayCache {
                         + "is held for the default TTL: {}", ex.toString());
                 }
             }
-            cache = entryExpiryCache != null ? entryExpiryCache : JCacheUtils.getOrCreate(cacheManager, key,
+            acquired = entryExpiryCache != null ? entryExpiryCache : JCacheUtils.getOrCreate(cacheManager, key,
                 String.class, EHCacheValue.class, JCacheReplayCache::defaultTtlConfiguration);
             // the cache may already exist with another configuration, so check the one it has
             entryExpiry = entryExpiryCache != null && EhcacheReplayExpiry.isUsedBy(entryExpiryCache);
         } catch (Exception ex) {
+            if (acquired != null) {
+                JCacheUtils.release(acquired);
+            }
             LOG.error("Error configuring JCacheReplayCache: {}", ex.getMessage());
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "replayCacheError");
         }
+        cache = acquired;
     }
 
     /**
