@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -53,6 +52,13 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.Constants;
 
 public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
+
+    /**
+     * The single error returned to the client for any failure that depends on the encrypted content:
+     * unwrapping the key, decrypting the payload or parsing the decrypted payload. Distinct messages
+     * would tell an attacker which step failed (a decryption oracle). The details are logged.
+     */
+    private static final String DECRYPTION_FAILED = "Payload can not be decrypted";
 
     private EncryptionProperties encProps;
 
@@ -80,7 +86,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         try {
             decryptedPayload = decryptPayload(root, symmetricKeyBytes, symKeyAlgo);
         } catch (Exception ex) {
-            throwFault("Payload can not be decrypted", ex);
+            throwFault(DECRYPTION_FAILED, ex);
         }
 
         // Clean the secret key from memory
@@ -91,7 +97,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             payloadDoc = StaxUtils.read(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
                                                StandardCharsets.UTF_8));
         } catch (Exception ex) {
-            throwFault("Payload document can not be created", ex);
+            throwFault(DECRYPTION_FAILED, ex);
         }
         message.setContent(XMLStreamReader.class,
                            new W3CDOMStreamReader(payloadDoc));
@@ -163,7 +169,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
                                        digestAlgo,
                                        message);
         } catch (Exception ex) {
-            throwFault(ex.getMessage(), ex);
+            throwFault(DECRYPTION_FAILED, ex);
         }
         return null;
     }
@@ -243,7 +249,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         try {
             key = crypto.getPrivateKey(cert, callback);
         } catch (Exception ex) {
-            throwFault("Encrypted key can not be decrypted", ex);
+            throwFault(DECRYPTION_FAILED, ex);
         }
         Cipher cipher =
             EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
@@ -259,10 +265,8 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             }
 
             return decryptedKey;
-        } catch (Base64Exception ex) {
-            throwFault("Base64 decoding has failed", ex);
         } catch (Exception ex) {
-            throwFault("Encrypted key can not be decrypted", ex);
+            throwFault(DECRYPTION_FAILED, ex);
         }
         return null;
 
