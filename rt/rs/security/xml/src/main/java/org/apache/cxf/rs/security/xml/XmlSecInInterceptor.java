@@ -44,6 +44,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
@@ -63,6 +64,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InboundXMLSec;
 import org.apache.xml.security.stax.ext.XMLSec;
@@ -257,6 +259,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                     checkSignatureTransform((AlgorithmSuiteSecurityEvent)securityEvent);
                     if (encryptionProperties != null) {
                         checkEncryptionAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
+                    } else {
+                        checkDefaultKeyTransportAlgorithm((AlgorithmSuiteSecurityEvent)securityEvent);
                     }
                     if (sigProps != null) {
                         checkSignatureAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
@@ -302,6 +306,18 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             && encryptionProperties.getEncryptionDigestAlgo() != null
             && !encryptionProperties.getEncryptionDigestAlgo().equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", new Object[] {"The encryption digest algorithm "
+                + event.getAlgorithmURI() + " is not allowed"});
+        }
+    }
+
+    // RSA-OAEP is the required default Key Transport Algorithm (RSA-OAEP-11 in FIPS mode),
+    // as in AbstractXmlEncInHandler
+    private static void checkDefaultKeyTransportAlgorithm(AlgorithmSuiteSecurityEvent event)
+        throws XMLSecurityException {
+        String defaultAlgorithm = JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_OAEP_11 : XMLCipher.RSA_OAEP;
+        if (XMLSecurityConstants.Asym_Key_Wrap.equals(event.getAlgorithmUsage())
+            && !defaultAlgorithm.equals(event.getAlgorithmURI())) {
+            throw new XMLSecurityException("empty", new Object[] {"The key transport algorithm "
                 + event.getAlgorithmURI() + " is not allowed"});
         }
     }
