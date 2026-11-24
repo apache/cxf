@@ -256,14 +256,16 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
                 if (securityEvent.getSecurityEventType() == SecurityEventConstants.AlgorithmSuite) {
-                    checkSignatureTransform((AlgorithmSuiteSecurityEvent)securityEvent);
+                    final AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent =
+                        (AlgorithmSuiteSecurityEvent)securityEvent;
+                    checkSignatureTransform(algorithmSuiteSecurityEvent);
                     if (encryptionProperties != null) {
-                        checkEncryptionAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
+                        checkEncryptionAlgorithms(algorithmSuiteSecurityEvent);
                     } else {
-                        checkDefaultKeyTransportAlgorithm((AlgorithmSuiteSecurityEvent)securityEvent);
+                        checkDefaultKeyTransportAlgorithm(algorithmSuiteSecurityEvent);
                     }
                     if (sigProps != null) {
-                        checkSignatureAlgorithms((AlgorithmSuiteSecurityEvent)securityEvent);
+                        checkSignatureAlgorithms(algorithmSuiteSecurityEvent);
                     }
                 } else if (securityEvent.getSecurityEventType() != SecurityEventConstants.EncryptedKeyToken
                     && securityEvent instanceof TokenSecurityEvent<?>) {
