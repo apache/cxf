@@ -21,6 +21,7 @@ package org.apache.cxf.endpoint;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -88,6 +89,12 @@ public class ClientImpl
     public static final String SYNC_TIMEOUT = "cxf.synchronous.timeout";
 
     public static final String FINISHED = "exchange.finished";
+
+    //REVISIT move the decoupled destination property name into api
+    private static final String DECOUPLED_DESTINATION =
+        "org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination";
+    // the message that finished the exchange
+    private static final String RESPONSE = ClientImpl.class.getName() + ".response";
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClientImpl.class);
 
@@ -624,8 +631,8 @@ public class ClientImpl
         Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
         if (null != responseCode && 202 == responseCode) {
             Endpoint ep = exchange.getEndpoint();
-            if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
-                getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+            if (null != ep && null != ep.getEndpointInfo()
+                && null == ep.getEndpointInfo().getProperty(DECOUPLED_DESTINATION)) {
                 return null;
             }
         }
@@ -646,9 +653,11 @@ public class ClientImpl
             completeExchange(exchange);
         }
 
-        // Grab the response objects if there are any
+        // Grab the response objects if there are any: from the response this is called with
+        // (asynchronous calls) or the one that finished the exchange (synchronous calls), as a
+        // message arriving later (e.g. a partial response with a fault) may replace the exchange's
         List<Object> resList = null;
-        Message inMsg = exchange.getInMessage();
+        Message inMsg = Boolean.TRUE.equals(message.get(Message.INBOUND_MESSAGE)) ? message : getResponse(exchange);
         if (inMsg != null) {
             if (null != resContext) {
                 resContext.putAll(inMsg);
@@ -660,7 +669,7 @@ public class ClientImpl
         }
 
         // check for an incoming fault
-        ex = getException(exchange);
+        ex = getException(exchange, inMsg);
 
         if (ex != null) {
             throw ex;
@@ -770,6 +779,34 @@ public class ClientImpl
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the failure of a call whose response is the given inbound message (null if there is none).
+     * While that message is still the exchange's in (or in fault) message, this is getException(Exchange);
+     * if a message that arrived later has replaced it, or has become the exchange's in fault message
+     * meanwhile (e.g. a partial response with a SOAP fault), it is the response's own failure, or else an
+     * outbound fault.
+     */
+    protected Exception getException(Exchange exchange, Message response) {
+        Message inFault = exchange.getInFaultMessage();
+        if (response == null || response == inFault) {
+            return getException(exchange);
+        }
+        if (inFault == null && response == exchange.getInMessage()) {
+            Exception ex = getException(exchange);
+            // the in fault message is only ever set, and a message that arrives later never makes the
+            // response the in message again, so if both are unchanged, getException(Exchange) cannot
+            // have read a message that arrived after the response
+            if (exchange.getInFaultMessage() == null && response == exchange.getInMessage()) {
+                return ex;
+            }
+        }
+        Exception ex = response.getContent(Exception.class);
+        if (ex == null && exchange.getOutFaultMessage() != null) {
+            ex = exchange.getOutFaultMessage().getContent(Exception.class);
+        }
+        return ex;
+    }
+
     protected Exception getException(Exchange exchange) {
         if (exchange.getInFaultMessage() != null) {
             return exchange.getInFaultMessage().getContent(Exception.class);
@@ -837,7 +874,7 @@ public class ClientImpl
             message.getExchange().put(Endpoint.class, endpoint);
         }
         message = endpoint.getBinding().createMessage(message);
-        message.getExchange().setInMessage(message);
+        receive(message);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);
@@ -960,9 +997,10 @@ public class ClientImpl
                 BusFactory.setThreadDefaultBus(origBus);
             }
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message)
-                    || message.getContent(Exception.class) != null) {
+                if (!isFinished(message.getExchange())
+                    && (!isPartialResponse(message) || message.getContent(Exception.class) != null)) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
+                    message.getExchange().put(RESPONSE, message);
                     message.getExchange().setInMessage(message);
                     message.getExchange().notifyAll();
                 }
@@ -1158,6 +1196,47 @@ public class ClientImpl
 
     public final synchronized void setConduitSelector(ConduitSelector selector) {
         conduitSelector = selector == null ? new UpfrontConduitSelector() : selector;
+    }
+
+    private static boolean isFinished(Exchange exchange) {
+        return Boolean.TRUE.equals(exchange.get(FINISHED));
+    }
+
+    // the messages of a decoupled call can arrive in any order. A message that arrives after the exchange
+    // is finished still runs the inbound chain, but the exchange's in message stays the response: client
+    // interceptors read the message they are given, not exchange.getInMessage()
+    private static void receive(Message message) {
+        if (isDecoupledAcknowledgement(message)) {
+            // the response arrives separately: the acknowledgement, which can come first, must not
+            // finish the exchange
+            message.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
+        }
+        synchronized (message.getExchange()) {
+            // a message that arrives after another has finished the exchange (e.g. a partial
+            // response) is processed, but must not replace the response
+            if (!isFinished(message.getExchange())) {
+                message.getExchange().setInMessage(message);
+            }
+        }
+    }
+
+    // the message that finished the exchange, or the exchange's in message
+    private static Message getResponse(Exchange exchange) {
+        Message response = (Message)exchange.get(RESPONSE);
+        return response != null ? response : exchange.getInMessage();
+    }
+
+    // an HTTP 202 without content, which acknowledges a call whose response goes to a decoupled endpoint.
+    // A one-way call gets no other response, so there the 202 is the response
+    private static boolean isDecoupledAcknowledgement(Message message) {
+        if (message.getExchange().isOneWay()
+            || !Integer.valueOf(202).equals(message.get(Message.RESPONSE_CODE))
+            || message.getContent(InputStream.class) != null) {
+            return false;
+        }
+        Endpoint ep = message.getExchange().getEndpoint();
+        return ep != null && ep.getEndpointInfo() != null
+            && ep.getEndpointInfo().getProperty(DECOUPLED_DESTINATION) != null;
     }
 
     private boolean isPartialResponse(Message in) {
