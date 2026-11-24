@@ -254,6 +254,53 @@ public class ClientImplDecoupledResponseTest {
     }
 
     @Test
+    public void testPartialResponseArrivingWhileAsyncFailureIsResolved() throws Exception {
+        // a partial response with a failure becomes the exchange's in message after the reply was found
+        // to be the exchange's in message, but before getException(Exchange) reads the exchange
+        AtomicBoolean arrived = new AtomicBoolean();
+        client = new ClientImpl(bus, endpoint, selector) {
+            @Override
+            protected Exception getException(Exchange e) {
+                if (arrived.compareAndSet(false, true)) {
+                    Message partial = partialResponse();
+                    partial.setContent(Exception.class, new IllegalStateException("late partial failure"));
+                    e.setInMessage(partial);
+                }
+                return super.getException(e);
+            }
+        };
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        client.onMessage(reply());
+        assertArrayEquals(RESULT.toArray(), callback.get(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testPartialResponseArrivingWhileAsyncFailureIsResolvedKeepsTheFailure() throws Exception {
+        // the reply failed, and a partial response without a failure replaces it as the exchange's in
+        // message before getException(Exchange) reads the exchange
+        IllegalStateException failure = new IllegalStateException("reply failure");
+        AtomicBoolean arrived = new AtomicBoolean();
+        client = new ClientImpl(bus, endpoint, selector) {
+            @Override
+            protected Exception getException(Exchange e) {
+                if (arrived.compareAndSet(false, true)) {
+                    e.setInMessage(partialResponse());
+                }
+                return super.getException(e);
+            }
+        };
+        ClientCallback callback = new ClientCallback();
+        exchange.put(ClientCallback.class, callback);
+        Message reply = reply();
+        reply.setContent(Exception.class, failure);
+        client.onMessage(reply);
+        ExecutionException ex = assertThrows(ExecutionException.class,
+            () -> callback.get(5, TimeUnit.SECONDS));
+        assertSame(failure, ex.getCause());
+    }
+
+    @Test
     public void testSoapFaultPartialResponseAfterReply() throws Exception {
         // as CheckFaultInterceptor does for a SOAP fault: the in fault chain makes the message the
         // in fault message of the exchange, and clears its in message

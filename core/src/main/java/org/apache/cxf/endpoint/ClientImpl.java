@@ -796,9 +796,10 @@ public class ClientImpl
         }
         if (inFault == null && response == exchange.getInMessage()) {
             Exception ex = getException(exchange);
-            // the in fault message is only ever set, so if it is still unset, getException(Exchange)
-            // cannot have read a fault that arrived after the response
-            if (exchange.getInFaultMessage() == null) {
+            // the in fault message is only ever set, and a message that arrives later never makes the
+            // response the in message again, so if both are unchanged, getException(Exchange) cannot
+            // have read a message that arrived after the response
+            if (exchange.getInFaultMessage() == null && response == exchange.getInMessage()) {
                 return ex;
             }
         }
