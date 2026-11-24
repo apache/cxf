@@ -26,6 +26,10 @@ import java.security.cert.X509Certificate;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -35,6 +39,7 @@ import org.w3c.dom.Element;
 import jakarta.ws.rs.WebApplicationException;
 import org.apache.cxf.bus.managers.PhaseManagerImpl;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -45,11 +50,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
+import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -140,6 +151,36 @@ public class XmlSecInInterceptorTest {
         }
     }
 
+    @Test
+    public void testDefaultKeyTransportAlgorithm() throws Exception {
+        String defaultAlgorithm = JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_OAEP_11 : XMLCipher.RSA_OAEP;
+        Element root = processEncrypted(createEncryptedDocument(defaultAlgorithm), null);
+
+        assertEquals("Book", root.getLocalName());
+        assertEquals("CXF", DOMUtils.getFirstElement(root).getTextContent());
+    }
+
+    @Test
+    public void testNonDefaultKeyTransportAlgorithmIsRejected() throws Exception {
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
+        try {
+            processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP_11), null);
+            fail("Failure expected on a non-default key transport algorithm");
+        } catch (XMLStreamException ex) {
+            assertTrue(ex.getMessage(), ex.getMessage().contains("is not allowed"));
+        }
+    }
+
+    @Test
+    public void testConfiguredKeyTransportAlgorithm() throws Exception {
+        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
+        EncryptionProperties encProps = new EncryptionProperties();
+        encProps.setEncryptionKeyTransportAlgo(XMLCipher.RSA_OAEP_11);
+        Element root = processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP_11), encProps);
+
+        assertEquals("Book", root.getLocalName());
+    }
+
     private static void assertRejected(Document doc) throws Exception {
         try {
             process(doc);
@@ -176,6 +217,55 @@ public class XmlSecInInterceptorTest {
             next.handleMessage(message);
         }
         return payload.getDocumentElement();
+    }
+
+    // Decrypt the message with the XmlSecInInterceptor and read the (decrypted) payload
+    private static Element processEncrypted(Document doc, EncryptionProperties encProps) throws Exception {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        CallbackHandler callbackHandler = (Callback[] callbacks) -> {
+            for (Callback callback : callbacks) {
+                ((WSPasswordCallback)callback).setPassword("password");
+            }
+        };
+        message.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
+        byte[] bytes = StaxUtils.toString(doc).getBytes(StandardCharsets.UTF_8);
+        message.setContent(InputStream.class, new ByteArrayInputStream(bytes));
+        message.setInterceptorChain(new PhaseInterceptorChain(new PhaseManagerImpl().getInPhases()));
+
+        XmlSecInInterceptor interceptor = new XmlSecInInterceptor();
+        interceptor.setEncryptionProperties(encProps);
+        interceptor.handleMessage(message);
+
+        return StaxUtils.read(message.getContent(XMLStreamReader.class)).getDocumentElement();
+    }
+
+    private static Document createEncryptedDocument(String keyTransportAlgorithm) throws Exception {
+        Document doc = DOMUtils.createDocument();
+        Element root = createBook(doc, "CXF");
+        doc.appendChild(root);
+
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        SecretKey symmetricKey = keyGenerator.generateKey();
+
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("alice");
+        X509Certificate cert = crypto.getX509Certificates(cryptoType)[0];
+        XMLCipher keyCipher = XMLCipher.getInstance(keyTransportAlgorithm);
+        keyCipher.init(XMLCipher.WRAP_MODE, cert.getPublicKey());
+        EncryptedKey encryptedKey = keyCipher.encryptKey(doc, symmetricKey);
+
+        XMLCipher cipher = XMLCipher.getInstance(XMLCipher.AES_128_GCM);
+        cipher.init(XMLCipher.ENCRYPT_MODE, symmetricKey);
+        EncryptedData encryptedData = cipher.getEncryptedData();
+        KeyInfo keyInfo = new KeyInfo(doc);
+        keyInfo.add(encryptedKey);
+        encryptedData.setKeyInfo(keyInfo);
+        cipher.doFinal(doc, root, false);
+        return doc;
     }
 
     private static Document createSignedDocument() throws Exception {
