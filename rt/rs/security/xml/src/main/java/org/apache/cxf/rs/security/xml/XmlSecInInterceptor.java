@@ -44,7 +44,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ReaderInterceptor;
 import jakarta.ws.rs.ext.ReaderInterceptorContext;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
@@ -312,13 +311,11 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         }
     }
 
-    // RSA-OAEP is the required default Key Transport Algorithm (RSA-OAEP-11 in FIPS mode),
-    // as in AbstractXmlEncInHandler
+    // RSA-OAEP is the required default Key Transport Algorithm, as in AbstractXmlEncInHandler
     private static void checkDefaultKeyTransportAlgorithm(AlgorithmSuiteSecurityEvent event)
         throws XMLSecurityException {
-        String defaultAlgorithm = JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_OAEP_11 : XMLCipher.RSA_OAEP;
         if (XMLSecurityConstants.Asym_Key_Wrap.equals(event.getAlgorithmUsage())
-            && !defaultAlgorithm.equals(event.getAlgorithmURI())) {
+            && !XMLCipher.RSA_OAEP.equals(event.getAlgorithmURI())) {
             throw new XMLSecurityException("empty", new Object[] {"The key transport algorithm "
                 + event.getAlgorithmURI() + " is not allowed"});
         }

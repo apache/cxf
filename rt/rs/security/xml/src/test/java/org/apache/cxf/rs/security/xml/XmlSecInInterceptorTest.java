@@ -39,7 +39,6 @@ import org.w3c.dom.Element;
 import jakarta.ws.rs.WebApplicationException;
 import org.apache.cxf.bus.managers.PhaseManagerImpl;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -60,7 +59,6 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -153,8 +151,7 @@ public class XmlSecInInterceptorTest {
 
     @Test
     public void testDefaultKeyTransportAlgorithm() throws Exception {
-        String defaultAlgorithm = JavaUtils.isFIPSEnabled() ? XMLCipher.RSA_OAEP_11 : XMLCipher.RSA_OAEP;
-        Element root = processEncrypted(createEncryptedDocument(defaultAlgorithm), null);
+        Element root = processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP), null);
 
         assertEquals("Book", root.getLocalName());
         assertEquals("CXF", DOMUtils.getFirstElement(root).getTextContent());
@@ -162,7 +159,6 @@ public class XmlSecInInterceptorTest {
 
     @Test
     public void testNonDefaultKeyTransportAlgorithmIsRejected() throws Exception {
-        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         try {
             processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP_11), null);
             fail("Failure expected on a non-default key transport algorithm");
@@ -173,7 +169,6 @@ public class XmlSecInInterceptorTest {
 
     @Test
     public void testConfiguredKeyTransportAlgorithm() throws Exception {
-        Assume.assumeFalse(JavaUtils.isFIPSEnabled());
         EncryptionProperties encProps = new EncryptionProperties();
         encProps.setEncryptionKeyTransportAlgo(XMLCipher.RSA_OAEP_11);
         Element root = processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP_11), encProps);
