@@ -205,8 +205,9 @@ public final class JAXBContextCache {
                 if (exact) {
                     cachedContextAndSchemasInternalMap
                         = JAXBCONTEXT_CACHE.get(classes);
-                    if (cachedContextAndSchemasInternalMap != null && defaultNs != null) {
-                        cachedContextAndSchemasInternal = cachedContextAndSchemasInternalMap.get(defaultNs);
+                    if (cachedContextAndSchemasInternalMap != null) {
+                        cachedContextAndSchemasInternal
+                            = cachedContextAndSchemasInternalMap.get(defaultNs != null ? defaultNs : "");
                     }
                 } else {
                     for (Entry<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> k
