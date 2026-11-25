@@ -166,7 +166,9 @@ public final class TLSParameterJaxBUtils {
                 keyStore.load(is, password);
             }
         } else if (kst.isSetUrl()) {
-            keyStore.load(openKeystoreUrl(kst.getUrl()), password);
+            try (InputStream is = openKeystoreUrl(kst.getUrl())) {
+                keyStore.load(is, password);
+            }
         } else {
             final String loc;
             if (trustStore) {
@@ -204,21 +206,25 @@ public final class TLSParameterJaxBUtils {
             type = KeyStore.getDefaultType();
         }
         if (pst.isSetFile()) {
-            InputStream is = Files.newInputStream(Paths.get(pst.getFile()));
-            return createTrustStore(is, type);
+            try (InputStream is = Files.newInputStream(Paths.get(pst.getFile()))) {
+                return createTrustStore(is, type);
+            }
         }
         if (pst.isSetResource()) {
-            final InputStream is = getResourceAsStream(pst.getResource());
-            if (is == null) {
-                final String msg =
-                    "Could not load truststore resource " + pst.getResource();
-                LOG.severe(msg);
-                throw new IOException(msg);
+            try (InputStream is = getResourceAsStream(pst.getResource())) {
+                if (is == null) {
+                    final String msg =
+                        "Could not load truststore resource " + pst.getResource();
+                    LOG.severe(msg);
+                    throw new IOException(msg);
+                }
+                return createTrustStore(is, type);
             }
-            return createTrustStore(is, type);
         }
         if (pst.isSetUrl()) {
-            return createTrustStore(openKeystoreUrl(pst.getUrl()), type);
+            try (InputStream is = openKeystoreUrl(pst.getUrl())) {
+                return createTrustStore(is, type);
+            }
         }
         throw new IllegalArgumentException("Could not create KeyStore based on information in CertStoreType");
     }
