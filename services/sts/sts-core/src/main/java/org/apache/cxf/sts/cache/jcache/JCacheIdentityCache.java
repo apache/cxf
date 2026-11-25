@@ -44,6 +44,7 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.cache.AbstractIdentityCache;
 import org.apache.cxf.sts.cache.EHCacheIdentityValue;
@@ -62,6 +63,7 @@ public class JCacheIdentityCache extends AbstractIdentityCache
     private static final String KEY = "org.apache.cxf.sts.cache.EHCacheIdentityCache";
     private Cache<String, EHCacheIdentityValue> cache;
     private final CacheManager cacheManager;
+    private boolean closed;
 
 
     public JCacheIdentityCache(
@@ -91,11 +93,17 @@ public class JCacheIdentityCache extends AbstractIdentityCache
 
         final URL xmlConfigURL = configFileURL != null ? configFileURL : getDefaultConfigFileURL();
         try {
-            cacheManager = cachingProvider.getCacheManager(xmlConfigURL.toURI(), getClass().getClassLoader());
-            cache = JCacheSupport.getOrCreate(cacheManager, KEY, String.class, EHCacheIdentityValue.class);
+            cacheManager = JCacheUtils.getCacheManager(cachingProvider, xmlConfigURL.toURI(),
+                getClass().getClassLoader());
         } catch (final URISyntaxException ex) {
             throw new IllegalStateException("Unable to convert " + xmlConfigURL + " to URI", ex);
-        } 
+        }
+        try {
+            cache = JCacheSupport.getOrCreate(cacheManager, KEY, String.class, EHCacheIdentityValue.class);
+        } catch (RuntimeException ex) {
+            JCacheUtils.releaseCacheManager(cacheManager);
+            throw ex;
+        }
     }
 
     @Override
@@ -125,9 +133,10 @@ public class JCacheIdentityCache extends AbstractIdentityCache
     }
 
     public synchronized void close() {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(KEY);
-            cacheManager.close();
+        if (!closed) {
+            closed = true;
+            JCacheUtils.release(cache);
+            JCacheUtils.releaseCacheManager(cacheManager);
 
             if (super.getBus() != null) {
                 super.getBus().getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
