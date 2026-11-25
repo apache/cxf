@@ -988,6 +988,7 @@ public class AsyncHTTPConduit extends HttpClientHTTPConduit {
             params.setServerNames(serverNames.stream().map(SNIHostName::new).collect(Collectors.toList()));
             sslengine.setSSLParameters(params);
         }
+        org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(sslengine, tlsClientParameters.getNamedGroups());
     }
 
     private String[] findProtocols(String p, String[] options) {

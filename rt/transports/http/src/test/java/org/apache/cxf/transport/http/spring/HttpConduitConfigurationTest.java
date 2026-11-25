@@ -19,6 +19,8 @@
 
 package org.apache.cxf.transport.http.spring;
 
+import java.util.Arrays;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
@@ -97,6 +99,7 @@ public class HttpConduitConfigurationTest {
         assertNotNull(tlscps);
         assertTrue(tlscps.isDisableCNCheck());
         assertEquals(3600000, tlscps.getSslCacheTimeout());
+        assertEquals(Arrays.asList("x25519", "secp384r1"), tlscps.getNamedGroups());
 
         KeyManager[] kms = tlscps.getKeyManagers();
         assertTrue(kms != null && kms.length == 1);

@@ -74,6 +74,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -106,6 +107,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
 
     private static final Set<String> RESTRICTED_HEADERS = getRestrictedHeaders();
     private static final HttpClientCache CLIENTS_CACHE = new HttpClientCache();
+    // Ensures the "HttpClient drops the configured named groups" warning is logged at most once per JVM.
+    private static final AtomicBoolean NAMED_GROUPS_DROPPED_WARNED = new AtomicBoolean();
     volatile RefCount<HttpClient> clientRef;
     volatile URI sslURL;
     private final ReentrantLock initializationLock = new ReentrantLock();
@@ -292,6 +295,24 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
             copy.setVersion(version);
         }
         return copy;
+    }
+
+    /**
+     * The JDK HttpClient only keeps the named groups of the SSLParameters it is given from JDK 26 on.
+     * Warn once when the configured groups were dropped despite this JDK supporting them on
+     * {@code SSLParameters} (JDK 20-25), since the JVM-wide jdk.tls.namedGroups apply instead. On
+     * JDK &lt; 20 the groups never reach the parameters and SSLUtils already warns about that, so this
+     * is gated on {@link SSLUtils#isNamedGroupsSupported()} to avoid a second, mis-attributed warning.
+     * Called for every resolved client, including shared ones reused from the cache.
+     */
+    private static void checkNamedGroups(HttpClient client, List<String> namedGroups) {
+        if (namedGroups != null && !namedGroups.isEmpty()
+            && SSLUtils.isNamedGroupsSupported()
+            && SSLUtils.getNamedGroups(client.sslParameters()) == null
+            && NAMED_GROUPS_DROPPED_WARNED.compareAndSet(false, true)) {
+            LOG.warning("The TLS named groups " + namedGroups + " are not retained by the JDK HttpClient"
+                + " before JDK 26 and are ignored; the JVM-wide jdk.tls.namedGroups setting applies instead");
+        }
     }
 
     private static TLSClientParameters copyOf(TLSClientParameters params) {
@@ -537,6 +558,8 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                 cb.version(Version.HTTP_1_1);
             }
 
+            final List<String> namedGroups = "https".equals(uri.getScheme())
+                ? clientParameters.getNamedGroups() : null;
             // make sure the conduit is not yet initialized
             initializationLock.lock();
             try {
@@ -545,7 +568,10 @@ public class HttpClientHTTPConduit extends URLConnectionHTTPConduit {
                     final boolean shareHttpClient = MessageUtils.getContextualBoolean(message,
                         SHARE_HTTPCLIENT_CONDUIT, true);
                     cl = CLIENTS_CACHE.computeIfAbsent(shareHttpClient, clientPolicy, clientParametersCopy,
-                        () -> cb.build());
+                        cb::build);
+                    // run for every resolved client, so a shared client reused from the cache (where the
+                    // supplier above does not run) still reports dropped named groups
+                    checkNamedGroups(cl.client(), namedGroups);
                     // the cache may hand back a shared client this conduit has stopped using, when it
                     // switches back to its settings or its HTTPS address changes. Keep a single reference
                     if (deferredClientRefs.remove(cl)) {

@@ -59,6 +59,10 @@
         <hj:engine port="9002">
             <hj:tlsServerParameters>
                 <sec:clientAuthentication want="true" required="true"/>
+                <sec:namedGroups>
+                    <sec:namedGroup>x25519</sec:namedGroup>
+                    <sec:namedGroup>secp384r1</sec:namedGroup>
+                </sec:namedGroups>
             </hj:tlsServerParameters>
             <hj:threadingParametersRef id="sampleThreading1"/>
         </hj:engine>

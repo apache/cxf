@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.http_undertow.spring;
 
+import java.util.Arrays;
+
 import javax.xml.namespace.QName;
 
 import org.xml.sax.SAXParseException;
@@ -152,6 +154,7 @@ public class ApplicationContextTest {
 
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
+        assertEquals(Arrays.asList("x25519", "secp384r1"), engine.getTlsServerParameters().getNamedGroups());
 
         UndertowHTTPDestination jd4 =
             (UndertowHTTPDestination)factory.getDestination(

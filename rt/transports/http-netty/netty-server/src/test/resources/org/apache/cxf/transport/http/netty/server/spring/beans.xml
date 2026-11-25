@@ -55,6 +55,10 @@
         <hn:engine port="9002">
             <hn:tlsServerParameters>
                 <sec:clientAuthentication want="true" required="true"/>
+                <sec:namedGroups>
+                    <sec:namedGroup>x25519</sec:namedGroup>
+                    <sec:namedGroup>secp384r1</sec:namedGroup>
+                </sec:namedGroups>
             </hn:tlsServerParameters>
         </hn:engine>
         <hn:engine port="9003">

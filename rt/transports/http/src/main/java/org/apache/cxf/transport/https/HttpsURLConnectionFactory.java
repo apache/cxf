@@ -155,7 +155,7 @@ public class HttpsURLConnectionFactory {
             String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
                 .getSecureSocketProtocol() : ctx.getProtocol();
             socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,
-                                                        protocol);
+                                                        protocol, tlsClientParameters.getNamedGroups());
             //recalc the hashcode since some of the above MAY have changed the tlsClientParameters
             lastTlsHash = tlsClientParameters.hashCode();
         } else {

@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLParameters;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.RequestDispatcher;
@@ -734,16 +733,11 @@ public class JettyHTTPServerEngine implements ServerEngine, HttpServerEngineSupp
                     //we'll handle this later
                 }
                 @Override
-                public SSLParameters customize(SSLParameters sslParams) {
-                    sslParams = super.customize(sslParams);
-                    org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(
-                        sslParams, tlsServerParameters.getNamedGroups());
-                    return sslParams;
-                }
-                @Override
                 public void customize(SSLEngine sslEngine) {
                     super.customize(sslEngine);
-                    org.apache.cxf.transport.https.SSLUtils.applyNamedGroupsBC(
+                    // through BCSSLParameters for a BC JSSE engine, otherwise SSLParameters (JDK 20+), so
+                    // that the groups are only reported as ignored when neither can apply them
+                    org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(
                         sslEngine, tlsServerParameters.getNamedGroups());
                 }
             };

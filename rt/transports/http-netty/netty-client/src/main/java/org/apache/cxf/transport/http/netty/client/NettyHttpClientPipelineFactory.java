@@ -283,6 +283,8 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
                 }
             }
 
+            SSLUtils.applyNamedGroups(sslEngine, tlsClientParameters.getNamedGroups());
+
             if (peerHost == null && !tlsClientParameters.isDisableCNCheck()) {
                 LOG.warning("No peer host information was supplied to the pipeline factory: TLS "
                     + "hostname verification cannot be performed. Use the constructor taking a "
