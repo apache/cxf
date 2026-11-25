@@ -33,6 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.cxf.ws.security.utils.JCacheSupport;
 import org.apache.cxf.xkms.cache.XKMSCacheToken;
 import org.apache.cxf.xkms.cache.XKMSClientCache;
@@ -43,9 +44,8 @@ import org.apache.cxf.xkms.cache.XKMSClientCacheException;
  */
 public class JCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListener {
     private final Cache<String, XKMSCacheToken> cache;
-    private final CacheManager cacheManager;
     private final Bus bus;
-    private final String cacheKey;
+    private boolean closed;
 
     public JCacheXKMSClientCache() throws XKMSClientCacheException {
         this(null);
@@ -60,10 +60,10 @@ public class JCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListe
         }
 
         this.bus = cxfBus;
-        this.cacheKey = UUID.randomUUID().toString();
+        String cacheKey = UUID.randomUUID().toString();
 
         final CachingProvider cachingProvider = Caching.getCachingProvider();
-        cacheManager = cachingProvider.getCacheManager(); 
+        final CacheManager cacheManager = cachingProvider.getCacheManager();
 
         cache = JCacheSupport.getOrCreate(cacheManager, cacheKey, String.class, XKMSCacheToken.class,
             cacheConfiguration -> cacheConfiguration.setExpiryPolicyFactory(() -> new ExpiryPolicy() {
@@ -101,9 +101,11 @@ public class JCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListe
     }
 
     public synchronized void close() {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(cacheKey);
-            cacheManager.close();
+        // the cache is in the provider's default manager, which other caches (such as the WS-Security
+        // replay caches) share, so only the cache is released
+        if (!closed) {
+            closed = true;
+            JCacheUtils.release(cache);
 
             if (bus != null) {
                 bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
