@@ -222,9 +222,12 @@ class JCacheReplayCache implements ReplayCache {
     }
 
     private EHCacheValue value(String identifier, Instant expiry, Instant now) {
-        // as EHCacheExpiry does, an expiry that is not in the future gets the default TTL
-        if (expiry == null || !expiry.isAfter(now) || expiry.isAfter(now.plusSeconds(EHCacheExpiry.MAX_TTL))) {
+        // as EHCacheExpiry does, an expiry that is not in the future gets the default TTL, and one beyond
+        // the max TTL is held for the max TTL (rather than for less than an identifier that expires sooner)
+        if (expiry == null || !expiry.isAfter(now)) {
             expiry = now.plusSeconds(EHCacheExpiry.DEFAULT_TTL);
+        } else if (expiry.isAfter(now.plusSeconds(EHCacheExpiry.MAX_TTL))) {
+            expiry = now.plusSeconds(EHCacheExpiry.MAX_TTL);
         }
         return new EHCacheValue(identifier, expiry);
     }
