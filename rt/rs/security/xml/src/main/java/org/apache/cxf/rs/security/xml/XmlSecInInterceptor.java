@@ -85,6 +85,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> implements ReaderInterceptor  {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
+    private static final String SECURITY_PROCESSING_FAILED = "Security processing failed";
 
     private static final Set<String> ALLOWED_TRANSFORMS = Set.of(
         XMLSecurityConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE,
@@ -146,7 +147,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             inMsg.setContent(XMLStreamReader.class, newXmlStreamReader);
 
         } catch (XMLStreamException | XMLSecurityException | IOException | UnsupportedCallbackException e) {
-            throwFault(e.getMessage(), e);
+            // Don't return the exception message to the client, it is logged instead
+            throwFault(SECURITY_PROCESSING_FAILED, e);
         }
     }
 
@@ -399,7 +401,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
 
 
     protected void throwFault(String error, Exception ex) {
-        LOG.warning(error);
+        LOG.warning(ex == null ? error : error + " - " + ex.getMessage());
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).type("text/plain").build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }

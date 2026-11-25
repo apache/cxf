@@ -31,6 +31,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.WebApplicationException;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -174,6 +175,29 @@ public class XmlSecInInterceptorTest {
         Element root = processEncrypted(createEncryptedDocument(XMLCipher.RSA_OAEP_11), encProps);
 
         assertEquals("Book", root.getLocalName());
+    }
+
+    @Test
+    public void testSecurityProcessingErrorIsNotReturnedToClient() throws Exception {
+        Message message = new MessageImpl();
+        message.setExchange(new ExchangeImpl());
+        message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        message.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
+        CallbackHandler callbackHandler = (Callback[] callbacks) -> {
+            throw new UnsupportedCallbackException(callbacks[0], "internal details");
+        };
+        message.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
+        byte[] bytes = StaxUtils.toString(createSignedDocument()).getBytes(StandardCharsets.UTF_8);
+        message.setContent(InputStream.class, new ByteArrayInputStream(bytes));
+        message.setInterceptorChain(new PhaseInterceptorChain(new PhaseManagerImpl().getInPhases()));
+
+        try {
+            new XmlSecInInterceptor().handleMessage(message);
+            fail("Failure expected on a security processing error");
+        } catch (WebApplicationException ex) {
+            assertEquals(400, ex.getResponse().getStatus());
+            assertEquals("Security processing failed", ex.getResponse().getEntity());
+        }
     }
 
     private static void assertRejected(Document doc) throws Exception {
