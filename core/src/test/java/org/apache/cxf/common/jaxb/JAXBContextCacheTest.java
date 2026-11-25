@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.common.jaxb;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 public class JAXBContextCacheTest {
@@ -33,5 +37,19 @@ public class JAXBContextCacheTest {
         CachedContextAndSchemas first = JAXBContextCache.getCachedContextAndSchemas(pkg, null, loader);
         CachedContextAndSchemas second = JAXBContextCache.getCachedContextAndSchemas(pkg, null, loader);
         assertSame(first.getContext(), second.getContext());
+    }
+
+    @Test
+    public void testContextPropertiesAreNotIgnored() throws Exception {
+        String pkg = org.apache.cxf.configuration.security.ObjectFactory.class.getPackage().getName();
+        ClassLoader loader = getClass().getClassLoader();
+        Map<String, Object> props =
+            Collections.singletonMap("org.glassfish.jaxb.defaultNamespaceRemap", "urn:probe");
+        CachedContextAndSchemas plain = JAXBContextCache.getCachedContextAndSchemas(pkg, null, loader);
+        CachedContextAndSchemas remapped = JAXBContextCache.getCachedContextAndSchemas(pkg, props, loader);
+        assertNotSame(plain.getContext(), remapped.getContext());
+        // and a context built with properties must not be handed to a caller without them
+        CachedContextAndSchemas plainAgain = JAXBContextCache.getCachedContextAndSchemas(pkg, null, loader);
+        assertNotSame(remapped.getContext(), plainAgain.getContext());
     }
 }
