@@ -34,7 +34,6 @@ import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.configuration.CompleteConfiguration;
-import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.CreatedExpiryPolicy;
 import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.spi.CachingProvider;
@@ -44,6 +43,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.common.TokenReplayCache;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.wss4j.common.cache.EHCacheExpiry;
 import org.apache.wss4j.common.cache.EHCacheValue;
 import org.apache.wss4j.common.util.Loader;
@@ -61,10 +61,10 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
     private static final Logger LOG = LogUtils.getL7dLogger(JCacheTokenReplayCache.class);
     private static final String DEFAULT_CONFIG_URL = "/cxf-rs-security-replay-jcache.xml";
 
-    private final String cacheKey;
     private final Cache<String, EHCacheValue> cache;
     private final CacheManager cacheManager;
     private final Duration maxTTL;
+    private boolean closed;
 
     public JCacheTokenReplayCache() throws URISyntaxException {
         this(DEFAULT_CONFIG_URL, null);
@@ -91,7 +91,6 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
      */
     protected JCacheTokenReplayCache(String cacheKey, String configFile, String defaultConfigFile, Bus bus)
         throws URISyntaxException {
-        this.cacheKey = cacheKey;
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus(true);
         }
@@ -107,11 +106,19 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
         URL resolvedConfigFileURL = getConfigFileURL(configFileURL, defaultConfigFile);
         URI configURI = resolvedConfigFileURL != null
             ? resolvedConfigFileURL.toURI() : cachingProvider.getDefaultURI();
-        cacheManager = cachingProvider.getCacheManager(configURI, getClass().getClassLoader());
+        cacheManager = JCacheUtils.getCacheManager(cachingProvider, configURI, getClass().getClassLoader());
 
-        Cache<String, EHCacheValue> configuredCache =
-            cacheManager.getCache(cacheKey, String.class, EHCacheValue.class);
-        cache = configuredCache != null ? configuredCache : createCache(cacheManager, cacheKey);
+        try {
+            // a cache the provider does not define is created holding every entry for the max TTL (JCache
+            // has no per-entry expiry), rather than forever; a configuration (such as the default one) can
+            // still supply its settings, including its expiry, through a template for the cache name
+            cache = JCacheUtils.getOrCreate(cacheManager, cacheKey, String.class, EHCacheValue.class,
+                configuration -> configuration.setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(
+                    new javax.cache.expiry.Duration(TimeUnit.SECONDS, EHCacheExpiry.MAX_TTL))));
+        } catch (RuntimeException ex) {
+            JCacheUtils.releaseCacheManager(cacheManager);
+            throw ex;
+        }
 
         // The max TTL is read from the JCache expiry policy of the cache, if the provider can return it.
         // Ehcache cannot for a cache whose expiry comes from its own configuration, but the default
@@ -161,21 +168,6 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
             }
         }
         return maxTTL;
-    }
-
-    /**
-     * Create the cache, if the JCache provider does not define it. A configuration (such as the default
-     * one) can still supply its settings, including its expiry, through a template for the cache name.
-     * Without one, every entry is held for the max TTL (JCache has no per-entry expiry), rather than
-     * forever.
-     */
-    private static Cache<String, EHCacheValue> createCache(CacheManager cacheManager, String name) {
-        final MutableConfiguration<String, EHCacheValue> cacheConfiguration = new MutableConfiguration<>();
-        cacheConfiguration.setTypes(String.class, EHCacheValue.class);
-        cacheConfiguration.setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(
-            new javax.cache.expiry.Duration(TimeUnit.SECONDS, EHCacheExpiry.MAX_TTL)));
-
-        return cacheManager.createCache(name, cacheConfiguration);
     }
 
     private static URL getConfigFileURL(URL suppliedConfigFileURL, String defaultConfigFile) {
@@ -257,9 +249,10 @@ public class JCacheTokenReplayCache implements TokenReplayCache<String> {
     }
 
     public synchronized void close() {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(cacheKey);
-            cacheManager.close();
+        if (!closed) {
+            closed = true;
+            JCacheUtils.release(cache);
+            JCacheUtils.releaseCacheManager(cacheManager);
         }
     }
 

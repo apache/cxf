@@ -25,7 +25,6 @@ import java.net.URL;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
-import javax.cache.configuration.MutableConfiguration;
 import javax.cache.spi.CachingProvider;
 
 import org.apache.cxf.Bus;
@@ -34,6 +33,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.wss4j.common.util.Loader;
 
 /**
@@ -51,6 +51,7 @@ public class JCacheSPStateManager implements SPStateManager {
     private final Cache<String, RequestState> requestCache;
     private final Cache<String, ResponseState> responseCache;
     private final CacheManager cacheManager;
+    private boolean closed;
 
     public JCacheSPStateManager() throws URISyntaxException {
         this(DEFAULT_CONFIG_URL, null);
@@ -79,26 +80,28 @@ public class JCacheSPStateManager implements SPStateManager {
 
         final CachingProvider cachingProvider = Caching.getCachingProvider();
 
-        cacheManager = cachingProvider.getCacheManager(
-            getConfigFileURL(configFileURL).toURI(), 
-            getClass().getClassLoader()); 
+        cacheManager = JCacheUtils.getCacheManager(cachingProvider,
+            getConfigFileURL(configFileURL).toURI(),
+            getClass().getClassLoader());
 
-        requestCache = getOrCreate(cacheManager, REQUEST_CACHE_KEY, String.class, RequestState.class);
-        responseCache = getOrCreate(cacheManager, RESPONSE_CACHE_KEY, String.class, ResponseState.class);
+        Cache<String, RequestState> request = null;
+        try {
+            request = getOrCreate(cacheManager, REQUEST_CACHE_KEY, String.class, RequestState.class);
+            responseCache = getOrCreate(cacheManager, RESPONSE_CACHE_KEY, String.class, ResponseState.class);
+        } catch (RuntimeException ex) {
+            if (request != null) {
+                JCacheUtils.release(request);
+            }
+            JCacheUtils.releaseCacheManager(cacheManager);
+            throw ex;
+        }
+        requestCache = request;
     }
 
     private static <K, V> Cache<K, V> getOrCreate(CacheManager cacheManager, String name,
             Class<K> kclass, Class<V> vclass) {
 
-        final Cache<K, V> cache = cacheManager.getCache(name, kclass, vclass);
-        if (cache != null) {
-            return cache;
-        }
-
-        final MutableConfiguration<K, V> cacheConfiguration = new MutableConfiguration<>();
-        cacheConfiguration.setTypes(kclass, vclass);
-
-        return cacheManager.createCache(name, cacheConfiguration);
+        return JCacheUtils.getOrCreate(cacheManager, name, kclass, vclass);
     }
 
     private URL getConfigFileURL(URL suppliedConfigFileURL) {
@@ -155,10 +158,11 @@ public class JCacheSPStateManager implements SPStateManager {
     }
 
     public synchronized void close() throws IOException {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(REQUEST_CACHE_KEY);
-            cacheManager.destroyCache(RESPONSE_CACHE_KEY);
-            cacheManager.close();
+        if (!closed) {
+            closed = true;
+            JCacheUtils.release(requestCache);
+            JCacheUtils.release(responseCache);
+            JCacheUtils.releaseCacheManager(cacheManager);
         }
     }
 

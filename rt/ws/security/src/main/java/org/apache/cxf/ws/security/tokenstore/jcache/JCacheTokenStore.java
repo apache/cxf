@@ -34,6 +34,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreException;
@@ -47,7 +48,7 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
     private final Bus bus;
     private final Cache<String, SecurityToken> cache;
     private final CacheManager cacheManager;
-    private final String key;
+    private boolean closed;
 
     public JCacheTokenStore(String key, Bus b, URL configFileURL) throws TokenStoreException {
         bus = b;
@@ -55,7 +56,6 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
 
-        this.key = key;
         try {
             // Exclude the endpoint info bit added in TokenStoreUtils when getting the template name
             String template = key;
@@ -64,10 +64,15 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
             }
 
             final CachingProvider cachingProvider = Caching.getCachingProvider();
-            cacheManager = cachingProvider.getCacheManager(configFileURL.toURI(),
-                    SecurityToken.class.getClassLoader()); 
-            cache = JCacheSupport.getOrCreate(cacheManager, key, String.class, SecurityToken.class);
+            cacheManager = JCacheUtils.getCacheManager(cachingProvider, configFileURL.toURI(),
+                    SecurityToken.class.getClassLoader());
         } catch (Exception e) {
+            throw new TokenStoreException(e);
+        }
+        try {
+            cache = JCacheSupport.getOrCreate(cacheManager, key, String.class, SecurityToken.class);
+        } catch (RuntimeException e) {
+            JCacheUtils.releaseCacheManager(cacheManager);
             throw new TokenStoreException(e);
         }
     }
@@ -112,10 +117,12 @@ public class JCacheTokenStore implements TokenStore, Closeable, BusLifeCycleList
     }
 
     public synchronized void close() {
-        if (!cacheManager.isClosed()) {
-            cacheManager.destroyCache(key);
-            cacheManager.close();
+        if (closed) {
+            return;
         }
+        closed = true;
+        JCacheUtils.release(cache);
+        JCacheUtils.releaseCacheManager(cacheManager);
 
         if (bus != null) {
             bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);

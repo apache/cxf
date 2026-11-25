@@ -33,6 +33,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.JCacheOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
+import org.apache.cxf.rt.security.utils.JCacheUtils;
 
 public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     implements AuthorizationCodeDataProvider {
@@ -40,6 +41,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
     private long codeLifetime = 10 * 60;
     private Cache<String, ServerAuthorizationCodeGrant> grantCache;
+    private boolean grantCacheReleased;
 
     protected JCacheCodeDataProvider() {
         this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
@@ -67,7 +69,12 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
                                      String refreshTokenKey,
                                      boolean storeJwtTokenKeyOnly) {
         super(configFileURL, bus, clientCacheKey, accessTokenKey, refreshTokenKey, storeJwtTokenKeyOnly);
-        grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
+        try {
+            grantCache = createCache(cacheManager, codeCacheKey, String.class, ServerAuthorizationCodeGrant.class);
+        } catch (RuntimeException ex) {
+            super.close();
+            throw ex;
+        }
     }
 
 
@@ -138,8 +145,12 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     }
 
     @Override
-    public void close() {
-        grantCache.close();
+    public synchronized void close() {
+        // keep the reference, so that a request still in flight fails as on a closed cache, not with an NPE
+        if (!grantCacheReleased) {
+            grantCacheReleased = true;
+            JCacheUtils.release(grantCache);
+        }
         super.close();
     }
 }
