@@ -22,14 +22,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 
+import org.apache.cxf.configuration.security.CertStoreType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -87,6 +91,49 @@ public class TLSParameterJaxBUtilsTest {
         } catch (IOException e) {
             fail("Expected IllegalArgumentException but got IOException, "
                     + "meaning ftp:// was accepted and an outbound connection was attempted: " + e);
+        }
+    }
+
+    private static long openFileDescriptors() throws IOException {
+        try (java.util.stream.Stream<Path> fds = Files.list(Paths.get("/proc/self/fd"))) {
+            return fds.count();
+        }
+    }
+
+    @Test
+    public void testKeystoreStreamsAreClosed() throws Exception {
+        Assume.assumeTrue(Files.isDirectory(Paths.get("/proc/self/fd")));
+        final String password = "changeit";
+        final Path tempJks = Files.createTempFile("cxf-urlstore-", ".jks");
+        final Path tempCerts = Files.createTempFile("cxf-certstore-", ".pem");
+        try {
+            KeyStore source = KeyStore.getInstance("JKS");
+            source.load(null, password.toCharArray());
+            try (OutputStream os = Files.newOutputStream(tempJks)) {
+                source.store(os, password.toCharArray());
+            }
+
+            KeyStoreType kst = new KeyStoreType();
+            kst.setType("JKS");
+            kst.setPassword(password);
+            kst.setUrl(tempJks.toUri().toString());
+
+            CertStoreType fileCst = new CertStoreType();
+            fileCst.setFile(tempCerts.toString());
+            CertStoreType urlCst = new CertStoreType();
+            urlCst.setUrl(tempCerts.toUri().toString());
+
+            long before = openFileDescriptors();
+            for (int i = 0; i < 50; i++) {
+                TLSParameterJaxBUtils.getKeyStore(kst, false);
+                TLSParameterJaxBUtils.getKeyStore(fileCst);
+                TLSParameterJaxBUtils.getKeyStore(urlCst);
+            }
+            long leaked = openFileDescriptors() - before;
+            assertTrue("Leaked " + leaked + " file descriptors", leaked < 20);
+        } finally {
+            Files.deleteIfExists(tempJks);
+            Files.deleteIfExists(tempCerts);
         }
     }
 
