@@ -611,6 +611,8 @@ public class CachedWriter extends Writer {
     }
 
     private OutputStreamWriter createOutputStreamWriter(File file) throws IOException {
+        // a new file writer is being opened; the previous one (if any) may have been closed
+        cosClosed = false;
         OutputStream out = new BufferedOutputStream(Files.newOutputStream(file.toPath()));
         if (cipherTransformation != null) {
             try {
