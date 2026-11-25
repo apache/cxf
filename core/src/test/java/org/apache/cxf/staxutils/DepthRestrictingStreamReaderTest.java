@@ -20,12 +20,15 @@
 package org.apache.cxf.staxutils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DepthRestrictingStreamReaderTest {
 
@@ -115,5 +118,29 @@ public class DepthRestrictingStreamReaderTest {
                                                                            7,
                                                                            2);
         StaxUtils.copy(dr, new ByteArrayOutputStream());
+    }
+
+    @Test
+    public void testInnerElementCountExceededWithGetElementText() throws Exception {
+        StringBuilder sb = new StringBuilder("<root>");
+        for (int i = 0; i < 10; i++) {
+            sb.append("<child>").append(i).append("</child>");
+        }
+        sb.append("</root>");
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(sb.toString()));
+
+        DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader, -1, -1, 5);
+        int read = 0;
+        try {
+            while (dr.hasNext()) {
+                if (dr.next() == XMLStreamReader.START_ELEMENT && "child".equals(dr.getLocalName())) {
+                    assertEquals(Integer.toString(read), dr.getElementText());
+                    read++;
+                }
+            }
+            fail("Expected DepthExceededStaxException after " + read + " children");
+        } catch (DepthExceededStaxException ex) {
+            assertEquals(4, read);
+        }
     }
 }
