@@ -23,6 +23,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 
+import org.apache.cxf.helpers.IOUtils;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class CachedWriterTest extends CachedStreamTestBase {
     @Override
     protected void reloadDefaultProperties() {
@@ -81,6 +88,24 @@ public class CachedWriterTest extends CachedStreamTestBase {
     protected String readPartiallyFromStreamObject(Object cache, int len) throws IOException {
         return readPartiallyFromReader((Reader)cache, len);
     }
+
+    @Test
+    public void testSpillToFileAgainAfterResetOut() throws IOException {
+        CachedWriter cw = new CachedWriter();
+        cw.setThreshold(16);
+        String first = "first-content-that-exceeds-the-threshold";
+        cw.write(first);
+        assertNotNull("first write should have spilled to a temp file", cw.getTempFile());
+
+        // closes the file writer and moves the content back in memory
+        cw.resetOut(null, true);
+
+        String second = "second-content-that-exceeds-the-threshold";
+        cw.write(second);
+        assertNotNull("second write should have spilled to a temp file", cw.getTempFile());
+        try (Reader r = cw.getReader()) {
+            assertEquals(first + second, IOUtils.toString(r));
+        }
+        cw.close();
+    }
 }
-
-
