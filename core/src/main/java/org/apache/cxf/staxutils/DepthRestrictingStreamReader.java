@@ -82,4 +82,14 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
         }
         return next;
     }
+
+    @Override
+    public String getElementText() throws XMLStreamException {
+        // getElementText() consumes the END_ELEMENT without going through next()
+        String text = super.getElementText();
+        if (props.getInnerElementCountThreshold() != -1 && !stack.isEmpty()) {
+            stack.pop();
+        }
+        return text;
+    }
 }
