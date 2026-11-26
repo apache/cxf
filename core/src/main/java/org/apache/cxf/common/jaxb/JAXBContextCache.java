@@ -199,14 +199,20 @@ public final class JAXBContextCache {
         CachedContextAndSchemasInternal cachedContextAndSchemasInternal = null;
         JAXBContext context = null;
         Map<String, CachedContextAndSchemasInternal> cachedContextAndSchemasInternalMap = null;
-        if (typeRefs == null || typeRefs.isEmpty()) {
+        // Entries are keyed on the classes and default namespace only. Exact lookups with a
+        // null default namespace never hit the cache before, so keep that behaviour when JAXB
+        // properties are given rather than sharing a context built with different properties.
+        final boolean cacheable = (typeRefs == null || typeRefs.isEmpty())
+            && (defaultNs != null || props == null || props.isEmpty());
+        if (cacheable) {
             synchronized (JAXBCONTEXT_CACHE) {
 
                 if (exact) {
                     cachedContextAndSchemasInternalMap
                         = JAXBCONTEXT_CACHE.get(classes);
-                    if (cachedContextAndSchemasInternalMap != null && defaultNs != null) {
-                        cachedContextAndSchemasInternal = cachedContextAndSchemasInternalMap.get(defaultNs);
+                    if (cachedContextAndSchemasInternalMap != null) {
+                        cachedContextAndSchemasInternal
+                            = cachedContextAndSchemasInternalMap.get(defaultNs != null ? defaultNs : "");
                     }
                 } else {
                     for (Entry<Set<Class<?>>, Map<String, CachedContextAndSchemasInternal>> k
@@ -252,7 +258,7 @@ public final class JAXBContextCache {
         }
         cachedContextAndSchemasInternal = new CachedContextAndSchemasInternal(context, classes);
         synchronized (JAXBCONTEXT_CACHE) {
-            if (typeRefs == null || typeRefs.isEmpty()) {
+            if (cacheable) {
                 if (cachedContextAndSchemasInternalMap == null) {
                     cachedContextAndSchemasInternalMap
                         = new CacheMap<>();
