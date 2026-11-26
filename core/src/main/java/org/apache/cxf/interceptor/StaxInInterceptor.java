@@ -23,10 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -52,7 +51,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);
 
-    private static Map<Object, XMLInputFactory> factories = new HashMap<>();
+    private static final Map<Object, XMLInputFactory> FACTORIES = new ConcurrentHashMap<>();
 
     public StaxInInterceptor() {
         super(Phase.POST_STREAM);
@@ -164,7 +163,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (o instanceof XMLInputFactory) {
             return (XMLInputFactory)o;
         } else if (o != null) {
-            XMLInputFactory xif = factories.get(o);
+            XMLInputFactory xif = FACTORIES.get(o);
             if (xif == null) {
                 Class<?> cls;
                 if (o instanceof Class) {
@@ -181,13 +180,13 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                            LOG, o));
                 }
 
-                try {
-                    xif = (XMLInputFactory)(cls.getDeclaredConstructor().newInstance());
-                    factories.put(o, xif);
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    throw new Fault(e);
-                }
+                xif = FACTORIES.computeIfAbsent(o, k -> {
+                    try {
+                        return (XMLInputFactory)cls.getDeclaredConstructor().newInstance();
+                    } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        throw new Fault(e);
+                    }
+                });
             }
             return xif;
         }

@@ -21,11 +21,10 @@ package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -54,7 +53,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER, WRITER_HOLDER);
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
-    private static Map<Object, XMLOutputFactory> factories = new HashMap<>();
+    private static final Map<Object, XMLOutputFactory> FACTORIES = new ConcurrentHashMap<>();
 
 
     public StaxOutInterceptor() {
@@ -167,7 +166,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             m.put(FORCE_START_DOCUMENT, Boolean.TRUE);
             return (XMLOutputFactory)o;
         } else if (o != null) {
-            XMLOutputFactory xif = factories.get(o);
+            XMLOutputFactory xif = FACTORIES.get(o);
             if (xif == null) {
                 Class<?> cls;
                 if (o instanceof Class) {
@@ -183,13 +182,13 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                            BUNDLE, o));
                 }
 
-                try {
-                    xif = (XMLOutputFactory)(cls.getDeclaredConstructor().newInstance());
-                    factories.put(o, xif);
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    throw new Fault(e);
-                }
+                xif = FACTORIES.computeIfAbsent(o, k -> {
+                    try {
+                        return (XMLOutputFactory)cls.getDeclaredConstructor().newInstance();
+                    } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        throw new Fault(e);
+                    }
+                });
             }
             m.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
                   Boolean.TRUE);
