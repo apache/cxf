@@ -67,17 +67,19 @@ public final class URIParserUtil {
     public static String escapeChars(String s) {
         StringBuilder sb = new StringBuilder(s.length());
 
-        for (int x = 0; x < s.length(); x++) {
-            char ch = s.charAt(x);
-            if (isExcluded(ch)) {
-                byte[] bytes = Character.toString(ch).getBytes(StandardCharsets.UTF_8);
+        for (int x = 0; x < s.length();) {
+            int cp = s.codePointAt(x);
+            int len = Character.charCount(cp);
+            if (len > 1 || isExcluded((char)cp)) {
+                byte[] bytes = s.substring(x, x + len).getBytes(StandardCharsets.UTF_8);
                 for (byte b : bytes) {
                     sb.append('%');
                     StringUtils.byteToHex(b, sb);
                 }
             } else {
-                sb.append(ch);
+                sb.append((char)cp);
             }
+            x += len;
         }
         return sb.toString();
     }
