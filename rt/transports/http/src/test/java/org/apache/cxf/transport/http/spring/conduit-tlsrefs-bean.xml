@@ -33,6 +33,10 @@
                 <sec:include>.*_WITH_AES_.*</sec:include>
                 <sec:exclude>.*_CBC_.*</sec:exclude>
             </sec:cipherSuitesFilter>
+            <sec:namedGroups>
+                <sec:namedGroup>x25519</sec:namedGroup>
+                <sec:namedGroup>secp384r1</sec:namedGroup>
+            </sec:namedGroups>
         </http:tlsClientParameters>
         <http:authorization>
             <sec:UserName>Betty</sec:UserName>

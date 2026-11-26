@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.http_jetty.spring;
 
+import java.util.Arrays;
+
 import javax.xml.namespace.QName;
 
 import org.xml.sax.SAXParseException;
@@ -156,6 +158,7 @@ public class ApplicationContextTest {
         assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
+        assertEquals(Arrays.asList("x25519", "secp384r1"), engine.getTlsServerParameters().getNamedGroups());
 
         JettyHTTPDestination jd4 =
             (JettyHTTPDestination)factory.getDestination(

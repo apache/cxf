@@ -978,6 +978,7 @@ public class URLConnectionAsyncHTTPConduit extends URLConnectionHTTPConduit {
         if (p != null) {
             sslengine.setEnabledProtocols(p);
         }
+        org.apache.cxf.transport.https.SSLUtils.applyNamedGroups(sslengine, tlsClientParameters.getNamedGroups());
     }
 
     private String[] findProtocols(String p, String[] options) {

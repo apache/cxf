@@ -28,7 +28,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import javax.net.ssl.ExtendedSSLSession;
@@ -65,8 +68,37 @@ public final class SSLUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SSLUtils.class);
 
+    // Cached reflection for SSLParameters.setNamedGroups/getNamedGroups (JDK 20+), resolved once.
+    private static final Method SSL_PARAMS_SET_NAMED_GROUPS =
+        findMethod(SSLParameters.class, "setNamedGroups", String[].class);
+    private static final Method SSL_PARAMS_GET_NAMED_GROUPS =
+        findMethod(SSLParameters.class, "getNamedGroups");
+
+    // BC JSSE reflection handles per engine or socket class, found through the class's own interfaces so that
+    // BC JSSE is recognised whichever class loader loaded it (such as a separate bundle in OSGi). ClassValue
+    // does not keep the class, or its class loader, reachable.
+    private static final ClassValue<BCHandle> BC_HANDLES = new ClassValue<BCHandle>() {
+        @Override
+        protected BCHandle computeValue(Class<?> type) {
+            return resolveBCHandle(type);
+        }
+    };
+    private static final Set<String> BC_TYPES =
+        new HashSet<>(Arrays.asList("org.bouncycastle.jsse.BCSSLEngine", "org.bouncycastle.jsse.BCSSLSocket"));
+
+    // Ensures the "named groups ignored on JDK < 20" warning is logged at most once per JVM.
+    private static final AtomicBoolean NAMED_GROUPS_UNSUPPORTED_WARNED = new AtomicBoolean();
+
     private SSLUtils() {
         //Helper class
+    }
+
+    private static Method findMethod(Class<?> type, String name, Class<?>... paramTypes) {
+        try {
+            return type.getMethod(name, paramTypes);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
     }
 
     public static String[] getProtocolsToInclude(List<String> includeProtocols,
@@ -243,6 +275,7 @@ public final class SSLUtils {
                 serverEngine.setNeedClientAuth(clientAuth.isRequired());
             }
         }
+        applyNamedGroups(serverEngine, parameters.getNamedGroups());
         return serverEngine;
     }
 
@@ -254,6 +287,7 @@ public final class SSLUtils {
         SSLContext sslContext = getSSLContext(parameters);
         SSLEngine clientEngine = sslContext.createSSLEngine();
         clientEngine.setUseClientMode(true);
+        applyNamedGroups(clientEngine, parameters.getNamedGroups());
         return clientEngine;
     }
 
@@ -262,6 +296,7 @@ public final class SSLUtils {
         SSLContext sslContext = getSSLContext(parameters, true);
         SSLEngine clientEngine = sslContext.createSSLEngine(peerHost, peerPort);
         clientEngine.setUseClientMode(true);
+        applyNamedGroups(clientEngine, parameters.getNamedGroups());
         return clientEngine;
     }
 
@@ -632,41 +667,153 @@ public final class SSLUtils {
     }
 
     /**
+     * Whether this JDK exposes {@code SSLParameters.setNamedGroups()} (JDK 20+). When it does not,
+     * named groups configured for a non-BouncyCastle provider cannot be applied and are ignored.
+     */
+    public static boolean isNamedGroupsSupported() {
+        return SSL_PARAMS_SET_NAMED_GROUPS != null;
+    }
+
+    /**
      * Applies the given named groups to {@code SSLParameters} via reflection.
-     * {@code SSLParameters.setNamedGroups()} requires JDK 20+; this method
-     * silently skips the call on older JDKs.
+     * {@code SSLParameters.setNamedGroups()} requires JDK 20+; on older JDKs the groups are
+     * ignored and a single warning is logged so the inert setting is not silently dropped.
      */
     public static void applyNamedGroups(SSLParameters params, List<String> namedGroups) {
         if (namedGroups == null || namedGroups.isEmpty()) {
             return;
         }
+        if (SSL_PARAMS_SET_NAMED_GROUPS == null) {
+            warnNamedGroupsUnsupported(namedGroups);
+            return;
+        }
         try {
-            Method m = SSLParameters.class.getMethod("setNamedGroups", String[].class);
-            m.invoke(params, (Object) namedGroups.toArray(new String[0]));
-        } catch (NoSuchMethodException e) {
-            LOG.fine("SSLParameters.setNamedGroups() not available on this JDK; namedGroups ignored");
+            SSL_PARAMS_SET_NAMED_GROUPS.invoke(params, (Object) namedGroups.toArray(new String[0]));
         } catch (ReflectiveOperationException e) {
             LOG.warning("Failed to apply TLS namedGroups: " + e.getMessage());
         }
     }
 
-    // Reflection-based BC JSSE path: avoids a compile-time dependency on bctls-jdk18on.
-    public static void applyNamedGroupsBC(SSLEngine sslEngine, List<String> namedGroups) {
-        if (namedGroups == null || namedGroups.isEmpty()) {
-            return;
+    /**
+     * Returns the named groups of {@code SSLParameters} via reflection, or null when none are set
+     * or {@code SSLParameters.getNamedGroups()} is not available (JDK 20+).
+     */
+    public static String[] getNamedGroups(SSLParameters params) {
+        if (SSL_PARAMS_GET_NAMED_GROUPS == null) {
+            return null;
         }
         try {
-            Class<?> bcEngineClass = Class.forName("org.bouncycastle.jsse.BCSSLEngine");
-            if (!bcEngineClass.isInstance(sslEngine)) {
-                return;
-            }
-            Class<?> bcParamsClass = Class.forName("org.bouncycastle.jsse.BCSSLParameters");
-            Object bcParams = bcEngineClass.getMethod("getParameters").invoke(sslEngine);
-            bcParamsClass.getMethod("setNamedGroups", String[].class)
-                .invoke(bcParams, (Object) namedGroups.toArray(new String[0]));
-            bcEngineClass.getMethod("setParameters", bcParamsClass).invoke(sslEngine, bcParams);
+            return (String[]) SSL_PARAMS_GET_NAMED_GROUPS.invoke(params);
         } catch (ReflectiveOperationException e) {
-            LOG.fine("Could not apply named groups via BC JSSE engine: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Applies the given named groups to an {@code SSLEngine}: through {@code BCSSLParameters}
+     * for a BC JSSE engine, otherwise through {@code SSLParameters} (JDK 20+).
+     */
+    public static void applyNamedGroups(SSLEngine sslEngine, List<String> namedGroups) {
+        if (namedGroups == null || namedGroups.isEmpty() || applyNamedGroupsBC(sslEngine, namedGroups)) {
+            return;
+        }
+        if (!isNamedGroupsSupported()) {
+            warnNamedGroupsUnsupported(namedGroups);
+            return;
+        }
+        SSLParameters params = sslEngine.getSSLParameters();
+        applyNamedGroups(params, namedGroups);
+        sslEngine.setSSLParameters(params);
+    }
+
+    /**
+     * Applies the given named groups to an {@code SSLSocket}: through {@code BCSSLParameters}
+     * for a BC JSSE socket, otherwise through {@code SSLParameters} (JDK 20+).
+     */
+    public static void applyNamedGroups(SSLSocket socket, List<String> namedGroups) {
+        if (namedGroups == null || namedGroups.isEmpty() || applyNamedGroupsBC(socket, namedGroups)) {
+            return;
+        }
+        if (!isNamedGroupsSupported()) {
+            warnNamedGroupsUnsupported(namedGroups);
+            return;
+        }
+        SSLParameters params = socket.getSSLParameters();
+        applyNamedGroups(params, namedGroups);
+        socket.setSSLParameters(params);
+    }
+
+    private static void warnNamedGroupsUnsupported(List<String> namedGroups) {
+        if (NAMED_GROUPS_UNSUPPORTED_WARNED.compareAndSet(false, true)) {
+            LOG.warning("The configured TLS named groups " + namedGroups + " are ignored:"
+                + " SSLParameters.setNamedGroups() requires JDK 20 or later."
+                + " The JVM-wide jdk.tls.namedGroups setting applies instead.");
+        }
+    }
+
+    /**
+     * Sets the named groups through BCSSLParameters if the engine or socket is a BC JSSE one (BCSSLEngine or
+     * BCSSLSocket), by reflection, to avoid a compile-time dependency on bctls. Returns false if it is not, or
+     * if setting them failed, so the caller falls back to the standard {@code SSLParameters} path.
+     */
+    private static boolean applyNamedGroupsBC(Object engineOrSocket, List<String> namedGroups) {
+        BCHandle handle = BC_HANDLES.get(engineOrSocket.getClass());
+        if (handle == BCHandle.NONE) {
+            return false;
+        }
+        try {
+            Object bcParams = handle.getParameters.invoke(engineOrSocket);
+            handle.setNamedGroups.invoke(bcParams, (Object) namedGroups.toArray(new String[0]));
+            handle.setParameters.invoke(engineOrSocket, bcParams);
+            return true;
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOG.warning("Could not apply the TLS named groups " + namedGroups + " through BC JSSE, trying"
+                + " SSLParameters instead: " + e);
+            return false;
+        }
+    }
+
+    private static BCHandle resolveBCHandle(Class<?> type) {
+        Class<?> bcType = findBCType(type);
+        if (bcType == null) {
+            return BCHandle.NONE;
+        }
+        try {
+            Method getParameters = bcType.getMethod("getParameters");
+            Class<?> bcParamsClass = getParameters.getReturnType();
+            return new BCHandle(getParameters, bcType.getMethod("setParameters", bcParamsClass),
+                bcParamsClass.getMethod("setNamedGroups", String[].class));
+        } catch (ReflectiveOperationException | LinkageError e) {
+            LOG.fine("BC JSSE " + bcType.getName() + " does not support named groups: " + e);
+            return BCHandle.NONE;
+        }
+    }
+
+    // the BCSSLEngine or BCSSLSocket interface that the class implements, or null
+    private static Class<?> findBCType(Class<?> type) {
+        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+            for (Class<?> i : c.getInterfaces()) {
+                Class<?> found = BC_TYPES.contains(i.getName()) ? i : findBCType(i);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** BC JSSE reflection handles for one engine or socket class, or {@link #NONE} if it is not a BC JSSE one. */
+    private static final class BCHandle {
+        static final BCHandle NONE = new BCHandle(null, null, null);
+
+        private final Method getParameters;
+        private final Method setParameters;
+        private final Method setNamedGroups;
+
+        BCHandle(Method getParameters, Method setParameters, Method setNamedGroups) {
+            this.getParameters = getParameters;
+            this.setParameters = setParameters;
+            this.setNamedGroups = setNamedGroups;
         }
     }
 

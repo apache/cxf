@@ -42,6 +42,7 @@ import org.apache.cxf.configuration.security.ExcludeProtocols;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.configuration.security.IncludeProtocols;
 import org.apache.cxf.configuration.security.KeyManagersType;
+import org.apache.cxf.configuration.security.NamedGroups;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.security.TrustManagersType;
@@ -199,6 +200,9 @@ public class UndertowHTTPServerEngineBeanDefinitionParser extends AbstractBeanDe
             } else if ("certConstraints".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          CertificateConstraintsType.class);
+            } else if ("namedGroups".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         NamedGroups.class);
             } else if ("certAlias".equals(ename)) {
                 paramsbean.addPropertyValue(ename, n.getTextContent());
             }

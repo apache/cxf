@@ -41,15 +41,26 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
     private SSLSocketFactory sslSocketFactory;
     private String[] ciphers;
     private String protocol;
+    private List<String> namedGroups;
 
     SSLSocketFactoryWrapper(
         SSLSocketFactory sslSocketFactoryParam,
         String[]         ciphersParam,
         String           protocolParam
     ) {
+        this(sslSocketFactoryParam, ciphersParam, protocolParam, null);
+    }
+
+    SSLSocketFactoryWrapper(
+        SSLSocketFactory sslSocketFactoryParam,
+        String[]         ciphersParam,
+        String           protocolParam,
+        List<String>     namedGroupsParam
+    ) {
         sslSocketFactory = sslSocketFactoryParam;
         ciphers = ciphersParam;
         protocol = protocolParam;
+        namedGroups = namedGroupsParam;
     }
 
     public String[] getDefaultCipherSuites() {
@@ -112,6 +123,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         if (ciphers != null) {
             socket.setEnabledCipherSuites(ciphers);
         }
+        SSLUtils.applyNamedGroups(socket, namedGroups);
 
         return socket;
     }

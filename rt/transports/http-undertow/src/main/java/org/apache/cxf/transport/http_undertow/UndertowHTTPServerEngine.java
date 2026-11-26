@@ -241,7 +241,8 @@ public class UndertowHTTPServerEngine implements ServerEngine, HttpServerEngineS
             if (this.sslContext == null) {
                 this.sslContext = createSSLContext();
             }
-            result = result.addHttpsListener(getPort(), getHost(), this.sslContext);
+            result = result.addHttpsListener(getPort(), getHost(),
+                NamedGroupsSSLContext.wrap(this.sslContext, tlsServerParameters.getNamedGroups()));
         } else {
             result = result.addHttpListener(getPort(), getHost());
         }

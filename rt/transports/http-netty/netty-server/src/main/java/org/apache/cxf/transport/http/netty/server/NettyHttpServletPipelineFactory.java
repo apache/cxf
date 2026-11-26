@@ -364,6 +364,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         SslContext sslCtx = configureServerHttp2SSLOnDemand();
         if (sslCtx != null) {
             final SslHandler sslHandler = sslCtx.newHandler(channel.alloc());
+            SSLUtils.applyNamedGroups(sslHandler.engine(), tlsServerParameters.getNamedGroups());
 
             LOG.log(Level.FINE,
                     "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}",

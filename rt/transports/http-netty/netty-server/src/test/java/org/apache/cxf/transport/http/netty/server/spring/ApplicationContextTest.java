@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.transport.http.netty.server.spring;
 
+import java.util.Arrays;
+
 import javax.xml.namespace.QName;
 
 import org.xml.sax.SAXParseException;
@@ -145,6 +147,7 @@ public class ApplicationContextTest {
         engine = (NettyHttpServerEngine)jd3.getEngine();
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
         assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
+        assertEquals(Arrays.asList("x25519", "secp384r1"), engine.getTlsServerParameters().getNamedGroups());
 
         NettyHttpDestination jd4 =
             (NettyHttpDestination)factory.getDestination(
