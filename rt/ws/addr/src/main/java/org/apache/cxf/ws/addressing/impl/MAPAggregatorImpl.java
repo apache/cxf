@@ -92,6 +92,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private static final Logger LOG =
         LogUtils.getL7dLogger(MAPAggregator.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
+    private static final int MAX_DISPLAYED_MESSAGE_ID_LENGTH = 256;
 
     private static final ClientLifeCycleListener DECOUPLED_DEST_CLEANER = new ClientLifeCycleListener() {
         public void clientCreated(Client client) {
@@ -1162,9 +1163,12 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (!allowDuplicates && messageID != null && messageID.getValue() != null
                 && !messageIdCache.checkUniquenessAndCacheId(messageID.getValue())) {
 
+                // the message ID comes from the sender and can be very long, so don't copy all of it
+                // into the log or the fault
+                String displayedId = truncateMessageId(messageID.getValue());
                 LOG.log(Level.WARNING,
                         "DUPLICATE_MESSAGE_ID_MSG",
-                        messageID.getValue());
+                        displayedId);
 
                 // Only throw the fault if something else has not already marked the
                 // message as invalid.
@@ -1172,7 +1176,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     String reason =
                         BUNDLE.getString("DUPLICATE_MESSAGE_ID_MSG");
                     String l7dReason =
-                        MessageFormat.format(reason, messageID.getValue());
+                        MessageFormat.format(reason, displayedId);
                     ContextUtils.storeMAPFaultName(Names.DUPLICATE_MESSAGE_ID_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(l7dReason, message);
@@ -1214,6 +1218,16 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                 new QName(Names.WSA_NAMESPACE_NAME,
                                           Names.WSA_NONE_ADDRESS));
         }
+    }
+
+    /**
+     * Shorten a message ID, which comes from the sender, before it is logged or returned in a fault.
+     */
+    static String truncateMessageId(String messageId) {
+        if (messageId.length() <= MAX_DISPLAYED_MESSAGE_ID_LENGTH) {
+            return messageId;
+        }
+        return messageId.substring(0, MAX_DISPLAYED_MESSAGE_ID_LENGTH) + "...";
     }
 
     /**

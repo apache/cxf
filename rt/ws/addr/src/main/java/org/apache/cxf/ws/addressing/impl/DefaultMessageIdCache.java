@@ -18,30 +18,79 @@
  */
 package org.apache.cxf.ws.addressing.impl;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.ws.addressing.MessageIdCache;
 
 /**
- * An implementation that uses a simple set to store received message IDs.
- * Note that this implementation does not make any attempt to flush older
- * message IDs or to persist the message IDs outside of this instance.
+ * An implementation that stores the IDs of received messages in memory. To bound the memory it uses, it
+ * stores a digest of each message ID rather than the ID itself, and it holds at most a maximum number of IDs
+ * (100000 by default), forgetting the oldest ones once it is full. A duplicate message is therefore only
+ * detected while the ID of the original message is still in the cache. This implementation does not persist
+ * the message IDs outside of this instance.
  */
 public class DefaultMessageIdCache implements MessageIdCache {
 
+    public static final int DEFAULT_MAX_SIZE = 100000;
+
     /**
-     * The set of message IDs.
+     * The set of message ID digests, oldest first.
      */
-    private final Map<String, Boolean> messageIdSet =
-        new ConcurrentHashMap<>();
+    private final Map<String, Boolean> messageIdSet;
+
+    public DefaultMessageIdCache() {
+        this(DEFAULT_MAX_SIZE);
+    }
+
+    /**
+     * @param maxSize the maximum number of message IDs to hold
+     */
+    public DefaultMessageIdCache(int maxSize) {
+        if (maxSize <= 0) {
+            throw new IllegalArgumentException("The maximum size must be positive: " + maxSize);
+        }
+        this.messageIdSet = Collections.synchronizedMap(new BoundedMap(maxSize));
+    }
 
     public boolean checkUniquenessAndCacheId(String messageId) {
-        return this.messageIdSet.put(messageId, Boolean.TRUE) == null;
+        return this.messageIdSet.put(digest(messageId), Boolean.TRUE) == null;
     }
 
     protected Set<String> getMessageIdSet() {
         return this.messageIdSet.keySet();
+    }
+
+    private static String digest(String messageId) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return Base64.getEncoder().encodeToString(digest.digest(messageId.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException ex) {
+            // every Java platform is required to support SHA-256
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    /**
+     * An insertion-ordered map that removes its oldest entry once it holds more than the maximum size.
+     */
+    private static final class BoundedMap extends LinkedHashMap<String, Boolean> {
+        private static final long serialVersionUID = 1L;
+        private final int maxSize;
+
+        BoundedMap(int maxSize) {
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
+            return size() > maxSize;
+        }
     }
 }
