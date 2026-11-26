@@ -124,4 +124,12 @@ public class URIParserUtilTest {
         assertEquals(orig, URLDecoder.decode(s, StandardCharsets.UTF_8.name()));
     }
 
+    @Test
+    public void testEscapeCharsSupplementaryCharacter() throws Exception {
+        String orig = "/foo" + new String(Character.toChars(0x1F600)) + ".txt";
+        String s = URIParserUtil.escapeChars(orig);
+        assertEquals("/foo%f0%9f%98%80.txt", s);
+        assertEquals(orig, URLDecoder.decode(s, StandardCharsets.UTF_8.name()));
+    }
+
 }
