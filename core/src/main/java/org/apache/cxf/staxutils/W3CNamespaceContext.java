@@ -104,6 +104,7 @@ public class W3CNamespaceContext implements NamespaceContext {
                     if (name.startsWith("xmlns:")) {
                         return name.substring(6);
                     }
+                    // any other attribute is not a namespace declaration: keep looking
                 }
             }
         }
