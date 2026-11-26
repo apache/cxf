@@ -21,6 +21,7 @@ package org.apache.cxf.feature.transform;
 
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Templates;
@@ -31,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -87,5 +89,20 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
 
     protected Templates getXSLTTemplate() {
         return xsltTemplate;
+    }
+
+    protected String getEncoding(Message message) {
+        String encoding = (String) message.get(Message.ENCODING);
+        if (encoding == null) {
+            Exchange ex = message.getExchange();
+            if (ex != null && ex.getInMessage() != null) {
+                encoding =
+                    (String) ex.getInMessage().get(Message.ENCODING);
+            }
+        }
+        if (encoding == null) {
+            encoding = StandardCharsets.UTF_8.name();
+        }
+        return encoding;
     }
 }
