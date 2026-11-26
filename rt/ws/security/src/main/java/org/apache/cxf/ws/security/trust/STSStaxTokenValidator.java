@@ -99,15 +99,24 @@ public class STSStaxTokenValidator
                                                  final SamlAssertionWrapper samlAssertionWrapper,
                                                  final InboundSecurityToken subjectSecurityToken,
                                                  final TokenContext tokenContext) throws WSSecurityException {
-        // Check conditions
-        checkConditions(samlAssertionWrapper);
+        // Check conditions, including the audience restrictions
+        checkConditions(samlAssertionWrapper,
+                        tokenContext.getWssSecurityProperties().getAudienceRestrictions());
 
-        // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertionWrapper,
-                        tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
+        // Check the AuthnStatements of the assertion (if any)
+        checkAuthnStatements(samlAssertionWrapper);
+
+        // Check the Subject Confirmation requirements
+        verifySubjectConfirmationMethod(samlAssertionWrapper);
 
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
+
+        // Check OneTimeUse Condition. This must come after the other checks, as it caches the Assertion ID,
+        // and caching the ID of an Assertion that is then rejected would let an attacker poison the cache
+        // against a genuine Assertion with the same ID
+        checkOneTimeUse(samlAssertionWrapper,
+                        tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
 
         Crypto sigVerCrypto = null;
         if (samlAssertionWrapper.isSigned()) {

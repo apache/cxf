@@ -18,9 +18,14 @@
  */
 package org.apache.cxf.ws.security.wss4j.saml;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
@@ -31,6 +36,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.cxf.ws.security.trust.STSStaxTokenValidator;
 import org.apache.cxf.ws.security.wss4j.AbstractSecurityTest;
 import org.apache.cxf.ws.security.wss4j.Echo;
 import org.apache.cxf.ws.security.wss4j.EchoImpl;
@@ -38,10 +44,14 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 
 import org.junit.Test;
 
@@ -287,6 +297,61 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         assertEquals("test", echo.echo("test"));
     }
 
+
+    @Test
+    public void testSaml2WrongAudienceDefaultValidator() throws Exception {
+        assertWrongAudienceRejected(new SamlTokenValidatorImpl());
+    }
+
+    @Test
+    public void testSaml2WrongAudienceSTSStaxTokenValidator() throws Exception {
+        assertWrongAudienceRejected(new STSStaxTokenValidator());
+    }
+
+    private void assertWrongAudienceRejected(SamlTokenValidatorImpl validator) throws Exception {
+        Service service = createService();
+
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        Properties cryptoProperties =
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
+        inProperties.addValidator(WSConstants.SAML_TOKEN, validator);
+        inProperties.addValidator(WSConstants.SAML2_TOKEN, validator);
+        service.getInInterceptors().add(new WSS4JStaxInInterceptor(inProperties));
+
+        Echo echo = createClientProxy();
+        Client client = ClientProxy.getClient(echo);
+
+        // A signed Assertion issued for another service
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler() {
+            @Override
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                super.handle(callbacks);
+                ConditionsBean conditions = new ConditionsBean();
+                AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
+                audienceRestriction.setAudienceURIs(Collections.singletonList("https://other.example.com/service"));
+                conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
+                ((SAMLCallback) callbacks[0]).setConditions(conditions);
+            }
+        };
+        callbackHandler.setSignAssertion(true);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_SIGNED);
+        properties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
+        properties.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        properties.put(ConfigurationConstants.USER, "alice");
+        properties.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
+        properties.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        client.getOutInterceptors().add(new WSS4JOutInterceptor(properties));
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on an Assertion with the wrong audience");
+        } catch (jakarta.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+    }
 
     private Service createService() {
         // Create the Service

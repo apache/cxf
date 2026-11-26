@@ -76,7 +76,13 @@ public class STSTokenValidator implements Validator {
             return credential;
         }
 
-        return validateWithSTS(credential, (Message)data.getMsgContext());
+        Credential validatedCredential = validateWithSTS(credential, (Message)data.getMsgContext());
+        if (!alwaysValidateToSts && credential.getSamlAssertion() != null) {
+            // The OneTimeUse ID of an assertion that was not trusted locally is only cached once the STS
+            // has validated it
+            new STSSamlAssertionValidator().checkOneTimeUseAfterSTSValidation(credential.getSamlAssertion(), data);
+        }
+        return validatedCredential;
     }
 
     public Credential validateWithSTS(Credential credential, Message message) throws WSSecurityException {
