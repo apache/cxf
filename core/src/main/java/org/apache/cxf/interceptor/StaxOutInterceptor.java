@@ -21,7 +21,6 @@ package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -183,16 +182,13 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                            BUNDLE, o));
                 }
 
-                try {
-                    xif = (XMLOutputFactory)(cls.getDeclaredConstructor().newInstance());
-                    XMLOutputFactory existing = FACTORIES.putIfAbsent(o, xif);
-                    if (existing != null) {
-                        xif = existing;
+                xif = FACTORIES.computeIfAbsent(o, k -> {
+                    try {
+                        return (XMLOutputFactory)cls.getDeclaredConstructor().newInstance();
+                    } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        throw new Fault(e);
                     }
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    throw new Fault(e);
-                }
+                });
             }
             m.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
                   Boolean.TRUE);

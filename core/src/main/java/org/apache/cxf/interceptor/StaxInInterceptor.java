@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -181,16 +180,13 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                            LOG, o));
                 }
 
-                try {
-                    xif = (XMLInputFactory)(cls.getDeclaredConstructor().newInstance());
-                    XMLInputFactory existing = FACTORIES.putIfAbsent(o, xif);
-                    if (existing != null) {
-                        xif = existing;
+                xif = FACTORIES.computeIfAbsent(o, k -> {
+                    try {
+                        return (XMLInputFactory)cls.getDeclaredConstructor().newInstance();
+                    } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        throw new Fault(e);
                     }
-                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    throw new Fault(e);
-                }
+                });
             }
             return xif;
         }
