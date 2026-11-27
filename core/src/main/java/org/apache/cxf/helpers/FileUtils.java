@@ -82,6 +82,10 @@ public final class FileUtils {
             File f = new File(s);
             if (f.mkdirs()) {
                 defaultTempDir = f;
+            } else if (f.isDirectory()) {
+                LogUtils.getL7dLogger(FileUtils.class).warning("The directory " + s + " set by "
+                    + FileUtils.class.getName() + ".TempDirectory already exists and is ignored; "
+                    + "a directory under java.io.tmpdir is used instead");
             }
         }
         // also create a new directory if ours was removed, e.g. by a tmp cleaner, while the JVM was running.
@@ -99,7 +103,9 @@ public final class FileUtils {
     }
 
     public static synchronized void maybeDeleteDefaultTempDir() {
-        if (defaultTempDir != null) {
+        // with no shutdown hook the directory was configured via the TempDirectory property,
+        // so it is managed outside of CXF and must not be removed
+        if (defaultTempDir != null && shutdownHook != null) {
             Runtime.getRuntime().gc(); // attempt a garbage collect to close any files
             String[] files = defaultTempDir.list();
             if (files != null && files.length > 0) {
