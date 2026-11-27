@@ -65,6 +65,29 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
     }
 
     /**
+     * The OneTimeUse ID of an assertion that is not trusted locally is not cached here, as the assertion is
+     * then validated by the STS, which may reject it. Caching the ID of an assertion that is rejected would
+     * let an attacker poison the cache against a genuine assertion with the same ID. Such an assertion is
+     * checked with checkOneTimeUseAfterSTSValidation once the STS has validated it.
+     */
+    @Override
+    protected void checkOneTimeUse(SamlAssertionWrapper samlAssertion, RequestData data)
+        throws WSSecurityException {
+        if (trustVerificationSucceeded) {
+            super.checkOneTimeUse(samlAssertion, data);
+        }
+    }
+
+    /**
+     * Check the OneTimeUse Condition of an assertion that was not trusted locally, once the STS has
+     * validated it
+     */
+    public void checkOneTimeUseAfterSTSValidation(SamlAssertionWrapper samlAssertion, RequestData data)
+        throws WSSecurityException {
+        super.checkOneTimeUse(samlAssertion, data);
+    }
+
+    /**
      * Return if trust verification on the signature of the assertion succeeded.
      * @return if trust verification on the signature of the assertion succeeded
      */

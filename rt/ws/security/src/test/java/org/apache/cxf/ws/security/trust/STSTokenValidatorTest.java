@@ -29,11 +29,15 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.security.wss4j.saml.SAML2CallbackHandler;
+import org.apache.wss4j.common.cache.MemoryReplayCache;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
@@ -44,6 +48,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for local validation of SAML Assertions in the STSTokenValidator.
@@ -134,6 +139,36 @@ public class STSTokenValidatorTest {
         }
     }
 
+    /**
+     * An Assertion whose signature is not trusted locally is passed on to the STS. Its OneTimeUse ID must not
+     * be cached before then: otherwise an attacker could send an Assertion signed with an untrusted key that
+     * carries the ID of a genuine one, which the STS rejects, so that the genuine Assertion is subsequently
+     * rejected as a replay.
+     */
+    @Test
+    public void testOneTimeUseNotCachedForUntrustedAssertion() throws Exception {
+        STSTokenValidator validator = new STSTokenValidator();
+        ReplayCache replayCache = new MemoryReplayCache();
+        String id = "_" + java.util.UUID.randomUUID();
+
+        RequestData untrustedData = createRequestData(untrustedCrypto);
+        untrustedData.setSamlOneTimeUseReplayCache(replayCache);
+        assertFalse(validator.isValidatedLocally(createCredential(true, untrustedData, id), untrustedData));
+
+        RequestData trustedData = createRequestData(trustedCrypto);
+        trustedData.setSamlOneTimeUseReplayCache(replayCache);
+        assertTrue(validator.isValidatedLocally(createCredential(true, trustedData, id), trustedData));
+
+        // The genuine Assertion is cached once it is trusted, so it can not be replayed
+        try {
+            validator.isValidatedLocally(createCredential(true, trustedData, id), trustedData);
+            fail("Expected failure on a replayed OneTimeUse Assertion");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        replayCache.close();
+    }
+
     private static RequestData createRequestData(Crypto sigVerCrypto) {
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigVerCrypto);
@@ -142,10 +177,27 @@ public class STSTokenValidatorTest {
     }
 
     private static Credential createCredential(boolean signed, RequestData data) throws Exception {
+        return createCredential(signed, data, null);
+    }
+
+    /**
+     * Create a Credential holding an Assertion, a OneTimeUse Assertion with the given ID if it is not null
+     */
+    private static Credential createCredential(boolean signed, RequestData data, String oneTimeUseId)
+        throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        if (oneTimeUseId != null) {
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            conditions.setOneTimeUse(true);
+            samlCallback.setConditions(conditions);
+        }
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
+        if (oneTimeUseId != null) {
+            assertion.getSaml2().setID(oneTimeUseId);
+        }
         if (signed) {
             assertion.signAssertion("myalias", "myAliasPassword", signingCrypto, false);
         }
