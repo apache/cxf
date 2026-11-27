@@ -96,11 +96,15 @@ public class W3CNamespaceContext implements NamespaceContext {
 
                 String val = a.getValue();
                 if (val != null && val.equals(uri)) {
-                    String name = a.getLocalName();
+                    // only namespace declarations bind a prefix
+                    String name = a.getName();
                     if ("xmlns".equals(name)) {
                         return "";
                     }
-                    return name;
+                    if (name.startsWith("xmlns:")) {
+                        return name.substring(6);
+                    }
+                    // any other attribute is not a namespace declaration: keep looking
                 }
             }
         }
