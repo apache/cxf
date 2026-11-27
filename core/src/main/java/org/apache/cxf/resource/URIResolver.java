@@ -522,6 +522,9 @@ public class URIResolver implements AutoCloseable {
     /**
      * Returns the first scheme of a reference that is not allowed, as for
      * {@link #isAllowedReference(String, String)}, or null if all of its schemes are allowed.
+     * The base URI is only used when the reference is relative, as an absolute reference resolves to itself
+     * whatever the base URI is (RFC 3986, section 5.2). A nested archive is written in the reference itself,
+     * e.g. jar:http://host/a.jar!/a.xsd, and then both "jar" and "http" are checked.
      */
     public static String getDisallowedScheme(String href, String base) {
         if (href == null) {
@@ -549,8 +552,8 @@ public class URIResolver implements AutoCloseable {
         return null;
     }
 
-    private static String getScheme(String reference) {
-        Matcher matcher = URL_SCHEME.matcher(reference);
+    private static String getScheme(String href) {
+        Matcher matcher = URL_SCHEME.matcher(href);
         return matcher.find() ? matcher.group(1).toLowerCase(Locale.ROOT) : null;
     }
 

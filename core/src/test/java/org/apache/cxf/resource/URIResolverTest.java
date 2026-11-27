@@ -421,6 +421,12 @@ public class URIResolverTest {
             URIResolver.isAllowedReference("ftp://localhost/a b.xsd", null));
         assertFalse(URIResolver.isAllowedReference(null, null));
 
+        // The base URI is only used for a relative reference
+        assertNull("Absolute reference is not checked against its base",
+            URIResolver.getDisallowedScheme("http://localhost/a.jar!/a.xsd", "jar:ftp://localhost/b.jar!/b.xsd"));
+        assertEquals("Relative reference is checked against its base", "ftp",
+            URIResolver.getDisallowedScheme("a.xsd", "jar:ftp://localhost/b.jar!/b.xsd"));
+
         String property = "org.apache.cxf.resource.uriresolver.allowedSchemes";
         String oldValue = System.getProperty(property);
         System.setProperty(property, "ftp");
