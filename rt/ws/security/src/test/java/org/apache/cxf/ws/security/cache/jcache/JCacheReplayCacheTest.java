@@ -107,13 +107,15 @@ public class JCacheReplayCacheTest {
             assertEquals(longExpiry, cache.get("long").getExpiry());
             assertEquals(clock.instant().plusSeconds(3600), cache.get("past").getExpiry());
             assertEquals(cache.get("past").getExpiry(), cache.get("now").getExpiry());
-            assertEquals(cache.get("past").getExpiry(), cache.get("too-long").getExpiry());
+            // beyond the max TTL: held for the max TTL, as with EHCacheExpiry
+            assertEquals(clock.instant().plusSeconds(43200), cache.get("too-long").getExpiry());
             clock.advance(3601);
             assertTrue(cache.contains("long"));
             assertFalse(cache.contains("default"));
             assertFalse(cache.contains("past"));
             clock.advance(3600);
             assertFalse(cache.contains("long"));
+            assertTrue(cache.contains("too-long"));
         } finally {
             cache.close();
         }
