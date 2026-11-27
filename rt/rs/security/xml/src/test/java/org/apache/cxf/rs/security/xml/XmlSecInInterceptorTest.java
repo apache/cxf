@@ -30,8 +30,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.WebApplicationException;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.ws.rs.WebApplicationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
