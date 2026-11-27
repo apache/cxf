@@ -217,7 +217,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             }
         }
         StringBuffer buffer = stringWriter.getBuffer();
-        if (buffer.length() > limit) {
+        if (limit != -1 && buffer.length() > limit) {
             builder.append(buffer.subSequence(0, limit));
         } else {
             builder.append(buffer);
