@@ -210,6 +210,56 @@ public class URIResolverTest {
     }
 
     @Test
+    public void testArchiveWithDisallowedInnerSchemeRejected() throws Exception {
+        try {
+            new URIResolver("jar:ftp://127.0.0.1:12345/example.jar!/example.wsdl");
+            fail("Expected IOException for an archive at a disallowed ftp:// location");
+        } catch (java.io.IOException ex) {
+            assertTrue(ex.getMessage().contains("ftp"));
+            assertTrue(ex.getMessage().contains("not permitted"));
+        }
+    }
+
+    @Test
+    public void testCheckAllowedSchemeChecksArchiveLocation() throws Exception {
+        URIResolver.checkAllowedScheme(new URL("jar:file:/tmp/a.jar!/a.xsd"));
+        URIResolver.checkAllowedScheme(new URL("jar:http://localhost/a.jar!/a.xsd"));
+        try {
+            URIResolver.checkAllowedScheme(new URL("jar:ftp://localhost/a.jar!/a.xsd"));
+            fail("Expected IOException for an archive at a disallowed ftp:// location");
+        } catch (java.io.IOException ex) {
+            assertTrue(ex.getMessage().contains("'ftp'"));
+        }
+    }
+
+    @Test
+    public void testLocalArchiveContainerSchemesAllowedByDefault() throws Exception {
+        // Spring Boot 3.2+ fat jars
+        String nested = "jar:nested:/app.jar/!BOOT-INF/lib/x.jar!/wsdl/a.xsd";
+        // Tomcat with unpackWARs="false"
+        String war = "jar:war:file:/app.war*/WEB-INF/lib/x.jar!/wsdl/a.xsd";
+
+        // no nested: or war: handler is registered here, so supply one to build the URLs
+        URLStreamHandler handler = new URLStreamHandler() {
+            @Override
+            protected URLConnection openConnection(URL u) throws IOException {
+                throw new IOException("not supported");
+            }
+        };
+        URIResolver.checkAllowedScheme(new URL(null, nested, handler));
+        URIResolver.checkAllowedScheme(new URL(null, war, handler));
+
+        assertTrue(URIResolver.isAllowedReference(nested, null));
+        assertTrue(URIResolver.isAllowedReference(war, null));
+        assertTrue("Relative reference against a nested jar",
+            URIResolver.isAllowedReference("b.xsd", nested));
+
+        assertTrue(URIResolver.isLocalReference(nested, null));
+        assertTrue(URIResolver.isLocalReference(war, null));
+        assertTrue("Relative reference against a nested jar", URIResolver.isLocalReference("b.xsd", nested));
+    }
+
+    @Test
     public void testBundleResourceProtocolAllowedByDefault() throws Exception {
         assertTrue(URIResolver.getAllowedSchemes().contains("bundleresource"));
         // no bundleresource handler is registered outside OSGi, so supply one to build the URL
@@ -372,5 +422,50 @@ public class URIResolverTest {
             URIResolver.isLocalReference("jar:jar:http://localhost/a.jar!/b.jar!/a.xsl", null));
         assertFalse("Invalid URI", URIResolver.isLocalReference("file:/tmp/a b.xsl", null));
         assertFalse(URIResolver.isLocalReference(null, null));
+    }
+
+    @Test
+    public void testIsAllowedReference() {
+        // Default allowed schemes, including network schemes
+        assertTrue(URIResolver.isAllowedReference("http://localhost/a.xsd", null));
+        assertTrue(URIResolver.isAllowedReference("HTTPS://localhost/a.xsd", null));
+        assertTrue(URIResolver.isAllowedReference("file:/tmp/a b.xsd", null));
+        assertTrue(URIResolver.isAllowedReference("jar:http://localhost/a.jar!/a.xsd", null));
+        assertTrue("Relative reference against an allowed base",
+            URIResolver.isAllowedReference("b.xsd", "http://localhost/a.xsd"));
+        assertTrue("Relative reference without a base", URIResolver.isAllowedReference("b.xsd", null));
+        assertTrue("Windows path", URIResolver.isAllowedReference("C:\\schemas\\a.xsd", null));
+
+        assertFalse(URIResolver.isAllowedReference("ftp://localhost/a.xsd", null));
+        assertFalse(URIResolver.isAllowedReference("gopher://localhost/a.xsd", null));
+        assertFalse("Relative reference against a disallowed base",
+            URIResolver.isAllowedReference("b.xsd", "ftp://localhost/a.xsd"));
+        assertFalse("Archive at a disallowed location",
+            URIResolver.isAllowedReference("jar:ftp://localhost/a.jar!/a.xsd", null));
+        assertFalse("Nested archive at a disallowed location",
+            URIResolver.isAllowedReference("jar:jar:ftp://localhost/a.jar!/b.jar!/a.xsd", null));
+        assertFalse("Disallowed scheme in a reference that is not a valid URI",
+            URIResolver.isAllowedReference("ftp://localhost/a b.xsd", null));
+        assertFalse(URIResolver.isAllowedReference(null, null));
+
+        // The base URI is only used for a relative reference
+        assertNull("Absolute reference is not checked against its base",
+            URIResolver.getDisallowedScheme("http://localhost/a.jar!/a.xsd", "jar:ftp://localhost/b.jar!/b.xsd"));
+        assertEquals("Relative reference is checked against its base", "ftp",
+            URIResolver.getDisallowedScheme("a.xsd", "jar:ftp://localhost/b.jar!/b.xsd"));
+
+        String property = "org.apache.cxf.resource.uriresolver.allowedSchemes";
+        String oldValue = System.getProperty(property);
+        System.setProperty(property, "ftp");
+        try {
+            assertTrue("Configured allowed scheme", URIResolver.isAllowedReference("ftp://localhost/a.xsd", null));
+            assertTrue(URIResolver.isAllowedReference("jar:ftp://localhost/a.jar!/a.xsd", null));
+        } finally {
+            if (oldValue == null) {
+                System.clearProperty(property);
+            } else {
+                System.setProperty(property, oldValue);
+            }
+        }
     }
 }

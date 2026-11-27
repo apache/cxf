@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.common.CXFPermissions;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -65,14 +67,18 @@ public class URIResolver implements AutoCloseable {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
     private static final String ALLOWED_URL_SCHEMES_PROPERTY =
         "org.apache.cxf.resource.uriresolver.allowedSchemes";
+    // "nested" (Spring Boot 3.2+ fat jars) and "war" (Tomcat with unpackWARs="false") are the locations of
+    // archives inside local archives, e.g. jar:nested:/app.jar/!BOOT-INF/lib/x.jar!/a.xsd
     private static final Set<String> DEFAULT_ALLOWED_URL_SCHEMES =
         Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
-                    "resource", "bundleresource")));
+                    "resource", "bundleresource", "nested", "war")));
     private static final Set<String> NETWORK_URL_SCHEMES =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList("http", "https", "ftp")));
     private static final Set<String> ARCHIVE_URL_SCHEMES =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList("jar", "wsjar", "zip")));
+    // An RFC 3986 scheme of at least two characters, so that a Windows drive letter is not taken for one
+    private static final Pattern URL_SCHEME = Pattern.compile("^([a-zA-Z][a-zA-Z0-9+.-]+):");
     private static final Set<String> ADDITIONAL_LOCAL_URL_SCHEMES =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList("bundle", "bundleresource")));
 
@@ -457,15 +463,12 @@ public class URIResolver implements AutoCloseable {
     }
 
     /**
-     * Verifies that the URL scheme is permitted by URIResolver allowlist policy.
+     * Verifies that the URL scheme is permitted by URIResolver allowlist policy. For an archive URL such as
+     * jar:http://host/a.jar!/a.xsd, the archive location's scheme must also be permitted.
      */
     public static void checkAllowedScheme(URL targetUrl) throws IOException {
-        String scheme = targetUrl.getProtocol();
-        if (scheme == null) {
-            return;
-        }
-        scheme = scheme.toLowerCase(Locale.ROOT);
-        if (!getAllowedSchemes().contains(scheme)) {
+        String scheme = getDisallowedScheme(targetUrl.toString(), null);
+        if (scheme != null) {
             throw new IOException("URL scheme '" + scheme + "' is not permitted for URIResolver. "
                                   + "Allowed schemes: " + getAllowedSchemes());
         }
@@ -506,6 +509,54 @@ public class URIResolver implements AutoCloseable {
         } catch (URISyntaxException ex) {
             return false;
         }
+    }
+
+    /**
+     * Returns whether a reference may be fetched under the allowed schemes (see {@link #getAllowedSchemes()}).
+     * A relative reference is checked against the base URI, or is allowed if there is no base URI. For an
+     * archive URL such as jar:http://host/a.jar!/a.xsd, the archive location's scheme must also be allowed.
+     * Unlike {@link #checkAllowedScheme(URL)}, this does not need the reference to parse as a URL or URI.
+     */
+    public static boolean isAllowedReference(String href, String base) {
+        return href != null && getDisallowedScheme(href, base) == null;
+    }
+
+    /**
+     * Returns the first scheme of a reference that is not allowed, as for
+     * {@link #isAllowedReference(String, String)}, or null if all of its schemes are allowed.
+     * The base URI is only used when the reference is relative, as an absolute reference resolves to itself
+     * whatever the base URI is (RFC 3986, section 5.2). A nested archive is written in the reference itself,
+     * e.g. jar:http://host/a.jar!/a.xsd, and then both "jar" and "http" are checked.
+     */
+    public static String getDisallowedScheme(String href, String base) {
+        if (href == null) {
+            return null;
+        }
+        String target = href.trim();
+        if (getScheme(target) == null) {
+            if (base == null) {
+                return null;
+            }
+            target = base.trim();
+        }
+        Set<String> allowed = getAllowedSchemes();
+        String scheme = getScheme(target);
+        while (scheme != null) {
+            if (!allowed.contains(scheme)) {
+                return scheme;
+            }
+            if (!ARCHIVE_URL_SCHEMES.contains(scheme)) {
+                break;
+            }
+            target = target.substring(scheme.length() + 1);
+            scheme = getScheme(target);
+        }
+        return null;
+    }
+
+    private static String getScheme(String href) {
+        Matcher matcher = URL_SCHEME.matcher(href);
+        return matcher.find() ? matcher.group(1).toLowerCase(Locale.ROOT) : null;
     }
 
     private static String getInnermostScheme(URI uri) throws URISyntaxException {
