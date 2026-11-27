@@ -84,7 +84,9 @@ public final class FileUtils {
                 defaultTempDir = f;
             }
         }
-        if (defaultTempDir == null) {
+        // also create a new directory if ours was removed, e.g. by a tmp cleaner, while the JVM was running.
+        // A fresh random directory is used rather than recreating the old, predictable path in a shared tmpdir
+        if (defaultTempDir == null || !exists(defaultTempDir)) {
             defaultTempDir = createTmpDir(false);
             if (shutdownHook != null) {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
