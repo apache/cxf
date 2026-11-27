@@ -67,10 +67,12 @@ public class URIResolver implements AutoCloseable {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
     private static final String ALLOWED_URL_SCHEMES_PROPERTY =
         "org.apache.cxf.resource.uriresolver.allowedSchemes";
+    // "nested" (Spring Boot 3.2+ fat jars) and "war" (Tomcat with unpackWARs="false") are the locations of
+    // archives inside local archives, e.g. jar:nested:/app.jar/!BOOT-INF/lib/x.jar!/a.xsd
     private static final Set<String> DEFAULT_ALLOWED_URL_SCHEMES =
         Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("file", "http", "https", "jar", "zip", "wsjar", "local", "classpath", "vfs",
-                    "resource", "bundleresource")));
+                    "resource", "bundleresource", "nested", "war")));
     private static final Set<String> NETWORK_URL_SCHEMES =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList("http", "https", "ftp")));
     private static final Set<String> ARCHIVE_URL_SCHEMES =

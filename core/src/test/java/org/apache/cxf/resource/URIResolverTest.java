@@ -233,6 +233,33 @@ public class URIResolverTest {
     }
 
     @Test
+    public void testLocalArchiveContainerSchemesAllowedByDefault() throws Exception {
+        // Spring Boot 3.2+ fat jars
+        String nested = "jar:nested:/app.jar/!BOOT-INF/lib/x.jar!/wsdl/a.xsd";
+        // Tomcat with unpackWARs="false"
+        String war = "jar:war:file:/app.war*/WEB-INF/lib/x.jar!/wsdl/a.xsd";
+
+        // no nested: or war: handler is registered here, so supply one to build the URLs
+        URLStreamHandler handler = new URLStreamHandler() {
+            @Override
+            protected URLConnection openConnection(URL u) throws IOException {
+                throw new IOException("not supported");
+            }
+        };
+        URIResolver.checkAllowedScheme(new URL(null, nested, handler));
+        URIResolver.checkAllowedScheme(new URL(null, war, handler));
+
+        assertTrue(URIResolver.isAllowedReference(nested, null));
+        assertTrue(URIResolver.isAllowedReference(war, null));
+        assertTrue("Relative reference against a nested jar",
+            URIResolver.isAllowedReference("b.xsd", nested));
+
+        assertTrue(URIResolver.isLocalReference(nested, null));
+        assertTrue(URIResolver.isLocalReference(war, null));
+        assertTrue("Relative reference against a nested jar", URIResolver.isLocalReference("b.xsd", nested));
+    }
+
+    @Test
     public void testBundleResourceProtocolAllowedByDefault() throws Exception {
         assertTrue(URIResolver.getAllowedSchemes().contains("bundleresource"));
         // no bundleresource handler is registered outside OSGi, so supply one to build the URL
